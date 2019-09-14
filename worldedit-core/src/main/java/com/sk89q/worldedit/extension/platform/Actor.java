@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.entity.Metadatable;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.util.Identifiable;
@@ -30,7 +31,7 @@ import java.io.File;
 /**
  * An object that can perform actions in WorldEdit.
  */
-public interface Actor extends Identifiable, SessionOwner, Subject {
+public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable {
 
     /**
      * Get the name of the actor.
@@ -119,5 +120,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject {
      * @param event the event
      */
     void dispatchCUIEvent(CUIEvent event);
+
+    boolean runAction(Runnable ifFree, boolean checkFree, boolean async);
 
 }

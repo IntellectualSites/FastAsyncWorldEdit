@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -69,6 +70,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
+        super();
         this.plugin = plugin;
         this.player = player;
     }
@@ -351,5 +353,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 }
             }
         }
+    }
+
+    @Override
+    public void sendTitle(String title, String sub) {
+        player.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
     }
 }

@@ -3,9 +3,8 @@ package com.boydti.fawe.bukkit.listener;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.BrushSettings;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -13,11 +12,19 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Rotation;
@@ -42,13 +49,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 public class BukkitImageListener implements Listener {
 
     private Location mutable = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
@@ -63,7 +63,7 @@ public class BukkitImageListener implements Listener {
         Iterator<Player> iter = recipients.iterator();
         while (iter.hasNext()) {
             Player player = iter.next();
-            FawePlayer<Object> fp = FawePlayer.wrap(player);
+            BukkitPlayer fp = BukkitAdapter.adapt(player);
             CFICommands.CFISettings settings = fp.getMeta("CFISettings");
             if (player.equals(event.getPlayer()) || !fp.hasMeta() || settings == null || !settings.hasGenerator()) {
                 continue;
@@ -106,7 +106,7 @@ public class BukkitImageListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
+        BukkitPlayer fp = BukkitAdapter.adapt(player);
         if (fp.getMeta("CFISettings") == null) {
             return;
         }
@@ -189,7 +189,7 @@ public class BukkitImageListener implements Listener {
         }
         ItemFrame itemFrame = (ItemFrame) entity;
 
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
+        BukkitPlayer fp = BukkitAdapter.adapt(player);
         CFICommands.CFISettings settings = fp.getMeta("CFISettings");
         HeightMapMCAGenerator generator = settings == null ? null : settings.getGenerator();
         BukkitImageViewer viewer = get(generator);
@@ -204,7 +204,7 @@ public class BukkitImageListener implements Listener {
         LocalSession session = fp.getSession();
         BrushTool tool;
         try {
-            tool = session.getBrushTool(fp.getPlayer(), false);
+            tool = session.getBrushTool(fp, false);
         } catch (InvalidToolBindException e) {
             return;
         }

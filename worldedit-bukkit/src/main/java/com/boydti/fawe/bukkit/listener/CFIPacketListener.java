@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.comphenix.protocol.PacketType;
@@ -16,28 +15,19 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.List;
-
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import java.lang.reflect.InvocationTargetException;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -243,7 +233,7 @@ public class CFIPacketListener implements Listener {
 
     private boolean sendBlockChange(Player plr, VirtualWorld gen, BlockVector3 pt, Interaction action) {
         PlatformManager platform = WorldEdit.getInstance().getPlatformManager();
-        com.sk89q.worldedit.entity.Player actor = FawePlayer.wrap(plr).getPlayer();
+        com.sk89q.worldedit.entity.Player actor = BukkitAdapter.adapt(plr);
         com.sk89q.worldedit.util.Location location = new com.sk89q.worldedit.util.Location(actor.getWorld(), pt.toVector3());
         BlockInteractEvent toCall = new BlockInteractEvent(actor, location, action);
         platform.handleBlockInteract(toCall);
@@ -265,10 +255,10 @@ public class CFIPacketListener implements Listener {
     }
 
     private VirtualWorld getGenerator(Player player) {
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
-        VirtualWorld vw = fp.getSession().getVirtualWorld();
+        BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
+        VirtualWorld vw = bukkitPlayer.getSession().getVirtualWorld();
         if (vw != null) return vw;
-        CFICommands.CFISettings settings = fp.getMeta("CFISettings");
+        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
         if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
             return settings.getGenerator();
         }

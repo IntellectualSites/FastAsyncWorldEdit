@@ -27,7 +27,6 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
@@ -116,7 +115,7 @@ public class ClipboardCommands {
         desc = "Copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.copy")
-    public void copy(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
+    public void copy(Player player, LocalSession session, EditSession editSession,
                      @Selection Region region,
                      @Switch(name = 'e', desc = "Skip copy entities")
                          boolean skipEntities,
@@ -129,11 +128,11 @@ public class ClipboardCommands {
 
         long volume =
             ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
+        FaweLimit limit = player.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweException.MAX_CHECKS;
         }
-        fp.checkConfirmationRegion(() -> {
+        player.checkConfirmationRegion(() -> {
             session.setClipboard(null);
 
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
@@ -178,7 +177,7 @@ public class ClipboardCommands {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
+        FaweLimit limit = player.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
         }
@@ -210,7 +209,7 @@ public class ClipboardCommands {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
+        FaweLimit limit = player.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweException.MAX_CHECKS;
         }
@@ -234,7 +233,7 @@ public class ClipboardCommands {
     )
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
-    public void cut(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
+    public void cut(Player player, LocalSession session, EditSession editSession,
                     @Selection Region region,
                     @Arg(desc = "Pattern to leave in place of the selection", def = "air")
                         Pattern leavePattern,
@@ -249,14 +248,14 @@ public class ClipboardCommands {
         BlockVector3 max = region.getMaximumPoint();
 
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
+        FaweLimit limit = player.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweException.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
             throw FaweException.MAX_CHANGES;
         }
-        fp.checkConfirmationRegion(() -> {
+        player.checkConfirmationRegion(() -> {
             session.setClipboard(null);
 
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());

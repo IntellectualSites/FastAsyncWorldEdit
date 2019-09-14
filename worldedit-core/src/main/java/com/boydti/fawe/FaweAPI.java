@@ -3,7 +3,6 @@ package com.boydti.fawe;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
@@ -16,16 +15,12 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -37,8 +32,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -48,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -150,21 +144,6 @@ public class FaweAPI {
     }
 
     /**
-     * Wrap some object into a FawePlayer<br>
-     * - org.bukkit.entity.Player
-     * - org.spongepowered.api.entity.living.player
-     * - com.sk89q.worldedit.entity.Player
-     * - String (name)
-     * - UUID (player UUID)
-     *
-     * @param obj
-     * @return
-     */
-    public static FawePlayer wrapPlayer(Object obj) {
-        return FawePlayer.wrap(obj);
-    }
-
-    /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
@@ -241,7 +220,7 @@ public class FaweAPI {
      * @param player
      * @return
      */
-    public static Region[] getRegions(FawePlayer player) {
+    public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
     }
 
@@ -395,7 +374,7 @@ public class FaweAPI {
      * @param uuid
      * @param index
      * @return
-     * @see DiskStorageHistory#toEditSession(FawePlayer)
+     * @see DiskStorageHistory#toEditSession(Player)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);

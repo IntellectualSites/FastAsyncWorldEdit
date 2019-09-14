@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.bukkit.filter.GriefPreventionFilter;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -26,8 +25,8 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player fp, MaskType type) {
+        final Player player = BukkitAdapter.adapt(fp);
         final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(BukkitAdapter.adapt(fp.getLocation()), true, null);
         if (claim != null) {
             if (isAllowed(player, claim, type)) {
@@ -37,7 +36,7 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
                 return new FaweMask(pos1, pos2) {
 
                     @Override
-                    public boolean isValid(FawePlayer fp, MaskType type) {
+                    public boolean isValid(com.sk89q.worldedit.entity.Player fp, MaskType type) {
                         return isAllowed(player, claim, type);
                     }
                 };

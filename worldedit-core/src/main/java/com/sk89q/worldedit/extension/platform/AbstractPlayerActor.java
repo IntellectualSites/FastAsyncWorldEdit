@@ -19,18 +19,36 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
+import com.boydti.fawe.regions.FaweMaskManager;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CylinderRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -49,7 +67,12 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.io.File;
+import java.text.NumberFormat;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -58,6 +81,34 @@ import javax.annotation.Nullable;
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
+    private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
+
+    // Queue for async tasks
+    private AtomicInteger runningCount = new AtomicInteger();
+    private SimpleAsyncNotifyQueue asyncNotifyQueue = new SimpleAsyncNotifyQueue(
+        (thread, throwable) -> {
+            while (throwable.getCause() != null) {
+                throwable = throwable.getCause();
+            }
+            if (throwable instanceof WorldEditException) {
+                printError(throwable.getLocalizedMessage());
+            } else {
+                FaweException fe = FaweException.get(throwable);
+                if (fe != null) {
+                    printError(fe.getMessage());
+                } else {
+                    throwable.printStackTrace();
+                }
+            }
+        });
+
+    public AbstractPlayerActor() {
+        Fawe.get().register(this);
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            loadClipboardFromDisk();
+        }
+
+    }
     @Override
     public final Extent getExtent() {
         return getWorld();
@@ -601,4 +652,207 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
     }
+
+    /**
+     * Set some session only metadata for the player
+     *
+     * @param key
+     * @param value
+     * @return previous value
+     */
+    public final void setMeta(String key, Object value) {
+        this.meta.put(key, value);
+    }
+
+    public final <T> T getAndSetMeta(String key, T value) {
+        return (T) this.meta.put(key, value);
+    }
+
+    public final boolean hasMeta() {
+        return !meta.isEmpty();
+    }
+
+    /**
+     * Get the metadata for a key.
+     *
+     * @param <V>
+     * @param key
+     * @return
+     */
+    public final <V> V getMeta(String key) {
+        return (V) this.meta.get(key);
+    }
+
+
+    /**
+     * Delete the metadata for a key.
+     * - metadata is session only
+     * - deleting other plugin's metadata may cause issues
+     *
+     * @param key
+     */
+    public final <V> V deleteMeta(String key) {
+        return (V) this.meta.remove(key);
+    }
+
+    /**
+     * Run a task either async, or on the current thread
+     *
+     * @param ifFree
+     * @param checkFree Whether to first check if a task is running
+     * @param async
+     * @return false if the task was ran or queued
+     */
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
+        if (checkFree) {
+            if (runningCount.get() != 0) {
+                return false;
+            }
+        }
+        Runnable wrapped = () -> {
+            try {
+                runningCount.addAndGet(1);
+                ifFree.run();
+            } finally {
+                runningCount.decrementAndGet();
+            }
+        };
+        if (async) {
+            asyncNotifyQueue.queue(wrapped);
+        } else {
+            TaskManager.IMP.taskNow(wrapped, false);
+        }
+        return true;
+    }
+
+    public void checkConfirmationStack(@NotNull Runnable task, @NotNull String command,
+        Region region, int times, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
+            if (region != null) {
+                BlockVector3 min = region.getMinimumPoint();
+                BlockVector3 max = region.getMaximumPoint();
+                long area =
+                    (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
+                if (area > 2 << 18) {
+                    setConfirmTask(task, context, command);
+                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
+                    long volume = (long) base.getX() * base.getZ() * base.getY() * times;
+                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
+                        .format(min, max, command,
+                            NumberFormat.getNumberInstance().format(volume)));
+                }
+            }
+        }
+        task.run();
+    }
+
+    public void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command,
+        Region region, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
+            if (region != null) {
+                BlockVector3 min = region.getMinimumPoint();
+                BlockVector3 max = region.getMaximumPoint();
+                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
+                if (area > 2 << 18) {
+                    setConfirmTask(task, context, command);
+                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
+                    long volume = (long) base.getX() * base.getZ() * base.getY();
+                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
+                        .format(min, max, command,
+                            NumberFormat.getNumberInstance().format(volume)));
+                }
+            }
+        }
+        task.run();
+    }
+
+    public void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context,
+        @NotNull String command) {
+        CommandEvent event = new CommandEvent(this, command);
+        Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
+            task.run();
+            return null;
+        }, context, getSession(), event);
+        setMeta("cmdConfirm", newTask);
+    }
+
+    /**
+     * Get the player's current allowed WorldEdit regions
+     *
+     * @return an array of allowed regions
+     */
+    @Deprecated
+    public Region[] getCurrentRegions() {
+        return WEManager.IMP.getMask(this);
+    }
+
+    @Deprecated
+    public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type);
+    }
+
+    /**
+     * Get the largest region in the player's allowed WorldEdit region
+     *
+     * @return
+     */
+    public Region getLargestRegion() {
+        int area = 0;
+        Region max = null;
+        for (Region region : this.getCurrentRegions()) {
+            final int tmp = region.getArea();
+            if (tmp > area) {
+                area = tmp;
+                max = region;
+            }
+        }
+        return max;
+    }
+
+    public void setSelection(Region region) {
+        RegionSelector selector;
+        if (region instanceof ConvexPolyhedralRegion) {
+            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
+        } else if (region instanceof CylinderRegion) {
+            selector = new CylinderRegionSelector((CylinderRegion) region);
+        } else if (region instanceof Polygonal2DRegion) {
+            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
+        } else {
+            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
+                region.getMaximumPoint());
+        }
+        selector.setWorld(region.getWorld());
+
+        getSession().setRegionSelector(getWorld(), selector);
+    }
+
+    public void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times,
+        int limit, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
+            if (times > limit) {
+                setConfirmTask(task, context, command);
+                String volume = "<unspecified>";
+                throw new RegionOperationException(
+                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
+            }
+        }
+        task.run();
+    }
+
+    public synchronized boolean confirm() {
+        Runnable confirm = deleteMeta("cmdConfirm");
+        if (confirm == null) {
+            return false;
+        }
+        queueAction(() -> {
+            setMeta("cmdConfirmRunning", true);
+            try {
+                confirm.run();
+            } finally {
+                setMeta("cmdConfirmRunning", false);
+            }
+        });
+        return true;
+    }
+
 }

@@ -6,25 +6,40 @@ import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
+import com.boydti.fawe.bukkit.listener.ChunkListener_8;
+import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.*;
+import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
+import com.boydti.fawe.bukkit.regions.FactionsFeature;
+import com.boydti.fawe.bukkit.regions.FactionsOneFeature;
+import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
+import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
+import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
+import com.boydti.fawe.bukkit.regions.PreciousStonesFeature;
+import com.boydti.fawe.bukkit.regions.ResidenceFeature;
+import com.boydti.fawe.bukkit.regions.TownyFeature;
+import com.boydti.fawe.bukkit.regions.Worldguard;
+import com.boydti.fawe.bukkit.regions.WorldguardFlag;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
-import com.boydti.fawe.bukkit.listener.ChunkListener_8;
-import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
-
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
-import org.bstats.bukkit.MetricsLite;
+import io.papermc.lib.PaperLib;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Supplier;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
@@ -37,14 +52,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 public class FaweBukkit implements IFawe, Listener {
 
@@ -74,14 +81,7 @@ public class FaweBukkit implements IFawe, Listener {
                 e.printStackTrace();
                 debug("===================================");
             }
-            if (Bukkit.getVersion().contains("git-Spigot")) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug("==============================");
-            }
-            if (Bukkit.getVersion().contains("git-Paper") && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -122,7 +122,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public synchronized ImageViewer getImageViewer(FawePlayer fp) {
+    public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player fp) {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
@@ -143,7 +143,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(fp.toWorldEditPlayer()));
+            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(fp));
             if (imageListener == null) {
                 this.imageListener = new BukkitImageListener(plugin);
             }
@@ -195,34 +195,21 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public FawePlayer<Player> wrap(final Object obj) {
+    public com.sk89q.worldedit.entity.Player wrap(final Object obj) {
         if (obj.getClass() == String.class) {
             String name = (String) obj;
-            FawePlayer existing = Fawe.get().getCachedPlayer(name);
+            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(name);
             if (existing != null) {
                 return existing;
             }
             Player player = Bukkit.getPlayer(name);
-            return player != null ? new BukkitPlayer(player) : null;
-        } else if (obj instanceof Player) {
-            Player player = (Player) obj;
-            FawePlayer existing = Fawe.get().getCachedPlayer(player.getName());
-            return existing != null ? existing : new BukkitPlayer(player);
-        } else if (obj.getClass().getName().contains("EntityPlayer")) {
-            try {
-                Method method = obj.getClass().getDeclaredMethod("getBukkitEntity");
-                return wrap(method.invoke(obj));
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return null;
-            }
-        } else {
-            return null;
+            return player != null ? BukkitAdapter.adapt(player) : null;
         }
+        return null;
     }
 
     @Override public void startMetrics() {
-        new MetricsLite(plugin);
+        new Metrics(plugin);
     }
 
     public ItemUtil getItemUtil() {
@@ -347,7 +334,7 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin preciousStonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
         if (preciousStonesPlugin != null && preciousStonesPlugin.isEnabled()) {
             try {
-                managers.add(new PreciousStonesFeature(preciousStonesPlugin, this));
+                managers.add(new PreciousStonesFeature(preciousStonesPlugin));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -399,9 +386,9 @@ public class FaweBukkit implements IFawe, Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
-        FawePlayer fp = Fawe.get().getCachedPlayer(name);
-        if (fp != null) {
-            fp.unregister();
+        com.sk89q.worldedit.entity.Player wePlayer = Fawe.get().getCachedPlayer(name);
+        if (wePlayer != null) {
+            wePlayer.unregister();
             Fawe.get().unregister(name);
         }
     }

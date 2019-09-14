@@ -109,7 +109,7 @@ public class BiomeCommands {
         descFooter = "By default, uses all blocks in your selection."
     )
     @CommandPermissions("worldedit.biome.info")
-    public void biomeInfo(Player player, LocalSession session, EditSession editSession,
+    public void biomeInfo(Player player, LocalSession session,
                           @Switch(name = 't', desc = "Use the block you are looking at.")
                               boolean useLineOfSight,
                           @Switch(name = 'p', desc = "Use the block you are currently in.")

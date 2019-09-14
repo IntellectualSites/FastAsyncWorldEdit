@@ -1,28 +1,18 @@
 package com.boydti.fawe.object.brush.visualization;
 
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.util.MathMan;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockID;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
 import javax.annotation.Nullable;
-import java.util.concurrent.Future;
 
 public class VisualExtent extends AbstractDelegateExtent {
     public static final BlockType VISUALIZE_BLOCK_DEFAULT = BlockTypes.BLACK_STAINED_GLASS;

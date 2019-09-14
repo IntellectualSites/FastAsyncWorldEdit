@@ -22,12 +22,9 @@ package com.sk89q.worldedit.extension.platform;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -73,7 +70,7 @@ public class PlatformManager {
 
     private final WorldEdit worldEdit;
 
-    private PlatformCommandManager platformCommandManager;
+    private final PlatformCommandManager platformCommandManager;
 
     private final List<Platform> platforms = new ArrayList<>();
     private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
@@ -89,6 +86,7 @@ public class PlatformManager {
     public PlatformManager(WorldEdit worldEdit) {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
+        this.platformCommandManager = new PlatformCommandManager(worldEdit, this);
 
         // Register this instance for events
         worldEdit.getEventBus().register(this);
@@ -119,9 +117,6 @@ public class PlatformManager {
             firstSeenVersion = platform.getVersion();
         }
 
-        if (this.platformCommandManager == null) {
-            this.platformCommandManager = new PlatformCommandManager(worldEdit, this);
-        }
     }
 
     /**
@@ -265,8 +260,17 @@ public class PlatformManager {
 
         if (base instanceof Player) {
             Player player = (Player) base;
-            FawePlayer fp = FawePlayer.wrap(player);
-            return (T) fp.createProxy();
+            Player permActor = queryCapability(Capability.PERMISSIONS).matchPlayer(player);
+            if (permActor == null) {
+                permActor = player;
+            }
+
+            Player cuiActor = queryCapability(Capability.WORLDEDIT_CUI).matchPlayer(player);
+            if (cuiActor == null) {
+                cuiActor = player;
+            }
+
+            return (T) new PlayerProxy(player, permActor, cuiActor, getWorldForEditing(player.getWorld()));
         } else {
             return base;
         }
@@ -341,9 +345,7 @@ public class PlatformManager {
                 if (session.hasSuperPickAxe()) {
                         final BlockTool superPickaxe = session.getSuperPickaxe();
                         if (superPickaxe != null && superPickaxe.canUse(player) && player.isHoldingPickAxe()) {
-                            FawePlayer<?> fp = FawePlayer.wrap(player);
-                            final Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
-                            fp.runAction(() -> reset(superPickaxe).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location), false, true);
+                            player.runAction(() -> reset(superPickaxe).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location), false, true);
                             event.setCancelled(true);
                             return;
                         }
@@ -351,9 +353,7 @@ public class PlatformManager {
 
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
-                        FawePlayer<?> fp = FawePlayer.wrap(player);
-                        final Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
-                        fp.runAction(() -> reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location), false, true);
+                        player.runAction(() -> reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location), false, true);
                         event.setCancelled(true);
                     }
                     break;
@@ -362,14 +362,12 @@ public class PlatformManager {
                 case OPEN: {
                     Tool tool = session.getTool(player);
                     if (tool instanceof BlockTool && tool.canUse(player)) {
-                        FawePlayer<?> fp = FawePlayer.wrap(player);
-                        if (fp.checkAction()) {
-                            final Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
-                            fp.runAction(() -> {
+                        if (player.checkAction()) {
+                            player.runAction(() -> {
                                 if (tool instanceof BrushTool) {
-                                    ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location);
+                                    ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
                                 } else {
-                                    reset((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location);
+                                    reset((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
                                 }
                             }, false, true);
                             event.setCancelled(true);
@@ -400,8 +398,7 @@ public class PlatformManager {
     public void handlePlayerInput(PlayerInputEvent event) {
         // Create a proxy actor with a potentially different world for
         // making changes to the world
-        Player actor = createProxyActor(event.getPlayer());
-        Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap(actor), actor.getLocation(), true);
+        Player player = createProxyActor(event.getPlayer());
         LocalSession session = worldEdit.getSessionManager().get(player);
 
         VirtualWorld virtual = session.getVirtualWorld();
@@ -430,8 +427,7 @@ public class PlatformManager {
                     }
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
-                        FawePlayer<?> fp = FawePlayer.wrap(player);
-                        fp.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session));
+                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session));
                         event.setCancelled(true);
                         return;
                     }
@@ -454,9 +450,8 @@ public class PlatformManager {
                     }
                     Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool && tool.canUse(player)) {
-                        FawePlayer<?> fp = FawePlayer.wrap(player);
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
-                        fp.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session), false, true);
+                        player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session), false, true);
                         event.setCancelled(true);
                         return;
                     }

@@ -1,6 +1,6 @@
 package com.boydti.fawe.regions;
 
-import com.boydti.fawe.object.FawePlayer;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.IDelegateRegion;
@@ -23,7 +23,7 @@ public class FaweMask implements IDelegateRegion {
         return region;
     }
 
-    public boolean isValid(FawePlayer player, FaweMaskManager.MaskType type) {
+    public boolean isValid(Player player, FaweMaskManager.MaskType type) {
         return false;
     }
 

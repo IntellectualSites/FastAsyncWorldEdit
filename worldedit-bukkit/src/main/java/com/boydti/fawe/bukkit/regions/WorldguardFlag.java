@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.bukkit.filter.WorldGuardFilter;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -30,8 +29,8 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(FawePlayer<Player> fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
+    public FaweMask getMask(com.sk89q.worldedit.entity.Player fp, MaskType type) {
+        final Player player = BukkitAdapter.adapt(fp);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final RegionContainer container = WorldGuard.getInstance().getPlatform()
             .getRegionContainer();
@@ -39,7 +38,7 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
 
         return new FaweMask(new ManagerRegion(manager, localplayer)) {
             @Override
-            public boolean isValid(FawePlayer player, MaskType type) {
+            public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                 // We rely on the region mask instead of this
                 return true;
             }

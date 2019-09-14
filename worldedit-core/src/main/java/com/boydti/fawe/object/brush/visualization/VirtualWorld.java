@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.visualization;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
@@ -28,7 +27,7 @@ public interface VirtualWorld extends SimpleWorld, Closeable {
     @Override
     boolean setBlock(BlockVector3 pt, BlockStateHolder block) throws WorldEditException;
 
-    FawePlayer getPlayer();
+    Player getPlayer();
 
     void update();
 

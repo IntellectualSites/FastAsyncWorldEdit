@@ -36,7 +36,7 @@ public class SurfaceSpline implements Brush {
             if (max == -1) return;
 //            pos.mutY(max);
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().sendMessage(BBC.BRUSH_SPLINE_PRIMARY_2.s());
+            editSession.getPlayer().print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!vis) return;
         }
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
@@ -90,6 +90,6 @@ public class SurfaceSpline implements Brush {
             editSession.setBlocks(newSet, pattern);
             if (!vis) path.clear();
         }
-        editSession.getPlayer().sendMessage(BBC.BRUSH_SPLINE_SECONDARY.s());
+        editSession.getPlayer().print(BBC.BRUSH_SPLINE_SECONDARY.s());
     }
 }

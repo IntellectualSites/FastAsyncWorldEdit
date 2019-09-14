@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.regions.selector;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.regions.FuzzyRegion;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
@@ -11,7 +10,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -33,7 +31,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
 
     public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
         super(new EditSessionBuilder(world)
-                .player(FawePlayer.wrap(player))
+                .player(player)
                 .changeSetNull()
                 .checkMemory(false)
                 .autoQueue(false)
@@ -53,7 +51,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     @Override
     public void setWorld(@Nullable World world) {
         EditSession extent = new EditSessionBuilder(world)
-                .player(FawePlayer.wrap(player))
+                .player(player)
                 .changeSetNull()
                 .checkMemory(false)
                 .autoQueue(true)

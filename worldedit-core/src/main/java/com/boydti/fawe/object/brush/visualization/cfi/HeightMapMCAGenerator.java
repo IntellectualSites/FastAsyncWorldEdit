@@ -3,11 +3,9 @@ package com.boydti.fawe.object.brush.visualization.cfi;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.FallbackChunkGet;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
@@ -29,6 +27,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -52,8 +51,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,6 +61,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nullable;
 
 // TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
@@ -208,7 +206,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     // Used for visualizing the world by sending chunk packets
     // These three variables should be set together
 //    private IQueueExtent packetQueue;
-    private FawePlayer player;
+    private Player player;
     private BlockVector2 chunkOffset = BlockVector2.ZERO;
     private EditSession editSession;
     // end
@@ -246,7 +244,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return player != null;
     }
 
-    public void setPacketViewer(FawePlayer player) {
+    public void setPacketViewer(Player player) {
         this.player = player;
         if (player != null) {
             Location pos = player.getLocation();
@@ -254,7 +252,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         }
     }
 
-    public FawePlayer getOwner() {
+    public Player getOwner() {
         return player;
     }
 
@@ -690,7 +688,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public FawePlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -834,8 +832,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (curES != null && isModified()) {
             try {
                 update();
-                FawePlayer esPlayer = curES.getPlayer();
-                UUID uuid = esPlayer != null ? esPlayer.getUUID() : EditSession.CONSOLE;
+                Player esPlayer = curES.getPlayer();
+                UUID uuid = esPlayer != null ? esPlayer.getUniqueId() : EditSession.CONSOLE;
                 try {
                     curES.setRawChangeSet(new CFIChangeSet(this, uuid));
                 } catch (IOException e) {

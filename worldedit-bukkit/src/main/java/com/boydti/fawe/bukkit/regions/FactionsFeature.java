@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
@@ -21,15 +20,15 @@ public class FactionsFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player p, MaskType type) {
+        final Player player = BukkitAdapter.adapt(p);
         final Location loc = player.getLocation();
         final PS ps = PS.valueOf(loc);
         final Faction fac = BoardColl.get().getFactionAt(ps);
         if (fac != null) {
             if (type == MaskType.OWNER) {
                 MPlayer leader = fac.getLeader();
-                if (leader != null && fp.getUUID().equals(leader.getUuid())) {
+                if (leader != null && p.getUniqueId().equals(leader.getUuid())) {
                     final Chunk chunk = loc.getChunk();
                     final BlockVector3 pos1 = BlockVector3.at(chunk.getX() * 16, 0, chunk.getZ() * 16);
                     final BlockVector3 pos2 = BlockVector3

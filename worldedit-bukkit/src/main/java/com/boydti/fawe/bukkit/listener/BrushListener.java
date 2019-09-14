@@ -1,10 +1,11 @@
 package com.boydti.fawe.bukkit.listener;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.MovableTool;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.scroll.ScrollTool;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.command.tool.Tool;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,9 +30,8 @@ public class BrushListener implements Listener {
         if (bukkitPlayer.isSneaking()) {
             return;
         }
-        FawePlayer<Object> fp = FawePlayer.wrap(bukkitPlayer);
-        com.sk89q.worldedit.entity.Player player = fp.getPlayer();
-        LocalSession session = fp.getSession();
+        BukkitPlayer player = BukkitAdapter.adapt(bukkitPlayer);
+        LocalSession session = player.getSession();
         Tool tool = session.getTool(player);
         if (tool instanceof ScrollTool) {
             final int slot = event.getNewSlot();
@@ -55,9 +55,8 @@ public class BrushListener implements Listener {
         Location to = event.getTo();
         if ((from.getYaw() != to.getYaw() &&  from.getPitch() != to.getPitch()) || from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() || from.getBlockY() != to.getBlockY()) {
             Player bukkitPlayer = event.getPlayer();
-            FawePlayer<Object> fp = FawePlayer.wrap(bukkitPlayer);
-            com.sk89q.worldedit.entity.Player player = fp.getPlayer();
-            LocalSession session = fp.getSession();
+            com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
+            LocalSession session = player.getSession();
             Tool tool = session.getTool(player);
             if (tool != null) {
                 if (tool instanceof MovableTool) {
@@ -74,9 +73,8 @@ public class BrushListener implements Listener {
             if (event.getAction() == Action.PHYSICAL) {
                 return;
             }
-            FawePlayer<Object> fp = FawePlayer.wrap(bukkitPlayer);
-            com.sk89q.worldedit.entity.Player player = fp.getPlayer();
-            LocalSession session = fp.getSession();
+            com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
+            LocalSession session = player.getSession();
             Tool tool = session.getTool(player);
             if (tool instanceof ResettableTool) {
                 if (((ResettableTool) tool).reset()) {

@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
@@ -32,16 +31,14 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import java.awt.image.BufferedImage;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Optional;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.util.ValueProvider;
-
-import java.awt.image.BufferedImage;
-import java.lang.annotation.Annotation;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
 
 public class ProvideBindings extends Bindings {
     private final WorldEdit worldEdit;
@@ -110,17 +107,6 @@ public class ProvideBindings extends Bindings {
         EditSession editSession = editSession(getLocalSession(plr), plr);
         store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));
         return editSession;
-    }
-
-    /**
-     * Gets an {@link com.boydti.fawe.object.FawePlayer} from a {@link ArgumentStack}.
-     *
-     * @param context the context
-     * @return a FawePlayer
-     * @throws ParameterException on other error
-     */
-    public FawePlayer getFawePlayer(Actor actor) throws InputParseException {
-        return FawePlayer.wrap(actor);
     }
 
     /*

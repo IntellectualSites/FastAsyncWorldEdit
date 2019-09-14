@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.MovableTool;
@@ -584,7 +583,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             this.visualMode = visualMode;
             if (visualMode != VisualMode.NONE) {
                 try {
-                    queueVisualization(FawePlayer.wrap(player));
+                    queueVisualization(player);
                 } catch (Throwable e) {
                     WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
                 }
@@ -614,7 +613,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             if (tmp.increment(player, amount)) {
                 if (visualMode != VisualMode.NONE) {
                     try {
-                        queueVisualization(FawePlayer.wrap(player));
+                        queueVisualization(player);
                     } catch (Throwable e) {
                         WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
                     }
@@ -628,7 +627,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         return false;
     }
 
-    public void queueVisualization(FawePlayer fp) {
+    public void queueVisualization(Player fp) {
         Fawe.get().getVisualQueue().queue(fp);
     }
 
@@ -641,9 +640,8 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         BrushSettings current = getContext();
         Brush brush = current.getBrush();
         if (brush == null) return;
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
         EditSessionBuilder builder = new EditSessionBuilder(player.getWorld())
-                .player(fp)
+                .player(player)
                 .allowedRegionsEverywhere()
                 .autoQueue(false)
                 .blockBag(null)
@@ -674,8 +672,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     public void clear(Player player) {
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
-        Fawe.get().getVisualQueue().dequeue(fp);
+        Fawe.get().getVisualQueue().dequeue(player);
         if (visualExtent != null) {
             visualExtent.clear();
         }
@@ -684,7 +681,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     @Override
     public boolean move(Player player) {
         if (visualMode != VisualMode.NONE) {
-            queueVisualization(FawePlayer.wrap(player));
+            queueVisualization(player);
             return true;
         }
         return false;

@@ -26,7 +26,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
@@ -373,7 +372,7 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
-        FawePlayer fp = editSession.getPlayer();
+        Player fp = editSession.getPlayer();
         int limit = fp == null ? Integer.MAX_VALUE : fp.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
     }
@@ -457,9 +456,9 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
-        FawePlayer fp = editSession.getPlayer();
+        Player fp = editSession.getPlayer();
         if (fp != null) {
-            loadSessionHistoryFromDisk(fp.getUUID(), editSession.getWorld());
+            loadSessionHistoryFromDisk(fp.getUniqueId(), editSession.getWorld());
         }
         // Destroy any sessions after this undo point
         if (append) {
@@ -509,8 +508,7 @@ public class LocalSession implements TextureHolder {
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         //TODO This method needs to be modified to use actors instead of FAWEPlayer
-        FawePlayer fp = FawePlayer.wrap((Player)actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
+        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player) actor).getWorldForEditing());
         if (getHistoryNegativeIndex() < history.size()) {
             FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
             try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
@@ -518,8 +516,8 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed(fp)
-                    .player(fp)
+                    .limitUnprocessed((Player)actor)
+                    .player((Player)actor)
                     .blockBag(getBlockBag((Player)actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
@@ -547,8 +545,7 @@ public class LocalSession implements TextureHolder {
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         //TODO This method needs to be modified to use actors instead of FAWEPlayer
-        FawePlayer fp = FawePlayer.wrap((Player)actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
+        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player)actor).getWorldForEditing());
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
@@ -558,8 +555,8 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed(fp)
-                    .player(fp)
+                    .limitUnprocessed((Player)actor)
+                    .player((Player)actor)
                     .blockBag(getBlockBag((Player)actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
@@ -578,6 +575,7 @@ public class LocalSession implements TextureHolder {
     public World getWorldOverride() {
         return this.worldOverride;
     }
+
     public void setWorldOverride(@Nullable World worldOverride) {
         this.worldOverride = worldOverride;
     }
@@ -904,7 +902,7 @@ public class LocalSession implements TextureHolder {
     @Nullable
     public BlockBag getBlockBag(Player player) {
         checkNotNull(player);
-        if (!useInventory && FawePlayer.wrap(player).getLimit().INVENTORY_MODE == 0) {
+        if (!useInventory && player.getLimit().INVENTORY_MODE == 0) {
             return null;
         }
         return player.getInventoryBlockBag();
@@ -955,7 +953,6 @@ public class LocalSession implements TextureHolder {
      * @return the tool, which may be {@code null}
      */
     @Nullable
-    @Deprecated
     public Tool getTool(ItemType item) {
         return tools[item.getInternalId()];
     }
@@ -1364,7 +1361,7 @@ public class LocalSession implements TextureHolder {
             world = (World) ((Locatable) actor).getExtent();
         }
         EditSessionBuilder builder = new EditSessionBuilder(world);
-        if (actor.isPlayer() && actor instanceof Player) builder.player(FawePlayer.wrap(actor));
+        if (actor.isPlayer() && actor instanceof Player) builder.player((Player) actor);
         builder.blockBag(blockBag);
         builder.fastmode(fastMode);
 

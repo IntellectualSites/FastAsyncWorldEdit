@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
@@ -29,7 +28,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -146,8 +144,8 @@ public class HistoryCommands {
             UUID uuid = player.getUniqueId();
             DiskStorageHistory file = new DiskStorageHistory(world, uuid, index);
             if (file.getBDFile().exists()) {
-                if (restore) file.redo(FawePlayer.wrap(player));
-                else file.undo(FawePlayer.wrap(player));
+                if (restore) file.redo(player);
+                else file.undo(player);
                 BBC.ROLLBACK_ELEMENT.send(player, world.getName() + "/" + user + "-" + index);
             } else {
                 BBC.TOOL_INSPECT_INFO_FOOTER.send(player, 0);
@@ -177,11 +175,10 @@ public class HistoryCommands {
         bot = bot.withY(Math.min(255, top.getY()));
         RollbackDatabase database = DBHandler.IMP.getDatabase(world);
         final AtomicInteger count = new AtomicInteger();
-        final FawePlayer fp = FawePlayer.wrap(player);
 
-        Region[] allowedRegions = fp.getCurrentRegions(FaweMaskManager.MaskType.OWNER);
+        Region[] allowedRegions = player.getCurrentRegions(FaweMaskManager.MaskType.OWNER);
         if (allowedRegions == null) {
-            BBC.NO_REGION.send(fp);
+            BBC.NO_REGION.send(player);
             return;
         }
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
@@ -194,7 +191,7 @@ public class HistoryCommands {
         database.getPotentialEdits(other, System.currentTimeMillis() - timeDiff, bot, top, new RunnableVal<DiskStorageHistory>() {
             @Override
             public void run(DiskStorageHistory edit) {
-                edit.undo(fp, allowedRegions);
+                edit.undo(player, allowedRegions);
                 BBC.ROLLBACK_ELEMENT.send(player, edit.getWorld().getName() + "/" + user + "-" + edit.getIndex());
                 count.incrementAndGet();
             }
@@ -242,7 +239,7 @@ public class HistoryCommands {
             undoSession = session;
         }
         int finalTimes = times;
-        FawePlayer.wrap(player).checkConfirmation(() -> {
+        player.checkConfirmation(() -> {
             EditSession undone = null;
             int i = 0;
             for (; i < finalTimes; ++i) {

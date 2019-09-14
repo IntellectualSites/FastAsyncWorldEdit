@@ -2,10 +2,10 @@ package com.boydti.fawe.object.progress;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 
+import com.sk89q.worldedit.entity.Player;
 import java.util.function.BiConsumer;
 
 /**
@@ -13,12 +13,12 @@ import java.util.function.BiConsumer;
  */
 public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker.ProgressType, Integer> {
 
-    private final FawePlayer player;
+    private final Player player;
     private final long start;
     private int delay = Settings.IMP.QUEUE.PROGRESS.DELAY;
     private int interval = Settings.IMP.QUEUE.PROGRESS.INTERVAL;
 
-    public DefaultProgressTracker(FawePlayer player) {
+    public DefaultProgressTracker(Player player) {
         this.start = System.currentTimeMillis();
         this.player = player;
     }
@@ -39,7 +39,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
         return delay;
     }
 
-    public FawePlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 

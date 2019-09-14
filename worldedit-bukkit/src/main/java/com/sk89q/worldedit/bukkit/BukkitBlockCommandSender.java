@@ -28,17 +28,16 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
-import org.bukkit.Chunk;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements Locatable {
 
@@ -72,21 +71,21 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7d" + part);
+            print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
         }
     }
 
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A77" + part);
+            print(TextComponent.of(part, TextColor.GRAY));
         }
     }
 
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7c" + part);
+            print(TextComponent.of(part, TextColor.RED));
         }
     }
 
@@ -156,10 +155,9 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
                 @NotNull Block block = sender.getBlock();
                 @NotNull World world = block.getWorld();
                 if (world.isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
-                    @NotNull Material type = block.getType();
-                    return type == Material.COMMAND_BLOCK
-                            || type == Material.CHAIN_COMMAND_BLOCK
-                            || type == Material.REPEATING_COMMAND_BLOCK;
+                    return sender.getBlock().getType() == Material.COMMAND_BLOCK
+                            || sender.getBlock().getType() == Material.CHAIN_COMMAND_BLOCK
+                            || sender.getBlock().getType() == Material.REPEATING_COMMAND_BLOCK;
                 }
                 return false;
             }

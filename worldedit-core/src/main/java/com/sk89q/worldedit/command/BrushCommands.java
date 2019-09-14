@@ -25,7 +25,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.BlendBall;
 import com.boydti.fawe.object.brush.BlobBrush;
 import com.boydti.fawe.object.brush.BrushSettings;
@@ -127,7 +126,6 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
-
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -647,8 +645,7 @@ public class BrushCommands {
                                 Mask maskOpt, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
 
-        FawePlayer fp = FawePlayer.wrap(player);
-        FaweLimit limit = Settings.IMP.getLimit(fp);
+        FaweLimit limit = Settings.IMP.getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
 
         set(session, context,

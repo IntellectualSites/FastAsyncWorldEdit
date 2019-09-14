@@ -8,7 +8,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.NullChangeSet;
 import com.boydti.fawe.object.RegionWrapper;
@@ -19,6 +18,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -34,7 +34,7 @@ public class EditSessionBuilder {
     private World world;
     private String worldName;
     private Extent extent;
-    private FawePlayer player;
+    private Player player;
     private FaweLimit limit;
     private FaweChangeSet changeSet;
     private Region[] allowedRegions;
@@ -81,7 +81,7 @@ public class EditSessionBuilder {
         this.world = FaweAPI.getWorld(worldName);
     }
 
-    public EditSessionBuilder player(@Nullable FawePlayer player) {
+    public EditSessionBuilder player(@Nullable Player player) {
         this.player = player;
         return this;
     }
@@ -95,7 +95,7 @@ public class EditSessionBuilder {
         return limit(FaweLimit.MAX.copy());
     }
 
-    public EditSessionBuilder limitUnprocessed(@Nonnull FawePlayer fp) {
+    public EditSessionBuilder limitUnprocessed(@Nonnull Player fp) {
         checkNotNull(fp);
         limitUnlimited();
         FaweLimit tmp = fp.getLimit();
@@ -266,10 +266,10 @@ public class EditSessionBuilder {
             eventBus = WorldEdit.getInstance().getEventBus();
         }
         if (event == null) {
-            event = new EditSessionEvent(world, player == null ? null : (player.getPlayer()), -1, null);
+            event = new EditSessionEvent(world, player, -1, null);
         }
         if (player == null && event.getActor() != null) {
-            player = FawePlayer.wrap(event.getActor());
+            player = (Player) event.getActor();
         }
         if (limit == null) {
             if (player == null) {
@@ -293,7 +293,7 @@ public class EditSessionBuilder {
         }
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
-                if (Permission.hasPermission(player.toWorldEditPlayer(), "worldedit.fast")) {
+                if (Permission.hasPermission(player, "worldedit.fast")) {
                     BBC.WORLDEDIT_OOM_ADMIN.send(player);
                 }
                 throw FaweException.LOW_MEMORY;
@@ -450,7 +450,7 @@ public class EditSessionBuilder {
         return limit;
     }
 
-    public FawePlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 

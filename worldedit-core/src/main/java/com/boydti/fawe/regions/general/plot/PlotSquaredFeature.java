@@ -2,7 +2,6 @@ package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.SimpleRegion;
@@ -23,6 +22,7 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -89,17 +89,17 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
     }
 
-    public boolean isAllowed(FawePlayer fp, Plot plot, MaskType type) {
+    public boolean isAllowed(com.sk89q.worldedit.entity.Player player, Plot plot, MaskType type) {
         if (plot == null) {
             return false;
         }
-        UUID uid = fp.getUUID();
-        return !Flags.NO_WORLDEDIT.isTrue(plot) && ((plot.isOwner(uid) || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)  || ((plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && fp.hasPermission("fawe.plotsquared.member"))))) || fp.hasPermission("fawe.plotsquared.admin"));
+        UUID uid = player.getUniqueId();
+        return !Flags.NO_WORLDEDIT.isTrue(plot) && ((plot.isOwner(uid) || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)  || ((plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && player.hasPermission("fawe.plotsquared.member"))))) || player.hasPermission("fawe.plotsquared.admin"));
     }
 
     @Override
-    public FaweMask getMask(FawePlayer fp, MaskType type) {
-        final PlotPlayer pp = PlotPlayer.wrap(fp.parent);
+    public FaweMask getMask(Player fp, MaskType type) {
+        final PlotPlayer pp = PlotPlayer.wrap(fp);
         final HashSet<RegionWrapper> regions;
         Plot plot = pp.getCurrentPlot();
         if (isAllowed(fp, plot, type)) {
@@ -151,7 +151,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
         return new FaweMask(maskedRegion) {
             @Override
-            public boolean isValid(FawePlayer player, MaskType type) {
+            public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                 if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot)) {
                     return false;
                 }

@@ -26,7 +26,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -41,7 +40,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.CommandQueued;
-import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
@@ -50,8 +48,6 @@ import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
@@ -92,7 +88,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.imageio.ImageIO;
-
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -180,7 +175,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.cancel")
     @CommandQueued(false)
-    public void cancel(FawePlayer fp) {
+    public void cancel(Player fp) {
         int cancelled = fp.cancel(false);
         BBC.WORLDEDIT_CANCEL_COUNT.send(fp, cancelled);
     }
@@ -679,7 +674,7 @@ public class UtilityCommands {
             desc = "Confirm a command"
     )
     @CommandPermissions("fawe.confirm")
-    public void confirm(FawePlayer fp) throws WorldEditException {
+    public void confirm(Player fp) throws WorldEditException {
         if (!fp.confirm()) {
             BBC.NOTHING_CONFIRMED.send(fp);
         }
@@ -697,7 +692,8 @@ public class UtilityCommands {
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
                          List<String> commandStr) throws WorldEditException {
-        PrintCommandHelp.help(commandStr, page, listSubCommands, we, actor);
+        PrintCommandHelp.help(commandStr, page, listSubCommands,
+            we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
     }
 
     public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {

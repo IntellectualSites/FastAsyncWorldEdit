@@ -1,10 +1,8 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.command.CFICommand;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.regions.general.plot.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
@@ -16,10 +14,11 @@ import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
+import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.session.request.Request;
 import java.io.BufferedReader;
 import java.io.File;
@@ -192,8 +191,8 @@ public class Fawe {
             } catch (Throwable ignored) {}
             try {
                 imp().startMetrics();
-            } catch (Throwable ignored) {
-                debug(ignored.getMessage());
+            } catch (Throwable e) {
+                debug(e.getMessage());
             }
         }, 0);
 
@@ -334,7 +333,7 @@ public class Fawe {
          */
         if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {
             try {
-                com.github.luben.zstd.util.Native.load();
+                Native.load();
             } catch (Throwable e) {
                 if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
@@ -367,7 +366,6 @@ public class Fawe {
             if (x86OS != x86JVM) {
                 debug("====== UPGRADE TO 64-BIT JAVA ======");
                 debug("You are running 32-bit Java on a 64-bit machine");
-                debug(" - This is only a recommendation");
                 debug("====================================");
             }
         } catch (Throwable ignore) {}
@@ -402,9 +400,8 @@ public class Fawe {
                     mp.setUsageThreshold(alert);
                 }
             }
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
             debug("====== MEMORY LISTENER ERROR ======");
-            e.printStackTrace();
             debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");
@@ -435,29 +432,29 @@ public class Fawe {
         return this.thread = Thread.currentThread();
     }
 
-    private ConcurrentHashMap<String, FawePlayer> players = new ConcurrentHashMap<>(8, 0.9f, 1);
-    private ConcurrentHashMap<UUID, FawePlayer> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private ConcurrentHashMap<UUID, Player> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public <T> void register(FawePlayer<T> player) {
+    public <T> void register(Player player) {
         players.put(player.getName(), player);
-        playersUUID.put(player.getUUID(), player);
+        playersUUID.put(player.getUniqueId(), player);
 
     }
 
     public <T> void unregister(String name) {
-        FawePlayer player = players.remove(name);
-        if (player != null) playersUUID.remove(player.getUUID());
+        Player player = players.remove(name);
+        if (player != null) playersUUID.remove(player.getUniqueId());
     }
 
-    public FawePlayer getCachedPlayer(String name) {
+    public Player getCachedPlayer(String name) {
         return players.get(name);
     }
 
-    public FawePlayer getCachedPlayer(UUID uuid) {
+    public Player getCachedPlayer(UUID uuid) {
         return playersUUID.get(uuid);
     }
 
-    public Collection<FawePlayer> getCachedPlayers() {
+    public Collection<Player> getCachedPlayers() {
         return players.values();
     }
 }

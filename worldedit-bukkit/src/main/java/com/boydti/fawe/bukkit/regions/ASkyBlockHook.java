@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -24,12 +23,11 @@ public class ASkyBlockHook extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
-        final Location location = player.getLocation();
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player player, MaskType type) {
+        final Location location = BukkitAdapter.adapt(player).getLocation();
 
         Island island = ASkyBlockAPI.getInstance().getIslandAt(location);
-        if (island != null && isAllowed(player, island, type)) {
+        if (island != null && isAllowed(BukkitAdapter.adapt(player), island, type)) {
 
             Location center1 = island.getCenter();
             MutableBlockVector3 center = MutableBlockVector3.at(center1.getX(), center1.getY(), center1.getZ());
@@ -38,8 +36,8 @@ public class ASkyBlockHook extends BukkitMaskManager implements Listener {
 
             return new FaweMask(pos1, pos2) {
                 @Override
-                public boolean isValid(FawePlayer player, MaskType type) {
-                    return isAllowed(BukkitAdapter.adapt(player.toWorldEditPlayer()), island, type);
+                public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+                    return isAllowed(BukkitAdapter.adapt(player), island, type);
                 }
             };
         }

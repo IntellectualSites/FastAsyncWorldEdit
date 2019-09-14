@@ -2,10 +2,11 @@ package com.boydti.fawe.command;
 
 import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.command.CFICommands.CFISettings;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,17 +24,17 @@ public class CFICommand extends CommandProcessor<Object, Object> {
 
     @Override
     public List<String> preprocess(InjectedValueAccess context, List<String> args) {
-        FawePlayer fp = context.injectedValue(Key.of(FawePlayer.class)).orElseThrow(() -> new IllegalStateException("No player"));
-        CFICommands.CFISettings settings = CFICommands.getSettings(fp);
-        settings.popMessages(fp);
-        args = dispatch(fp, settings, args, context);
+        Player player = context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"));
+        CFICommands.CFISettings settings = CFICommands.getSettings(player);
+        settings.popMessages(player);
+        args = dispatch(player, settings, args, context);
         HeightMapMCAGenerator gen = settings.getGenerator();
         if (gen != null && gen.isModified()) {
             try {
                 gen.update();
-                CFIChangeSet set = new CFIChangeSet(gen, fp.getUUID());
-                LocalSession session = fp.getSession();
-                session.remember(fp.getPlayer(), gen, set, fp.getLimit());
+                CFIChangeSet set = new CFIChangeSet(gen, player.getUniqueId());
+                LocalSession session = player.getSession();
+                session.remember(player, gen, set, player.getLimit());
             } catch (IOException e) {
                 throw new StopExecutionException(TextComponent.of(e.getMessage()));
             }
@@ -46,7 +47,7 @@ public class CFICommand extends CommandProcessor<Object, Object> {
         return result;
     }
 
-    private List<String> dispatch(FawePlayer fp, CFICommands.CFISettings settings, List<String> args, InjectedValueAccess context) {
+    private List<String> dispatch(Player player, CFISettings settings, List<String> args, InjectedValueAccess context) {
         if (!settings.hasGenerator()) {
             if (args.size() == 0) {
                 String hmCmd = "/cfi ";
@@ -62,25 +63,23 @@ public class CFICommand extends CommandProcessor<Object, Object> {
                     .append(newline())
                     .append("[Empty]")//TODO .cmdTip(CFICommands.alias() + " empty")
                     .append("- An empty map of a specific size").build();
-                fp.toWorldEditPlayer().print(build);
+                player.print(build);
             } else {
                 args = new ArrayList<>(args);
                 switch (args.size()) {
-                    case 1: {
+                    case 1:
                         args.add(0, "heightmap");
                         break;
-                    }
-                    case 2: {
+                    case 2:
                         args.add(0, "empty");
                         break;
-                    }
                 }
                 return args;
             }
         } else {
             if (args.isEmpty()) {
                 settings.setCategory(null);
-                CFICommands.mainMenu(fp);
+                CFICommands.mainMenu(player);
                 return null;
             }
         }

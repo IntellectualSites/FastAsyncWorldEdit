@@ -508,7 +508,6 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void sendChunk(int X, int Z, int mask) {
-
     }
 
     @Override

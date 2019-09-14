@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -49,7 +48,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
 
     @Override
     public void build(final EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        FawePlayer fp = editSession.getPlayer();
+        Player fp = editSession.getPlayer();
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
             if (editSession.getExtent() instanceof VisualExtent) {
@@ -96,7 +95,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             }
             if (autoRotate) {
                 if (transform == null) transform = new AffineTransform();
-                Location loc = editSession.getPlayer().toWorldEditPlayer().getLocation();
+                Location loc = fp.getLocation();
                 float yaw = loc.getYaw();
                 float pitch = loc.getPitch();
                 transform = transform.rotateY((-yaw) % 360);

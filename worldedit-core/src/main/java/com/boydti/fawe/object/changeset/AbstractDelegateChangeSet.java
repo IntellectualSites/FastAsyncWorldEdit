@@ -1,22 +1,18 @@
 package com.boydti.fawe.object.changeset;
 
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -131,12 +127,12 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public EditSession toEditSession(FawePlayer player) {
+    public EditSession toEditSession(Player player) {
         return parent.toEditSession(player);
     }
 
     @Override
-    public EditSession toEditSession(FawePlayer player, Region[] regions) {
+    public EditSession toEditSession(Player player, Region[] regions) {
         return parent.toEditSession(player, regions);
     }
 

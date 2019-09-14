@@ -1,6 +1,6 @@
 package com.boydti.fawe.regions.general.plot;
 
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.Command;
@@ -79,7 +79,7 @@ public class PlotSetBiome extends Command {
                                 .autoQueue(false)
                                 .checkMemory(false)
                                 .allowedRegionsEverywhere()
-                                .player(FawePlayer.wrap(player.getName()))
+                                .player(Fawe.imp().wrap(player.getName()))
                                 .limitUnlimited()
                                 .build();
                         long seed = ThreadLocalRandom.current().nextLong();

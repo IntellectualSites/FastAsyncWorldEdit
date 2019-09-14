@@ -139,11 +139,6 @@ public class Expression {
         return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, values);
     }
 
-    public double evaluateTimeout(int timeout) throws EvaluationException {
-        if (root instanceof Constant) return root.getValue();
-        return evaluateFinal(timeout);
-    }
-
     public double evaluateTimeout(int timeout, double x, double y) throws EvaluationException {
         if (root instanceof Constant) return root.getValue();
         variableArray[0].value = x;

@@ -5,13 +5,14 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -27,7 +28,11 @@ public class Rollback extends FaweCommand {
     }
 
     @Override
-    public boolean execute(FawePlayer player, String... args) {
+    public boolean execute(Actor actor, String... args) {
+        if (!(actor.isPlayer() && actor instanceof Player)) {
+            return false;
+        }
+        Player player = (Player) actor;
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return false;
@@ -58,13 +63,13 @@ public class Rollback extends FaweCommand {
                     BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
                     return false;
                 }
-                player.deleteMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
-                Location origin = player.getPlayer().getLocation();
+                player.deleteMeta(Player.METADATA_KEYS.ROLLBACK);
+                Location origin = player.getLocation();
                 rollback(player, !player.hasPermission("fawe.rollback.deep"), Arrays.copyOfRange(args, 1, args.length), new RunnableVal<List<DiskStorageHistory>>() {
                     @Override
                     public void run(List<DiskStorageHistory> edits) {
                         long total = 0;
-                        player.sendMessage("&d=| Username | Bounds | Distance | Changes | Age |=");
+                        player.print("&d=| Username | Bounds | Distance | Changes | Age |=");
                         for (DiskStorageHistory edit : edits) {
                             DiskStorageHistory.DiskStorageSummary summary = edit.summarize(new RegionWrapper(origin.getBlockX(), origin.getBlockX(), origin.getBlockZ(), origin.getBlockZ()), !player.hasPermission("fawe.rollback.deep"));
                             RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
@@ -82,14 +87,14 @@ public class Rollback extends FaweCommand {
                                 percentString.append(prefix).append(entry.getValue()).append("% ").append(itemName);
                                 prefix = ", ";
                             }
-                            player.sendMessage("&c" + name + " | " + region + " | " + distance + "m | " + size + " | " + MainUtil.secToTime(seconds));
-                            player.sendMessage("&8 - &7(" + percentString + ")");
+                            player.print("&c" + name + " | " + region + " | " + distance + "m | " + size + " | " + MainUtil.secToTime(seconds));
+                            player.print("&8 - &7(" + percentString + ")");
                         }
-                        player.sendMessage("&d==================================================");
-                        player.sendMessage("&dSize: " + (double) (total / 1024) / 1000 + "MB");
-                        player.sendMessage("&dTo rollback: /frb undo");
-                        player.sendMessage("&d==================================================");
-                        player.setMeta(FawePlayer.METADATA_KEYS.ROLLBACK, edits);
+                        player.print("&d==================================================");
+                        player.print("&dSize: " + (double) (total / 1024) / 1000 + "MB");
+                        player.print("&dTo rollback: /frb undo");
+                        player.print("&d==================================================");
+                        player.setMeta(Player.METADATA_KEYS.ROLLBACK, edits);
                     }
                 });
                 break;
@@ -99,20 +104,20 @@ public class Rollback extends FaweCommand {
                     BBC.NO_PERM.send(player, "fawe.rollback.perform");
                     return false;
                 }
-                final List<DiskStorageHistory> edits = player.getMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
-                player.deleteMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
+                final List<DiskStorageHistory> edits = player.getMeta(Player.METADATA_KEYS.ROLLBACK);
+                player.deleteMeta(Player.METADATA_KEYS.ROLLBACK);
                 if (edits == null) {
                     BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
                     return false;
                 }
                 for (DiskStorageHistory edit : edits) {
-                    player.sendMessage("&d" + edit.getBDFile());
+                    player.print("&d" + edit.getBDFile());
                     EditSession session = edit.toEditSession(null);
                     session.undo(session);
                     edit.deleteFiles();
                     session.flushQueue();
                 }
-                player.sendMessage("Rollback complete!");
+                player.print("Rollback complete!");
             default:
                 BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
                 return false;
@@ -120,7 +125,7 @@ public class Rollback extends FaweCommand {
         return true;
     }
 
-    public void rollback(FawePlayer player, boolean shallow, String[] args, RunnableVal<List<DiskStorageHistory>> result) {
+    public void rollback(Player player, boolean shallow, String[] args, RunnableVal<List<DiskStorageHistory>> result) {
         UUID user = null;
         int radius = Integer.MAX_VALUE;
         long time = Long.MAX_VALUE;
@@ -143,14 +148,14 @@ public class Rollback extends FaweCommand {
                     } catch (IllegalArgumentException ignored) {
                     }
                     if (user == null) {
-                        player.sendMessage("&dInvalid user: " + split[1]);
+                        player.print("&dInvalid user: " + split[1]);
                         return;
                     }
                     break;
                 case "r":
                 case "radius":
                     if (!MathMan.isInteger(split[1])) {
-                        player.sendMessage("&dInvalid radius: " + split[1]);
+                        player.print("&dInvalid radius: " + split[1]);
                         return;
                     }
                     radius = Integer.parseInt(split[1]);
@@ -167,11 +172,11 @@ public class Rollback extends FaweCommand {
         Location origin = player.getLocation();
         List<DiskStorageHistory> edits = FaweAPI.getBDFiles(origin, user, radius, time, shallow);
         if (edits == null) {
-            player.sendMessage("&cToo broad, try refining your search!");
+            player.print("&cToo broad, try refining your search!");
             return;
         }
         if (edits.size() == 0) {
-            player.sendMessage("&cNo edits found!");
+            player.print("&cNo edits found!");
             return;
         }
         result.run(edits);

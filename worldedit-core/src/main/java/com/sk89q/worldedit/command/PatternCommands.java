@@ -1,16 +1,41 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.object.DataAnglePattern;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.RandomCollection;
-import com.boydti.fawe.object.pattern.*;
+import com.boydti.fawe.object.pattern.AngleColorPattern;
+import com.boydti.fawe.object.pattern.AverageColorPattern;
+import com.boydti.fawe.object.pattern.BiomePattern;
+import com.boydti.fawe.object.pattern.BufferedPattern;
+import com.boydti.fawe.object.pattern.BufferedPattern2D;
+import com.boydti.fawe.object.pattern.DataPattern;
+import com.boydti.fawe.object.pattern.DesaturatePattern;
+import com.boydti.fawe.object.pattern.ExistingPattern;
+import com.boydti.fawe.object.pattern.ExpressionPattern;
+import com.boydti.fawe.object.pattern.FullClipboardPattern;
+import com.boydti.fawe.object.pattern.IdDataMaskPattern;
+import com.boydti.fawe.object.pattern.IdPattern;
+import com.boydti.fawe.object.pattern.Linear2DBlockPattern;
+import com.boydti.fawe.object.pattern.Linear3DBlockPattern;
+import com.boydti.fawe.object.pattern.LinearBlockPattern;
+import com.boydti.fawe.object.pattern.MaskedPattern;
+import com.boydti.fawe.object.pattern.NoXPattern;
+import com.boydti.fawe.object.pattern.NoYPattern;
+import com.boydti.fawe.object.pattern.NoZPattern;
+import com.boydti.fawe.object.pattern.OffsetPattern;
+import com.boydti.fawe.object.pattern.PropertyPattern;
+import com.boydti.fawe.object.pattern.RandomFullClipboardPattern;
+import com.boydti.fawe.object.pattern.RandomOffsetPattern;
+import com.boydti.fawe.object.pattern.RelativePattern;
+import com.boydti.fawe.object.pattern.SaturatePattern;
+import com.boydti.fawe.object.pattern.ShadePattern;
+import com.boydti.fawe.object.pattern.SolidRandomOffsetPattern;
+import com.boydti.fawe.object.pattern.SurfaceRandomOffsetPattern;
 import com.boydti.fawe.object.random.SimplexRandom;
 import com.boydti.fawe.util.ColorUtil;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import org.enginehub.piston.annotation.Command;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -21,21 +46,21 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
+import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
 
 //@Command(aliases = {"patterns"},
 //        desc = "Help for the various patterns. [More Info](https://git.io/vSPmA)",
@@ -184,7 +209,7 @@ public class PatternCommands {
                     "Use with a brush when you don't want to apply to the same spot twice"
 )
     public Pattern buffer(Actor actor, Pattern pattern) {
-        return new BufferedPattern(FawePlayer.wrap(actor), pattern);
+        return new BufferedPattern(actor, pattern);
     }
 
     @Command(
@@ -192,7 +217,7 @@ public class PatternCommands {
             desc = "Only place a block once in a column while a pattern is in use"
 )
     public Pattern buffer2d(Actor actor, Pattern pattern) {
-        return new BufferedPattern2D(FawePlayer.wrap(actor), pattern);
+        return new BufferedPattern2D(actor, pattern);
     }
 
     @Command(

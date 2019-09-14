@@ -1,22 +1,24 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class WEManager {
 
@@ -63,7 +65,7 @@ public class WEManager {
     }
 
     @Deprecated
-    public Region[] getMask(FawePlayer<?> player) {
+    public Region[] getMask(Player player) {
         return getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
     }
 
@@ -77,7 +79,7 @@ public class WEManager {
      * @param player
      * @return
      */
-    public Region[] getMask(FawePlayer<?> player, FaweMaskManager.MaskType type) {
+    public Region[] getMask(Player player, FaweMaskManager.MaskType type) {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }

@@ -23,8 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -32,29 +30,14 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
-import com.sk89q.worldedit.scripting.CraftScriptContext;
-import com.sk89q.worldedit.scripting.CraftScriptEngine;
-import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
-import javax.script.ScriptException;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
-import org.mozilla.javascript.NativeJavaObject;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 
 /**
@@ -80,7 +63,7 @@ public class ScriptingCommands {
         desc = ""
     )
     @CommandPermissions("fawe.setupdispatcher")
-    public void setupdispatcher(Player player, LocalSession session, final InjectedValueAccess args) throws WorldEditException {
+    public void setupdispatcher(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         PlatformCommandManager.getInstance().registerAllCommands();
     }
 
@@ -96,7 +79,7 @@ public class ScriptingCommands {
                         @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
                             List<String> commandStr) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
-            BBC.SCRIPTING_NO_PERM.send(player);
+            player.printError(BBC.SCRIPTING_NO_PERM.s());
             return;
         }
 
@@ -122,12 +105,12 @@ public class ScriptingCommands {
         String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
-            BBC.SCRIPTING_NO_PERM.send(player);
+            player.printError(BBC.SCRIPTING_NO_PERM.s());
             return;
         }
 
         if (lastScript == null) {
-            BBC.SCRIPTING_CS.send(player);
+            player.printError(BBC.SCRIPTING_CS.s());
             return;
         }
 

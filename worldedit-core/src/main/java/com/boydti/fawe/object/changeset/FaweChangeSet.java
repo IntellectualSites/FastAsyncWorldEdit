@@ -5,13 +5,13 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
@@ -143,11 +143,11 @@ public abstract class FaweChangeSet implements ChangeSet {
     public void delete() {
     }
 
-    public EditSession toEditSession(FawePlayer player) {
+    public EditSession toEditSession(Player player) {
         return toEditSession(player, null);
     }
 
-    public EditSession toEditSession(FawePlayer player, Region[] regions) {
+    public EditSession toEditSession(Player player, Region[] regions) {
         EditSessionBuilder builder = new EditSessionBuilder(getWorld()).player(player).autoQueue(false).fastmode(false).checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);

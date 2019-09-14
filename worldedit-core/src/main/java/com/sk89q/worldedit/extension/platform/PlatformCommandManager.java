@@ -28,11 +28,9 @@ import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -104,7 +102,6 @@ import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
-import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
@@ -119,12 +116,10 @@ import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
-import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.session.request.Request;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -134,14 +129,11 @@ import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.FileHandler;
@@ -570,50 +562,11 @@ public final class PlatformCommandManager {
         return def;
     }
 
-    private Actor wrapActor(Actor actor, InjectedValueStore context) {
-        if (actor instanceof Player) {
-            final Set<String> failedPermissions = new LinkedHashSet<>();
-            Player player = (Player) actor;
-            Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
-            actor = new LocationMaskedPlayerWrapper(unwrapped, player.getLocation(), true) {
-                @Override
-                public boolean hasPermission(String permission) {
-                    if (!super.hasPermission(permission)) {
-                        failedPermissions.add(permission);
-                        return false;
-                    }
-                    return true;
-                }
-                @Override
-                public void checkPermission(String permission) throws AuthorizationException {
-                    try {
-                        super.checkPermission(permission);
-                    } catch (AuthorizationException e) {
-                        failedPermissions.add(permission);
-                        throw e;
-                    }
-                }
-            };
-            context.injectValue(Key.of(CommandPermissions.class), i -> Optional.of(new CommandPermissions() {
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return CommandPermissions.class;
-                }
-                @Override
-                public String[] value() {
-                    return failedPermissions.toArray(new String[0]);
-                }
-            }));
-        }
-        return actor;
-    }
-
     @Subscribe
     public void handleCommand(CommandEvent event) {
         Request.reset();
         Actor actor = event.getActor();
         String args = event.getArguments();
-        final FawePlayer<Object> fp = FawePlayer.wrap(actor);
         System.out.println(1);
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
@@ -747,10 +700,9 @@ public final class PlatformCommandManager {
 
     private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor) {
         InjectedValueStore store = MapBackedValueStore.create();
-        Actor finalActor = wrapActor(actor, store);
-        store.injectValue(Key.of(Actor.class), ValueProvider.constant(finalActor));
-        if (finalActor instanceof Player) {
-            store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) finalActor));
+        store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
+        if (actor instanceof Player) {
+            store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));
         } else {
             store.injectValue(Key.of(Player.class), context -> {
                 throw new CommandException(TextComponent.of("This command must be used with a player."), ImmutableList.of());
@@ -759,8 +711,8 @@ public final class PlatformCommandManager {
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
         store.injectValue(Key.of(LocalSession.class),
             context -> {
-                LocalSession localSession = worldEdit.getSessionManager().get(finalActor);
-                localSession.tellVersion(finalActor);
+                LocalSession localSession = worldEdit.getSessionManager().get(actor);
+                localSession.tellVersion(actor);
                 return Optional.of(localSession);
             });
 

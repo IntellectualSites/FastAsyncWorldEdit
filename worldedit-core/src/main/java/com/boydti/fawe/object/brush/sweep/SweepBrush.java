@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush.sweep;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.util.MathMan;
@@ -10,6 +9,7 @@ import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -47,7 +47,7 @@ public class SweepBrush implements Brush, ResettableTool {
 
         boolean newPos = !position.equals(this.position);
         this.position = position;
-        FawePlayer player = editSession.getPlayer();
+        Player player = editSession.getPlayer();
         if (newPos) {
             BBC.BRUSH_SPLINE_PRIMARY_2.send(player);
             positions.add(position);

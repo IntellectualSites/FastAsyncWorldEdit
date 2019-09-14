@@ -2,17 +2,14 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +46,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
                 return;
             }
         } else if (this.direction) {
-            Location loc = editSession.getPlayer().getPlayer().getLocation();
+            Location loc = editSession.getPlayer().getLocation();
             Vector3 facing = loc.getDirection().normalize();
             BlockVector3 midpoint = pos1.add(pos2).divide(2);
             BlockVector3 offset = midpoint.subtract(vertex);

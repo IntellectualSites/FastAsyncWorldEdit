@@ -6,13 +6,13 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.IntegerPair;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -139,22 +139,22 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         enttFile.delete();
     }
 
-    public void undo(FawePlayer fp, Region[] regions) {
+    public void undo(Player fp, Region[] regions) {
         EditSession session = toEditSession(fp, regions);
         session.undo(session);
         deleteFiles();
     }
 
-    public void undo(FawePlayer fp) {
+    public void undo(Player fp) {
         undo(fp, null);
     }
 
-    public void redo(FawePlayer fp, Region[] regions) {
+    public void redo(Player fp, Region[] regions) {
         EditSession session = toEditSession(fp, regions);
         session.redo(session);
     }
 
-    public void redo(FawePlayer fp) {
+    public void redo(Player fp) {
         undo(fp, null);
     }
 

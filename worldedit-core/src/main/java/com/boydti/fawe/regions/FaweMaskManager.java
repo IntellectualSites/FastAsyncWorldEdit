@@ -1,10 +1,10 @@
 package com.boydti.fawe.regions;
 
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.general.RegionFilter;
+import com.sk89q.worldedit.entity.Player;
 
-public abstract class FaweMaskManager<T> {
+public abstract class FaweMaskManager {
 
     public enum MaskType {
         OWNER,
@@ -37,11 +37,11 @@ public abstract class FaweMaskManager<T> {
     }
 
     @Deprecated
-    public FaweMask getMask(final FawePlayer<T> player) {
+    public FaweMask getMask(final Player player) {
         return getMask(player, MaskType.getDefaultMaskType());
     }
 
-    public FaweMask getMask(final FawePlayer<T> player, MaskType type) {
+    public FaweMask getMask(final Player player, MaskType type) {
         return getMask(player);
     }
 
@@ -53,8 +53,8 @@ public abstract class FaweMaskManager<T> {
         return null;
     }
 
-    private boolean hasMemberPermission(FawePlayer fp) {
-        return fp.hasPermission("fawe." + getKey() + ".member");
+    private boolean hasMemberPermission(Player player) {
+        return player.hasPermission("fawe." + getKey() + ".member");
     }
 
     public boolean isExclusive() {

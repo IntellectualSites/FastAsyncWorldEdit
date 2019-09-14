@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.bekvon.bukkit.residence.commands.message;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.util.MainUtil;
-
 import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
+import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.EditSession;
@@ -42,6 +42,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
@@ -51,32 +52,15 @@ import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Tag;
-import org.bukkit.block.Biome;
-import org.bukkit.command.BlockCommandSender;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +70,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
+import javax.annotation.Nullable;
+import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Biome;
+import org.bukkit.command.BlockCommandSender;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Plugin for Bukkit.
@@ -171,9 +177,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Setup platform
         server = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(server);
-        loadAdapter(); // Need an adapter to work with special blocks with NBT data
 
-        loadConfig(); // Load configuration
+        Path delChunks = Paths.get(getDataFolder().getPath(), DELCHUNKS_FILE_NAME);
+        if (Files.exists(delChunks)) {
+            ChunkDeleter.runFromFile(delChunks, true);
+        }
+
         fail(() -> PermissionsResolverManager.initialize(INSTANCE), "Failed to initialize permissions resolver");
     }
 
@@ -184,10 +193,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public void onEnable() {
         if (INSTANCE != null) return;
         onLoad();
-        setupTags(); // these have to be done post-world since they rely on MC registries. the other ones just use Bukkit enums
-        //TODO: FAWE -- This needs to be moved to onLoad()
-        setupRegistries();
-        WorldEdit.getInstance().loadMappings();
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
@@ -204,7 +209,20 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             getServer().getPluginManager().registerEvents(new AsyncTabCompleteListener(), this);
         }
 
-        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
+        initializeRegistries(); // this creates the objects matching Bukkit's enums - but doesn't fill them with data yet
+        if (Bukkit.getWorlds().isEmpty()) {
+            setupPreWorldData();
+            // register this so we can load world-dependent data right as the first world is loading
+            getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
+        } else {
+            getLogger().warning("Server reload detected. This may cause various issues with WorldEdit and dependent plugins.");
+            try {
+                setupPreWorldData();
+                // since worlds are loaded already, we can do this now
+                setupWorldData();
+            } catch (Throwable ignored) {
+            }
+        }
 
 //        // Register 1.13 Material ids with LegacyMapper
 //        LegacyMapper legacyMapper = LegacyMapper.getInstance();
@@ -213,11 +231,24 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 //                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
 //            }
 //        }
-
+        // Enable metrics
+        new Metrics(this);
         PaperLib.suggestPaper(this);
     }
 
-    private void setupRegistries() {
+    private void setupPreWorldData() {
+        loadAdapter();
+        loadConfig();
+        WorldEdit.getInstance().loadMappings();
+    }
+
+    private void setupWorldData() {
+        setupTags(); // datapacks aren't loaded until just before the world is, and bukkit has no event for this
+        // so the earliest we can do this is in WorldInit
+        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
+    }
+
+    private void initializeRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
@@ -323,13 +354,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private void loadConfig() {
         createDefaultConfiguration("config-legacy.yml"); // Create the default configuration file
-        try {
-            config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
-            config.load();
-        } catch (Throwable e) {
-            getLogger().severe("Failed to load config.yml");
-            e.printStackTrace();
-        }
+        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
+        config.load();
         // Create schematics folder
         WorldEdit worldEdit = WorldEdit.getInstance();
         File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().saveDir);
@@ -380,7 +406,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public void onDisable() {
         Fawe.get().onDisable();
         WorldEdit worldEdit = WorldEdit.getInstance();
-        worldEdit.getSessionManager().clear();
+        worldEdit.getSessionManager().unload();
         worldEdit.getPlatformManager().unregister(server);
         if (config != null) {
             config.unload();
@@ -537,7 +563,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player) {
             return wrapPlayer((Player) sender);
-        } else if (sender instanceof BlockCommandSender) {
+        } else if (config.commandBlockSupport && sender instanceof BlockCommandSender) {
             return new BukkitBlockCommandSender(this, (BlockCommandSender) sender);
         }
 
@@ -575,6 +601,16 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     @Nullable
     public BukkitImplAdapter getBukkitImplAdapter() {
         return bukkitAdapter;
+    }
+
+    private class WorldInitListener implements Listener {
+        private boolean loaded = false;
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void onWorldInit(@SuppressWarnings("unused") WorldInitEvent event) {
+            if (loaded) return;
+            loaded = true;
+            setupWorldData();
+        }
     }
 
     private class AsyncTabCompleteListener implements Listener {

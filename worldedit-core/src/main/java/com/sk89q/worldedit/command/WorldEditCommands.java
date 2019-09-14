@@ -108,7 +108,7 @@ public class WorldEditCommands {
             }
         }
         actor.printDebug("");
-        actor.printDebug("Wiki: " + "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki");
+        actor.printDebug("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki");
     }
 
     @Command(
@@ -197,6 +197,7 @@ public class WorldEditCommands {
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
                          List<String> commandStr) throws WorldEditException {
-        PrintCommandHelp.help(commandStr, page, listSubCommands, we, actor);
+        PrintCommandHelp.help(commandStr, page, listSubCommands,
+            we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help");
     }
 }

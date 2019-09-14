@@ -2,6 +2,8 @@ package com.boydti.fawe.object;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 
 public abstract class FaweCommand<T> {
     public final String perm;
@@ -20,7 +22,7 @@ public abstract class FaweCommand<T> {
         return this.perm;
     }
 
-    public boolean executeSafe(final FawePlayer<T> player, final String... args) {
+    public boolean executeSafe(final Actor player, final String... args) {
         try {
             if (!safe) {
                 execute(player, args);
@@ -40,5 +42,5 @@ public abstract class FaweCommand<T> {
         return false;
     }
 
-    public abstract boolean execute(final FawePlayer<T> player, final String... args);
+    public abstract boolean execute(final Actor actor, final String... args);
 }

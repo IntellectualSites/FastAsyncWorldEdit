@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.util.Permission;
@@ -26,11 +25,10 @@ public class FactionsOneFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player p, MaskType type) {
+        final Player player = BukkitAdapter.adapt(p);
         final Chunk chunk = player.getLocation().getChunk();
-        final boolean perm = Permission
-            .hasPermission(fp.toWorldEditPlayer(), "fawe.factions.wilderness");
+        final boolean perm = Permission.hasPermission(p, "fawe.factions.wilderness");
         final World world = player.getWorld();
 
         RegionWrapper locs = new RegionWrapper(chunk.getX(), chunk.getX(), chunk.getZ(), chunk.getZ());
