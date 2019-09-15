@@ -19,9 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -102,13 +100,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             }
         });
 
-    public AbstractPlayerActor() {
-        Fawe.get().register(this);
-        if (Settings.IMP.CLIPBOARD.USE_DISK) {
-            loadClipboardFromDisk();
-        }
-
-    }
     @Override
     public final Extent getExtent() {
         return getWorld();

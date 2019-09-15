@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
@@ -70,9 +71,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
-        super();
         this.plugin = plugin;
         this.player = player;
+        Fawe.get().register(this);
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            loadClipboardFromDisk();
+        }
     }
 
     @Override
