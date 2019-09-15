@@ -53,7 +53,7 @@ public interface OutputExtent {
      * @throws WorldEditException thrown on an error
      */
     default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+        return true;
     }
 
     default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {

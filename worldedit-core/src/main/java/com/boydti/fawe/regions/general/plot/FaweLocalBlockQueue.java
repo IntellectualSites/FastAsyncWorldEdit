@@ -10,17 +10,14 @@ import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Collection;
-import java.util.List;
 
 // TODO FIXME
 public class FaweLocalBlockQueue extends LocalBlockQueue {
@@ -114,9 +111,8 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public void enqueue() {
-        super.enqueue();
-        IMP.enqueue();
+    public boolean enqueue() {
+        return super.enqueue() && IMP.enqueue();
     }
 
     @Override

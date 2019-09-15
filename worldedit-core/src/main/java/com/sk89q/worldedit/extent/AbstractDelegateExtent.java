@@ -118,6 +118,11 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return extent.setBlock(x, y, z, block);
     }
 
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
+        return extent.setBlock(position, block);
+    }
+
     /*
     Light
      */
