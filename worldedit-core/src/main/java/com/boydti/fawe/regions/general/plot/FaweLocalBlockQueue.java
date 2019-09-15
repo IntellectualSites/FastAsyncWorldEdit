@@ -65,12 +65,12 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     public long getModified() {
         return IMP.getModified();
     }
-    
+
     @Override
     public boolean setBlock(final int x, final int y, final int z, final PlotBlock id) {
     	return setBlock(x, y, z, legacyMapper.getBaseBlockFromPlotBlock(id));
     }
-    
+
     @Override
     public boolean setBlock(final int x, final int y, final int z, final BaseBlock id) {
     	return IMP.setBlock(x, y, z, id);
@@ -111,8 +111,9 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public boolean enqueue() {
-        return super.enqueue() && IMP.enqueue();
+    public void enqueue() {
+        super.enqueue();
+        IMP.enqueue();
     }
 
     @Override

@@ -27,10 +27,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 @CommandDeclaration(
@@ -48,12 +46,12 @@ public class PlotSetBiome extends Command {
     }
 
     @Override
-    public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
+    public void execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
         checkTrue(plot.isOwner(player.getUUID()) || Permissions.hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
         if (plot.getRunning() != 0) {
             Captions.WAIT_FOR_TIMER.send(player);
-            return CompletableFuture.completedFuture(true);
+            return;
         }
         checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
         final HashSet<RegionWrapper> regions = plot.getRegions();
@@ -64,7 +62,7 @@ public class PlotSetBiome extends Command {
             String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), ", ");
             Captions.NEED_BIOME.send(player);
             MainUtil.sendMessage(player, Captions.format(Captions.SUBCOMMAND_SET_OPTIONS_HEADER, biomes));
-            return CompletableFuture.completedFuture(true);
+            return;
         }
         confirm.run(this, () -> {
             if (plot.getRunning() != 0) {
@@ -93,6 +91,6 @@ public class PlotSetBiome extends Command {
             });
         }, null);
 
-        return CompletableFuture.completedFuture(true);
+        return;
     }
 }
