@@ -54,7 +54,7 @@ public class CommandContextTest {
     public void testInvalidFlags() {
         final String failingCommand = "herpderp -opw testers";
         assertThrows(CommandException.class, () -> {
-        new CommandContext(failingCommand, new HashSet<>(Arrays.asList('o', 'w')));
+            new CommandContext(failingCommand, new HashSet<>(Arrays.asList('o', 'w')));
         });
     }
 

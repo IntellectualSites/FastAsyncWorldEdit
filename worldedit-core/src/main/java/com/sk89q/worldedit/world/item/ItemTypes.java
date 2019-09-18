@@ -232,7 +232,7 @@ public final class ItemTypes {
     @Nullable public static final ItemType CYAN_WOOL = get("minecraft:cyan_wool");
     @Nullable public static final ItemType DAMAGED_ANVIL = get("minecraft:damaged_anvil");
     @Nullable public static final ItemType DANDELION = get("minecraft:dandelion");
-    @Deprecated @Nullable public static final ItemType DANDELION_YELLOW = Optional.ofNullable(get("minecraft:dandelion_yellow")).orElseGet(() -> (get("minecraft:yellow_dye")));
+    @Deprecated @Nullable public static final ItemType DANDELION_YELLOW = Optional.ofNullable(get("minecraft:dandelion_yellow")).orElseGet(() -> get("minecraft:yellow_dye"));
     @Nullable public static final ItemType DARK_OAK_BOAT = get("minecraft:dark_oak_boat");
     @Nullable public static final ItemType DARK_OAK_BUTTON = get("minecraft:dark_oak_button");
     @Nullable public static final ItemType DARK_OAK_DOOR = get("minecraft:dark_oak_door");
@@ -730,7 +730,7 @@ public final class ItemTypes {
     @Nullable public static final ItemType REPEATER = get("minecraft:repeater");
     @Nullable public static final ItemType REPEATING_COMMAND_BLOCK = get("minecraft:repeating_command_block");
     @Nullable public static final ItemType ROSE_BUSH = get("minecraft:rose_bush");
-    @Deprecated @Nullable public static final ItemType ROSE_RED = Optional.ofNullable(get("minecraft:rose_red")).orElseGet(() -> (get("minecraft:red_dye")));
+    @Deprecated @Nullable public static final ItemType ROSE_RED = Optional.ofNullable(get("minecraft:rose_red")).orElseGet(() -> get("minecraft:red_dye"));
     @Nullable public static final ItemType ROTTEN_FLESH = get("minecraft:rotten_flesh");
     @Nullable public static final ItemType SADDLE = get("minecraft:saddle");
     @Nullable public static final ItemType SALMON = get("minecraft:salmon");
@@ -752,7 +752,7 @@ public final class ItemTypes {
     @Nullable public static final ItemType SHULKER_BOX = get("minecraft:shulker_box");
     @Nullable public static final ItemType SHULKER_SHELL = get("minecraft:shulker_shell");
     @Nullable public static final ItemType SHULKER_SPAWN_EGG = get("minecraft:shulker_spawn_egg");
-    @Deprecated @Nullable public static final ItemType SIGN = Optional.ofNullable(get("minecraft:sign")).orElseGet(() -> (get("minecraft:oak_sign")));
+    @Deprecated @Nullable public static final ItemType SIGN = Optional.ofNullable(get("minecraft:sign")).orElseGet(() -> get("minecraft:oak_sign"));
     @Nullable public static final ItemType SILVERFISH_SPAWN_EGG = get("minecraft:silverfish_spawn_egg");
     @Nullable public static final ItemType SKELETON_HORSE_SPAWN_EGG = get("minecraft:skeleton_horse_spawn_egg");
     @Nullable public static final ItemType SKELETON_SKULL = get("minecraft:skeleton_skull");
@@ -929,12 +929,12 @@ public final class ItemTypes {
         return get(input);
     }
 
-    public static @Nullable ItemType get(final String id) {
+    public static @Nullable ItemType get(String id) {
         return ItemType.REGISTRY.get(id);
     }
 
     @Deprecated
-    public static ItemType get(final int ordinal) {
+    public static ItemType get(int ordinal) {
         return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 

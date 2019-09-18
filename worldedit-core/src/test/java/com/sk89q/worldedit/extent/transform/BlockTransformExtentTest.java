@@ -24,9 +24,9 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @Disabled("A platform is currently required to get properties, preventing this test.")
 public class BlockTransformExtentTest {
@@ -37,7 +37,7 @@ public class BlockTransformExtentTest {
 
     @BeforeEach
     public void setUp() {
-//        BlockType.REGISTRY.register("worldedit:test", new BlockType("worldedit:test"));
+        //BlockType.REGISTRY.register("worldedit:test", new BlockType("worldedit:test"));
     }
 
     @Test
