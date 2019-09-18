@@ -13,6 +13,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import java.util.concurrent.CompletableFuture;
 
 public class FaweChunkManager extends ChunkManager {
 
@@ -28,13 +29,13 @@ public class FaweChunkManager extends ChunkManager {
     }
 
     @Override
-    public boolean loadChunk(String world, ChunkLoc loc, boolean force) {
+    public CompletableFuture loadChunk(String world, ChunkLoc loc, boolean force) {
         return parent.loadChunk(world, loc, force);
     }
 
     @Override
-    public void unloadChunk(String world, ChunkLoc loc, boolean save, boolean safe) {
-        parent.unloadChunk(world, loc, save, safe);
+    public void unloadChunk(String world, ChunkLoc loc, boolean save) {
+        parent.unloadChunk(world, loc, save);
     }
 
     @Override
