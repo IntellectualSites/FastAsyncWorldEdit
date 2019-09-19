@@ -52,27 +52,29 @@ processResources {
 
 jar.archiveName="fawe-bukkit-${project.parent.version}.jar"
 jar.destinationDir = file '../mvn/com/boydti/fawe-bukkit/' + project.parent.version
-task createPom << {
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-bukkit'
-            version project.parent.version
+task createPom {
+    doLast {
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-bukkit'
+                version project.parent.version
+            }
         }
-    }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-bukkit/${project.parent.version}/fawe-bukkit-${project.parent.version}.pom")
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-bukkit'
-            version 'latest'
+                .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-bukkit/${project.parent.version}/fawe-bukkit-${project.parent.version}.pom")
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-bukkit'
+                version 'latest'
+            }
         }
+                .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-bukkit/latest/fawe-bukkit-latest.pom")
     }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-bukkit/latest/fawe-bukkit-latest.pom")
 }
 task copyFiles {
     doLast {
