@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.registry;
 
-import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
@@ -30,7 +28,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -43,20 +40,12 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
     private final List<V> values = new ArrayList<>();
     private int lastInternalId = 0;
 
-    public NamespacedRegistry(final String name, Map<String, V> map) {
-        this(name, map, MINECRAFT_NAMESPACE);
-    }
-
     public NamespacedRegistry(final String name) {
         this(name, MINECRAFT_NAMESPACE);
     }
 
     public NamespacedRegistry(final String name, final String defaultNamespace) {
-        this(name, Maps.newHashMap(), defaultNamespace);
-    }
-
-    public NamespacedRegistry(final String name, Map<String, V> map, final String defaultNamespace) {
-        super(name, map);
+        super(name);
         this.defaultNamespace = defaultNamespace;
     }
 
@@ -71,19 +60,13 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
         requireNonNull(key, "key");
         final int i = key.indexOf(':');
         checkState(i > 0, "key is not namespaced");
-        final V existing = super.get(key);
-        if (existing != null) {
-            throw new UnsupportedOperationException("Replacing existing registrations is not supported");
-        }
         if (value instanceof RegistryItem) {
             ((RegistryItem) value).setInternalId(lastInternalId++);
         }
         values.add(value);
-        super.register(key, value);
-        if (key.startsWith(defaultNamespace)) {
-            super.register(key.substring(i + 1), value);
-        }
-        return value;
+        final V registered = super.register(key, value);
+        knownNamespaces.add(key.substring(0, i));
+        return registered;
     }
 
     public V getByInternalId(int index) {
@@ -123,7 +106,6 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
         return key;
     }
 
-    @Override
     public <V1 extends Keyed> Stream<String> getSuggestions(String input) {
         if (input.isEmpty() || input.equals(":")) {
             final Set<String> namespaces = getKnownNamespaces();

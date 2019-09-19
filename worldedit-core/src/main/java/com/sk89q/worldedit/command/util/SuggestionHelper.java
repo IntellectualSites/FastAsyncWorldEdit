@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.sk89q.worldedit.registry.IRegistry;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
@@ -139,7 +138,7 @@ public final class SuggestionHelper {
         return Stream.empty();
     }
 
-    public static <V extends Keyed> Stream<String> getRegistrySuggestions(IRegistry<V> registry, String input) {
+    public static <V extends Keyed> Stream<String> getRegistrySuggestions(Registry<V> registry, String input) {
         if (registry instanceof NamespacedRegistry) {
             return getNamespacedRegistrySuggestions(((NamespacedRegistry<?>) registry), input);
         }

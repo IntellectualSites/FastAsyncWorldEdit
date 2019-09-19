@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command.argument;
 
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.registry.IRegistry;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.Registry;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -29,7 +28,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.fluid.FluidCategory;
 import com.sk89q.worldedit.world.fluid.FluidType;
@@ -75,7 +73,7 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
     private static <V extends Keyed> RegistryConverter<V> from(Class<Keyed> registryType) {
         try {
             Field registryField = registryType.getDeclaredField("REGISTRY");
-            IRegistry<V> registry = (IRegistry<V>) registryField.get(null);
+            Registry<V> registry = (Registry<V>) registryField.get(null);
             return new RegistryConverter<>(registry);
         } catch (NoSuchFieldException e) {
             throw new IllegalArgumentException("Not a registry-backed type: " + registryType.getName());
@@ -84,10 +82,10 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
         }
     }
 
-    private final IRegistry<V> registry;
+    private final Registry<V> registry;
     private final TextComponent choices;
 
-    private RegistryConverter(IRegistry<V> registry) {
+    private RegistryConverter(Registry<V> registry) {
         this.registry = registry;
         this.choices = TextComponent.of("any " + registry.getName());
     }

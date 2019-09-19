@@ -19,29 +19,24 @@
 
 package com.sk89q.worldedit.registry;
 
-import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 
-public class Registry<V extends Keyed> implements IRegistry<V> {
-    private final Map<String, V> map;
+public class Registry<V extends Keyed> implements Iterable<V> {
+    private final Map<String, V> map = new HashMap<>();
     private final String name;
 
-    public Registry(String name, Map<String, V> map) {
-        this.name = name;
-        this.map = map;
-    }
-
     public Registry(final String name) {
-        this(name, Maps.newHashMap());
+        this.name = name;
     }
 
     public String getName() {
@@ -73,6 +68,11 @@ public class Registry<V extends Keyed> implements IRegistry<V> {
 
     public Collection<V> values() {
         return Collections.unmodifiableCollection(this.map.values());
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+        return this.map.values().iterator();
     }
 
 }
