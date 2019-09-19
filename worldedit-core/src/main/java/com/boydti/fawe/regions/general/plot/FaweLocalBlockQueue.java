@@ -114,9 +114,10 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public void enqueue() {
-        super.enqueue();
+    public boolean enqueue() {
+        boolean val = super.enqueue();
         IMP.enableQueue();
+        return val;
     }
 
     @Override

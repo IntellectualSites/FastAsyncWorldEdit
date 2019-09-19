@@ -13,6 +13,7 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.sk89q.worldedit.WorldEdit;
+import java.util.concurrent.CompletableFuture;
 
 @CommandDeclaration(
         command = "cfi",
@@ -32,7 +33,7 @@ public class CFIRedirect extends Command {
     }
 
     @Override
-    public void execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
+    public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         checkTrue(args.length >= 1, Captions.COMMAND_SYNTAX, getUsage());
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
         checkTrue(plot.isOwner(player.getUUID()), Captions.NOW_OWNER);
@@ -42,7 +43,8 @@ public class CFIRedirect extends Command {
             player.sendMessage("The command has been changed to: //cfi");
         } else {
             player.sendMessage("Must have the `worlds` component enabled in the PlotSquared config.yml");
-            return;
+            return CompletableFuture.completedFuture(false);
         }
+        return CompletableFuture.completedFuture(true);
     }
 }
