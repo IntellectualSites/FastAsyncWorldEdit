@@ -354,6 +354,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private void loadConfig() {
         createDefaultConfiguration("config-legacy.yml"); // Create the default configuration file
+
         config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
         config.load();
         // Create schematics folder

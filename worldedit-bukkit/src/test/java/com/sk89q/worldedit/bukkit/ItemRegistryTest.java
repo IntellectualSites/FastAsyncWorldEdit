@@ -20,21 +20,20 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Material;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ItemRegistryTest {
 
     @Test
-    public void testTreeTypeMapping() {
+    public void testItemRegistry() {
         for (Material material : Material.values()) {
             if (material.isItem() && !material.isLegacy()) {
                 ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
-                System.out.println(material.getKey().toString());
             }
         }
-        System.out.println(ItemType.REGISTRY.getKnownNamespaces().toString());
+        Assertions.assertNotNull(ItemType.REGISTRY.get("minecraft:wooden_axe"));
     }
 
 }

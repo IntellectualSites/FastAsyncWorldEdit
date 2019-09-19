@@ -923,7 +923,6 @@ public final class BlockTypes {
             { // Register new blocks
                 int internalId = 1;
                 for (Map.Entry<String, String> entry : blockMap.entrySet()) {
-                    String id = entry.getKey();
                     String defaultState = entry.getValue();
                     // Skip already registered ids
                     for (; values[internalId] != null; internalId++);
@@ -994,7 +993,7 @@ public final class BlockTypes {
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
             .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
-            .map(e1 -> e1.getId())
+            .map(BlockType::getId)
             .sorted(StringMan.blockStateComparator(inputLower))
             .collect(Collectors.toList())
         );
@@ -1004,12 +1003,14 @@ public final class BlockTypes {
         return $NAMESPACES;
     }
 
-    public static @Nullable BlockType get(final String id) {
-        return BlockType.REGISTRY.getMap().get(id);
+    @Nullable
+    public static BlockType get(final String id) {
+        return BlockType.REGISTRY.get(id);
     }
 
-    public static @Nullable BlockType get(final CharSequence id) {
-        return BlockType.REGISTRY.getMap().get(id);
+    @Nullable
+    public static BlockType get(final CharSequence id) {
+        return BlockType.REGISTRY.get(id.toString());
     }
 
     @Deprecated
