@@ -35,7 +35,8 @@ public class Triangle {
         radius[1] = RADIUS;
         radius[2] = RADIUS;
         this.normalVec = pos2.subtract(pos1).cross(pos3.subtract(pos1)).normalize();
-        this.b = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)), this.normalVec.dot(pos3));
+        this.b = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)),
+            this.normalVec.dot(pos3));
     }
 
     public boolean above(BlockVector3 pt) {
@@ -45,9 +46,14 @@ public class Triangle {
 
     public Edge getEdge(int index) {
         if (index == this.verts.length - 1) {
-            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
+            return new Edge(
+                Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
+                Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
         } else {
-            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1], this.verts[index + 1][2]));
+            return new Edge(
+                Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
+                Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1],
+                    this.verts[index + 1][2]));
         }
     }
 
@@ -80,7 +86,7 @@ public class Triangle {
     }
 
     private double dot(double[] v1, double[] v2) {
-        return (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]);
+        return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
     }
 
 
@@ -175,8 +181,8 @@ public class Triangle {
     }
 
 
-    private boolean overlaps(double boxcenter[], double boxhalfsize[], double triverts[][]) {
-        double min, max, p0, p1, p2, rad, fex, fey, fez;
+    private boolean overlaps(double[] boxcenter, double[] boxhalfsize, double[][] triverts) {
+        double min, max, fex, fey, fez;
         sub(v0, triverts[0], boxcenter);
         sub(v1, triverts[1], boxcenter);
         sub(v2, triverts[2], boxcenter);
@@ -188,48 +194,71 @@ public class Triangle {
         fey = Math.abs(e0[1]);
         fez = Math.abs(e0[2]);
 
-        if (!axisTestX01(e0[2], e0[1], fez, fey)) return false;
-        if (!axisTestY02(e0[2], e0[0], fez, fex)) return false;
-        if (!axisTestZ12(e0[1], e0[0], fey, fex)) return false;
+        if (!axisTestX01(e0[2], e0[1], fez, fey)) {
+            return false;
+        }
+        if (!axisTestY02(e0[2], e0[0], fez, fex)) {
+            return false;
+        }
+        if (!axisTestZ12(e0[1], e0[0], fey, fex)) {
+            return false;
+        }
 
         fex = Math.abs(e1[0]);
         fey = Math.abs(e1[1]);
         fez = Math.abs(e1[2]);
 
-        if (!axisTestX01(e1[2], e1[1], fez, fey)) return false;
-        if (!axisTestY02(e1[2], e1[0], fez, fex)) return false;
-        if (!axisTestZ0(e1[1], e1[0], fey, fex)) return false;
-
+        if (!axisTestX01(e1[2], e1[1], fez, fey)) {
+            return false;
+        }
+        if (!axisTestY02(e1[2], e1[0], fez, fex)) {
+            return false;
+        }
+        if (!axisTestZ0(e1[1], e1[0], fey, fex)) {
+            return false;
+        }
 
         fex = Math.abs(e2[0]);
         fey = Math.abs(e2[1]);
         fez = Math.abs(e2[2]);
 
-        if (!axisTestX2(e2[2], e2[1], fez, fey)) return false;
-        if (!axisTestY1(e2[2], e2[0], fez, fex)) return false;
-        if (!axisTestZ12(e2[1], e2[0], fey, fex)) return false;
+        if (!axisTestX2(e2[2], e2[1], fez, fey)) {
+            return false;
+        }
+        if (!axisTestY1(e2[2], e2[0], fez, fex)) {
+            return false;
+        }
+        if (!axisTestZ12(e2[1], e2[0], fey, fex)) {
+            return false;
+        }
 
         max = MathMan.max(v0[0], v1[0], v2[0]);
         min = MathMan.min(v0[0], v1[0], v2[0]);
 
-        if (min > boxhalfsize[0] || max < -boxhalfsize[0]) return false;
+        if (min > boxhalfsize[0] || max < -boxhalfsize[0]) {
+            return false;
+        }
 
         max = MathMan.max(v0[1], v1[1], v2[1]);
         min = MathMan.min(v0[1], v1[1], v2[1]);
 
-        if (min > boxhalfsize[1] || max < -boxhalfsize[1]) return false;
+        if (min > boxhalfsize[1] || max < -boxhalfsize[1]) {
+            return false;
+        }
 
         max = MathMan.max(v0[2], v1[2], v2[2]);
         min = MathMan.min(v0[2], v1[2], v2[2]);
 
-        if (min > boxhalfsize[2] || max < -boxhalfsize[2]) return false;
+        if (min > boxhalfsize[2] || max < -boxhalfsize[2]) {
+            return false;
+        }
 
         cross(normal, e0, e1);
 
-        return (planeBoxOverlap(normal, v0, boxhalfsize));
+        return planeBoxOverlap(normal, v0, boxhalfsize);
     }
 
-    private boolean planeBoxOverlap(double normal[], double vert[], double maxbox[]) {
+    private boolean planeBoxOverlap(double[] normal, double[] vert, double[] maxbox) {
         for (int q = 0; q <= 2; q++) {
             double v = vert[q];
             if (normal[q] > 0.0f) {
@@ -240,8 +269,9 @@ public class Triangle {
                 vmax[q] = -maxbox[q] - v;
             }
         }
-        if (dot(normal, vmin) > 0.0f) return false;
-        if (dot(normal, vmax) >= 0.0f) return true;
-        return false;
+        if (dot(normal, vmin) > 0.0f) {
+            return false;
+        }
+        return dot(normal, vmax) >= 0.0f;
     }
 }

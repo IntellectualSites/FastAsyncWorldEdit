@@ -20,8 +20,8 @@ public class LineBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, final Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visual = (editSession.getExtent() instanceof VisualExtent);
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+        boolean visual = editSession.getExtent() instanceof VisualExtent;
         if (pos1 == null) {
             if (!visual) {
                 pos1 = position;
@@ -34,7 +34,6 @@ public class LineBrush implements Brush, ResettableTool {
             BBC.BRUSH_LINE_SECONDARY.send(editSession.getPlayer());
             if (!select) {
                 pos1 = null;
-                return;
             } else {
                 pos1 = position;
             }

@@ -69,6 +69,7 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         this(extent);
+        checkNotNull(blocks);
         add(blocks);
     }
 
@@ -149,9 +150,8 @@ public class BlockMask extends ABlockMask {
      */
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
-        for (BaseBlock block : blocks) {
-            add(block.toBlockState());
-        }
+        checkNotNull(blocks);
+        blocks.forEach(baseBlock -> add(baseBlock.toBlockState()));
     }
 
     /**
@@ -235,7 +235,7 @@ public class BlockMask extends ABlockMask {
                     setType = type;
                     setStates += all.size();
                     setState = type.getDefaultState();
-                } else if (hasAny) {
+                } else {
                     for (BlockState state : all) {
                         if (test(state)) {
                             setStates++;
@@ -244,8 +244,6 @@ public class BlockMask extends ABlockMask {
                             unsetState = state;
                         }
                     }
-                } else {
-                    unsetType = type;
                 }
             }
         }
@@ -269,11 +267,7 @@ public class BlockMask extends ABlockMask {
         }
 
         if (setTypes == totalTypes - 1) {
-            if (unsetType != null) {
-                return new InverseSingleBlockTypeMask(getExtent(), unsetType);
-            } else {
-                throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
-            }
+            throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
         }
 
         return null;

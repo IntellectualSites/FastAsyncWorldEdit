@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
-
 /**
  * Combines several masks and requires that all masks return true
  * when a certain position is tested. It serves as a logical AND operation
@@ -223,6 +222,10 @@ public class MaskIntersection extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
+        if (masksArray.length == 0) {
+            return false;
+        }
+
         for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;

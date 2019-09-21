@@ -47,6 +47,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.enginehub.piston.annotation.Command;
@@ -93,45 +94,51 @@ public class HistoryCommands {
                     return;
                 }
                 File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY);
-                if (!folder.exists()) {
-                    return;
-                }
-                for (File worldFolder : folder.listFiles()) {
-                    if (!worldFolder.isDirectory()) {
-                        continue;
-                    }
-                    String worldName = worldFolder.getName();
-                    World world = FaweAPI.getWorld(worldName);
-                    if (world != null) {
-                        for (File userFolder : worldFolder.listFiles()) {
-                            if (!userFolder.isDirectory()) {
-                                continue;
-                            }
-                            String userUUID = userFolder.getName();
-                            try {
-                                UUID uuid = UUID.fromString(userUUID);
-                                for (File historyFile : userFolder.listFiles()) {
-                                    String name = historyFile.getName();
-                                    if (!name.endsWith(".bd")) {
+                if (folder.exists()) {
+                    for (File worldFolder : Objects.requireNonNull(folder.listFiles())) {
+                        if (worldFolder != null && worldFolder.isDirectory()) {
+                            String worldName = worldFolder.getName();
+                            World world = FaweAPI.getWorld(worldName);
+                            if (world != null) {
+                                for (File userFolder : worldFolder.listFiles()) {
+                                    if (!userFolder.isDirectory()) {
                                         continue;
                                     }
-                                    RollbackOptimizedHistory rollback = new RollbackOptimizedHistory(world, uuid, Integer.parseInt(name.substring(0, name.length() - 3)));
-                                    DiskStorageHistory.DiskStorageSummary summary = rollback.summarize(RegionWrapper.GLOBAL(), false);
-                                    if (summary != null) {
-                                        rollback.setDimensions(BlockVector3.at(summary.minX, 0, summary.minZ), BlockVector3.at(summary.maxX, 255, summary.maxZ));
-                                        rollback.setTime(historyFile.lastModified());
-                                        RollbackDatabase db = DBHandler.IMP.getDatabase(world);
-                                        db.logEdit(rollback);
-                                        player.print("Logging: " + historyFile);
+                                    String userUUID = userFolder.getName();
+                                    try {
+                                        UUID uuid = UUID.fromString(userUUID);
+                                        for (File historyFile : userFolder.listFiles()) {
+                                            String name = historyFile.getName();
+                                            if (!name.endsWith(".bd")) {
+                                                continue;
+                                            }
+                                            RollbackOptimizedHistory rollback = new RollbackOptimizedHistory(
+                                                world, uuid,
+                                                Integer.parseInt(
+                                                    name.substring(0, name.length() - 3)));
+                                            DiskStorageHistory.DiskStorageSummary summary = rollback
+                                                .summarize(RegionWrapper.GLOBAL(), false);
+                                            if (summary != null) {
+                                                rollback.setDimensions(
+                                                    BlockVector3.at(summary.minX, 0, summary.minZ),
+                                                    BlockVector3
+                                                        .at(summary.maxX, 255, summary.maxZ));
+                                                rollback.setTime(historyFile.lastModified());
+                                                RollbackDatabase db = DBHandler.IMP
+                                                    .getDatabase(world);
+                                                db.logEdit(rollback);
+                                                player.print("Logging: " + historyFile);
+                                            }
+                                        }
+                                    } catch (IllegalArgumentException e) {
+                                        e.printStackTrace();
                                     }
                                 }
-                            } catch (IllegalArgumentException e) {
-                                e.printStackTrace();
                             }
                         }
                     }
+                    player.print("Done import!");
                 }
-                player.print("Done import!");
                 return;
             }
             String toParse = user.substring(1);

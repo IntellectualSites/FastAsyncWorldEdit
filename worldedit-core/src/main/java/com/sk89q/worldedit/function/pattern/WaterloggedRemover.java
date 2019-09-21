@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -64,9 +65,10 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
-        BlockState newState = remap[block.getOrdinal()];
-        if (newState != null) {
-            return newState.toBaseBlock(block.getNbtData());
+        @SuppressWarnings("unchecked")
+        Property<Object> prop = (Property<Object>) remap[block.getOrdinal()].getBlockType().getPropertyMap().getOrDefault("waterlogged", null);
+        if (prop != null) {
+            return block.with(prop, false);
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }

@@ -4,7 +4,6 @@ import com.boydti.fawe.object.mask.RadiusMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -24,7 +23,7 @@ public class RecurseBrush implements Brush {
     }
 
     @Override
-    public void build(final EditSession editSession, final BlockVector3 position, Pattern to, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern to, double size) throws MaxChangedBlocksException {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = Masks.alwaysTrue();
@@ -35,7 +34,7 @@ public class RecurseBrush implements Brush {
             return;
         }
         final BlockReplace replace = new BlockReplace(editSession, to);
-        editSession.setMask((Mask) null);
+        editSession.setMask(null);
         final int maxY = editSession.getMaxY();
         if (dfs) {
             final Mask radMask = new RadiusMask(0, (int) size);
@@ -43,7 +42,7 @@ public class RecurseBrush implements Brush {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
-                    return y >= y && y < maxY && radMask.test(to) && super.isVisitable(from, to);
+                    return y < maxY && radMask.test(to) && super.isVisitable(from, to);
                 }
             };
             visitor.visit(position);
@@ -53,7 +52,7 @@ public class RecurseBrush implements Brush {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
-                    return y >= y && y < maxY && super.isVisitable(from, to);
+                    return y < maxY && super.isVisitable(from, to);
                 }
             };
             visitor.visit(position);

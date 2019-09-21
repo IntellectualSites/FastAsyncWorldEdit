@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.plot;
+package com.boydti.fawe.bukkit.regions.plotquared;
 
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
@@ -6,7 +6,6 @@ import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
 import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
 import com.github.intellectualsites.plotsquared.plot.commands.SubCommand;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 

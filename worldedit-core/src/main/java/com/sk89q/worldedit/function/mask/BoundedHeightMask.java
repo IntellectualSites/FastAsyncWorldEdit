@@ -55,4 +55,5 @@ public class BoundedHeightMask extends AbstractMask {
     public Mask2D toMask2D() {
         return null;
     }
+
 }

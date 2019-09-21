@@ -20,14 +20,12 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-
 import java.util.List;
 
 /**
@@ -42,17 +40,12 @@ public class RegionVisitor implements Operation {
     public int affected = 0;
     public final Iterable<? extends BlockVector3> iterable;
 
-    /**
-     * Deprecated in favor of the other constructors which will preload chunks during iteration
-     *
-     * @param region
-     * @param function
-     */
+
+    @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {
         this((Iterable<BlockVector3>) region, function);
     }
 
-    @Deprecated
     public RegionVisitor(Iterable<BlockVector3> iterable, RegionFunction function) {
         this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;
@@ -75,6 +68,7 @@ public class RegionVisitor implements Operation {
                 affected++;
             }
         }
+
         return null;
     }
 

@@ -35,8 +35,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
+import java.util.Map;
 import java.util.OptionalInt;
+import javax.annotation.Nullable;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -44,11 +45,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Map;
-import java.util.OptionalInt;
-
-import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -202,7 +198,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param state The block state
      * @return the internal ID of the state
      */
-
     default OptionalInt getInternalBlockStateId(BlockState state) {
         return OptionalInt.empty();
     }

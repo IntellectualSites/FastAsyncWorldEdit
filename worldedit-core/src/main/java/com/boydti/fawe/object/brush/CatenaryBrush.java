@@ -31,7 +31,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
 
     @Override
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visual = (editSession.getExtent() instanceof VisualExtent);
+        boolean visual = editSession.getExtent() instanceof VisualExtent;
         if (pos1 == null || pos2.equals(pos1)) {
             if (!visual) {
                 pos1 = pos2;
@@ -64,9 +64,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
             if (!select) {
                 pos1 = null;
                 return;
-            } else {
-                pos1 = pos2;
             }
+            pos1 = pos2;
         }
     }
 
@@ -87,7 +86,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double a = 0.00001;
         for (;g < a * Math.sinh(dh/(2 * a)); a *= 1.00001);
         double vertX = (dh-a*Math.log((curveLen + dy)/(curveLen - dy)))/2.0;
-        double z = (dh/2)/a;
+        double z = (dh / 2) / a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;
         double vertY = a * 1 + oY;
         return pos1.add(pos2.subtract(pos1).multiply(vertX / dh).add(0, vertY, 0)).round().toBlockPoint();

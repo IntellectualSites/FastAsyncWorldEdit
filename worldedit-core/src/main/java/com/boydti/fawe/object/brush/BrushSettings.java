@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.brush.scroll.ScrollAction;
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
@@ -42,10 +41,10 @@ public class BrushSettings {
 
     private final Map<SettingType, Object> constructor = new ConcurrentHashMap<>();
 
-    private Brush brush = null;
-    private Mask mask = null;
-    private Mask sourceMask = null;
-    private ResettableExtent transform = null;
+    private Brush brush;
+    private Mask mask;
+    private Mask sourceMask;
+    private ResettableExtent transform;
     private Pattern material;
     private Expression size = new Expression(1);
     private Set<String> permissions;
@@ -57,7 +56,7 @@ public class BrushSettings {
         this.constructor.put(SettingType.PERMISSIONS, permissions);
     }
 
-    public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws CommandException, InputParseException {
+    public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws InputParseException {
         PlatformCommandManager manager = PlatformCommandManager.getInstance();
         String constructor = (String) settings.get(SettingType.BRUSH.name());
         if (constructor == null) {

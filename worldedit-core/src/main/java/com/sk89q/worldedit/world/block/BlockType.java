@@ -37,12 +37,10 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
@@ -101,18 +99,6 @@ public class BlockType implements FawePattern, Keyed {
         } else {
             return name;
         }
-    }
-
-    public BlockState withProperties(String properties) { //
-        int id = getInternalId();
-        for (String keyPair : properties.split(",")) {
-            String[] split = keyPair.split("=");
-            String name = split[0];
-            String value = split[1];
-            AbstractProperty btp = settings.propertiesMap.get(name);
-            id = btp.modify(id, btp.getValueFor(value));
-        }
-        return withStateId(id);
     }
 
     @Deprecated
@@ -177,14 +163,10 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public final BlockState getDefaultState() {
+    public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
-    /**
-     * @Deprecated use a Mask instead
-     * @return
-     */
     @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
         return new FuzzyBlockState(this);
@@ -303,10 +285,6 @@ public class BlockType implements FawePattern, Keyed {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.getDefaultState().toBaseBlock();
-    }
-
-    public SingleBlockTypeMask toMask() {
-        return toMask(null);
     }
 
     public SingleBlockTypeMask toMask(Extent extent) {

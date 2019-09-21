@@ -40,9 +40,7 @@ dependencies {
     "implementation"("io.papermc:paperlib:1.0.2")
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
-    "testCompile"("org.mockito:mockito-core:1.9.0-rc1") {
-        exclude("junit", "junit")
-    }
+    "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
     "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.0") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -61,6 +59,9 @@ dependencies {
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     "implementation"("com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT") { isTransitive = false }
     "implementation"("com.wasteofplastic:askyblock:3.0.8.2") { isTransitive = false }
+    "compileOnly"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
+        isTransitive = false
+    }
 }
 
 tasks.named<Copy>("processResources") {

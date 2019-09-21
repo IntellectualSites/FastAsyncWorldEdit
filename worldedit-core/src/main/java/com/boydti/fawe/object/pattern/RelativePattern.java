@@ -23,9 +23,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = pos;
         }
-        mutable.mutX((pos.getX() - origin.getX()));
-        mutable.mutY((pos.getY() - origin.getY()));
-        mutable.mutZ((pos.getZ() - origin.getZ()));
+        mutable.mutX(pos.getX() - origin.getX());
+        mutable.mutY(pos.getY() - origin.getY());
+        mutable.mutZ(pos.getZ() - origin.getZ());
         return pattern.apply(mutable);
     }
 
@@ -34,9 +34,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = set;
         }
-        mutable.mutX((set.getX() - origin.getX()));
-        mutable.mutY((set.getY() - origin.getY()));
-        mutable.mutZ((set.getZ() - origin.getZ()));
+        mutable.mutX(set.getX() - origin.getX());
+        mutable.mutY(set.getY() - origin.getY());
+        mutable.mutZ(set.getZ() - origin.getZ());
         return pattern.apply(extent, get, mutable);
     }
 

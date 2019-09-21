@@ -55,7 +55,7 @@ public class QueryTool implements BlockTool {
         builder.append(TextComponent.of("@" + clicked.toVector().toBlockPoint() + ": ", TextColor.BLUE));
         builder.append(TextComponent.of(block.getBlockType().getName(), TextColor.YELLOW));
         builder.append(TextComponent.of(" (" + block + ") ", TextColor.GRAY)
-                                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Block state"))));
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Block state"))));
 /*
         final OptionalInt internalId = BlockStateIdAccess.getBlockStateId(block.toImmutableState());
         if (internalId.isPresent()) {
@@ -64,8 +64,8 @@ public class QueryTool implements BlockTool {
         }
 */
         builder.append(TextComponent.of(" (" + world.getBlockLightLevel(blockPoint) + "/"
-                                                + world.getBlockLightLevel(blockPoint.add(0, 1, 0)) + ")", TextColor.WHITE)
-                                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Block Light/Light Above"))));
+                    + world.getBlockLightLevel(blockPoint.add(0, 1, 0)) + ")", TextColor.WHITE)
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Block Light/Light Above"))));
 
         player.print(builder.build());
 

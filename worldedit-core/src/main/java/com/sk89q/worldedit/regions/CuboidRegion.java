@@ -413,6 +413,11 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
+    public boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
+    }
+
+    @Override
     public Iterator<BlockVector3> iterator() {
         if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9 || useOldIterator) {
             return iterator_old();

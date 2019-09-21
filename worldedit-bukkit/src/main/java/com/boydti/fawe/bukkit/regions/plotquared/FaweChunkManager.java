@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.plot;
+package com.boydti.fawe.bukkit.regions.plotquared;
 
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;

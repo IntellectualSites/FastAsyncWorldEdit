@@ -104,7 +104,7 @@ public class EllipsoidRegion extends AbstractRegion {
 
     @Override
     public int getHeight() {
-        return Math.max((int) (2 * radius.getY()), 256);
+        return (int) (2 * radius.getY());
     }
 
     @Override
@@ -244,6 +244,11 @@ public class EllipsoidRegion extends AbstractRegion {
        double cyd = cy2 * inverseRadius.getY();
        double czd = cz2 * inverseRadius.getZ();
        return cxd + cyd + czd <= 1;
+    }
+
+    @Override
+    public boolean contains(BlockVector3 position) {
+        return position.subtract(center).toVector3().divide(radius).lengthSq() <= 1;
     }
 
     @Override

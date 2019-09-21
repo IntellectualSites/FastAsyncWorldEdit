@@ -78,9 +78,9 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     private final RegionFunction function;
+    private BlockVectorSet queue = new BlockVectorSet();
+    private BlockVectorSet visited = new BlockVectorSet();
     private BlockVector3[] directions;
-    private BlockVectorSet visited;
-    private BlockVectorSet queue;
     private int affected = 0;
     private int currentDepth = 0;
     private final int maxDepth;
@@ -98,8 +98,6 @@ public abstract class BreadthFirstSearch implements Operation {
 
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
         checkNotNull(function);
-        this.queue = new BlockVectorSet();
-        this.visited = new BlockVectorSet();
         this.function = function;
         this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
@@ -120,6 +118,8 @@ public abstract class BreadthFirstSearch implements Operation {
      * what adjacent points area available. Vectors should not be
      * unit vectors. An example of a valid direction is
      * {@code BlockVector3.at(1, 0, 1)}.</p>
+     *
+     * <p>The list of directions can be cleared.</p>
      *
      * @return the list of directions
      */
@@ -260,6 +260,7 @@ public abstract class BreadthFirstSearch implements Operation {
             tmp.clear();
             tempQueue = tmp;
         }
+
         return null;
     }
 

@@ -70,6 +70,7 @@ public class FlatRegionVisitor implements Operation {
                 affected++;
             }
         }
+
         return null;
     }
 

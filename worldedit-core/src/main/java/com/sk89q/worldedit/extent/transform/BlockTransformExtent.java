@@ -19,10 +19,27 @@
 
 package com.sk89q.worldedit.extent.transform;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_EAST;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_NORTH;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_SOUTH;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_WEST;
+import static com.sk89q.worldedit.util.Direction.DOWN;
+import static com.sk89q.worldedit.util.Direction.EAST;
+import static com.sk89q.worldedit.util.Direction.Flag;
+import static com.sk89q.worldedit.util.Direction.NORTH;
+import static com.sk89q.worldedit.util.Direction.NORTHEAST;
+import static com.sk89q.worldedit.util.Direction.NORTHWEST;
+import static com.sk89q.worldedit.util.Direction.SOUTH;
+import static com.sk89q.worldedit.util.Direction.SOUTHEAST;
+import static com.sk89q.worldedit.util.Direction.SOUTHWEST;
+import static com.sk89q.worldedit.util.Direction.UP;
+import static com.sk89q.worldedit.util.Direction.WEST;
+import static com.sk89q.worldedit.util.Direction.findClosest;
+import static com.sk89q.worldedit.util.Direction.values;
+
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.ReflectionUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -38,21 +55,19 @@ import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
-import static com.sk89q.worldedit.util.Direction.*;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
@@ -87,11 +102,8 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     private static long combine(Direction... directions) {
-        long mask = 0;
-        for (Direction dir : directions) {
-            mask = mask | (1L << dir.ordinal());
-        }
-        return mask;
+        return Arrays.stream(directions).mapToLong(dir -> (1L << dir.ordinal()))
+            .reduce(0, (a, b) -> a | b);
     }
 
     private static long[] adapt(Direction... dirs) {
@@ -497,7 +509,7 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return super.setBlock(x, y, z, transformInverse(block));
     }
 }

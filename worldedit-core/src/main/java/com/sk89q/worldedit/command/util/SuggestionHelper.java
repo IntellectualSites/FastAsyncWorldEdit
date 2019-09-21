@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command.util;
 
+import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
+
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
@@ -26,7 +29,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -36,9 +38,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
-import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
 /**
  * Internal class for generating common command suggestions.
@@ -140,12 +139,12 @@ public final class SuggestionHelper {
 
     public static <V extends Keyed> Stream<String> getRegistrySuggestions(Registry<V> registry, String input) {
         if (registry instanceof NamespacedRegistry) {
-            return getNamespacedRegistrySuggestions(((NamespacedRegistry<?>) registry), input);
+            return getNamespacedRegistrySuggestions(((NamespacedRegistry<V>) registry), input);
         }
         return limitByPrefix(registry.keySet().stream(), input).stream();
     }
 
-    public static <V extends Keyed> Stream<String> getNamespacedRegistrySuggestions(NamespacedRegistry<?> registry, String input) {
+    public static <V extends Keyed> Stream<String> getNamespacedRegistrySuggestions(NamespacedRegistry<V> registry, String input) {
         if (input.isEmpty() || input.equals(":")) {
             final Set<String> namespaces = registry.getKnownNamespaces();
             if (namespaces.size() == 1) {

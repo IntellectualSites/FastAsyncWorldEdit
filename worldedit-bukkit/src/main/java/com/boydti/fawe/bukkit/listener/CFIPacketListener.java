@@ -21,7 +21,7 @@ import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import java.lang.reflect.InvocationTargetException;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -239,14 +239,14 @@ public class CFIPacketListener implements Listener {
         platform.handleBlockInteract(toCall);
         if (toCall.isCancelled() || action == Interaction.OPEN) {
             BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
-            BlockStateHolder block = gen.getBlock(pt);
+            BlockState block = gen.getBlock(pt);
             sendBlockChange(plr, realPos, block);
             return true;
         }
         return false;
     }
 
-    private void sendBlockChange(Player plr, BlockVector3 pt, BlockStateHolder block) {
+    private void sendBlockChange(Player plr, BlockVector3 pt, BlockState block) {
         plr.sendBlockChange(new Location(plr.getWorld(), pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()), BukkitAdapter.adapt(block));
     }
 

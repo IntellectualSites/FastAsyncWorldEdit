@@ -67,4 +67,5 @@ public class BlockPattern extends AbstractPattern {
     public BaseBlock apply(BlockVector3 position) {
         return block;
     }
+
 }

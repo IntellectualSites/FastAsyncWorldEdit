@@ -24,6 +24,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     boolean isEmpty();
 
+    @Override
     boolean setTile(int x, int y, int z, CompoundTag tile);
 
     void setEntity(CompoundTag tag);

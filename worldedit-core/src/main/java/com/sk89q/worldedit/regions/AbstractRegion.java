@@ -120,6 +120,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
                 (max.getY() - min.getY() + 1) *
                 (max.getZ() - min.getZ() + 1);
     }
+
     /**
      * Get X-size.
      *

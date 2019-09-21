@@ -26,7 +26,6 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.session.request.RequestExtent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.Set;

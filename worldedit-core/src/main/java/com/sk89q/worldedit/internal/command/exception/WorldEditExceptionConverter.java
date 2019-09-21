@@ -85,6 +85,7 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
     public void convert(MissingWorldException e) throws CommandException {
         throw newCommandException("You need to provide a world (Try //world)", e);
     }
+
     @ExceptionMatch
     public void convert(UnknownItemException e) throws CommandException {
         throw newCommandException("Block name '" + e.getID() + "' was not recognized.", e);

@@ -20,6 +20,7 @@ import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.regions.WorldguardFlag;
+import com.boydti.fawe.bukkit.regions.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
@@ -29,6 +30,7 @@ import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
@@ -84,6 +86,7 @@ public class FaweBukkit implements IFawe, Listener {
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
+            WEManager.IMP.managers.add(new PlotSquaredFeature());
         } catch (final Throwable e) {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
@@ -203,6 +206,15 @@ public class FaweBukkit implements IFawe, Listener {
                 return existing;
             }
             Player player = Bukkit.getPlayer(name);
+            return player != null ? BukkitAdapter.adapt(player) : null;
+        }
+        if (obj.getClass() == UUID.class) {
+            UUID uuid = (UUID) obj;
+            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(uuid);
+            if (existing != null) {
+                return existing;
+            }
+            Player player = Bukkit.getPlayer(uuid);
             return player != null ? BukkitAdapter.adapt(player) : null;
         }
         return null;

@@ -28,12 +28,10 @@ public class SplineBrush implements Brush, ResettableTool {
     private ArrayList<ArrayList<BlockVector3>> positionSets;
     private int numSplines;
 
-    private final LocalSession session;
     private final Player player;
     private BlockVector3 position;
 
     public SplineBrush(Player player, LocalSession session) {
-        this.session = session;
         this.player = player;
         this.positionSets = new ArrayList<>();
     }

@@ -17,23 +17,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.function;
+package com.sk89q.worldedit.function.pattern;
 
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 /**
- * Performs a function on points in a region.
+ * Returns a {@link BiomeType} for a given position.
  */
-public interface RegionFunction {
+public interface BiomePattern {
 
     /**
-     * Apply the function to the given position.
+     * Return a {@link BiomeType} for the given position.
      *
      * @param position the position
-     * @return true if something was changed
-     * @throws WorldEditException thrown on an error
+     * @return a block
      */
-    boolean apply(BlockVector3 position) throws WorldEditException;
-
+    BiomeType apply(BlockVector2 position);
 }

@@ -164,7 +164,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
 
             @Override
             public boolean isPersistent() {
-                return true;
+                return false;
             }
 
             @Override

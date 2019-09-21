@@ -47,8 +47,8 @@ import javax.annotation.Nullable;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
-    private final BlockState blockState;
-    private final CompoundTag nbtData;
+    private BlockState blockState;
+    @Nullable private CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
@@ -103,25 +103,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
             blockState = BlockTypes.AIR.getDefaultState();
         }
         return blockState;
-    }
-
-    protected BaseBlock(int internalId, CompoundTag nbtData) {
-        this(BlockState.getFromInternalId(internalId), nbtData);
-    }
-
-    @Deprecated
-    public static BaseBlock getFromInternalId(int internalId, CompoundTag nbtData) {
-        return BlockState.getFromInternalId(internalId).toBaseBlock(nbtData);
-    }
-
-    /**
-     * Create a clone of another block.
-     *
-     * @param other the other block
-     */
-    @Deprecated
-    public BaseBlock(BaseBlock other) {
-        this(other.toImmutableState(), other.getNbtData());
     }
 
     /**

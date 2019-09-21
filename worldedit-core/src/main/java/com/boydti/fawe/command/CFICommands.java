@@ -104,7 +104,7 @@ public class CFICommands {
             desc = "Start CFI with a height map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void heightmap(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "yscale", desc = "double", def = "1") double yscale) {
+    public void heightmap(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "yscale", desc = "double", def = "1") double yscale) {
         if (yscale != 0) {
             int[] raw = ((DataBufferInt) image.load().getRaster().getDataBuffer()).getData();
             int[] table = IntStream.range(0, 256).map(i -> Math.min(255, (int) (i * yscale)))
@@ -118,7 +118,7 @@ public class CFICommands {
             }
         }
         HeightMapMCAGenerator generator = new HeightMapMCAGenerator(image.load(), getFolder(generateName()));
-        setup(generator, fp);
+        setup(generator, player);
     }
 
     @Command(
@@ -126,9 +126,9 @@ public class CFICommands {
             desc = "Start CFI with an empty map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void heightMap(Player fp, int width, int length) {
+    public void heightMap(Player player, int width, int length) {
         HeightMapMCAGenerator generator = new HeightMapMCAGenerator(width, length, getFolder(generateName()));
-        setup(generator, fp);
+        setup(generator, player);
     }
 
     private String generateName() {
@@ -136,13 +136,13 @@ public class CFICommands {
         return df.format(new Date());
     }
 
-    private void setup(HeightMapMCAGenerator generator, Player fp) {
-        CFISettings settings = getSettings(fp).remove();
-        generator.setPacketViewer(fp);
+    private void setup(HeightMapMCAGenerator generator, Player player) {
+        CFISettings settings = getSettings(player).remove();
+        generator.setPacketViewer(player);
         settings.setGenerator(generator).bind();
-        generator.setImageViewer(Fawe.imp().getImageViewer(fp));
+        generator.setImageViewer(Fawe.imp().getImageViewer(player));
         generator.update();
-        mainMenu(fp);
+        mainMenu(player);
     }
 
     @Command(
@@ -172,9 +172,9 @@ public class CFICommands {
             desc = "Cancel creation"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void cancel(Player fp) {
-        getSettings(fp).remove();
-        fp.print("Cancelled!");
+    public void cancel(Player player) {
+        getSettings(player).remove();
+        player.print("Cancelled!");
     }
 
     @Command(
@@ -238,8 +238,8 @@ public class CFICommands {
             desc = "Set the floor and main block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void column(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    public void column(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.setColumn(load(image), patternArg, !disableWhiteOnly);
         } else if (maskOpt != null) {
@@ -247,9 +247,9 @@ public class CFICommands {
         } else {
             gen.setColumn(patternArg);
         }
-        fp.print("Set column!");
-        assertSettings(fp).resetComponent();
-        component(fp);
+        player.print("Set column!");
+        assertSettings(player).resetComponent();
+        component(player);
     }
 
     @Command(
@@ -257,15 +257,15 @@ public class CFICommands {
             desc = "Set the floor (default: grass)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorCmd(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        floor(fp, patternArg, image, maskOpt, disableWhiteOnly);
-        fp.print("Set floor!");
-        assertSettings(fp).resetComponent();
-        component(fp);
+    public void floorCmd(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        floor(player, patternArg, image, maskOpt, disableWhiteOnly);
+        player.print("Set floor!");
+        assertSettings(player).resetComponent();
+        component(player);
     }
 
-    private void floor(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    private void floor(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.setFloor(load(image), patternArg, !disableWhiteOnly);
         } else if (maskOpt != null) {
@@ -280,15 +280,15 @@ public class CFICommands {
             desc = "Set the main block (default: stone)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mainCmd(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        main(fp, patternArg, image, maskOpt, disableWhiteOnly);
-        fp.print("Set main!");
-        assertSettings(fp).resetComponent();
-        component(fp);
+    public void mainCmd(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        main(player, patternArg, image, maskOpt, disableWhiteOnly);
+        player.print("Set main!");
+        assertSettings(player).resetComponent();
+        component(player);
     }
 
-    public void main(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    public void main(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.setMain(load(image), patternArg, !disableWhiteOnly);
         } else if (maskOpt != null) {
@@ -306,8 +306,8 @@ public class CFICommands {
                     "e.g. Tallgrass"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void overlay(Player fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    public void overlay(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.setOverlay(load(image), patternArg, !disableWhiteOnly);
         } else if (maskOpt != null) {
@@ -315,8 +315,8 @@ public class CFICommands {
         } else {
             gen.setOverlay(patternArg);
         }
-        fp.print("Set overlay!");
-        component(fp);
+        player.print("Set overlay!");
+        component(player);
     }
 
     @Command(
@@ -328,14 +328,14 @@ public class CFICommands {
                     " - A good value for radius and iterations would be 1 8."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void smoothCmd(Player fp, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        smooth(fp, radius, iterations, image, maskOpt, disableWhiteOnly);
-        assertSettings(fp).resetComponent();
-        component(fp);
+    public void smoothCmd(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        smooth(player, radius, iterations, image, maskOpt, disableWhiteOnly);
+        assertSettings(player).resetComponent();
+        component(player);
     }
 
-    private void smooth(Player fp, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    private void smooth(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.smooth(load(image), !disableWhiteOnly, radius, iterations);
         } else {
@@ -348,14 +348,14 @@ public class CFICommands {
             desc = "Create some snow"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void snow(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
-        floor(fp, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, maskOpt, disableWhiteOnly);
-        main(fp, BlockTypes.SNOW_BLOCK, image, maskOpt, disableWhiteOnly);
-        smooth(fp, 1, 8, image, maskOpt, disableWhiteOnly);
-        fp.print(TextComponent.of("Added snow!"));
-        assertSettings(fp).resetComponent();
-        component(fp);
+    public void snow(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
+        floor(player, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, maskOpt, disableWhiteOnly);
+        main(player, BlockTypes.SNOW_BLOCK, image, maskOpt, disableWhiteOnly);
+        smooth(player, 1, 8, image, maskOpt, disableWhiteOnly);
+        player.print(TextComponent.of("Added snow!"));
+        assertSettings(player).resetComponent();
+        component(player);
     }
 
     @Command(

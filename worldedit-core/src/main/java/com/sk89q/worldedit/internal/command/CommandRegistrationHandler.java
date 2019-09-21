@@ -46,7 +46,7 @@ public class CommandRegistrationHandler {
             .listeners(callListeners);
         if (registration instanceof CommandPermissionsConditionGenerator.Registration) {
             ((CommandPermissionsConditionGenerator.Registration) registration).commandPermissionsConditionGenerator(
-                    PERM_GEN
+                PERM_GEN
             );
         }
         if (registration instanceof CommandQueuedConditionGenerator.Registration) {

@@ -4,7 +4,6 @@ import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
-import com.boydti.fawe.regions.general.plot.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -186,7 +185,6 @@ public class Fawe {
                 transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                WEManager.IMP.managers.add(new PlotSquaredFeature());
                 Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
             try {

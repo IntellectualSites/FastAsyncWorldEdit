@@ -9,23 +9,23 @@ import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Arrays;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class ErodeBrush implements Brush {
 
-    private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(direction -> direction.toBlockVector()).toArray(size -> new BlockVector3[size]);
+    private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(Direction::toBlockVector).toArray(BlockVector3[]::new);
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        this.erosion(editSession, 2, 1, 5, 1, position, size);
+        this.erosion(editSession, 2, 1, 5, position, size);
     }
 
-    public void erosion(final EditSession es, int erodeFaces, int erodeRec, int fillFaces, int fillRec, BlockVector3 target, double size) {
+    void erosion(EditSession es, int erodeFaces, int erodeRec, int fillFaces,
+        BlockVector3 target, double size) {
         int brushSize = (int) size + 1;
         int brushSizeSquared = (int) (size * size);
         int dimension = brushSize * 2 + 1;
@@ -42,7 +42,7 @@ public class ErodeBrush implements Brush {
                 int y0 = y + by;
                 for (int z = -brushSize; z <= brushSize; z++) {
                     int z0 = z + bz;
-                    BlockStateHolder state = es.getBlock(x0, y0, z0);
+                    BlockState state = es.getBlock(x0, y0, z0);
                     buffer1.setBlock(x, y, z, state);
                     buffer2.setBlock(x, y, z, state);
                 }
@@ -55,7 +55,7 @@ public class ErodeBrush implements Brush {
             swap++;
         }
 
-        for (int i = 0; i < fillRec; ++i) {
+        for (int i = 0; i < 1; ++i) {
             fillIteration(brushSize, brushSizeSquared, fillFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
             swap++;
         }
@@ -69,7 +69,8 @@ public class ErodeBrush implements Brush {
         }, true);
     }
 
-    public void fillIteration(int brushSize, int brushSizeSquared, int fillFaces, FaweClipboard current, FaweClipboard target) {
+    private void fillIteration(int brushSize, int brushSizeSquared, int fillFaces,
+        FaweClipboard current, FaweClipboard target) {
         int[] frequency = null;
         for (int x = -brushSize; x <= brushSize; x++) {
             int x2 = x * x;
@@ -81,20 +82,20 @@ public class ErodeBrush implements Brush {
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
-                    BlockStateHolder state = current.getBlock(x, y, z);
+                    BaseBlock state = current.getBlock(x, y, z);
                     if (state.getBlockType().getMaterial().isMovementBlocker()) {
                         continue;
                     }
                     int total = 0;
                     int highest = 1;
-                    BlockStateHolder highestState = state;
+                    BaseBlock highestState = state;
                     if (frequency == null) {
                         frequency = new int[BlockTypes.size()];
                     } else {
                         Arrays.fill(frequency, 0);
                     }
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BlockStateHolder next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
+                        BaseBlock next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
                         if (!next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
                         }
@@ -113,7 +114,8 @@ public class ErodeBrush implements Brush {
         }
     }
 
-    public void erosionIteration(int brushSize, int brushSizeSquared, int erodeFaces, FaweClipboard current, FaweClipboard target) {
+    private void erosionIteration(int brushSize, int brushSizeSquared, int erodeFaces,
+        FaweClipboard current, FaweClipboard target) {
         int[] frequency = null;
         for (int x = -brushSize; x <= brushSize; x++) {
             int x2 = x * x;
@@ -125,20 +127,20 @@ public class ErodeBrush implements Brush {
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
-                    BlockStateHolder state = current.getBlock(x, y, z);
+                    BaseBlock state = current.getBlock(x, y, z);
                     if (!state.getBlockType().getMaterial().isMovementBlocker()) {
                         continue;
                     }
                     int total = 0;
                     int highest = 1;
-                    BlockStateHolder highestState = state;
+                    BaseBlock highestState = state;
                     if (frequency == null) {
                         frequency = new int[BlockTypes.size()];
                     } else {
                         Arrays.fill(frequency, 0);
                     }
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BlockStateHolder next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
+                        BaseBlock next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
                         if (next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
                         }

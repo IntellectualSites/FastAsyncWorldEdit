@@ -1,10 +1,8 @@
-package com.boydti.fawe.regions.general.plot;
+package com.boydti.fawe.bukkit.regions.plotquared;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.regions.SimpleRegion;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
@@ -22,12 +20,16 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
 import java.util.HashSet;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 
 public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
@@ -89,7 +91,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
     }
 
-    public boolean isAllowed(com.sk89q.worldedit.entity.Player player, Plot plot, MaskType type) {
+    public boolean isAllowed(Player player, Plot plot, MaskType type) {
         if (plot == null) {
             return false;
         }
@@ -114,14 +116,14 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 }
             }
         }
-        if (regions.size() == 0) {
+        if (regions.isEmpty()) {
             return null;
         }
         PlotArea area = pp.getApplicablePlotArea();
         int min = area != null ? area.MIN_BUILD_HEIGHT : 0;
         int max = area != null ? Math.min(255, area.MAX_BUILD_HEIGHT) : 255;
         final HashSet<com.boydti.fawe.object.RegionWrapper> faweRegions = new HashSet<>();
-        for (final RegionWrapper current : regions) {
+        for (RegionWrapper current : regions) {
             faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.minX, current.maxX, min, max, current.minZ, current.maxZ));
         }
         final RegionWrapper region = regions.iterator().next();
@@ -136,7 +138,27 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (regions.size() == 1) {
             maskedRegion = new CuboidRegion(pos1, pos2);
         } else {
-            maskedRegion = new SimpleRegion(FaweAPI.getWorld(area.worldname), pos1, pos2) {
+            maskedRegion = new AbstractRegion(BukkitAdapter.adapt(Bukkit.getWorld(area.worldname))) {
+                @Override
+                public BlockVector3 getMinimumPoint() {
+                    return pos1;
+                }
+
+                @Override
+                public BlockVector3 getMaximumPoint() {
+                    return pos2;
+                }
+
+                @Override
+                public void expand(BlockVector3... changes) throws RegionOperationException {
+                    throw new UnsupportedOperationException("Region is immutable");
+                }
+
+                @Override
+                public void contract(BlockVector3... changes) throws RegionOperationException {
+                    throw new UnsupportedOperationException("Region is immutable");
+                }
+
                 @Override
                 public boolean contains(int x, int y, int z) {
                     return WEManager.maskContains(regions, x, y, z);
@@ -146,12 +168,17 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 public boolean contains(int x, int z) {
                     return WEManager.maskContains(regions, x, z);
                 }
+
+                @Override
+                public boolean contains(BlockVector3 position) {
+                    return contains(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+                }
             };
         }
 
         return new FaweMask(maskedRegion) {
             @Override
-            public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+            public boolean isValid(Player player, MaskType type) {
                 if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot)) {
                     return false;
                 }

@@ -38,17 +38,6 @@ public interface Mask {
      */
     boolean test(BlockVector3 vector);
 
-    default Filter toFilter(Runnable run) {
-        return new Filter() {
-            @Override
-            public void applyBlock(FilterBlock block) {
-                if (test(block)) {
-                    run.run();
-                }
-            }
-        };
-    }
-
     default <T extends Filter> DelegateFilter<T> toFilter(T filter) {
         return new DelegateFilter<T>(filter) {
             @Override

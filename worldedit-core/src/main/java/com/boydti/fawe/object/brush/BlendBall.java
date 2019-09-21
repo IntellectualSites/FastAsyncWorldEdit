@@ -1,16 +1,13 @@
 package com.boydti.fawe.object.brush;
 
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Arrays;
-import java.util.Map;
 
 public class BlendBall implements Brush {
 
@@ -38,8 +35,8 @@ public class BlendBall implements Brush {
                     }
                     int z0 = z + tz;
                     int highest = 1;
-                    BlockStateHolder currentState = editSession.getBlock(x0, y0, z0);
-                    BlockStateHolder highestState = currentState;
+                    BlockState currentState = editSession.getBlock(x0, y0, z0);
+                    BlockState highestState = currentState;
                     Arrays.fill(frequency, 0);
                     boolean tie = false;
                     for (int ox = -1; ox <= 1; ox++) {
@@ -48,13 +45,9 @@ public class BlendBall implements Brush {
                                 if (oy + y0 < 0 || oy + y0 > maxY) {
                                     continue;
                                 }
-                                BlockStateHolder state = editSession.getBlock(x0 + ox, y0 + oy, z0 + oz);
+                                BlockState state = editSession.getBlock(x0 + ox, y0 + oy, z0 + oz);
                                 Integer count = frequency[state.getInternalBlockTypeId()];
-                                if (count == null) {
-                                    count = 1;
-                                } else {
-                                    count++;
-                                }
+                                count++;
                                 if (count > highest) {
                                     highest = count;
                                     highestState = state;

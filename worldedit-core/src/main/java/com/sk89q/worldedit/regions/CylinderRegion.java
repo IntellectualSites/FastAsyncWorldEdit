@@ -35,7 +35,6 @@ import com.sk89q.worldedit.math.geom.Polygons;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
 import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
 import com.sk89q.worldedit.world.World;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -327,6 +326,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return dx * dx + dz * dz <= 1;
     }
 
+    @Override
+    public boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
+    }
+
     /**
      * Sets the height of the cylinder to fit the specified Y.
      *
@@ -411,7 +415,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
+        final IChunkGet get, final IChunkSet set) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;

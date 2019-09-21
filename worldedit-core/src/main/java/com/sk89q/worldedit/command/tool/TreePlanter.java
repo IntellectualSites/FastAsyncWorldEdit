@@ -64,10 +64,10 @@ public class TreePlanter implements BlockTool {
                 }
 
                 if (!successful) {
-                    BBC.TOOL_TREE_ERROR_BLOCK.send(player);
+                    player.printError(BBC.TOOL_TREE_ERROR_BLOCK.s());
                 }
             } catch (MaxChangedBlocksException e) {
-                BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.send(player);
+                player.printError(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.s());
             } finally {
                 session.remember(editSession);
             }

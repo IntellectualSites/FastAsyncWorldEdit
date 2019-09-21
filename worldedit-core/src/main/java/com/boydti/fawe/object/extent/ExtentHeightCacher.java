@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 
@@ -30,7 +29,7 @@ public class ExtentHeightCacher extends PassthroughExtent {
         int rx = x - cacheBotX + 16;
         int rz = z - cacheBotZ + 16;
         int index;
-        if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
+        if ((rx & 0xFF) != rx || (rz & 0xFF) != rz) {
             cacheBotX = x - 16;
             cacheBotZ = z - 16;
             lastY = y;

@@ -27,42 +27,42 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.util.Location;
 
 public class NavigationWand implements DoubleActionTraceTool {
-  @Override
-  public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-    if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
-      return false;
-    }
-    final int maxDist = config.navigationWandMaxDistance;
-    if (maxDist <= 0) {
-      return false;
-    }
-    Location pos = player.getSolidBlockTrace(maxDist);
-    if (pos != null) {
-      player.findFreePosition(pos);
-    } else {
-      player.printError("No block in sight (or too far)!");
-    }
-    return true;
-  }
-
-  @Override
-  public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-    if (!player.hasPermission("worldedit.navigation.thru.tool")) {
-      return false;
-    }
-    final int maxDist = config.navigationWandMaxDistance;
-    if (maxDist <= 0) {
-      return false;
+    @Override
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
+            return false;
+        }
+        final int maxDist = config.navigationWandMaxDistance;
+        if (maxDist <= 0) {
+            return false;
+        }
+        Location pos = player.getSolidBlockTrace(maxDist);
+        if (pos != null) {
+            player.findFreePosition(pos);
+        } else {
+            player.printError("No block in sight (or too far)!");
+        }
+        return true;
     }
 
-    if (!player.passThroughForwardWall(Math.max(1, maxDist - 10))) {
-      player.printError("Nothing to pass through (or too far)!");
-    }
-    return true;
-  }
+    @Override
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission("worldedit.navigation.thru.tool")) {
+            return false;
+        }
+        final int maxDist = config.navigationWandMaxDistance;
+        if (maxDist <= 0) {
+            return false;
+        }
 
-  @Override
-  public boolean canUse(Actor actor) {
-    return true; // skip check here - checked separately for primary/secondary
-  }
+        if (!player.passThroughForwardWall(Math.max(1, maxDist - 10))) {
+            player.printError("Nothing to pass through (or too far)!");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean canUse(Actor actor) {
+        return true; // skip check here - checked separately for primary/secondary
+    }
 }

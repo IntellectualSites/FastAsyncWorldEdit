@@ -175,6 +175,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().getBlockDistributionWithData(region);
     }
 
+    @Override
     @Nullable
     public Operation commit() {
         return getExtent().commit();
@@ -271,6 +272,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().setBlock(position, block);
     }
 
+    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
@@ -285,6 +287,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().setBiome(position, biome);
     }
 
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
     }

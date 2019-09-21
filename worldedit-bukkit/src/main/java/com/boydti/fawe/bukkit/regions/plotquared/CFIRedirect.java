@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.plot;
+package com.boydti.fawe.bukkit.regions.plotquared;
 
 import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;

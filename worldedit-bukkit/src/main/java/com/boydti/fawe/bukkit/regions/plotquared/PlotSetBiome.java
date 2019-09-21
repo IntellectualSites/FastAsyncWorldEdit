@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.plot;
+package com.boydti.fawe.bukkit.regions.plotquared;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -20,6 +20,7 @@ import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import org.bukkit.Bukkit;
 
 @CommandDeclaration(
         command = "generatebiome",
@@ -65,34 +67,28 @@ public class PlotSetBiome extends Command {
             MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
             return CompletableFuture.completedFuture(false);
         }
-        confirm.run(this, new Runnable() {
-            @Override
-            public void run() {
-                if (plot.getRunning() != 0) {
-                    Captions.WAIT_FOR_TIMER.send(player);
-                    return;
-                }
-                plot.addRunning();
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        EditSession session = new EditSessionBuilder(plot.getArea().worldname)
-                                .autoQueue(false)
-                                .checkMemory(false)
-                                .allowedRegionsEverywhere()
-                                .player(Fawe.imp().wrap(player.getName()))
-                                .limitUnlimited()
-                                .build();
-                        long seed = ThreadLocalRandom.current().nextLong();
-                        for (RegionWrapper region : regions) {
-                            CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
-                            session.regenerate(cuboid, biome, seed);
-                        }
-                        session.flushQueue();
-                        plot.removeRunning();
-                    }
-                });
+        confirm.run(this, () -> {
+            if (plot.getRunning() != 0) {
+                Captions.WAIT_FOR_TIMER.send(player);
+                return;
             }
+            plot.addRunning();
+            TaskManager.IMP.async(() -> {
+                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
+                        .autoQueue(false)
+                        .checkMemory(false)
+                        .allowedRegionsEverywhere()
+                        .player(Fawe.imp().wrap(player.getUUID()))
+                        .limitUnlimited()
+                        .build();
+                long seed = ThreadLocalRandom.current().nextLong();
+                for (RegionWrapper region : regions) {
+                    CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
+                    session.regenerate(cuboid, biome, seed);
+                }
+                session.flushQueue();
+                plot.removeRunning();
+            });
         }, null);
 
         return CompletableFuture.completedFuture(true);

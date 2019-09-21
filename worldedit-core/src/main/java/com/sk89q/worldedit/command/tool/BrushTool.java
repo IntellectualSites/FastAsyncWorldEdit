@@ -91,7 +91,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     protected static int MAX_RANGE = 500;
-    protected static int DEFAULT_RANGE = 240;
     protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
@@ -178,7 +177,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (targetMode != TargetMode.TARGET_BLOCK_RANGE) {
             map.put("target", targetMode);
         }
-        if (range != -1 && range != DEFAULT_RANGE) {
+        if (range != -1 && range != MAX_RANGE) {
             map.put("range", range);
         }
         if (targetOffset != 0) {
@@ -312,7 +311,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @return the mask used to stop block traces
      */
     public @Nullable Mask getTraceMask() {
-        return traceMask;
+        return this.traceMask;
     }
 
     /**
@@ -409,7 +408,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @return the range of the brush in blocks
      */
     public int getRange() {
-        return (range < 0) ? DEFAULT_RANGE : Math.min(range, MAX_RANGE);
+        return (range < 0) ? MAX_RANGE : Math.min(range, MAX_RANGE);
     }
 
     /**
@@ -418,16 +417,12 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @param range the range of the brush in blocks
      */
     public void setRange(int range) {
-        if (range == DEFAULT_RANGE) {
-            this.range = -1;
-        } else {
-            this.range = range;
-        }
+        this.range = range;
     }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        return act(BrushAction.PRIMARY, server, config, player, session);
+        return act(BrushAction.PRIMARY, player, session);
     }
 
     public BlockVector3 getPosition(EditSession editSession, Player player) {
@@ -481,7 +476,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         });
     }
 
-    public boolean act(BrushAction action, Platform server, LocalConfiguration config, Player player, LocalSession session) {
+    public boolean act(BrushAction action, Player player, LocalSession session) {
         switch (action) {
             case PRIMARY:
                 setContext(primary);
@@ -499,14 +494,14 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             return false;
         }
         try (EditSession editSession = session.createEditSession(player)) {
-            BlockVector3 target = getPosition(editSession, player);
+            Location target = player.getBlockTrace(getRange(), true, traceMask);
 
             if (target == null) {
                 editSession.cancel();
-                BBC.NO_BLOCK.send(player);
+                player.print(BBC.NO_BLOCK.s());
                 return true;
             }
-            BlockBag bag = editSession.getBlockBag();
+            BlockBag bag = session.getBlockBag(player);
 
             Request.request().setEditSession(editSession);
             Mask mask = current.getMask();
@@ -536,7 +531,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 new PatternTraverser(current).reset(editSession);
                 double size = current.getSize();
                 WorldEdit.getInstance().checkMaxBrushRadius(size);
-                brush.build(editSession, target, current.getMaterial(), size);
+                brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
                 player.printError("Max blocks change limit reached.");
             } finally {
@@ -554,7 +549,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        return act(BrushAction.SECONDARY, server, config, player, session);
+        return act(BrushAction.SECONDARY, player, session);
     }
 
 
@@ -627,8 +622,8 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         return false;
     }
 
-    public void queueVisualization(Player fp) {
-        Fawe.get().getVisualQueue().queue(fp);
+    public void queueVisualization(Player player) {
+        Fawe.get().getVisualQueue().queue(player);
     }
 
     @Deprecated

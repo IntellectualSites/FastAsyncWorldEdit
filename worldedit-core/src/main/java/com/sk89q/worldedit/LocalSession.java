@@ -372,8 +372,8 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
-        Player fp = editSession.getPlayer();
-        int limit = fp == null ? Integer.MAX_VALUE : fp.getLimit().MAX_HISTORY;
+        Player player = editSession.getPlayer();
+        int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
     }
 
@@ -507,7 +507,6 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        //TODO This method needs to be modified to use actors instead of FAWEPlayer
         loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player) actor).getWorldForEditing());
         if (getHistoryNegativeIndex() < history.size()) {
             FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
@@ -544,7 +543,6 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        //TODO This method needs to be modified to use actors instead of FAWEPlayer
         loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player)actor).getWorldForEditing());
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
@@ -622,16 +620,12 @@ public class LocalSession implements TextureHolder {
      */
     public RegionSelector getRegionSelector(World world) {
         checkNotNull(world);
-        try {
-            if (selector.getWorld() == null || !selector.getWorld().equals(world)) {
-                selector.setWorld(world);
-                selector.clear();
-                if (hasWorldOverride() && !world.equals(getWorldOverride())) {
-                    setWorldOverride(null);
-                }
-            }
-        } catch (Throwable ignore) {
+        if (selector.getWorld() == null || !selector.getWorld().equals(world)) {
+            selector.setWorld(world);
             selector.clear();
+            if (hasWorldOverride() && !world.equals(getWorldOverride())) {
+                setWorldOverride(null);
+            }
         }
         return selector;
     }
@@ -1044,6 +1038,7 @@ public class LocalSession implements TextureHolder {
         } else if (type.getId().equalsIgnoreCase(config.navigationWand)) {
             throw new InvalidToolBindException(type, "Already used for the navigation wand");
         }
+
         Tool previous;
         if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
@@ -1350,23 +1345,25 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession createEditSession(Actor actor) {
         checkNotNull(actor);
-        BlockBag blockBag = null;
-        if (actor.isPlayer() && actor instanceof Player) {
-            blockBag = getBlockBag((Player) actor);
-        }
+
         World world = null;
         if (hasWorldOverride()) {
             world = getWorldOverride();
         } else if (actor instanceof Locatable && ((Locatable) actor).getExtent() instanceof World) {
             world = (World) ((Locatable) actor).getExtent();
         }
-        EditSessionBuilder builder = new EditSessionBuilder(world);
-        if (actor.isPlayer() && actor instanceof Player) builder.player((Player) actor);
-        builder.blockBag(blockBag);
-        builder.fastmode(fastMode);
 
         // Create an edit session
-        EditSession editSession = builder.build();
+        EditSession editSession;
+        EditSessionBuilder builder = new EditSessionBuilder(world);
+        if (actor.isPlayer() && actor instanceof Player) {
+            BlockBag blockBag = getBlockBag((Player) actor);
+            builder.player((Player) actor);
+            builder.blockBag(blockBag);
+        }
+        builder.fastmode(fastMode);
+
+        editSession = builder.build();
 
         if (mask != null) {
             editSession.setMask(mask);

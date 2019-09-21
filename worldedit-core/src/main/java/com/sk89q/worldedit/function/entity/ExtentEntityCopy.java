@@ -157,10 +157,10 @@ public class ExtentEntityCopy implements EntityFunction {
                     BlockVector3 newLeash = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
                     return new BaseEntity(state.getType(), tag.createBuilder()
                             .put("Leash", leashCompound.createBuilder()
-                                    .putInt("X", newLeash.getBlockX())
-                                    .putInt("Y", newLeash.getBlockY())
-                                    .putInt("Z", newLeash.getBlockZ())
-                                    .build()
+                                .putInt("X", newLeash.getBlockX())
+                                .putInt("Y", newLeash.getBlockY())
+                                .putInt("Z", newLeash.getBlockZ())
+                                .build()
                             ).build());
                 }
             }
