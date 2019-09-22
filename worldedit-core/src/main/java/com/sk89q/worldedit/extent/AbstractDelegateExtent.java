@@ -32,8 +32,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -124,10 +124,9 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
 
-
     /*
-        Bounds
-         */
+    Bounds
+    */
     @Override
     public int getMaxY() {
         return extent.getMaxY();
@@ -158,6 +157,12 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return extent.setBlock(position.getX(), position.getY(), position.getZ(), block);
+    }
+
+    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
         return extent.setBlock(x, y, z, block);
@@ -166,6 +171,11 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return extent.setBiome(position.getX(), 0, position.getZ(), biome);
     }
 
     /*

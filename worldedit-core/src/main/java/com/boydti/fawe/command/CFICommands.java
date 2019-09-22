@@ -19,6 +19,8 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
@@ -925,7 +927,12 @@ public class CFICommands {
         ImageIO.write(image, "jpg", baos);
         byte[] data = baos.toByteArray();
         player.print("Please wait...");
-        URL url = ImgurUtility.uploadImage(data);
+        String json = ImgurUtility.getImgurContent(ImgurUtility.CLIENT_ID, data);
+        Gson gson = new Gson();
+        JsonObject obj = gson.fromJson(json, JsonObject.class);
+        JsonObject data1 = obj.get("data").getAsJsonObject();
+        String link = data1.get("link").getAsString();
+        URL url = new URL(link);
         BBC.DOWNLOAD_LINK.send(player, url);
     }
 

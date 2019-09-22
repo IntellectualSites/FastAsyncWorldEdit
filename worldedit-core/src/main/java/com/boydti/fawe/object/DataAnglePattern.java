@@ -22,7 +22,7 @@ public class DataAnglePattern extends AbstractPattern {
         this.factor = (1D / distance) * (1D / 255);
     }
 
-    public int getSlope(BlockStateHolder block, BlockVector3 vector, Extent extent) {
+    public <T extends BlockStateHolder<T>> int getSlope(T block, BlockVector3 vector, Extent extent) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();

@@ -12,7 +12,7 @@ import com.sk89q.worldedit.extent.PassthroughExtent;
 public class MemoryCheckingExtent extends PassthroughExtent {
     private final Player player;
 
-    public MemoryCheckingExtent(final Player player, final Extent extent) {
+    public MemoryCheckingExtent(Player player, Extent extent) {
         super(extent);
         this.player = player;
     }

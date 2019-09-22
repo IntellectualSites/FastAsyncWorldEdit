@@ -28,7 +28,6 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import java.awt.image.BufferedImage;
@@ -118,10 +117,6 @@ public class ProvideBindings extends Bindings {
 
     public BlockType blockType(Actor actor, String argument) {
         return blockState(actor, argument).getBlockType();
-    }
-
-    public BlockStateHolder blockStateHolder(Actor actor, String argument) {
-        return blockState(actor, argument);
     }
 
     public BlockState blockState(Actor actor, String argument) {

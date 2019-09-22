@@ -6,6 +6,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -38,7 +39,7 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public int getSlope(BlockStateHolder block, BlockVector3 vector, Extent extent) {
+    public <T extends BlockStateHolder<T>> int getSlope(T block, BlockVector3 vector, Extent extent) {
         int slope = super.getSlope(block, vector, extent);
         if (slope != -1) {
             int x = vector.getBlockX();
@@ -46,7 +47,7 @@ public class AngleColorPattern extends DataAnglePattern {
             int z = vector.getBlockZ();
             int height = extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
             if (height > 0) {
-                BlockStateHolder below = extent.getBlock(x, height - 1, z);
+                BlockState below = extent.getBlock(x, height - 1, z);
                 if (!below.getBlockType().getMaterial().isMovementBlocker()) {
                     return Integer.MAX_VALUE;
                 }
@@ -57,7 +58,7 @@ public class AngleColorPattern extends DataAnglePattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        BlockStateHolder block = get.getBlock(extent);
+        BlockState block = get.getBlock(extent);
         int slope = getSlope(block, get, extent);
         if (slope == -1) return false;
         int color = holder.getTextureUtil().getColor(block.getBlockType());

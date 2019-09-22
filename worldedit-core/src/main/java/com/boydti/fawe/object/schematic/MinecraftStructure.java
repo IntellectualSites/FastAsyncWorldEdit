@@ -26,7 +26,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
@@ -170,7 +169,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         // Palette
         ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
         for (BlockVector3 point : region) {
-            BlockStateHolder block = clipboard.getBlock(point);
+            BlockState block = clipboard.getBlock(point);
             int combined = block.getInternalId();
             BlockType type = block.getBlockType();
 

@@ -38,6 +38,8 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -361,7 +363,13 @@ public class ClipboardCommands {
                     ClipboardWriter writer = format.getWriter(baos);
                     writer.write(target);
                     baos.flush();
-                    url = ImgurUtility.uploadImage(baos.toByteArray());
+                    String json = ImgurUtility
+                        .getImgurContent(ImgurUtility.CLIENT_ID, baos.toByteArray());
+                    Gson gson = new Gson();
+                    JsonObject obj = gson.fromJson(json, JsonObject.class);
+                    JsonObject data = obj.get("data").getAsJsonObject();
+                    String link = data.get("link").getAsString();
+                    url = new URL(link);
                 } catch (IOException e) {
                     e.printStackTrace();
                     url = null;

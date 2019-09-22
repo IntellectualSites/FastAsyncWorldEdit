@@ -165,7 +165,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
             if (free == 2) {
                 final BlockVector3 pos = mutablePos.setComponents(x, y - 2, z);
-                final BlockStateHolder state = world.getBlock(pos);
+                final BlockState state = world.getBlock(pos);
                 setPosition(new Location(world,
                     Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
                 return;

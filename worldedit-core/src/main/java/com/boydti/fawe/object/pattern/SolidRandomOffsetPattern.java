@@ -7,7 +7,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.SplittableRandom;
@@ -58,7 +57,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
         mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
         mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
-        BlockStateHolder block = pattern.apply(mutable);
+        BaseBlock block = pattern.apply(mutable);
         if (block.getMaterial().isSolid()) {
             return pattern.apply(extent, get, mutable);
         }

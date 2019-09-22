@@ -87,8 +87,14 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return parent.setBlock(x, y, z, block);
     }
 
     @Override
@@ -112,7 +118,7 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void simulateBlockMine(final BlockVector3 pt) {
+    public void simulateBlockMine(BlockVector3 pt) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
@@ -214,7 +220,7 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean regenerate(final Region region, final EditSession session) {
+    public boolean regenerate(Region region, EditSession session) {
         return session.regenerate(region);
     }
 
@@ -234,7 +240,7 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public List<? extends Entity> getEntities(final Region region) {
+    public List<? extends Entity> getEntities(Region region) {
         return TaskManager.IMP.sync(new RunnableVal<List<? extends Entity>>() {
             @Override
             public void run(List<? extends Entity> value) {
@@ -277,6 +283,11 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return parent.setBiome(position, biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return parent.setBiome(x, y , z, biome);
     }
 
     @Override

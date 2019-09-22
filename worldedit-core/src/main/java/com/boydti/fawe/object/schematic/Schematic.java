@@ -31,6 +31,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -264,7 +265,7 @@ public class Schematic {
 
                 @Override
                 public boolean apply(BlockVector3 mutable) throws WorldEditException {
-                    BlockStateHolder block = clipboard.getBlock(mutable);
+                    BlockState block = clipboard.getBlock(mutable);
                     int xx = mutable.getBlockX() + relx;
                     int zz = mutable.getBlockZ() + relz;
                     if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {

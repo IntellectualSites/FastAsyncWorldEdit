@@ -7,14 +7,14 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
+import com.sk89q.worldedit.world.block.BlockState;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 
 public class PNGWriter implements ClipboardWriter {
 
@@ -92,7 +92,7 @@ public class PNGWriter implements ClipboardWriter {
                 double cpy2 = cpy1 + dpyj[zz];
                 for (int y = y0; y < y0 + height; y++) {
                     mutable.mutY(y);
-                    BlockStateHolder block = clipboard.getBlock(mutable);
+                    BlockState block = clipboard.getBlock(mutable);
                     if (block.getBlockType().getMaterial().isAir()) {
                         continue;
                     }

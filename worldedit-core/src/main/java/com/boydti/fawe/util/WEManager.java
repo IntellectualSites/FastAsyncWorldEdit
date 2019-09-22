@@ -15,7 +15,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import java.lang.reflect.Field;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -42,26 +41,6 @@ public class WEManager {
 
     public void cancelEdit(Extent parent, FaweException reason) throws WorldEditException {
         cancelEditSafe(parent, reason);
-    }
-
-    public boolean maskContains(HashSet<RegionWrapper> mask, int x, int z) {
-        for (RegionWrapper region : mask) {
-            if (x >= region.minX && x <= region.maxX && z >= region.minZ && z <= region.maxZ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean maskContains(RegionWrapper[] mask, int x, int z) {
-        switch (mask.length) {
-            case 0:
-                return false;
-            case 1:
-                return mask[0].isIn(x, z);
-            default:
-                return Arrays.stream(mask).anyMatch(region -> region.isIn(x, z));
-        }
     }
 
     @Deprecated

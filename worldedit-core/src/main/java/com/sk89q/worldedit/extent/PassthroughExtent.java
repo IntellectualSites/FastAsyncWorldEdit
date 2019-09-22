@@ -186,6 +186,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().cancel();
     }
 
+    @Override
     public int getMaxY() {
         return getExtent().getMaxY();
     }

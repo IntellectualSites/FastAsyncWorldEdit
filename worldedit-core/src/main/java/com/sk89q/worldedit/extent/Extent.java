@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -59,16 +61,13 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -295,7 +294,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        BlockStateHolder block = getBlock(x, y, z);
+        BlockState block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {

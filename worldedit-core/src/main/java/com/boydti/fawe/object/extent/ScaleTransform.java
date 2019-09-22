@@ -60,7 +60,7 @@ public class ScaleTransform extends ResettableExtent {
 
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(location));
         double sx = pos.getX();
@@ -96,7 +96,7 @@ public class ScaleTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(int x1, int y1, int z1, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x1, int y1, int z1, B block) throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(x1, y1, z1));
         double sx = pos.getX();
