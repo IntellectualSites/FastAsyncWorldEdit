@@ -59,7 +59,7 @@ dependencies {
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     "implementation"("com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT") { isTransitive = false }
     "implementation"("com.wasteofplastic:askyblock:3.0.8.2") { isTransitive = false }
-    "compileOnly"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
+    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
 }

@@ -6,6 +6,10 @@ plugins {
     id("net.ltgt.apt-idea")
 }
 
+repositories {
+    maven { url = uri("http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/") }
+}
+
 applyPlatformAndCoreConfiguration()
 
 configurations.all {
@@ -34,6 +38,9 @@ dependencies {
     "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.4.3-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
+    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
+        isTransitive = false
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
