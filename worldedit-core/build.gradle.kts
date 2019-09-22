@@ -6,6 +6,10 @@ plugins {
     id("net.ltgt.apt-idea")
 }
 
+repositories {
+    maven { url = uri("http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/") }
+}
+
 applyPlatformAndCoreConfiguration()
 
 configurations.all {
