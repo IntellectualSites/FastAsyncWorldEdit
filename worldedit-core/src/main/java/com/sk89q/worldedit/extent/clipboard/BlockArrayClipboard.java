@@ -254,6 +254,11 @@ public class BlockArrayClipboard implements Clipboard, Closeable {
         return IMP.setBiome(x, z, biome);
     }
 
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return IMP.setBiome(x, z, biome);
+    }
+
     @Nullable
     @Override
     public Operation commit() {

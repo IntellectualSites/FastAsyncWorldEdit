@@ -2,7 +2,6 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -14,7 +13,6 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -33,6 +31,7 @@ import java.util.function.Supplier;
 /**
  * Class which handles all the queues {@link IQueueExtent}
  */
+@SuppressWarnings("UnstableApiUsage")
 public abstract class QueueHandler implements Trimable, Runnable {
 
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
@@ -77,7 +76,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
                 // TODO reduce mem usage
             }
 
-            long taskAllocate = currentAllocate;
             boolean wait = false;
             do {
                 Runnable task = syncTasks.poll();
@@ -100,7 +98,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                     task.run();
                     wait = true;
                 }
-            } while (System.currentTimeMillis() - now < taskAllocate);
+            } while (System.currentTimeMillis() - now < currentAllocate);
         }
         while (!syncTasks.isEmpty()) {
             final FutureTask task = syncTasks.poll();

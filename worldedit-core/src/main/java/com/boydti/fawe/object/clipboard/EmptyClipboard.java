@@ -70,12 +70,23 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return false;
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
 

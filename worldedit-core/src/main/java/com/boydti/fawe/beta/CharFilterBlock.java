@@ -4,11 +4,15 @@ import static com.sk89q.worldedit.world.block.BlockTypes.states;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import javax.annotation.Nullable;
@@ -404,6 +408,23 @@ public class CharFilterBlock extends ChunkFilterBlock {
             return get.getBiomeType(x & 15, z & 15);
         }
         return getExtent().getBiomeType(x, z);
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
     }
 
     @Override

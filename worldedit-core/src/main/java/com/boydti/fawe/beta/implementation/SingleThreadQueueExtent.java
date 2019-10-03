@@ -14,7 +14,12 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -305,5 +310,17 @@ public class SingleThreadQueueExtent implements IQueueExtent {
     @Override
     public ChunkFilterBlock initFilterBlock() {
         return new CharFilterBlock(this);
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return setBlock(position.getX(),position.getY(), position.getZ(), block);
+
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return setBiome(position.getX(),0, position.getZ(), biome);
     }
 }

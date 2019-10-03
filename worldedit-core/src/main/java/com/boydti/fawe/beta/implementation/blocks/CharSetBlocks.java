@@ -5,6 +5,9 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -79,6 +82,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+    }
+
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) {
         if (tiles == null) {
             tiles = new HashMap<>();
@@ -86,6 +95,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         final short pair = MathMan.tripleBlockCoord(x, y, z);
         tiles.put(pair, tile);
         return true;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return setBiome(position.getX(),0, position.getZ(), biome);
     }
 
     @Override
