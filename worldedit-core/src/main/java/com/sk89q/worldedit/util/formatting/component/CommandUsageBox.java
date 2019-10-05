@@ -29,9 +29,9 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.enginehub.piston.ColorConfig;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandParameters;
+import org.enginehub.piston.config.ColorConfig;
 import org.enginehub.piston.util.HelpGenerator;
 
 /**
@@ -71,15 +71,13 @@ public class CommandUsageBox extends TextComponentProducer {
             .append(HelpGenerator.create(commands).getFullHelp());
         if (getSubCommands(Iterables.getLast(commands)).size() > 0) {
             boxContent.append(TextComponent.newline())
-                .append(TextComponent.builder("> ")
-                    .color(ColorConfig.getHelpText())
-                    .append(TextComponent.builder("List Subcommands")
-                        .color(ColorConfig.getMainText())
+                .append(ColorConfig.helpText().wrap(TextComponent.builder("> ")
+                    .append(ColorConfig.mainText().wrap(TextComponent.builder("List Subcommands")
                         .decoration(TextDecoration.ITALIC, true)
                         .clickEvent(ClickEvent.runCommand(helpRootCommand + " -s " + commandString))
                         .hoverEvent(HoverEvent.showText(TextComponent.of("List all subcommands of this command")))
-                        .build())
-                    .build());
+                        .build()))
+                    .build()));
         }
         MessageBox box = new MessageBox("Help for " + commandString,
             boxContent);
