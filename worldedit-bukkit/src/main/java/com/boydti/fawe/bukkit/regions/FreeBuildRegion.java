@@ -4,6 +4,7 @@ import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -35,7 +36,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player player, MaskType type) {
+    public FaweMask getMask(Player player, MaskType type) {
         if (type != MaskType.MEMBER) return null;
         ArrayList<RegisteredListener> currRegList = new ArrayList<>();
         for (RegisteredListener listener : this.listeners) {
@@ -58,7 +59,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
         return new FaweMask(pos1, pos2) {
 
         @Override
-            public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+            public boolean isValid(Player player, MaskType type) {
                 return bukkitWorld == BukkitAdapter.adapt(player.getWorld()) && type == MaskType.MEMBER;
             }
 
