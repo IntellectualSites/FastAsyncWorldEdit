@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -30,7 +29,6 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -41,7 +39,6 @@ import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -65,12 +62,9 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -716,57 +710,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return true;
     }
 
-    public void checkConfirmationStack(@NotNull Runnable task, @NotNull String command,
-        Region region, int times, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (region != null) {
-                BlockVector3 min = region.getMinimumPoint();
-                BlockVector3 max = region.getMaximumPoint();
-                long area =
-                    (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
-                if (area > 2 << 18) {
-                    setConfirmTask(task, context, command);
-                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
-                    long volume = (long) base.getX() * base.getZ() * base.getY() * times;
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(min, max, command,
-                            NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
-        }
-        task.run();
-    }
-
-    public void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command,
-        Region region, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (region != null) {
-                BlockVector3 min = region.getMinimumPoint();
-                BlockVector3 max = region.getMaximumPoint();
-                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
-                if (area > 2 << 18) {
-                    setConfirmTask(task, context, command);
-                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
-                    long volume = (long) base.getX() * base.getZ() * base.getY();
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(min, max, command,
-                            NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
-        }
-        task.run();
-    }
-
-    public void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context,
-        @NotNull String command) {
-        CommandEvent event = new CommandEvent(this, command);
-        Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
-            task.run();
-            return null;
-        }, context, getSession(), event);
-        setMeta("cmdConfirm", newTask);
-    }
-
     /**
      * Get the player's current allowed WorldEdit regions
      *
@@ -815,35 +758,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         selector.setWorld(region.getWorld());
 
         getSession().setRegionSelector(getWorld(), selector);
-    }
-
-    public void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times,
-        int limit, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (times > limit) {
-                setConfirmTask(task, context, command);
-                String volume = "<unspecified>";
-                throw new RegionOperationException(
-                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
-            }
-        }
-        task.run();
-    }
-
-    public synchronized boolean confirm() {
-        Runnable confirm = deleteMeta("cmdConfirm");
-        if (confirm == null) {
-            return false;
-        }
-        queueAction(() -> {
-            setMeta("cmdConfirmRunning", true);
-            try {
-                confirm.run();
-            } finally {
-                setMeta("cmdConfirmRunning", false);
-            }
-        });
-        return true;
     }
 
 }

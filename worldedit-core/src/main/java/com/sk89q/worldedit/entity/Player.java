@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -40,7 +39,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Direction;
@@ -51,10 +49,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import java.io.File;
-import java.text.NumberFormat;
 import javax.annotation.Nullable;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a player
@@ -329,15 +324,6 @@ public interface Player extends Entity, Actor {
         return Settings.IMP.getLimit(this);
     }
 
-    void checkConfirmationStack(@NotNull Runnable task, @NotNull String command,
-        Region region, int times, InjectedValueAccess context) throws RegionOperationException;
-
-    void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command,
-        Region region, InjectedValueAccess context) throws RegionOperationException;
-
-    void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context,
-        @NotNull String command);
-
     public Region[] getCurrentRegions();
 
     Region[] getCurrentRegions(FaweMaskManager.MaskType type);
@@ -386,49 +372,12 @@ public interface Player extends Entity, Actor {
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
-    void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times,
-        int limit, InjectedValueAccess context) throws RegionOperationException;
-
-    default void checkConfirmationRadius(@NotNull Runnable task, String command, int radius,
-        InjectedValueAccess context) throws RegionOperationException {
-        if (command != null && !getMeta("cmdConfirmRunning", false)) {
-            if (radius > 0) {
-                if (radius > 448) {
-                    setConfirmTask(task, context, command);
-                    long volume = (long) (Math.PI * ((double) radius * radius));
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(0, radius, command,
-                            NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
-        }
-        task.run();
-    }
-
-    boolean confirm();
-
-    /**
-     * Queue an action to run async
-     *
-     * @param run
-     */
-    default void queueAction(Runnable run) {
-        runAction(run, false, true);
-    }
-
     default boolean runAsyncIfFree(Runnable r) {
         return runAction(r, true, true);
     }
 
     default boolean runIfFree(Runnable r) {
         return runAction(r, true, false);
-    }
-
-    default boolean checkAction() {
-        long time = getMeta("faweActionTick", Long.MIN_VALUE);
-        long tick = Fawe.get().getTimer().getTick();
-        setMeta("faweActionTick", tick);
-        return tick > time;
     }
 
     /**
