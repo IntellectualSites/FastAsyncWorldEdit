@@ -40,6 +40,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.generator.CavesGen;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -270,17 +271,18 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
-    public int forestGen(Player player, LocalSession session, EditSession editSession,
-                         @Arg(name = "size", desc = "The size of the forest, in blocks", def = "10")
-                             int sizeOpt,
+    public int forestGen(Actor actor, LocalSession session, EditSession editSession,
+                         @Arg(desc = "The size of the forest, in blocks", def = "10")
+                             int size,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
-                         @Range(min = 0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
+                         @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
+        worldEdit.checkMaxRadius(size);
         density /= 100;
-        int affected = editSession.makeForest(session.getPlacementPosition(player), sizeOpt, density, type);
-        player.print(affected + " trees created.");
+        int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
+        actor.print(affected + " trees created.");
         return affected;
     }
 
@@ -290,16 +292,17 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
-    public int pumpkins(Player player, LocalSession session, EditSession editSession,
-                        @Arg(name = "size", desc = "The size of the patch", def = "10")
-                            int sizeOpt,
+    public int pumpkins(Actor actor, LocalSession session, EditSession editSession,
+                        @Arg(desc = "The size of the patch", def = "10")
+                            int size,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
                         @Arg(desc = "//TODO ", def = "0.02")
                             double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
-        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
-        BBC.COMMAND_PUMPKIN.send(player, affected);
+        worldEdit.checkMaxRadius(size);
+        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), apothem, density);
+        BBC.COMMAND_PUMPKIN.send(actor, affected);
         return affected;
     }
 

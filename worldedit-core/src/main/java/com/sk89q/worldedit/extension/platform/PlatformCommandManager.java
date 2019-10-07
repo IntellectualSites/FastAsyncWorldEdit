@@ -57,13 +57,9 @@ import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.GenerationCommandsRegistration;
 import com.sk89q.worldedit.command.HistoryCommands;
 import com.sk89q.worldedit.command.HistoryCommandsRegistration;
-import com.sk89q.worldedit.command.MaskCommands;
-import com.sk89q.worldedit.command.MaskCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
-import com.sk89q.worldedit.command.PatternCommands;
-import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.RegionCommandsRegistration;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -82,8 +78,6 @@ import com.sk89q.worldedit.command.ToolCommands;
 import com.sk89q.worldedit.command.ToolCommandsRegistration;
 import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
-import com.sk89q.worldedit.command.TransformCommands;
-import com.sk89q.worldedit.command.TransformCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.UtilityCommandsRegistration;
 import com.sk89q.worldedit.command.WorldEditCommands;
@@ -201,7 +195,6 @@ public final class PlatformCommandManager {
         checkNotNull(worldEdit);
         checkNotNull(platformManager);
         INSTANCE = this;
-
         this.worldEdit = worldEdit;
         this.platformManager = platformManager;
         this.exceptionConverter = new WorldEditExceptionConverter(worldEdit);
@@ -291,8 +284,7 @@ public final class PlatformCommandManager {
                                         return (World) ((Locatable) actor).getExtent();
                                     } else {
                                         throw new MissingWorldException();
-    }
-
+                                    }
                                 } catch (MissingWorldException e) {
                                     exceptionConverter.convert(e);
                                     throw new AssertionError("Should have thrown a new exception.", e);
@@ -302,15 +294,15 @@ public final class PlatformCommandManager {
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandManager commandManager,
-        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance) {
+                                      CommandManager commandManager,
+                                      Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance) {
         registerSubCommands(name, aliases, desc, commandManager, handlerInstance, m -> {});
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandManager commandManager,
-        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
-        Consumer<CommandManager> additionalConfig) {
+                                          CommandManager commandManager,
+                                          Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
+                                          Consumer<CommandManager> additionalConfig) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -320,17 +312,18 @@ public final class PlatformCommandManager {
 
             handlerInstance.accept((handler, instance) ->
             this.registration.register(
-                    manager,
-                    handler,
-                    instance
+                manager,
+                handler,
+                instance
             ));
+            additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run."))
-                    .withCommands(subCommands)
-                    .required()
-                    .build());
+                TextComponent.of("Sub-command to run."))
+                .withCommands(subCommands)
+                .required()
+                .build());
 
             cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
         });
@@ -343,27 +336,27 @@ public final class PlatformCommandManager {
 
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
-            registerSubCommands(
-                    "patterns",
-                    ImmutableList.of(),
-                    "Patterns determine what blocks are placed",
-                    PatternCommandsRegistration.builder(),
-                    new PatternCommands()
-            );
-            registerSubCommands(
-                    "masks",
-                    ImmutableList.of(),
-                    "Masks determine which blocks are placed",
-                    MaskCommandsRegistration.builder(),
-                    new MaskCommands(worldEdit)
-            );
-            registerSubCommands(
-                "transforms",
-                ImmutableList.of(),
-                "Transforms modify how a block is placed",
-                TransformCommandsRegistration.builder(),
-                new TransformCommands()
-            );
+//            registerSubCommands(
+//                    "patterns",
+//                    ImmutableList.of(),
+//                    "Patterns determine what blocks are placed",
+//                    PatternCommandsRegistration.builder(),
+//                    new PatternCommands()
+//            );
+//            registerSubCommands(
+//                    "masks",
+//                    ImmutableList.of(),
+//                    "Masks determine which blocks are placed",
+//                    MaskCommandsRegistration.builder(),
+//                    new MaskCommands(worldEdit)
+//            );
+//            registerSubCommands(
+//                "transforms",
+//                ImmutableList.of(),
+//                "Transforms modify how a block is placed",
+//                TransformCommandsRegistration.builder(),
+//                new TransformCommands()
+//            );
             registerSubCommands(
                 "schematic",
                 ImmutableList.of("schem", "/schematic", "/schem"),
@@ -476,11 +469,7 @@ public final class PlatformCommandManager {
                 SnapshotUtilCommandsRegistration.builder(),
                 new SnapshotUtilCommands(worldEdit)
             );
-            this.registration.register(
-                commandManager,
-                ToolCommandsRegistration.builder(),
-                new ToolCommands(worldEdit)
-            );
+            ToolCommands.register(registration, commandManager, commandManagerService, worldEdit);
             this.registration.register(
                     commandManager,
                     ToolUtilCommandsRegistration.builder(),
@@ -504,13 +493,6 @@ public final class PlatformCommandManager {
 
     void registerCommandsWith(Platform platform) {
         log.info("Registering commands with " + platform.getClass().getCanonicalName());
-
-        // Delay command registration to allow time for other plugins to hook into FAWE
-        try {
-//            new CommandScriptLoader().load();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
 
         LocalConfiguration config = platform.getConfiguration();
         boolean logging = config.logCommands;
@@ -536,7 +518,6 @@ public final class PlatformCommandManager {
         }
 
         platform.registerCommands(commandManager);
-//        commandManager.getCommand("pattern").get()
     }
 
     void removeCommands() {
@@ -544,7 +525,7 @@ public final class PlatformCommandManager {
     }
 
     private Stream<Substring> parseArgs(String input) {
-        return new CommandArgParser(CommandArgParser.spaceSplit(input)).parseArgs();
+        return CommandArgParser.forArgString(input.substring(1)).parseArgs();
     }
 
     public <T> Collection<T> parse(Class<T> clazz, String arguments, @Nullable Actor actor) {

@@ -276,7 +276,7 @@ public class SelectionCommands {
             player.print("Left click: jump to location; Right click: pass through walls");
         } else {
             session.setTool(itemType, new SelectionWand());
-            BBC.SELECTION_WAND.send(player);
+            player.print(BBC.SELECTION_WAND.s());
         }
         if (!player.hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
@@ -360,7 +360,7 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-            BBC.SELECTION_SHIFT.send(actor);
+            actor.print(BBC.SELECTION_SHIFT.s());
         } catch (RegionOperationException e) {
             actor.printError(e.getMessage());
         }
@@ -383,7 +383,7 @@ public class SelectionCommands {
         region.expand(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
-        BBC.SELECTION_OUTSET.send(actor);
+        actor.print(BBC.SELECTION_OUTSET.s());
     }
 
     @Command(
@@ -560,7 +560,7 @@ public class SelectionCommands {
         if (selector == null) {
             session.getRegionSelector(world).clear();
             session.dispatchCUISelection(actor);
-            BBC.SELECTION_CLEARED.send(actor);
+            actor.print(BBC.SELECTION_CLEARED.s());
             return;
         }
 
