@@ -16,9 +16,10 @@ repositories {
     maven { url = uri("http://ci.frostcast.net/plugin/repository/everything") }
     maven { url = uri("http://dl.bintray.com/tastybento/maven-repo") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
-    maven { url = uri("https://libraries.minecraft.net") }
+    maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
+    maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
 }
 
 configurations.all {
@@ -49,10 +50,8 @@ dependencies {
     }
     "implementation"("com.massivecraft:factions:2.8.0") { isTransitive = false }
     "implementation"("com.drtshock:factions:1.6.9.5") { isTransitive = false }
-    "implementation"("com.factionsone:FactionsOne:1.2.2") { isTransitive = false }
-    "implementation"("me.ryanhamshire:GriefPrevention:11.5.2") { isTransitive = false }
+    "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
-    "implementation"("net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT") { isTransitive = false }
     "implementation"("net.jzx7:regios:5.9.9") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }

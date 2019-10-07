@@ -11,11 +11,9 @@ import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
 import com.boydti.fawe.bukkit.regions.FactionsFeature;
-import com.boydti.fawe.bukkit.regions.FactionsOneFeature;
 import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
-import com.boydti.fawe.bukkit.regions.PreciousStonesFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
@@ -86,7 +84,11 @@ public class FaweBukkit implements IFawe, Listener {
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
-            WEManager.IMP.managers.add(new PlotSquaredFeature());
+            try {
+                WEManager.IMP.managers.add(new PlotSquaredFeature());
+            } catch (Exception ignored) {
+                //Not everyone uses or needs PlotSquared.
+            }
         } catch (final Throwable e) {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
@@ -291,37 +293,28 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new Worldguard(worldguardPlugin));
                 managers.add(new WorldguardFlag(worldguardPlugin));
-                Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'WorldGuard'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
         if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
                 managers.add(new TownyFeature(townyPlugin));
-                Fawe.debug("Plugin 'Towny' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'Towny'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
         if (factionsPlugin != null && factionsPlugin.isEnabled()) {
             try {
                 managers.add(new FactionsFeature(factionsPlugin));
-                Fawe.debug("Plugin 'Factions' found. Using it now.");
+                Fawe.debug("Attempting to use plugin 'Factions'");
             } catch (Throwable e) {
                 try {
                     managers.add(new FactionsUUIDFeature(factionsPlugin, this));
-                    Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
-                } catch (Throwable e2) {
-                    try {
-                        managers.add(new FactionsOneFeature(factionsPlugin));
-                        Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
-                    } catch (Throwable e3) {
-                        e.printStackTrace();
-                    }
-
+                    Fawe.debug("Attempting to use plugin 'FactionsUUID'");
+                } catch (Throwable ignored) {
                 }
             }
         }
@@ -329,36 +322,24 @@ public class FaweBukkit implements IFawe, Listener {
         if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
-                Fawe.debug("Plugin 'Residence' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'Residence'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
         if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
-                Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'GriefPrevention'");
+            } catch (Throwable ignored) {
             }
         }
-        final Plugin preciousStonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
-        if (preciousStonesPlugin != null && preciousStonesPlugin.isEnabled()) {
-            try {
-                managers.add(new PreciousStonesFeature(preciousStonesPlugin));
-                Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
 
         final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
         if (aSkyBlock != null && aSkyBlock.isEnabled()) {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock));
-                Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
+                Fawe.debug("Attempting to use plugin  'ASkyBlock' found. Using it now.");
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -366,9 +347,8 @@ public class FaweBukkit implements IFawe, Listener {
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
             try {
                 managers.add(new FreeBuildRegion());
-                Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin '<internal.freebuild>'");
+            } catch (Throwable ignored) {
             }
         }
 
