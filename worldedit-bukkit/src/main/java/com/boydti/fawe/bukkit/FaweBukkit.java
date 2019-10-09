@@ -84,10 +84,12 @@ public class FaweBukkit implements IFawe, Listener {
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
-            try {
-                WEManager.IMP.managers.add(new PlotSquaredFeature());
-            } catch (Exception ignored) {
-                //Not everyone uses or needs PlotSquared.
+            if (Bukkit.getPluginManager().getPlugin("PlotSquared") != null) {
+                try {
+                    WEManager.IMP.managers.add(new PlotSquaredFeature());
+                } catch (Exception ignored) {
+                    //Not everyone uses or needs PlotSquared.
+                }
             }
         } catch (final Throwable e) {
             e.printStackTrace();
