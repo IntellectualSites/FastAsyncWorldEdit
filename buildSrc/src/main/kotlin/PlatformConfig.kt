@@ -24,7 +24,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "maven")
     //apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
-    apply(plugin = "com.jfrog.artifactory")
+    //apply(plugin = "com.jfrog.artifactory")
 
     ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
 

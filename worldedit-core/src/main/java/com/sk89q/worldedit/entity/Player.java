@@ -21,7 +21,6 @@ package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -319,10 +318,6 @@ public interface Player extends Entity, Actor {
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
-
-    default FaweLimit getLimit() {
-        return Settings.IMP.getLimit(this);
-    }
 
     public Region[] getCurrentRegions();
 

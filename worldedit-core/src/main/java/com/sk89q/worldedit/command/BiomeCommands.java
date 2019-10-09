@@ -122,7 +122,7 @@ public class BiomeCommands {
         if (useLineOfSight) {
             Location blockPosition = player.getBlockTrace(300);
             if (blockPosition == null) {
-                BBC.NO_BLOCK.send(player);
+                player.printError(BBC.NO_BLOCK.s());
                 return;
             }
 
@@ -144,8 +144,8 @@ public class BiomeCommands {
                     biomes.add(world.getBiome(pt));
                 }
             } else {
-                RegionVisitor visitor = new RegionVisitor(region, position -> {
-                    biomes.add(world.getBiome(position.toBlockVector2()));
+                RegionVisitor visitor = new RegionVisitor(region, pt -> {
+                    biomes.add(world.getBiome(pt.toBlockVector2()));
                     return true;
                 });
                 Operations.completeBlindly(visitor);

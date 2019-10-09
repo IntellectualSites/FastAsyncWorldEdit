@@ -146,20 +146,21 @@ public class ToolCommands {
 //    }
 
     @Command(
-        name = "/selwand",
-        aliases = "selwand",
+        name = "selwand",
+        aliases = "/selwand",
         desc = "Selection wand tool"
     )
     @CommandPermissions("worldedit.setwand")
     public void selwand(Player player, LocalSession session) throws WorldEditException {
+
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
         session.setTool(player, new SelectionWand());
         player.print("Selection wand bound to " + itemType.getName() + ".");
     }
 
     @Command(
-        name = "/navwand",
-        aliases = "navwand",
+        name = "navwand",
+        aliases = "/navwand",
         desc = "Navigation wand tool"
     )
     @CommandPermissions("worldedit.setwand")
@@ -288,10 +289,10 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.lrbuild")
     public void longrangebuildtool(Player player, LocalSession session,
-        @Arg(desc = "Pattern to set on left-click")
-            Pattern primary,
-        @Arg(desc = "Pattern to set on right-click")
-            Pattern secondary) throws WorldEditException {
+                                   @Arg(desc = "Pattern to set on left-click")
+                                       Pattern primary,
+                                   @Arg(desc = "Pattern to set on right-click")
+                                       Pattern secondary) throws WorldEditException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
 
         session.setTool(player, new LongRangeBuildTool(primary, secondary));

@@ -2388,10 +2388,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makePumpkinPatches(BlockVector3 position, int apothem) throws MaxChangedBlocksException {
-        return makePumpkinPatches(position, apothem, 0.02);
-    }
-
     public int makePumpkinPatches(BlockVector3 position, int apothem, double density) throws MaxChangedBlocksException {
         // We want to generate pumpkins
         GardenPatchGenerator generator = new GardenPatchGenerator(this);
@@ -2665,8 +2661,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return deformRegion(region, zero, unit, expressionString, WorldEdit.getInstance().getConfiguration().calculationTimeout);
     }
 
-    public int deformRegion(Region region, Vector3 zero, Vector3 unit, String expressionString,
-                            int timeout) throws ExpressionException, MaxChangedBlocksException {
+    public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString,
+                           final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
 

@@ -38,6 +38,7 @@ import com.sk89q.worldedit.command.tool.TraceTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
+import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
@@ -69,9 +70,7 @@ public class PlatformManager {
     private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
 
     private final WorldEdit worldEdit;
-
     private final PlatformCommandManager platformCommandManager;
-
     private final List<Platform> platforms = new ArrayList<>();
     private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
     private @Nullable String firstSeenVersion;
@@ -116,7 +115,6 @@ public class PlatformManager {
         } else {
             firstSeenVersion = platform.getVersion();
         }
-
     }
 
     /**
@@ -260,6 +258,7 @@ public class PlatformManager {
 
         if (base instanceof Player) {
             Player player = (Player) base;
+
             Player permActor = queryCapability(Capability.PERMISSIONS).matchPlayer(player);
             if (permActor == null) {
                 permActor = player;
@@ -338,42 +337,45 @@ public class PlatformManager {
                 if (event.isCancelled()) return;
             }
 
-            switch (event.getType()) {
-                case HIT: {
-                    // superpickaxe is special because its primary interaction is a left click, not a right click
-                    // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
-                if (session.hasSuperPickAxe()) {
-                        final BlockTool superPickaxe = session.getSuperPickaxe();
-                        if (superPickaxe != null && superPickaxe.canUse(player) && player.isHoldingPickAxe()) {
-                            player.runAction(() -> reset(superPickaxe).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location), false, true);
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-
-                    Tool tool = session.getTool(player);
-                    if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
-                        player.runAction(() -> reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location), false, true);
+            if (event.getType() == Interaction.HIT) {
+                // superpickaxe is special because its primary interaction is a left click, not a right click
+                // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
+                if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
+                    final BlockTool superPickaxe = session.getSuperPickaxe();
+                    if (superPickaxe != null && superPickaxe.canUse(player)) {
+                        player.runAction(() -> reset(superPickaxe)
+                            .actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                getConfiguration(), player, session, location), false, true);
                         event.setCancelled(true);
+                        return;
                     }
-                    break;
                 }
 
-                case OPEN: {
-                    Tool tool = session.getTool(player);
-                    if (tool instanceof BlockTool && tool.canUse(player)) {
-                        if (player.checkAction()) {
-                            player.runAction(() -> {
-                                if (tool instanceof BrushTool) {
-                                    ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
-                                } else {
-                                    reset((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
-                                }
-                            }, false, true);
-                            event.setCancelled(true);
-                        }
+                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
+                    player.runAction(() -> reset(((DoubleActionBlockTool) tool))
+                        .actSecondary(queryCapability(Capability.WORLD_EDITING),
+                            getConfiguration(), player, session, location), false, true);
+                    event.setCancelled(true);
+                }
+
+            } else if (event.getType() == Interaction.OPEN) {
+                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                if (tool instanceof BlockTool && tool.canUse(player)) {
+                    if (player.checkAction()) {
+                        player.runAction(() -> {
+                            if (tool instanceof BrushTool) {
+                                ((BlockTool) tool)
+                                    .actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session, location);
+                            } else {
+                                reset((BlockTool) tool)
+                                    .actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session, location);
+                            }
+                        }, false, true);
+                        event.setCancelled(true);
                     }
-                    break;
                 }
             }
         } catch (Throwable e) {
@@ -425,9 +427,10 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-                    Tool tool = session.getTool(player);
+                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
-                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session));
+                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
+                            getConfiguration(), player, session));
                         event.setCancelled(true);
                         return;
                     }
@@ -448,10 +451,11 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-                    Tool tool = session.getTool(player);
+                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
                     if (tool instanceof TraceTool && tool.canUse(player)) {
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
-                        player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session), false, true);
+                        player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
+                            getConfiguration(), player, session), false, true);
                         event.setCancelled(true);
                         return;
                     }

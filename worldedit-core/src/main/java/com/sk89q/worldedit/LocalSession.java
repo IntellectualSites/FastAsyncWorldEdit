@@ -578,7 +578,6 @@ public class LocalSession implements TextureHolder {
         this.worldOverride = worldOverride;
     }
 
-
     public void unregisterTools(Player player) {
         for (Tool tool : tools) {
             if (tool instanceof BrushTool) {

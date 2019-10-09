@@ -19,14 +19,16 @@
 
 package com.sk89q.worldedit.world.biome;
 
+import com.sk89q.worldedit.function.pattern.BiomePattern;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.registry.Keyed;
-import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.registry.RegistryItem;
 
 /**
  * All the types of biomes in the game.
  */
-public class BiomeType implements RegistryItem, Keyed {
+public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 
     public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
 
@@ -79,5 +81,10 @@ public class BiomeType implements RegistryItem, Keyed {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof BiomeType && this.id.equals(((BiomeType) obj).id);
+    }
+
+    @Override
+    public BiomeType apply(BlockVector2 position) {
+        return this;
     }
 }

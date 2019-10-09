@@ -75,7 +75,6 @@ import com.sk89q.worldedit.command.SnapshotUtilCommandsRegistration;
 import com.sk89q.worldedit.command.SuperPickaxeCommands;
 import com.sk89q.worldedit.command.SuperPickaxeCommandsRegistration;
 import com.sk89q.worldedit.command.ToolCommands;
-import com.sk89q.worldedit.command.ToolCommandsRegistration;
 import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
@@ -138,8 +137,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.config.ConfigHolder;
-import org.enginehub.piston.config.TextConfig;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ArgumentConverters;
 import org.enginehub.piston.converter.ConversionResult;
@@ -380,12 +377,11 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "brush",
-                    Lists.newArrayList("br", "/brush", "/br", "/tool", "tool"),
+                    Lists.newArrayList("br", "/brush", "/br"),
                     "Brushing commands",
                     commandManager,
                     c -> {
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
-                        c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
                     },
                     manager -> {
                         PaintBrushCommands.register(commandManagerService, manager, registration);
@@ -656,7 +652,8 @@ public final class PlatformCommandManager {
             } else {
                 System.out.println("Invalid context " + context);
             }
-            Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
+            Optional<EditSession> editSessionOpt =
+                context.injectedValue(Key.of(EditSession.class));
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();

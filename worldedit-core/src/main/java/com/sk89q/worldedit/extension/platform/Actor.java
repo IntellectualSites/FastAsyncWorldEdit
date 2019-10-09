@@ -21,6 +21,8 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.entity.Metadatable;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -242,5 +244,9 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
         long tick = Fawe.get().getTimer().getTick();
         setMeta("faweActionTick", tick);
         return tick > time;
+    }
+
+    default FaweLimit getLimit() {
+        return Settings.IMP.getLimit(this);
     }
 }

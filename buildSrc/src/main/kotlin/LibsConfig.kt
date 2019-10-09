@@ -16,7 +16,6 @@ fun Project.applyLibrariesConfiguration() {
     apply(plugin = "java-base")
     apply(plugin = "maven")
     apply(plugin = "com.github.johnrengelman.shadow")
-    apply(plugin = "com.jfrog.artifactory")
 
     configurations {
         create("shade")

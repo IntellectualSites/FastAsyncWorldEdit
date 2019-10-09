@@ -10,8 +10,18 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -55,16 +65,6 @@ import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -647,14 +647,17 @@ public class AsyncWorld extends PassthroughExtent implements World {
         parent.setThunderDuration(duration);
     }
 
+    @Override
     public boolean createExplosion(double x, double y, double z, float power) {
         return this.createExplosion(x, y, z, power, false, true);
     }
 
+    @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire) {
         return this.createExplosion(x, y, z, power, setFire, true);
     }
 
+    @Override
     public boolean createExplosion(final double x, final double y, final double z, final float power, final boolean setFire, final boolean breakBlocks) {
         return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
             @Override
@@ -664,14 +667,28 @@ public class AsyncWorld extends PassthroughExtent implements World {
         });
     }
 
+    @Override
+    public boolean createExplosion(double x, double y, double z, float power, boolean setFire,
+        boolean breakBlocks, @Nullable Entity source) {
+        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+            @Override
+            public void run(Boolean value) {
+                this.value = parent.createExplosion(x, y, z, power, setFire, breakBlocks, source);
+            }
+        });
+    }
+
+    @Override
     public boolean createExplosion(Location loc, float power) {
         return this.createExplosion(loc, power, false);
     }
 
+    @Override
     public boolean createExplosion(Location loc, float power, boolean setFire) {
         return this.createExplosion(loc.getX(), loc.getY(), loc.getZ(), power, setFire);
     }
 
+    @NotNull
     @Override
     public Environment getEnvironment() {
         return parent.getEnvironment();
@@ -810,7 +827,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.adapt(getExtent().getBiomeType(x, z));
+        return adapter.adapt(getExtent().getBiome(BlockVector2.at(x, z)));
     }
 
     @Override
@@ -1299,6 +1316,18 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
         return TaskManager.IMP.sync(() -> parent.createExplosion(source, loc, power, setFire, breakBlocks));
+    }
+
+    @Override
+    public boolean createExplosion(@NotNull Location loc, float power, boolean setFire,
+        boolean breakBlocks) {
+        return false;
+    }
+
+    @Override
+    public boolean createExplosion(@NotNull Location loc, float power, boolean setFire,
+        boolean breakBlocks, @Nullable Entity source) {
+        return false;
     }
 
 
