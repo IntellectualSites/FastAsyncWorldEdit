@@ -547,7 +547,7 @@ public final class PlatformCommandManager {
             if (arg0.startsWith("\\")) {
                 arg0 = arg0.substring(1);
             }
-            Optional<Command> optional = commandManager.getCommand(arg0.);
+            Optional<Command> optional = commandManager.getCommand(arg0);
             if (!optional.isPresent()) {
                 System.out.println("No command for '" + arg0 + "' " + StringMan.getString(commandManager.getAllCommands().map(
                     Command::getName).collect(Collectors.toList())));
