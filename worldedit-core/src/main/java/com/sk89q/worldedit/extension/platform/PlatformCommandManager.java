@@ -544,7 +544,7 @@ public final class PlatformCommandManager {
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
-            if (arg0.startsWith("\\")) {
+            if (arg0.startsWith("/")) {
                 arg0 = arg0.substring(1);
             }
             Optional<Command> optional = commandManager.getCommand(arg0);

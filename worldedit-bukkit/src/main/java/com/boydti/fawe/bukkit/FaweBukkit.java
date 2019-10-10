@@ -252,17 +252,17 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
-            this.debug("&dVault is used for persistent `/wea` toggles.");
         }
     }
 
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        msg.append("server.version: " + Bukkit.getVersion() + "\n");
+        msg.append("server.version: ").append(Bukkit.getVersion()).append("\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-            msg.append(" - " + p.getName() + ": " + p.getDescription().getVersion() + "\n");
+            msg.append(" - ").append(p.getName()).append(": ")
+                .append(p.getDescription().getVersion()).append("\n");
         }
         return msg.toString();
     }
