@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.World;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class EditSessionBuilder {
     private World world;
@@ -446,7 +447,11 @@ public class EditSessionBuilder {
         return bypassAll;
     }
 
+    @NotNull
     public FaweLimit getLimit() {
+        if (limit == null) {
+            return FaweLimit.MAX;
+        }
         return limit;
     }
 
