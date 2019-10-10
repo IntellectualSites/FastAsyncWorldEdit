@@ -224,13 +224,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
 
-//        // Register 1.13 Material ids with LegacyMapper
-//        LegacyMapper legacyMapper = LegacyMapper.getInstance();
-//        for (Material m : Material.values()) {
-//            if (!m.isLegacy() && m.isBlock()) {
-//                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
-//            }
-//        }
         // Enable metrics
         new Metrics(this);
         PaperLib.suggestPaper(this);
@@ -465,7 +458,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = commandLabel;
+        split[0] = "/" + commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);

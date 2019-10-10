@@ -29,6 +29,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

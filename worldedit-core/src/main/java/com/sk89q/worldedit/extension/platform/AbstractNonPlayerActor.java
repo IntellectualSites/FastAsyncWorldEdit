@@ -114,14 +114,17 @@ public abstract class AbstractNonPlayerActor implements Actor {
      * @param value
      * @return previous value
      */
+    @Override
     public final void setMeta(String key, Object value) {
         this.meta.put(key, value);
     }
 
+    @Override
     public final <T> T getAndSetMeta(String key, T value) {
         return (T) this.meta.put(key, value);
     }
 
+    @Override
     public final boolean hasMeta() {
         return !meta.isEmpty();
     }
@@ -133,6 +136,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
      * @param key
      * @return
      */
+    @Override
     public final <V> V getMeta(String key) {
         return (V) this.meta.get(key);
     }
@@ -144,6 +148,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
      *
      * @param key
      */
+    @Override
     public final <V> V deleteMeta(String key) {
         return (V) this.meta.remove(key);
     }

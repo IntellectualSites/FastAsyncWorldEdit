@@ -541,7 +541,6 @@ public final class PlatformCommandManager {
         Request.reset();
         Actor actor = event.getActor();
         String args = event.getArguments();
-        System.out.println(1);
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
@@ -596,8 +595,7 @@ public final class PlatformCommandManager {
     }
 
     public void handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @Nullable LocalSession session, CommandEvent event) {
-        Request.reset();
-        Actor actor = context.injectedValue(Key.of(Actor.class)).orElseThrow(() -> new IllegalStateException("No player"));
+        Actor actor = event.getActor();
 
         long start = System.currentTimeMillis();
 
@@ -662,7 +660,7 @@ public final class PlatformCommandManager {
 
                 long time = System.currentTimeMillis() - start;
                 if (time > 1000) {
-                    BBC.ACTION_COMPLETE.send(actor, time / 1000D);
+                    BBC.ACTION_COMPLETE.send(event.getActor(), time / 1000D);
                 }
 
                 worldEdit.flushBlockBag(actor, editSession);
