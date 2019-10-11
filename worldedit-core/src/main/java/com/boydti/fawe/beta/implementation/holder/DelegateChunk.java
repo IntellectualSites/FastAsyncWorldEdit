@@ -1,29 +1,25 @@
 package com.boydti.fawe.beta.implementation.holder;
 
 import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IDelegateChunk;
-import com.sk89q.jnbt.CompoundTag;
-
-import java.util.concurrent.Future;
 
 /**
  * Implementation of IDelegateChunk
  */
-public class DelegateChunk<U extends IChunk> implements IDelegateChunk<U> {
+public class DelegateChunk<T extends IChunk> implements IDelegateChunk<T> {
 
-    private U parent;
+    private T parent;
 
-    public DelegateChunk(U parent) {
+    public DelegateChunk(final T parent) {
         this.parent = parent;
     }
 
     @Override
-    public final U getParent() {
+    public final T getParent() {
         return parent;
     }
 
-    public final void setParent(U parent) {
+    public final void setParent(final T parent) {
         this.parent = parent;
     }
 }

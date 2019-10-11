@@ -23,6 +23,6 @@ public class CombinedBlockCopy implements RegionFunction {
 //        BlockStateHolder block = source.getBlock(position);
         BaseBlock block = source.getFullBlock(position);
         function.apply(position);
-        return destination.setBlock(position.getX(),position.getY(),position.getZ(), block);
+        return destination.setBlock(position, block);
     }
 }

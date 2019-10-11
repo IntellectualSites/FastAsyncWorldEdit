@@ -113,8 +113,7 @@ public class CharBlocks implements IBlocks {
             return get(blocks, layer)[index];
         }
 
-        public final void set(CharBlocks blocks, int layer, int index,
-            char value) {
+        public final void set(CharBlocks blocks, int layer, int index, char value) {
             get(blocks, layer)[index] = value;
         }
     }

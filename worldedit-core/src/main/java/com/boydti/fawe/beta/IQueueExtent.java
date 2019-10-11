@@ -145,7 +145,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * #wrap(IChunk)}
      *
      * @param isFull true if a more optimized chunk should be returned
-     * @return
+     * @return a more optimized chunk object
      */
     IChunk create(boolean isFull);
 
@@ -173,13 +173,16 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     ChunkFilterBlock initFilterBlock();
 
     /**
-     * Number of chunks in queue
-     * @return
+     * Returns the number of chunks in this queue.
+     *
+     * @return the number of chunks in this queue
      */
     int size();
 
     /**
-     * @return If queue is empty
+     * Returns <tt>true</tt> if this queue contains no elements.
+     *
+     * @return <tt>true</tt> if this queue contains no elements
      */
     boolean isEmpty();
 }

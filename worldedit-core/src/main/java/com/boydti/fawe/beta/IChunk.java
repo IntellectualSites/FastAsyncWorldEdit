@@ -89,7 +89,7 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      * Filter through all the blocks in the chunk
      *
      * @param filter the filter
-     * @param block  The filter block
+     * @param block The filter block
      * @param region The region allowed to filter (may be null)
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
