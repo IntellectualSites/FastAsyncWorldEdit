@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.object.mask.BlockTypeMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -72,9 +72,9 @@ public class RecursivePickaxe implements BlockTool {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
             final int radius = (int) range;
-            final BlockReplace replace = new BlockReplace(editSession, (BlockTypes.AIR.getDefaultState()));
+            final BlockReplace replace = new BlockReplace(editSession, BlockTypes.AIR.getDefaultState());
             editSession.setMask(null);
-            RecursiveVisitor visitor = new RecursiveVisitor(new IdMask(editSession), replace, radius);
+            RecursiveVisitor visitor = new RecursiveVisitor(new BlockTypeMask(editSession), replace, radius);
             visitor.visit(pos);
             Operations.completeBlindly(visitor);
 

@@ -355,7 +355,8 @@ public class PlatformManager {
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
                     player.runAction(() -> reset(((DoubleActionBlockTool) tool))
                         .actSecondary(queryCapability(Capability.WORLD_EDITING),
-                            getConfiguration(), player, session, location), false, true);
+                            getConfiguration(), player, session, location)
+                        , false, true);
                     event.setCancelled(true);
                 }
 
@@ -421,7 +422,7 @@ public class PlatformManager {
                         if (pos != null) {
                             player.findFreePosition(pos);
                         } else {
-                            BBC.NO_BLOCK.send(player);
+                            player.print(BBC.NO_BLOCK.s());
                         }
 
                         event.setCancelled(true);
@@ -445,7 +446,7 @@ public class PlatformManager {
                         }
 
                         if (!player.passThroughForwardWall(40)) {
-                            BBC.NAVIGATION_WAND_ERROR.send(player);
+                            player.print(BBC.NAVIGATION_WAND_ERROR.s());
                         }
 
                         event.setCancelled(true);

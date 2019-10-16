@@ -3,10 +3,9 @@ package com.boydti.fawe.object.brush;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.object.mask.BlockTypeMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -31,7 +30,7 @@ public class SplineBrush implements Brush, ResettableTool {
     private final Player player;
     private BlockVector3 position;
 
-    public SplineBrush(Player player, LocalSession session) {
+    public SplineBrush(Player player) {
         this.player = player;
         this.positionSets = new ArrayList<>();
     }
@@ -49,9 +48,9 @@ public class SplineBrush implements Brush, ResettableTool {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws WorldEditException {
         Mask mask = editSession.getMask();
         if (mask == null) {
-            mask = new IdMask(editSession);
+            mask = new BlockTypeMask(editSession);
         } else {
-            mask = new MaskIntersection(mask, new IdMask(editSession));
+            mask = new MaskIntersection(mask, new BlockTypeMask(editSession));
         }
         boolean visualization = editSession.getExtent() instanceof VisualExtent;
         if (visualization && positionSets.isEmpty()) {
@@ -112,16 +111,12 @@ public class SplineBrush implements Brush, ResettableTool {
         double continuity = 0;
         double quality = 10;
 
-        final List<Node> nodes = new ArrayList<>(centroids.size());
-
         for (Vector3 nodevector : centroids) {
             final Node n = new Node(nodevector);
             n.setTension(tension);
             n.setBias(bias);
             n.setContinuity(continuity);
-            nodes.add(n);
         }
-        int samples = numSplines;
         for (int i = 0; i < numSplines; i++) {
             List<BlockVector3> currentSpline = new ArrayList<>();
             for (ArrayList<BlockVector3> points : positionSets) {

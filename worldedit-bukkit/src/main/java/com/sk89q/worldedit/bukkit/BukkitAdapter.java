@@ -24,9 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -66,12 +64,7 @@ public enum BukkitAdapter {
     private final IBukkitAdapter adapter;
 
     BukkitAdapter() {
-        BukkitImplAdapter tmp = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (tmp != null) {
-            this.adapter = tmp;
-        } else {
-            this.adapter = new SimpleBukkitAdapter();
-        }
+        this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
     }
 
     private static final IBukkitAdapter getAdapter() {
@@ -412,7 +405,8 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static BlockData adapt(@NotNull BlockStateHolder block) {
+    public static <B extends BlockStateHolder<B>> BlockData adapt(B block) {
+        checkNotNull(block);
         return getAdapter().adapt(block);
     }
 

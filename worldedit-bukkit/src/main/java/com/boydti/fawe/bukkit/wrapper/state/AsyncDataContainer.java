@@ -1,22 +1,15 @@
 package com.boydti.fawe.bukkit.wrapper.state;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Map.Entry;
-
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import net.minecraft.server.v1_14_R1.NBTBase;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang.Validate;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_14_R1.persistence.CraftPersistentDataAdapterContext;
-import org.bukkit.craftbukkit.v1_14_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -54,7 +47,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(key, "The provided key for the custom value was null");
         Validate.notNull(type, "The provided type for the custom value was null");
         Validate.notNull(value, "The provided value for the custom value was null");
-        get().put(key.toString(), FaweCache.IMP.asTag(type.toPrimitive(value, null)));
+        get().put(key.toString(), FaweCache.asTag(type.toPrimitive(value, null)));
     }
 
     public <T, Z> boolean has(NamespacedKey key, PersistentDataType<T, Z> type) {

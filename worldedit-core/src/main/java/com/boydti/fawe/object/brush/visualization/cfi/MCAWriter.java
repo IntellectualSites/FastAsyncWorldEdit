@@ -9,6 +9,7 @@ import com.sk89q.worldedit.world.block.BlockID;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.Deflater;
@@ -166,12 +167,9 @@ public abstract class MCAWriter implements Extent {
                 pool.submit(() -> {
                     try {
                         int totalLength = 8192;
-                        for (byte[] compressedBytes : compressed) {
-                            if (compressedBytes != null) {
-                                int blocks = ((4095 + compressedBytes.length + 5) / 4096) * 4096;
-                                totalLength += blocks;
-                            }
-                        }
+                        totalLength += Arrays.stream(compressed).filter(Objects::nonNull).mapToInt(
+                            compressedBytes -> ((4095 + compressedBytes.length + 5) / 4096) * 4096)
+                            .sum();
                         raf.setLength(totalLength);
                         int offset = 8192;
                         for (int i = 0; i < compressed.length; i++) {

@@ -19,14 +19,18 @@ import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.regions.WorldguardFlag;
 import com.boydti.fawe.bukkit.regions.plotquared.PlotSquaredFeature;
+import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
-import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
+import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
+import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
+import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
@@ -35,6 +39,8 @@ import com.sk89q.worldedit.world.World;
 import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -55,10 +61,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class FaweBukkit implements IFawe, Listener {
 
-//    private final WorldEditPlugin plugin;
     private final Plugin plugin;
     private VaultUtil vault;
-    private ItemUtil itemUtil;
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
@@ -228,21 +232,6 @@ public class FaweBukkit implements IFawe, Listener {
         new Metrics(plugin);
     }
 
-    public ItemUtil getItemUtil() {
-        ItemUtil tmp = itemUtil;
-        if (tmp == null) {
-            try {
-                this.itemUtil = tmp = new ItemUtil();
-            } catch (Throwable e) {
-                Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                debug("===== PERSISTENT BRUSH FAILED =====");
-                e.printStackTrace();
-                debug("===================================");
-            }
-        }
-        return tmp;
-    }
-
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
      * @return
@@ -252,6 +241,7 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
+            this.debug("&dVault is used for persistent `/wea` toggles.");
         }
     }
 
@@ -273,6 +263,102 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public TaskManager getTaskManager() {
         return new BukkitTaskMan(plugin);
+    }
+
+    private boolean hasNMS = true;
+    private boolean playerChunk = false;
+
+    @Override
+    public FaweQueue getNewQueue(String world, boolean fast) {
+        if (playerChunk != (playerChunk = true)) {
+            try {
+                Field fieldDirtyCount = BukkitReflectionUtils.getRefClass("{nms}.PlayerChunk").getField("dirtyCount").getRealField();
+                fieldDirtyCount.setAccessible(true);
+                int mod = fieldDirtyCount.getModifiers();
+                if ((mod & Modifier.VOLATILE) == 0) {
+                    Field modifiersField = Field.class.getDeclaredField("modifiers");
+                    modifiersField.setAccessible(true);
+                    modifiersField.setInt(fieldDirtyCount, mod + Modifier.VOLATILE);
+                }
+            } catch (Throwable ignore) {}
+        }
+        try {
+            return getQueue(world);
+        } catch (Throwable throwable) {
+            // Disable incompatible settings
+            Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
+            Settings.IMP.HISTORY.COMBINE_STAGES = false; // Performing a chunk copy (if possible) wouldn't be faster using the BukkitAPI
+            if (hasNMS) {
+
+                debug("====== NO NMS BLOCK PLACER FOUND ======");
+                debug("FAWE couldn't find a fast block placer");
+                debug("Bukkit version: " + Bukkit.getVersion());
+                debug("NMS label: " + plugin.getClass().getSimpleName().split("_")[1]);
+                debug("Fallback placer: " + BukkitQueue_All.class);
+                debug("=======================================");
+                debug("Download the version of FAWE for your platform");
+                debug(" - http://ci.athion.net/job/FastAsyncWorldEdit/lastSuccessfulBuild/artifact/target");
+                debug("=======================================");
+                throwable.printStackTrace();
+                debug("=======================================");
+                TaskManager.IMP.laterAsync(
+                    () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
+                hasNMS = false;
+            }
+            return new BukkitQueue_All(world);
+        }
+    }
+
+    /**
+     * The FaweQueue is a core part of block placement<br>
+     *  - The queue returned here is used in the SetQueue class (SetQueue handles the implementation specific queue)<br>
+     *  - Block changes are grouped by chunk (as it's more efficient for lighting/packet sending)<br>
+     *  - The FaweQueue returned here will provide the wrapper around the chunk object (FaweChunk)<br>
+     *  - When a block change is requested, the SetQueue will first check if the chunk exists in the queue, or it will create and add it<br>
+     */
+    @Override
+    public FaweQueue getNewQueue(World world, boolean fast) {
+        if (fast) {
+            if (playerChunk != (playerChunk = true)) {
+                try {
+                    Field fieldDirtyCount = BukkitReflectionUtils.getRefClass("{nms}.PlayerChunk").getField("dirtyCount").getRealField();
+                    fieldDirtyCount.setAccessible(true);
+                    int mod = fieldDirtyCount.getModifiers();
+                    if ((mod & Modifier.VOLATILE) == 0) {
+                        Field modifiersField = Field.class.getDeclaredField("modifiers");
+                        modifiersField.setAccessible(true);
+                        modifiersField.setInt(fieldDirtyCount, mod + Modifier.VOLATILE);
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
+            Throwable error;
+            try {
+                return getQueue(world);
+            } catch (Throwable throwable) {
+                error = throwable;
+            }
+            // Disable incompatible settings
+            Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
+            Settings.IMP.HISTORY.COMBINE_STAGES = false; // Performing a chunk copy (if possible) wouldn't be faster using the BukkitAPI
+            if (hasNMS) {
+                debug("====== NO NMS BLOCK PLACER FOUND ======");
+                debug("FAWE couldn't find a fast block placer");
+                debug("Bukkit version: " + Bukkit.getVersion());
+                debug("NMS label: " + plugin.getClass().getSimpleName());
+                debug("Fallback placer: " + BukkitQueue_All.class);
+                debug("=======================================");
+                debug("Download the version of FAWE for your platform");
+                debug(" - http://ci.athion.net/job/FastAsyncWorldEdit/lastSuccessfulBuild/artifact/target");
+                debug("=======================================");
+                error.printStackTrace();
+                debug("=======================================");
+                TaskManager.IMP.laterAsync(
+                    () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
+                hasNMS = false;
+            }
+        }
+        return new BukkitQueue_All(world);
     }
 
     public Plugin getPlugin() {
@@ -416,5 +502,12 @@ public class FaweBukkit implements IFawe, Listener {
         }
         return null;
 //        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
+    }
+    private FaweQueue getQueue(World world) {
+        return new BukkitQueue_1_14(world);
+    }
+
+    private FaweQueue getQueue(String world) {
+        return new BukkitQueue_1_14(world);
     }
 }

@@ -1,14 +1,13 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -25,35 +24,41 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nullable;
 
 public class DelegateFilterBlock extends FilterBlock {
-
     private final FilterBlock parent;
 
     public DelegateFilterBlock(FilterBlock parent) {
         this.parent = parent;
     }
 
-    public static BlockVector3 at(double x, double y, double z) {
-        return BlockVector3.at(x, y, z);
-    }
-
-    public static BlockVector3 at(int x, int y, int z) {
-        return BlockVector3.at(x, y, z);
-    }
-
-    public static Comparator<BlockVector3> sortByCoordsYzx() {
-        return BlockVector3.sortByCoordsYzx();
-    }
-
     @Override
     public Extent getExtent() {
         return parent.getExtent();
+    }
+
+    @Override
+    public void setOrdinal(int ordinal) {
+        parent.setOrdinal(ordinal);
+    }
+
+    @Override
+    public void setBlock(BlockState state) {
+        parent.setBlock(state);
+    }
+
+    @Override
+    public void setFullBlock(BaseBlock block) {
+        parent.setFullBlock(block);
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        parent.setNbtData(nbtData);
     }
 
     @Override
@@ -72,18 +77,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void setOrdinal(int ordinal) {
-        parent.setOrdinal(ordinal);
-    }
-
-    @Override
     public BlockState getBlock() {
         return parent.getBlock();
-    }
-
-    @Override
-    public void setBlock(BlockState state) {
-        parent.setBlock(state);
     }
 
     @Override
@@ -92,18 +87,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void setFullBlock(BaseBlock block) {
-        parent.setFullBlock(block);
-    }
-
-    @Override
     public CompoundTag getNbtData() {
         return parent.getNbtData();
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        parent.setNbtData(nbtData);
     }
 
     @Override
@@ -254,6 +239,18 @@ public class DelegateFilterBlock extends FilterBlock {
     @Override
     public BlockState getStateRelativeY(Extent orDefault, int y) {
         return parent.getStateRelativeY(orDefault, y);
+    }
+
+    public static BlockVector3 at(double x, double y, double z) {
+        return BlockVector3.at(x, y, z);
+    }
+
+    public static BlockVector3 at(int x, int y, int z) {
+        return BlockVector3.at(x, y, z);
+    }
+
+    public static Comparator<BlockVector3> sortByCoordsYzx() {
+        return BlockVector3.sortByCoordsYzx();
     }
 
     @Override
@@ -417,26 +414,6 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BlockVector3 shr(int x, int y, int z) {
-        return parent.shr(x, y, z);
-    }
-
-    @Override
-    public BlockVector3 shr(int n) {
-        return parent.shr(n);
-    }
-
-    @Override
-    public BlockVector3 shl(int x, int y, int z) {
-        return parent.shl(x, y, z);
-    }
-
-    @Override
-    public BlockVector3 shl(int n) {
-        return parent.shl(n);
-    }
-
-    @Override
     public double length() {
         return parent.length();
     }
@@ -502,8 +479,7 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX,
-        double translateZ) {
+    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
         return parent.transform2D(angle, aboutX, aboutZ, translateX, translateZ);
     }
 
@@ -543,11 +519,6 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return parent.equals(obj);
-    }
-
-    @Override
     public int hashCode() {
         return parent.hashCode();
     }
@@ -574,37 +545,6 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    @Nullable
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        parent.removeEntity(x, y, z, uuid);
-    }
-
-    @Override
-    public boolean isQueueEnabled() {
-        return parent.isQueueEnabled();
-    }
-
-    @Override
-    public void enableQueue() {
-        parent.enableQueue();
-    }
-
-    @Override
-    public void disableQueue() {
-        parent.disableQueue();
-    }
-
-    @Override
-    public boolean isWorld() {
-        return parent.isWorld();
-    }
-
-    @Override
-    public boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
-        return parent.regenerateChunk(x, z, type, seed);
-    }
-
-    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
         return parent.getHighestTerrainBlock(x, z, minY, maxY);
     }
@@ -620,8 +560,7 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY,
-        boolean ignoreAir) {
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
         return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
     }
 
@@ -631,23 +570,18 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
-        int failedMax) {
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
-        int failedMax, Mask mask) {
-        return parent
-            .getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
-        int failedMax, boolean ignoreAir) {
-        return parent
-            .getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+        return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
     }
 
     @Override
@@ -661,14 +595,12 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity,
-        boolean rotate) throws WorldEditException {
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
         parent.addSchems(region, mask, clipboards, rarity, rotate);
     }
 
     @Override
-    public void spawnResource(Region region, Resource gen, int rarity, int frequency)
-        throws WorldEditException {
+    public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
         parent.spawnResource(region, gen, rarity, frequency);
     }
 
@@ -678,8 +610,7 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency,
-        int rarity, int minY, int maxY) throws WorldEditException {
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
         parent.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
@@ -704,59 +635,9 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
-        return parent.countBlocks(region, searchBlocks);
-    }
-
-    @Override
-    public int countBlocks(Region region, Mask searchMask) {
-        return parent.countBlocks(region, searchMask);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return parent.setBlocks(region, block);
-    }
-
-    @Override
-    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        return parent.setBlocks(region, pattern);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return parent.replaceBlocks(region, filter, replacement);
-    }
-
-    @Override
-    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
-        return parent.replaceBlocks(region, filter, pattern);
-    }
-
-    @Override
-    public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
-        return parent.replaceBlocks(region, mask, pattern);
-    }
-
-    @Override
-    public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        return parent.center(region, pattern);
-    }
-
-    @Override
-    public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
-        return parent.setBlocks(vset, pattern);
-    }
-
-    @Override
     @Nullable
     public Operation commit() {
         return parent.commit();
-    }
-
-    @Override
-    public boolean cancel() {
-        return parent.cancel();
     }
 
     @Override
@@ -767,6 +648,10 @@ public class DelegateFilterBlock extends FilterBlock {
     @Override
     public BlockState getBlock(BlockVector3 position) {
         return parent.getBlock(position);
+    }
+
+    public BlockType getBlockType(BlockVector3 position) {
+        return parent.getBlock(position).getBlockType();
     }
 
     @Override
@@ -784,22 +669,14 @@ public class DelegateFilterBlock extends FilterBlock {
         return parent.getBiomeType(x, z);
     }
 
-    @Deprecated
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return parent.setBlock(position, block);
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return parent.setBlock(x, y, z, block);
-    }
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
     }
 
     @Override

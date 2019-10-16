@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta.implementation.holder;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
@@ -10,205 +9,36 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
+import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
-import com.boydti.fawe.config.Settings;
-import com.sk89q.jnbt.CompoundTag;
+import com.boydti.fawe.util.MathMan;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.concurrent.Future;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 /**
- * An abstract {@link IChunk} class that implements basic get/set blocks
+ * Abstract IChunk class that implements basic get/set blocks
  */
-public class ChunkHolder<T extends Future<T>> implements IChunk {
-
-    private static FaweCache.Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
-
-    public static ChunkHolder newInstance() {
-        return POOL.poll();
-    }
-
+public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     private IChunkGet get;
     private IChunkSet set;
     private IBlockDelegate delegate;
     private IQueueExtent extent;
-    private int chunkX;
-    private int chunkZ;
+    private int X,Z;
 
     public ChunkHolder() {
         this.delegate = NULL;
     }
 
-    public void init(IBlockDelegate delegate) {
+    public ChunkHolder(final IBlockDelegate delegate) {
         this.delegate = delegate;
     }
-
-    @Override
-    public void recycle() {
-        delegate = NULL;
-    }
-
-    public IBlockDelegate getDelegate() {
-        return delegate;
-    }
-
-    @Override
-    public IQueueExtent getQueue() {
-        return extent;
-    }
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        return false;
-    }
-
-    @Override
-    public char[] load(int layer) {
-        return getOrCreateGet().load(layer);
-    }
-
-    public static final IBlockDelegate BOTH = new IBlockDelegate() {
-        @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
-            return chunk.set.setBiome(x, y, z, biome);
-        }
-
-        @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
-            return chunk.set.setBlock(x, y, z, block);
-        }
-
-        @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            return chunk.get.getBiomeType(x, z);
-        }
-
-        @Override
-        public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
-            return chunk.get.getBlock(x, y, z);
-        }
-
-        @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
-            return chunk.get.getFullBlock(x, y, z);
-        }
-    };
-    public static final IBlockDelegate GET = new IBlockDelegate() {
-        @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
-            chunk.getOrCreateSet();
-            chunk.delegate = BOTH;
-            return chunk.setBiome(x, y, z, biome);
-        }
-
-        @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
-            chunk.getOrCreateSet();
-            chunk.delegate = BOTH;
-            return chunk.setBlock(x, y, z, block);
-        }
-
-        @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            return chunk.get.getBiomeType(x, z);
-        }
-
-        @Override
-        public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
-            return chunk.get.getBlock(x, y, z);
-        }
-
-        @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
-            return chunk.get.getFullBlock(x, y, z);
-        }
-    };
-    public static final IBlockDelegate SET = new IBlockDelegate() {
-        @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
-            return chunk.set.setBiome(x, y, z, biome);
-        }
-
-        @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
-            return chunk.set.setBlock(x, y, z, block);
-        }
-
-        @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
-            return chunk.getBiomeType(x, z);
-        }
-
-        @Override
-        public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
-            return chunk.getBlock(x, y, z);
-        }
-
-        @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
-            return chunk.getFullBlock(x, y, z);
-        }
-    };
-    public static final IBlockDelegate NULL = new IBlockDelegate() {
-        @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
-            chunk.getOrCreateSet();
-            chunk.delegate = SET;
-            return chunk.setBiome(x, y, z, biome);
-        }
-
-        @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
-            chunk.getOrCreateSet();
-            chunk.delegate = SET;
-            return chunk.setBlock(x, y, z, block);
-        }
-
-        @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = GET;
-            return chunk.getBiomeType(x, z);
-        }
-
-        @Override
-        public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = GET;
-            return chunk.getBlock(x, y, z);
-        }
-
-        @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = GET;
-            return chunk.getFullBlock(x, y, z);
-        }
-    };
 
     @Override
     public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
@@ -216,29 +46,16 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
-        return delegate.getFullBlock(this, x, y, z)
-            .getNbtData(); // TODO NOT IMPLEMENTED (add getTag delegate)
-    }
-
-    @Override
-    public boolean hasSection(int layer) {
-        return get != null && get.hasSection(layer);
-    }
-
-    @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+    public void filterBlocks(final Filter filter, ChunkFilterBlock block, @Nullable Region region) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {
             if (region != null) {
                 region.filter(this, filter, block, get, set);
             } else {
-                block = block.init(chunkX, chunkZ, get);
+                block = block.init(X, Z, get);
                 for (int layer = 0; layer < 16; layer++) {
-                    if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) {
-                        continue;
-                    }
+                    if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
                     block.init(get, set, layer);
                     block.filter(filter);
                 }
@@ -249,7 +66,7 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
     }
 
     @Override
-    public boolean trim(boolean aggressive) {
+    public boolean trim(final boolean aggressive) {
         if (set != null) {
             final boolean result = set.trim(aggressive);
             if (result) {
@@ -277,53 +94,33 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
         return set == null || set.isEmpty();
     }
 
-    /**
-     * Get or create the settable part of this chunk
-     * @return
-     */
     public final IChunkGet getOrCreateGet() {
-        if (get == null) {
-            get = newWrappedGet();
-        }
+        if (get == null) get = newGet();
         return get;
     }
 
-    /**
-     * Get or create the settable part of this chunk
-     * @return
-     */
     public final IChunkSet getOrCreateSet() {
-        if (set == null) {
-            set = newWrappedSet();
-        }
+        if (set == null) set = set();
         return set;
     }
 
-    /**
-     * Create a wrapped set object
-     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - E.g. caching, optimizations, filtering
-     * @return
-     */
-    private IChunkSet newWrappedSet() {
-        return extent.getCachedSet(chunkX, chunkZ);
+    public IChunkSet set() {
+        return new CharSetBlocks();
     }
 
-    /**
-     * Create a wrapped get object
-     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - E.g. caching, optimizations, filtering
-     * @return
-     */
-    private IChunkGet newWrappedGet() {
-        return extent.getCachedGet(chunkX, chunkZ);
+    private IChunkGet newGet() {
+        if (extent instanceof SingleThreadQueueExtent) {
+            final WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
+            return cache.get(MathMan.pairInt(X, Z), this);
+        }
+        return get();
     }
 
     @Override
-    public void init(IQueueExtent extent, int chunkX, int chunkZ) {
+    public void init(final IQueueExtent extent, final int X, final int Z) {
         this.extent = extent;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
+        this.X = X;
+        this.Z = Z;
         if (set != null) {
             set.reset();
             delegate = SET;
@@ -333,73 +130,182 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
         get = null;
     }
 
-    @Override
-    public synchronized T call() {
-        if (get != null && set != null) {
-            return getOrCreateGet().call(getOrCreateSet(), this::recycle);
-        }
-        return null;
-    }
-
-    @Override
-    public T call(IChunkSet set, Runnable finalize) {
-        if (get != null && set != null) {
-            return getOrCreateGet().call(set, finalize);
-        }
-        return null;
-    }
-
     public IQueueExtent getExtent() {
         return extent;
     }
 
     @Override
     public int getX() {
-        return chunkX;
+        return X;
     }
 
     @Override
     public int getZ() {
-        return chunkZ;
+        return Z;
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+    public boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         return delegate.setBiome(this, x, y, z, biome);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public boolean setBlock(final int x, final int y, final int z, final BlockStateHolder block) {
         return delegate.setBlock(this, x, y, z, block);
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiome(final int x, final int z) {
         return delegate.getBiome(this, x, z);
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BlockState getBlock(final int x, final int y, final int z) {
         return delegate.getBlock(this, x, y, z);
     }
 
     @Override
-    public BaseBlock getFullBlock(int x, int y, int z) {
+    public BaseBlock getFullBlock(final int x, final int y, final int z) {
         return delegate.getFullBlock(this, x, y, z);
     }
 
     public interface IBlockDelegate {
+        boolean setBiome(final ChunkHolder chunk, final int x, final int y, final int z, final BiomeType biome);
 
-        boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome);
+        boolean setBlock(final ChunkHolder chunk, final int x, final int y, final int z, final BlockStateHolder holder);
 
-        boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder holder);
+        BiomeType getBiome(final ChunkHolder chunk, final int x, final int z);
 
-        BiomeType getBiome(ChunkHolder chunk, int x, int z);
+        BlockState getBlock(final ChunkHolder chunk, final int x, final int y, final int z);
 
-        BlockState getBlock(ChunkHolder chunk, int x, int y, int z);
-
-        BaseBlock getFullBlock(ChunkHolder chunk, int x, int y, int z);
+        BaseBlock getFullBlock(final ChunkHolder chunk, final int x, final int y, final int z);
     }
+
+    public static final IBlockDelegate NULL = new IBlockDelegate() {
+        @Override
+        public boolean setBiome(final ChunkHolder chunk, final int x, final int y, final int z, final BiomeType biome) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            return chunk.setBiome(x, y, z, biome);
+        }
+
+        @Override
+        public boolean setBlock(final ChunkHolder chunk, final int x, final int y, final int z, final BlockStateHolder block) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            return chunk.setBlock(x, y, z, block);
+        }
+
+        @Override
+        public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            return chunk.getBiome(x, z);
+        }
+
+        @Override
+        public BlockState getBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            return chunk.getBlock(x, y, z);
+        }
+
+        @Override
+        public BaseBlock getFullBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            return chunk.getFullBlock(x, y, z);
+        }
+    };
+
+    public static final IBlockDelegate GET = new IBlockDelegate() {
+        @Override
+        public boolean setBiome(final ChunkHolder chunk, final int x, final int y, final int z, final BiomeType biome) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            return chunk.setBiome(x, y, z, biome);
+        }
+
+        @Override
+        public boolean setBlock(final ChunkHolder chunk, final int x, final int y, final int z, final BlockStateHolder block) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            return chunk.setBlock(x, y, z, block);
+        }
+
+        @Override
+        public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
+            return chunk.get.getBiomeType(x, z);
+        }
+
+        @Override
+        public BlockState getBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            return chunk.get.getBlock(x, y, z);
+        }
+
+        @Override
+        public BaseBlock getFullBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            return chunk.get.getFullBlock(x, y, z);
+        }
+    };
+
+    public static final IBlockDelegate SET = new IBlockDelegate() {
+        @Override
+        public boolean setBiome(final ChunkHolder chunk, final int x, final int y, final int z, final BiomeType biome) {
+            return chunk.set.setBiome(x, y, z, biome);
+        }
+
+        @Override
+        public boolean setBlock(final ChunkHolder chunk, final int x, final int y, final int z, final BlockStateHolder block) {
+            return chunk.set.setBlock(x, y, z, block);
+        }
+
+        @Override
+        public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            return chunk.getBiome(x, z);
+        }
+
+        @Override
+        public BlockState getBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            return chunk.getBlock(x, y, z);
+        }
+
+        @Override
+        public BaseBlock getFullBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            return chunk.getFullBlock(x, y, z);
+        }
+    };
+
+    public static final IBlockDelegate BOTH = new IBlockDelegate() {
+        @Override
+        public boolean setBiome(final ChunkHolder chunk, final int x, final int y, final int z, final BiomeType biome) {
+            return chunk.set.setBiome(x, y, z, biome);
+        }
+
+        @Override
+        public boolean setBlock(final ChunkHolder chunk, final int x, final int y, final int z, final BlockStateHolder block) {
+            return chunk.set.setBlock(x, y, z, block);
+        }
+
+        @Override
+        public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
+            return chunk.get.getBiomeType(x, z);
+        }
+
+        @Override
+        public BlockState getBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            return chunk.get.getBlock(x, y, z);
+        }
+
+        @Override
+        public BaseBlock getFullBlock(final ChunkHolder chunk, final int x, final int y, final int z) {
+            return chunk.get.getFullBlock(x, y, z);
+        }
+    };
 }

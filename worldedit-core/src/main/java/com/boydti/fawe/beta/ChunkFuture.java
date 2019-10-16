@@ -11,7 +11,7 @@ public class ChunkFuture implements Future<Void> {
     private volatile boolean cancelled;
     private volatile boolean done;
 
-    public ChunkFuture(IChunk chunk) {
+    public ChunkFuture(final IChunk chunk) {
         this.chunk = chunk;
     }
 
@@ -20,9 +20,10 @@ public class ChunkFuture implements Future<Void> {
     }
 
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
+    public boolean cancel(final boolean mayInterruptIfRunning) {
         cancelled = true;
-        return !done;
+        if (done) return false;
+        return true;
     }
 
     @Override
@@ -46,8 +47,7 @@ public class ChunkFuture implements Future<Void> {
     }
 
     @Override
-    public Void get(long timeout, TimeUnit unit)
-        throws InterruptedException, ExecutionException, TimeoutException {
+    public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         synchronized (chunk) {
             if (!done) {
                 this.wait(unit.toMillis(timeout));

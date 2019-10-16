@@ -7,7 +7,6 @@ import com.boydti.fawe.beta.Trimable;
  * IQueueExtents - avoids conversion between palette and raw data on every block get
  */
 public interface IChunkCache<T> extends Trimable {
-    T get(int chunkX, int chunkZ);
 
     @Override
     default boolean trim(boolean aggressive) {

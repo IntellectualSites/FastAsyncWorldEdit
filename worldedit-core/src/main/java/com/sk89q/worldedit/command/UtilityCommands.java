@@ -189,11 +189,12 @@ public class UtilityCommands {
     public int fill(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
-                    @Range(min=1) @Arg(desc = "The radius to fill in")
+                    @Arg(desc = "The radius to fill in")
                         Expression radiusExp,
-                    @Range(min=1) @Arg(desc = "The depth to fill", def = "1")
+                    @Arg(desc = "The depth to fill", def = "1")
                         int depth,
-                    @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException, EvaluationException {
+                    @Arg(desc = "Direction to fill", def = "down")
+                        BlockVector3 direction) throws WorldEditException, EvaluationException {
         double radius = radiusExp.evaluate();
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
@@ -285,7 +286,7 @@ public class UtilityCommands {
     public int fillr(Actor actor, LocalSession session, EditSession editSession,
                      @Arg(desc = "The blocks to fill with")
                          Pattern pattern,
-                     @Range(min=1) @Arg(desc = "The radius to fill in")
+                     @Arg(desc = "The radius to fill in")
                          Expression radiusExp,
                      @Arg(desc = "The depth to fill", def = "")
                          Integer depth) throws WorldEditException, EvaluationException {
@@ -308,7 +309,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.drain")
     @Logging(PLACEMENT)
     public int drain(Actor actor, LocalSession session, EditSession editSession,
-                     @Range(min=0) @Arg(desc = "The radius to drain")
+                     @Arg(desc = "The radius to drain")
                          Expression radiusExp,
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
                          boolean waterlogged) throws WorldEditException, EvaluationException {
@@ -329,7 +330,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.fixlava")
     @Logging(PLACEMENT)
     public int fixLava(Actor actor, LocalSession session, EditSession editSession,
-                       @Range(min=0) @Arg(desc = "The radius to fix in")
+                       @Arg(desc = "The radius to fix in")
                            Expression radiusExp) throws WorldEditException, EvaluationException {
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
@@ -347,7 +348,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.fixwater")
     @Logging(PLACEMENT)
     public int fixWater(Actor actor, LocalSession session, EditSession editSession,
-                        @Range(min=0) @Arg(desc = "The radius to fix in")
+                        @Arg(desc = "The radius to fix in")
                             Expression radiusExp) throws WorldEditException, EvaluationException {
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
@@ -365,7 +366,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.removeabove")
     @Logging(PLACEMENT)
     public int removeAbove(Actor actor, World world, LocalSession session, EditSession editSession,
-                           @Range(min=1) @Arg(name = "size", desc = "The apothem of the square to remove from", def = "1")
+                           @Arg(desc = "The apothem of the square to remove from", def = "1")
                                int size,
                            @Arg(desc = "The maximum height above you to remove from", def = "")
                                Integer height) throws WorldEditException {
@@ -385,7 +386,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.removebelow")
     @Logging(PLACEMENT)
     public int removeBelow(Actor actor, World world, LocalSession session, EditSession editSession,
-                           @Arg(name = "size", desc = "The apothem of the square to remove from", def = "1")
+                           @Arg(desc = "The apothem of the square to remove from", def = "1")
                                int size,
                            @Arg(desc = "The maximum height below you to remove from", def = "")
                                Integer height) throws WorldEditException {
@@ -408,7 +409,7 @@ public class UtilityCommands {
     public int removeNear(Actor actor, LocalSession session, EditSession editSession,
                           @Arg(desc = "The mask of blocks to remove")
                               Mask mask,
-                          @Range(min=1) @Arg(desc = "The radius of the square to remove from", def = "50")
+                          @Arg(desc = "The radius of the square to remove from", def = "50")
                               int radius) throws WorldEditException {
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
@@ -426,7 +427,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.replacenear")
     @Logging(PLACEMENT)
     public int replaceNear(Actor actor, World world, LocalSession session, EditSession editSession,
-                           @Range(min=1) @Arg(desc = "The radius of the square to remove in")
+                           @Arg(desc = "The radius of the square to remove in")
                                int radius,
                            @Arg(desc = "The mask matching blocks to remove", def = "")
                                Mask from,
@@ -457,7 +458,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.snow")
     @Logging(PLACEMENT)
     public int snow(Actor actor, LocalSession session, EditSession editSession,
-                    @Range(min=1) @Arg(desc = "The radius of the circle to snow in", def = "10")
+                    @Arg(desc = "The radius of the circle to snow in", def = "10")
                         double size) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
@@ -475,7 +476,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.thaw")
     @Logging(PLACEMENT)
     public int thaw(Actor actor, LocalSession session, EditSession editSession,
-                    @Range(min=1) @Arg(desc = "The radius of the circle to thaw in", def = "10")
+                    @Arg(desc = "The radius of the circle to thaw in", def = "10")
                         double size) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
@@ -493,7 +494,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.green")
     @Logging(PLACEMENT)
     public int green(Actor actor, LocalSession session, EditSession editSession,
-                     @Range(min=1) @Arg(desc = "The radius of the circle to convert in", def = "10")
+                     @Arg(desc = "The radius of the circle to convert in", def = "10")
                          double size,
                      @Switch(name = 'f', desc = "Also convert coarse dirt")
                          boolean convertCoarse) throws WorldEditException {
@@ -514,7 +515,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.extinguish")
     @Logging(PLACEMENT)
     public void extinguish(Actor actor, LocalSession session, EditSession editSession,
-                           @Range(min=1) @Arg(desc = "The radius of the square to remove in", def = "")
+                           @Arg(desc = "The radius of the square to remove in", def = "")
                                Integer radius) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
@@ -596,7 +597,7 @@ public class UtilityCommands {
     public int remove(Actor actor,
                       @Arg(desc = "The type of entity to remove")
                           EntityRemover remover,
-                      @Range(min=-1) @Arg(desc = "The radius of the cuboid to remove from")
+                      @Arg(desc = "The radius of the cuboid to remove from")
                           int radius) throws WorldEditException {
 
         if (radius < -1) {

@@ -95,7 +95,4 @@ public class StencilBrush extends HeightBrush {
         Operations.completeBlindly(visitor);
     }
 
-    private void apply(double val) {
-
-    }
 }

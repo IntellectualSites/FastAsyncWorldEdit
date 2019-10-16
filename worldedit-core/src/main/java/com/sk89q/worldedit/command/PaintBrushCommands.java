@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
+import static java.util.Objects.requireNonNull;
+import static org.enginehub.piston.part.CommandParts.arg;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.LocalSession;
@@ -37,13 +40,13 @@ import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
-import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
+import java.util.stream.Collectors;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
 import org.enginehub.piston.CommandParameters;
@@ -53,11 +56,6 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.part.CommandArgument;
 import org.enginehub.piston.part.SubCommandPart;
-
-import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
-import static org.enginehub.piston.part.CommandParts.arg;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class PaintBrushCommands {
@@ -104,7 +102,7 @@ public class PaintBrushCommands {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         double density = requireNonNull(DENSITY.value(parameters).asSingle(double.class)) / 100;
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
-        BrushCommands.setOperationBasedBrush(player, localSession, new Expression(radius),
+        BrushCommands.setOperationBasedBrush(player, localSession, radius,
             new Paint(generatorFactory, density), regionFactory, "worldedit.brush.paint");
     }
 

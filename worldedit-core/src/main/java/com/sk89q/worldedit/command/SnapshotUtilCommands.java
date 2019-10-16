@@ -68,7 +68,7 @@ public class SnapshotUtilCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(actor);
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
 
@@ -79,7 +79,7 @@ public class SnapshotUtilCommands {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(snapshotName);
             } catch (InvalidSnapshotException e) {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
+                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
                 return;
             }
         } else {
@@ -92,7 +92,7 @@ public class SnapshotUtilCommands {
                 snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot == null) {
-                    BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
+                    actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
 
                     // Okay, let's toss some debugging information!
                     File dir = config.snapshotRepo.getDirectory();
@@ -109,7 +109,7 @@ public class SnapshotUtilCommands {
                     return;
                 }
             } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(actor);
+                actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
                 return;
             }
         }
@@ -128,15 +128,16 @@ public class SnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (!restore.getMissingChunks().isEmpty()) {
-                    BBC.SNAPSHOT_ERROR_RESTORE.send(actor);
+                    actor.printError(BBC.SNAPSHOT_ERROR_RESTORE.s());
                 } else if (error != null) {
                     actor.printError("Errors prevented any blocks from being restored.");
                     actor.printError("Last error: " + error);
                 } else {
-                    BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(actor);
+                    actor.printError(BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.s());
                 }
             } else {
-                actor.print(String.format("Restored; %d missing chunks and %d other errors.",
+                actor.print(String.format("Restored; %d "
+                        + "missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }

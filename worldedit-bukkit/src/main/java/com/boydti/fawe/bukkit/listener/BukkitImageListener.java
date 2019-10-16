@@ -3,8 +3,7 @@ package com.boydti.fawe.bukkit.listener;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -19,6 +18,7 @@ import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.HandSide;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
@@ -204,7 +204,7 @@ public class BukkitImageListener implements Listener {
         LocalSession session = fp.getSession();
         BrushTool tool;
         try {
-            tool = session.getBrushTool(fp, false);
+            tool = session.getBrushTool(fp.getItemInHand(HandSide.MAIN_HAND).getType());
         } catch (InvalidToolBindException e) {
             return;
         }
@@ -217,12 +217,10 @@ public class BukkitImageListener implements Listener {
             return;
         }
 
-        BrushSettings context = primary ? tool.getPrimary() : tool.getSecondary();
-        Brush brush = context.getBrush();
+        Brush brush = tool.getBrush();
         if (brush == null) {
             return;
         }
-        tool.setContext(context);
 
         if (event instanceof Cancellable) {
             ((Cancellable) event).setCancelled(true);
@@ -293,7 +291,7 @@ public class BukkitImageListener implements Listener {
                         }
                         last.setNext(generator);
                         try {
-                            brush.build(es, wPos, context.getMaterial(), context.getSize());
+                            brush.build(es, wPos, tool.getMaterial(), tool.getSize());
                         } catch (WorldEditException e) {
                             e.printStackTrace();
                         }

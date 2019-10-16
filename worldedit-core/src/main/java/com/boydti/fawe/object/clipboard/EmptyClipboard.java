@@ -76,8 +76,7 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return false;
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
     }
 
     @Override

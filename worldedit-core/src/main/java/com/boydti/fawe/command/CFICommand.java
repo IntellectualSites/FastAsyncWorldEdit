@@ -3,7 +3,7 @@ package com.boydti.fawe.command;
 import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
 import com.boydti.fawe.command.CFICommands.CFISettings;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;

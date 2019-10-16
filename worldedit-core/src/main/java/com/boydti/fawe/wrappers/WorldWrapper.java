@@ -1,6 +1,5 @@
 package com.boydti.fawe.wrappers;
 
-import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -98,8 +97,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        parent.setTile(x, y, z, tile);
     }
 
     @Override
@@ -235,11 +234,6 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
-        parent.sendChunk(X, Z, mask);
-    }
-
-    @Override
     public List<? extends Entity> getEntities(Region region) {
         return TaskManager.IMP.sync(new RunnableVal<List<? extends Entity>>() {
             @Override
@@ -300,8 +294,4 @@ public class WorldWrapper extends AbstractWorld {
         return parent.getSpawnPosition();
     }
 
-    @Override
-    public IChunkGet get(int x, int z) {
-        return parent.get(x, z);
-    }
 }

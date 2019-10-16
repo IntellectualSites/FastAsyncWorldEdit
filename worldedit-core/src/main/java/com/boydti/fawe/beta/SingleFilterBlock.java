@@ -1,14 +1,11 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import javax.annotation.Nullable;
 
 public class SingleFilterBlock extends FilterBlock {
@@ -30,18 +27,8 @@ public class SingleFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int getOrdinal() {
-        return block.getOrdinal();
-    }
-
-    @Override
     public void setOrdinal(int ordinal) {
         setBlock(BlockState.getFromOrdinal(ordinal));
-    }
-
-    @Override
-    public BlockState getBlock() {
-        return block.toBlockState();
     }
 
     @Override
@@ -50,8 +37,18 @@ public class SingleFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BaseBlock getFullBlock() {
-        return block;
+    public void setFullBlock(BaseBlock block) {
+        this.block = block;
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        block = block.toBaseBlock(nbtData);
+    }
+
+    @Override
+    public int getOrdinal() {
+        return block.getOrdinal();
     }
 
 //    @Override
@@ -60,18 +57,18 @@ public class SingleFilterBlock extends FilterBlock {
 //    }
 
     @Override
-    public void setFullBlock(BaseBlock block) {
-        this.block = block;
+    public BlockState getBlock() {
+        return block.toBlockState();
+    }
+
+    @Override
+    public BaseBlock getFullBlock() {
+        return block;
     }
 
     @Override
     public CompoundTag getNbtData() {
         return block.getNbtData();
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        block = block.toBaseBlock(nbtData);
     }
 
     @Override
@@ -97,27 +94,5 @@ public class SingleFilterBlock extends FilterBlock {
     @Override
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.at(x, y, z);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return getExtent().setBlock(position.getX(),position.getY(), position.getZ(), block);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return getExtent().setBlock(x,y, z, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return getExtent().setBiome(position.getX(),0, position.getZ(), biome);
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x,y, z,biome);
     }
 }

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world;
 
-import com.boydti.fawe.Fawe;
+import com.boydti.fawe.util.SetQueue;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -39,9 +39,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of {@link World}.
@@ -106,7 +105,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
-        Fawe.get().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
+        SetQueue.IMP.addTask(() -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
         return true;
     }
 

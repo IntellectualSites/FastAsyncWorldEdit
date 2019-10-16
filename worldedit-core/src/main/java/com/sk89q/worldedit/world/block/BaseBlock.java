@@ -105,6 +105,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         return blockState;
     }
 
+    @Deprecated
+    public static BaseBlock getFromInternalId(int internalId, CompoundTag nbtData) {
+        return BlockState.getFromInternalId(internalId).toBaseBlock(nbtData);
+    }
+
     /**
      * Gets a map of state to statevalue
      *

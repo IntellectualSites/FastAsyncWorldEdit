@@ -8,7 +8,6 @@ import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -38,12 +37,12 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
 
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        return perform(player, session, false);
+        return perform(player, false);
     }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        return perform(player, session, true);
+        return perform(player, true);
     }
 
     public Vector3 getTarget(Player player, boolean adjacent) {
@@ -56,8 +55,8 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         }
     }
 
-    public boolean perform(final Player player, LocalSession session, boolean rightClick) {
-        if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
+    public boolean perform(final Player player, boolean rightClick) {
+        if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(BBC.NO_PERM.format("worldedit.tool.inspect"));
             return false;
         }
@@ -70,7 +69,6 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         final int y = target.getBlockY();
         final int z = target.getBlockZ();
         World world = player.getWorld();
-        EditSessionBuilder editSession = new EditSessionBuilder(world).player(player);
         RollbackDatabase db = DBHandler.IMP.getDatabase(world);
         final AtomicInteger count = new AtomicInteger();
         db.getPotentialEdits(null, 0, target, target, new RunnableVal<DiskStorageHistory>() {
@@ -87,7 +85,6 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                         int to = change.to;
                         UUID uuid = value.getUUID();
                         String name = Fawe.imp().getName(uuid);
-                        int index = value.getIndex();
                         long age = System.currentTimeMillis() - value.getBDFile().lastModified();
                         String ageFormatted = MainUtil.secToTime(age / 1000);
                         BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromInternalId(from).getAsString(), BlockState.getFromInternalId(to).getAsString(), ageFormatted);
@@ -98,12 +95,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                     e.printStackTrace();
                 }
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count);
-            }
-        }, false, false);
+        }, () -> BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count), false, false);
         return true;
     }
 

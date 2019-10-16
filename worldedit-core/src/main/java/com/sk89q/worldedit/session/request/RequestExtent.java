@@ -102,8 +102,8 @@ public class RequestExtent implements Extent {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return getExtent().setTile(x, y, z, tile);
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        getExtent().setTile(x, y, z, tile);
     }
 
     @Override

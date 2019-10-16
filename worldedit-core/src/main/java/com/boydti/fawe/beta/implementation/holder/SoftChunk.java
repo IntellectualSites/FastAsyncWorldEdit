@@ -10,12 +10,12 @@ import java.lang.ref.SoftReference;
  */
 public class SoftChunk extends ReferenceChunk {
 
-    public SoftChunk(IChunk parent, IQueueExtent queueExtent) {
+    public SoftChunk(final IChunk parent, final IQueueExtent queueExtent) {
         super(parent, queueExtent);
     }
 
     @Override
-    protected Reference<FinalizedChunk> toReference(FinalizedChunk parent) {
+    protected Reference<FinalizedChunk> toReference(final FinalizedChunk parent) {
         return new SoftReference<>(parent);
     }
 }

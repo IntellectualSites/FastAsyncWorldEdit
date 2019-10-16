@@ -1,18 +1,23 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import javax.annotation.Nullable;
 
 public abstract class FilterBlock extends BlockVector3 implements Extent, TileEntityBlock {
-
     public abstract Extent getExtent();
+
+    public abstract void setOrdinal(int ordinal);
+
+    public abstract void setBlock(BlockState state);
+
+    public abstract void setFullBlock(BaseBlock block);
 
     public void setBiome(BiomeType biome) {
         setBiome(getX(), getY(), getZ(), biome);
@@ -20,23 +25,14 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
 
     public abstract int getOrdinal();
 
-    public abstract void setOrdinal(int ordinal);
-
     public abstract BlockState getBlock();
-
-    public abstract void setBlock(BlockState state);
 
     public abstract BaseBlock getFullBlock();
 
-    public abstract void setFullBlock(BaseBlock block);
-
-    @Override
     public abstract CompoundTag getNbtData();
 
-    @Override
     public abstract void setNbtData(@Nullable CompoundTag nbtData);
 
-    @Override
     public boolean hasNbtData() {
         return getNbtData() != null;
     }
@@ -54,12 +50,6 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return getExtent().getBlock(x, y, z);
-    }
-
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return getExtent().setTile(x, y, z, tile);
     }
 
     @Override
@@ -91,8 +81,8 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
         return getBlock(getX() - 1, getY(), getZ());
     }
 
-    public BlockState getBlockRelativeY(int y) {
-        return getBlock(getX(), getY() + y, getZ());
+    public BlockState getBlockRelativeY(final int y) {
+        return getBlock(getX(), getY() + y , getZ());
     }
 
     @Override
@@ -127,62 +117,51 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     /*
     Extent
      */
-    @Override
     public boolean setOrdinal(Extent orDefault, int ordinal) {
         setOrdinal(ordinal);
         return true;
     }
 
-    @Override
     public boolean setBlock(Extent orDefault, BlockState state) {
         setBlock(state);
         return true;
     }
 
-    @Override
     public boolean setFullBlock(Extent orDefault, BaseBlock block) {
         setFullBlock(block);
         return true;
     }
 
-    @Override
     public boolean setBiome(Extent orDefault, BiomeType biome) {
         setBiome(biome);
         return true;
     }
 
-    @Override
     public int getOrdinal(Extent orDefault) {
         return getOrdinal();
     }
 
-    @Override
     public BlockState getBlock(Extent orDefault) {
         return getBlock();
     }
 
-    @Override
     public BaseBlock getFullBlock(Extent orDefault) {
         return getFullBlock();
     }
 
-    @Override
     public CompoundTag getNbtData(Extent orDefault) {
         return getNbtData();
     }
 
-    @Override
     public BlockState getOrdinalBelow(Extent orDefault) {
         return getBlockBelow();
     }
 
-    @Override
     public BlockState getStateAbove(Extent orDefault) {
         return getBlockAbove();
     }
 
-    @Override
-    public BlockState getStateRelativeY(Extent orDefault, int y) {
+    public BlockState getStateRelativeY(Extent orDefault, final int y) {
         return getBlockRelativeY(y);
     }
 }

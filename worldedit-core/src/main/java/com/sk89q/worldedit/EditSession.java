@@ -25,9 +25,12 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
@@ -47,7 +50,10 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -56,7 +62,6 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
-import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
@@ -95,6 +100,7 @@ import com.sk89q.worldedit.function.visitor.NonRisingVisitor;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.history.UndoContext;
+import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -126,6 +132,7 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -159,7 +166,7 @@ import org.slf4j.LoggerFactory;
  * using the {@link ChangeSetExtent}.</p>
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class EditSession extends PassthroughExtent implements AutoCloseable {
+public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
 
@@ -197,8 +204,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
     }
     private final World world;
-    private final String worldName;
+    private final FaweQueue queue;
     private boolean wrapped;
+    private boolean fastMode;
     private final HistoryExtent history;
     private AbstractDelegateExtent bypassHistory;
     private AbstractDelegateExtent bypassAll;
@@ -228,9 +236,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
-        this.worldName = builder.getWorldName();
+        this.queue = builder.getQueue();
         this.wrapped = builder.isWrapped();
-//        this.fastMode = builder.hasFastMode(); Not used
+        this.fastMode = builder.hasFastMode();
         this.history = builder.getHistory();
         this.bypassHistory = builder.getBypassHistory();
         this.bypassAll = builder.getBypassAll();
@@ -332,17 +340,58 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public boolean cancel() {
-        ExtentTraverser traverser = new ExtentTraverser<>(getExtent());
+        ExtentTraverser traverser = new ExtentTraverser(this);
         NullExtent nullExtent = new NullExtent(world, FaweException.MANUAL);
         while (traverser != null) {
             Extent get = traverser.get();
-            ExtentTraverser next = traverser.next();
             if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
                 traverser.setNext(nullExtent);
             }
+            ExtentTraverser next = traverser.next();
             traverser = next;
         }
-        return super.cancel();
+        bypassHistory = nullExtent;
+        bypassAll = nullExtent;
+        dequeue();
+        if (!queue.isEmpty()) {
+            if (Fawe.isMainThread()) {
+                queue.clear();
+            } else {
+                SetQueue.IMP.addTask(() -> queue.clear());
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Remove this EditSession from the queue<br>
+     * - This doesn't necessarily stop it from being queued again
+     */
+    public void dequeue() {
+        if (queue != null) {
+            SetQueue.IMP.dequeue(queue);
+        }
+    }
+
+    /**
+     * Add a task to run when this EditSession is done dispatching
+     *
+     * @param whenDone
+     */
+    public void addNotifyTask(Runnable whenDone) {
+        if (queue != null) {
+            queue.addNotifyTask(whenDone);
+        }
+    }
+
+    /**
+     * Get the FaweQueue this EditSession uses to queue the changes<br>
+     * - Note: All implementation queues for FAWE are instances of NMSMappedFaweQueue
+     *
+     * @return
+     */
+    public FaweQueue getQueue() {
+        return queue;
     }
 
     // pkg private for TracedEditSession only, may later become public API
@@ -356,6 +405,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * chunk batching}.
      */
     public void enableStandardMode() {
+        setBatchingChunks(true);
     }
 
     /**
@@ -364,29 +414,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(ReorderMode reorderMode) {
-        switch (reorderMode) {
-            case MULTI_STAGE:
-                enableQueue();
-                break;
-            case NONE: // Functionally the same, since FAWE doesn't perform physics
-            case FAST:
-                disableQueue();
-                break;
-            default:
-                throw new UnsupportedOperationException("Not implemented: " + reorderMode);
-        }
+        //TODO Not working yet. - It shouldn't need to work. FAWE doesn't need reordering.
     }
 
+    //TODO: Reorder mode.
     /**
      * Get the reorder mode.
      *
      * @return the reorder mode
      */
     public ReorderMode getReorderMode() {
-        if (isQueueEnabled()) {
-            return ReorderMode.MULTI_STAGE;
-        }
-        return ReorderMode.FAST;
+        return null;
     }
 
     /**
@@ -422,6 +460,26 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public void setRawChangeSet(@Nullable FaweChangeSet set) {
         changeTask = set;
+        changes++;
+    }
+
+    /**
+     * Change the ChangeSet being used for this EditSession
+     * - If history is disabled, no changeset can be set
+     *
+     * @param set (null = remove the changeset)
+     */
+    public void setChangeSet(@Nullable FaweChangeSet set) {
+        if (set == null) {
+            disableHistory(true);
+        } else {
+            if (history != null) {
+                history.setChangeSet(set);
+            } else {
+                changeTask = set;
+                set.addChangeTask(queue);
+            }
+        }
         changes++;
     }
 
@@ -465,7 +523,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public void enableQueue() {
-        super.enableQueue();
     }
 
     /**
@@ -473,7 +530,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public void disableQueue() {
-        super.disableQueue();
+        if (isQueueEnabled()) {
+            this.flushQueue();
+        }
     }
 
     /**
@@ -600,6 +659,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param enabled true to enable
      */
     public void setFastMode(boolean enabled) {
+        this.fastMode = enabled;
         disableHistory(enabled);
     }
 
@@ -730,11 +790,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param batchingChunks {@code true} to enable, {@code false} to disable
      */
     public void setBatchingChunks(boolean batchingChunks) {
-        if (batchingChunks) {
-            enableQueue();
-        } else {
-            disableQueue();
-        }
     }
 
     /**
@@ -744,7 +799,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @see #setBatchingChunks(boolean)
      */
     public void disableBuffering() {
-        disableQueue();
     }
 
     /**
@@ -830,7 +884,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public BlockType getBlockType(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType();
+        if (!limit.MAX_CHECKS()) {
+            throw FaweException.MAX_CHECKS;
+        }
+        int combinedId4Data = queue.getCombinedId4DataDebug(x, y, z, BlockTypes.AIR.getInternalId(), this);
+        return BlockTypes.getFromStateId(combinedId4Data);
     }
 
     /**
@@ -971,6 +1029,22 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
+     * Insert a contrived block change into the history.
+     *
+     * @param position the position
+     * @param existing the previous block at that position
+     * @param block    the new block
+     * @deprecated Get the change set with {@link #getChangeSet()} and add the change with that
+     */
+    @Deprecated
+    public void rememberChange(final BlockVector3 position, final BaseBlock existing, final BaseBlock block) {
+        ChangeSet changeSet = getChangeSet();
+        if (changeSet != null) {
+            changeSet.add(new BlockChange(position, existing, block));
+        }
+    }
+
+    /**
      * Restores all blocks to their initial state.
      *
      * @param editSession a new {@link EditSession} to perform the undo in
@@ -979,7 +1053,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        setChangeSet(null);
+        editSession.getQueue().setChangeTask(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.UNDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1003,7 +1077,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        setChangeSet(null);
+        editSession.getQueue().setChangeTask(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.REDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1082,7 +1156,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Reset limit
         limit.set(originalLimit);
         // Enqueue it
-        super.commit();
+        if (queue == null || queue.isEmpty()) {
+            queue.dequeue();
+            return;
+        }
+        if (Fawe.isMainThread()) {
+            SetQueue.IMP.flush(queue);
+        } else {
+            queue.flush();
+        }
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
                 ((FaweChangeSet) getChangeSet()).closeAsync();
@@ -2994,7 +3076,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
         queue.add(origin);
-
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
             while (iter.hasNext()) {
@@ -3082,15 +3163,53 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return regenerate(region, this);
     }
 
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public boolean clearContainerBlockContents(BlockVector3 position) {
+        return false;
+    }
+
+    @Override
+    public void dropItem(Vector3 position, BaseItemStack item) {
+
+    }
+
     public boolean regenerate(Region region, EditSession session) {
         return session.regenerate(region, null, null);
+    }
+
+    @Override
+    public boolean playEffect(Vector3 position, int type, int data) {
+        return false;
+    }
+
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return null;
     }
 
     private void setExistingBlocks(BlockVector3 pos1, BlockVector3 pos2) {
         for (int x = pos1.getX(); x <= pos2.getX(); x++) {
             for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
                 for (int y = pos1.getY(); y <= pos2.getY(); y++) {
-                    setBlock(x, y, z, getFullBlock(x, y, z));
+                    int from = queue.getCombinedId4Data(x, y, z);
+                    queue.setBlock(x, y, z, from);
+                    if (BlockTypes.getFromStateId(from).getMaterial().hasContainer()) {
+                        CompoundTag tile = queue.getTileEntity(x, y, z);
+                        if (tile != null) {
+                            queue.setTile(x, y, z, tile);
+                        }
+                    }
                 }
             }
         }
@@ -3187,7 +3306,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 TaskManager.IMP.sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
-                        regenerateChunk(cx, cz, biome, seed);
+                        queue.regenerateChunk(cx, cz, biome, seed);
                     }
                 });
             }

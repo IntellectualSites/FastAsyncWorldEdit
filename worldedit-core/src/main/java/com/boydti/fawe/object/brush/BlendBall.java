@@ -20,7 +20,6 @@ public class BlendBall implements Brush {
         int ty = position.getBlockY();
         int tz = position.getBlockZ();
 
-//        Map<BlockState, Integer> frequency = Maps.newHashMap();
         int[] frequency = new int[BlockTypes.size()];
 
         int maxY = editSession.getMaximumPoint().getBlockY();
@@ -46,7 +45,7 @@ public class BlendBall implements Brush {
                                     continue;
                                 }
                                 BlockState state = editSession.getBlock(x0 + ox, y0 + oy, z0 + oz);
-                                Integer count = frequency[state.getInternalBlockTypeId()];
+                                int count = frequency[state.getInternalBlockTypeId()];
                                 count++;
                                 if (count > highest) {
                                     highest = count;

@@ -29,7 +29,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-@Deprecated
 public class BlockStateMask extends AbstractExtentMask {
 
     private final Map<String, String> states;
@@ -52,10 +51,7 @@ public class BlockStateMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(vector.getBlock(getExtent()));
-    }
-
-    public boolean test(BlockState block) {
+        BlockState block = getExtent().getBlock(vector);
         final Map<Property<Object>, Object> checkProps = cache
                 .computeIfAbsent(block.getBlockType(), (b -> Blocks.resolveProperties(states, b)));
         if (strict && checkProps.isEmpty()) {

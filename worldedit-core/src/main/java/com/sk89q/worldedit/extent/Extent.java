@@ -21,6 +21,12 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.OreGen;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
+import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
+
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -30,11 +36,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.sk89q.worldedit.function.generator.CavesGen;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.OreGen;
-import com.sk89q.worldedit.function.generator.Resource;
-import com.sk89q.worldedit.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -444,10 +445,6 @@ public interface Extent extends InputExtent, OutputExtent {
     @Override
     default Operation commit() {
         return null;
-    }
-
-    default boolean cancel() {
-        return true;
     }
 
     default int getMaxY() {

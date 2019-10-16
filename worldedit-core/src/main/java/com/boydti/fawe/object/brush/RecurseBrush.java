@@ -12,7 +12,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 
 public class RecurseBrush implements Brush {
 
@@ -29,7 +29,7 @@ public class RecurseBrush implements Brush {
             mask = Masks.alwaysTrue();
         }
         final int radius = (int) size;
-        BlockStateHolder block = editSession.getBlock(position);
+        BlockState block = editSession.getBlock(position);
         if (block.getBlockType().getMaterial().isAir()) {
             return;
         }

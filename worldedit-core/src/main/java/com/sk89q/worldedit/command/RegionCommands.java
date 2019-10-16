@@ -107,16 +107,16 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
-    public void set(Player fp, EditSession editSession,
+    public void set(Actor actor, EditSession editSession,
         @Selection Region region,
         @Arg(desc = "The pattern of blocks to set")
-            Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
-            int affected = editSession.setBlocks(region, patternArg);
+            Pattern pattern, InjectedValueAccess context) throws WorldEditException {
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.setBlocks(region, pattern);
             if (affected != 0) {
-                BBC.OPERATION.send(fp, affected);
-                if (!fp.hasPermission("fawe.tips"))
-                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(fp);
+                BBC.OPERATION.send(actor, affected);
+                if (!actor.hasPermission("fawe.tips"))
+                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(actor);
             }
         }, getArguments(context), region, context);
     }
@@ -213,8 +213,8 @@ public class RegionCommands {
     public int line(Actor actor, EditSession editSession,
                     @Selection Region region,
                     @Arg(desc = "The pattern of blocks to place")
-                        Pattern patternArgOpt,
-                    @Range(min = 1) @Arg(desc = "The thickness of the line", def = "0")
+                        Pattern pattern,
+                    @Arg(desc = "The thickness of the line", def = "0")
                         int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
@@ -227,7 +227,7 @@ public class RegionCommands {
         CuboidRegion cuboidregion = (CuboidRegion) region;
         BlockVector3 pos1 = cuboidregion.getPos1();
         BlockVector3 pos2 = cuboidregion.getPos2();
-        int blocksChanged = editSession.drawLine(patternArgOpt, pos1, pos2, thickness, !shell);
+        int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(actor, blocksChanged);
         return blocksChanged;
@@ -240,27 +240,27 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.curve")
     @Logging(REGION)
-    public void curve(Player fp, EditSession editSession,
+    public void curve(Actor actor, EditSession editSession,
                      @Selection Region region,
                      @Arg(desc = "The pattern of blocks to place")
-                         Pattern patternArg,
+                         Pattern pattern,
                      @Arg(desc = "The thickness of the curve", def = "0")
                          int thickness,
                      @Switch(name = 'h', desc = "Generate only a shell")
                          boolean shell, InjectedValueAccess context) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
-            fp.printError("//curve only works with convex polyhedral selections");
+            actor.printError("//curve only works with convex polyhedral selections");
             return;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
-        fp.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
         ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;
         List<BlockVector3> vectors = new ArrayList<>(cpregion.getVertices());
 
-        int blocksChanged = editSession.drawSpline(patternArg, vectors, 0, 0, 0, 10, thickness, !shell);
+        int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
 
-        BBC.VISITOR_BLOCK.send(fp, blocksChanged);
+        BBC.VISITOR_BLOCK.send(actor, blocksChanged);
         }, getArguments(context), region, context);
     }
 
@@ -271,7 +271,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
-    public void replace(Player fp, EditSession editSession, @Selection Region region,
+    public void replace(Actor actor, EditSession editSession, @Selection Region region,
                        @Arg(desc = "The mask representing blocks to replace", def = "")
                            Mask from,
                        @Arg(desc = "The pattern of blocks to replace with")
@@ -280,14 +280,14 @@ public class RegionCommands {
             from = new ExistingBlockMask(editSession);
         }
         Mask finalFrom = from;
-        fp.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
             int affected = editSession.replaceBlocks(region, finalFrom, to);
-            BBC.VISITOR_BLOCK.send(fp, affected);
-            if (!fp.hasPermission("fawe.tips")) {
+            BBC.VISITOR_BLOCK.send(actor, affected);
+            if (!actor.hasPermission("fawe.tips")) {
                 BBC.TIP_REPLACE_ID
                     .or(BBC.TIP_REPLACE_LIGHT, BBC.TIP_REPLACE_MARKER, BBC.TIP_TAB_COMPLETE,
                         BBC.TIP_REPLACE_REGEX, BBC.TIP_REPLACE_REGEX_2, BBC.TIP_REPLACE_REGEX_3,
-                        BBC.TIP_REPLACE_REGEX_4, BBC.TIP_REPLACE_REGEX_5).send(fp);
+                        BBC.TIP_REPLACE_REGEX_4, BBC.TIP_REPLACE_REGEX_5).send(actor);
             }
         }, getArguments(context), region, context);
     }
@@ -298,12 +298,12 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
-    public void overlay(Player fp, EditSession editSession, @Selection Region region,
+    public void overlay(Actor actor, EditSession editSession, @Selection Region region,
                        @Arg(desc = "The pattern of blocks to overlay")
-                            Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
-            int affected = editSession.overlayCuboidBlocks(region, patternArg);
-            BBC.VISITOR_BLOCK.send(fp, affected);
+                            Pattern pattern, InjectedValueAccess context) throws WorldEditException {
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.overlayCuboidBlocks(region, pattern);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -342,8 +342,8 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.center")
     public void center(Actor actor, EditSession editSession, @Selection Region region,
                       @Arg(desc = "The pattern of blocks to set")
-                          Pattern patternArg) throws WorldEditException {
-        int affected = editSession.center(region, patternArg);
+                          Pattern pattern) throws WorldEditException {
+        int affected = editSession.center(region, pattern);
         BBC.VISITOR_BLOCK.send(actor, affected);
     }
 
@@ -353,10 +353,10 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.naturalize")
     @Logging(REGION)
-    public void naturalize(Player fp, EditSession editSession, @Selection Region region, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
+    public void naturalize(Actor actor, EditSession editSession, @Selection Region region, InjectedValueAccess context) throws WorldEditException {
+        actor.checkConfirmationRegion(() -> {
             int affected = editSession.naturalizeCuboidBlocks(region);
-            BBC.VISITOR_BLOCK.send(fp, affected);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -366,12 +366,12 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.walls")
     @Logging(REGION)
-    public void walls(Player fp, EditSession editSession, @Selection Region region,
+    public void walls(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The pattern of blocks to set")
-                         Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
-            int affected = editSession.makeWalls(region, patternArg);
-            BBC.VISITOR_BLOCK.send(fp, affected);
+                         Pattern pattern, InjectedValueAccess context) throws WorldEditException {
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.makeWalls(region, pattern);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -382,12 +382,12 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.faces")
     @Logging(REGION)
-    public void faces(Player fp, EditSession editSession, @Selection Region region,
+    public void faces(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The pattern of blocks to set")
-                         Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
-            int affected = editSession.makeCuboidFaces(region, patternArg);
-            BBC.VISITOR_BLOCK.send(fp, affected);
+                         Pattern pattern, InjectedValueAccess context) throws WorldEditException {
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.makeCuboidFaces(region, pattern);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -398,25 +398,25 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
-    public void smooth(Player fp, EditSession editSession, @Selection Region region,
+    public void smooth(Actor actor, EditSession editSession, @Selection Region region,
                       @Arg(desc = "# of iterations to perform", def = "1")
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
-                          Mask maskOpt,
+                          Mask mask,
         @Switch(name = 's', desc = "TODO") boolean snow, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = fp.getLimit();
+        FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweException.MAX_CHECKS;
         }
-        fp.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
             try {
-                HeightMap heightMap = new HeightMap(editSession, region, maskOpt, snow);
+                HeightMap heightMap = new HeightMap(editSession, region, mask, snow);
                 HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
                 int affected = heightMap.applyFilter(filter, iterations);
-                BBC.VISITOR_BLOCK.send(fp, affected);
+                BBC.VISITOR_BLOCK.send(actor, affected);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -430,11 +430,11 @@ public class RegionCommands {
             descFooter = "Bypass region restrictions"
     )
     @CommandPermissions("fawe.admin")
-    public void wea(Player player) throws WorldEditException {
-        if (player.togglePermission("fawe.bypass")) {
-            BBC.WORLDEDIT_BYPASSED.send(player);
+    public void wea(Actor actor) throws WorldEditException {
+        if (actor.togglePermission("fawe.bypass")) {
+            actor.print(BBC.WORLDEDIT_BYPASSED.s());
         } else {
-            BBC.WORLDEDIT_RESTRICTED.send(player);
+            actor.print(BBC.WORLDEDIT_RESTRICTED.s());
         }
     }
 
@@ -445,13 +445,13 @@ public class RegionCommands {
             descFooter = "Select your current allowed region"
     )
     @CommandPermissions("fawe.worldeditregion")
-    public void wer(Player fp) throws WorldEditException {
-        final Region region = fp.getLargestRegion();
+    public void wer(Player player) throws WorldEditException {
+        final Region region = player.getLargestRegion();
         if (region == null) {
-            BBC.NO_REGION.send(fp);
+            player.print(BBC.NO_REGION.s());
         } else {
-            fp.setSelection(region);
-            BBC.SET_REGION.send(fp);
+            player.setSelection(region);
+            player.print(BBC.SET_REGION.s());
         }
     }
 
@@ -462,7 +462,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
-    public void move(Player player, World world, EditSession editSession, LocalSession session,
+    public void move(Actor actor, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
                         int count,
@@ -481,7 +481,7 @@ public class RegionCommands {
                         boolean skipEntities,
                     InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
-        player.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
             int affected = editSession.moveRegion(region, direction, count, !ignoreAirBlocks, !skipEntities, copyBiomes, replace);
 
             if (moveSelection) {
@@ -489,13 +489,13 @@ public class RegionCommands {
                     region.shift(direction.multiply(count));
 
                     session.getRegionSelector(world).learnChanges();
-                    session.getRegionSelector(world).explainRegionAdjust(player, session);
+                    session.getRegionSelector(world).explainRegionAdjust(actor, session);
                 } catch (RegionOperationException e) {
-                    player.printError(e.getMessage());
+                    actor.printError(e.getMessage());
                 }
             }
 
-            BBC.VISITOR_BLOCK.send(player, affected);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -509,8 +509,10 @@ public class RegionCommands {
     @Logging(ORIENTATION_REGION)
     public void fall(Player player, EditSession editSession, LocalSession session,
                      @Selection Region region,
-                     @Arg(name = "replace", desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
-                     @Switch(name = 'm', desc = "TODO") boolean notFullHeight,
+                     @Arg(name = "replace", desc = "BlockStateHolder", def = "air")
+                         BlockStateHolder replace,
+                     @Switch(name = 'm', desc = "TODO")
+                         boolean notFullHeight,
                      InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.fall(region, !notFullHeight, replace);
@@ -524,7 +526,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Logging(ORIENTATION_REGION)
-    public void stack(Player player, EditSession editSession, LocalSession session,
+    public void stack(Actor actor, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(desc = "# of copies to stack", def = "1")
                          int count,
@@ -533,16 +535,16 @@ public class RegionCommands {
                          BlockVector3 direction,
                      @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                          boolean moveSelection,
-                     @Switch(name = 'b', desc = "Copy Biomes")
-                         boolean copyBiomes,
-                     @Switch(name = 'e', desc = "Skip entities")
-                         boolean skipEntities,
-                     @Switch(name = 'a', desc = "Ignore air blocks")
+                    @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
+                    @Switch(name = 'e', desc = "Skip entities")
+                         boolean skipEntities,
+                    @Switch(name = 'b', desc = "Also copy biomes")
+                        boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Source mask")
                          Mask sourceMask,
                     InjectedValueAccess context) throws WorldEditException {
-        player.checkConfirmationStack(() -> {
+        actor.checkConfirmationStack(() -> {
             if (sourceMask != null) {
                 editSession.addSourceMask(sourceMask);
             }
@@ -555,14 +557,14 @@ public class RegionCommands {
                 final BlockVector3 shiftVector = direction.toVector3().multiply(count * (Math.abs(direction.dot(size)) + 1)).toBlockPoint();
                     region.shift(shiftVector);
 
-                    session.getRegionSelector(player.getWorld()).learnChanges();
-                    session.getRegionSelector(player.getWorld()).explainRegionAdjust(player, session);
+                    session.getRegionSelector(world).learnChanges();
+                    session.getRegionSelector(world).explainRegionAdjust(actor, session);
                 } catch (RegionOperationException e) {
-                    player.printError(e.getMessage());
+                    actor.printError(e.getMessage());
                 }
             }
 
-            BBC.VISITOR_BLOCK.send(player, affected);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, count, context);
     }
 
@@ -575,7 +577,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
-    public void deform(Player player, LocalSession session, EditSession editSession, InjectedValueAccess context,
+    public void deform(Actor actor, LocalSession session, EditSession editSession, InjectedValueAccess context,
                       @Selection Region region,
                       @Arg(desc = "The expression to use", variable = true)
                           List<String> expression,
@@ -590,7 +592,7 @@ public class RegionCommands {
             zero = Vector3.ZERO;
             unit = Vector3.ONE;
         } else if (offset) {
-            zero = session.getPlacementPosition(player).toVector3();
+            zero = session.getPlacementPosition(actor).toVector3();
             unit = Vector3.ONE;
         } else {
             final Vector3 min = region.getMinimumPoint().toVector3();
@@ -605,13 +607,15 @@ public class RegionCommands {
         }
 
         final Vector3 unit1 = unit;
-        player.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
             try {
                 final int affected = editSession.deformRegion(region, zero, unit1, String.join(" ", expression), session.getTimeout());
-                player.findFreePosition();
-                BBC.VISITOR_BLOCK.send(player, affected);
+                if (actor instanceof Player) {
+                    ((Player) actor).findFreePosition();
+                }
+                BBC.VISITOR_BLOCK.send(actor, affected);
             } catch (ExpressionException e) {
-                player.printError(e.getMessage());
+                actor.printError(e.getMessage());
             }
         }, getArguments(context), region, context);
     }
@@ -663,19 +667,19 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
-    public void hollow(Player fp, EditSession editSession,
+    public void hollow(Actor actor, EditSession editSession,
                       @Selection Region region,
-                       @Range(min = 0) @Arg(desc = "Thickness of the shell to leave", def = "0")
+                      @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
-                      @Arg(name = "pattern", desc = "The pattern of blocks to replace the hollowed area with", def = "air")
-                          Pattern patternArgOpt,
+                      @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
+                          Pattern pattern,
         @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
-        fp.checkConfirmationRegion(() -> {
-            int affected = editSession.hollowOutRegion(region, thickness, patternArgOpt, finalMask);
-            BBC.VISITOR_BLOCK.send(fp, affected);
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
+            BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), region, context);
     }
 
@@ -702,18 +706,18 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
-    public void flora(Player fp, EditSession editSession, @Selection Region region,
+    public void flora(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The density of the forest", def = "5")
                          double density, InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be in [0, 100]");
-        fp.checkConfirmationRegion(() -> {
+        actor.checkConfirmationRegion(() -> {
             FloraGenerator generator = new FloraGenerator(editSession);
             GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
             LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
             visitor.setMask(new NoiseFilter2D(new RandomNoise(), density / 100));
             Operations.completeLegacy(visitor);
 
-            BBC.COMMAND_FLORA.send(fp, ground.getAffected());
+            BBC.COMMAND_FLORA.send(actor, ground.getAffected());
         }, "/flora", region, context);
     }
 

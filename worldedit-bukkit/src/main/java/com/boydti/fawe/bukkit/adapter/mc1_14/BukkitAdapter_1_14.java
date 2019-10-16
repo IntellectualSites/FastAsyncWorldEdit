@@ -234,10 +234,10 @@ public class BukkitAdapter_1_14 {
         if (blocks == null) {
             return section;
         }
-        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        final int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
         try {
             int num_palette = 0;
             int air = 0;

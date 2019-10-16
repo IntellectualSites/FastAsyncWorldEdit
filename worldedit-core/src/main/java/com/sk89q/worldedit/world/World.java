@@ -292,16 +292,4 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
         return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
-    /**
-     * Refresh a specific chunk with a bitMask (0 = default, 65535 = all block sections)
-     * Note: only 0 is guaranteed to send all tiles / entities
-     * Note: Only 65535 is guaranteed to send all blocks
-     * @param chunkX
-     * @param chunkZ
-     * @param bitMask
-     */
-    void sendChunk(final int X, final int Z, final int mask);
-
-    @Override
-    IChunkGet get(int x, int z);
 }

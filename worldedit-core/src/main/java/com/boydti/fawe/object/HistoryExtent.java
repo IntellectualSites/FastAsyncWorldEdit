@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 public class HistoryExtent extends AbstractDelegateExtent {
 
     private FaweChangeSet changeSet;
+    private final FaweQueue queue;
 
     /**
      * Create a new instance.
@@ -33,9 +34,10 @@ public class HistoryExtent extends AbstractDelegateExtent {
      * @param extent    the extent
      * @param changeSet the change set
      */
-    public HistoryExtent(Extent extent, FaweChangeSet changeSet) {
+    public HistoryExtent(final Extent extent, final FaweChangeSet changeSet, FaweQueue queue) {
         super(extent);
         checkNotNull(changeSet);
+        this.queue = queue;
         this.changeSet = changeSet;
     }
 
@@ -43,16 +45,15 @@ public class HistoryExtent extends AbstractDelegateExtent {
         return changeSet;
     }
 
-    @Override
     public void setChangeSet(FaweChangeSet fcs) {
         this.changeSet = fcs;
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        BaseBlock previous = getFullBlock(x, y, z);
+        BaseBlock previous = queue.getFullBlock(x, y, z);
         if (previous.getInternalId() == block.getInternalId()) {
-            if (!previous.hasNbtData() && block instanceof BaseBlock && !block.hasNbtData()) {
+            if (!previous.hasNbtData() && (block instanceof BaseBlock && !block.hasNbtData())) {
                 return false;
             }
         }
@@ -60,17 +61,16 @@ public class HistoryExtent extends AbstractDelegateExtent {
         return getExtent().setBlock(x, y, z, block);
     }
 
-
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
     @Nullable
     @Override
-    public Entity createEntity(Location location, BaseEntity state) {
+    public Entity createEntity(final Location location, final BaseEntity state) {
         final Entity entity = super.createEntity(location, state);
-        if (state != null) {
+        if ((state != null)) {
             this.changeSet.addEntityCreate(state.getNbtData());
         }
         return entity;
@@ -82,13 +82,13 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public List<? extends Entity> getEntities(Region region) {
+    public List<? extends Entity> getEntities(final Region region) {
         return this.wrapEntities(super.getEntities(region));
     }
 
-    private List<? extends Entity> wrapEntities(List<? extends Entity> entities) {
+    private List<? extends Entity> wrapEntities(final List<? extends Entity> entities) {
         final List<Entity> newList = new ArrayList<>(entities.size());
-        for (Entity entity : entities) {
+        for (final Entity entity : entities) {
             newList.add(new TrackedEntity(entity));
         }
         return newList;
@@ -119,7 +119,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     public class TrackedEntity implements Entity {
         private final Entity entity;
 
-        private TrackedEntity(Entity entity) {
+        private TrackedEntity(final Entity entity) {
             this.entity = entity;
         }
 
@@ -143,7 +143,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
             final Location location = this.entity.getLocation();
             final BaseEntity state = this.entity.getState();
             final boolean success = this.entity.remove();
-            if (state != null && success) {
+            if ((state != null) && success) {
                 HistoryExtent.this.changeSet.addEntityRemove(state.getNbtData());
             }
             return success;
@@ -151,13 +151,13 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
         @Nullable
         @Override
-        public <T> T getFacet(Class<? extends T> cls) {
+        public <T> T getFacet(final Class<? extends T> cls) {
             return this.entity.getFacet(cls);
         }
 
-        @Override
-        public boolean setLocation(Location location) {
-            return this.entity.setLocation(location);
-        }
+		@Override
+		public boolean setLocation(Location location) {
+			return this.entity.setLocation(location);
+		}
     }
 }

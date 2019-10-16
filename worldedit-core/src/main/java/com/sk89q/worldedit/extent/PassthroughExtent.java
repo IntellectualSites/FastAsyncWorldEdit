@@ -6,8 +6,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.Resource;
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -38,14 +38,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         super(extent);
     }
 
-    public BlockVector3 getMinimumPoint() {
-        return getExtent().getMinimumPoint();
-    }
-
-    public BlockVector3 getMaximumPoint() {
-        return getExtent().getMaximumPoint();
-    }
-
     @Override
     public List<? extends Entity> getEntities(Region region) {
         return getExtent().getEntities(region);
@@ -66,10 +58,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         getExtent().removeEntity(x, y, z, uuid);
-    }
-
-    public boolean isQueueEnabled() {
-        return getExtent().isQueueEnabled();
     }
 
     public void enableQueue() {
@@ -182,11 +170,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean cancel() {
-        return getExtent().cancel();
-    }
-
-    @Override
     public int getMaxY() {
         return getExtent().getMaxY();
     }
@@ -279,8 +262,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return getExtent().setTile(x, y, z, tile);
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        getExtent().setTile(x, y, z, tile);
     }
 
     @Override

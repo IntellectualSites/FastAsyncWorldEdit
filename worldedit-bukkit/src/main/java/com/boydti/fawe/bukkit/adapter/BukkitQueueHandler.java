@@ -1,6 +1,7 @@
 package com.boydti.fawe.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
 
@@ -27,7 +28,6 @@ public class BukkitQueueHandler extends QueueHandler {
         } catch (Throwable ignore){}
     }
 
-    @Override
     public void startSet(boolean parallel) {
         ChunkListener.physicsFreeze = true;
         if (parallel) {
@@ -52,7 +52,6 @@ public class BukkitQueueHandler extends QueueHandler {
         }
     }
 
-    @Override
     public void endSet(boolean parallel) {
         ChunkListener.physicsFreeze = false;
         if (parallel) {
@@ -68,5 +67,10 @@ public class BukkitQueueHandler extends QueueHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public IQueueExtent create() {
+        return null;
     }
 }

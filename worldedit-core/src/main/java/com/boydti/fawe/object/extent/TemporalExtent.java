@@ -1,13 +1,12 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.extent.PassthroughExtent;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -70,7 +69,7 @@ public class TemporalExtent extends PassthroughExtent {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
             if(block instanceof BaseBlock) {
                 return (BaseBlock)block;
-            }else {
+            } else {
                 return block.toBaseBlock();
             }
         }

@@ -21,9 +21,6 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
-import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -500,8 +497,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return false;
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
     }
 
     @Override
@@ -515,12 +511,4 @@ public class BukkitWorld extends AbstractWorld {
         return setBiome(BlockVector2.at(x,z), biome);
     }
 
-    @Override
-    public void sendChunk(int X, int Z, int mask) {
-    }
-
-    @Override
-    public IChunkGet get(int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
-    }
 }

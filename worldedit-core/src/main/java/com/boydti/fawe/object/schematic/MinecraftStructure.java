@@ -160,7 +160,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         if (width > WARN_SIZE || height > WARN_SIZE || length > WARN_SIZE) {
             Fawe.debug("A structure longer than 32 is unsupported by minecraft (but probably still works)");
         }
-        Map<String, Object> structure = FaweCache.IMP.asMap("version", 1, "author", owner);
+        Map<String, Object> structure = FaweCache.asMap("version", 1, "author", owner);
         // ignored: version / owner
         MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
@@ -210,10 +210,10 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
                     point.getY() - min.getY(), point.getZ() - min.getZ());
                 if (!block.hasNbtData()) {
-                    blocks.add(FaweCache.IMP.asMap("state", index, "pos", pos));
+                    blocks.add(FaweCache.asMap("state", index, "pos", pos));
                 } else {
                     blocks.add(
-                        FaweCache.IMP.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
+                        FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
                 }
             }
         }
@@ -233,14 +233,14 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 // Replace rotation data
                 nbtMap.put("Rotation", writeRotation(entity.getLocation()));
                 nbtMap.put("id", new StringTag(state.getType().getId()));
-                Map<String, Object> entityMap = FaweCache.IMP.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
+                Map<String, Object> entityMap = FaweCache.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
                 entities.add(entityMap);
             }
         }
         if (!entities.isEmpty()) {
             structure.put("entities", entities);
         }
-        out.writeNamedTag("", FaweCache.IMP.asTag(structure));
+        out.writeNamedTag("", FaweCache.asTag(structure));
         close();
     }
 

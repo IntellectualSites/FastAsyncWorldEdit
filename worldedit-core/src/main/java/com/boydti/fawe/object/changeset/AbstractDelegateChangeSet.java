@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.changeset;
 
+import com.boydti.fawe.object.FaweQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
@@ -14,15 +15,9 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.Iterator;
-import java.util.UUID;
-import java.util.concurrent.Future;
 
 public class AbstractDelegateChangeSet extends FaweChangeSet {
     public final FaweChangeSet parent;
-
-    public static FaweChangeSet getDefaultChangeSet(World world, UUID uuid) {
-        return FaweChangeSet.getDefaultChangeSet(world, uuid);
-    }
 
     public AbstractDelegateChangeSet(FaweChangeSet parent) {
         super(parent.getWorld());
@@ -32,8 +27,13 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
+    public void addChangeTask(FaweQueue queue) {
+        super.addChangeTask(queue);
+    }
+
+    @Override
     public boolean closeAsync() {
-        return parent.closeAsync();
+        return super.closeAsync();
     }
 
     @Override
@@ -176,23 +176,15 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
         parent.add(x, y, z, combinedFrom, to);
     }
 
-    @Override
-    public Future<?> addWriteTask(Runnable writeTask) {
-        return parent.addWriteTask(writeTask);
-    }
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
-    @Override
-    public Future<?> addWriteTask(Runnable writeTask, boolean completeNow) {
-        return parent.addWriteTask(writeTask, completeNow);
-    }
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
 
-    @Override
-    public boolean isRecordingChanges() {
-        return parent.isRecordingChanges();
-    }
-
-    @Override
-    public void setRecordChanges(boolean recordChanges) {
-        parent.setRecordChanges(recordChanges);
-    }
+	}
 }

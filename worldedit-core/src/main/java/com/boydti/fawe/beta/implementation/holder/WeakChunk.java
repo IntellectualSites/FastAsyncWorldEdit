@@ -6,16 +6,15 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 /**
- * A {@link ReferenceChunk} using {@link WeakReference} to hold the chunk.
+ * Weak reference implementation of {@link ReferenceChunk}
  */
 public class WeakChunk extends ReferenceChunk {
-
-    public WeakChunk(IChunk parent, IQueueExtent queueExtent) {
+    public WeakChunk(final IChunk parent, final IQueueExtent queueExtent) {
         super(parent, queueExtent);
     }
 
     @Override
-    protected Reference<FinalizedChunk> toReference(FinalizedChunk parent) {
+    protected Reference<FinalizedChunk> toReference(final FinalizedChunk parent) {
         return new WeakReference<>(parent);
     }
 }

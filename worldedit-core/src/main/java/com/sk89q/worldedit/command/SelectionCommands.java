@@ -24,7 +24,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.object.mask.BlockTypeMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
 import com.boydti.fawe.util.ExtentTraverser;
@@ -116,7 +116,7 @@ public class SelectionCommands {
         }
 
         if (!session.getRegionSelector(world).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.print(BBC.SELECTOR_ALREADY_SET.s());
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -144,7 +144,7 @@ public class SelectionCommands {
         }
 
         if (!session.getRegionSelector(world).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.print(BBC.SELECTOR_ALREADY_SET.s());
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -163,14 +163,14 @@ public class SelectionCommands {
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.print(BBC.SELECTOR_ALREADY_SET.s());
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainPrimarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.print(BBC.NO_BLOCK.s());
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -185,14 +185,14 @@ public class SelectionCommands {
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.print(BBC.SELECTOR_ALREADY_SET.s());
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainSecondarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.print(BBC.NO_BLOCK.s());
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -614,7 +614,7 @@ public class SelectionCommands {
             case FUZZY:
             case MAGIC:
                 if (maskOpt == null) {
-                    maskOpt = new IdMask(world);
+                    maskOpt = new BlockTypeMask(world);
                 }
                 //TODO Make FuzzyRegionSelector accept actors
                 newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);

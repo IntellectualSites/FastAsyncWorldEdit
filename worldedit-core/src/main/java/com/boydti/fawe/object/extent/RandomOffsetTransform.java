@@ -11,17 +11,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.SplittableRandom;
 
-public class RandomOffsetTransform extends ResettableExtent {
+public class RandomOffsetTransform extends OffsetExtent {
     private transient SplittableRandom random;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
-    private final int dx, dy, dz;
-
     public RandomOffsetTransform(Extent parent, int dx, int dy, int dz) {
-        super(parent);
-        this.dx = dx + 1;
-        this.dy = dy + 1;
-        this.dz = dz + 1;
+        super(parent, dx + 1, dy + 1, dz + 1);
         this.random = new SplittableRandom();
     }
 

@@ -41,6 +41,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -224,7 +225,7 @@ public class HistoryCommands {
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
     public void undo(Player player, LocalSession session,
-        @Range(min = 1) @Arg(desc = "Number of undoes to perform", def = "1")
+        @Arg(desc = "Number of undoes to perform", def = "1")
             int times,
         @Arg(name = "player", desc = "Undo this player's operations", def = "")
             String playerName,
@@ -232,7 +233,7 @@ public class HistoryCommands {
         times = Math.max(1, times);
         LocalSession undoSession;
         if (session.hasFastMode()) {
-            BBC.COMMAND_UNDO_DISABLED.send(player);
+            player.print(BBC.COMMAND_UNDO_DISABLED.s());
             return;
         }
         if (playerName != null && !playerName.isEmpty()) {
@@ -247,19 +248,20 @@ public class HistoryCommands {
         }
         int finalTimes = times;
         player.checkConfirmation(() -> {
-            EditSession undone = null;
+            EditSession undone;
             int i = 0;
             for (; i < finalTimes; ++i) {
                 undone = undoSession.undo(undoSession.getBlockBag(player), player);
-                if (undone == null) break;
+                if (undone != null) {
+                    worldEdit.flushBlockBag(player, undone);
+                } else {
+                    break;
+                }
             }
-            if (undone == null) i--;
             if (i > 0) {
                 BBC.COMMAND_UNDO_SUCCESS.send(player, i == 1 ? "" : " x" + i);
-                worldEdit.flushBlockBag(player, undone);
-            }
-            if (undone == null) {
-                BBC.COMMAND_UNDO_ERROR.send(player);
+            } else {
+                player.printError(BBC.COMMAND_UNDO_ERROR.s());
             }
         }, "undo", times, 50, context);
     }
@@ -271,7 +273,7 @@ public class HistoryCommands {
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
     public void redo(Player player, LocalSession session,
-                     @Range(min = 1) @Arg(desc = "Number of redoes to perform", def = "1")
+                     @Arg(desc = "Number of redoes to perform", def = "1")
                          int times,
                      @Arg(name = "player", desc = "Redo this player's operations", def = "")
                          String playerName) throws WorldEditException {
@@ -298,7 +300,7 @@ public class HistoryCommands {
         if (timesRedone > 0) {
             BBC.COMMAND_REDO_SUCCESS.send(player, timesRedone == 1 ? "" : " x" + timesRedone);
         } else {
-            BBC.COMMAND_REDO_ERROR.send(player);
+            player.printError(BBC.COMMAND_REDO_ERROR.s());
         }
     }
 
@@ -308,9 +310,9 @@ public class HistoryCommands {
         desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
-    public void clearHistory(Player player, LocalSession session) {
+    public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        BBC.COMMAND_HISTORY_CLEAR.send(player);
+        actor.print(BBC.COMMAND_HISTORY_CLEAR.s());
     }
 
 }

@@ -116,7 +116,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             public void run(OutputStream output) {
                 try {
                     try (PGZIPOutputStream gzip = new PGZIPOutputStream(output)) {
-                        CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
+                        CompoundTag weTag = (CompoundTag) FaweCache.asTag(tag);
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
                             Map<String, Tag> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));

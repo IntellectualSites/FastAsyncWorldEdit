@@ -2,9 +2,8 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
-import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
@@ -24,202 +23,101 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public enum FaweCache implements Trimable {
-    IMP
-    ; // singleton
-
-    public final int BLOCKS_PER_LAYER = 4096;
-    public final int CHUNK_LAYERS = 16;
-    public final int WORLD_HEIGHT = CHUNK_LAYERS << 4;
-    public final int WORLD_MAX_Y = WORLD_HEIGHT - 1;
-
-    public final char[] EMPTY_CHAR_4096 = new char[4096];
-
-    private final IdentityHashMap<Class, IterableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
-    private final IdentityHashMap<Class, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
-
-    public interface Pool<T> {
-        T poll();
-        default boolean offer(T recycle) {
-            return false;
-        }
-        default void clear() {}
-    }
-
-    public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
-        private final Supplier<T> supplier;
-
-        public QueuePool(Supplier<T> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        public boolean offer(T t) {
-            return super.offer(t);
-        }
-
-        @Override
-        public T poll() {
-            T result = super.poll();
-            if (result == null) {
-                return supplier.get();
-            }
-            return result;
-        }
-
-        @Override
-        public void clear() {
-            if (!isEmpty()) super.clear();
-        }
-    }
+public class FaweCache implements Trimable {
+    public static final char[] EMPTY_CHAR_4096 = new char[4096];
 
     /*
     Palette buffers / cache
      */
 
     @Override
-    public synchronized boolean trim(boolean aggressive) {
+    public boolean trim(boolean aggressive) {
         BLOCK_TO_PALETTE.clean();
         PALETTE_TO_BLOCK.clean();
         BLOCK_STATES.clean();
         SECTION_BLOCKS.clean();
         PALETTE_CACHE.clean();
         PALETTE_TO_BLOCK_CHAR.clean();
-        INDEX_STORE.clean();
 
         MUTABLE_VECTOR3.clean();
         MUTABLE_BLOCKVECTOR3.clean();
-        SECTION_BITS_TO_CHAR.clean();
-        for (Map.Entry<Class, IterableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
-            entry.getValue().clean();
-        }
-        for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
-            Pool pool = entry.getValue();
-            pool.clear();
-        }
-
         return false;
     }
 
-    public final <T> Pool<T> getPool(Class<T> clazz) {
-        Pool<T> pool = REGISTERED_POOLS.get(clazz);
-        if (pool == null) {
-            synchronized (this) {
-                pool = REGISTERED_POOLS.get(clazz);
-                if (pool == null) {
-                    Fawe.debug("Not registered " + clazz);
-                    Supplier<T> supplier = IOUtil.supplier(clazz::newInstance);
-                    pool = supplier::get;
-                    REGISTERED_POOLS.put(clazz, pool);
-                }
-            }
+    public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            int[] result = new int[BlockTypes.states.length];
+            Arrays.fill(result, Integer.MAX_VALUE);
+            return result;
         }
-        return pool;
-    }
+    };
 
-    public final <T> T getFromPool(Class<T> clazz) {
-        Pool<T> pool = getPool(clazz);
-        return pool.poll();
-    }
-
-    public final <T> T getSingleton(Class<T> clazz) {
-        IterableThreadLocal<T> cache = REGISTERED_SINGLETONS.get(clazz);
-        if (cache == null) {
-            synchronized (this) {
-                cache = REGISTERED_SINGLETONS.get(clazz);
-                if (cache == null) {
-                    Fawe.debug("Not registered " + clazz);
-                    cache = new IterableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
-                    REGISTERED_SINGLETONS.put(clazz, cache);
-                }
-            }
+    public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            return new int[Character.MAX_VALUE + 1];
         }
-        return cache.get();
-    }
+    };
 
-    public synchronized <T> IterableThreadLocal<T> registerSingleton(Class<T> clazz, Supplier<T> cache) {
-        checkNotNull(cache);
-        IterableThreadLocal<T> local = new IterableThreadLocal<>(cache);
-        IterableThreadLocal previous = REGISTERED_SINGLETONS.putIfAbsent(clazz, local);
-        if (previous != null) {
-            throw new IllegalStateException("Previous key");
+    public static final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            char[] result = new char[Character.MAX_VALUE + 1];
+            Arrays.fill(result, Character.MAX_VALUE);
+            return result;
         }
-        return local;
-    }
+    };
 
-    public synchronized <T> Pool<T> registerPool(Class<T> clazz, Supplier<T> cache, boolean buffer) {
-        checkNotNull(cache);
-        Pool<T> pool;
-        if (buffer) {
-            pool = new QueuePool<>(cache);
-        } else {
-            pool = cache::get;
+    public static final IterableThreadLocal<long[]> BLOCK_STATES = new IterableThreadLocal<long[]>() {
+        @Override
+        public long[] init() {
+            return new long[2048];
         }
-        Pool previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
-        if (previous != null) {
-            throw new IllegalStateException("Previous key");
+    };
+
+    public static final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            return new int[4096];
         }
-        return pool;
-    }
-
-    public final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<>(() -> {
-        int[] result = new int[BlockTypes.states.length];
-        Arrays.fill(result, Integer.MAX_VALUE);
-        return result;
-    });
-
-    public final IterableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new IterableThreadLocal<>(() -> new char[4096]);
-
-    public final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
-
-    public final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<>(
-        () -> new char[Character.MAX_VALUE + 1], a -> {
-            Arrays.fill(a, Character.MAX_VALUE);
-        }
-    );
-
-    public final IterableThreadLocal<long[]> BLOCK_STATES = new IterableThreadLocal<>(() -> new long[2048]);
-
-    public final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<>(() -> new int[4096]);
-
-    public final IterableThreadLocal<int[]> INDEX_STORE = new IterableThreadLocal<>(() -> new int[256]);
+    };
 
     /**
      * Holds data for a palette used in a chunk section
      */
-    public final class Palette {
+    public static final class Palette {
         public int paletteToBlockLength;
         /**
          * Reusable buffer array, MUST check paletteToBlockLength for actual length
          */
         public int[] paletteToBlock;
 
-        public int blockStatesLength;
+        public int blockstatesLength;
         /**
-         * Reusable buffer array, MUST check blockStatesLength for actual length
+         * Reusable buffer array, MUST check blockstatesLength for actual length
          */
-        public long[] blockStates;
+        public long[] blockstates;
     }
 
-    private final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<>(Palette::new);
+    private static final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<Palette>() {
+        @Override
+        public Palette init() {
+            return new Palette();
+        }
+    };
 
     /**
      * Convert raw char array to palette
@@ -227,7 +125,7 @@ public enum FaweCache implements Trimable {
      * @param blocks
      * @return palette
      */
-    public Palette toPalette(int layerOffset, char[] blocks) {
+    public static Palette toPalette(int layerOffset, char[] blocks) {
         return toPalette(layerOffset, null, blocks);
     }
 
@@ -237,14 +135,14 @@ public enum FaweCache implements Trimable {
      * @param blocks
      * @return palette
      */
-    public Palette toPalette(int layerOffset, int[] blocks) {
+    public static Palette toPalette(int layerOffset, int[] blocks) {
         return toPalette(layerOffset, blocks, null);
     }
 
-    private Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
+    private static Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
-        long[] blockStates = BLOCK_STATES.get();
+        long[] blockstates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
         int blockIndexStart = layerOffset << 12;
@@ -288,10 +186,10 @@ public enum FaweCache implements Trimable {
             int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
                 // Set a value, because minecraft needs it for some  reason
-                blockStates[0] = 0;
+                blockstates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -300,8 +198,8 @@ public enum FaweCache implements Trimable {
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
 
-            palette.blockStatesLength = blockBitArrayEnd;
-            palette.blockStates = blockStates;
+            palette.blockstatesLength = blockBitArrayEnd;
+            palette.blockstates = blockstates;
 
             return palette;
         } catch (Throwable e) {
@@ -315,9 +213,14 @@ public enum FaweCache implements Trimable {
      * Vector cache
      */
 
-    public IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<>(MutableBlockVector3::new);
+    public static IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<MutableBlockVector3>() {
+        @Override
+        public MutableBlockVector3 init() {
+            return new MutableBlockVector3();
+        }
+    };
 
-    public IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>(MutableVector3::new) {
+    public static IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>() {
         @Override
         public MutableVector3 init() {
             return new MutableVector3();
@@ -327,7 +230,7 @@ public enum FaweCache implements Trimable {
     /*
     Conversion methods between JNBT tags and raw values
      */
-    public Map<String, Object> asMap(Object... pairs) {
+    public static Map<String, Object> asMap(Object... pairs) {
         HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
         for (int i = 0; i < pairs.length; i += 2) {
             String key = (String) pairs[i];
@@ -337,47 +240,47 @@ public enum FaweCache implements Trimable {
         return map;
     }
 
-    public ShortTag asTag(short value) {
+    public static ShortTag asTag(short value) {
         return new ShortTag(value);
     }
 
-    public IntTag asTag(int value) {
+    public static IntTag asTag(int value) {
         return new IntTag(value);
     }
 
-    public DoubleTag asTag(double value) {
+    public static DoubleTag asTag(double value) {
         return new DoubleTag(value);
     }
 
-    public ByteTag asTag(byte value) {
+    public static ByteTag asTag(byte value) {
         return new ByteTag(value);
     }
 
-    public FloatTag asTag(float value) {
+    public static FloatTag asTag(float value) {
         return new FloatTag(value);
     }
 
-    public LongTag asTag(long value) {
+    public static LongTag asTag(long value) {
         return new LongTag(value);
     }
 
-    public ByteArrayTag asTag(byte[] value) {
+    public static ByteArrayTag asTag(byte[] value) {
         return new ByteArrayTag(value);
     }
 
-    public IntArrayTag asTag(int[] value) {
+    public static IntArrayTag asTag(int[] value) {
         return new IntArrayTag(value);
     }
 
-    public LongArrayTag asTag(long[] value) {
+    public static LongArrayTag asTag(long[] value) {
         return new LongArrayTag(value);
     }
 
-    public StringTag asTag(String value) {
+    public static StringTag asTag(String value) {
         return new StringTag(value);
     }
 
-    public CompoundTag asTag(Map<String, Object> value) {
+    public static CompoundTag asTag(Map<String, Object> value) {
         HashMap<String, Tag> map = new HashMap<>();
         for (Map.Entry<String, Object> entry : value.entrySet()) {
             Object child = entry.getValue();
@@ -387,7 +290,7 @@ public enum FaweCache implements Trimable {
         return new CompoundTag(map);
     }
 
-    public Tag asTag(Object value) {
+    public static Tag asTag(Object value) {
         if (value instanceof Integer) {
             return asTag((int) value);
         } else if (value instanceof Short) {
@@ -440,7 +343,7 @@ public enum FaweCache implements Trimable {
         }
     }
 
-    public ListTag asTag(Object... values) {
+    public static ListTag asTag(Object... values) {
         Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.length);
         for (Object value : values) {
@@ -454,7 +357,7 @@ public enum FaweCache implements Trimable {
         return new ListTag(clazz, list);
     }
 
-    public ListTag asTag(Collection values) {
+    public static ListTag asTag(Collection values) {
         Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.size());
         for (Object value : values) {
@@ -471,7 +374,7 @@ public enum FaweCache implements Trimable {
     /*
     Thread stuff
      */
-    public ThreadPoolExecutor newBlockingExecutor() {
+    public static ThreadPoolExecutor newBlockingExecutor() {
         int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
         return new ThreadPoolExecutor(nThreads, nThreads,

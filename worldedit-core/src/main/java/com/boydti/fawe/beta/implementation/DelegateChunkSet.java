@@ -9,13 +9,13 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 public interface DelegateChunkSet extends IChunkSet {
-
     IChunkSet getParent();
 
     @Override
@@ -34,8 +34,8 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default boolean setTile(int x, int y, int z, CompoundTag tile) {
-        return getParent().setTile(x, y, z, tile);
+    default void setTile(int x, int y, int z, CompoundTag tile) {
+        getParent().setTile(x, y, z, tile);
     }
 
     @Override
@@ -102,8 +102,7 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
+    default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return getParent().setBlock(position, block);
     }
 

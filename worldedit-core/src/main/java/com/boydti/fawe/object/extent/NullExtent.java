@@ -10,7 +10,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -192,7 +191,6 @@ public class NullExtent extends FaweRegionExtent {
         throw reason;
     }
 
-    @Override
     public boolean cancel() {
         throw reason;
     }
@@ -287,18 +285,12 @@ public class NullExtent extends FaweRegionExtent {
         throw reason;
     }
 
-    @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
             throw reason;
         }
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
-        throw reason;
-    }
-
-    @Override
-    public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
         throw reason;
     }
 

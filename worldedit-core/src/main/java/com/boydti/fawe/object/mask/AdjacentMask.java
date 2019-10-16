@@ -8,7 +8,7 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 public class AdjacentMask extends AbstractMask {
     private final int min, max;
     private final Mask mask;
-    private MutableBlockVector3 v;
+    private final MutableBlockVector3 v;
 
     public AdjacentMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;

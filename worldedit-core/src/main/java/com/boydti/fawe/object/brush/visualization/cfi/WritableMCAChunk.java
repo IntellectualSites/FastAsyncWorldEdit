@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
@@ -22,8 +23,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
-public class WritableMCAChunk {
+public class WritableMCAChunk extends FaweChunk<Void> {
     public final boolean[] hasSections = new boolean[16];
     public final byte[] skyLight = new byte[65536];
     public final byte[] blockLight = new byte[65536];
@@ -43,7 +45,8 @@ public class WritableMCAChunk {
 
     public int chunkX, chunkZ;
 
-    protected WritableMCAChunk() {
+    public WritableMCAChunk() {
+        super(null, 0,0);
     }
 
     public int getX() {
@@ -79,10 +82,10 @@ public class WritableMCAChunk {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
-        int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        long[] blockstates = FaweCache.IMP.BLOCK_STATES.get();
-        int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
+        long[] blockstates = FaweCache.BLOCK_STATES.get();
+        int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
 
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);
@@ -263,13 +266,8 @@ public class WritableMCAChunk {
     }
 
     public int getBitMask() {
-        int bitMask = 0;
-        for (int section = 0; section < hasSections.length; section++) {
-            if (hasSections[section]) {
-                bitMask += 1 << section;
-            }
-        }
-        return bitMask;
+        return IntStream.range(0, hasSections.length).filter(section -> hasSections[section])
+            .map(section -> 1 << section).sum();
     }
 
     public void setTile(int x, int y, int z, CompoundTag tile) {
@@ -402,6 +400,19 @@ public class WritableMCAChunk {
 
     public void setBiome(BiomeType biome) {
         Arrays.fill(biomes, (byte) biome.getInternalId());
+    }
+
+    @Override
+    public FaweChunk<Void> copy(boolean shallow) {
+        throw new UnsupportedOperationException("Unsupported");
+    }
+
+    public Void getChunk() {
+        throw new UnsupportedOperationException("Not applicable for this");
+    }
+
+    public FaweChunk call() {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     public void removeEntity(UUID uuid) {

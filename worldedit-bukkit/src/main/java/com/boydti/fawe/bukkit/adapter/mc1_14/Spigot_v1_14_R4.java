@@ -19,6 +19,8 @@
 
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -64,6 +66,20 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.BlockStateBoolean;
@@ -121,27 +137,10 @@ import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
@@ -423,11 +422,11 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         try {
             block = IRegistry.BLOCK.get(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
         } catch (Throwable e) {
-            e.printStackTrace();
+            logger.warning("Failed to find properties for " + blockType.getId());
             return Collections.emptyMap();
         }
         if (block == null) {
-            logger.warn("Failed to find properties for " + blockType.getId());
+            logger.warning("Failed to find properties for " + blockType.getId());
             return Collections.emptyMap();
         }
         Map<String, Property<?>> properties = Maps.newLinkedHashMap();
@@ -451,6 +450,21 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
             properties.put(property.getName(), property);
         }
         return properties;
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack adapt(BaseItemStack item) {
+        ItemStack stack = new ItemStack(IRegistry.ITEM.get(MinecraftKey.a(item.getType().getId())), item.getAmount());
+        stack.setTag(((NBTTagCompound) fromNative(item.getNbtData())));
+        return CraftItemStack.asCraftMirror(stack);
+    }
+
+    @Override
+    public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
+        final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
+        weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
+        return weStack;
     }
 
     /**
@@ -493,7 +507,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
             try {
                 return toNativeList((NBTTagList) foreign);
             } catch (Throwable e) {
-                logger.warn("Failed to convert NBTTagList", e);
+                logger.log(Level.WARNING, "Failed to convert NBTTagList", e);
                 return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
             }
         } else if (foreign instanceof NBTTagLong) {
@@ -514,12 +528,11 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
      *
      * @param foreign the foreign tag
      * @return the converted tag
-     * @throws NoSuchFieldException on error
      * @throws SecurityException on error
      * @throws IllegalArgumentException on error
      * @throws IllegalAccessException on error
      */
-    public ListTag toNativeList(NBTTagList foreign) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public ListTag toNativeList(NBTTagList foreign) throws SecurityException, IllegalArgumentException, IllegalAccessException {
         List<Tag> values = new ArrayList<>();
         int type = foreign.getTypeId();
 
@@ -698,18 +711,4 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         return result == EnumInteractionResult.SUCCESS;
     }
 
-    @Override
-    public org.bukkit.inventory.ItemStack adapt(BaseItemStack item) {
-        ItemStack stack = new ItemStack(IRegistry.ITEM.get(MinecraftKey.a(item.getType().getId())), item.getAmount());
-        stack.setTag(((NBTTagCompound) fromNative(item.getNbtData())));
-        return CraftItemStack.asCraftMirror(stack);
-    }
-
-    @Override
-    public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
-        final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
-        return weStack;
-    }
 }

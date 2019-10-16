@@ -15,7 +15,6 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Arrays;
 
@@ -64,7 +63,7 @@ public class LayerBrush implements Brush {
             return !adjacent.test(pos);
         }, pos -> {
             int depth = visitor.getDepth();
-            BlockStateHolder currentPattern = layers[depth];
+            BlockState currentPattern = layers[depth];
             return currentPattern.apply(editSession, pos, pos);
         }, layers.length - 1);
         for (BlockVector3 pos : visited) {

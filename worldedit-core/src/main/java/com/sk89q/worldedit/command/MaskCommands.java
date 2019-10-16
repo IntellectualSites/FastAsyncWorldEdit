@@ -9,7 +9,7 @@
 //import com.boydti.fawe.object.mask.DataMask;
 //import com.boydti.fawe.object.mask.ExtremaMask;
 //import com.boydti.fawe.object.mask.IdDataMask;
-//import com.boydti.fawe.object.mask.IdMask;
+//import com.boydti.fawe.object.mask.BlockTypeMask;
 //import com.boydti.fawe.object.mask.LightMask;
 //import com.boydti.fawe.object.mask.OpacityMask;
 //import com.boydti.fawe.object.mask.ROCAngleMask;
@@ -231,7 +231,7 @@
 //            desc = "Restrict to initial id"
 //    )
 //    public Mask id(Extent extent) {
-//        return new IdMask(extent);
+//        return new BlockTypeMask(extent);
 //    }
 //
 //    @Command(

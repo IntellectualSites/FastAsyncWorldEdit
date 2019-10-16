@@ -20,11 +20,15 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.MaskedFaweQueue;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.SetQueue;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -383,7 +387,6 @@ public interface Player extends Entity, Actor {
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             getSession().setClipboard(null);
             getSession().clearHistory();
-            getSession().unregisterTools(this);
         }
         Fawe.get().unregister(getName());
     }
@@ -448,4 +451,25 @@ public interface Player extends Entity, Actor {
             Fawe.debug("===============---=============");
         }
     }
-}
+
+    default FaweQueue getFaweQueue(boolean autoQueue) {
+        return getFaweQueue(true, autoQueue);
+    }
+
+    default FaweQueue getFaweQueue(boolean fast, boolean autoQueue) {
+        CFICommands.CFISettings settings = this.getMeta("CFISettings");
+        if (settings != null && settings.hasGenerator()) {
+            return settings.getGenerator();
+        } else {
+            return SetQueue.IMP.getNewQueue(getWorld(), true, autoQueue);
+        }
+    }
+
+    default FaweQueue getMaskedFaweQueue(boolean autoQueue) {
+        FaweQueue queue = getFaweQueue(autoQueue);
+        Region[] allowedRegions = getCurrentRegions();
+        if (allowedRegions.length == 1 && allowedRegions[0].isGlobal()) {
+            return queue;
+        }
+        return new MaskedFaweQueue(queue, allowedRegions);
+    }}

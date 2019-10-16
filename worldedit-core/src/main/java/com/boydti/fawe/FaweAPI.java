@@ -6,7 +6,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -422,17 +421,17 @@ public class FaweAPI {
         int count = 0;
         if (queue == null) queue = createQueue(world, false);
         // Remove existing lighting first
-        if (queue instanceof LightingExtent) {
-            LightingExtent relighter = (LightingExtent) queue;
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.relightChunk(x, z);
-                    count++;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
-        }
+//        if (queue instanceof LightingExtent) {
+//            LightingExtent relighter = (LightingExtent) queue;
+//            for (int x = minX; x <= maxX; x++) {
+//                for (int z = minZ; z <= maxZ; z++) {
+//                    relighter.relightChunk(x, z);
+//                    count++;
+//                }
+//            }
+//        } else {
+//            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
+//        }
         return count;
     }
 

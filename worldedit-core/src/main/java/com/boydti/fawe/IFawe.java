@@ -2,6 +2,7 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.object.FaweCommand;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
@@ -24,6 +25,10 @@ public interface IFawe {
     void setupVault();
 
     TaskManager getTaskManager();
+
+    FaweQueue getNewQueue(World world, boolean fast);
+
+    FaweQueue getNewQueue(String world, boolean fast);
 
     String getWorldName(World world);
 

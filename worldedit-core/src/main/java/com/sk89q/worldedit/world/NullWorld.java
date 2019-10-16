@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.world;
 
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.NullChunkGet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -148,16 +146,6 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
-
-    }
-
-    @Override
-    public IChunkGet get(int x, int z) {
-        return NullChunkGet.INSTANCE;
-    }
-
-    @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState();
     }
@@ -173,8 +161,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return false;
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
     }
 
     @Override

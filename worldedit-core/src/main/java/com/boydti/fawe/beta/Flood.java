@@ -9,20 +9,21 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Flood {
-
     private final int maxBranch;
     private final int maxDepth;
     private final Direction[] directions;
-    private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
-    private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
+
     private int[] queue;
     private long[] visit;
+
     private int[][] queues;
     private long[][] visits;
     private int chunkX;
     private int chunkYLayer;
     private int chunkZ;
     private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
+    private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
+    private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
 
     public Flood(int maxBranch, int maxDepth, Direction[] directions) {
         this.maxBranch = maxBranch;

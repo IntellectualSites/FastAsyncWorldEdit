@@ -2,11 +2,10 @@ package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.object.brush.MovableTool;
 import com.boydti.fawe.object.brush.ResettableTool;
-import com.boydti.fawe.object.brush.scroll.ScrollTool;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.command.tool.Tool;
+import com.sk89q.worldedit.util.HandSide;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,38 +14,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 
 public class BrushListener implements Listener {
     public BrushListener(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerItemHoldEvent(final PlayerItemHeldEvent event) {
-        final Player bukkitPlayer = event.getPlayer();
-        if (bukkitPlayer.isSneaking()) {
-            return;
-        }
-        BukkitPlayer player = BukkitAdapter.adapt(bukkitPlayer);
-        LocalSession session = player.getSession();
-        Tool tool = session.getTool(player);
-        if (tool instanceof ScrollTool) {
-            final int slot = event.getNewSlot();
-            final int oldSlot = event.getPreviousSlot();
-            final int ri;
-            if ((((slot - oldSlot) <= 4) && ((slot - oldSlot) > 0)) || (((slot - oldSlot) < -4))) {
-                ri = 1;
-            } else {
-                ri = -1;
-            }
-            ScrollTool scrollable = (ScrollTool) tool;
-            if (scrollable.increment(player, ri)) {
-                bukkitPlayer.getInventory().setHeldItemSlot(oldSlot);
-            }
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -57,7 +30,7 @@ public class BrushListener implements Listener {
             Player bukkitPlayer = event.getPlayer();
             com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
             LocalSession session = player.getSession();
-            Tool tool = session.getTool(player);
+            Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
             if (tool != null) {
                 if (tool instanceof MovableTool) {
                     ((MovableTool) tool).move(player);
@@ -75,7 +48,7 @@ public class BrushListener implements Listener {
             }
             com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
             LocalSession session = player.getSession();
-            Tool tool = session.getTool(player);
+            Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
             if (tool instanceof ResettableTool) {
                 if (((ResettableTool) tool).reset()) {
                     event.setCancelled(true);

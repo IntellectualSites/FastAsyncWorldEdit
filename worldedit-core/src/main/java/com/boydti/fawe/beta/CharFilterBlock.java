@@ -1,69 +1,51 @@
 package com.boydti.fawe.beta;
 
-import static com.sk89q.worldedit.world.block.BlockTypes.states;
-
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+
 import javax.annotation.Nullable;
 
+import static com.sk89q.worldedit.world.block.BlockTypes.states;
 public class CharFilterBlock extends ChunkFilterBlock {
-
-    private static final SetDelegate FULL = new SetDelegate() {
-        @Override
-        public final void set(CharFilterBlock block, char value) {
-            block.setArr[block.index] = value;
-        }
-    };
-    private static final SetDelegate NULL = new SetDelegate() {
-        @Override
-        public void set(CharFilterBlock block, char value) {
-            block.initSet().set(block, value);
-        }
-    };
     private CharGetBlocks get;
     private IChunkSet set;
+
     private char[] getArr;
-    private @Nullable
-    char[] setArr;
+    private @Nullable char[] setArr;
     private SetDelegate delegate;
+
     // local
-    private int layer, index, x, y, z, xx, yy, zz, chunkX, chunkZ;
+    private int layer, index, x, y, z, xx, yy, zz, X, Z;
 
     public CharFilterBlock(IQueueExtent queueExtent) {
         super(queueExtent);
     }
 
     @Override
-    public final ChunkFilterBlock init(int chunkX, int chunkZ, IChunkGet chunk) {
+    public final ChunkFilterBlock init(final int X, final int Z, final IChunkGet chunk) {
         this.get = (CharGetBlocks) chunk;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
-        this.xx = chunkX << 4;
-        this.zz = chunkZ << 4;
+        this.X = X;
+        this.Z = Z;
+        this.xx = X << 4;
+        this.zz = Z << 4;
         return this;
     }
 
-    @Override
-    public void flood(IChunkGet iget, IChunkSet iset, int layer, Flood flood,
-        FilterBlockMask mask) {
+    public void flood(final IChunkGet iget, final IChunkSet iset, final int layer, Flood flood, FilterBlockMask mask) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
         if (init(iget, iset, layer) != null) {
             while ((index = flood.poll()) != -1) {
                 x = index & 15;
-                z = index >> 4 & 15;
-                y = index >> 8 & 15;
+                z = (index >> 4) & 15;
+                y = (index >> 8) & 15;
 
                 if (mask.applyBlock(this)) {
                     int depth = index >> 12;
@@ -79,13 +61,10 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock init(IChunkGet iget, IChunkSet iset,
-        int layer) {
+    public final ChunkFilterBlock init(final IChunkGet iget, final IChunkSet iset, final int layer) {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
-        if (!get.hasSection(layer)) {
-            return null;
-        }
+        if (!get.hasSection(layer)) return null;
         this.set = iset;
         getArr = get.sections[layer].get(get, layer);
         if (set.hasSection(layer)) {
@@ -104,13 +83,13 @@ public class CharFilterBlock extends ChunkFilterBlock {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.index = x | z << 4 | y << 8;
+        this.index = x | (z << 4) | (y << 8);
         filter.applyBlock(this);
     }
 
     @Override
     public void filter(Filter filter, int yStart, int yEnd) {
-        for (y = yStart, index = yStart << 8; y < yEnd; y++) {
+        for (y = yStart, index = (yStart << 8); y < yEnd; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
                     filter.applyBlock(this);
@@ -121,8 +100,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        int yis = minY << 8;
-        int zis = minZ << 4;
+        int yis = (minY << 8);
+        int zis = (minZ << 4);
         for (y = minY, index = yis; y <= maxY; y++) {
             for (z = minZ, index += zis; z <= maxZ; z++) {
                 for (x = minX, index += minX; x <= maxX; x++, index++) {
@@ -133,7 +112,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final void filter(Filter filter, Region region) {
+    public final void filter(final Filter filter, final Region region) {
         for (y = 0, index = 0; y < 16; y++) {
             int absY = yy + y;
             for (z = 0; z < 16; z++) {
@@ -149,7 +128,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final void filter(Filter filter) {
+    public final void filter(final Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
@@ -162,6 +141,25 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public void setBiome(BiomeType biome) {
         set.setBiome(x, y, z, biome);
+    }
+
+    @Override
+    public void setOrdinal(final int ordinal) {
+        delegate.set(this, (char) ordinal);
+    }
+
+    @Override
+    public void setBlock(final BlockState state) {
+        delegate.set(this, state.getOrdinalChar());
+    }
+
+    @Override
+    public void setFullBlock(final BaseBlock block) {
+        delegate.set(this, block.getOrdinalChar());
+        final CompoundTag nbt = block.getNbtData();
+        if (nbt != null) { // TODO optimize check via ImmutableBaseBlock
+            set.setTile(x, yy + y, z, nbt);
+        }
     }
 
     @Override
@@ -196,12 +194,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public final int getChunkX() {
-        return chunkX;
+        return X;
     }
 
     @Override
     public final int getChunkZ() {
-        return chunkZ;
+        return Z;
     }
 
     public final char getOrdinalChar() {
@@ -214,19 +212,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void setOrdinal(int ordinal) {
-        delegate.set(this, (char) ordinal);
-    }
-
-    @Override
     public final BlockState getBlock() {
         final int ordinal = getArr[index];
         return BlockTypes.states[ordinal];
-    }
-
-    @Override
-    public void setBlock(BlockState state) {
-        delegate.set(this, state.getOrdinalChar());
     }
 
     @Override
@@ -241,24 +229,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void setFullBlock(BaseBlock block) {
-        delegate.set(this, block.getOrdinalChar());
-        final CompoundTag nbt = block.getNbtData();
-        if (nbt != null) { // TODO optimize check via ImmutableBaseBlock
-            set.setTile(x, yy + y, z, nbt);
-        }
-    }
-
-    @Override
     public final CompoundTag getNbtData() {
         return get.getTag(x, y + (layer << 4), z);
     }
-    /*
-    NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
-    EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
-    SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3),
-    WEST(Vector3.at(-1, 0, 0), Flag.CARDINAL, 2, 0),
-     */
 
     @Override
     public void setNbtData(CompoundTag tag) {
@@ -273,13 +246,19 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final BlockMaterial material = state.getMaterial();
         return material.hasContainer();
     }
+    /*
+    NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
+    EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
+    SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3),
+    WEST(Vector3.at(-1, 0, 0), Flag.CARDINAL, 2, 0),
+     */
 
     @Override
     public final BlockState getBlockNorth() {
         if (z > 0) {
             return states[getArr[index - 16]];
         }
-        return getExtent().getBlock(getX(), getY(), getZ() - 1);
+        return getExtent().getBlock(getX(),  getY(), getZ() - 1);
     }
 
     @Override
@@ -287,7 +266,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (x < 15) {
             return states[getArr[index + 1]];
         }
-        return getExtent().getBlock(getX() + 1, getY(), getZ());
+        return getExtent().getBlock(getX() + 1,  getY(), getZ());
     }
 
     @Override
@@ -295,7 +274,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (z < 15) {
             return states[getArr[index + 16]];
         }
-        return getExtent().getBlock(getX(), getY(), getZ() + 1);
+        return getExtent().getBlock(getX(),  getY(), getZ() + 1);
     }
 
     @Override
@@ -303,7 +282,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (x > 0) {
             return states[getArr[index - 1]];
         }
-        return getExtent().getBlock(getX() - 1, getY(), getZ());
+        return getExtent().getBlock(getX() - 1,  getY(), getZ());
     }
 
     @Override
@@ -333,7 +312,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final BlockState getBlockRelativeY(int y) {
+    public final BlockState getBlockRelativeY(final int y) {
         final int newY = this.y + y;
         final int layerAdd = newY >> 4;
         switch (layerAdd) {
@@ -375,13 +354,14 @@ public class CharFilterBlock extends ChunkFilterBlock {
             case -12:
             case -13:
             case -14:
-            case -15:
+            case -15: {
                 final int newLayer = layer + layerAdd;
                 if (newLayer >= 0) {
                     final int index = this.index + ((y & 15) << 8);
                     return states[get.sections[newLayer].get(get, newLayer, index)];
                 }
                 break;
+            }
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
@@ -404,39 +384,35 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        if (x >> 4 == chunkX && z >> 4 == chunkZ) {
+        if ((x >> 4) == X && (z >> 4) == Z) {
             return get.getBiomeType(x & 15, z & 15);
         }
         return getExtent().getBiomeType(x, z);
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return false;
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return false;
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return false;
-    }
-
-    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        if (x >> 4 == chunkX && z >> 4 == chunkZ) {
+        if ((x >> 4) == X && (z >> 4) == Z) {
             return set.setBiome(x & 15, y, z & 15, biome);
         }
         return getExtent().setBiome(x, y, z, biome);
     }
 
     private interface SetDelegate {
-
         void set(CharFilterBlock block, char value);
     }
+
+    private static final SetDelegate NULL = new SetDelegate() {
+        @Override
+        public void set(final CharFilterBlock block, final char value) {
+            block.initSet().set(block, value);
+        }
+    };
+
+    private static final SetDelegate FULL = new SetDelegate() {
+        @Override
+        public final void set(final CharFilterBlock block, final char value) {
+            block.setArr[block.index] = value;
+        }
+    };
 }

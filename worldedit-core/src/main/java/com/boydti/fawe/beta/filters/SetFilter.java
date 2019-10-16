@@ -8,12 +8,12 @@ public class SetFilter implements Filter {
 
     private final BlockState state;
 
-    public SetFilter(BlockState state) {
+    public SetFilter(final BlockState state) {
         this.state = state;
     }
 
     @Override
-    public void applyBlock(FilterBlock block) {
+    public void applyBlock(final FilterBlock block) {
         block.setBlock(state);
     }
 }

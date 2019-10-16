@@ -2,22 +2,14 @@ package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.util.SplittableRandom;
 
-public class SolidRandomOffsetPattern extends AbstractPattern {
-    private final int dx, dy, dz;
-    private final Pattern pattern;
-
-    private final int dx2, dy2, dz2;
-    private final MutableBlockVector3 mutable;
-    private SplittableRandom r;
+public class SolidRandomOffsetPattern extends RandomOffsetPattern {
 
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
@@ -28,15 +20,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     }
 
     public SolidRandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
-        this.pattern = pattern;
-        this.dx = dx;
-        this.dy = dy;
-        this.dz = dz;
-
-        this.dx2 = dx * 2 + 1;
-        this.dy2 = dy * 2 + 1;
-        this.dz2 = dz * 2 + 1;
-        this.r = new SplittableRandom();
+        super(pattern, dx, dy, dz);
         this.mutable = new MutableBlockVector3();
     }
 

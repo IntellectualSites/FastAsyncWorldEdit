@@ -7,5 +7,5 @@ public interface IBlocks extends Trimable {
 
     boolean hasSection(int layer);
 
-    IBlocks reset();
+    IChunkSet reset();
 }

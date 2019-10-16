@@ -414,7 +414,7 @@ public class SchematicStreamer extends NBTStreamer {
 
     public Clipboard getClipboard() throws IOException {
         try {
-            setupClipboard(0);
+        	setupClipboard(0);
             addDimensionReaders();
             addBlockReaders();
             readFully();

@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -12,14 +11,11 @@ import javax.annotation.Nullable;
 
 /**
  * Delegate for IChunk
- *
  * @param <U> parent class
  */
 public interface IDelegateChunk<U extends IChunk> extends IChunk {
-
     U getParent();
 
-    @Override
     default IChunk getRoot() {
         IChunk root = getParent();
         while (root instanceof IDelegateChunk) {
@@ -29,68 +25,38 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
-        return getParent().call(set, finalize);
-    }
-
-    @Override
-    default IQueueExtent getQueue() {
-        return getParent().getQueue();
-    }
-
-    @Override
-    default CompoundTag getTag(int x, int y, int z) {
-        return getParent().getTag(x, y, z);
-    }
-
-    @Override
-    default boolean hasSection(int layer) {
-        return getParent().hasSection(layer);
-    }
-
-    @Override
     default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
         getParent().flood(flood, mask, block);
     }
 
     @Override
-    default boolean setTile(int x, int y, int z, CompoundTag tag) {
-        return getParent().setTile(x, y, z, tag);
-    }
-
-    @Override
-    default boolean setBiome(int x, int y, int z, BiomeType biome) {
+    default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         return getParent().setBiome(x, y, z, biome);
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder holder) {
         return getParent().setBlock(x, y, z, holder);
     }
 
     @Override
-    default BiomeType getBiomeType(int x, int z) {
-        return getParent().getBiomeType(x, z);
+    default BiomeType getBiome(final int x, final int z) {
+        return getParent().getBiome(x, z);
     }
 
     @Override
-    default BlockState getBlock(int x, int y, int z) {
+    default BlockState getBlock(final int x, final int y, final int z) {
         return getParent().getBlock(x, y, z);
     }
 
     @Override
-    default BaseBlock getFullBlock(int x, int y, int z) {
+    default BaseBlock getFullBlock(final int x, final int y, final int z) {
         return getParent().getFullBlock(x, y, z);
     }
 
     @Override
-    default char[] load(int layer) {
-        return getParent().load(layer);
-    }
-
-    @Override
-    default void init(IQueueExtent extent, int chunkX, int chunkZ) {
-        getParent().init(extent, chunkX, chunkZ);
+    default void init(final IQueueExtent extent, final int X, final int Z) {
+        getParent().init(extent, X, Z);
     }
 
     @Override
@@ -105,7 +71,7 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
 
 
     @Override
-    default boolean trim(boolean aggressive) {
+    default boolean trim(final boolean aggressive) {
         return getParent().trim(aggressive);
     }
 
@@ -129,16 +95,12 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
         return getParent().isEmpty();
     }
 
-    default <T extends IChunk> T findParent(Class<T> clazz) {
+    default <T extends IChunk> T findParent(final Class<T> clazz) {
         IChunk root = getParent();
-        if (clazz.isAssignableFrom(root.getClass())) {
-            return (T) root;
-        }
+        if (clazz.isAssignableFrom(root.getClass())) return (T) root;
         while (root instanceof IDelegateChunk) {
             root = ((IDelegateChunk) root).getParent();
-            if (clazz.isAssignableFrom(root.getClass())) {
-                return (T) root;
-            }
+            if (clazz.isAssignableFrom(root.getClass())) return (T) root;
         }
         return null;
     }

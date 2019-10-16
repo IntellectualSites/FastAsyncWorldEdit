@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
-import com.sk89q.worldedit.bukkit.BukkitItemStack;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -230,10 +229,7 @@ public interface IBukkitAdapter {
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BaseItemStack
      */
-    default BaseItemStack adapt(ItemStack itemStack) {
-        checkNotNull(itemStack);
-        return new BukkitItemStack(itemStack);
-    }
+    BaseItemStack adapt(ItemStack itemStack);
 
     /**
      * Create a Bukkit ItemStack from a WorldEdit BaseItemStack
@@ -241,11 +237,7 @@ public interface IBukkitAdapter {
      * @param item The WorldEdit BaseItemStack
      * @return The Bukkit ItemStack
      */
-    default ItemStack adapt(BaseItemStack item) {
-        checkNotNull(item);
-        if (item instanceof BukkitItemStack) return ((BukkitItemStack) item).getBukkitItemStack();
-        return new ItemStack(adapt(item.getType()), item.getAmount());
-    }
+    ItemStack adapt(BaseItemStack item);
 
     /**
      * Create a WorldEdit Player from a Bukkit Player.

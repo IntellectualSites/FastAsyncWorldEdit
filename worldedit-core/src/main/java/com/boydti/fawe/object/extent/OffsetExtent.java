@@ -9,7 +9,9 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class OffsetExtent extends ResettableExtent {
-    private final int dx, dy, dz;
+    protected final int dx;
+    protected final int dy;
+    protected final int dz;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public OffsetExtent(Extent parent, int dx, int dy, int dz) {
