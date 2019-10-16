@@ -19,13 +19,15 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.google.common.collect.Sets;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +50,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      */
     public BlockTypeMask(Extent extent, @NotNull Collection<BlockType> blocks) {
         super(extent);
-        this.blocks = Sets.newHashSet(blocks);
+        this.blocks = new HashSet<>(blocks);
     }
 
     /**

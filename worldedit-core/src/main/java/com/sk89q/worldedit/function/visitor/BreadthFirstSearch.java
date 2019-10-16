@@ -131,26 +131,26 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the directions along the axes as directions to visit.
      */
     public void addAxes() {
-        HashSet<BlockVector3> set = Sets.newHashSet(directions);
-        set.add(BlockVector3.UNIT_MINUS_Y);
-        set.add(BlockVector3.UNIT_Y);
-        set.add(BlockVector3.UNIT_MINUS_X);
-        set.add(BlockVector3.UNIT_X);
-        set.add(BlockVector3.UNIT_MINUS_Z);
-        set.add(BlockVector3.UNIT_Z);
-        setDirections(set);
+        this.directions = new BlockVector3[] {
+            BlockVector3.UNIT_MINUS_Y,
+            BlockVector3.UNIT_Y,
+            BlockVector3.UNIT_MINUS_X,
+            BlockVector3.UNIT_X,
+            BlockVector3.UNIT_MINUS_Z,
+            BlockVector3.UNIT_Z
+        };
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
     public void addDiagonal() {
-        HashSet<BlockVector3> set = Sets.newHashSet(directions);
-        set.add(Direction.NORTHEAST.toBlockVector());
-        set.add(Direction.SOUTHEAST.toBlockVector());
-        set.add(Direction.SOUTHWEST.toBlockVector());
-        set.add(Direction.NORTHWEST.toBlockVector());
-        setDirections(set);
+        this.directions = new BlockVector3[] {
+            Direction.NORTHEAST.toBlockVector(),
+            Direction.SOUTHEAST.toBlockVector(),
+            Direction.SOUTHWEST.toBlockVector(),
+            Direction.NORTHWEST.toBlockVector()
+        };
     }
 
     /**

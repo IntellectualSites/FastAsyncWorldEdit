@@ -52,6 +52,7 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

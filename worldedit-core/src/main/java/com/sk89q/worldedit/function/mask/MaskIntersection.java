@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
  */
 public class MaskIntersection extends AbstractMask {
 
-    private final Set<Mask> masks = new LinkedHashSet<>();
+    private final Set<Mask> masks;
     private Mask[] masksArray;
 
     /**
@@ -54,7 +54,7 @@ public class MaskIntersection extends AbstractMask {
      */
     public MaskIntersection(Collection<Mask> masks) {
         checkNotNull(masks);
-        this.masks.addAll(masks);
+        this.masks = new LinkedHashSet<>(masks);
         formArray();
     }
 
@@ -155,7 +155,7 @@ public class MaskIntersection extends AbstractMask {
         }
         // Return result
         formArray();
-        if (masks.size() == 0) return Masks.alwaysTrue();
+        if (masks.isEmpty()) return Masks.alwaysTrue();
         if (masks.size() == 1) return masks.iterator().next();
         return changed ? this : null;
     }

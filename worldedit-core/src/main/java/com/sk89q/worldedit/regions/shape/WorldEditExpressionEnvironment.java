@@ -30,7 +30,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     private final Vector3 unit;
     private final Vector3 zero2;
-    private Vector3 current = new MutableVector3(Vector3.ZERO);
+    private Vector3 current = MutableVector3.ZERO;
     private Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
@@ -59,7 +59,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockData(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
+        return 0;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockDataAbs(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
+        return 0;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockDataRel(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
+        return 0;
     }
 
     public void setCurrentBlock(int x, int y, int z) {

@@ -27,6 +27,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.util.Map;
+
 import javax.annotation.Nullable;
 
 public class BlockStateMask extends AbstractExtentMask {

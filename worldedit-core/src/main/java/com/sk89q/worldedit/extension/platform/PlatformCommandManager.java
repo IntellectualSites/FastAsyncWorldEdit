@@ -674,7 +674,7 @@ public final class PlatformCommandManager {
         event.setCancelled(true);
     }
 
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor) {
+    public MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor) {
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
         if (actor instanceof Player) {
@@ -691,10 +691,11 @@ public final class PlatformCommandManager {
                 localSession.tellVersion(actor);
                 return Optional.of(localSession);
             });
-
-        return MemoizingValueAccess.wrap(
+        MemoizingValueAccess wrap = MemoizingValueAccess.wrap(
             MergedValueAccess.of(store, globalInjectedValues)
         );
+        wrap.injectedValue(Key.of(InjectedValueAccess.class), wrap);
+        return wrap;
     }
 
     private void handleUnknownException(Actor actor, Throwable t) {

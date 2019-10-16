@@ -29,7 +29,6 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.OffsetMask;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.request.RequestExtent;
 
 import java.util.stream.Stream;
 
