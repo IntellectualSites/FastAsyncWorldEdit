@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
@@ -344,7 +343,7 @@ public class GenerationCommands {
                 ((Player) actor).findFreePosition();
             }
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), size, context);
+        }, "/pyramid", size, context);
     }
 
     @Command(
