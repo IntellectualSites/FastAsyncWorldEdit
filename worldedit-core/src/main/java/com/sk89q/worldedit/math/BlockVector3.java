@@ -20,6 +20,10 @@
 package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.math.BitMath.mask;
+import static com.sk89q.worldedit.math.BitMath.unpackX;
+import static com.sk89q.worldedit.math.BitMath.unpackY;
+import static com.sk89q.worldedit.math.BitMath.unpackZ;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
@@ -67,9 +71,33 @@ public abstract class BlockVector3 {
         return new BlockVector3Imp(x, y, z);
     }
 
+    private static final int WORLD_XZ_MINMAX = 30_000_000;
+    private static final int WORLD_Y_MAX = 4095;
+
+    private static boolean isHorizontallyInBounds(int h) {
+        return -WORLD_XZ_MINMAX <= h && h <= WORLD_XZ_MINMAX;
+    }
+
+    public static boolean isLongPackable(BlockVector3 location) {
+        return isHorizontallyInBounds(location.getX()) &&
+            isHorizontallyInBounds(location.getZ()) &&
+            0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+    }
+
+    public static void checkLongPackable(BlockVector3 location) {
+        checkArgument(isLongPackable(location),
+            "Location exceeds long packing limits: %s", location);
+    }
+
+    private static final long BITS_26 = mask(26);
+    private static final long BITS_12 = mask(12);
+
+    public static BlockVector3 fromLongPackedForm(long packed) {
+        return at(unpackX(packed), unpackY(packed), unpackZ(packed));
+    }
+
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
-
         private static final Comparator<BlockVector3> YZX_ORDER =
             Comparator.comparingInt(BlockVector3::getY)
                 .thenComparingInt(BlockVector3::getZ)
@@ -122,37 +150,10 @@ public abstract class BlockVector3 {
         return BlockVector3.at(getX(), getY(), getZ());
     }
 
-//    /**
-//     * Get the BlockVector3 to the north<br>
-//     * Normal use you would use north(this),
-//     * To avoid constructing a new Vector, pass e.g. north(some MutableBlockVector3)
-//     * There is no gaurantee it will use this provided vector
-//     * @param orDefault the vector to use as the result<br>
-//     * @return BlockVector3
-//     */
-//    public BlockVector3 north(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY(), getZ() - 1);
-//    }
-//
-//    public BlockVector3 east(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX() + 1, getY(), getZ());
-//    }
-//
-//    public BlockVector3 south(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY(), getZ() + 1);
-//    }
-//
-//    public BlockVector3 west(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX() - 1, getY(), getZ());
-//    }
-//
-//    public BlockVector3 up(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY() + 1, getZ());
-//    }
-//
-//    public BlockVector3 down(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY() - 1, getZ());
-//    }
+    public long toLongPackedForm() {
+        checkLongPackable(this);
+        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
+    }
 
     /**
      * Get the X coordinate.
@@ -255,7 +256,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Add a list of vectors to this vector and return the result as a new vector.
+     * Add a list of vectors to this vector and return the
+     * result as a new vector.
      *
      * @param others an array of vectors
      * @return a new vector
@@ -273,7 +275,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract another vector from this vector and return the result as a new vector.
+     * Subtract another vector from this vector and return the result
+     * as a new vector.
      *
      * @param other the other vector
      * @return a new vector
@@ -283,7 +286,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract another vector from this vector and return the result as a new vector.
+     * Subtract another vector from this vector and return the result
+     * as a new vector.
      *
      * @param x the value to subtract
      * @param y the value to subtract
@@ -295,7 +299,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract a list of vectors from this vector and return the result as a new vector.
+     * Subtract a list of vectors from this vector and return the result
+     * as a new vector.
      *
      * @param others an array of vectors
      * @return a new vector
@@ -480,7 +485,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Get the normalized vector, which is the vector divided by its length, as a new vector.
+     * Get the normalized vector, which is the vector divided by its
+     * length, as a new vector.
      *
      * @return a new vector
      */
@@ -579,7 +585,8 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Returns a vector with the absolute values of the components of this vector.
+     * Returns a vector with the absolute values of the components of
+     * this vector.
      *
      * @return a new vector
      */
@@ -590,16 +597,15 @@ public abstract class BlockVector3 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle      in degrees
-     * @param aboutX     about which x coordinate to rotate
-     * @param aboutZ     about which z coordinate to rotate
+     * @param angle in degrees
+     * @param aboutX about which x coordinate to rotate
+     * @param aboutZ about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
      * @see AffineTransform another method to transform vectors
      */
-    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX,
-        double translateZ) {
+    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
         angle = Math.toRadians(angle);
         double x = this.getX() - aboutX;
         double z = this.getZ() - aboutZ;
@@ -657,9 +663,9 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 getMinimum(BlockVector3 v2) {
         return new BlockVector3Imp(
-            Math.min(getX(), v2.getX()),
-            Math.min(getY(), v2.getY()),
-            Math.min(getZ(), v2.getZ())
+                Math.min(getX(), v2.getX()),
+                Math.min(getY(), v2.getY()),
+                Math.min(getZ(), v2.getZ())
         );
     }
 
@@ -671,9 +677,9 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 getMaximum(BlockVector3 v2) {
         return new BlockVector3Imp(
-            Math.max(getX(), v2.getX()),
-            Math.max(getY(), v2.getY()),
-            Math.max(getZ(), v2.getZ())
+                Math.max(getX(), v2.getX()),
+                Math.max(getY(), v2.getY()),
+                Math.max(getZ(), v2.getZ())
         );
     }
 
@@ -754,7 +760,8 @@ public abstract class BlockVector3 {
             return false;
         }
 
-        return equals((BlockVector3) obj);
+        BlockVector3 other = (BlockVector3) obj;
+        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 
     public final boolean equals(BlockVector3 other) {

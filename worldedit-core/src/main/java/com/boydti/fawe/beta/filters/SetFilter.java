@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public class SetFilter implements Filter {
+
     private final BlockState state;
 
     public SetFilter(final BlockState state) {

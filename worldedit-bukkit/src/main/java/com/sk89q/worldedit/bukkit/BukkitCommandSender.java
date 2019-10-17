@@ -23,15 +23,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extension.platform.AbstractNonPlayerActor;
-import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
-import java.io.File;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class BukkitCommandSender extends AbstractNonPlayerActor {
@@ -93,12 +93,7 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(sender, component);
-    }
-
-    @Override
-    public boolean canDestroyBedrock() {
-        return true;
+        TextAdapter.sendComponent(sender, WorldEditText.format(component));
     }
 
     @Override
@@ -123,25 +118,6 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
     }
 
     @Override
-    public boolean isPlayer() {
-        return false;
-    }
-
-    @Override
-    public File openFileOpenDialog(String[] extensions) {
-        return null;
-    }
-
-    @Override
-    public File openFileSaveDialog(String[] extensions) {
-        return null;
-    }
-
-    @Override
-    public void dispatchCUIEvent(CUIEvent event) {
-    }
-
-    @Override
     public SessionKey getSessionKey() {
         return new SessionKey() {
             @Nullable
@@ -152,6 +128,10 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
             @Override
             public boolean isActive() {
+                if (sender instanceof Entity) {
+                    Entity entity = (Entity) sender;
+                    return (entity.isValid() && !entity.isDead());
+                }
                 return true;
             }
 

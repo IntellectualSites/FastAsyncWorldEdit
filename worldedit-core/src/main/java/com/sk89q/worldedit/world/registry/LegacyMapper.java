@@ -104,7 +104,7 @@ public final class LegacyMapper {
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
                 }
-                int combinedId = getCombinedId(blockEntry.getKey());
+                Integer combinedId = getCombinedId(blockEntry.getKey());
                 blockArr[combinedId] = blockState.getInternalId();
 
                 blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
@@ -221,7 +221,7 @@ public final class LegacyMapper {
     }
 
     public void register(int id, int data, BlockStateHolder state) {
-        int combinedId = ((id << 4) + data);
+        Integer combinedId = ((id << 4) + data);
         extraId4DataToStateId.put(combinedId, (Integer) state.getInternalId());
         blockStateToLegacyId4Data.putIfAbsent(state.getInternalId(), combinedId);
     }

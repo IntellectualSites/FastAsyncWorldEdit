@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.DelegateFilter;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import javax.annotation.Nullable;
 
@@ -37,28 +34,6 @@ public interface Mask {
      * @return true if the criteria is met
      */
     boolean test(BlockVector3 vector);
-
-    default Filter toFilter(Runnable run) {
-        return new Filter() {
-            @Override
-            public void applyBlock(FilterBlock block) {
-                if (test(block)) {
-                    run.run();
-                }
-            }
-        };
-    }
-
-    default <T extends Filter> DelegateFilter<T> toFilter(T filter) {
-        return new DelegateFilter<T>(filter) {
-            @Override
-            public void applyBlock(FilterBlock block) {
-                if (test(block)) {
-                    filter.applyBlock(block);
-                }
-            }
-        };
-    }
 
     /**
      * Get the 2D version of this mask if one exists.
@@ -90,16 +65,6 @@ public interface Mask {
     default Mask optimize() {
         Mask value = tryOptimize();
         return value == null ? this : value;
-    }
-
-    default Mask and(Mask other) {
-        Mask value = and(other);
-        return value == null ? new MaskIntersection(this, other) : value;
-    }
-
-    default Mask or(Mask other) {
-        Mask value = or(other);
-        return value == null ? new MaskUnion(this, other) : value;
     }
 
     default Mask inverse() {

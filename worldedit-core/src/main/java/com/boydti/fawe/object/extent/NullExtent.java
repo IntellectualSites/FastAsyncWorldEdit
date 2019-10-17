@@ -10,7 +10,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -20,17 +19,15 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 public class NullExtent extends FaweRegionExtent {
 
@@ -60,7 +57,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BiomeType getBiome(final BlockVector2 arg0) {
+    public BiomeType getBiome(BlockVector2 arg0) {
             throw reason;
         }
 
@@ -70,7 +67,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BlockState getBlock(final BlockVector3 arg0) {
+    public BlockState getBlock(BlockVector3 arg0) {
             throw reason;
         }
 
@@ -93,7 +90,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 arg0, final BiomeType arg1) {
+    public boolean setBiome(BlockVector2 arg0, BiomeType arg1) {
         throw reason;
     }
 
@@ -103,18 +100,18 @@ public class NullExtent extends FaweRegionExtent {
         }
 
     @Override
-    public boolean setBlock(final BlockVector3 arg0, final BlockStateHolder arg1) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 arg0, B arg1) throws WorldEditException {
             throw reason;
         }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
             throw reason;
         }
 
     @Nullable
     @Override
-    public Entity createEntity(final Location arg0, final BaseEntity arg1) {
+    public Entity createEntity(Location arg0, BaseEntity arg1) {
         throw reason;
     }
 
@@ -159,7 +156,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public List<? extends Entity> getEntities(final Region arg0) {
+    public List<? extends Entity> getEntities(Region arg0) {
         throw reason;
     }
 
@@ -194,7 +191,6 @@ public class NullExtent extends FaweRegionExtent {
         throw reason;
     }
 
-    @Override
     public boolean cancel() {
         throw reason;
     }
@@ -255,11 +251,6 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public World getWorld() {
-        throw reason;
-    }
-
-    @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         throw reason;
     }
@@ -294,18 +285,12 @@ public class NullExtent extends FaweRegionExtent {
         throw reason;
     }
 
-    @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
             throw reason;
         }
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
-        throw reason;
-    }
-
-    @Override
-    public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
         throw reason;
     }
 

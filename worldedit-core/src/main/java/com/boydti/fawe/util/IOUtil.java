@@ -5,6 +5,11 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 public final class IOUtil {
 
@@ -78,5 +83,31 @@ public final class IOUtil {
             }
             out.write(buf, 0, r);
         }
+    }
+
+    public static <T> Supplier<T> supplier(IntFunction<T> funx, int size) {
+        return () -> funx.apply(size);
+    }
+
+    public static <T> Supplier<T> supplier(Supplier<T> supplier, Function<T, T> modifier) {
+        return () -> modifier.apply(supplier.get());
+    }
+
+    public static <T> Supplier<T> supplier(Supplier<T> supplier, Consumer<T> modifier) {
+        return () -> {
+            T instance = supplier.get();
+            modifier.accept(instance);
+            return instance;
+        };
+    }
+
+    public static <T> Supplier<T> supplier(Callable<T> callable) {
+        return () -> {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 }

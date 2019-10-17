@@ -86,7 +86,6 @@ public class Expression {
                     .build());
 
     private final Map<String, RValue> variables = new HashMap<>();
-    private final String[] variableNames;
     private Variable[] variableArray;
     private RValue root;
     private final Functions functions = new Functions();
@@ -97,7 +96,6 @@ public class Expression {
     }
 
     public Expression(double constant) {
-        variableNames = null;
         root = new Constant(0, constant);
     }
 
@@ -106,7 +104,6 @@ public class Expression {
     }
 
     private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
-        this.variableNames = variableNames;
 
         variables.put("e", new Constant(-1, Math.E));
         variables.put("pi", new Constant(-1, Math.PI));
@@ -115,12 +112,11 @@ public class Expression {
 
         variableArray = new Variable[variableNames.length];
         for (int i = 0; i < variableNames.length; i++) {
-            String variableName = variableNames[i];
-            if (variables.containsKey(variableName)) {
-                throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableName + "'");
+            if (variables.containsKey(variableNames[i])) {
+                throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableNames[i] + "'");
             }
             Variable var = new Variable(0);
-            variables.put(variableName, var);
+            variables.put(variableNames[i], var);
             variableArray[i] = var;
         }
 
@@ -139,19 +135,7 @@ public class Expression {
         return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, values);
     }
 
-    public double evaluateTimeout(int timeout) throws EvaluationException {
-        if (root instanceof Constant) return root.getValue();
-        return evaluateFinal(timeout);
-    }
-
-    public double evaluateTimeout(int timeout, double x, double y) throws EvaluationException {
-        if (root instanceof Constant) return root.getValue();
-        variableArray[0].value = x;
-        variableArray[1].value = y;
-        return evaluateFinal(timeout);
-    }
-
-    public double evaluateTimeout(int timeout, double x, double y, double z) throws EvaluationException {
+    private double evaluateTimeout(int timeout, double x, double y, double z) throws EvaluationException {
         if (root instanceof Constant) return root.getValue();
         variableArray[0].value = x;
         variableArray[1].value = y;
@@ -161,8 +145,8 @@ public class Expression {
 
     public double evaluateTimeout(int timeout, double... values) throws EvaluationException {
         if (root instanceof Constant) return root.getValue();
-        for (int i = 0; i < values.length; i++) {
-            Variable var = variableArray[i];
+        for (int i = 0; i < values.length; ++i) {
+            final Variable var = variableArray[i];
             var.value = values[i];
         }
         return evaluateFinal(timeout);
@@ -172,7 +156,7 @@ public class Expression {
         if (root instanceof Constant) {
             return root.getValue();
         }
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; ++i) {
             Variable var = variableArray[i];
             var.value = values[i];
         }

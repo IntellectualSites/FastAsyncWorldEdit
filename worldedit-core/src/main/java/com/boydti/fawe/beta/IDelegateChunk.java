@@ -1,15 +1,13 @@
 package com.boydti.fawe.beta;
 
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * Delegate for IChunk
@@ -24,22 +22,6 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
             root = ((IDelegateChunk) root).getParent();
         }
         return root;
-    }
-
-
-    @Override
-    default IQueueExtent getQueue() {
-        return getParent().getQueue();
-    }
-
-    @Override
-    default CompoundTag getTag(int x, int y, int z) {
-        return getParent().getTag(x, y, z);
-    }
-
-    @Override
-    default boolean hasSection(int layer) {
-        return getParent().hasSection(layer);
     }
 
     @Override
@@ -58,8 +40,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default BiomeType getBiomeType(final int x, final int z) {
-        return getParent().getBiomeType(x, z);
+    default BiomeType getBiome(final int x, final int z) {
+        return getParent().getBiome(x, z);
     }
 
     @Override
@@ -73,8 +55,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void init(final IQueueExtent extent, final int chunkX, final int chunkZ) {
-        getParent().init(extent, chunkX, chunkZ);
+    default void init(final IQueueExtent extent, final int X, final int Z) {
+        getParent().init(extent, X, Z);
     }
 
     @Override

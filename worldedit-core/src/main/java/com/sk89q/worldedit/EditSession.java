@@ -25,10 +25,12 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
@@ -48,12 +50,13 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
-import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
@@ -64,10 +67,13 @@ import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.block.Counter;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -124,7 +130,6 @@ import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
@@ -137,8 +142,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.weather.WeatherType;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -149,8 +152,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,15 +166,9 @@ import org.slf4j.LoggerFactory;
  * using the {@link ChangeSetExtent}.</p>
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class EditSession extends AbstractDelegateExtent implements SimpleWorld, AutoCloseable {
+public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
-
-    //TODO
-    @Override
-    public String getId() {
-        return null;
-    }
 
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
@@ -207,7 +204,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         }
     }
     private final World world;
-    private final String worldName;
+    private final FaweQueue queue;
     private boolean wrapped;
     private boolean fastMode;
     private final HistoryExtent history;
@@ -215,7 +212,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     private AbstractDelegateExtent bypassAll;
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
-    private final FawePlayer player;
+    private final Player player;
     private FaweChangeSet changeTask;
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
@@ -228,18 +225,18 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     public static final UUID CONSOLE = UUID.fromString("1-1-3-3-7");
 
     @Deprecated
-    public EditSession(@Nonnull World world, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@NotNull World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         this(null, world, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
     }
 
-    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         this(new EditSessionBuilder(world, worldName).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
 
     public EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
-        this.worldName = builder.getWorldName();
+        this.queue = builder.getQueue();
         this.wrapped = builder.isWrapped();
         this.fastMode = builder.hasFastMode();
         this.history = builder.getHistory();
@@ -338,22 +335,63 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @return
      */
     @Nullable
-    public FawePlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
     public boolean cancel() {
-        ExtentTraverser traverser = new ExtentTraverser<>(getExtent());
+        ExtentTraverser traverser = new ExtentTraverser(this);
         NullExtent nullExtent = new NullExtent(world, FaweException.MANUAL);
         while (traverser != null) {
             Extent get = traverser.get();
-            ExtentTraverser next = traverser.next();
             if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
                 traverser.setNext(nullExtent);
             }
+            ExtentTraverser next = traverser.next();
             traverser = next;
         }
-        return super.cancel();
+        bypassHistory = nullExtent;
+        bypassAll = nullExtent;
+        dequeue();
+        if (!queue.isEmpty()) {
+            if (Fawe.isMainThread()) {
+                queue.clear();
+            } else {
+                SetQueue.IMP.addTask(() -> queue.clear());
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Remove this EditSession from the queue<br>
+     * - This doesn't necessarily stop it from being queued again
+     */
+    public void dequeue() {
+        if (queue != null) {
+            SetQueue.IMP.dequeue(queue);
+        }
+    }
+
+    /**
+     * Add a task to run when this EditSession is done dispatching
+     *
+     * @param whenDone
+     */
+    public void addNotifyTask(Runnable whenDone) {
+        if (queue != null) {
+            queue.addNotifyTask(whenDone);
+        }
+    }
+
+    /**
+     * Get the FaweQueue this EditSession uses to queue the changes<br>
+     * - Note: All implementation queues for FAWE are instances of NMSMappedFaweQueue
+     *
+     * @return
+     */
+    public FaweQueue getQueue() {
+        return queue;
     }
 
     // pkg private for TracedEditSession only, may later become public API
@@ -367,6 +405,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * chunk batching}.
      */
     public void enableStandardMode() {
+        setBatchingChunks(true);
     }
 
     /**
@@ -375,29 +414,17 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(ReorderMode reorderMode) {
-        switch (reorderMode) {
-            case MULTI_STAGE:
-                enableQueue();
-                break;
-            case NONE: // Functionally the same, since FAWE doesn't perform physics
-            case FAST:
-                disableQueue();
-                break;
-            default:
-                throw new UnsupportedOperationException("Not implemented: " + reorderMode);
-        }
+        //TODO Not working yet. - It shouldn't need to work. FAWE doesn't need reordering.
     }
 
+    //TODO: Reorder mode.
     /**
      * Get the reorder mode.
      *
      * @return the reorder mode
      */
     public ReorderMode getReorderMode() {
-        if (isQueueEnabled()) {
-            return ReorderMode.MULTI_STAGE;
-        }
-        return ReorderMode.FAST;
+        return null;
     }
 
     /**
@@ -433,6 +460,26 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     public void setRawChangeSet(@Nullable FaweChangeSet set) {
         changeTask = set;
+        changes++;
+    }
+
+    /**
+     * Change the ChangeSet being used for this EditSession
+     * - If history is disabled, no changeset can be set
+     *
+     * @param set (null = remove the changeset)
+     */
+    public void setChangeSet(@Nullable FaweChangeSet set) {
+        if (set == null) {
+            disableHistory(true);
+        } else {
+            if (history != null) {
+                history.setChangeSet(set);
+            } else {
+                changeTask = set;
+                set.addChangeTask(queue);
+            }
+        }
         changes++;
     }
 
@@ -476,7 +523,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     @Deprecated
     public void enableQueue() {
-        super.enableQueue();
     }
 
     /**
@@ -484,7 +530,9 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     @Deprecated
     public void disableQueue() {
-        super.disableQueue();
+        if (isQueueEnabled()) {
+            this.flushQueue();
+        }
     }
 
     /**
@@ -742,11 +790,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @param batchingChunks {@code true} to enable, {@code false} to disable
      */
     public void setBatchingChunks(boolean batchingChunks) {
-        if (batchingChunks) {
-            enableQueue();
-        } else {
-            disableQueue();
-        }
     }
 
     /**
@@ -756,7 +799,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @see #setBatchingChunks(boolean)
      */
     public void disableBuffering() {
-        disableQueue();
     }
 
     /**
@@ -802,18 +844,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     }
 
     /**
-     * Get a block type at the given position.
-     *
-     * @param position the position
-     * @return the block type
-     * @deprecated Use {@link #getBlock(BlockVector3)} or {@link #getBlock(BlockVector3)}
-     */
-    @Deprecated
-    public BlockType getBlockType(final BlockVector3 position) {
-        return getBlockType(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-    }
-
-    /**
      * Returns the highest solid 'terrain' block.
      *
      * @param x the X coordinate
@@ -849,11 +879,16 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 return y;
             }
         }
+
         return minY;
     }
 
     public BlockType getBlockType(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType();
+        if (!limit.MAX_CHECKS()) {
+            throw FaweException.MAX_CHECKS;
+        }
+        int combinedId4Data = queue.getCombinedId4DataDebug(x, y, z, BlockTypes.AIR.getInternalId(), this);
+        return BlockTypes.getFromStateId(combinedId4Data);
     }
 
     /**
@@ -987,37 +1022,9 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         return changes;
     }
 
-    /**
-     * Set a block (only if a previous block was not there) if {@link Math#random()}
-     * returns a number less than the given probability.
-     *
-     * @param position the position
-     * @param block the block
-     * @param probability a probability between 0 and 1, inclusive
-     * @return Whether the block changed -- not entirely dependable
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public boolean setChanceBlockIfAir(final BlockVector3 position, final BaseBlock block, final double probability) throws MaxChangedBlocksException {
-        return (ThreadLocalRandom.current().nextInt(65536) <= (probability * 65536)) && this.setBlockIfAir(position, block);
-    }
-
-    /**
-     * Set a block only if there's no block already there.
-     *
-     * @param position the position
-     * @param block    the block to set
-     * @return if block was changed
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     * @deprecated Use your own method
-     */
-    @Deprecated
-    public boolean setBlockIfAir(final BlockVector3 position, final BlockStateHolder block) throws MaxChangedBlocksException {
-        return this.getBlock(position).getBlockType().getMaterial().isAir() && this.setBlock(position, block);
-    }
-
     @Override
     @Nullable
-    public Entity createEntity(Location location, final BaseEntity entity) {
+    public Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity entity) {
         return getExtent().createEntity(location, entity);
     }
 
@@ -1046,7 +1053,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        setChangeSet(null);
+        editSession.getQueue().setChangeTask(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.UNDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1070,7 +1077,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        setChangeSet(null);
+        editSession.getQueue().setChangeTask(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.REDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1149,7 +1156,15 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         // Reset limit
         limit.set(originalLimit);
         // Enqueue it
-        super.commit();
+        if (queue == null || queue.isEmpty()) {
+            queue.dequeue();
+            return;
+        }
+        if (Fawe.isMainThread()) {
+            SetQueue.IMP.flush(queue);
+        } else {
+            queue.flush();
+        }
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
                 ((FaweChangeSet) getChangeSet()).closeAsync();
@@ -1159,7 +1174,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         }
     }
 
-    public int fall(final Region region, boolean fullHeight, final BlockStateHolder replace) {
+    public <B extends BlockStateHolder<B>> int fall(final Region region, boolean fullHeight, final B replace) {
         FlatRegion flat = asFlatRegion(region);
         final int startPerformY = region.getMinimumPoint().getBlockY();
         final int startCheckY = fullHeight ? 0 : startPerformY;
@@ -1229,6 +1244,33 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     }
 
     /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchBlocks the list of blocks to search
+     * @return the number of blocks that matched the block
+     */
+    public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
+        BlockMask mask = new BlockMask(this, searchBlocks);
+        return countBlocks(region, mask);
+    }
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchMask mask to match
+     * @return the number of blocks that matched the mask
+     */
+    public int countBlocks(Region region, Mask searchMask) {
+        Counter count = new Counter();
+        RegionMaskingFilter filter = new RegionMaskingFilter(searchMask, count);
+        RegionVisitor visitor = new RegionVisitor(region, filter);
+        Operations.completeBlindly(visitor); // We can't throw exceptions, nor do we expect any
+        return count.getCount();
+    }
+
+    /**
      * Fills an area recursively in the X/Z directions.
      *
      * @param origin the location to start from
@@ -1240,7 +1282,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int fillXZ(BlockVector3 origin, B block, double radius, int depth, boolean recursive) throws MaxChangedBlocksException {
-        return fillXZ(origin, block, radius, depth, recursive);
+        return fillXZ(origin, (Pattern) block, radius, depth, recursive);
     }
 
     /**
@@ -1327,8 +1369,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 getWorld(), // Causes clamping of Y range
                 position.add(-apothem + 1, 0, -apothem + 1),
                 position.add(apothem - 1, -height + 1, apothem - 1));
-        Pattern pattern = BlockTypes.AIR.getDefaultState();
-        return setBlocks(region, pattern);
+        return setBlocks(region, BlockTypes.AIR.getDefaultState());
     }
 
     /**
@@ -1400,8 +1441,88 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 getWorld(), // Causes clamping of Y range
                 position.add(adjustment.multiply(-1)),
                 position.add(adjustment));
-        Pattern pattern = BlockTypes.AIR.getDefaultState();
+        return replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given block type.
+     *
+     * @param region the region
+     * @param block the block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        return setBlocks(region, (Pattern) block);
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given pattern.
+     *
+     * @param region the region
+     * @param pattern the pattern that provides the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionVisitor visitor = new RegionVisitor(region, replace);
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param replacement the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+        return replaceBlocks(region, filter, (Pattern) replacement);
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
         return replaceBlocks(region, mask, pattern);
+    }
+
+    /**
+     * Replaces all the blocks matching a given mask, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param mask the mask that blocks must match
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(mask);
+        checkNotNull(pattern);
+
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionVisitor visitor = new RegionVisitor(region, filter);
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
     }
 
     /**
@@ -1420,10 +1541,12 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
         Vector3 center = region.getCenter();
         Region centerRegion = new CuboidRegion(
-            getWorld(), // Causes clamping of Y range
-            BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-            BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-                center.getY(), MathUtils.roundHalfUp(center.getZ())));
+                getWorld(), // Causes clamping of Y range
+                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+                BlockVector3.at(
+                        MathUtils.roundHalfUp(center.getX()),
+                        MathUtils.roundHalfUp(center.getY()),
+                        MathUtils.roundHalfUp(center.getZ())));
         return setBlocks(centerRegion, pattern);
     }
 
@@ -1488,7 +1611,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int makeCuboidWalls(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidWalls(region, block);
+        return makeCuboidWalls(region, (Pattern) block);
     }
 
     /**
@@ -1535,6 +1658,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                     if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
                         return true;
                     }
+
                     return false;
                 }
             }, pattern);
@@ -1553,7 +1677,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     public <B extends BlockStateHolder<B>> int overlayCuboidBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(block);
-        return overlayCuboidBlocks(region, block);
+
+        return overlayCuboidBlocks(region, (Pattern) block);
     }
 
     /**
@@ -1598,7 +1723,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     }
 
     /**
-     * Stack a cuboid region.
+     * Stack a cuboid region. For compatibility, entities are copied but biomes are not.
+     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, Mask)} to fine tune.
      *
      * @param region the region to stack
      * @param dir the direction to stack
@@ -1643,10 +1769,13 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, boolean copyEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
+    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir,
+                          boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(dir);
         checkArgument(distance >= 1, "distance >= 1 required");
+        checkArgument(!copyBiomes || region instanceof FlatRegion, "can't copy biomes from non-flat region");
+
         BlockVector3 to = region.getMinimumPoint().add(dir.multiply(distance));
 
         final BlockVector3 displace = dir.multiply(distance);
@@ -1663,10 +1792,11 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
         if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
         BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
-        copy.setCopyingBiomes(copyBiomes);
-        copy.setCopyingEntities(copyEntities);
         copy.setSourceFunction(remove); // Remove
-        copy.setRemovingEntities(true);
+
+        copy.setCopyingEntities(moveEntities);
+        copy.setRemovingEntities(moveEntities);
+        copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(1);
         Mask sourceMask = getSourceMask();
         if (sourceMask != null) {
@@ -1677,6 +1807,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         if (!copyAir) {
             copy.setSourceMask(new ExistingBlockMask(this));
         }
+
         Operations.completeBlindly(copy);
         return this.changes = copy.getAffected();
     }
@@ -1858,6 +1989,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
+
         double xSqr, zSqr;
         double distanceSq;
         double nextXn = 0;
@@ -2051,6 +2183,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeSphere(BlockVector3 pos, Pattern block, double radiusX, double radiusY, double radiusZ, boolean filled) throws MaxChangedBlocksException {
+        int affected = 0;
+
         radiusX += 0.5;
         radiusY += 0.5;
         radiusZ += 0.5;
@@ -2336,10 +2470,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makePumpkinPatches(BlockVector3 position, int apothem) throws MaxChangedBlocksException {
-        return makePumpkinPatches(position, apothem, 0.02);
-    }
-
     public int makePumpkinPatches(BlockVector3 position, int apothem, double density) throws MaxChangedBlocksException {
         // We want to generate pumpkins
         GardenPatchGenerator generator = new GardenPatchGenerator(this);
@@ -2490,7 +2620,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
                     for (int z = minZ; z <= maxZ; ++z) {
-                        BlockStateHolder blk = getBlock(x, y, z);
+                        BlockState blk = getBlock(x, y, z);
                         BlockType type = blk.getBlockType();
                         int[] stateCounter = counter[type.getInternalId()];
                         if (stateCounter == null) {
@@ -2501,8 +2631,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 }
             }
         } else {
-            for (final BlockVector3 pt : region) {
-                BlockStateHolder blk = this.getBlock(pt);
+            for (BlockVector3 pt : region) {
+                BlockState blk = this.getBlock(pt);
                 BlockType type = blk.getBlockType();
                 int[] stateCounter = counter[type.getInternalId()];
                 if (stateCounter == null) {
@@ -2614,7 +2744,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     }
 
     public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString,
-                            final int timeout) throws ExpressionException, MaxChangedBlocksException {
+                           final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
 
@@ -2636,7 +2766,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                     final Vector3 scaled = position.toVector3().subtract(zero).divide(unit);
 
                     // transform
-                    expression.evaluateTimeout(timeout, scaled.getX(), scaled.getY(), scaled.getZ());
+                    expression.evaluate(new double[]{scaled.getX(), scaled.getY(), scaled.getZ()}, timeout);
                     int xv = (int) (x.getValue() * unit.getX() + zero2.getX());
                     int yv = (int) (y.getValue() * unit.getY() + zero2.getY());
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());
@@ -2667,7 +2797,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         return hollowOutRegion(region, thickness, pattern, new SolidBlockMask(this));
     }
 
-    public int hollowOutRegion(final Region region, final int thickness, final Pattern pattern, Mask mask) {
+    public int hollowOutRegion(Region region, int thickness, Pattern pattern, Mask mask) {
         try {
         final Set<BlockVector3> outside = new LocalBlockVectorSet();
 
@@ -2735,7 +2865,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         return changes;
     }
 
-    public int drawLine(final Pattern pattern, final BlockVector3 pos1, final BlockVector3 pos2, final double radius, final boolean filled) throws MaxChangedBlocksException {
+    public int drawLine(Pattern pattern, BlockVector3 pos1, BlockVector3 pos2, double radius, boolean filled) throws MaxChangedBlocksException {
         return drawLine(pattern, pos1, pos2, radius, filled, false);
     }
 
@@ -2770,8 +2900,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         if (Math.max(Math.max(dx, dy), dz) == dx && notdrawn) {
             for (int domstep = 0; domstep <= dx; domstep++) {
                 tipx = x1 + domstep * (x2 - x1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dx) * (y2 - y1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dx) * (z2 - z1 > 0 ? 1 : -1));
+                tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dx * (y2 - y1 > 0 ? 1 : -1));
+                tipz = (int) Math.round(z1 + domstep * (double) dz / (double) dx * (z2 - z1 > 0 ? 1 : -1));
 
                 vset.add(BlockVector3.at(tipx, tipy, tipz));
             }
@@ -2781,8 +2911,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         if (Math.max(Math.max(dx, dy), dz) == dy && notdrawn) {
             for (int domstep = 0; domstep <= dy; domstep++) {
                 tipy = y1 + domstep * (y2 - y1 > 0 ? 1 : -1);
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dy) * (x2 - x1 > 0 ? 1 : -1));
-                tipz = (int) Math.round(z1 + domstep * ((double) dz) / ((double) dy) * (z2 - z1 > 0 ? 1 : -1));
+                tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dy * (x2 - x1 > 0 ? 1 : -1));
+                tipz = (int) Math.round(z1 + domstep * (double) dz / (double) dy * (z2 - z1 > 0 ? 1 : -1));
 
                 vset.add(BlockVector3.at(tipx, tipy, tipz));
             }
@@ -2792,8 +2922,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         if (Math.max(Math.max(dx, dy), dz) == dz && notdrawn) {
             for (int domstep = 0; domstep <= dz; domstep++) {
                 tipz = z1 + domstep * (z2 - z1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dz) * (y2-y1>0 ? 1 : -1));
-                tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dz) * (x2-x1>0 ? 1 : -1));
+                tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dz * (y2-y1>0 ? 1 : -1));
+                tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dz * (x2-x1>0 ? 1 : -1));
 
                 vset.add(BlockVector3.at(tipx, tipy, tipz));
             }
@@ -2896,7 +3026,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         }
         final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
         final int ceilrad = (int) Math.ceil(radius);
-        for (final BlockVector3 v : vset) {
+        for (BlockVector3 v : vset) {
             final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
             for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                 for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
@@ -2946,7 +3076,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
         queue.add(origin);
-
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
             while (iter.hasNext()) {
@@ -3030,48 +3159,63 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
             Direction.DOWN.toBlockVector(),
     };
 
-
-    @Override
-    public String getName() {
-        return worldName;
-    }
-
-    @Override public @org.jetbrains.annotations.Nullable Path getStoragePath() {
-        return null;
-    }
-
-    @Override
-    public boolean clearContainerBlockContents(BlockVector3 pos) {
-        BaseBlock block = getFullBlock(pos);
-        CompoundTag nbt = block.getNbtData();
-        if (nbt != null) {
-            if (nbt.containsKey("items")) {
-                return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block.toBlockState().toBaseBlock());
-            }
-        }
-        return false;
-    }
-
-    public boolean regenerate(final Region region) {
+    public boolean regenerate(Region region) {
         return regenerate(region, this);
     }
 
     @Override
-    public boolean regenerate(final Region region, final EditSession session) {
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public boolean clearContainerBlockContents(BlockVector3 position) {
+        return false;
+    }
+
+    @Override
+    public void dropItem(Vector3 position, BaseItemStack item) {
+
+    }
+
+    public boolean regenerate(Region region, EditSession session) {
         return session.regenerate(region, null, null);
+    }
+
+    @Override
+    public boolean playEffect(Vector3 position, int type, int data) {
+        return false;
+    }
+
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return null;
     }
 
     private void setExistingBlocks(BlockVector3 pos1, BlockVector3 pos2) {
         for (int x = pos1.getX(); x <= pos2.getX(); x++) {
             for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
                 for (int y = pos1.getY(); y <= pos2.getY(); y++) {
-                    setBlock(x, y, z, getFullBlock(x, y, z));
+                    int from = queue.getCombinedId4Data(x, y, z);
+                    queue.setBlock(x, y, z, from);
+                    if (BlockTypes.getFromStateId(from).getMaterial().hasContainer()) {
+                        CompoundTag tile = queue.getTileEntity(x, y, z);
+                        if (tile != null) {
+                            queue.setTile(x, y, z, tile);
+                        }
+                    }
                 }
             }
         }
     }
 
-    public boolean regenerate(final Region region, final BiomeType biome, final Long seed) {
+    public boolean regenerate(Region region, BiomeType biome, Long seed) {
         //TODO Optimize - avoid Vector2D creation (make mutable)
         final FaweChangeSet fcs = (FaweChangeSet) this.getChangeSet();
         this.setChangeSet(null);
@@ -3094,11 +3238,13 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
             final int bz = cz << 4;
             final BlockVector3 cmin = BlockVector3.at(bx, 0, bz);
             final BlockVector3 cmax = cmin.add(15, maxY, 15);
-            final boolean containsBot1 = (fe == null || fe.contains(cmin.getBlockX(), cmin.getBlockY(), cmin.getBlockZ()));
+            final boolean containsBot1 =
+                fe == null || fe.contains(cmin.getBlockX(), cmin.getBlockY(), cmin.getBlockZ());
             final boolean containsBot2 = region.contains(cmin);
-            final boolean containsTop1 = (fe == null || fe.contains(cmax.getBlockX(), cmax.getBlockY(), cmax.getBlockZ()));
+            final boolean containsTop1 =
+                fe == null || fe.contains(cmax.getBlockX(), cmax.getBlockY(), cmax.getBlockZ());
             final boolean containsTop2 = region.contains(cmax);
-            if (((containsBot2 && containsTop2)) && !containsBot1 && !containsTop1) {
+            if (containsBot2 && containsTop2 && !containsBot1 && !containsTop1) {
                 continue;
             }
             boolean conNextX = chunks.contains(mutable2D.setComponents(cx + 1, cz));
@@ -3144,7 +3290,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                                     fcs.add(mutable, block, BlockTypes.AIR.getDefaultState().toBaseBlock());
                                 }
                             } else {
-                                BlockStateHolder block = getFullBlock(mutable);
+                                BaseBlock block = getFullBlock(mutable);
                                 try {
                                     setBlock(mutable, block);
                                 } catch (MaxChangedBlocksException e) {
@@ -3160,7 +3306,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 TaskManager.IMP.sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
-                        regenerateChunk(cx, cz, biome, seed);
+                        queue.regenerateChunk(cx, cz, biome, seed);
                     }
                 });
             }
@@ -3171,69 +3317,4 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         }
         return false;
     }
-
-    @Override
-    public void simulateBlockMine(BlockVector3 position) {
-        TaskManager.IMP.sync((Supplier<Object>) () -> {
-            world.simulateBlockMine(position);
-            return null;
-        });
-    }
-
-    public boolean generateTree(TreeGenerator.TreeType type, BlockVector3 position) {
-        return generateTree(type, this, position);
-    }
-
-    @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) {
-        if (getWorld() != null) {
-            try {
-                return getWorld().generateTree(type, editSession, position);
-            } catch (MaxChangedBlocksException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public WeatherType getWeather() {
-        return world.getWeather();
-    }
-
-    @Override
-    public long getRemainingWeatherDuration() {
-        return world.getRemainingWeatherDuration();
-    }
-
-    @Override
-    public void setWeather(WeatherType weatherType) {
-        world.setWeather(weatherType);
-    }
-
-    @Override
-    public void setWeather(WeatherType weatherType, long duration) {
-        world.setWeather(weatherType, duration);
-    }
-
-    @Override
-    public void dropItem(Vector3 position, BaseItemStack item) {
-        world.dropItem(position, item);
-    }
-
-    @Override
-    public boolean playEffect(Vector3 position, int type, int data) {
-        return world.playEffect(position, type, data);
-    }
-
-    @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        return world.notifyAndLightBlock(position, previousType);
-    }
-
-    @Override
-    public BlockVector3 getSpawnPosition() {
-        return world.getSpawnPosition();
-    }
-
 }

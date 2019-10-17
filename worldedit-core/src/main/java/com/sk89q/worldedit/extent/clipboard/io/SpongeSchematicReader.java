@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import net.jpountz.lz4.LZ4BlockInputStream;
@@ -303,7 +304,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             throw new IOException("Biome palette size does not match expected size.");
         }
 
-        for (Map.Entry<String, Tag> palettePart : paletteTag.getValue().entrySet()) {
+        for (Entry<String, Tag> palettePart : paletteTag.getValue().entrySet()) {
             String key = palettePart.getKey();
             if (fixer != null) {
                 key = fixer.fixUp(DataFixer.FixTypes.BIOME, key, dataVersion);

@@ -198,6 +198,11 @@ public class PlayerProxy extends AbstractPlayerActor {
         basePlayer.sendFakeBlock(pos, block);
     }
 
+    @Override
+    public void sendTitle(String title, String sub) {
+        basePlayer.sendTitle(title, sub);
+    }
+
     public Player getBasePlayer() {
         return basePlayer;
     }

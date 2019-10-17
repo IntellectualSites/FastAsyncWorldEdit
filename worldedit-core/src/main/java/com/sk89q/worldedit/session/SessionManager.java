@@ -65,13 +65,14 @@ import org.slf4j.LoggerFactory;
  */
 public class SessionManager {
 
-    public static int EXPIRATION_GRACE = 0;
-    private static final int FLUSH_PERIOD = 1000 * 60;
-    private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
+    public static int EXPIRATION_GRACE = 10 * 60 * 1000;
+    private static final int FLUSH_PERIOD = 1000 * 30;
+    private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
+            EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5, "WorldEdit Session Saver - %s"));
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private static boolean warnedInvalidTool;
 
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer("WorldEdit Session Manager");
     private final WorldEdit worldEdit;
     private final Map<UUID, SessionHolder> sessions = new HashMap<>();
     private SessionStore store = new VoidStore();

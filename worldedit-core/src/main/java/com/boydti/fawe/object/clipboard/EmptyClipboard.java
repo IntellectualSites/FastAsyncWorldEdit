@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.clipboard;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -69,7 +70,22 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
 

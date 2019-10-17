@@ -78,9 +78,9 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     private final RegionFunction function;
+    private BlockVectorSet queue = new BlockVectorSet();
+    private BlockVectorSet visited = new BlockVectorSet();
     private BlockVector3[] directions;
-    private BlockVectorSet visited;
-    private BlockVectorSet queue;
     private int affected = 0;
     private int currentDepth = 0;
     private final int maxDepth;
@@ -98,8 +98,6 @@ public abstract class BreadthFirstSearch implements Operation {
 
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
         checkNotNull(function);
-        this.queue = new BlockVectorSet();
-        this.visited = new BlockVectorSet();
         this.function = function;
         this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
@@ -121,6 +119,8 @@ public abstract class BreadthFirstSearch implements Operation {
      * unit vectors. An example of a valid direction is
      * {@code BlockVector3.at(1, 0, 1)}.</p>
      *
+     * <p>The list of directions can be cleared.</p>
+     *
      * @return the list of directions
      */
     public Collection<BlockVector3> getDirections() {
@@ -131,26 +131,26 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the directions along the axes as directions to visit.
      */
     public void addAxes() {
-        HashSet<BlockVector3> set = Sets.newHashSet(directions);
-        set.add(BlockVector3.UNIT_MINUS_Y);
-        set.add(BlockVector3.UNIT_Y);
-        set.add(BlockVector3.UNIT_MINUS_X);
-        set.add(BlockVector3.UNIT_X);
-        set.add(BlockVector3.UNIT_MINUS_Z);
-        set.add(BlockVector3.UNIT_Z);
-        setDirections(set);
+        this.directions = new BlockVector3[] {
+            BlockVector3.UNIT_MINUS_Y,
+            BlockVector3.UNIT_Y,
+            BlockVector3.UNIT_MINUS_X,
+            BlockVector3.UNIT_X,
+            BlockVector3.UNIT_MINUS_Z,
+            BlockVector3.UNIT_Z
+        };
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
     public void addDiagonal() {
-        HashSet<BlockVector3> set = Sets.newHashSet(directions);
-        set.add(Direction.NORTHEAST.toBlockVector());
-        set.add(Direction.SOUTHEAST.toBlockVector());
-        set.add(Direction.SOUTHWEST.toBlockVector());
-        set.add(Direction.NORTHWEST.toBlockVector());
-        setDirections(set);
+        this.directions = new BlockVector3[] {
+            Direction.NORTHEAST.toBlockVector(),
+            Direction.SOUTHEAST.toBlockVector(),
+            Direction.SOUTHWEST.toBlockVector(),
+            Direction.NORTHWEST.toBlockVector()
+        };
     }
 
     /**
@@ -260,6 +260,7 @@ public abstract class BreadthFirstSearch implements Operation {
             tmp.clear();
             tempQueue = tmp;
         }
+
         return null;
     }
 

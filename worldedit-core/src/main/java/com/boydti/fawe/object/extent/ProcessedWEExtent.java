@@ -21,7 +21,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     private final FaweLimit limit;
     private final AbstractDelegateExtent extent;
 
-    public ProcessedWEExtent(final Extent parent, FaweLimit limit) {
+    public ProcessedWEExtent(Extent parent, FaweLimit limit) {
         super(parent);
         this.limit = limit;
         this.extent = (AbstractDelegateExtent) parent;
@@ -32,7 +32,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public Entity createEntity(final Location location, final BaseEntity entity) {
+    public Entity createEntity(Location location, BaseEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -64,7 +64,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -75,7 +75,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {
                 WEManager.IMP.cancelEdit(this, FaweException.MAX_TILES);
@@ -97,7 +97,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (!limit.MAX_CHANGES()) {
             WEManager.IMP.cancelEditSafe(this, FaweException.MAX_CHANGES);
             return false;

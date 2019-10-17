@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -28,10 +29,10 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
@@ -45,6 +46,8 @@ import javax.annotation.Nullable;
 public class BlockMask extends ABlockMask {
 
     private final boolean[] ordinals;
+
+    private Set<BaseBlock> blocks;
 
     public BlockMask() {
         this(new NullExtent());
@@ -69,6 +72,9 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         this(extent);
+        checkNotNull(blocks);
+        this.blocks = Sets.newHashSet(blocks);
+        this.blocks.addAll(blocks);
         add(blocks);
     }
 
@@ -106,20 +112,6 @@ public class BlockMask extends ABlockMask {
         return this;
     }
 
-    public BlockMask clear() {
-        Arrays.fill(ordinals, false);
-        return this;
-    }
-
-    public boolean isEmpty() {
-        for (boolean value : ordinals) {
-            if (value) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private BlockMask addStates(Collection<BlockState> states) {
         for (BlockState state : states) {
             ordinals[state.getOrdinal()] = true;
@@ -149,9 +141,9 @@ public class BlockMask extends ABlockMask {
      */
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
-        for (BaseBlock block : blocks) {
-            add(block.toBlockState());
-        }
+        checkNotNull(blocks);
+        this.blocks.addAll(blocks);
+        blocks.forEach(baseBlock -> add(baseBlock.toBlockState()));
     }
 
     /**
@@ -163,6 +155,15 @@ public class BlockMask extends ABlockMask {
         add(Arrays.asList(checkNotNull(block)));
     }
 
+    /**
+     * Get the list of blocks that are tested with.
+     *
+     * @return a list of blocks
+     */
+    public Collection<BaseBlock> getBlocks() {
+        return blocks;
+    }
+
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()];
@@ -170,7 +171,14 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return ordinals[vector.getOrdinal(getExtent())];
+        BlockState block = getExtent().getBlock(vector);
+        for (BaseBlock testBlock : blocks) {
+            if (testBlock.equalsFuzzy(block)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -216,26 +224,23 @@ public class BlockMask extends ABlockMask {
 
         int setTypes = 0;
         BlockType setType = null;
-        BlockType unsetType = null;
         int totalTypes = 0;
 
         for (BlockType type : BlockTypes.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;
-                boolean hasAny = false;
                 List<BlockState> all = type.getAllStates();
                 for (BlockState state : all) {
                     totalStates++;
                     hasAll &= test(state);
-                    hasAny = true;
                 }
                 if (hasAll) {
                     setTypes++;
                     setType = type;
                     setStates += all.size();
                     setState = type.getDefaultState();
-                } else if (hasAny) {
+                } else {
                     for (BlockState state : all) {
                         if (test(state)) {
                             setStates++;
@@ -244,8 +249,6 @@ public class BlockMask extends ABlockMask {
                             unsetState = state;
                         }
                     }
-                } else {
-                    unsetType = type;
                 }
             }
         }
@@ -269,11 +272,7 @@ public class BlockMask extends ABlockMask {
         }
 
         if (setTypes == totalTypes - 1) {
-            if (unsetType != null) {
-                return new InverseSingleBlockTypeMask(getExtent(), unsetType);
-            } else {
-                throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
-            }
+            throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
         }
 
         return null;

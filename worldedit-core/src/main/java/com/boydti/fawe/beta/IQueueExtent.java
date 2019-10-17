@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -11,46 +10,27 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Flushable;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 
 /**
  * TODO: implement Extent (need to refactor Extent first)
  * Interface for a queue based extent which uses chunks
  */
 public interface IQueueExtent extends Flushable, Trimable, Extent {
-
-    @Override
-    default boolean isQueueEnabled() {
-        return true;
-    }
-
-    /**
-     * Must ensure that it is enqueued with QueueHandler
-     */
-    @Override
-    void enableQueue();
-
-    /**
-     * Must ensure it is not in the queue handler
-     */
-    @Override
-    void disableQueue();
-
     void init(WorldChunkCache world);
 
     /**
      * Get the {@link WorldChunkCache}
      * @return
      */
-    IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier);
+    WorldChunkCache getCache();
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
-     * @param x
-     * @param z
+     * @param X
+     * @param Z
      * @return IChunk
      */
-    IChunk getCachedChunk(int x, int z);
+    IChunk getCachedChunk(int X, int Z);
 
     /**
      * Submit the chunk so that it's changes are applied to the world
@@ -59,13 +39,11 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      */
     <T extends Future<T>> T submit(IChunk<T> chunk);
 
-    @Override
     default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }
 
-    @Override
     default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBiome(x & 15, y, z & 15, biome);
@@ -84,19 +62,18 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     default BiomeType getBiome(final int x, final int z) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.getBiomeType(x & 15, z & 15);
+        return chunk.getBiome(x & 15, z & 15);
     }
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return BlockVector3.at(-30000000, 0, -30000000);
+        return getCache().getWorld().getMinimumPoint();
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(30000000, FaweCache.WORLD_MAX_Y, 30000000);
+        return getCache().getWorld().getMaximumPoint();
     }
-
     /**
      * Create a new root IChunk object<br>
      *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>
@@ -123,10 +100,4 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     void flush();
 
     ChunkFilterBlock initFilterBlock();
-
-    int size();
-
-    boolean isEmpty();
-
-    void sendChunk(int chunkX, int chunkZ, int bitMask);
 }

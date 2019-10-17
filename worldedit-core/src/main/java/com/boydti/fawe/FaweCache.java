@@ -2,7 +2,7 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -23,7 +23,6 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,13 +35,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public final class FaweCache implements Trimable {
-    public final static int BLOCKS_PER_LAYER = 4096;
-    public final static int CHUNK_LAYERS = 16;
-    public final static int WORLD_HEIGHT = CHUNK_LAYERS << 4;
-    public final static int WORLD_MAX_Y = WORLD_HEIGHT - 1;
-
-
+public class FaweCache implements Trimable {
     public static final char[] EMPTY_CHAR_4096 = new char[4096];
 
     /*
@@ -112,11 +105,11 @@ public final class FaweCache implements Trimable {
          */
         public int[] paletteToBlock;
 
-        public int blockStatesLength;
+        public int blockstatesLength;
         /**
-         * Reusable buffer array, MUST check blockStatesLength for actual length
+         * Reusable buffer array, MUST check blockstatesLength for actual length
          */
-        public long[] blockStates;
+        public long[] blockstates;
     }
 
     private static final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<Palette>() {
@@ -149,7 +142,7 @@ public final class FaweCache implements Trimable {
     private static Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
-        long[] blockStates = BLOCK_STATES.get();
+        long[] blockstates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
         int blockIndexStart = layerOffset << 12;
@@ -193,10 +186,10 @@ public final class FaweCache implements Trimable {
             int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
                 // Set a value, because minecraft needs it for some  reason
-                blockStates[0] = 0;
+                blockstates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -205,8 +198,8 @@ public final class FaweCache implements Trimable {
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
 
-            palette.blockStatesLength = blockBitArrayEnd;
-            palette.blockStates = blockStates;
+            palette.blockstatesLength = blockBitArrayEnd;
+            palette.blockstates = blockstates;
 
             return palette;
         } catch (Throwable e) {

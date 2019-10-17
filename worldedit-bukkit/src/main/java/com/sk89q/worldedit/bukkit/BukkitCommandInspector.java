@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.bukkit.BukkitTextAdapter.reduceToText;
+import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 import com.sk89q.bukkit.util.CommandInspector;
 import com.sk89q.worldedit.extension.platform.Actor;

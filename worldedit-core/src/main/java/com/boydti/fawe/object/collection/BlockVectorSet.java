@@ -19,6 +19,7 @@ import java.util.*;
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public int size() {
@@ -71,7 +72,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        	BlockVector3 v = (BlockVector3) o;
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -151,7 +152,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     @Override
     public boolean remove(Object o) {
         if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        	BlockVector3 v = (BlockVector3) o;
             return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;

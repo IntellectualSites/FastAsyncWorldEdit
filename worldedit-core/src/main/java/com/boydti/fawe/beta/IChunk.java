@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -15,16 +14,14 @@ import javax.annotation.Nullable;
  * Represents a chunk in the queue {@link IQueueExtent}
  * Used for getting and setting blocks / biomes / entities
  */
-public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChunkGet {
+public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
     /**
      * Initialize at the location
      * @param extent
-     * @param x
-     * @param z
+     * @param X
+     * @param Z
      */
-    void init(IQueueExtent extent, int x, int z);
-
-    IQueueExtent getQueue();
+    void init(IQueueExtent extent, int X, int Z);
 
     int getX();
 
@@ -82,17 +79,9 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
     /* get - from the world */
-    BiomeType getBiomeType(int x, int z);
+    BiomeType getBiome(int x, int z);
 
     BlockState getBlock(int x, int y, int z);
 
     BaseBlock getFullBlock(int x, int y, int z);
-
-    CompoundTag getTag(int x, int y, int z);
-
-    @Override
-    default IBlocks reset() {
-        init(getQueue(), getX(), getZ());
-        return this;
-    }
 }

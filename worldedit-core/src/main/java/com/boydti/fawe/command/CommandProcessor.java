@@ -67,13 +67,13 @@ public abstract class CommandProcessor<I, O> implements CommandManager {
     }
 
     @Override
-    public final O /* Need to recompile with FAWE-piston */ execute(InjectedValueAccess context, List<String> args) {
+    public final int execute(InjectedValueAccess context, List<String> args) {
         args = preprocess(context, args);
         if (args != null) {
-            I result = (I) parent.execute(context, args);
+            Object result = parent.execute(context, args);
             return process(context, args, result); // TODO NOT IMPLEMENTED (recompile piston)
         } else {
-            return null;
+            return 0;
         }
     }
 
@@ -89,5 +89,5 @@ public abstract class CommandProcessor<I, O> implements CommandManager {
 
     public abstract List<String> preprocess(InjectedValueAccess context, List<String> args);
 
-    public abstract O process(InjectedValueAccess context, List<String> args, I result);
+    public abstract int process(InjectedValueAccess context, List<String> args, Object result);
 }

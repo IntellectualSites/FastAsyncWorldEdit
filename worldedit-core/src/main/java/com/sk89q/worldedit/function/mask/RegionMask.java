@@ -70,4 +70,5 @@ public class RegionMask extends AbstractMask {
     public Mask2D toMask2D() {
         return null;
     }
+
 }

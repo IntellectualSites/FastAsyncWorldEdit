@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.change.MutableChunkChange;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,7 +20,7 @@ public class CPUOptimizedChangeSet extends FaweChangeSet {
 
     private ArrayList<Change> changes = new ArrayList<>();
 
-    public void addChangeTask(IQueueExtent queue) {
+    public void addChangeTask(FaweQueue queue) {
         queue.setChangeTask(new RunnableVal2<FaweChunk, FaweChunk>() {
             @Override
             public void run(final FaweChunk previous, final FaweChunk next) {

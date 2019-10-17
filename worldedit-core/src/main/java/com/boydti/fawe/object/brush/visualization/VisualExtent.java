@@ -1,10 +1,11 @@
 package com.boydti.fawe.object.brush.visualization;
 
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.example.IntFaweChunk;
+import com.boydti.fawe.example.NullQueueIntFaweChunk;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
-
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -14,25 +15,23 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-import java.util.concurrent.Future;
-
 public class VisualExtent extends AbstractDelegateExtent {
 
-    private final IQueueExtent queue;
+    private final FaweQueue queue;
     private Long2ObjectMap<VisualChunk> chunks = new Long2ObjectOpenHashMap<>();
 
-    public VisualExtent(Extent parent, IQueueExtent queue) {
+    public VisualExtent(Extent parent, FaweQueue queue) {
         super(parent);
         this.queue = queue;
-    }
-
-    public VisualChunk getChunk(int cx, int cz) {
-        return chunks.get(MathMan.pairInt(cx, cz));
     }
 
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
+    }
+
+    public VisualChunk getChunk(int cx, int cz) {
+        return chunks.get(MathMan.pairInt(cx, cz));
     }
 
     @Override
@@ -63,7 +62,7 @@ public class VisualExtent extends AbstractDelegateExtent {
         return false;
     }
 
-    public void clear(VisualExtent other, FawePlayer... players) {
+    public void clear(VisualExtent other, Player... players) {
         for (Long2ObjectMap.Entry<VisualChunk> entry : chunks.long2ObjectEntrySet()) {
             long pair = entry.getLongKey();
             int cx = MathMan.unpairIntX(pair);
@@ -92,13 +91,9 @@ public class VisualExtent extends AbstractDelegateExtent {
         }
     }
 
-    public void visualize(FawePlayer players) {
+    public void visualize(Player players) {
         for (VisualChunk chunk : chunks.values()) {
             queue.sendBlockUpdate(chunk, players);
         }
-    }
-
-    public Future sendChunkUpdate(VisualChunk visualChunk) {
-        return null; // TODO NOT IMPLEMENTED
     }
 }

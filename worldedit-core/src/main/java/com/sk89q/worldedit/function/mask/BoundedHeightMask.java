@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 /**
@@ -55,4 +56,5 @@ public class BoundedHeightMask extends AbstractMask {
     public Mask2D toMask2D() {
         return null;
     }
+
 }

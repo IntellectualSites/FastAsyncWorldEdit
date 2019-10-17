@@ -1,19 +1,18 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.queue.DelegateFaweQueue;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -23,10 +22,26 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import org.bukkit.*;
+import org.bukkit.BlockChangeDelegate;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
+import org.bukkit.Difficulty;
+import org.bukkit.Effect;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.GameRule;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Raid;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.StructureType;
+import org.bukkit.TreeType;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -50,6 +65,7 @@ import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Modify the world from an async thread<br>
@@ -60,10 +76,9 @@ import org.jetbrains.annotations.NotNull;
  *  @see #wrap(World)
  *  @see #create(WorldCreator)
  */
-public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue {
+public class AsyncWorld extends PassthroughExtent implements World {
 
     private World parent;
-    private FaweQueue queue;
     private BukkitImplAdapter adapter;
 
     @Override
@@ -78,7 +93,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
      */
     @Deprecated
     public AsyncWorld(World parent, boolean autoQueue) {
-        this(parent, FaweAPI.createQueue(parent.getName(), autoQueue));
+        this(parent, FaweAPI.createQueue(new BukkitWorld(parent), autoQueue));
     }
 
     public AsyncWorld(String world, boolean autoQueue) {
@@ -91,19 +106,10 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
      * @param queue
      */
     @Deprecated
-    public AsyncWorld(World parent, FaweQueue queue) {
-        super(queue);
+    public AsyncWorld(World parent, Extent extent) {
+        super(extent);
         this.parent = parent;
-        this.queue = queue;
-        if (queue instanceof BukkitQueue_0) {
-            this.adapter = BukkitQueue_0.getAdapter();
-        } else {
-            try {
-                this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
+        this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
     }
 
     /**
@@ -118,30 +124,13 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return new AsyncWorld(world, false);
     }
 
-    public void changeWorld(World world, FaweQueue queue) {
-        this.parent = world;
-        if (queue != this.queue) {
-            if (this.queue != null) {
-                final FaweQueue oldQueue = this.queue;
-                TaskManager.IMP.async(oldQueue::flush);
-            }
-            this.queue = queue;
-        }
-        setParent(queue);
-    }
-
     @Override
     public String toString() {
-        return super.toString() + ":" + queue.toString();
+        return getName();
     }
 
     public World getBukkitWorld() {
         return parent;
-    }
-
-    @Override
-    public FaweQueue getQueue() {
-        return queue;
     }
 
     /**
@@ -151,8 +140,8 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
      * @return
      */
     public synchronized static AsyncWorld create(final WorldCreator creator) {
-        BukkitQueue_0 queue = (BukkitQueue_0) SetQueue.IMP.getNewQueue(creator.name(), true, false);
-        World world = queue.createWorld(creator);
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        @Nullable World world = adapter.createWorld(creator);
         return wrap(world);
     }
 
@@ -163,9 +152,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     public void flush() {
-        if (queue != null) {
-            queue.flush();
-        }
+        getExtent().commit();
     }
 
     @Override
@@ -240,7 +227,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public AsyncBlock getBlockAt(final int x, final int y, final int z) {
-        return new AsyncBlock(this, queue, x, y, z);
+        return new AsyncBlock(this, x, y, z);
     }
 
     @Override
@@ -251,9 +238,8 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public int getHighestBlockYAt(int x, int z) {
         for (int y = getMaxHeight() - 1; y >= 0; y--) {
-            int stateId = queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
-            BlockType type = BlockTypes.getFromStateId(stateId);
-            if (!type.getMaterial().isAir()) return y;
+            BlockState state = this.getBlock(x, y, z);
+            if (!state.getMaterial().isAir()) return y;
         }
         return 0;
     }
@@ -276,7 +262,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public AsyncChunk getChunkAt(int x, int z) {
-        return new AsyncChunk(this, queue, x, z);
+        return new AsyncChunk(this, x, z);
     }
 
     @Override
@@ -422,8 +408,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     @Deprecated
     public boolean refreshChunk(int x, int z) {
-        queue.sendChunk(queue.getFaweChunk(x, z));
-        return true;
+        return parent.refreshChunk(x, z);
     }
 
     @Override
@@ -662,14 +647,17 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         parent.setThunderDuration(duration);
     }
 
+    @Override
     public boolean createExplosion(double x, double y, double z, float power) {
         return this.createExplosion(x, y, z, power, false, true);
     }
 
+    @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire) {
         return this.createExplosion(x, y, z, power, setFire, true);
     }
 
+    @Override
     public boolean createExplosion(final double x, final double y, final double z, final float power, final boolean setFire, final boolean breakBlocks) {
         return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
             @Override
@@ -679,14 +667,28 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         });
     }
 
+    @Override
+    public boolean createExplosion(double x, double y, double z, float power, boolean setFire,
+        boolean breakBlocks, @Nullable Entity source) {
+        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+            @Override
+            public void run(Boolean value) {
+                this.value = parent.createExplosion(x, y, z, power, setFire, breakBlocks, source);
+            }
+        });
+    }
+
+    @Override
     public boolean createExplosion(Location loc, float power) {
         return this.createExplosion(loc, power, false);
     }
 
+    @Override
     public boolean createExplosion(Location loc, float power, boolean setFire) {
         return this.createExplosion(loc.getX(), loc.getY(), loc.getZ(), power, setFire);
     }
 
+    @NotNull
     @Override
     public Environment getEnvironment() {
         return parent.getEnvironment();
@@ -825,13 +827,13 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.adapt(queue.getBiomeType(x, z));
+        return adapter.adapt(getExtent().getBiome(BlockVector2.at(x, z)));
     }
 
     @Override
     public void setBiome(int x, int z, Biome bio) {
         BiomeType biome = adapter.adapt(bio);
-        queue.setBiome(x, z, biome);
+        getExtent().setBiome(x, 0, z, biome);
     }
 
     @Override
@@ -1045,6 +1047,16 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
+    public @Nullable Raid locateNearestRaid(@NotNull Location location, int i) {
+        return parent.locateNearestRaid(location, i);
+    }
+
+    @Override
+    public @NotNull List<Raid> getRaids() {
+        return parent.getRaids();
+    }
+
+    @Override
     public void setMetadata(final String key, final MetadataValue meta) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -1112,6 +1124,11 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public Location locateNearestStructure(Location arg0, StructureType arg1, int arg2, boolean arg3) {
         return parent.locateNearestStructure(arg0, arg1, arg2, arg3);
+    }
+
+    @Override
+    public int getViewDistance() {
+        return parent.getViewDistance();
     }
 
     @Override
@@ -1299,6 +1316,18 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
         return TaskManager.IMP.sync(() -> parent.createExplosion(source, loc, power, setFire, breakBlocks));
+    }
+
+    @Override
+    public boolean createExplosion(@NotNull Location loc, float power, boolean setFire,
+        boolean breakBlocks) {
+        return false;
+    }
+
+    @Override
+    public boolean createExplosion(@NotNull Location loc, float power, boolean setFire,
+        boolean breakBlocks, @Nullable Entity source) {
+        return false;
     }
 
 

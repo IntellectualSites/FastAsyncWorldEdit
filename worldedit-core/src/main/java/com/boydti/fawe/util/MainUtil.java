@@ -7,11 +7,9 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal2;
-import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
@@ -88,22 +86,11 @@ import net.jpountz.lz4.LZ4InputStream;
 import net.jpountz.lz4.LZ4Utils;
 
 public class MainUtil {
-    /*
-     * Generic non plugin related utils
-     *  e.g. sending messages
-     */
-    public static void sendMessage(final FawePlayer<?> player, String message) {
-        if (player == null) {
-            Fawe.debug(message);
-        } else {
-            player.sendMessage(message);
-        }
-    }
 
     public static void sendAdmin(final String s) {
-        for (final FawePlayer<?> player : Fawe.get().getCachedPlayers()) {
+        for (final Player player : Fawe.get().getCachedPlayers()) {
             if (player.hasPermission("fawe.admin")) {
-                player.sendMessage(s);
+                player.print(s);
             }
         }
         Fawe.debug(s);
@@ -236,8 +223,8 @@ public class MainUtil {
         if (changeSet instanceof FaweStreamChangeSet) {
             FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
             return fscs.getSizeOnDisk() + fscs.getSizeInMemory();
-        } else if (changeSet instanceof CPUOptimizedChangeSet) {
-            return changeSet.size() + 32;
+//        } else if (changeSet instanceof CPUOptimizedChangeSet) {
+//            return changeSet.size() + 32;
         } else if (changeSet != null) {
             return changeSet.size() * 128;
         } else {

@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -48,8 +47,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(final EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        FawePlayer fp = editSession.getPlayer();
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+        Player player = editSession.getPlayer();
+        if (player == null) {
+            return;
+        }
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
             if (editSession.getExtent() instanceof VisualExtent) {
@@ -85,8 +87,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
             int blocks = builder.size();
-            BBC.COMMAND_COPY.send(fp, blocks);
-            return;
+            BBC.COMMAND_COPY.send(player, blocks);
         } else {
             AffineTransform transform = null;
             if (randomRotate) {
@@ -96,10 +97,10 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             }
             if (autoRotate) {
                 if (transform == null) transform = new AffineTransform();
-                Location loc = editSession.getPlayer().toWorldEditPlayer().getLocation();
+                Location loc = player.getLocation();
                 float yaw = loc.getYaw();
                 float pitch = loc.getPitch();
-                transform = transform.rotateY((-yaw) % 360);
+                transform = transform.rotateY(-yaw % 360);
                 transform = transform.rotateX(pitch - 90);
             }
             if (transform != null && !transform.isIdentity()) {

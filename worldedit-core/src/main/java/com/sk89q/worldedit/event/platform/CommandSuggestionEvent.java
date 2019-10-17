@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.event.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.util.Substring;

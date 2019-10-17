@@ -6,20 +6,17 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Interface for setting blocks
  */
 public interface IChunkSet extends IBlocks, OutputExtent {
-    @Override
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
-    @Override
     boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
     boolean isEmpty();

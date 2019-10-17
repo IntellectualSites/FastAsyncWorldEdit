@@ -74,7 +74,7 @@ public class FloatingTreeRemover implements BlockTool {
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
 
         if (!isTreeBlock(state.getBlockType())) {
-            BBC.TOOL_DELTREE_ERROR.send(player);
+            player.printError(BBC.TOOL_DELTREE_ERROR.s());
             return true;
         }
 
@@ -82,7 +82,7 @@ public class FloatingTreeRemover implements BlockTool {
             try {
                 final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
                 if (blockSet == null) {
-                    BBC.TOOL_DELTREE_FLOATING_ERROR.send(player);
+                    player.printError(BBC.TOOL_DELTREE_FLOATING_ERROR.s());
                     return true;
                 }
 

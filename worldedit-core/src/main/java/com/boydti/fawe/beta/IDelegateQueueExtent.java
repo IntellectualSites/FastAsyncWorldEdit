@@ -16,8 +16,8 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default IChunk getCachedChunk(final int x, final int z) {
-        return getParent().getCachedChunk(x, z);
+    default IChunk getCachedChunk(final int X, final int Z) {
+        return getParent().getCachedChunk(X, Z);
     }
 
     @Override

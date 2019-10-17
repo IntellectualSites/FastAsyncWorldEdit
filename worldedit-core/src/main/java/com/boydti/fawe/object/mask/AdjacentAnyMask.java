@@ -11,7 +11,7 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
 
     private final CachedMask mask;
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private transient MutableBlockVector3 mutable;
 
     public AdjacentAnyMask(Mask mask) {
         this.mask = CachedMask.cache(mask);
@@ -75,6 +75,6 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
         if (y > 0 && mask.test(x, y - 1, z)) {
             mutable.setComponents(0, -1, 0);
         }
-        return (mutable.getX() == 0 && mutable.getY() == 0 && mutable.getZ() == 0) ? null : mutable;
+        return mutable.getX() == 0 && mutable.getY() == 0 && mutable.getZ() == 0 ? null : mutable;
     }
 }

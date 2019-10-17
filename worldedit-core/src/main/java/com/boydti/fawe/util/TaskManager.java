@@ -1,9 +1,8 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -141,8 +138,7 @@ public abstract class TaskManager {
      * @param queue
      * @param run
      */
-    public void runUnsafe(Runnable run) {
-        QueueHandler queue = Fawe.get().getQueueHandler();
+    public void runUnsafe(FaweQueue queue, Runnable run) {
         queue.startSet(true);
         try {
             run.run();
@@ -258,12 +254,29 @@ public abstract class TaskManager {
         });
     }
 
-    public void wait(AtomicBoolean running, int timeout) {
+    /**
+     * Quickly run a task on the main thread, and wait for execution to finish:<br>
+     * - Useful if you need to access something from the Bukkit API from another thread<br>
+     * - Usualy wait time is around 25ms<br>
+     *
+     * @param function
+     * @param <T>
+     * @return
+     */
+    public <T> T sync(final RunnableVal<T> function) {
+        return sync(function, Integer.MAX_VALUE);
+    }
+
+    public <T> T sync(final Supplier<T> function) {
+        return sync(function, Integer.MAX_VALUE);
+    }
+
+    public void wait(AtomicBoolean running, int timout) {
         try {
             long start = System.currentTimeMillis();
             synchronized (running) {
                 while (running.get()) {
-                    running.wait(timeout);
+                    running.wait(timout);
                     if (running.get() && System.currentTimeMillis() - start > Settings.IMP.QUEUE.DISCARD_AFTER_MS) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
                         Fawe.debug("For full debug information use: /fawe threads");
@@ -282,11 +295,15 @@ public abstract class TaskManager {
         }
     }
 
+    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function) {
+        return syncWhenFree(function, Integer.MAX_VALUE);
+    }
+
     public void taskWhenFree(@NotNull Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
         } else {
-            Fawe.get().getQueueHandler().sync(run);
+            SetQueue.IMP.addTask(run);
         }
     }
 
@@ -300,16 +317,43 @@ public abstract class TaskManager {
      * @param <T>
      * @return
      */
-    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function) {
+    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function, int timeout) {
         if (Fawe.isMainThread()) {
             function.run();
             return function.value;
         }
+        final AtomicBoolean running = new AtomicBoolean(true);
+        RunnableVal<RuntimeException> run = new RunnableVal<RuntimeException>() {
+            @Override
+            public void run(RuntimeException value) {
+                try {
+                    function.run();
+                } catch (RuntimeException e) {
+                    this.value = e;
+                } catch (Throwable neverHappens) {
+                    neverHappens.printStackTrace();
+                } finally {
+                    running.set(false);
+                }
+                synchronized (function) {
+                    function.notifyAll();
+                }
+            }
+        };
+        SetQueue.IMP.addTask(run);
         try {
-            return Fawe.get().getQueueHandler().sync((Supplier<T>) function).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            synchronized (function) {
+                while (running.get()) {
+                    function.wait(timeout);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        if (run.value != null) {
+            throw run.value;
+        }
+        return function.value;
     }
 
     /**
@@ -322,27 +366,45 @@ public abstract class TaskManager {
      * @param <T>
      * @return
      */
-    public <T> T sync(@NotNull final RunnableVal<T> function) {
-        return sync((Supplier<T>) function);
+    public <T> T sync(@NotNull final RunnableVal<T> function, int timeout) {
+        return sync((Supplier<T>) function, timeout);
     }
 
-    /**
-     * Quickly run a task on the main thread, and wait for execution to finish:<br>
-     * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms<br>
-     *
-     * @param function
-     * @param <T>
-     * @return
-     */
-    public <T> T sync(final Supplier<T> function) {
+    public <T> T sync(final Supplier<T> function, int timeout) {
         if (Fawe.isMainThread()) {
             return function.get();
         }
+        final AtomicBoolean running = new AtomicBoolean(true);
+        RunnableVal<Object> run = new RunnableVal<Object>() {
+            @Override
+            public void run(Object value) {
+                try {
+                    this.value = function.get();
+                } catch (RuntimeException e) {
+                    this.value = e;
+                } catch (Throwable neverHappens) {
+                    neverHappens.printStackTrace();
+                } finally {
+                    running.set(false);
+                    synchronized (function) {
+                        function.notifyAll();
+                    }
+                }
+            }
+        };
+        SetQueue.IMP.addTask(run);
         try {
-            return Fawe.get().getQueueHandler().sync(function).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            synchronized (function) {
+                while (running.get()) {
+                    function.wait(timeout);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        if (run.value instanceof RuntimeException) {
+            throw (RuntimeException) run.value;
+        }
+        return (T) run.value;
     }
 }

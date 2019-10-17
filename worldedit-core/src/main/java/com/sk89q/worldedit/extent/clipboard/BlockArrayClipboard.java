@@ -216,15 +216,16 @@ public class BlockArrayClipboard implements Clipboard, Closeable {
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tag) {
         x -= mx;
         y -= my;
         z -= mz;
-        return IMP.setTile(x, y, z, tag);
+        IMP.setTile(x, y, z, tag);
     }
 
-    public boolean setTile(BlockVector3 position, CompoundTag tag) {
-        return setTile(position.getX(), position.getY(), position.getZ(), tag);
+    public void setTile(BlockVector3 position, CompoundTag tag) {
+        setTile(position.getX(), position.getY(), position.getZ(), tag);
     }
 
     @Override
@@ -250,6 +251,11 @@ public class BlockArrayClipboard implements Clipboard, Closeable {
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         int x = position.getBlockX() - mx;
         int z = position.getBlockZ() - mz;
+        return IMP.setBiome(x, z, biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return IMP.setBiome(x, z, biome);
     }
 

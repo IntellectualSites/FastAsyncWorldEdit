@@ -283,7 +283,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": true,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -758,7 +758,7 @@
       "hardness": 3.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": true,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -771,7 +771,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": false
+      "hasContainer": true
     }
   },
   {
@@ -1133,7 +1133,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": true,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1246,7 +1246,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": false
+      "hasContainer": true
     }
   },
   {
@@ -1383,7 +1383,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": true,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1391,10 +1391,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": false,
+      "toolRequired": true,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#7f3fb2",
+      "mapColor": "#707070",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -1408,7 +1408,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": true,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,

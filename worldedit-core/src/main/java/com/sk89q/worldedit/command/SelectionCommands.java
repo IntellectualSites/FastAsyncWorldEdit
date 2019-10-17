@@ -24,7 +24,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.object.mask.BlockTypeMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
 import com.boydti.fawe.util.ExtentTraverser;
@@ -116,7 +116,7 @@ public class SelectionCommands {
         }
 
         if (!session.getRegionSelector(world).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            BBC.SELECTOR_ALREADY_SET.send(actor);
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -142,8 +142,9 @@ public class SelectionCommands {
             actor.printError("You must provide coordinates as console.");
             return;
         }
+
         if (!session.getRegionSelector(world).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            BBC.SELECTOR_ALREADY_SET.send(actor);
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -158,18 +159,18 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos1(Player player, LocalSession session) throws WorldEditException {
 
-        BlockVector3 pos = player.getBlockTrace(300).toBlockPoint();
+        Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos, ActorSelectorLimits.forActor(player))) {
-                BBC.SELECTOR_ALREADY_SET.send(player);
+            if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
-                    .explainPrimarySelection(player, session, pos);
+                    .explainPrimarySelection(player, session, pos.toBlockPoint());
         } else {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -180,18 +181,18 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos2(Player player, LocalSession session) throws WorldEditException {
 
-        BlockVector3 pos = player.getBlockTrace(300).toBlockPoint();
+        Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos, ActorSelectorLimits.forActor(player))) {
-                BBC.SELECTOR_ALREADY_SET.send(player);
+            if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
-                    .explainSecondarySelection(player, session, pos);
+                    .explainSecondarySelection(player, session, pos.toBlockPoint());
         } else {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -259,7 +260,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.wand")
     public void wand(Player player, LocalSession session,
-                     @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand) throws WorldEditException {
+                        @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand) throws WorldEditException {
         String wandId = navWand ? session.getNavWandItem() : session.getWandItem();
         if (wandId == null) {
             wandId = navWand ? we.getConfiguration().navigationWand : we.getConfiguration().wandItem;
@@ -275,7 +276,7 @@ public class SelectionCommands {
             player.print("Left click: jump to location; Right click: pass through walls");
         } else {
             session.setTool(itemType, new SelectionWand());
-            BBC.SELECTION_WAND.send(player);
+            player.print(BBC.SELECTION_WAND.s());
         }
         if (!player.hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
@@ -359,7 +360,7 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-            BBC.SELECTION_SHIFT.send(actor);
+            actor.print(BBC.SELECTION_SHIFT.s());
         } catch (RegionOperationException e) {
             actor.printError(e.getMessage());
         }
@@ -382,7 +383,7 @@ public class SelectionCommands {
         region.expand(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
-        BBC.SELECTION_OUTSET.send(actor);
+        actor.print(BBC.SELECTION_OUTSET.s());
     }
 
     @Command(
@@ -469,10 +470,10 @@ public class SelectionCommands {
         } else {
 
             region = session.getSelection(player.getWorld());
+
             player.print("Type: " + session.getRegionSelector(player.getWorld()).getTypeName());
 
-            for (String line : session.getRegionSelector(player.getWorld())
-                .getInformationLines()) {
+            for (String line : session.getRegionSelector(player.getWorld()).getInformationLines()) {
                 player.print(line);
             }
 
@@ -480,8 +481,6 @@ public class SelectionCommands {
         BlockVector3 size = region.getMaximumPoint()
                 .subtract(region.getMinimumPoint())
                 .add(1, 1, 1);
-
-
 
         player.print("Size: " + size);
         player.print("Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
@@ -552,16 +551,16 @@ public class SelectionCommands {
         aliases = { ";", "/desel", "/deselect" },
         desc = "Choose a region selector"
     )
-    public void select(Actor actor, World world, LocalSession session, EditSession editSession,
+    public void select(Actor actor, World world, LocalSession session,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
-                       @Arg(desc = "Selector mask", def = "") Mask mask,
+                       @Arg(desc = "Selector mask", def = "") Mask maskOpt,
                        @Switch(name = 'd', desc = "Set default selector")
                            boolean setDefaultSelector) throws WorldEditException {
         if (selector == null) {
             session.getRegionSelector(world).clear();
             session.dispatchCUISelection(actor);
-            BBC.SELECTION_CLEARED.send(actor);
+            actor.print(BBC.SELECTION_CLEARED.s());
             return;
         }
 
@@ -614,17 +613,17 @@ public class SelectionCommands {
                 break;
             case FUZZY:
             case MAGIC:
-                if (mask == null) {
-                    mask = new IdMask(world);
+                if (maskOpt == null) {
+                    maskOpt = new BlockTypeMask(world);
                 }
                 //TODO Make FuzzyRegionSelector accept actors
-                newSelector = new FuzzyRegionSelector((Player) actor, editSession, mask);
+                newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);
                 actor.print(BBC.SEL_FUZZY.s());
                 actor.print(BBC.SEL_LIST.s());
                 break;
             case LIST:
             default:
-                CommandListBox box = new CommandListBox("Selection modes", null);
+                CommandListBox box = new CommandListBox("Selection modes", null, null);
                 box.setHidingHelp(true);
                 TextComponentProducer contents = box.getContents();
                 contents.append(SubtleFormat.wrap("Select one of the modes below:")).newline();
@@ -663,5 +662,4 @@ public class SelectionCommands {
         session.setRegionSelector(world, newSelector);
         session.dispatchCUISelection(actor);
     }
-
 }

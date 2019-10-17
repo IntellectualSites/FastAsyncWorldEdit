@@ -1,10 +1,7 @@
 package com.boydti.fawe.beta.implementation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
@@ -12,10 +9,12 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Single threaded implementation for IQueueExtent (still abstract)
@@ -29,7 +28,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
 
     /**
-     * Safety check to ensure that the thread being used matches the one being initialized on.
+     * Safety check to ensure that the thread being used matches the one being initialized on
      *  - Can be removed later
      */
     private void checkThread() {
@@ -39,12 +38,12 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier) {
-        return cache.get(MathMan.pairInt(x, z), supplier);
+    public WorldChunkCache getCache() {
+        return cache;
     }
 
     /**
-     * Resets the queue.
+     * Reset the queue
      */
     protected synchronized void reset() {
         checkThread();
@@ -82,16 +81,6 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
     public void returnToPool(final IChunk chunk) {
         CHUNK_POOL.add(chunk);
-    }
-
-    @Override
-    public int size() {
-        return chunks.size() + submissions.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return chunks.isEmpty() && submissions.isEmpty();
     }
 
     @Override
@@ -162,8 +151,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public final IChunk getCachedChunk(final int x, final int z) {
-        final long pair = (((long) x) << 32) | (z & 0xffffffffL);
+    public final IChunk getCachedChunk(final int X, final int Z) {
+        final long pair = (((long) X) << 32) | (Z & 0xffffffffL);
         if (pair == lastPair) {
             return lastChunk;
         }
@@ -195,7 +184,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                 submissions.add(future);
             }
         }
-        chunk = poolOrCreate(x, z);
+        chunk = poolOrCreate(X, Z);
         chunk = wrap(chunk);
 
         chunks.put(pair, chunk);

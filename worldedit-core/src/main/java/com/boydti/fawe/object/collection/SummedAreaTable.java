@@ -3,7 +3,6 @@ package com.boydti.fawe.object.collection;
 import com.boydti.fawe.util.MathMan;
 
 public class SummedAreaTable {
-
     private final char[] source;
     private final long[] summed;
     private final int length;
@@ -29,9 +28,10 @@ public class SummedAreaTable {
 
     public void processSummedAreaTable() {
         int rowSize = source.length / width;
+        int colSize = width;
         int index = 0;
         for (int i = 0; i < rowSize; i++) {
-            for (int j = 0; j < width; j++, index++) {
+            for (int j = 0; j < colSize; j++, index++) {
                 long val = getVal(i, j, index, source[index]);
                 summed[index] = val;
             }
@@ -39,9 +39,7 @@ public class SummedAreaTable {
     }
 
     private long getSum(int index) {
-        if (index < 0) {
-            return 0;
-        }
+        if (index < 0) return 0;
         return summed[index];
     }
 
@@ -80,12 +78,12 @@ public class SummedAreaTable {
         if (index == 0) {
             return curr;
         }
-        /* top row */
+		/* top row */
         else if (row == 0 && col != 0) {
             leftSum = summed[index - 1];
             return curr + leftSum;
         }
-        /* left-most column */
+		/* left-most column */
         else if (row != 0 && col == 0) {
             topSum = summed[index - width];
             return curr + topSum;

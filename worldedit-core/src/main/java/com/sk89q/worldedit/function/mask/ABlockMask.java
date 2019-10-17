@@ -21,16 +21,12 @@ public abstract class ABlockMask extends AbstractExtentMask {
         List<String> strings = new ArrayList<>();
         for (BlockType type : BlockTypes.values) {
             if (type != null) {
-                boolean hasAll = true;
-                boolean hasAny = false;
+                boolean hasAll;
                 List<BlockState> all = type.getAllStates();
-                for (BlockState state : all) {
-                    hasAll &= test(state);
-                    hasAny = true;
-                }
+                hasAll = all.stream().map(this::test).reduce(true, (a, b) -> a && b);
                 if (hasAll) {
                     strings.add(type.getId());
-                } else if (hasAny) {
+                } else {
                     for (BlockState state : all) {
                         if (test(state)) {
                             strings.add(state.getAsString());

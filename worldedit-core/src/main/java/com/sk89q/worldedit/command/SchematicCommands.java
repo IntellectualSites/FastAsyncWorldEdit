@@ -19,16 +19,17 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
+import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -38,7 +39,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.extent.PlayerSaveClipboardEvent;
+import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -51,9 +52,11 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
-import com.sk89q.worldedit.util.formatting.component.SchematicPaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import java.io.BufferedInputStream;
@@ -83,7 +86,6 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -338,7 +340,7 @@ public class SchematicCommands {
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
-                    BBC.NO_PERM.send(player, "worldedit.schematic.delete.other");
+                    BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
                     return;
                 }
             }
@@ -570,7 +572,7 @@ public class SchematicCommands {
         descFooter = "Note: Format is not fully verified until loading."
     )
     @CommandPermissions("worldedit.schematic.list")
-    public void list(FawePlayer fp, Actor actor, InjectedValueAccess args,
+    public void list(Actor actor,
                      @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
                          int page,
                      @Switch(name = 'd', desc = "Sort by date, oldest first")
@@ -698,7 +700,7 @@ public class SchematicCommands {
                 if (holder instanceof URIClipboardHolder) {
                     uri = ((URIClipboardHolder) holder).getURI(clipboard);
                 }
-                if (new PlayerSaveClipboardEvent(player, clipboard, uri, file.toURI()).call()) {
+                if (new ActorSaveClipboardEvent(actor, clipboard, uri, file.toURI()).call()) {
                     if (writer instanceof MinecraftStructure) {
                         ((MinecraftStructure) writer).write(target, actor.getName());
                     } else {
@@ -796,4 +798,46 @@ public class SchematicCommands {
         }
         return false;
     }
+
+    private static class SchematicPaginationBox extends PaginationBox {
+        private final String prefix;
+        private final File[] files;
+
+        SchematicPaginationBox(String rootDir, File[] files, String pageCommand) {
+            super("Available schematics", pageCommand);
+            this.prefix = rootDir == null ? "" : rootDir;
+            this.files = files;
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            checkArgument(number < files.length && number >= 0);
+            File file = files[number];
+            Multimap<String, ClipboardFormat> exts = ClipboardFormats.getFileExtensionMap();
+            String format = exts.get(com.google.common.io.Files.getFileExtension(file.getName()))
+                .stream().findFirst().map(ClipboardFormat::getName).orElse("Unknown");
+            boolean inRoot = file.getParentFile().getName().equals(prefix);
+
+            String path = inRoot ? file.getName() : file.getPath().split(Pattern.quote(prefix + File.separator))[1];
+
+            return TextComponent.builder()
+                .content("")
+                .append(TextComponent.of("[L]")
+                    .color(TextColor.GOLD)
+                    .clickEvent(ClickEvent
+                        .of(ClickEvent.Action.RUN_COMMAND, "/schem load \"" + path + "\""))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to load"))))
+                .append(TextComponent.space())
+                .append(TextComponent.of(path)
+                    .color(TextColor.DARK_GREEN)
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(format))))
+                .build();
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return files.length;
+        }
+    }
+
 }

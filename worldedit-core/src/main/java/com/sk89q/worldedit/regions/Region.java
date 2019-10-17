@@ -141,9 +141,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      * @param position the position
      * @return true if contained
      */
-    default boolean contains(BlockVector3 position) {
-        return contains(position.getX(), position.getY(), position.getZ());
-    }
+    boolean contains(BlockVector3 position);
 
     /**
      * Get a list of chunks.

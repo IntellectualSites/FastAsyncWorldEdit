@@ -2,17 +2,14 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
 
     @Override
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visual = (editSession.getExtent() instanceof VisualExtent);
+        boolean visual = editSession.getExtent() instanceof VisualExtent;
         if (pos1 == null || pos2.equals(pos1)) {
             if (!visual) {
                 pos1 = pos2;
@@ -49,7 +46,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
                 return;
             }
         } else if (this.direction) {
-            Location loc = editSession.getPlayer().getPlayer().getLocation();
+            Location loc = editSession.getPlayer().getLocation();
             Vector3 facing = loc.getDirection().normalize();
             BlockVector3 midpoint = pos1.add(pos2).divide(2);
             BlockVector3 offset = midpoint.subtract(vertex);
@@ -67,9 +64,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
             if (!select) {
                 pos1 = null;
                 return;
-            } else {
-                pos1 = pos2;
             }
+            pos1 = pos2;
         }
     }
 
@@ -90,7 +86,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double a = 0.00001;
         for (;g < a * Math.sinh(dh/(2 * a)); a *= 1.00001);
         double vertX = (dh-a*Math.log((curveLen + dy)/(curveLen - dy)))/2.0;
-        double z = (dh/2)/a;
+        double z = (dh / 2) / a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;
         double vertY = a * 1 + oY;
         return pos1.add(pos2.subtract(pos1).multiply(vertX / dh).add(0, vertY, 0)).round().toBlockPoint();

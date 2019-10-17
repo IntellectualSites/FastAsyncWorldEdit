@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
@@ -30,13 +31,13 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.world.World;
@@ -51,6 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -71,6 +73,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        Fawe.get().register(this);
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            loadClipboardFromDisk();
+        }
     }
 
     @Override
@@ -165,20 +171,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(player, component);
+        TextAdapter.sendComponent(player, WorldEditText.format(component));
     }
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-        if (pos instanceof com.sk89q.worldedit.util.Location) {
-            com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
-            Extent extent = loc.getExtent();
-            if (extent instanceof World) {
-                org.bukkit.World world = Bukkit.getWorld(((World) extent).getName());
-                player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
-            }
-        }
-        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
+        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(),
+                pos.getZ(), yaw, pitch));
     }
 
     @Override
@@ -257,7 +256,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public boolean isAllowedToFly() {
         return player.getAllowFlight();
-        }
+    }
 
     @Override
     public void setFlying(boolean flying) {
@@ -351,5 +350,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 }
             }
         }
+    }
+
+    @Override
+    public void sendTitle(String title, String sub) {
+        player.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
     }
 }

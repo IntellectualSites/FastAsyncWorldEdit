@@ -7,6 +7,8 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -55,7 +57,7 @@ public abstract class DFSVisitor implements Operation {
     private IntegerTrio[] getIntDirections() {
         IntegerTrio[] array = new IntegerTrio[directions.size()];
         for (int i = 0; i < array.length; i++) {
-            BlockVector3 dir = directions.get(i);
+        	BlockVector3 dir = directions.get(i);
             array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
         }
         return array;
@@ -98,7 +100,7 @@ public abstract class DFSVisitor implements Operation {
 //                mutable2.mutX(from.getX() + direction.x);
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
-                BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
+            	BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
                 if (isVisitable(bv, bv2)) {
                     adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if ((!adjacent.equals(current.from))) {

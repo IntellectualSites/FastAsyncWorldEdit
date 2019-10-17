@@ -1,12 +1,12 @@
 package com.boydti.fawe.object.visitor;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.object.HasFaweQueue;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Visits adjacent points on the same X-Z plane as long as the points
@@ -27,10 +27,10 @@ public class AboveVisitor extends RecursiveVisitor {
      * @param baseY    the base Y
      */
     public AboveVisitor(Mask mask, RegionFunction function, int baseY) {
-        this(mask, function, baseY, Integer.MAX_VALUE);
+        this(mask, function, baseY, Integer.MAX_VALUE, null);
     }
 
-    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
+    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasFaweQueue hasFaweQueue) {
         super(mask, function, depth);
         checkNotNull(mask);
 

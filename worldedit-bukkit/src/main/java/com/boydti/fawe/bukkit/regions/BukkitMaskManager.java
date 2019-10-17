@@ -3,7 +3,7 @@ package com.boydti.fawe.bukkit.regions;
 import com.boydti.fawe.regions.FaweMaskManager;
 import org.bukkit.entity.Player;
 
-public abstract class BukkitMaskManager extends FaweMaskManager<Player> {
+public abstract class BukkitMaskManager extends FaweMaskManager {
 
     public BukkitMaskManager(final String plugin) {
         super(plugin);

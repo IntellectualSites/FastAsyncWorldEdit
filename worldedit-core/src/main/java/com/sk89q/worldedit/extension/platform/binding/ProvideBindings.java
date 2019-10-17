@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
@@ -29,19 +28,16 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import java.awt.image.BufferedImage;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Optional;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.util.ValueProvider;
-
-import java.awt.image.BufferedImage;
-import java.lang.annotation.Annotation;
-import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
 
 public class ProvideBindings extends Bindings {
     private final WorldEdit worldEdit;
@@ -112,17 +108,6 @@ public class ProvideBindings extends Bindings {
         return editSession;
     }
 
-    /**
-     * Gets an {@link com.boydti.fawe.object.FawePlayer} from a {@link ArgumentStack}.
-     *
-     * @param context the context
-     * @return a FawePlayer
-     * @throws ParameterException on other error
-     */
-    public FawePlayer getFawePlayer(Actor actor) throws InputParseException {
-        return FawePlayer.wrap(actor);
-    }
-
     /*
     Parsed
      */
@@ -132,10 +117,6 @@ public class ProvideBindings extends Bindings {
 
     public BlockType blockType(Actor actor, String argument) {
         return blockState(actor, argument).getBlockType();
-    }
-
-    public BlockStateHolder blockStateHolder(Actor actor, String argument) {
-        return blockState(actor, argument);
     }
 
     public BlockState blockState(Actor actor, String argument) {
@@ -164,7 +145,7 @@ public class ProvideBindings extends Bindings {
      *
      * @param context the context
      * @param direction the direction annotation
-     * @return a pattern
+     * @return a BlockVector3
      * @throws ParameterException on error
      * @throws UnknownDirectionException on an unknown direction
      */
@@ -181,7 +162,7 @@ public class ProvideBindings extends Bindings {
      * Gets an {@link TreeType} from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @return a pattern
+     * @return a TreeType
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */
@@ -204,7 +185,7 @@ public class ProvideBindings extends Bindings {
      * Gets an {@link BiomeType} from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @return a pattern
+     * @return a BiomeType
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */

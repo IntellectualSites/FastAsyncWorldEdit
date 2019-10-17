@@ -1,6 +1,6 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.command.CFICommands.CFISettings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-
+import com.sk89q.worldedit.entity.Player;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Function;
@@ -36,15 +36,15 @@ public class PlotLoader {
             () -> autoClaimFromDatabase(player, area, plot.getId(), whenDone));
     }
 
-    public void load(FawePlayer fp, CFICommands.CFISettings  settings,
+    public void load(Player fp, CFISettings  settings,
         Function<File, Boolean> createTask) throws IOException {
         PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
             SinglePlotArea area = sManager.getArea();
-            PlotPlayer player = PlotPlayer.wrap(fp.parent);
+            PlotPlayer player = PlotPlayer.get(fp.getName());
 
-            fp.sendMessage("Claiming world");
+            fp.print("Claiming world");
             Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
                 @Override
                 public void run(Plot o) {

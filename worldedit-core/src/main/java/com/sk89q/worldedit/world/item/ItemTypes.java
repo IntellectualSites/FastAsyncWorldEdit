@@ -934,7 +934,7 @@ public final class ItemTypes {
     }
 
     @Deprecated
-    public static ItemType get(final int ordinal) {
+    public static ItemType get(int ordinal) {
         return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 

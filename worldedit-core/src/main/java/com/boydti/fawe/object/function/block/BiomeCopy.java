@@ -26,7 +26,7 @@ public class BiomeCopy implements RegionFunction {
         if (x != mPos2d.getBlockX() || z != mPos2d.getBlockZ()) {
             mPos2d.setComponents(x, z);
             BlockVector2 bv = mPos2d;
-            return destination.setBiome( bv, source.getBiome(bv));
+            return destination.setBiome(bv, source.getBiome(bv));
         }
         return false;
     }

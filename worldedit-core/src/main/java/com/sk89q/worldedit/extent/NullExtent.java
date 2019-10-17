@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -92,7 +93,22 @@ public class NullExtent implements Extent {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
 

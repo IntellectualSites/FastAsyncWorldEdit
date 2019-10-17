@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
@@ -30,7 +29,6 @@ public class PopulateSchem implements Brush {
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         new MaskTraverser(mask).reset(editSession);
-        SchemGen gen = new SchemGen(mask, editSession, clipboards, randomRotate);
         int size1 = MathMan.roundInt(size);
         CuboidRegion cuboid = new CuboidRegion(editSession.getWorld(), position.subtract(size1, size1, size1), position.add(size1, size1, size1));
         try {

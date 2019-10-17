@@ -2,11 +2,11 @@ package com.boydti.fawe.beta.filters;
 
 import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.beta.FilterBlockMask;
-
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ArrayImageMask implements FilterBlockMask {
+
     private final ThreadLocalRandom random;
     private final boolean white;
     private final BufferedImage image;
@@ -16,9 +16,10 @@ public class ArrayImageMask implements FilterBlockMask {
         this.white = white;
         this.random = ThreadLocalRandom.current();
     }
+
     @Override
     public boolean applyBlock(FilterBlock block) {
         int height = image.getRGB(block.getX(), block.getZ()) & 0xFF;
-        return ((height == 255 || height > 0 && !white && random.nextInt(256) <= height));
+        return height == 255 || height > 0 && !white && random.nextInt(256) <= height;
     }
 }

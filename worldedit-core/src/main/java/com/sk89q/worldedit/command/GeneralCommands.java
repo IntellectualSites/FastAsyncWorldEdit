@@ -85,23 +85,23 @@ public class GeneralCommands {
         desc = "Modify block change limit"
     )
     @CommandPermissions("worldedit.limit")
-    public void limit(Player player, LocalSession session,
+    public void limit(Actor actor, LocalSession session,
                       @Arg(desc = "The limit to set", def = "")
                           Integer limit) {
 
         LocalConfiguration config = worldEdit.getConfiguration();
-        boolean mayDisable = player.hasPermission("worldedit.limit.unrestricted");
+        boolean mayDisable = actor.hasPermission("worldedit.limit.unrestricted");
 
         limit = limit == null ? config.defaultChangeLimit : Math.max(-1, limit);
         if (!mayDisable && config.maxChangeLimit > -1) {
             if (limit > config.maxChangeLimit) {
-                player.printError("Your maximum allowable limit is " + config.maxChangeLimit + ".");
+                actor.printError("Your maximum allowable limit is " + config.maxChangeLimit + ".");
                 return;
             }
         }
 
         session.setBlockChangeLimit(limit);
-        player.print("Block change limit set to " + limit + "."
+        actor.print("Block change limit set to " + limit + "."
                 + (limit == config.defaultChangeLimit ? "" : " (Use //limit to go back to the default.)"));
     }
 
@@ -110,22 +110,22 @@ public class GeneralCommands {
         desc = "Modify evaluation timeout time."
     )
     @CommandPermissions("worldedit.timeout")
-    public void timeout(Player player, LocalSession session,
+    public void timeout(Actor actor, LocalSession session,
                         @Arg(desc = "The timeout time to set", def = "")
                             Integer limit) {
         LocalConfiguration config = worldEdit.getConfiguration();
-        boolean mayDisable = player.hasPermission("worldedit.timeout.unrestricted");
+        boolean mayDisable = actor.hasPermission("worldedit.timeout.unrestricted");
 
         limit = limit == null ? config.calculationTimeout : Math.max(-1, limit);
         if (!mayDisable && config.maxCalculationTimeout > -1) {
             if (limit > config.maxCalculationTimeout) {
-                player.printError("Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
+                actor.printError("Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
                 return;
             }
         }
 
         session.setTimeout(limit);
-        player.print("Timeout time set to " + limit + " ms."
+        actor.print("Timeout time set to " + limit + " ms."
                 + (limit == config.calculationTimeout ? "" : " (Use //timeout to go back to the default.)"));
     }
 
@@ -134,18 +134,20 @@ public class GeneralCommands {
             desc = "Toggle fast mode"
     )
     @CommandPermissions("worldedit.fast")
-    public void fast(Player player, LocalSession session, @Arg(desc = "The new fast mode state", def = "") Boolean fastMode) {
+    public void fast(Actor actor, LocalSession session,
+                     @Arg(desc = "The new fast mode state", def = "")
+                        Boolean fastMode) {
         boolean hasFastMode = session.hasFastMode();
         if (fastMode != null && fastMode == hasFastMode) {
-            player.printError("Fast mode already " + (fastMode ? "enabled" : "disabled") + ".");
+            actor.printError("Fast mode already " + (fastMode ? "enabled" : "disabled") + ".");
             return;
         }
         if (hasFastMode) {
             session.setFastMode(false);
-            BBC.FAST_DISABLED.send(player);
+            actor.print(BBC.FAST_DISABLED.s());
         } else {
             session.setFastMode(true);
-            BBC.FAST_ENABLED.send(player);
+            actor.print(BBC.FAST_ENABLED.s());
         }
     }
 
@@ -154,14 +156,14 @@ public class GeneralCommands {
         desc = "Sets the reorder mode of WorldEdit"
     )
     @CommandPermissions("worldedit.reorder")
-    public void reorderMode(Player player, LocalSession session,
+    public void reorderMode(Actor actor, LocalSession session,
                             @Arg(desc = "The reorder mode", def = "")
                                 EditSession.ReorderMode reorderMode) {
         if (reorderMode == null) {
-            player.print("The reorder mode is " + session.getReorderMode().getDisplayName());
+            actor.print("The reorder mode is " + session.getReorderMode().getDisplayName());
         } else {
             session.setReorderMode(reorderMode);
-            player.print("The reorder mode is now " + session.getReorderMode().getDisplayName());
+            actor.print("The reorder mode is now " + session.getReorderMode().getDisplayName());
         }
     }
 
@@ -192,20 +194,35 @@ public class GeneralCommands {
         }
     }
 
+//    @Command(
+//        name = "/world",
+//        desc = "Sets the world override"
+//    )
+//    @CommandPermissions("worldedit.world")
+//    public void worldOverride(Actor actor, LocalSession session,
+//        @Arg(desc = "The world override", def = "") World world) {
+//        session.setWorldOverride(world);
+//        if (world == null) {
+//            actor.print("Removed world override.");
+//        } else {
+//            actor.print("Set the world override to " + world.getId() + ". (Use //world to go back to default)");
+//        }
+//    }
+
     @Command(
-            name = "/gmask",
-            aliases = {"gmask", "globalmask", "/globalmask"},
+            name = "gmask",
+            aliases = {"/gmask"},
             descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
             desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gmask(Player player, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
+    public void gmask(Actor actor, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
         if (mask == null) {
             session.setMask(null);
-            BBC.MASK_DISABLED.send(player);
+            actor.print(BBC.MASK_DISABLED.s());
         } else {
             session.setMask(mask);
-            BBC.MASK.send(player);
+            actor.print(BBC.MASK.s());
         }
     }
 
@@ -216,9 +233,9 @@ public class GeneralCommands {
     )
     public void togglePlace(Player player, LocalSession session) {
         if (session.togglePlacementPosition()) {
-            BBC.PLACE_ENABLED.send(player);
+            player.print(BBC.PLACE_ENABLED.s());
         } else {
-            BBC.PLACE_DISABLED.send(player);
+            player.print(BBC.PLACE_DISABLED.s());
         }
     }
 
@@ -357,12 +374,11 @@ public class GeneralCommands {
             descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask mask) throws WorldEditException {
-        if (mask == null) {
-            session.setSourceMask((Mask) null);
+    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
+        session.setSourceMask(maskOpt);
+        if (maskOpt == null) {
             BBC.SOURCE_MASK_DISABLED.send(player);
         } else {
-            session.setSourceMask(mask);
             BBC.SOURCE_MASK.send(player);
         }
     }

@@ -27,7 +27,9 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.CommandParameters;
+import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.gen.CommandCallListener;
 import org.enginehub.piston.inject.Key;
 
@@ -71,18 +73,26 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
             logMode = loggingAnnotation.value();
         }
 
-        Optional<Player> playerOpt = parameters.injectedValue(Key.of(Actor.class))
-            .filter(Player.class::isInstance)
-            .map(Player.class::cast);
+        Optional<Actor> actorOpt = parameters.injectedValue(Key.of(Actor.class));
 
-        if (!playerOpt.isPresent()) {
+        if (!actorOpt.isPresent()) {
+            return;
+        }
+        Actor actor = actorOpt.get();
+
+        World world;
+        try {
+            Optional<World> worldOpt = parameters.injectedValue(Key.of(World.class));
+            if (!worldOpt.isPresent()) {
+                return;
+            }
+            world = worldOpt.get();
+        } catch (CommandException ex) {
             return;
         }
 
-        Player player = playerOpt.get();
-
-        builder.append("WorldEdit: ").append(player.getName());
-        builder.append(" (in \"").append(player.getWorld().getName()).append("\")");
+        builder.append("WorldEdit: ").append(actor.getName());
+        builder.append(" (in \"").append(world.getName()).append("\")");
 
         builder.append(": ").append(parameters.getMetadata().getCalledName());
 
@@ -92,14 +102,15 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                 parameters.getMetadata().getArguments().stream()
             ).collect(Collectors.joining(" ")));
 
-        if (logMode != null) {
+        if (logMode != null && actor instanceof Player) {
+            Player player = (Player) actor;
             Vector3 position = player.getLocation().toVector();
-            LocalSession session = worldEdit.getSessionManager().get(player);
+            LocalSession session = worldEdit.getSessionManager().get(actor);
 
             switch (logMode) {
                 case PLACEMENT:
                     try {
-                        position = session.getPlacementPosition(player).toVector3();
+                        position = session.getPlacementPosition(actor).toVector3();
                     } catch (IncompleteRegionException e) {
                         break;
                     }
@@ -120,7 +131,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                 case REGION:
                     try {
                         builder.append(" - Region: ")
-                            .append(session.getSelection(player.getWorld()));
+                            .append(session.getSelection(world));
                     } catch (IncompleteRegionException e) {
                         break;
                     }

@@ -73,7 +73,7 @@ public class WorldEditCommands {
         aliases = { "ver" },
         desc = "Get WorldEdit/FAWE version"
     )
-    @CommandQueued(false)
+    @CommandQueued
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
@@ -108,7 +108,7 @@ public class WorldEditCommands {
             }
         }
         actor.printDebug("");
-        actor.printDebug("Wiki: " + "https://github.com/boy0001/FastAsyncWorldedit/wiki");
+        actor.printDebug("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki");
     }
 
     @Command(
@@ -128,7 +128,7 @@ public class WorldEditCommands {
         aliases = { "debugpaste" },
         desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
-    @CommandQueued(false)
+    @CommandQueued
     @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
     public void report(Actor actor) throws WorldEditException, IOException {
         BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
@@ -138,7 +138,7 @@ public class WorldEditCommands {
         name = "threads",
         desc = "Print all thread stacks"
     )
-    @CommandQueued(false)
+    @CommandQueued
     @CommandPermissions("worldedit.threads")
     public void threads(Actor actor) throws WorldEditException {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
@@ -188,7 +188,7 @@ public class WorldEditCommands {
         name = "help",
         desc = "Displays help for FAWE commands"
     )
-    @CommandQueued(false)
+    @CommandQueued
     @CommandPermissions("worldedit.help")
     public void help(Actor actor,
                      @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
@@ -196,7 +196,8 @@ public class WorldEditCommands {
                      @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
-        PrintCommandHelp.help(command, page, listSubCommands, we, actor);
+                         List<String> commandStr) throws WorldEditException {
+        PrintCommandHelp.help(commandStr, page, listSubCommands,
+            we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help");
     }
 }

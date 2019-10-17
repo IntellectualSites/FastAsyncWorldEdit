@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 /**
@@ -40,7 +41,7 @@ public class ExistingBlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return !vector.getBlock(getExtent()).getMaterial().isAir();
+        return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
     }
 
     @Nullable

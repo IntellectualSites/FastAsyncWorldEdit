@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.InspectBrush;
+import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -31,6 +32,7 @@ import com.sk89q.worldedit.command.tool.BlockReplacer;
 import com.sk89q.worldedit.command.tool.DistanceWand;
 import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
 import com.sk89q.worldedit.command.tool.FloodFillTool;
+import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.LongRangeBuildTool;
 import com.sk89q.worldedit.command.tool.NavigationWand;
 import com.sk89q.worldedit.command.tool.QueryTool;
@@ -40,53 +42,126 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
+import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.item.ItemType;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.CommandManagerService;
+import org.enginehub.piston.CommandMetadata;
+import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.part.SubCommandPart;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ToolCommands {
+
+    public static void register(CommandRegistrationHandler registration,
+                                CommandManager commandManager,
+                                CommandManagerService commandManagerService,
+                                WorldEdit worldEdit) {
+        // Collect the tool commands
+        CommandManager collect = commandManagerService.newCommandManager();
+
+        registration.register(
+            collect,
+            ToolCommandsRegistration.builder(),
+            new ToolCommands(worldEdit)
+        );
+
+        // Register deprecated global commands
+        Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
+            .collect(Collectors.toSet());
+        for (org.enginehub.piston.Command command : commands) {
+            if (command.getAliases().contains("unbind")) {
+                // Don't register new /tool unbind alias
+                command = command.toBuilder().aliases(
+                    Collections2.filter(command.getAliases(), alias -> !"unbind".equals(alias))
+                ).build();
+            }
+            commandManager.register(CommandUtil.deprecate(
+                command, "Global tool names cause conflicts and will be removed in WorldEdit 8", ToolCommands::asNonGlobal
+            ));
+        }
+
+        // Remove aliases with / in them, since it doesn't make sense for sub-commands.
+        Set<org.enginehub.piston.Command> nonGlobalCommands = commands.stream()
+            .map(command ->
+                command.toBuilder().aliases(
+                    Collections2.filter(command.getAliases(), alias -> !alias.startsWith("/"))
+                ).build()
+            )
+            .collect(Collectors.toSet());
+        commandManager.register("tool", command -> {
+            command.addPart(SubCommandPart.builder(
+                TranslatableComponent.of("tool"),
+                TextComponent.of("The tool to bind")
+            )
+                .withCommands(nonGlobalCommands)
+                .required()
+                .build());
+            command.description(TextComponent.of("Binds a tool to the item in your hand"));
+        });
+    }
+
+    private static String asNonGlobal(org.enginehub.piston.Command oldCommand,
+                                      CommandParameters oldParameters) {
+        String name = Optional.ofNullable(oldParameters.getMetadata())
+            .map(CommandMetadata::getCalledName)
+            .filter(n -> !n.startsWith("/"))
+            .orElseGet(oldCommand::getName);
+        return "/tool " + name;
+    }
+
+    static void setToolNone(Player player, LocalSession session) throws InvalidToolBindException {
+        session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
+        player.print("Brush unbound from your current item.");
+    }
+
     private final WorldEdit we;
 
     public ToolCommands(WorldEdit we) {
         this.we = we;
     }
 
-    @Command(
-        name = "none",
-        desc = "Unbind a bound tool from your current item"
-    )
-    public void none(Player player, LocalSession session) throws WorldEditException {
+//    @Command(
+//        name = "none",
+//        aliases = "unbind",
+//        desc = "Unbind a bound tool from your current item"
+//    )
+//    public void none(Player player, LocalSession session) throws WorldEditException {
+//        setToolNone(player, session, "Tool");
+//    }
 
-        session.setTool(player, null);
-        player.print("Tool unbound from your current item.");
-    }
-
     @Command(
-        name = "/selwand",
-        aliases = "selwand",
+        name = "selwand",
+        aliases = "/selwand",
         desc = "Selection wand tool"
     )
     @CommandPermissions("worldedit.setwand")
     public void selwand(Player player, LocalSession session) throws WorldEditException {
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
-        session.setTool(player, new SelectionWand());
+        session.setTool(itemType, new SelectionWand());
         player.print("Selection wand bound to " + itemType.getName() + ".");
     }
 
     @Command(
-        name = "/navwand",
-        aliases = "navwand",
+        name = "navwand",
+        aliases = "/navwand",
         desc = "Navigation wand tool"
     )
     @CommandPermissions("worldedit.setwand")
     public void navwand(Player player, LocalSession session) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new NavigationWand());
+        session.setTool(itemStack.getType(), new NavigationWand());
         player.print("Navigation wand bound to " + itemStack.getType().getName() + ".");
     }
 
@@ -96,9 +171,8 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.info")
     public void info(Player player, LocalSession session) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new QueryTool());
+        session.setTool(itemStack.getType(), new QueryTool());
         BBC.TOOL_INFO.send(player, itemStack.getType().getName());
     }
 
@@ -107,12 +181,9 @@ public class ToolCommands {
             desc = "Inspect edits within a radius"
     )
     @CommandPermissions("worldedit.tool.inspect")
-    public void inspectBrush(Player player, LocalSession session,
-        @Arg(desc = "The radius of the brush", def = "1")
-            double radius) throws WorldEditException {
-        radius = Math.max(1,radius);
+    public void inspectBrush(Player player, LocalSession session) throws WorldEditException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new InspectBrush());
+        session.setTool(itemStack.getType(), new InspectBrush());
         BBC.TOOL_INSPECT.send(player, itemStack.getType().getName());
     }
 
@@ -124,9 +195,8 @@ public class ToolCommands {
     public void tree(Player player, LocalSession session,
                      @Arg(desc = "Type of tree to generate", def = "tree")
                      TreeGenerator.TreeType type) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new TreePlanter(type));
+        session.setTool(itemStack.getType(), new TreePlanter(type));
         BBC.TOOL_TREE.send(player, itemStack.getType().getName());
     }
 
@@ -138,9 +208,8 @@ public class ToolCommands {
     public void repl(Player player, LocalSession session,
                      @Arg(desc = "The pattern of blocks to place")
                          Pattern pattern) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new BlockReplacer(pattern));
+        session.setTool(itemStack.getType(), new BlockReplacer(pattern));
         BBC.TOOL_REPL.send(player, itemStack.getType().getName());
     }
 
@@ -150,9 +219,8 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.data-cycler")
     public void cycler(Player player, LocalSession session) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new BlockDataCyler());
+        session.setTool(itemStack.getType(), new BlockDataCyler());
         BBC.TOOL_CYCLER.send(player, itemStack.getType().getName());
     }
 
@@ -176,7 +244,7 @@ public class ToolCommands {
         }
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new FloodFillTool(range, pattern));
+        session.setTool(itemStack.getType(), new FloodFillTool(range, pattern));
         BBC.TOOL_FLOOD_FILL.send(player, itemStack.getType().getName());
     }
 
@@ -186,9 +254,8 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.deltree")
     public void deltree(Player player, LocalSession session) throws WorldEditException {
-
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new FloatingTreeRemover());
+        session.setTool(itemStack.getType(), new FloatingTreeRemover());
         BBC.TOOL_DELTREE.send(player, itemStack.getType().getName());
     }
 
@@ -200,7 +267,7 @@ public class ToolCommands {
     public void farwand(Player player, LocalSession session) throws WorldEditException {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
-        session.setTool(player, new DistanceWand());
+        session.setTool(itemStack.getType(), new DistanceWand());
         BBC.TOOL_FARWAND.send(player, itemStack.getType().getName());
     }
 
@@ -211,13 +278,13 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.lrbuild")
     public void longrangebuildtool(Player player, LocalSession session,
-        @Arg(desc = "Pattern to set on left-click")
-            Pattern primary,
-        @Arg(desc = "Pattern to set on right-click")
-            Pattern secondary) throws WorldEditException {
+                                   @Arg(desc = "Pattern to set on left-click")
+                                       Pattern primary,
+                                   @Arg(desc = "Pattern to set on right-click")
+                                       Pattern secondary) throws WorldEditException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
 
-        session.setTool(player, new LongRangeBuildTool(primary, secondary));
+        session.setTool(itemStack.getType(), new LongRangeBuildTool(primary, secondary));
         BBC.TOOL_LRBUILD_BOUND.send(player, itemStack.getType().getName());
         BBC.TOOL_LRBUILD_INFO.send(player, secondary, primary);
     }

@@ -81,7 +81,7 @@ public class ImageBrush implements Brush {
 
         double scale = Math.max(width, height) / sizeDouble;
 
-        Location loc = editSession.getPlayer().getPlayer().getLocation();
+        Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();

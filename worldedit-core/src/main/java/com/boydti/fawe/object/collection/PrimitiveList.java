@@ -141,28 +141,31 @@ public class PrimitiveList<T> extends AbstractList<T> {
 
     public void set(int index, char value) {
         switch (type) {
-            case Character:
-                ((char[]) arr)[index] = value;
-                return;
             default:
                 setFast(index, value);
+                return;
+            case Character:
+                ((char[]) arr)[index] = value;
                 return;
         }
     }
 
     public void set(int index, byte value) {
         switch (type) {
-            case Byte:
-                ((byte[]) arr)[index] = value;
-                return;
             default:
                 setFast(index, value);
+                return;
+            case Byte:
+                ((byte[]) arr)[index] = value;
                 return;
         }
     }
 
     public void set(int index, int value) {
         switch (type) {
+            default:
+                setFast(index, value);
+                return;
             case Integer:
                 ((int[]) arr)[index] = value;
                 return;
@@ -172,14 +175,14 @@ public class PrimitiveList<T> extends AbstractList<T> {
             case Double:
                 ((double[]) arr)[index] = (double) value;
                 return;
-            default:
-                setFast(index, value);
-                return;
         }
     }
 
     public void set(int index, long value) {
         switch (type) {
+            default:
+                setFast(index, value);
+                return;
             case Integer:
                 ((int[]) arr)[index] = (int) value;
                 return;
@@ -189,14 +192,14 @@ public class PrimitiveList<T> extends AbstractList<T> {
             case Double:
                 ((double[]) arr)[index] = (double) value;
                 return;
-            default:
-                setFast(index, value);
-                return;
         }
     }
 
     public void set(int index, double value) {
         switch (type) {
+            default:
+                setFast(index, value);
+                return;
             case Float:
                 ((float[]) arr)[index] = (float) value;
                 return;
@@ -205,9 +208,6 @@ public class PrimitiveList<T> extends AbstractList<T> {
                 return;
             case Double:
                 ((double[]) arr)[index] = value;
-                return;
-            default:
-                setFast(index, value);
                 return;
         }
     }

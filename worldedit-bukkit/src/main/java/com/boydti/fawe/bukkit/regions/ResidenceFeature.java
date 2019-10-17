@@ -4,7 +4,6 @@ import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import org.bukkit.Location;
@@ -28,8 +27,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, final MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player fp, final MaskType type) {
+        final Player player = BukkitAdapter.adapt(fp);
         final Location location = player.getLocation();
         ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
         if (residence != null) {
@@ -44,8 +43,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
                 final ClaimedResidence finalResidence = residence;
                 return new FaweMask(BukkitAdapter.asBlockVector(pos1), BukkitAdapter.asBlockVector(pos2)) {
                 @Override
-                    public boolean isValid(FawePlayer player, MaskType type) {
-                        return isAllowed((Player) BukkitAdapter.adapt(player.toWorldEditPlayer()), finalResidence, type);
+                    public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+                        return isAllowed(BukkitAdapter.adapt(player), finalResidence, type);
                     }
                 };
             }

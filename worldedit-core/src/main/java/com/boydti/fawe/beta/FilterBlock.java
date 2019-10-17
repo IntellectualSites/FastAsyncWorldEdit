@@ -10,8 +10,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
 
-import static com.sk89q.worldedit.world.block.BlockTypes.states;
-
 public abstract class FilterBlock extends BlockVector3 implements Extent, TileEntityBlock {
     public abstract Extent getExtent();
 

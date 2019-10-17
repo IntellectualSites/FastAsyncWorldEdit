@@ -1,7 +1,7 @@
 package com.boydti.fawe.beta.implementation.holder;
 
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IQueueExtent;
 
 /**
  * Used by {@link ReferenceChunk} to allow the chunk to be garbage collected

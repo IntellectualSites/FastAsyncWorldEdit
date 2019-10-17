@@ -50,7 +50,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     @Override
     public boolean contains(Object o) {
         if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        	BlockVector3 v = (BlockVector3) o;
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -249,7 +249,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     @Override
     public boolean remove(Object o) {
         if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        	BlockVector3 v = (BlockVector3) o;
             return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;

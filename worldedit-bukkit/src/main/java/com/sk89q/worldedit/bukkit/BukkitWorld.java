@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -161,6 +162,7 @@ public class BukkitWorld extends AbstractWorld {
     public String getId() {
         return getWorld().getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
+
     @Override
     public Path getStoragePath() {
         return getWorld().getWorldFolder().toPath();
@@ -247,9 +249,6 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
-        if (block == null) {
-            return false;
-        }
         BlockState state = block.getState();
         if (!(state instanceof InventoryHolder)) {
             return false;
@@ -316,14 +315,12 @@ public class BukkitWorld extends AbstractWorld {
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
 
-        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
-            world.loadChunk(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
-        }
+        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
     }
 
     @Override
     public boolean equals(Object other) {
-        World ref = worldRef.get();
+        final World ref = worldRef.get();
         if (ref == null) {
             return false;
         } else if (other == null) {
@@ -332,7 +329,7 @@ public class BukkitWorld extends AbstractWorld {
             World otherWorld = ((BukkitWorld) other).worldRef.get();
             return ref.equals(otherWorld);
         } else if (other instanceof com.sk89q.worldedit.world.World) {
-            return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
+            return ((com.sk89q.worldedit.world.World) other).getName().equals(ref.getName());
         } else {
             return false;
         }
@@ -494,8 +491,24 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return setBlock(BlockVector3.at(x,y,z), block);
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         getWorld().setBiome(position.getBlockX(), position.getBlockZ(), BukkitAdapter.adapt(biome));
         return true;
     }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return setBiome(BlockVector2.at(x,z), biome);
+    }
+
 }

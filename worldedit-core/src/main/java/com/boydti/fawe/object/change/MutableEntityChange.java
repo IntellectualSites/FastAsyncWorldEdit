@@ -2,18 +2,20 @@ package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.HasIQueueExtent;
-import com.boydti.fawe.object.extent.FastWorldEditExtent;
-import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,54 +49,28 @@ public class MutableEntityChange implements Change {
     }
 
     public void delete(UndoContext context) {
-        Extent extent = context.getExtent();
-        ExtentTraverser<FastWorldEditExtent> find = new ExtentTraverser(extent).find(FastWorldEditExtent.class);
-        if (find != null) {
-            FastWorldEditExtent fwee = find.get();
-            Map<String, Tag> map = tag.getValue();
-            long most;
-            long least;
-            if (map.containsKey("UUIDMost")) {
-                most = ((LongTag) map.get("UUIDMost")).getValue();
-                least = ((LongTag) map.get("UUIDLeast")).getValue();
-            } else if (map.containsKey("PersistentIDMSB")) {
-                most = ((LongTag) map.get("PersistentIDMSB")).getValue();
-                least = ((LongTag) map.get("PersistentIDLSB")).getValue();
-            } else {
-                Fawe.debug("Skipping entity without uuid.");
-                return;
-            }
-            List<DoubleTag> pos = (List<DoubleTag>) map.get("Pos").getValue();
-            int x = MathMan.roundInt(pos.get(0).getValue());
-            int y = MathMan.roundInt(pos.get(1).getValue());
-            int z = MathMan.roundInt(pos.get(2).getValue());
-            UUID uuid = new UUID(most, least);
-            fwee.getQueue().removeEntity(x, y, z, uuid);
+        Map<String, Tag> map = tag.getValue();
+        long most;
+        long least;
+        if (map.containsKey("UUIDMost")) {
+            most = ((LongTag) map.get("UUIDMost")).getValue();
+            least = ((LongTag) map.get("UUIDLeast")).getValue();
+        } else if (map.containsKey("PersistentIDMSB")) {
+            most = ((LongTag) map.get("PersistentIDMSB")).getValue();
+            least = ((LongTag) map.get("PersistentIDLSB")).getValue();
         } else {
-            Fawe.debug("FAWE doesn't support: " + context + " for " + getClass() + " (bug Empire92)");
+            Fawe.debug("Skipping entity without uuid.");
+            return;
         }
+        List<DoubleTag> pos = (List<DoubleTag>) map.get("Pos").getValue();
+        int x = MathMan.roundInt(pos.get(0).getValue());
+        int y = MathMan.roundInt(pos.get(1).getValue());
+        int z = MathMan.roundInt(pos.get(2).getValue());
+        UUID uuid = new UUID(most, least);
+        context.getExtent().removeEntity(x, y, z, uuid);
     }
-
-    private IQueueExtent queue;
-    private boolean checkedQueue;
 
     public void create(UndoContext context) {
-        if (queue != null) {
-            perform(queue);
-        }
-        if (!checkedQueue) {
-            checkedQueue = true;
-            Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser(extent).find(HasIQueueExtent.class);
-            if (found != null) {
-                perform(queue = ((HasIQueueExtent) found.get()).getQueue());
-            } else {
-                Fawe.debug("FAWE does not support: " + extent + " for " + getClass() + " (bug Empire92)");
-            }
-        }
-    }
-
-    public void perform(IQueueExtent queue) {
         Map<String, Tag> map = tag.getValue();
         Tag posTag = map.get("Pos");
         if (posTag == null) {
@@ -105,6 +81,15 @@ public class MutableEntityChange implements Change {
         int x = MathMan.roundInt(pos.get(0).getValue());
         int y = MathMan.roundInt(pos.get(1).getValue());
         int z = MathMan.roundInt(pos.get(2).getValue());
-        queue.setEntity(x, y, z, tag);
+        Extent extent = context.getExtent();
+        Location location = new Location(extent, x, y, z, 0, 0);
+        String id = tag.getString("id");
+        EntityType type = EntityTypes.parse(id);
+        BaseEntity entity = new BaseEntity(type, tag);
+        context.getExtent().createEntity(location, entity);
+    }
+
+    public void perform(IQueueExtent queue) {
+
     }
 }

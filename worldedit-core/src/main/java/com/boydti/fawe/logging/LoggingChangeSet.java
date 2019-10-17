@@ -1,11 +1,8 @@
 package com.boydti.fawe.logging;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.changeset.AbstractDelegateChangeSet;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
-import java.lang.reflect.Constructor;
+import com.sk89q.worldedit.entity.Player;
 //import org.primesoft.blockshub.IBlocksHubApi;
 //import org.primesoft.blockshub.api.IPlayer;
 //import org.primesoft.blockshub.api.IWorld;
@@ -14,7 +11,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 
     private static boolean initialized = false;
 
-    public static FaweChangeSet wrap(FawePlayer player, FaweChangeSet parent) {
+    public static FaweChangeSet wrap(Player player, FaweChangeSet parent) {
         if (!initialized) {
             initialized = true;
 //            api = (IBlocksHubApi) Fawe.imp().getBlocksHubApi();
@@ -33,7 +30,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 //    private final MutableBlockData oldBlock;
 //    private final MutableBlockData newBlock;
 
-    private LoggingChangeSet(FawePlayer player, FaweChangeSet parent) {
+    private LoggingChangeSet(Player player, FaweChangeSet parent) {
         super(parent);
 //        String world = player.getLocation().world;
 //        try {
@@ -58,10 +55,10 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 //        loc.x = x;
 //        loc.y = y;
 //        loc.z = z;
-//        oldBlock.id = FaweCache.getId(combinedId4DataFrom);
-//        oldBlock.data = FaweCache.getData(combinedId4DataFrom);
-//        newBlock.id = FaweCache.getId(combinedId4DataTo);
-//        newBlock.data = FaweCache.getData(combinedId4DataTo);
+//        oldBlock.id = FaweCache.IMP.getId(combinedId4DataFrom);
+//        oldBlock.data = FaweCache.IMP.getData(combinedId4DataFrom);
+//        newBlock.id = FaweCache.IMP.getId(combinedId4DataTo);
+//        newBlock.data = FaweCache.IMP.getData(combinedId4DataTo);
 //        // Log to BlocksHub and parent
 //        api.logBlock(loc, player, world, oldBlock, newBlock);
         parent.add(x, y, z, combinedId4DataFrom, combinedId4DataTo);

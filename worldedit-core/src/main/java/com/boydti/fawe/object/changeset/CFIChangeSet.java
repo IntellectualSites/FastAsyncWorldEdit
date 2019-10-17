@@ -2,7 +2,7 @@ package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.change.CFIChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,7 +20,7 @@ public class CFIChangeSet extends FaweChangeSet {
 
     public CFIChangeSet(HeightMapMCAGenerator hmmg, UUID uuid) throws IOException {
         super(hmmg);
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getWorldName());
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getId());
         int max = MainUtil.getMaxFileId(folder);
         this.file = new File(folder, max + ".cfi");
         File parent = this.file.getParentFile();

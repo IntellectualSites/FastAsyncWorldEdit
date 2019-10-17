@@ -1,21 +1,19 @@
 package com.boydti.fawe.object.changeset;
 
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.FaweQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.Iterator;
 
 public class AbstractDelegateChangeSet extends FaweChangeSet {
@@ -29,8 +27,13 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addChangeTask(IQueueExtent queue) {
+    public void addChangeTask(FaweQueue queue) {
         super.addChangeTask(queue);
+    }
+
+    @Override
+    public boolean closeAsync() {
+        return super.closeAsync();
     }
 
     @Override
@@ -124,8 +127,13 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public EditSession toEditSession(FawePlayer player) {
+    public EditSession toEditSession(Player player) {
         return parent.toEditSession(player);
+    }
+
+    @Override
+    public EditSession toEditSession(Player player, Region[] regions) {
+        return parent.toEditSession(player, regions);
     }
 
     @Override
@@ -168,15 +176,15 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
         parent.add(x, y, z, combinedFrom, to);
     }
 
-    @Override
-    public boolean isRecordingChanges() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
-    @Override
-    public void setRecordChanges(boolean recordChanges) {
-        // TODO Auto-generated method stub
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
 
-    }
+	}
 }

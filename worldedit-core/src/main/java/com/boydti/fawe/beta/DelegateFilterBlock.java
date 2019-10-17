@@ -1,13 +1,13 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -650,9 +650,8 @@ public class DelegateFilterBlock extends FilterBlock {
         return parent.getBlock(position);
     }
 
-    @Override
     public BlockType getBlockType(BlockVector3 position) {
-        return parent.getBlockType(position);
+        return parent.getBlock(position).getBlockType();
     }
 
     @Override

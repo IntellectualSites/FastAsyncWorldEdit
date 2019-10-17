@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -14,7 +13,7 @@ public class CircleBrush implements Brush {
     private final Player player;
 
     public CircleBrush(Player player) {
-        this.player = LocationMaskedPlayerWrapper.unwrap(player);
+        this.player = player;
     }
 
     @Override

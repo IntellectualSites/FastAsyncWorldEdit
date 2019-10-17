@@ -62,7 +62,7 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {
         player.findFreePosition();
-        BBC.UNSTUCK.send(player);
+        player.print(BBC.UNSTUCK.s());
     }
 
     @Command(
@@ -82,10 +82,10 @@ public class NavigationCommands {
             }
         }
         if (ascentLevels == 0) {
-            BBC.ASCEND_FAIL.send(player);
+            player.printError(BBC.ASCEND_FAIL.s());
         } else {
             if (ascentLevels == 1) {
-                BBC.ASCENDED_SINGULAR.send(player);
+                player.print(BBC.ASCENDED_SINGULAR.s());
             } else {
                 BBC.ASCENDED_PLURAL.send(player, ascentLevels);
             }
@@ -109,9 +109,9 @@ public class NavigationCommands {
             }
         }
         if (descentLevels == 0) {
-            BBC.DESCEND_FAIL.send(player);
+            player.printError(BBC.DESCEND_FAIL.s());
         } else if (descentLevels == 1) {
-            BBC.DESCEND_SINGULAR.send(player);
+            player.print(BBC.DESCEND_SINGULAR.s());
         } else {
             BBC.DESCEND_PLURAL.send(player, descentLevels);
         }
@@ -134,9 +134,9 @@ public class NavigationCommands {
 
         boolean alwaysGlass = getAlwaysGlass(forceFlight, forceGlass);
         if (player.ascendToCeiling(clearance, alwaysGlass)) {
-            BBC.WHOOSH.send(player);
+            player.print(BBC.WHOOSH.s());
         } else {
-            BBC.ASCEND_FAIL.send(player);
+            player.printError(BBC.ASCEND_FAIL.s());
         }
     }
 
@@ -147,9 +147,9 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.thru.command")
     public void thru(Player player) throws WorldEditException {
         if (player.passThroughForwardWall(6)) {
-            BBC.WHOOSH.send(player);
+            player.print(BBC.WHOOSH.s());
         } else {
-            BBC.THRU_FAIL.send(player);
+            player.printError(BBC.THRU_FAIL.s());
         }
     }
 
@@ -160,23 +160,19 @@ public class NavigationCommands {
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
     public void jumpTo(Player player,
-        @Arg(desc = "Location to jump to", def = "")
-            Location pos,
         @Switch(name = 'f', desc = "force teleport")
             boolean force) throws WorldEditException {
 
-        if (pos == null) {
-            pos = player.getSolidBlockTrace(300);
-        }
+        Location pos = player.getSolidBlockTrace(300);
         if (pos != null) {
             if (force) {
                 player.setPosition(pos);
             } else {
                 player.findFreePosition(pos);
             }
-            BBC.POOF.send(player);
+            player.print(BBC.POOF.s());
         } else {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -195,9 +191,9 @@ public class NavigationCommands {
                        boolean forceGlass) throws WorldEditException {
         boolean alwaysGlass = getAlwaysGlass(forceFlight, forceGlass);
         if (player.ascendUpwards(distance, alwaysGlass)) {
-            BBC.WHOOSH.send(player);
+            player.print(BBC.WHOOSH.s());
         } else {
-            BBC.UP_FAIL.send(player);
+            player.printError(BBC.UP_FAIL.s());
         }
     }
 

@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
+import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -45,6 +46,9 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
+
+    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+
     private final String id;
     private final BlockTypes.Settings settings;
 
@@ -95,18 +99,6 @@ public class BlockType implements FawePattern, Keyed {
         } else {
             return name;
         }
-    }
-
-    public BlockState withProperties(String properties) { //
-        int id = getInternalId();
-        for (String keyPair : properties.split(",")) {
-            String[] split = keyPair.split("=");
-            String name = split[0];
-            String value = split[1];
-            AbstractProperty btp = settings.propertiesMap.get(name);
-            id = btp.modify(id, btp.getValueFor(value));
-        }
-        return withStateId(id);
     }
 
     @Deprecated
@@ -171,14 +163,10 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public final BlockState getDefaultState() {
+    public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
-    /**
-     * @Deprecated use a Mask instead
-     * @return
-     */
     @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
         return new FuzzyBlockState(this);
@@ -297,10 +285,6 @@ public class BlockType implements FawePattern, Keyed {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.getDefaultState().toBaseBlock();
-    }
-
-    public SingleBlockTypeMask toMask() {
-        return toMask(null);
     }
 
     public SingleBlockTypeMask toMask(Extent extent) {

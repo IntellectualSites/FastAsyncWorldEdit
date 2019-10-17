@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -61,6 +62,10 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
+    public String getId() {
+        return "null";
+    }
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return false;
     }
@@ -81,8 +86,17 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
+    public BiomeType getBiome(BlockVector2 position) {
+        return BiomeTypes.THE_VOID;
+    }
+    @Override
     public BiomeType getBiomeType(int x, int z) {
         return BiomeTypes.THE_VOID;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
     }
 
     @Override
@@ -144,6 +158,10 @@ public class NullWorld extends AbstractWorld {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return false;
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
     }
 
     @Override

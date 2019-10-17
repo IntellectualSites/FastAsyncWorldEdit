@@ -8,10 +8,12 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class DistrFilter extends ForkedFilter<DistrFilter> {
+
     private final int[] counter = new int[BlockTypes.states.length];
 
     public DistrFilter() {
@@ -34,12 +36,8 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
         }
     }
 
-    /*
-    Implementation
-     */
-
     @Override
-    public final void applyBlock(final FilterBlock block) {
+    public final void applyBlock(FilterBlock block) {
         counter[block.getOrdinal()]++;
     }
 
@@ -55,9 +53,7 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
     }
 
     public int getTotal() {
-        int total = 0;
-        for (int value : counter) total += value;
-        return total;
+        return Arrays.stream(counter).sum();
     }
 
     public List<Countable<BlockState>> getDistribution() {
@@ -92,13 +88,13 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
         return distribution;
     }
 
-    public void print(final Actor actor, final long size) {
+    public void print(Actor actor, long size) {
         for (Countable c : getDistribution()) {
             final String name = c.getID().toString();
             final String str = String.format("%-7s (%.3f%%) %s",
-                    String.valueOf(c.getAmount()),
-                    c.getAmount() / (double) size * 100,
-                    name);
+                String.valueOf(c.getAmount()),
+                c.getAmount() / (double) size * 100,
+                name);
             actor.print(str);
         }
     }

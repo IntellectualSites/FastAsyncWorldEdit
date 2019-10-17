@@ -26,15 +26,12 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
-import com.boydti.fawe.object.changeset.AnvilHistory;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.BrushCache;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
@@ -47,11 +44,11 @@ import com.sk89q.jchronic.utils.Span;
 import com.sk89q.jchronic.utils.Time;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.blocks.BaseItem;
-import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockTool;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
+import com.sk89q.worldedit.command.tool.NavigationWand;
+import com.sk89q.worldedit.command.tool.SelectionWand;
 import com.sk89q.worldedit.command.tool.SinglePickaxe;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
@@ -72,7 +69,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -95,6 +92,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Stores session information.
@@ -131,7 +129,6 @@ public class LocalSession implements TextureHolder {
     private transient ClipboardHolder clipboard;
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-    private transient boolean hasTool = false;
     private transient Tool[] tools = new Tool[ItemTypes.size()];
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
@@ -152,6 +149,7 @@ public class LocalSession implements TextureHolder {
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
     private transient List<Countable<BlockState>> lastDistribution;
+    private transient World worldOverride;
 
     // Saved properties
     private String lastScript;
@@ -197,8 +195,8 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    public boolean loadSessionHistoryFromDisk(UUID uuid, World world) {
-        if (world == null || uuid == null) {
+    public boolean loadSessionHistoryFromDisk(@NotNull UUID uuid, World world) {
+        if (world == null) {
             return false;
         }
         if (Settings.IMP.HISTORY.USE_DISK) {
@@ -372,8 +370,8 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
-        FawePlayer fp = editSession.getPlayer();
-        int limit = fp == null ? Integer.MAX_VALUE : fp.getLimit().MAX_HISTORY;
+        Player player = editSession.getPlayer();
+        int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
     }
 
@@ -387,7 +385,8 @@ public class LocalSession implements TextureHolder {
             File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid);
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
-                return new AnvilHistory(currentWorld.getName(), specific);
+                // TODO NOT IMPLEMENTED
+//                return new AnvilHistory(currentWorld.getName(), specific);
             } else {
                 return new DiskStorageHistory(currentWorld, this.uuid, (Integer) o);
             }
@@ -395,7 +394,7 @@ public class LocalSession implements TextureHolder {
         return null;
     }
 
-    public synchronized void remember(Player player, World world, ChangeSet changeSet, FaweLimit limit) {
+    public synchronized void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
         if (Settings.IMP.HISTORY.USE_DISK) {
             LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }
@@ -429,7 +428,8 @@ public class LocalSession implements TextureHolder {
         }
         if (limit != null) {
             int limitMb = limit.MAX_HISTORY;
-            while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
+            while ((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE
+                || historySize >> 20 > limitMb) && history.size() > 1) {
                 FaweChangeSet item = (FaweChangeSet) history.remove(0);
                 item.delete();
                 long size = MainUtil.getSize(item);
@@ -438,7 +438,7 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    public synchronized void remember(final EditSession editSession, final boolean append, int limitMb) {
+    public synchronized void remember(EditSession editSession, boolean append, int limitMb) {
         if (Settings.IMP.HISTORY.USE_DISK) {
             LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }
@@ -455,9 +455,9 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
-        FawePlayer fp = editSession.getPlayer();
+        Player fp = editSession.getPlayer();
         if (fp != null) {
-            loadSessionHistoryFromDisk(fp.getUUID(), editSession.getWorld());
+            loadSessionHistoryFromDisk(fp.getUniqueId(), editSession.getWorld());
         }
         // Destroy any sessions after this undo point
         if (append) {
@@ -506,9 +506,7 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        //TODO This method needs to be modified to use actors instead of FAWEPlayer
-        FawePlayer fp = FawePlayer.wrap((Player)actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
+        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player) actor).getWorldForEditing());
         if (getHistoryNegativeIndex() < history.size()) {
             FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
             try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
@@ -516,8 +514,8 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed(fp)
-                    .player(fp)
+                    .limitUnprocessed((Player)actor)
+                    .player((Player)actor)
                     .blockBag(getBlockBag((Player)actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
@@ -544,36 +542,39 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        //TODO This method needs to be modified to use actors instead of FAWEPlayer
-        FawePlayer fp = FawePlayer.wrap((Player)actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
+        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player)actor).getWorldForEditing());
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
             FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
+            try (EditSession editSession = new EditSessionBuilder(changeSet.getWorld())
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed(fp)
-                    .player(fp)
+                    .limitUnprocessed((Player)actor)
+                    .player((Player)actor)
                     .blockBag(getBlockBag((Player)actor))
                     .build()) {
-                newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
-                return newEditSession;
+                editSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
+                return editSession;
             }
         }
 
         return null;
     }
 
-    public void unregisterTools(Player player) {
-        for (Tool tool : tools) {
-            if (tool instanceof BrushTool) {
-                ((BrushTool) tool).clear(player);
-            }
-        }
+    public boolean hasWorldOverride() {
+        return this.worldOverride != null;
+    }
+
+    @Nullable
+    public World getWorldOverride() {
+        return this.worldOverride;
+    }
+
+    public void setWorldOverride(@Nullable World worldOverride) {
+        this.worldOverride = worldOverride;
     }
 
     public int getSize() {
@@ -609,13 +610,12 @@ public class LocalSession implements TextureHolder {
      */
     public RegionSelector getRegionSelector(World world) {
         checkNotNull(world);
-        try {
-            if (selector.getWorld() == null || !selector.getWorld().equals(world)) {
-                selector.setWorld(world);
-                selector.clear();
-            }
-        } catch (Throwable ignore) {
+        if (selector.getWorld() == null || !selector.getWorld().equals(world)) {
+            selector.setWorld(world);
             selector.clear();
+            if (hasWorldOverride() && !world.equals(getWorldOverride())) {
+                setWorldOverride(null);
+            }
         }
         return selector;
     }
@@ -631,6 +631,9 @@ public class LocalSession implements TextureHolder {
         checkNotNull(selector);
         selector.setWorld(world);
         this.selector = selector;
+        if (hasWorldOverride() && !world.equals(getWorldOverride())) {
+            setWorldOverride(null);
+        }
     }
 
     /**
@@ -883,7 +886,7 @@ public class LocalSession implements TextureHolder {
     @Nullable
     public BlockBag getBlockBag(Player player) {
         checkNotNull(player);
-        if (!useInventory && FawePlayer.wrap(player).getLimit().INVENTORY_MODE == 0) {
+        if (!useInventory && player.getLimit().INVENTORY_MODE == 0) {
             return null;
         }
         return player.getInventoryBlockBag();
@@ -934,26 +937,8 @@ public class LocalSession implements TextureHolder {
      * @return the tool, which may be {@code null}
      */
     @Nullable
-    @Deprecated
     public Tool getTool(ItemType item) {
         return tools[item.getInternalId()];
-    }
-
-    @Nullable
-    public Tool getTool(Player player) {
-        if (!Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && !hasTool) {
-            return null;
-        }
-        BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
-        return getTool(item, player);
-    }
-
-    public Tool getTool(BaseItem item, Player player) {
-        if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
-            BrushTool tool = BrushCache.getTool(player, this, item);
-            if (tool != null) return tool;
-        }
-        return getTool(item.getType());
     }
 
     /**
@@ -961,34 +946,15 @@ public class LocalSession implements TextureHolder {
      * or the tool is not assigned, the slot will be replaced with the
      * brush tool.
      *
-     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
      * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
-    @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
-        return getBrushTool(item.getDefaultState(), null, true);
-    }
-
-    public BrushTool getBrushTool(Player player) throws InvalidToolBindException {
-        return getBrushTool(player, true);
-    }
-
-    public BrushTool getBrushTool(Player player, boolean create) throws InvalidToolBindException {
-        BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
-        return getBrushTool(item, player, create);
-    }
-
-    public BrushTool getBrushTool(BaseItem item, Player player, boolean create) throws InvalidToolBindException {
-        Tool tool = getTool(item, player);
+        Tool tool = getTool(item);
         if (!(tool instanceof BrushTool)) {
-            if (create) {
-                tool = new BrushTool();
-                setTool(item, tool, player);
-            } else {
-                return null;
-            }
+            tool = new BrushTool("worldedit.brush.sphere");
+            setTool(item, tool);
         }
 
         return (BrushTool) tool;
@@ -1004,54 +970,16 @@ public class LocalSession implements TextureHolder {
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.hasBlockType()) {
             throw new InvalidToolBindException(item, "Blocks can't be used");
-        } else if (item.getId().equalsIgnoreCase(config.wandItem)) {
-            throw new InvalidToolBindException(item, "Already used for the wand");
-        } else if (item.getId().equalsIgnoreCase(config.navigationWand)) {
-            throw new InvalidToolBindException(item, "Already used for the navigation wand");
         }
-        setTool(item.getDefaultState(), tool, null);
-    }
+        if (tool instanceof SelectionWand) {
+            this.wandItem = item.getId();
+            setDirty();
+        } else if (tool instanceof NavigationWand) {
+            this.navWandItem = item.getId();
+            setDirty();
+        }
 
-    public void setTool(Player player, @Nullable Tool tool) throws InvalidToolBindException {
-        BaseItemStack item = player.getItemInHand(HandSide.MAIN_HAND);
-        setTool(item, tool, player);
-    }
-
-    public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
-        ItemType type = item.getType();
-        if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
-            throw new InvalidToolBindException(type, "Blocks can't be used");
-        } else if (type.getId().equalsIgnoreCase(config.wandItem)) {
-            throw new InvalidToolBindException(type, "Already used for the wand");
-        } else if (type.getId().equalsIgnoreCase(config.navigationWand)) {
-            throw new InvalidToolBindException(type, "Already used for the navigation wand");
-        }
-        Tool previous;
-        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
-            previous = BrushCache.getCachedTool(item);
-            BrushCache.setTool(item, (BrushTool) tool);
-            if (tool != null) {
-                ((BrushTool) tool).setHolder(item);
-            } else {
-                this.tools[type.getInternalId()] = null;
-            }
-        } else {
-            previous = this.tools[type.getInternalId()];
-            this.tools[type.getInternalId()] = tool;
-            if (tool != null) {
-                hasTool = true;
-            } else {
-                hasTool = false;
-                for (Tool i : this.tools) if (i != null) {
-                    hasTool = true;
-                    break;
-                }
-            }
-        }
-        if (player != null && previous instanceof BrushTool) {
-            BrushTool brushTool = (BrushTool) previous;
-            brushTool.clear(player);
-        }
+        this.tools[item.getInternalId()] = tool;
     }
 
     /**
@@ -1327,22 +1255,30 @@ public class LocalSession implements TextureHolder {
     /**
      * Construct a new edit session.
      *
-     * @param player the actor
+     * @param actor the actor
      * @return an edit session
      */
-    public EditSession createEditSession(Player player) {
-        checkNotNull(player);
+    public EditSession createEditSession(Actor actor) {
+        checkNotNull(actor);
 
-        BlockBag blockBag = getBlockBag(player);
-
-        World world = player.getWorld();
-        EditSessionBuilder builder = new EditSessionBuilder(world);
-        if (player.isPlayer()) builder.player(FawePlayer.wrap(player));
-        builder.blockBag(blockBag);
-        builder.fastmode(fastMode);
+        World world = null;
+        if (hasWorldOverride()) {
+            world = getWorldOverride();
+        } else if (actor instanceof Locatable && ((Locatable) actor).getExtent() instanceof World) {
+            world = (World) ((Locatable) actor).getExtent();
+        }
 
         // Create an edit session
-        EditSession editSession = builder.build();
+        EditSession editSession;
+        EditSessionBuilder builder = new EditSessionBuilder(world);
+        if (actor.isPlayer() && actor instanceof Player) {
+            BlockBag blockBag = getBlockBag((Player) actor);
+            builder.player((Player) actor);
+            builder.blockBag(blockBag);
+        }
+        builder.fastmode(fastMode);
+
+        editSession = builder.build();
 
         if (mask != null) {
             editSession.setMask(mask);
@@ -1357,6 +1293,14 @@ public class LocalSession implements TextureHolder {
         return editSession;
     }
 
+    private void prepareEditingExtents(EditSession editSession, Actor actor) {
+        editSession.setFastMode(fastMode);
+        //editSession.setReorderMode(reorderMode);
+        if (editSession.getSurvivalExtent() != null) {
+            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
+        }
+        //editSession.setTickingWatchdog(tickingWatchdog);
+    }
     /**
      * Checks if the session has fast mode enabled.
      *

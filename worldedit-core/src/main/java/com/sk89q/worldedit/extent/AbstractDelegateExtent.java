@@ -22,17 +22,16 @@ package com.sk89q.worldedit.extent;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.HistoryExtent;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -44,7 +43,7 @@ import javax.annotation.Nullable;
  */
 public class AbstractDelegateExtent implements Extent, LightingExtent {
 
-    private final Extent extent;
+    public Extent extent;
 
     /**
      * Create a new instance.
@@ -65,6 +64,10 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return extent;
     }
 
+    /*
+    Bounds
+     */
+
     @Override
     public BlockState getBlock(BlockVector3 position) {
        return getBlock(position.getX(),position.getY(),position.getZ());
@@ -75,19 +78,19 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
          */
     public boolean isQueueEnabled() {
-        return extent.isQueueEnabled();
+        return getExtent().isQueueEnabled();
     }
 
     @Override
     public void disableQueue() {
         try {
-            if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
-                extent.disableQueue();
+            if (!(getExtent() instanceof ForgetfulExtentBuffer)) { // placeholder
+                getExtent().disableQueue();
             }
         } catch (FaweException ignored) {
         }
-        if (extent instanceof AbstractDelegateExtent) {
-            Extent next = ((AbstractDelegateExtent) extent).getExtent();
+        if (getExtent() instanceof AbstractDelegateExtent) {
+            Extent next = ((AbstractDelegateExtent) getExtent()).getExtent();
             new ExtentTraverser(this).setNext(next);
         } else {
             Fawe.debug("Cannot disable queue");
@@ -97,44 +100,20 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     @Override
     public void enableQueue() {
         try {
-            extent.enableQueue();
+            getExtent().enableQueue();
         } catch (FaweException enableQueue) {
             // TODO NOT IMPLEMENTED - THIS IS IMPORTANT (ForgetfulExtentBuffer is just a placeholder for now, it won't work)
-            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(extent));
+            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(getExtent()));
         }
     }
 
     /*
-     History
-     */
-    public void setChangeSet(FaweChangeSet changeSet) {
-        if (extent instanceof HistoryExtent) {
-            HistoryExtent history = ((HistoryExtent) extent);
-            if (changeSet == null) {
-                new ExtentTraverser(this).setNext(history.getExtent());
-            } else {
-                history.setChangeSet(changeSet);
-            }
-        } else if (extent instanceof AbstractDelegateExtent) {
-            ((AbstractDelegateExtent) extent).setChangeSet(changeSet);
-        } else if (changeSet != null) {
-            new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
-        }
-    }
-
-    @Override
-    public World getWorld() {
-        return getExtent().getWorld();
-    }
-
-    /*
-        Bounds
-         */
+    Bounds
+    */
     @Override
     public int getMaxY() {
-        return extent.getMaxY();
+        return getExtent().getMaxY();
     }
-
 
     /*
     Input + Output
@@ -142,91 +121,104 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return extent.getBlock(x, y, z);
+        return getExtent().getBlock(x, y, z);
     }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return extent.getFullBlock(x, y, z);
+        return getExtent().getFullBlock(x, y, z);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return extent.getBiomeType(x, z);
+        return getExtent().getBiomeType(x, z);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return extent.setBiome(x, y, z, biome);
+        return getExtent().setBiome(x, y, z, biome);
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return getExtent().setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
-        return extent.setBlock(x, y, z, block);
+        return getExtent().setBlock(x, y, z, block);
     }
 
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return getExtent().setBiome(position.getX(), 0, position.getZ(), biome);
+    }
 
     /*
     Light
      */
+
     public int getSkyLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getSkyLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getSkyLight(x, y, z);
         }
         return 0;
     }
 
     public int getBlockLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBlockLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getBlockLight(x, y, z);
         }
         return getBrightness(x, y, z);
     }
+
     public int getOpacity(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getOpacity(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getOpacity(x, y, z);
         }
         return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
     }
 
     @Override
     public int getLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getLight(x, y, z);
         }
         return 0;
     }
 
     @Override
     public int getBrightness(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBrightness(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getBrightness(x, y, z);
         }
         return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
 
-    @Override
-    public void relightChunk(int chunkX, int chunkZ) {
-        if (extent instanceof LightingExtent) {
-            ((LightingExtent) extent).relightChunk(chunkX, chunkZ);
-        } else {
-            throw new UnsupportedOperationException("Cannot relight");
-        }
-    }
+    /*
+    Generic
+     */
 
     @Override
     public String toString() {
-        return super.toString() + ":" + extent.toString();
+        return super.toString() + ":" + getExtent().toString();
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return extent.getMinimumPoint();
+        return getExtent().getMinimumPoint();
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return extent.getMaximumPoint();
+        return getExtent().getMaximumPoint();
     }
 
     protected Operation commitBefore() {
@@ -237,8 +229,8 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public @Nullable Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
-        if (extent != this) {
-            other = extent.commit();
+        if (getExtent() != this) {
+            other = getExtent().commit();
         }
         if (ours != null && other != null) {
             return new OperationQueue(ours, other);

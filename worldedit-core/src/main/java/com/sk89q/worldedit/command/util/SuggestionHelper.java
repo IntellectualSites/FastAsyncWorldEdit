@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command.util;
 
+import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
+
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
@@ -37,9 +40,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
-import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
-
 /**
  * Internal class for generating common command suggestions.
  */
@@ -49,11 +49,12 @@ public final class SuggestionHelper {
 
     public static Stream<String> getBlockCategorySuggestions(String tag, boolean allowRandom) {
         if (tag.isEmpty() || tag.equals("#")) {
-            return Stream.of("##", "##*");
+            return allowRandom ? Stream.of("##", "##*") : Stream.of("##");
         }
-        if (tag.startsWith("#")) {
+        if (tag.startsWith("##")) {
             if (tag.equals("##")) {
-                return Stream.concat(Stream.of("##*"), getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(2)).map(s -> "##" + s));
+                return Stream.concat(allowRandom ? Stream.of("##*") : Stream.empty(),
+                        getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(2)).map(s -> "##" + s));
             } else if (tag.equals("##*") && allowRandom) {
                 return getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(3)).map(s -> "##*" + s);
             } else {

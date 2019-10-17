@@ -1,10 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.regions.Region;
-
 import javax.annotation.Nullable;
 
 public interface IDelegateFilter extends Filter {
+
     Filter getParent();
 
     @Override
@@ -46,7 +46,5 @@ public interface IDelegateFilter extends Filter {
         return this;
     }
 
-    default Filter newInstance(Filter other) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
+    Filter newInstance(Filter other);
 }

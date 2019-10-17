@@ -67,9 +67,9 @@ public class BlobBrush implements Brush {
             .rotateY(ThreadLocalRandom.current().nextInt(360))
             .rotateZ(ThreadLocalRandom.current().nextInt(360));
 
-            double manScaleX = (1.25 + seedX * 0.5);
-            double manScaleY = (1.25 + seedY * 0.5);
-            double manScaleZ = (1.25 + seedZ * 0.5);
+            double manScaleX = 1.25 + seedX * 0.5;
+            double manScaleY = 1.25 + seedY * 0.5;
+            double manScaleZ = 1.25 + seedZ * 0.5;
 
             MutableVector3 mutable = new MutableVector3();
             double roughness = 1 - sphericity;

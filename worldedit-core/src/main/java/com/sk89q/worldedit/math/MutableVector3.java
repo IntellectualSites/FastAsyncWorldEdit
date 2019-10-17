@@ -6,9 +6,6 @@ public class MutableVector3 extends Vector3 {
 
     private double x, y, z;
 
-    public MutableVector3() {
-    }
-
     public static MutableVector3 get(int x, int y, int z) {
         return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
     }
@@ -16,6 +13,8 @@ public class MutableVector3 extends Vector3 {
     public static MutableVector3 get(double x, double y, double z) {
         return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
     }
+
+    public MutableVector3() {}
 
     public MutableVector3(double x, double y, double z) {
         this.x = x;

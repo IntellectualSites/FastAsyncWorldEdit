@@ -10,15 +10,18 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import java.util.Map;
+
+import com.sk89q.worldedit.world.block.BaseBlock;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
-    public AsyncSign(AsyncBlock block, int combined) {
-        super(block, combined);
+    public AsyncSign(AsyncBlock block, BaseBlock state) {
+        super(block, state);
     }
 
     private boolean isEditable = false;

@@ -1,18 +1,11 @@
 package com.boydti.fawe.object.change;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.HasIQueueExtent;
-import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class MutableFullBlockChange implements Change {
 
@@ -41,45 +34,26 @@ public class MutableFullBlockChange implements Change {
         create(context);
     }
 
-    private IQueueExtent queue;
-    private boolean checkedQueue;
-
     public void create(UndoContext context) {
-        if (queue != null) {
-            perform(queue);
-        }
-        if (!checkedQueue) {
-            checkedQueue = true;
-            Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser(extent).find(HasIQueueExtent.class);
-            if (found != null) {
-                perform(queue = ((HasIQueueExtent) found.get()).getQueue());
-            } else {
-                Fawe.debug("FAWE does not support: " + extent + " for " + getClass() + " (bug Empire92)");
-            }
-        }
-    }
-
-    public void perform(IQueueExtent queue) {
-        BlockType idFrom = BlockTypes.getFromStateId(from);
+        BlockState fromState = BlockState.getFromOrdinal(from);
         if (blockBag != null) {
-            BlockType idTo = BlockTypes.getFromStateId(to);
-            if (idFrom != idTo) {
+            BlockState toState = BlockState.getFromOrdinal(to);
+            if (fromState != toState) {
                 if (allowFetch && from != 0) {
                     try {
-                        blockBag.fetchPlacedBlock(BlockState.getFromInternalId(from));
+                        blockBag.fetchPlacedBlock(fromState);
                     } catch (BlockBagException e) {
                         return;
                     }
                 }
                 if (allowStore && to != 0) {
                     try {
-                        blockBag.storeDroppedBlock(BlockState.getFromInternalId(to));
+                        blockBag.storeDroppedBlock(toState);
                     } catch (BlockBagException ignored) {
                     }
                 }
             }
         }
-        queue.setBlock(x, y, z, from);
+        context.getExtent().setBlock(x, y, z, fromState);
     }
 }

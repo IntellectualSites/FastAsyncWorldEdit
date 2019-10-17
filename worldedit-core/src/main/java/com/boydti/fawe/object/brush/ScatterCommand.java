@@ -1,11 +1,7 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.boydti.fawe.wrappers.PlayerWrapper;
-import com.boydti.fawe.wrappers.SilentPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
@@ -14,7 +10,6 @@ import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.util.Location;
 import java.util.List;
 
 public class ScatterCommand extends ScatterBrush {
@@ -35,13 +30,11 @@ public class ScatterCommand extends ScatterBrush {
                 .replace("{world}", editSession.getWorld().getName())
                 .replace("{size}", Integer.toString(radius));
 
-        FawePlayer fp = editSession.getPlayer();
-        Player player = fp.getPlayer();
-        fp.setSelection(selector);
-        PlayerWrapper wePlayer = new SilentPlayerWrapper(new LocationMaskedPlayerWrapper(player, new Location(player.getExtent(), position.toVector3())));
+        Player player = editSession.getPlayer();
+        player.setSelection(selector);
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
-            CommandEvent event = new CommandEvent(wePlayer, cmd);
+            CommandEvent event = new CommandEvent(player, cmd);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }

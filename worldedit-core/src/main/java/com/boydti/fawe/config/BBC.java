@@ -3,7 +3,6 @@ package com.boydti.fawe.config;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
-import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.worldedit.extension.platform.Actor;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -497,16 +496,6 @@ public enum BBC {
         }
     }
 
-    public void send(FawePlayer<?> player, Object... args) {
-        if (isEmpty()) {
-            return;
-        }
-        if (player == null) {
-            Fawe.debug(this.format(args));
-        } else {
-            player.sendMessage(this.format(args));
-        }
-    }
     public void send(Actor player, Object... args) {
         if (isEmpty()) {
             return;

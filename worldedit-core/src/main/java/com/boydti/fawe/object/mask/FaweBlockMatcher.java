@@ -31,10 +31,10 @@ public abstract class FaweBlockMatcher {
 //                public boolean apply(BaseBlock oldBlock) {
 //                    int currentId = oldBlock.getId();
 //                    oldBlock.setId(id);
-//                    if (FaweCache.hasData(currentId)) {
+//                    if (FaweCache.IMP.hasData(currentId)) {
 //                        oldBlock.setData(0);
 //                    }
-//                    if (FaweCache.hasNBT(currentId)) {
+//                    if (FaweCache.IMP.hasNBT(currentId)) {
 //                        oldBlock.setNbtData(null);
 //                    }
 //                    return true;
@@ -47,7 +47,7 @@ public abstract class FaweBlockMatcher {
 //                int currentId = oldBlock.getId();
 //                oldBlock.setId(id);
 //                oldBlock.setData(data);
-//                if (FaweCache.hasNBT(currentId)) {
+//                if (FaweCache.IMP.hasNBT(currentId)) {
 //                    oldBlock.setNbtData(null);
 //                }
 //                return true;
@@ -67,10 +67,10 @@ public abstract class FaweBlockMatcher {
 //                BaseBlock replace = array[random.random(size)];
 //                int currentId = block.getId();
 //                block.setId(replace.getId());
-//                if (FaweCache.hasNBT(currentId)) {
+//                if (FaweCache.IMP.hasNBT(currentId)) {
 //                    block.setNbtData(null);
 //                }
-//                if (FaweCache.hasData(currentId) || replace.getData() != 0) {
+//                if (FaweCache.IMP.hasData(currentId) || replace.getData() != 0) {
 //                    block.setData(replace.getData());
 //                }
 //                return true;
@@ -82,7 +82,7 @@ public abstract class FaweBlockMatcher {
     public static FaweBlockMatcher fromBlock(BaseBlock block, boolean checkData) {
 //        final int id = block.getId();
 //        final int data = block.getData();
-//        if (checkData && FaweCache.hasData(id)) {
+//        if (checkData && FaweCache.IMP.hasData(id)) {
 //            return new FaweBlockMatcher() {
 //                @Override
 //                public boolean apply(BaseBlock block) {
@@ -104,13 +104,13 @@ public abstract class FaweBlockMatcher {
 //        if (searchBlocks.size() == 1) {
 //            return fromBlock(searchBlocks.iterator().next(), checkData);
 //        }
-//        final boolean[] allowedId = new boolean[FaweCache.getId(Character.MAX_VALUE)];
+//        final boolean[] allowedId = new boolean[FaweCache.IMP.getId(Character.MAX_VALUE)];
 //        for (BaseBlock block : searchBlocks) {
 //            allowedId[block.getId()] = true;
 //        }
 //        final boolean[] allowed = new boolean[Character.MAX_VALUE];
 //        for (BaseBlock block : searchBlocks) {
-//            allowed[FaweCache.getCombined(block)] = true;
+//            allowed[FaweCache.IMP.getCombined(block)] = true;
 //        }
 //        if (checkData) {
 //            return new FaweBlockMatcher() {
@@ -118,7 +118,7 @@ public abstract class FaweBlockMatcher {
 //                public boolean apply(BaseBlock block) {
 //                    int id = block.getId();
 //                    if (allowedId[id]) {
-//                        if (FaweCache.hasData(id)) {
+//                        if (FaweCache.IMP.hasData(id)) {
 //                            return allowed[(id << 4) + block.getData()];
 //                        }
 //                        return true;

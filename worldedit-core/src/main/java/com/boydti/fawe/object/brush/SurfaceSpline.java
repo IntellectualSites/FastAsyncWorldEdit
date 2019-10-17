@@ -16,9 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurfaceSpline implements Brush {
-    final double tension, bias, continuity, quality;
+    private final double tension;
+    private final double bias;
+    private final double continuity;
+    private final double quality;
 
-    public SurfaceSpline(final double tension, final double bias, final double continuity, final double quality) {
+    public SurfaceSpline(double tension, double bias, double continuity, double quality) {
         this.tension = tension;
         this.bias = bias;
         this.continuity = continuity;
@@ -36,14 +39,14 @@ public class SurfaceSpline implements Brush {
             if (max == -1) return;
 //            pos.mutY(max);
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().sendMessage(BBC.BRUSH_SPLINE_PRIMARY_2.s());
+            editSession.getPlayer().print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!vis) return;
         }
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
 
-        for (final BlockVector3 nodevector : path) {
+        for (BlockVector3 nodevector : path) {
             final Node n = new Node(nodevector.toVector3());
             n.setTension(tension);
             n.setBias(bias);
@@ -72,13 +75,13 @@ public class SurfaceSpline implements Brush {
             }
         }
         if (radius != 0) {
-            double radius2 = (radius * radius);
+            double radius2 = radius * radius;
             LocalBlockVectorSet newSet = new LocalBlockVectorSet();
             final int ceilrad = (int) Math.ceil(radius);
-            for (final BlockVector3 v : vset) {
+            for (BlockVector3 v : vset) {
                 final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
-                for (int loopx = tipx - ceilrad; loopx <= (tipx + ceilrad); loopx++) {
-                    for (int loopz = tipz - ceilrad; loopz <= (tipz + ceilrad); loopz++) {
+                for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
+                    for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                         if (MathMan.hypot2(loopx - tipx, 0, loopz - tipz) <= radius2) {
                             int y = editSession.getNearestSurfaceTerrainBlock(loopx, loopz, v.getBlockY(), 0, maxY);
                             if (y == -1) continue;
@@ -90,6 +93,6 @@ public class SurfaceSpline implements Brush {
             editSession.setBlocks(newSet, pattern);
             if (!vis) path.clear();
         }
-        editSession.getPlayer().sendMessage(BBC.BRUSH_SPLINE_SECONDARY.s());
+        editSession.getPlayer().print(BBC.BRUSH_SPLINE_SECONDARY.s());
     }
 }

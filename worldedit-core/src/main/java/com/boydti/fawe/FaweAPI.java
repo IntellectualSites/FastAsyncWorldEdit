@@ -3,11 +3,9 @@ package com.boydti.fawe;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -16,16 +14,12 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -37,8 +31,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -48,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -77,44 +70,44 @@ public class FaweAPI {
         return TaskManager.IMP;
     }
 
-    /**
-     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
-     *
-     * @param methods The class with a bunch of mask methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.MaskCommands
-     */
-    public static boolean registerMasks(Object methods) {
-        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom material for use in e.g {@literal //material #id:<input>}
-     *
-     * @param methods The class with a bunch of pattern methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.PatternCommands
-     */
-    public static boolean registerPatterns(Object methods) {
-        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom transform for use in
-     *
-     * @param methods The class with a bunch of transform methods
-     * @return true if the transform was registered
-     * @see com.sk89q.worldedit.command.TransformCommands
-     */
-    public static boolean registerTransforms(Object methods) {
-        DefaultTransformParser parser = Fawe.get().getTransformParser();
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
+//    /**
+//     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
+//     *
+//     * @param methods The class with a bunch of mask methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.MaskCommands
+//     */
+//    public static boolean registerMasks(Object methods) {
+//        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom material for use in e.g {@literal //material #id:<input>}
+//     *
+//     * @param methods The class with a bunch of pattern methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.PatternCommands
+//     */
+//    public static boolean registerPatterns(Object methods) {
+//        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom transform for use in
+//     *
+//     * @param methods The class with a bunch of transform methods
+//     * @return true if the transform was registered
+//     * @see com.sk89q.worldedit.command.TransformCommands
+//     */
+//    public static boolean registerTransforms(Object methods) {
+//        DefaultTransformParser parser = Fawe.get().getTransformParser();
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
 
     public static <T> T getParser(Class<T> parserClass) {
         try {
@@ -147,21 +140,6 @@ public class FaweAPI {
      */
     public static void registerCommands(Object clazz, String... aliases) {
 //        PlatformCommandManager.getInstance().registerCommands(clazz, aliases); TODO NOT IMPLEMENTED
-    }
-
-    /**
-     * Wrap some object into a FawePlayer<br>
-     * - org.bukkit.entity.Player
-     * - org.spongepowered.api.entity.living.player
-     * - com.sk89q.worldedit.entity.Player
-     * - String (name)
-     * - UUID (player UUID)
-     *
-     * @param obj
-     * @return
-     */
-    public static FawePlayer wrapPlayer(Object obj) {
-        return FawePlayer.wrap(obj);
     }
 
     /**
@@ -241,7 +219,7 @@ public class FaweAPI {
      * @param player
      * @return
      */
-    public static Region[] getRegions(FawePlayer player) {
+    public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
     }
 
@@ -395,7 +373,7 @@ public class FaweAPI {
      * @param uuid
      * @param index
      * @return
-     * @see DiskStorageHistory#toEditSession(FawePlayer)
+     * @see DiskStorageHistory#toEditSession(Player)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
@@ -443,17 +421,17 @@ public class FaweAPI {
         int count = 0;
         if (queue == null) queue = createQueue(world, false);
         // Remove existing lighting first
-        if (queue instanceof LightingExtent) {
-            LightingExtent relighter = (LightingExtent) queue;
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.relightChunk(x, z);
-                    count++;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
-        }
+//        if (queue instanceof LightingExtent) {
+//            LightingExtent relighter = (LightingExtent) queue;
+//            for (int x = minX; x <= maxX; x++) {
+//                for (int z = minZ; z <= maxZ; z++) {
+//                    relighter.relightChunk(x, z);
+//                    count++;
+//                }
+//            }
+//        } else {
+//            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
+//        }
         return count;
     }
 

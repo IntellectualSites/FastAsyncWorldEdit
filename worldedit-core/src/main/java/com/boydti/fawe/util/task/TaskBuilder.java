@@ -1,10 +1,10 @@
 package com.boydti.fawe.util.task;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -322,7 +322,7 @@ public class TaskBuilder extends Metadatable {
         }
     }
 
-    private IQueueExtent queue;
+    private FaweQueue queue;
     private long last;
     private long start;
     private Object asyncWaitLock = new Object();
@@ -430,7 +430,7 @@ public class TaskBuilder extends Metadatable {
     public static abstract class SplitTask extends RunnableTask {
 
         private final long allocation;
-        private final QueueHandler queue;
+        private final FaweQueue queue;
         private long last;
         private long start;
         private Object asyncWaitLock = new Object();
@@ -447,7 +447,7 @@ public class TaskBuilder extends Metadatable {
         public SplitTask(long allocation) {
             super(TaskType.SYNC_WHEN_FREE);
             this.allocation = allocation;
-            this.queue = Fawe.get().getQueueHandler();
+            this.queue = SetQueue.IMP.getNewQueue((String) null, true, false);
         }
 
         public Object execSplit(final Object previous) {

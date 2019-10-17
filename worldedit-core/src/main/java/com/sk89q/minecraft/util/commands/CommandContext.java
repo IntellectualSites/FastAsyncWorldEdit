@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class CommandContext {
 
@@ -256,8 +254,11 @@ public class CommandContext {
     }
 
     public String getString(int start, int end) {
-        return IntStream.range(start + 1, end + 1).mapToObj(i -> " " + parsedArgs.get(i))
-            .collect(Collectors.joining("", parsedArgs.get(start), ""));
+        StringBuilder buffer = new StringBuilder(parsedArgs.get(start));
+        for (int i = start + 1; i < end + 1; ++i) {
+            buffer.append(" ").append(parsedArgs.get(i));
+        }
+        return buffer.toString();
     }
 
     public int getInteger(int index) throws NumberFormatException {

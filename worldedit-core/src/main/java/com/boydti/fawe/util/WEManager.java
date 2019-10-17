@@ -1,22 +1,23 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class WEManager {
 
@@ -42,28 +43,8 @@ public class WEManager {
         cancelEditSafe(parent, reason);
     }
 
-    public boolean maskContains(HashSet<RegionWrapper> mask, int x, int z) {
-        for (RegionWrapper region : mask) {
-            if (x >= region.minX && x <= region.maxX && z >= region.minZ && z <= region.maxZ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean maskContains(RegionWrapper[] mask, int x, int z) {
-        switch (mask.length) {
-            case 0:
-                return false;
-            case 1:
-                return mask[0].isIn(x, z);
-            default:
-                return Arrays.stream(mask).anyMatch(region -> region.isIn(x, z));
-        }
-    }
-
     @Deprecated
-    public Region[] getMask(FawePlayer<?> player) {
+    public Region[] getMask(Player player) {
         return getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
     }
 
@@ -77,7 +58,7 @@ public class WEManager {
      * @param player
      * @return
      */
-    public Region[] getMask(FawePlayer<?> player, FaweMaskManager.MaskType type) {
+    public Region[] getMask(Player player, FaweMaskManager.MaskType type) {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
@@ -164,50 +145,5 @@ public class WEManager {
             }
         }
         return false;
-    }
-
-    public boolean delay(FawePlayer<?> player, String command) {
-        final long start = System.currentTimeMillis();
-        return this.delay(player, () -> {
-            try {
-                if (System.currentTimeMillis() - start > 1000) {
-                    BBC.WORLDEDIT_RUN.send(FawePlayer.wrap(player));
-                }
-                TaskManager.IMP.task(() -> {
-                    final long start1 = System.currentTimeMillis();
-                    player.executeCommand(command.substring(1));
-                    TaskManager.IMP.later(() -> SetQueue.IMP.addEmptyTask(() -> {
-                        if (System.currentTimeMillis() - start1 > 1000) {
-                            BBC.WORLDEDIT_COMPLETE.send(FawePlayer.wrap(player));
-                        }
-                    }), 2);
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, false, false);
-    }
-
-    public boolean delay(FawePlayer<?> player, Runnable whenDone, boolean delayed, boolean onlyDelayedExecution) {
-        final boolean free = SetQueue.IMP.addEmptyTask(null);
-        if (free) {
-            if (delayed) {
-                if (whenDone != null) {
-                    whenDone.run();
-                }
-            } else {
-                if (whenDone != null && !onlyDelayedExecution) {
-                    whenDone.run();
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            if (!delayed && player != null) {
-                BBC.WORLDEDIT_DELAYED.send(player);
-            }
-            SetQueue.IMP.addEmptyTask(whenDone);
-        }
-        return true;
     }
 }

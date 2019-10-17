@@ -57,13 +57,13 @@ public class CharBlocks implements IBlocks {
 
     public char get(final int x, final int y, final int z) {
         final int layer = y >> 4;
-        final int index = ((y & 15) << 8) | (z << 4) | (x);
+        final int index = ((y & 15) << 8) | (z << 4) | (x & 15);
         return sections[layer].get(this, layer, index);
     }
 
     public void set(final int x, final int y, final int z, final char value) {
         final int layer = y >> 4;
-        final int index = ((y & 15) << 8) | (z << 4) | (x);
+        final int index = ((y & 15) << 8) | (z << 4) | (x & 15);
         set(layer, index, value);
     }
 

@@ -19,6 +19,14 @@
 
 package com.sk89q.worldedit.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.OreGen;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
+import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
+
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -28,11 +36,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.sk89q.worldedit.function.generator.CavesGen;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.OreGen;
-import com.sk89q.worldedit.function.generator.Resource;
-import com.sk89q.worldedit.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -52,21 +55,20 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -134,6 +136,15 @@ public interface Extent extends InputExtent, OutputExtent {
     default @Nullable Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    /**
+     * Create an entity at the given location.
+     *
+     * @param entity the entity
+     * @param location the location
+     * @return a reference to the created entity, or null if the entity could not be created
+     */
+    default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
 
     /*
     Queue based methods
@@ -284,7 +295,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        BlockStateHolder block = getBlock(x, y, z);
+        BlockState block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
@@ -434,10 +445,6 @@ public interface Extent extends InputExtent, OutputExtent {
     @Override
     default Operation commit() {
         return null;
-    }
-
-    default boolean cancel() {
-        return true;
     }
 
     default int getMaxY() {
@@ -599,7 +606,7 @@ public interface Extent extends InputExtent, OutputExtent {
 
         Vector3 center = region.getCenter();
         Region centerRegion = new CuboidRegion(
-                getWorld(), // Causes clamping of Y range
+                this instanceof World ? (World) this : null, // Causes clamping of Y range
                 BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
                 BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
                         center.getY(), MathUtils.roundHalfUp(center.getZ())));
