@@ -692,7 +692,7 @@ public final class PlatformCommandManager {
         MemoizingValueAccess wrap = MemoizingValueAccess.wrap(
             MergedValueAccess.of(store, globalInjectedValues)
         );
-        wrap.injectedValue(Key.of(InjectedValueAccess.class), wrap);
+        store.injectValue(Key.of(InjectedValueAccess.class),ValueProvider.constant(wrap));
         return wrap;
     }
 
