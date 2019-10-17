@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
@@ -118,7 +117,7 @@ public class RegionCommands {
                 if (!actor.hasPermission("fawe.tips"))
                     BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(actor);
             }
-        }, getArguments(context), region, context);
+        }, "/set", region, context);
     }
 
     @Command(
@@ -261,7 +260,7 @@ public class RegionCommands {
         int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(actor, blocksChanged);
-        }, getArguments(context), region, context);
+        }, "/curve", region, context);
     }
 
     @Command(
@@ -289,7 +288,7 @@ public class RegionCommands {
                         BBC.TIP_REPLACE_REGEX, BBC.TIP_REPLACE_REGEX_2, BBC.TIP_REPLACE_REGEX_3,
                         BBC.TIP_REPLACE_REGEX_4, BBC.TIP_REPLACE_REGEX_5).send(actor);
             }
-        }, getArguments(context), region, context);
+        }, "/replace", region, context);
     }
 
     @Command(
@@ -304,7 +303,7 @@ public class RegionCommands {
         actor.checkConfirmationRegion(() -> {
             int affected = editSession.overlayCuboidBlocks(region, pattern);
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "/overlay", region, context);
     }
 
     @Command(
@@ -330,7 +329,7 @@ public class RegionCommands {
                 affected++;
             }
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), region, context);
+        }, "/lay", region, context);
     }
 
     @Command(
@@ -357,7 +356,7 @@ public class RegionCommands {
         actor.checkConfirmationRegion(() -> {
             int affected = editSession.naturalizeCuboidBlocks(region);
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "/naturalize", region, context);
     }
 
     @Command(
@@ -372,7 +371,7 @@ public class RegionCommands {
         actor.checkConfirmationRegion(() -> {
             int affected = editSession.makeWalls(region, pattern);
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "/walls", region, context);
     }
 
     @Command(
@@ -388,7 +387,7 @@ public class RegionCommands {
         actor.checkConfirmationRegion(() -> {
             int affected = editSession.makeCuboidFaces(region, pattern);
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "/faces", region, context);
     }
 
     @Command(
@@ -420,7 +419,7 @@ public class RegionCommands {
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
-        }, getArguments(context), region, context);
+        }, "/smooth", region, context);
     }
 
     @Command(
@@ -496,7 +495,7 @@ public class RegionCommands {
             }
 
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "/move", region, context);
     }
 
     @Command(
@@ -517,7 +516,7 @@ public class RegionCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.fall(region, !notFullHeight, replace);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region, context);
+        }, "/fall", region, context);
     }
 
     @Command(
@@ -565,7 +564,7 @@ public class RegionCommands {
             }
 
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, count, context);
+        }, "/stack", region, count, context);
     }
 
     @Command(
@@ -617,7 +616,7 @@ public class RegionCommands {
             } catch (ExpressionException e) {
                 actor.printError(e.getMessage());
             }
-        }, getArguments(context), region, context);
+        }, "/deform", region, context);
     }
 
     @Command(
@@ -652,7 +651,7 @@ public class RegionCommands {
             } else {
                 BBC.COMMAND_REGEN_2.send(fp);
             }
-        }, getArguments(context), region, context);
+        }, "/regen ", region, context);
 
 
     }
@@ -680,7 +679,7 @@ public class RegionCommands {
         actor.checkConfirmationRegion(() -> {
             int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
             BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), region, context);
+        }, "hollow", region, context);
     }
 
     @Command(

@@ -24,8 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
-import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.task.ThrowableSupplier;
@@ -395,13 +393,13 @@ public final class PlatformCommandManager {
                 WorldEditCommandsRegistration.builder(),
                 new WorldEditCommands(worldEdit)
             );
-            registerSubCommands(
-                "cfi",
-                ImmutableList.of(),
-                "CFI commands",
-                CFICommandsRegistration.builder(),
-                new CFICommands(worldEdit)
-            );
+//            registerSubCommands(
+//                "cfi",
+//                ImmutableList.of(),
+//                "CFI commands",
+//                CFICommandsRegistration.builder(),
+//                new CFICommands(worldEdit)
+//            );
             registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
