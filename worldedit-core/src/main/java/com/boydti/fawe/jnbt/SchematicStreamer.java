@@ -9,7 +9,6 @@ import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-
 import com.boydti.fawe.object.io.FastByteArrayOutputStream.FastByteArrayInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
@@ -25,6 +24,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -34,12 +34,11 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-
 import java.io.IOException;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 
 // TODO FIXME
 public class SchematicStreamer extends NBTStreamer {
@@ -207,94 +206,75 @@ public class SchematicStreamer extends NBTStreamer {
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 BlockType type = block.getBlockType();
-                switch (type.getInternalId()) {
-                    case BlockID.ACACIA_STAIRS:
-                    case BlockID.BIRCH_STAIRS:
-                    case BlockID.BRICK_STAIRS:
-                    case BlockID.COBBLESTONE_STAIRS:
-                    case BlockID.DARK_OAK_STAIRS:
-                    case BlockID.DARK_PRISMARINE_STAIRS:
-                    case BlockID.JUNGLE_STAIRS:
-                    case BlockID.NETHER_BRICK_STAIRS:
-                    case BlockID.OAK_STAIRS:
-                    case BlockID.PRISMARINE_BRICK_STAIRS:
-                    case BlockID.PRISMARINE_STAIRS:
-                    case BlockID.PURPUR_STAIRS:
-                    case BlockID.QUARTZ_STAIRS:
-                    case BlockID.RED_SANDSTONE_STAIRS:
-                    case BlockID.SANDSTONE_STAIRS:
-                    case BlockID.SPRUCE_STAIRS:
-                    case BlockID.STONE_BRICK_STAIRS:
-                        Direction facing = block.getState(PropertyKey.FACING);
+                if (BlockCategories.STAIRS.contains(block)) {
+                    Direction facing = block.getState(PropertyKey.FACING);
 
-                        BlockVector3 forward = facing.toBlockVector();
-                        Direction left = facing.getLeft();
-                        Direction right = facing.getRight();
+                    BlockVector3 forward = facing.toBlockVector();
+                    Direction left = facing.getLeft();
+                    Direction right = facing.getRight();
 
-                        BlockStateHolder<BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
-                        BlockType forwardType = forwardBlock.getBlockType();
-                        if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
-                            Direction forwardFacing = forwardBlock.getState(PropertyKey.FACING);
-                            if (forwardFacing == left) {
-                                BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
-                                BlockType rightType = rightBlock.getBlockType();
-                                if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
-                                    fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
-                                }
-                                return;
-                            } else if (forwardFacing == right) {
-                                BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
-                                BlockType leftType = leftBlock.getBlockType();
-                                if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
-                                    fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
-                                }
-                                return;
+                    BlockStateHolder<BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
+                    BlockType forwardType = forwardBlock.getBlockType();
+                    if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
+                        Direction forwardFacing = forwardBlock.getState(PropertyKey.FACING);
+                        if (forwardFacing == left) {
+                            BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                            BlockType rightType = rightBlock.getBlockType();
+                            if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
+                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                             }
-                        }
-
-                        BlockStateHolder<BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
-                        BlockType backwardsType = backwardsBlock.getBlockType();
-                        if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
-                            Direction backwardsFacing = backwardsBlock.getState(PropertyKey.FACING);
-                            if (backwardsFacing == left) {
-                                BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
-                                BlockType rightType = rightBlock.getBlockType();
-                                if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
-                                    fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
-                                }
-                                return;
-                            } else if (backwardsFacing == right) {
-                                BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
-                                BlockType leftType = leftBlock.getBlockType();
-                                if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
-                                    fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
-                                }
-                                return;
+                            return;
+                        } else if (forwardFacing == right) {
+                            BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                            BlockType leftType = leftBlock.getBlockType();
+                            if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
+                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
                             }
+                            return;
                         }
-                        break;
-                    default:
-                        int group = group(type);
-                        if (group == -1) return;
-                        B set = block;
+                    }
 
-                        if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
-                        if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
-                        if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
-                        if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
-
-                        if (group == 2) {
-                            int ns = (set.getState(PropertyKey.NORTH) ? 1 : 0) + (set.getState(PropertyKey.SOUTH)
-                                ? 1 : 0);
-                            int ew = (set.getState(PropertyKey.EAST) ? 1 : 0) + (set.getState(PropertyKey.WEST)
-                                ? 1 : 0);
-                            if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
-                                set = set.with(PropertyKey.UP, true);
+                    BlockStateHolder<BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
+                    BlockType backwardsType = backwardsBlock.getBlockType();
+                    if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
+                        Direction backwardsFacing = backwardsBlock.getState(PropertyKey.FACING);
+                        if (backwardsFacing == left) {
+                            BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                            BlockType rightType = rightBlock.getBlockType();
+                            if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
+                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                             }
+                            return;
+                        } else if (backwardsFacing == right) {
+                            BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                            BlockType leftType = leftBlock.getBlockType();
+                            if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
+                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
+                            }
+                            return;
                         }
+                    }
+                } else {
+                    int group = group(type);
+                    if (group == -1) return;
+                    B set = block;
 
-                        if (set != block) fc.setBlock(x, y, z, set);
-                        break;
+                    if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
+                    if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
+                    if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
+                    if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
+
+                    if (group == 2) {
+                        int ns = (set.getState(PropertyKey.NORTH) ? 1 : 0) + (set.getState(PropertyKey.SOUTH)
+                            ? 1 : 0);
+                        int ew = (set.getState(PropertyKey.EAST) ? 1 : 0) + (set.getState(PropertyKey.WEST)
+                            ? 1 : 0);
+                        if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
+                            set = set.with(PropertyKey.UP, true);
+                        }
+                    }
+
+                    if (set != block) fc.setBlock(x, y, z, set);
                 }
             }
         }, false);
@@ -302,7 +282,7 @@ public class SchematicStreamer extends NBTStreamer {
 
     private BlockTypeSwitch<Boolean> fullCube = new BlockTypeSwitchBuilder<>(false).add(type -> {
         BlockMaterial mat = type.getMaterial();
-        return (mat.isFullCube() && !mat.isFragileWhenPushed() && mat.getLightValue() == 0 && mat.isOpaque() && mat.isSolid() && !mat.isTranslucent());
+        return mat.isFullCube() && !mat.isFragileWhenPushed() && mat.getLightValue() == 0 && mat.isOpaque() && mat.isSolid() && !mat.isTranslucent();
     }, true).build();
 
     private boolean merge(int group, int x, int y, int z) {
@@ -312,62 +292,59 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     private int group(BlockType type) {
-        switch (type.getInternalId()) {
-            case BlockID.ACACIA_FENCE:
-            case BlockID.BIRCH_FENCE:
-            case BlockID.DARK_OAK_FENCE:
-            case BlockID.JUNGLE_FENCE:
-            case BlockID.OAK_FENCE:
-            case BlockID.SPRUCE_FENCE:
-                return 0;
-            case BlockID.NETHER_BRICK_FENCE:
-                return 1;
-            case BlockID.COBBLESTONE_WALL:
-            case BlockID.MOSSY_COBBLESTONE_WALL:
-                return 2;
-            case BlockID.IRON_BARS:
-            case BlockID.BLACK_STAINED_GLASS_PANE:
-            case BlockID.BLUE_STAINED_GLASS_PANE:
-            case BlockID.BROWN_MUSHROOM_BLOCK:
-            case BlockID.BROWN_STAINED_GLASS_PANE:
-            case BlockID.CYAN_STAINED_GLASS_PANE:
-            case BlockID.GLASS_PANE:
-            case BlockID.GRAY_STAINED_GLASS_PANE:
-            case BlockID.GREEN_STAINED_GLASS_PANE:
-            case BlockID.LIGHT_BLUE_STAINED_GLASS_PANE:
-            case BlockID.LIGHT_GRAY_STAINED_GLASS_PANE:
-            case BlockID.LIME_STAINED_GLASS_PANE:
-            case BlockID.MAGENTA_STAINED_GLASS_PANE:
-            case BlockID.ORANGE_STAINED_GLASS_PANE:
-            case BlockID.PINK_STAINED_GLASS_PANE:
-            case BlockID.PURPLE_STAINED_GLASS_PANE:
-            case BlockID.RED_STAINED_GLASS_PANE:
-            case BlockID.WHITE_STAINED_GLASS_PANE:
-            case BlockID.YELLOW_STAINED_GLASS_PANE:
-                return 3;
-            default:
-                return -1;
+        if (BlockCategories.WOODEN_FENCES.contains(type)) {
+            return 0;
+        } else {
+            switch (type.getInternalId()) {
+                case BlockID.NETHER_BRICK_FENCE:
+                    return 1;
+                case BlockID.COBBLESTONE_WALL:
+                case BlockID.MOSSY_COBBLESTONE_WALL:
+                    return 2;
+                case BlockID.IRON_BARS:
+                case BlockID.BLACK_STAINED_GLASS_PANE:
+                case BlockID.BLUE_STAINED_GLASS_PANE:
+                case BlockID.BROWN_MUSHROOM_BLOCK:
+                case BlockID.BROWN_STAINED_GLASS_PANE:
+                case BlockID.CYAN_STAINED_GLASS_PANE:
+                case BlockID.GLASS_PANE:
+                case BlockID.GRAY_STAINED_GLASS_PANE:
+                case BlockID.GREEN_STAINED_GLASS_PANE:
+                case BlockID.LIGHT_BLUE_STAINED_GLASS_PANE:
+                case BlockID.LIGHT_GRAY_STAINED_GLASS_PANE:
+                case BlockID.LIME_STAINED_GLASS_PANE:
+                case BlockID.MAGENTA_STAINED_GLASS_PANE:
+                case BlockID.ORANGE_STAINED_GLASS_PANE:
+                case BlockID.PINK_STAINED_GLASS_PANE:
+                case BlockID.PURPLE_STAINED_GLASS_PANE:
+                case BlockID.RED_STAINED_GLASS_PANE:
+                case BlockID.WHITE_STAINED_GLASS_PANE:
+                case BlockID.YELLOW_STAINED_GLASS_PANE:
+                    return 3;
+                default:
+                    return -1;
+            }
         }
     }
 
     public void addDimensionReaders() {
         addReader("Schematic.Height",
-            (BiConsumer<Integer, Short>) (index, value) -> height = (value));
-        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = (value));
+            (BiConsumer<Integer, Short>) (index, value) -> height = value);
+        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = value);
         addReader("Schematic.Length",
-            (BiConsumer<Integer, Short>) (index, value) -> length = (value));
+            (BiConsumer<Integer, Short>) (index, value) -> length = value);
         addReader("Schematic.WEOriginX",
-            (BiConsumer<Integer, Integer>) (index, value) -> originX = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> originX = value);
         addReader("Schematic.WEOriginY",
-            (BiConsumer<Integer, Integer>) (index, value) -> originY = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> originY = value);
         addReader("Schematic.WEOriginZ",
-            (BiConsumer<Integer, Integer>) (index, value) -> originZ = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> originZ = value);
         addReader("Schematic.WEOffsetX",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = value);
         addReader("Schematic.WEOffsetY",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = value);
         addReader("Schematic.WEOffsetZ",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = (value));
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = value);
     }
 
     private int height;
