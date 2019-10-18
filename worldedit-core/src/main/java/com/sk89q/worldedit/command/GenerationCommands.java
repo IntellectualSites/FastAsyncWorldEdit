@@ -45,6 +45,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.internal.annotation.Radii;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -177,6 +178,7 @@ public class GenerationCommands {
         }, "/ore", region, context);
     }
 
+    //TODO change hcyl and cyl to use BlockVector2 for radii (if they perform better that is)
     @Command(
         name = "/hcyl",
         desc = "Generates a hollow cylinder."
@@ -186,15 +188,32 @@ public class GenerationCommands {
     public void hcyl(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The pattern of blocks to generate")
                         Pattern pattern,
-                        BlockVector2 radius,
+                    @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+                    @Radii(2)
+                        List<Double> radii,
                     @Arg(desc = "The height of the cylinder", def = "1")
                                 int height,
                     @Range(min = 1) @Arg(name = "thickness", desc = "double", def = "1") double thickness, InjectedValueAccess context) throws WorldEditException {
-        double max = MathMan.max(radius.getBlockX(), radius.getBlockZ());
+        final double radiusX, radiusZ;
+        switch (radii.size()) {
+            case 1:
+                radiusX = radiusZ = Math.max(1, radii.get(0));
+                break;
+
+            case 2:
+                radiusX = Math.max(1, radii.get(0));
+                radiusZ = Math.max(1, radii.get(1));
+                break;
+
+            default:
+                actor.printError("You must either specify 1 or 2 radius values.");
+                return;
+        }
+        double max = MathMan.max(radiusX, height, radiusZ);
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
         actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), thickness - 1);
+            int affected = editSession.makeHollowCylinder(pos, pattern, radiusX, radiusZ, Math.min(256, height), thickness - 1);
             BBC.VISITOR_BLOCK.send(actor, affected);
         }, "/hcyl", (int) max, context);
     }
@@ -208,16 +227,34 @@ public class GenerationCommands {
     public void cyl(Actor actor, LocalSession session, EditSession editSession,
                    @Arg(desc = "The pattern of blocks to generate")
                        Pattern pattern,
-        BlockVector2 radius,
+                   @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+                   @Radii(2)
+                       List<Double> radii,
                    @Arg(desc = "The height of the cylinder", def = "1")
                        int height,
                    @Switch(name = 'h', desc = "Make a hollow cylinder")
                        boolean hollow, InjectedValueAccess context) throws WorldEditException {
-        double max = Math.max(radius.getBlockX(), radius.getBlockZ());
+        final double radiusX, radiusZ;
+        switch (radii.size()) {
+            case 1:
+                radiusX = radiusZ = Math.max(1, radii.get(0));
+                break;
+
+            case 2:
+                radiusX = Math.max(1, radii.get(0));
+                radiusZ = Math.max(1, radii.get(1));
+                break;
+
+            default:
+                actor.printError("You must either specify 1 or 2 radius values.");
+                return;
+        }
+
+        double max = MathMan.max(radiusX, height, radiusZ);
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
         actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
+            int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, Math.min(256, height), !hollow);
             BBC.VISITOR_BLOCK.send(actor, affected);
         }, "/cyl", (int) max, context);
     }
@@ -231,7 +268,9 @@ public class GenerationCommands {
     public void hsphere(Actor actor, LocalSession session, EditSession editSession,
                        @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W") BlockVector3 radii,
+                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+                       @Radii(3)
+                           List<Double> radii,
                        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
                            boolean raised,
                         InjectedValueAccess context) throws WorldEditException {
@@ -248,17 +287,34 @@ public class GenerationCommands {
         @Arg(desc = "The pattern of blocks to generate")
             Pattern pattern,
         @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-            BlockVector3 radii,
+                      @Radii(3)
+                          List<Double> radii,
         @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
             boolean raised,
         @Switch(name = 'h', desc = "Make a hollow sphere")
             boolean hollow, InjectedValueAccess context) throws WorldEditException {
-        double max = MathMan.max(radii.getBlockX(), radii.getBlockY(), radii.getBlockZ());
+        final double radiusX, radiusY, radiusZ;
+        switch (radii.size()) {
+            case 1:
+            radiusX = radiusY = radiusZ = Math.max(0, radii.get(0));
+                break;
+
+        case 3:
+            radiusX = Math.max(0, radii.get(0));
+            radiusY = Math.max(0, radii.get(1));
+            radiusZ = Math.max(0, radii.get(2));
+                break;
+
+            default:
+            actor.printError("You must either specify 1 or 3 radius values.");
+            return;
+        }
+        double max = MathMan.max(radiusX, radiusY, radiusZ);
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
-        BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
+        BlockVector3 finalPos = raised ? pos.add(0, (int) radiusY, 0) : pos;
         actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
+            int affected = editSession.makeSphere(finalPos, pattern, radiusX, radiusY, radiusZ, !hollow);
             if (actor instanceof Player) {
                 ((Player) actor).findFreePosition();
             }
