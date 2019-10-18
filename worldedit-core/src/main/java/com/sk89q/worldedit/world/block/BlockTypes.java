@@ -748,7 +748,7 @@ public final class BlockTypes {
         protected final AbstractProperty<?>[] propertiesMapArr;
         protected final AbstractProperty<?>[] propertiesArr;
         protected final List<AbstractProperty<?>> propertiesList;
-        protected final Map<String, AbstractProperty<?>> propertiesMap;
+        private final Map<String, AbstractProperty<?>> propertiesMap;
         protected final Set<AbstractProperty<?>> propertiesSet;
         protected final BlockMaterial blockMaterial;
         protected final int permutations;
@@ -830,6 +830,10 @@ public final class BlockTypes {
                 id = btp.modify(id, btp.getValueFor(value));
             }
             return id;
+        }
+
+        public Map<String, AbstractProperty<?>> getPropertyMap() {
+            return propertiesMap;
         }
     }
 

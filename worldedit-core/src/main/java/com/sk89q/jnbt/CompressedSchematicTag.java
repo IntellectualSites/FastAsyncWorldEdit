@@ -1,13 +1,12 @@
 package com.sk89q.jnbt;
 
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
+import com.boydti.fawe.object.io.FastByteArrayOutputStream.FastByteArrayInputStream;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
+import java.io.IOException;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
-
-import java.io.IOException;
 
 public class CompressedSchematicTag extends CompressedCompoundTag<Clipboard> {
     public CompressedSchematicTag(Clipboard holder) {
@@ -23,7 +22,7 @@ public class CompressedSchematicTag extends CompressedCompoundTag<Clipboard> {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        FastByteArraysInputStream in = new FastByteArraysInputStream(blocksOut.toByteArrays());
+        FastByteArrayInputStream in = new FastByteArrayInputStream(blocksOut);
         return new LZ4BlockInputStream(in);
     }
 }

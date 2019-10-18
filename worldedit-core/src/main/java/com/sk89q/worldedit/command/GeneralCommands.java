@@ -216,7 +216,9 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gmask(Actor actor, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
+    public void gmask(Actor actor, LocalSession session,
+                      @Arg(desc = "The mask to set", def = "")
+                          Mask mask) {
         if (mask == null) {
             session.setMask(null);
             actor.print(BBC.MASK_DISABLED.s());

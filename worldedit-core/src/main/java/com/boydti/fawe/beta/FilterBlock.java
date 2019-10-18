@@ -1,6 +1,8 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -163,5 +165,23 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
 
     public BlockState getStateRelativeY(Extent orDefault, final int y) {
         return getBlockRelativeY(y);
+    }
+
+    /**
+     * Return the name of the title entity ID.
+     *
+     * @return tile entity ID, non-null string
+     */
+    public String getNbtId() {
+        CompoundTag nbtData = getNbtData();
+        if (nbtData == null) {
+            return "";
+        }
+        Tag idTag = nbtData.getValue().get("id");
+        if (idTag instanceof StringTag) {
+            return ((StringTag) idTag).getValue();
+        } else {
+            return "";
+        }
     }
 }

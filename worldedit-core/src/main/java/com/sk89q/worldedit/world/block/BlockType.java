@@ -33,6 +33,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -50,10 +51,9 @@ public class BlockType implements FawePattern, Keyed {
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
 
     private final String id;
+    private final LazyReference<FuzzyBlockState> emptyFuzzy
+        = LazyReference.from(() -> new FuzzyBlockState(this));
     private final BlockTypes.Settings settings;
-
-    private boolean initItemType;
-    private ItemType itemType;
 
     protected BlockType(String id, int internalId, List<BlockState> states) {
         int i = id.indexOf("[");
@@ -118,7 +118,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return The properties map
      */
     public Map<String, ? extends Property<?>> getPropertyMap() {
-        return this.settings.propertiesMap;
+        return this.settings.getPropertyMap();
     }
 
     /**
@@ -127,7 +127,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return the properties
      */
     public List<? extends Property<?>> getProperties() {
-        return this.settings.propertiesList; // stop changing this
+        return this.settings.propertiesList;
     }
 
     @Deprecated
@@ -142,7 +142,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return The property
      */
     public <V> Property<V> getProperty(String name) {
-        return (Property<V>) this.settings.propertiesMap.get(name);  // stop changing this (performance)
+        return (Property<V>) this.settings.getPropertyMap().get(name);  // stop changing this (performance)
     }
 
     public boolean hasProperty(PropertyKey key) {
@@ -167,9 +167,8 @@ public class BlockType implements FawePattern, Keyed {
         return this.settings.defaultState;
     }
 
-    @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
-        return new FuzzyBlockState(this);
+        return emptyFuzzy.getValue();
     }
 
     /**
@@ -198,7 +197,7 @@ public class BlockType implements FawePattern, Keyed {
              * This is likely wrong. The only place this seems to currently (Dec 23 2018)
              * be invoked is via ForgeWorld, and value is a String when invoked there...
              */
-            AbstractProperty btp = this.settings.propertiesMap.get(prop.getName());
+            AbstractProperty btp = this.settings.getPropertyMap().get(prop.getName());
             checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
             id = btp.modify(id, btp.getValueFor((String)value));
         }
@@ -221,11 +220,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Nullable
     public ItemType getItemType() {
-        if(!initItemType) {
-            initItemType = true;
-            itemType = ItemTypes.get(this.id);
-        }
-        return itemType;
+        return ItemTypes.get(this.id);
     }
 
     /**

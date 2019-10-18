@@ -112,7 +112,6 @@ public abstract class AbstractNonPlayerActor implements Actor {
      *
      * @param key
      * @param value
-     * @return previous value
      */
     @Override
     public final void setMeta(String key, Object value) {

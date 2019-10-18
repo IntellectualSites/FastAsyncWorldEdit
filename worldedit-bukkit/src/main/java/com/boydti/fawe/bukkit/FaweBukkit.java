@@ -234,7 +234,6 @@ public class FaweBukkit implements IFawe, Listener {
 
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
-     * @return
      */
     @Override
     public void setupVault() {

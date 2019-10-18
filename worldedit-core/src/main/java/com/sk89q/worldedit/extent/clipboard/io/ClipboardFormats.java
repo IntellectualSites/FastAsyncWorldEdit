@@ -287,7 +287,7 @@ public class ClipboardFormats {
                             while ((len = zip.read(buffer)) > 0) {
                                 out.write(buffer, 0, len);
                             }
-                            byte[] array = out.toByteArray();
+                            byte[] array = out.toByteArrayUnsafe();
                             ByteSource source = ByteSource.wrap(array);
                             LazyClipboardHolder clipboard = new LazyClipboardHolder(url.toURI(), source, format, null);
                             clipboards.add(clipboard);

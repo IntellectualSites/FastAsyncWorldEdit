@@ -143,7 +143,7 @@ public class ProvideBindings extends Bindings {
     /**
      * Get a direction from the player.
      *
-     * @param context the context
+     * @param argument the context
      * @param direction the direction annotation
      * @return a BlockVector3
      * @throws ParameterException on error
@@ -161,7 +161,7 @@ public class ProvideBindings extends Bindings {
     /**
      * Gets an {@link TreeType} from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return a TreeType
      * @throws ParameterException on error
      * @throws WorldEditException on error
@@ -184,7 +184,7 @@ public class ProvideBindings extends Bindings {
     /**
      * Gets an {@link BiomeType} from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return a BiomeType
      * @throws ParameterException on error
      * @throws WorldEditException on error

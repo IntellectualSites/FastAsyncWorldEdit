@@ -9,8 +9,8 @@ import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
 
+import com.boydti.fawe.object.io.FastByteArrayOutputStream.FastByteArrayInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -24,6 +24,7 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -177,8 +178,8 @@ public class SchematicStreamer extends NBTStreamer {
         if (ids != null) ids.close();
         if (datas != null) datas.close();
         if (adds != null) adds.close();
-        FaweInputStream idIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays())));
-        FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
+        FaweInputStream idIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArrayInputStream(idOut)));
+        FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArrayInputStream(dataOut)));
 
         LegacyMapper remap = LegacyMapper.getInstance();
         BlockVector3 dimensions = fc.getDimensions();
@@ -188,11 +189,14 @@ public class SchematicStreamer extends NBTStreamer {
                 fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
             }
         } else {
-            FaweInputStream addIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
-            for (int i = 0; i < length; i++) {
-                fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((addIn.read() & 0xFF) << 8) + ((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
+            try (FaweInputStream addIn = new FaweInputStream(
+                new LZ4BlockInputStream(new FastByteArrayInputStream(dataOut)))) {
+                for (int i = 0; i < length; i++) {
+                    fc.setBlock(i, remap.getBlockFromLegacyCombinedId(
+                        ((addIn.read() & 0xFF) << 8) + ((idIn.read() & 0xFF) << 4) + (dataIn.read()
+                            & 0xF)));
+                }
             }
-            addIn.close();
         }
         idIn.close();
         dataIn.close();
@@ -221,26 +225,25 @@ public class SchematicStreamer extends NBTStreamer {
                     case BlockID.SANDSTONE_STAIRS:
                     case BlockID.SPRUCE_STAIRS:
                     case BlockID.STONE_BRICK_STAIRS:
-                        Object half = block.getState(PropertyKey.HALF);
                         Direction facing = block.getState(PropertyKey.FACING);
 
                         BlockVector3 forward = facing.toBlockVector();
                         Direction left = facing.getLeft();
                         Direction right = facing.getRight();
 
-                        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
+                        BlockStateHolder<BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
                         BlockType forwardType = forwardBlock.getBlockType();
                         if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
-                            Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
+                            Direction forwardFacing = forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
-                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                                BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                                 }
                                 return;
                             } else if (forwardFacing == right) {
-                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                                BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
@@ -249,19 +252,19 @@ public class SchematicStreamer extends NBTStreamer {
                             }
                         }
 
-                        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
+                        BlockStateHolder<BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
                         BlockType backwardsType = backwardsBlock.getBlockType();
                         if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
-                            Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
+                            Direction backwardsFacing = backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
-                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                                BlockStateHolder<BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                                 }
                                 return;
                             } else if (backwardsFacing == right) {
-                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                                BlockStateHolder<BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
@@ -273,7 +276,7 @@ public class SchematicStreamer extends NBTStreamer {
                     default:
                         int group = group(type);
                         if (group == -1) return;
-                        BlockStateHolder set = block;
+                        B set = block;
 
                         if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
                         if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
@@ -281,8 +284,10 @@ public class SchematicStreamer extends NBTStreamer {
                         if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
 
                         if (group == 2) {
-                            int ns = ((Boolean) set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
-                            int ew = ((Boolean) set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
+                            int ns = (set.getState(PropertyKey.NORTH) ? 1 : 0) + (set.getState(PropertyKey.SOUTH)
+                                ? 1 : 0);
+                            int ew = (set.getState(PropertyKey.EAST) ? 1 : 0) + (set.getState(PropertyKey.WEST)
+                                ? 1 : 0);
                             if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
                                 set = set.with(PropertyKey.UP, true);
                             }
@@ -301,7 +306,7 @@ public class SchematicStreamer extends NBTStreamer {
     }, true).build();
 
     private boolean merge(int group, int x, int y, int z) {
-        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> block = fc.getBlock(x, y, z);
+        BaseBlock block = fc.getBlock(x, y, z);
         BlockType type = block.getBlockType();
         return group(type) == group || fullCube.apply(type);
     }

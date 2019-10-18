@@ -127,7 +127,8 @@ public class MCAChunk extends FaweChunk<Void> {
         if (buffer == null) {
             buffer = new byte[8192];
         }
-        FastByteArrayOutputStream buffered = new FastByteArrayOutputStream(buffer);
+        FastByteArrayOutputStream buffered = new FastByteArrayOutputStream();
+        buffered.write(buffer);
         DataOutputStream dataOut = new DataOutputStream(buffered);
         try (NBTOutputStream nbtOut = new NBTOutputStream((DataOutput) dataOut)) {
             write(nbtOut);

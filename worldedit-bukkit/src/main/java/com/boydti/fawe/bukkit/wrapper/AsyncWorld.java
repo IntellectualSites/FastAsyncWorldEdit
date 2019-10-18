@@ -103,7 +103,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     /**
      * @deprecated use {@link #wrap(World)} instead
      * @param parent
-     * @param queue
+     * @param extent
      */
     @Deprecated
     public AsyncWorld(World parent, Extent extent) {

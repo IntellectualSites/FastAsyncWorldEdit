@@ -50,7 +50,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets an {@link com.sk89q.worldedit.extent.Extent} from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return an extent
      * @throws InputParseException on other error
      */
@@ -73,7 +73,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -103,7 +103,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -132,7 +132,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -159,7 +159,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -188,7 +188,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -278,7 +278,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws InputParseException on error
@@ -297,7 +297,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws InputParseException on error
@@ -313,7 +313,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws InputParseException on error
@@ -331,7 +331,7 @@ public class PrimitiveBindings extends Bindings {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context the context
+     * @param argument the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws InputParseException on error

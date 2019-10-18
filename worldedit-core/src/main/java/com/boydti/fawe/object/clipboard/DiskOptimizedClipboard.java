@@ -81,7 +81,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             area = width * length;
             this.volume = length * width * height;
 
-            if (braf.length() - HEADER_SIZE == (volume << 2) + area) {
+            if ((braf.length() - HEADER_SIZE) == (volume << 2) + area) {
                 hasBiomes = true;
             }
             autoCloseTask();

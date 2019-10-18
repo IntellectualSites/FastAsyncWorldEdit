@@ -32,7 +32,7 @@ import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
+import com.boydti.fawe.object.io.FastByteArrayOutputStream.FastByteArrayInputStream;
 import com.boydti.fawe.util.IOUtil;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -48,7 +48,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -56,10 +55,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
-import com.sk89q.worldedit.world.storage.NBTConversions;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -252,8 +249,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
         }
         region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
-        if (blocksOut.getSize() != 0) {
-            try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(blocksOut.toByteArrays())))) {
+        if (blocksOut.size() != 0) {
+            try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArrayInputStream(blocksOut)))) {
                 int volume = width * height * length;
                 if (palette.length < 128) {
                     for (int index = 0; index < volume; index++) {
@@ -268,8 +265,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-        if (biomesOut.getSize() != 0) {
-            try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
+        if (biomesOut.size() != 0) {
+            try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArrayInputStream(biomesOut)))) {
                 int volume = width * length;
                 for (int index = 0; index < volume; index++) {
                     fc.setBiome(index, BiomeTypes.get(fis.read()));

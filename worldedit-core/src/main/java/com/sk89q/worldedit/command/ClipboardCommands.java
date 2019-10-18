@@ -366,7 +366,7 @@ public class ClipboardCommands {
                     writer.write(target);
                     baos.flush();
                     String json = ImgurUtility
-                        .getImgurContent(ImgurUtility.CLIENT_ID, baos.toByteArray());
+                        .getImgurContent(ImgurUtility.CLIENT_ID, baos.toByteArrayUnsafe());
                     Gson gson = new Gson();
                     JsonObject obj = gson.fromJson(json, JsonObject.class);
                     JsonObject data = obj.get("data").getAsJsonObject();
