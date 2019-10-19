@@ -1,6 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
+import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.nio.file.Path;
@@ -11,7 +12,7 @@ import java.util.concurrent.ForkJoinPool;
  * MCAQueue.filterWorld(MCAFilter)<br>
  * - Read and modify the world
  */
-public class MCAFilter<T> extends CleanableThreadLocal<T> {
+public class MCAFilter<T> extends IterableThreadLocal<T> {
 
     public void withPool(ForkJoinPool pool, MCAQueue queue) {
     }
