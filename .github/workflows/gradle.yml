@@ -3,13 +3,13 @@ name: Java CI
 on:
   push:
     branches:
-    - breaking-114
     - master
+    - breaking-114
     - commanding
   pull_request:
     branches:
-    - breaking-114
     - master
+    - breaking-114
     - commanding
  
 jobs:
