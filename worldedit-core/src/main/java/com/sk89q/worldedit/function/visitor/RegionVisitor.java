@@ -94,7 +94,6 @@ public class RegionVisitor implements Operation {
             int lastLeadChunkX = Integer.MIN_VALUE;
             int lastLeadChunkZ = Integer.MIN_VALUE;
             int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
-            try {
                 while (trailingIterator.hasNext()) {
                     BlockVector3 pt = trailingIterator.next();
                     this.apply(pt);
@@ -131,19 +130,9 @@ public class RegionVisitor implements Operation {
                         this.apply(trailingIterator.next());
                     }
                 }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable event) {
-                event.printStackTrace();
-            }
-            try {
                 while (trailingIterator.hasNext()) {
                     apply(trailingIterator.next());
                 }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable ignore) {
-            }
         } else {
             for (BlockVector3 pt : iterable) {
                 apply(pt);
