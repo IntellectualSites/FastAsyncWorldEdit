@@ -3,9 +3,6 @@ package com.boydti.fawe.object.mask;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
-/**
- * Restricts the
- */
 public class ZAxisMask extends AbstractMask implements ResettableMask {
 
     private transient int layer = -1;

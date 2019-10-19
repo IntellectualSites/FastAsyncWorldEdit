@@ -578,7 +578,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find field by type
+         * Find the field by type.
          *
          * @param type field type
          * @return RefField
@@ -589,7 +589,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find field by type
+         * Find the field by type.
          *
          * @param type field type
          * @return RefField
@@ -612,7 +612,7 @@ public class ReflectionUtils {
     }
 
     /**
-     * Method wrapper
+     * Method wrapper.
      */
     public static class RefMethod {
         private final Method method;
@@ -644,7 +644,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * apply method to object
+         * Apply method to object.
          *
          * @param e object to which the method is applied
          * @return RefExecutor with method call(...)
@@ -654,7 +654,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * call static method
+         * Calls static method.
          *
          * @param params sent parameters
          * @return return value
@@ -717,7 +717,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * create new instance with constructor
+         * Creates a new instance with constructor
          *
          * @param params parameters for constructor
          * @return new object

@@ -160,9 +160,9 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
     }
 
     /**
-     * Set the block filter used for identifying blocks to replace.
+     * Set the block mask used for identifying blocks to replace.
      *
-     * @param filter the filter to set
+     * @param mask the mask to set
      */
     public void setSourceMask(Mask mask) {
         this.sourceMask = mask;

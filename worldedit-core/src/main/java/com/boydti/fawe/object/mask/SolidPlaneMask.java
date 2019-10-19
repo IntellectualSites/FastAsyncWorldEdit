@@ -5,9 +5,6 @@ import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
-/**
- * Restricts the
- */
 public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
 
     private transient int mode = -1;

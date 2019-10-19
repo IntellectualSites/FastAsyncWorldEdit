@@ -1,4 +1,7 @@
 /*
+ * This code was original from the Spring Framework. Minor modifications have been made for its use
+ * in FastAsyncWorldEdit. The following is the license for the code:
+ *
  * Copyright 2002-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,8 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A speedy alternative to {@link java.io.ByteArrayOutputStream}. Note that
- * this variant does <i>not</i> extend {@code ByteArrayOutputStream}, unlike
- * its sibling {@link ResizableByteArrayOutputStream}.
+ * this variant does <i>not</i> extend {@code ByteArrayOutputStream}.
  *
  * <p>Unlike {@link java.io.ByteArrayOutputStream}, this implementation is backed
  * by a {@link java.util.LinkedList} of {@code byte[]} instead of 1 constantly
@@ -41,7 +43,6 @@ import org.jetbrains.annotations.Nullable;
  * @author Juergen Hoeller
  * @since 4.2
  * @see #resize
- * @see ResizableByteArrayOutputStream
  */
 public class FastByteArrayOutputStream extends OutputStream {
 

@@ -106,10 +106,11 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Run some async tasks in parallel<br>
-     * - All async parallel tasks which occur directly after each other will be run at the same time
+     * Run some async tasks in parallel.
+     * <br>
+     * All async parallel tasks which occur directly after each other will be run at the same time.
      *
-     * @param run
+     * @param run the task to run
      * @return this
      */
     public TaskBuilder asyncParallel(Runnable run) {
@@ -133,12 +134,12 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Run a split task when the server has free time<br>
+     * Run a split task when the server has free time.<br>
      * - i.e. To maintain high tps
      * - Use the split() method within task execution
      * - FAWE will be able to pause execution at these points
      *
-     * @param run
+     * @param run the split task to run
      * @return this
      */
     public TaskBuilder syncWhenFree(SplitTask run) {
@@ -199,8 +200,8 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Have all async tasks run on a new thread<br>
-     * - As opposed to trying to using the current thread
+     * Have all async tasks run on a new thread.<br>
+     * As opposed to trying to using the current thread.
      */
     public void buildAsync() {
         TaskManager.IMP.async(this::build);

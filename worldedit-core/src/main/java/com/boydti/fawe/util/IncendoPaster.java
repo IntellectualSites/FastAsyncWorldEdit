@@ -21,13 +21,14 @@ import java.util.*;
 public final class IncendoPaster {
 
     /**
-     * Upload service URL
+     * Upload service URL.
      */
-    public static final String UPLOAD_PATH = "https://athion.net/ISPaster/paste/upload";
+    private static final String UPLOAD_PATH = "https://athion.net/ISPaster/paste/upload";
+
     /**
-     * Valid paste applications
+     * Valid paste applications.
      */
-    public static final Collection<String>
+    private static final Collection<String>
         VALID_APPLICATIONS = Arrays
         .asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
 
@@ -35,7 +36,7 @@ public final class IncendoPaster {
     private final String pasteApplication;
 
     /**
-     * Construct a new paster
+     * Construct a new paster.
      *
      * @param pasteApplication The application that is sending the paste
      */
@@ -51,7 +52,7 @@ public final class IncendoPaster {
     }
 
     /**
-     * Get an immutable collection containing all the files that have been added to this paster
+     * Get an immutable collection containing all the files that have been added to this paster.
      *
      * @return Unmodifiable collection
      */
@@ -60,7 +61,7 @@ public final class IncendoPaster {
     }
 
     /**
-     * Add a file to the paster
+     * Add a file to the paster.
      *
      * @param file File to paste
      */
@@ -79,7 +80,7 @@ public final class IncendoPaster {
     }
 
     /**
-     * Create a JSON string from the submitted information
+     * Creates a new JSON string from the submitted information.
      *
      * @return compiled JSON string
      */
@@ -109,7 +110,7 @@ public final class IncendoPaster {
     }
 
     /**
-     * Upload the paste and return the status message
+     * Uploads the paste and returns the status message.
      *
      * @return Status message
      * @throws Throwable any and all exceptions
@@ -143,7 +144,7 @@ public final class IncendoPaster {
     }
 
     /**
-     * Simple class that represents a paste file
+     * Simple class that represents a paste file.
      */
     public static class PasteFile {
 
@@ -151,10 +152,10 @@ public final class IncendoPaster {
         private final String content;
 
         /**
-         * Construct a new paste file
+         * Construct a new paste file.
          *
-         * @param fileName File name, cannot be empty, nor null
-         * @param content File content, cannot be empty, nor null
+         * @param fileName file name, cannot be empty, nor null
+         * @param content file content, cannot be empty, nor null
          */
         public PasteFile(final String fileName, final String content) {
             if (fileName == null || fileName.isEmpty()) {
@@ -168,18 +169,18 @@ public final class IncendoPaster {
         }
 
         /**
-         * Get the file name
+         * Gets the name of the file.
          *
-         * @return File name
+         * @return the file name
          */
         public String getFileName() {
             return this.fileName;
         }
 
         /**
-         * Get the file content as a single string
+         * Gets the contents of the file as a String.
          *
-         * @return File content
+         * @return the contents of the file
          */
         public String getContent() {
             return this.content;

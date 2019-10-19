@@ -140,8 +140,10 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Create an entity at the given location.
      *
-     * @param entity the entity
-     * @param location the location
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @param uuid the unique identifier of the entity
      * @return a reference to the created entity, or null if the entity could not be created
      */
     default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}

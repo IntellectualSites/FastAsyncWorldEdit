@@ -50,8 +50,8 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
 
     /**
      * Call and join
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws ExecutionException if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
      */
     default void join() throws ExecutionException, InterruptedException {
         T future = call();
@@ -66,8 +66,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
      * @param filter the filter
      * @param block The filter block
      * @param region The region allowed to filter (may be null)
-     * @param unitialized a mutable block vector (buffer)
-     * @param unitialized2 a mutable block vector (buffer)
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 

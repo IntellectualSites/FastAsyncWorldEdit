@@ -26,11 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Store the change on disk
- * - High disk usage
- * - Moderate CPU usage
- * - Minimal memory usage
- * - Slow
+ * Stores the change on disk which is slower than storing in memory but has high disk usage. Another
+ * benefit is that it has moderate CPU Usage.
  */
 public class DiskStorageHistory extends FaweStreamChangeSet {
 
@@ -76,7 +73,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(),
+            Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
         int max = MainUtil.getMaxFileId(folder);
         init(uuid, max);
     }
@@ -117,7 +115,9 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(),
+            Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator
+                + uuid);
         initFiles(folder);
     }
 
@@ -174,14 +174,28 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public boolean flush() {
         super.flush();
         synchronized (this) {
-            boolean flushed = osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null || osENTCT != null;
+            boolean flushed =
+                osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null
+                    || osENTCT != null;
             try {
-                if (osBD != null) osBD.flush();
-                if (osBIO != null) osBIO.flush();
-                if (osNBTF != null) osNBTF.flush();
-                if (osNBTT != null) osNBTT.flush();
-                if (osENTCF != null) osENTCF.flush();
-                if (osENTCT != null) osENTCT.flush();
+                if (osBD != null) {
+                    osBD.flush();
+                }
+                if (osBIO != null) {
+                    osBIO.flush();
+                }
+                if (osNBTF != null) {
+                    osNBTF.flush();
+                }
+                if (osNBTT != null) {
+                    osNBTT.flush();
+                }
+                if (osENTCF != null) {
+                    osENTCF.flush();
+                }
+                if (osENTCT != null) {
+                    osENTCT.flush();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -193,7 +207,9 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public boolean close() {
         super.close();
         synchronized (this) {
-            boolean flushed = osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null || osENTCT != null;
+            boolean flushed =
+                osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null
+                    || osENTCT != null;
             try {
                 if (osBD != null) {
                     osBD.close();

@@ -67,17 +67,6 @@ public class Schematic {
         return clipboard;
     }
 
-    /**
-     * Forwards to paste(world, to, true, true, null)
-     *
-     * @param world
-     * @param to
-     * @return
-     */
-    public EditSession paste(World world, BlockVector3 to) {
-        return paste(world, to, true, true, null);
-    }
-
     public void save(File file, ClipboardFormat format) throws IOException {
         checkNotNull(file);
         checkNotNull(format);
@@ -112,7 +101,7 @@ public class Schematic {
     }
 
     /**
-     * Paste this schematic in a world
+     * Paste this schematic in a world.
      *
      * @param world
      * @param to

@@ -1724,7 +1724,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     /**
      * Stack a cuboid region. For compatibility, entities are copied but biomes are not.
-     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, Mask)} to fine tune.
+     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, boolean)} to fine tune.
      *
      * @param region the region to stack
      * @param dir the direction to stack

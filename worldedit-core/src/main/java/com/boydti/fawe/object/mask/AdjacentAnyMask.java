@@ -6,7 +6,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
 /**
- * Just an optimized version of the Adjacent Mask for single adjacency
+ * An optimized version of the {@link AdjacentMask} for single adjacency.
  */
 public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
 

@@ -291,9 +291,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Gets the connection with the database
+     * Gets the connection with the database.
      *
-     * @return Connection with the database, null if none
+     * @return the connection with the database, {@code null} if none
      */
     public Connection getConnection() {
         if (connection == null) {
@@ -307,7 +307,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Closes the connection with the database
+     * Closes the connection with the database.
      *
      * @return true if successful
      * @throws SQLException if the connection cannot be closed
@@ -327,10 +327,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Checks if a connection is open with the database
+     * Checks if a connection is open with the database.
      *
-     * @return true if the connection is open
-     * @throws SQLException if the connection cannot be checked
+     * @return returns {@code true} if the connection is open, otherwise {@code false}
      */
     public boolean checkConnection() {
         try {

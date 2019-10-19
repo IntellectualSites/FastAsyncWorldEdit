@@ -105,16 +105,14 @@ public class Fawe {
     }
 
     /**
-     * Get the implementation independent class
-     *
-     * @return
+     * Gets the implementation independent class.
      */
     public static Fawe get() {
         return INSTANCE;
     }
 
     /**
-     * Setup Fawe
+     * Setup Fawe.
      *
      * @param implementation
      * @throws InstanceAlreadyExistsException
@@ -246,18 +244,18 @@ public class Fawe {
     }
 
     /**
-     * The FaweTimer is a useful class for monitoring TPS
+     * The FaweTimer is a useful class for monitoring TPS.
      *
-     * @return FaweTimer
+     * @return the FaweTimer object
      */
     public FaweTimer getTimer() {
         return timer;
     }
 
     /**
-     * The visual queue is used to queue visualizations
+     * The visual queue is used to queue visualizations.
      *
-     * @return
+     * @return the VisualQueue object
      */
     public VisualQueue getVisualQueue() {
         return visualQueue;
@@ -269,9 +267,8 @@ public class Fawe {
      *
      * @return FaweVersion
      */
-    public
     @Nullable
-    FaweVersion getVersion() {
+    public FaweVersion getVersion() {
         return version;
     }
 
@@ -409,8 +406,8 @@ public class Fawe {
     }
 
     /**
-     * Get the main thread
-     *
+     * Gets the main thread.
+     * //TODO Consider removing this (see setMainThread)
      * @return
      */
     public Thread getMainThread() {
@@ -422,8 +419,8 @@ public class Fawe {
     }
 
     /**
-     * Sets the main thread to the current thread
-     *
+     * Sets the main thread to the current thread.
+     * //TODO Consider removing this changing the main thread can cause confusion especially if someone is using getMainThread)
      * @return
      */
     public Thread setMainThread() {

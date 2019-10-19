@@ -12,10 +12,8 @@ import com.sk89q.worldedit.world.World;
 import java.io.IOException;
 
 /**
- * ChangeSet optimized for low memory usage
- * - No disk usage
- * - High CPU usage
- * - Low memory usage
+ * An implementation of {@link com.sk89q.worldedit.history.changeset.ChangeSet} optimized for low
+ * memory usage but is heavy on CPU usage. This changeset does not usage any disk storage.
  */
 public class MemoryOptimizedHistory extends FaweStreamChangeSet {
 
@@ -56,12 +54,24 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         super.flush();
         synchronized (this) {
             try {
-                if (idsStream != null) idsStreamZip.flush();
-                if (biomeStream != null) biomeStreamZip.flush();
-                if (entCStream != null) entCStreamZip.flush();
-                if (entRStream != null) entRStreamZip.flush();
-                if (tileCStream != null) tileCStreamZip.flush();
-                if (tileRStream != null) tileRStreamZip.flush();
+                if (idsStream != null) {
+                    idsStreamZip.flush();
+                }
+                if (biomeStream != null) {
+                    biomeStreamZip.flush();
+                }
+                if (entCStream != null) {
+                    entCStreamZip.flush();
+                }
+                if (entRStream != null) {
+                    entRStreamZip.flush();
+                }
+                if (tileCStream != null) {
+                    tileCStreamZip.flush();
+                }
+                if (tileRStream != null) {
+                    tileRStreamZip.flush();
+                }
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -215,22 +225,26 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
 
     @Override
     public NBTInputStream getEntityCreateIS() throws IOException {
-        return entC == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(entC)));
+        return entC == null ? null
+            : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(entC)));
     }
 
     @Override
     public NBTInputStream getEntityRemoveIS() throws IOException {
-        return entR == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(entR)));
+        return entR == null ? null
+            : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(entR)));
     }
 
     @Override
     public NBTInputStream getTileCreateIS() throws IOException {
-        return tileC == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(tileC)));
+        return tileC == null ? null
+            : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(tileC)));
     }
 
     @Override
     public NBTInputStream getTileRemoveIS() throws IOException {
-        return tileR == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(tileR)));
+        return tileR == null ? null
+            : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArrayInputStream(tileR)));
     }
 
     @Override

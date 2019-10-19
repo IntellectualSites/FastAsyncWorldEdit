@@ -69,7 +69,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
     private BlockVector3 centerAccum = BlockVector3.ZERO;
 
     /**
-     * The last triangle that caused a {@link #contains(Vector3)} to classify a point as "outside". Used for optimization.
+     * The last triangle that caused a {@link #contains(BlockVector3)} to classify a point as "outside". Used for optimization.
      */
     private Triangle lastTriangle;
 
@@ -196,7 +196,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
         }
 
         if (!vertexBacklog.isEmpty()) {
-            // Remove the new vertex 
+            // Remove the new vertex
             vertices.remove(vertex);
 
             // Clone, clear and work through the backlog
@@ -226,7 +226,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
     public BlockVector3 getMaximumPoint() {
         return maximumPoint;
     }
-    
+
     @Override
     public Vector3 getCenter() {
         return centerAccum.toVector3().divide(vertices.size());

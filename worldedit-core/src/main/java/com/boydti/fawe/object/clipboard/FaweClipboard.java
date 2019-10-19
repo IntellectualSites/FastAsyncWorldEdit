@@ -66,7 +66,7 @@ public abstract class FaweClipboard {
     public abstract BlockVector3 getDimensions();
 
     /**
-     * The locations provided are relative to the clipboard min
+     * The locations provided are relative to the clipboard min.
      *
      * @param task
      * @param air

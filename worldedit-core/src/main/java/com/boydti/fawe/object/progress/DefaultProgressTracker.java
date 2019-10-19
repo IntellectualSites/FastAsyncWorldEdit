@@ -9,7 +9,7 @@ import com.sk89q.worldedit.entity.Player;
 import java.util.function.BiConsumer;
 
 /**
- * The default progress tracker uses titles
+ * The default progress tracker uses titles.
  */
 public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker.ProgressType, Integer> {
 

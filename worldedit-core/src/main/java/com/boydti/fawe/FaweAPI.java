@@ -6,7 +6,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -24,7 +23,6 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +30,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -148,14 +145,13 @@ public class FaweAPI {
      * - The WorldEdit EditSession can do a lot more<br>
      * Remember to commit when you're done!<br>
      *
-     * @param world     The name of the world
-     * @param autoqueue If it should start dispatching before you enqueue it.
-     * @return
-     * @see IQueueExtent#enqueue()
+     * @param world the name of the world
+     * @param autoQueue If it should start dispatching before you enqueue it.
+     * @return the queue that was created
      */
-    public static IQueueExtent createQueue(World world, boolean autoqueue) {
+    public static IQueueExtent createQueue(World world, boolean autoQueue) {
         IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
-        if (!autoqueue) {
+        if (!autoQueue) {
             queue.disableQueue();
         }
         return queue;
@@ -176,23 +172,11 @@ public class FaweAPI {
      * Upload the clipboard to the configured web interface
      *
      * @param clipboard The clipboard (may not be null)
-     * @param format    The format to use (some formats may not be supported)
+     * @param format The format to use (some formats may not be supported)
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
         return format.uploadAnonymous(clipboard);
-    }
-
-    /**
-     * Just forwards to ClipboardFormat.SCHEMATIC.load(file)
-     *
-     * @param file
-     * @return
-     * @see ClipboardFormat
-     * @see Schematic
-     */
-    public static Schematic load(File file) throws IOException {
-        return ClipboardFormats.findByFile(file).load(file);
     }
 
     /**
@@ -214,10 +198,10 @@ public class FaweAPI {
     }
 
     /**
-     * Get a player's allowed WorldEdit region
+     * Gets a player's allowed WorldEdit region
      *
-     * @param player
-     * @return
+     * @param player the player to check
+     * @return the regions the player can use WorldEdit in
      */
     public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
@@ -228,8 +212,8 @@ public class FaweAPI {
      * - The extent must be the one being used by an EditSession, otherwise an error may be thrown <br>
      * - Insert an extent into the EditSession using the EditSessionEvent: http://wiki.sk89q.com/wiki/WorldEdit/API/Hooking_EditSession <br>
      *
-     * @param extent
-     * @param reason
+     * @param extent the extent being used by an {@link EditSession}
+     * @param reason the caption that explains why the edit was canceled
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
     public static void cancelEdit(Extent extent, BBC reason) {
@@ -244,10 +228,10 @@ public class FaweAPI {
     }
 
     /**
-     * Get the DiskStorageHistory object representing a File
+     * Get the {@link DiskStorageHistory} object representing a File
      *
-     * @param file
-     * @return
+     * @param file the file containing a {@link DiskStorageHistory} object
+     * @return the history from the file as an object
      */
     public static DiskStorageHistory getChangeSetFromFile(File file) {
         if (!file.exists() || file.isDirectory()) {
@@ -283,15 +267,15 @@ public class FaweAPI {
      * Used in the RollBack to generate a list of DiskStorageHistory objects<br>
      * - Note: An edit outside the radius may be included if it overlaps with an edit inside that depends on it.
      *
-     * @param origin   - The origin location
-     * @param user     - The uuid (may be null)
-     * @param radius   - The radius from the origin of the edit
-     * @param timediff - The max age of the file in milliseconds
-     * @param shallow  - If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
+     * @param origin The origin location
+     * @param user The uuid (may be null)
+     * @param radius The radius from the origin of the edit
+     * @param timeDiff the max age of the file in milliseconds
+     * @param shallow If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
      *                 Reading only part of the file will result in unreliable bounds info for large edits
-     * @return
+     * @return a list of DiskStorageHistory objects
      */
-    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
+    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timeDiff, boolean shallow) {
         Extent extent = origin.getExtent();
         if (!(extent instanceof World)) {
             throw new IllegalArgumentException("Origin is not a valid world");
@@ -319,7 +303,7 @@ public class FaweAPI {
             ArrayList<Integer> ids = new ArrayList<>();
             for (File file : userFile.listFiles()) {
                 if (file.getName().endsWith(".bd")) {
-                    if (timediff >= Integer.MAX_VALUE || now - file.lastModified() <= timediff) {
+                    if (timeDiff >= Integer.MAX_VALUE || now - file.lastModified() <= timeDiff) {
                         files.add(file);
                         if (files.size() > 2048) {
                             return null;
@@ -438,7 +422,7 @@ public class FaweAPI {
     /**
      * Have a task run when the server is low on memory (configured threshold)
      *
-     * @param run
+     * @param run the task to run
      */
     public static void addMemoryLimitedTask(Runnable run) {
         MemUtil.addMemoryLimitedTask(run);
@@ -447,18 +431,10 @@ public class FaweAPI {
     /**
      * Have a task run when the server is no longer low on memory (configured threshold)
      *
-     * @param run
+     * @param run the task to run
      */
     public static void addMemoryPlentifulTask(Runnable run) {
         MemUtil.addMemoryPlentifulTask(run);
-    }
-
-    /**
-     * @return
-     * @see BBC
-     */
-    public static BBC[] getTranslations() {
-        return BBC.values();
     }
 
 }
