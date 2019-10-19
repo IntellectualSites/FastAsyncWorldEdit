@@ -119,11 +119,6 @@ public abstract class AbstractNonPlayerActor implements Actor {
     }
 
     @Override
-    public final <T> T getAndSetMeta(String key, T value) {
-        return (T) this.meta.put(key, value);
-    }
-
-    @Override
     public final boolean hasMeta() {
         return !meta.isEmpty();
     }
