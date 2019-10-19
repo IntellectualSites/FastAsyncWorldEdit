@@ -1,7 +1,6 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -22,7 +21,7 @@ public class FaweCache {
         SECTION_BLOCKS.clean();
     }
 
-    public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
+    public static final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<int[]>() {
         @Override
         public int[] init() {
             int[] result = new int[BlockTypes.states.length];
@@ -31,21 +30,21 @@ public class FaweCache {
         }
     };
 
-    public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
+    public static final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK = new CleanableThreadLocal<int[]>() {
         @Override
         public int[] init() {
             return new int[Character.MAX_VALUE];
         }
     };
 
-    public static final IterableThreadLocal<long[]> BLOCK_STATES = new IterableThreadLocal<long[]>() {
+    public static final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<long[]>() {
         @Override
         public long[] init() {
             return new long[2048];
         }
     };
 
-    public static final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<int[]>() {
+    public static final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<int[]>() {
         @Override
         public int[] init() {
             return new int[4096];

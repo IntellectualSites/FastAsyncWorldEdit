@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.collection;
 
-public class ByteStore extends IterableThreadLocal<byte[]> {
+public class ByteStore extends CleanableThreadLocal<byte[]> {
     private final int size;
 
     public ByteStore(int size) {

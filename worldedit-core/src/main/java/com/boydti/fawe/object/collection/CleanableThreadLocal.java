@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.collection;
 
+import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MainUtil;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -8,35 +9,47 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
-public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements Iterable<T> {
-    private ThreadLocal<T> flag;
-    private ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
+public class CleanableThreadLocal<T> extends ThreadLocal<T> {
+    private final Supplier<T> supplier;
+    private LongAdder count = new LongAdder();
 
-    public IterableThreadLocal() {
+    public CleanableThreadLocal(Supplier<T> supplier) {
+        this.supplier = supplier;
+    }
+
+    public CleanableThreadLocal(Supplier<T> supplier, Function<T, T> modifier) {
+        this.supplier = supplier;
+    }
+
+    public CleanableThreadLocal(Supplier<T> supplier, Consumer<T> modifier) {
+        this.supplier = supplier;
     }
 
     @Override
     protected final T initialValue() {
         T value = init();
         if (value != null) {
-            allValues.add(value);
+            count.increment();
         }
         return value;
     }
 
-    @Override
-    public final Iterator<T> iterator() {
-        return getAll().iterator();
-    }
-
     public T init() {
-        return null;
+        return supplier.get();
     }
 
     public void clean() {
-        IterableThreadLocal.clean(this);
+        if (count.sumThenReset() > 0) {
+            CleanableThreadLocal.clean(this);
+        }
     }
 
     public static void clean(ThreadLocal instance) {
@@ -100,21 +113,5 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
             // We will tolerate an exception here and just log it
             throw new IllegalStateException(e);
         }
-    }
-
-    public final Collection<T> getAll() {
-        return Collections.unmodifiableCollection(allValues);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        if (!allValues.isEmpty()) {
-            clean(this);
-        }
-        super.finalize();
-    }
-
-    public int size() {
-        return allValues.size();
     }
 }

@@ -1,11 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.SimpleIntFaweChunk;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCADrawer;
-import com.boydti.fawe.jnbt.anvil.MCAChunk;
-import com.boydti.fawe.jnbt.anvil.MCAWriter;
 import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
@@ -1987,7 +1983,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     protected void finalize() throws Throwable {
-        IterableThreadLocal.clean(indexStore);
+        CleanableThreadLocal.clean(indexStore);
         super.finalize();
     }
 

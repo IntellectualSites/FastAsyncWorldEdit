@@ -20,7 +20,6 @@ public class MemUtil {
 
     public static boolean isMemoryLimitedSlow() {
         if (memory.get()) {
-            FaweCache.cleanAll();
             System.gc();
             System.gc();
             calculateMemory();

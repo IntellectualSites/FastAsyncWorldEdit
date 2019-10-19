@@ -5,7 +5,7 @@ import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal4;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.object.io.FastByteArrayInputStream;
@@ -109,16 +109,16 @@ public class MCAFile {
             chunks.clear();
         }
         locations = null;
-        IterableThreadLocal.clean(byteStore1);
-        IterableThreadLocal.clean(byteStore2);
-        IterableThreadLocal.clean(byteStore3);
+        CleanableThreadLocal.clean(byteStore1);
+        CleanableThreadLocal.clean(byteStore2);
+        CleanableThreadLocal.clean(byteStore3);
     }
 
     @Override
     protected void finalize() throws Throwable {
-        IterableThreadLocal.clean(byteStore1);
-        IterableThreadLocal.clean(byteStore2);
-        IterableThreadLocal.clean(byteStore3);
+        CleanableThreadLocal.clean(byteStore1);
+        CleanableThreadLocal.clean(byteStore2);
+        CleanableThreadLocal.clean(byteStore3);
         super.finalize();
     }
 
@@ -671,8 +671,8 @@ public class MCAFile {
                 }
             }
         }
-        IterableThreadLocal.clean(byteStore1);
-        IterableThreadLocal.clean(byteStore2);
-        IterableThreadLocal.clean(byteStore3);
+        CleanableThreadLocal.clean(byteStore1);
+        CleanableThreadLocal.clean(byteStore2);
+        CleanableThreadLocal.clean(byteStore3);
     }
 }

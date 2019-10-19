@@ -437,7 +437,6 @@ public class SetQueue {
 
     private synchronized boolean runEmptyTasks() {
         if (this.emptyTasks.isEmpty()) {
-            FaweCache.cleanAll(); // clean when empty ???
             return false;
         }
         final ConcurrentLinkedDeque<Runnable> tmp = new ConcurrentLinkedDeque<>(this.emptyTasks);
