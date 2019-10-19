@@ -21,13 +21,13 @@ buildscript {
 
 plugins {
     id "org.ajoberstar.grgit" version "3.1.1"
-    id 'com.gradle.build-scan' version "1.16"
+    id 'com.gradle.build-scan' version "2.4.1"
 
 }
 
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    setTermsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    setTermsOfServiceAgree = 'yes'
 }
 
 println """
