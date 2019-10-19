@@ -21,6 +21,10 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> {
     private final Supplier<T> supplier;
     private LongAdder count = new LongAdder();
 
+    public CleanableThreadLocal() {
+        this(() -> null);
+    }
+
     public CleanableThreadLocal(Supplier<T> supplier) {
         this.supplier = supplier;
     }
