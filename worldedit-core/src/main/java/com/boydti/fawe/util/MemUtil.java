@@ -1,5 +1,6 @@
 package com.boydti.fawe.util;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,6 +20,7 @@ public class MemUtil {
 
     public static boolean isMemoryLimitedSlow() {
         if (memory.get()) {
+            FaweCache.cleanAll();
             System.gc();
             System.gc();
             calculateMemory();

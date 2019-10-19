@@ -108,7 +108,13 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
 
     @Override
     protected void finalize() throws Throwable {
-        clean(this);
+        if (!allValues.isEmpty()) {
+            clean(this);
+        }
         super.finalize();
+    }
+
+    public int size() {
+        return allValues.size();
     }
 }

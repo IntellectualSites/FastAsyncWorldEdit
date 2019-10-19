@@ -1,5 +1,6 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 
 import com.sk89q.jnbt.*;
@@ -14,6 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 public class FaweCache {
+    public static void cleanAll() {
+        BLOCK_TO_PALETTE.clean();
+        PALETTE_TO_BLOCK.clean();
+        BLOCK_STATES.clean();
+        SECTION_BLOCKS.clean();
+    }
+
     public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
         @Override
         public int[] init() {

@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.wrappers.WorldWrapper;
@@ -436,6 +437,7 @@ public class SetQueue {
 
     private synchronized boolean runEmptyTasks() {
         if (this.emptyTasks.isEmpty()) {
+            FaweCache.cleanAll(); // clean when empty ???
             return false;
         }
         final ConcurrentLinkedDeque<Runnable> tmp = new ConcurrentLinkedDeque<>(this.emptyTasks);
