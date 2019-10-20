@@ -53,6 +53,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.primesoft.blockshub.IBlocksHubApiProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -531,8 +532,7 @@ public class FaweBukkit implements IFawe, Listener {
             enabledBlocksHub = false;
             return null;
         }
-        return null;
-//        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
+        return ((IBlocksHubApiProvider) blocksHubPlugin).getApi();
     }
 
     private Version version = null;
