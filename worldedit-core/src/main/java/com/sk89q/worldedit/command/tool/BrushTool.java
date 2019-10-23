@@ -91,6 +91,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     protected static int MAX_RANGE = 500;
+    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
     protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
@@ -177,7 +178,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (targetMode != TargetMode.TARGET_BLOCK_RANGE) {
             map.put("target", targetMode);
         }
-        if (range != -1 && range != MAX_RANGE) {
+        if (range != -1 && range != DEFAULT_RANGE) {
             map.put("range", range);
         }
         if (targetOffset != 0) {
@@ -408,7 +409,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @return the range of the brush in blocks
      */
     public int getRange() {
-        return (range < 0) ? MAX_RANGE : Math.min(range, MAX_RANGE);
+        return (range < 0) ? DEFAULT_RANGE : Math.min(range, MAX_RANGE);
     }
 
     /**

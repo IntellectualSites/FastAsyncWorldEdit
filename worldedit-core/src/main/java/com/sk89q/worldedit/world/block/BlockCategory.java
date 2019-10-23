@@ -32,7 +32,7 @@ import java.util.Set;
  * blocks such as wool into separate ids.
  */
 public class BlockCategory extends Category<BlockType> implements Keyed {
-
+    private boolean[] flat_map;
     public static final NamespacedRegistry<BlockCategory> REGISTRY = new NamespacedRegistry<>("block tag");
 
     public BlockCategory(final String id) {
@@ -41,9 +41,19 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
 
     @Override
     protected Set<BlockType> load() {
-        return WorldEdit.getInstance().getPlatformManager()
+        Set<BlockType> result = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.GAME_HOOKS).getRegistries()
                 .getBlockCategoryRegistry().getAll(this);
+
+        int max = -1;
+        for (BlockType type : result) {
+            max = Math.max(max, type.getInternalId());
+        }
+        this.flat_map = new boolean[max + 1];
+        for (BlockType type : result) {
+            this.flat_map[type.getInternalId()] = true;
+        }
+        return result;
     }
 
     /**
@@ -54,6 +64,7 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
      * @return If it's a part of this category
      */
     public <B extends BlockStateHolder<B>> boolean contains(B blockStateHolder) {
-        return this.getAll().contains(blockStateHolder.getBlockType());
+        int typeId = blockStateHolder.getBlockType().getInternalId();
+        return flat_map.length > typeId && flat_map[typeId];
     }
 }

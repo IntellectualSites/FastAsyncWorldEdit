@@ -69,10 +69,10 @@ public class TextureUtil implements TextureHolder {
     private BiomeColor[] biomes = new BiomeColor[]{
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
-        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 7842607),
+        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain
-        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 7842607),
-        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 7842607),
+        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
         new BiomeColor(3, "mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(4, "forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(5, "taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
@@ -97,7 +97,7 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(22, "jungle_hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(23, "jungle_edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(24, "deep_ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 9616729, 0x77AB2F),
+        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(26, "snowy_beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(27, "birch_forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
         new BiomeColor(28, "birch_forest_hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),

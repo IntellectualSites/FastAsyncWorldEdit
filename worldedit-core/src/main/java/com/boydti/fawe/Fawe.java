@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
+import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -185,6 +186,7 @@ public class Fawe {
                 transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
+                WEManager.IMP.managers.add(new PlotSquaredFeature());
                 Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
             try {
@@ -428,31 +430,5 @@ public class Fawe {
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
-    }
-
-    private ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
-    private ConcurrentHashMap<UUID, Player> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
-
-    public <T> void register(Player player) {
-        players.put(player.getName(), player);
-        playersUUID.put(player.getUniqueId(), player);
-
-    }
-
-    public <T> void unregister(String name) {
-        Player player = players.remove(name);
-        if (player != null) playersUUID.remove(player.getUniqueId());
-    }
-
-    public Player getCachedPlayer(String name) {
-        return players.get(name);
-    }
-
-    public Player getCachedPlayer(UUID uuid) {
-        return playersUUID.get(uuid);
-    }
-
-    public Collection<Player> getCachedPlayers() {
-        return players.values();
     }
 }

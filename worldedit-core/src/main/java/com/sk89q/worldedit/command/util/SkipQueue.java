@@ -10,6 +10,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @CommandCondition(CommandQueuedConditionGenerator.class)
-public @interface CommandQueued {
-    boolean value() default false;
+public @interface SkipQueue {
+    boolean value() default true;
 }

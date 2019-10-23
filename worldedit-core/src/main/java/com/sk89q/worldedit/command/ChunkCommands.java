@@ -171,27 +171,16 @@ public class ChunkCommands {
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/stop"))));
     }
 
-    private static class ChunkListPaginationBox extends PaginationBox {
+    private static class ChunkListPaginationBox extends PaginationBox.ListPaginationBox {
         //private final Region region;
-        private final List<BlockVector2> chunks;
 
         ChunkListPaginationBox(Region region) {
-            super("Selected Chunks", "/listchunks -p %page%");
-            // TODO make efficient/streamable/calculable implementations of this
-            // for most region types, so we can just store the region and random-access get one page of chunks
-            // (this is non-trivial for some types of selections...)
-            //this.region = region.clone();
-            this.chunks = new ArrayList<>(region.getChunks());
+            super("Selected Chunks", "/listchunks -p %page%", region.getChunks());
         }
 
         @Override
         public Component getComponent(int number) {
-            return TextComponent.of(chunks.get(number).toString());
-        }
-
-        @Override
-        public int getComponentsSize() {
-            return chunks.size();
+            return create(number);
         }
     }
 }

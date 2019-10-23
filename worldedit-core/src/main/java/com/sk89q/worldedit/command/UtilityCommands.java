@@ -39,7 +39,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.CommandQueued;
+import com.sk89q.worldedit.command.util.SkipQueue;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
@@ -51,7 +51,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -174,7 +173,7 @@ public class UtilityCommands {
             desc = "Cancel your current command"
     )
     @CommandPermissions("fawe.cancel")
-    @CommandQueued(false)
+    @SkipQueue
     public void cancel(Player fp) {
         int cancelled = fp.cancel(false);
         BBC.WORLDEDIT_CANCEL_COUNT.send(fp, cancelled);
@@ -523,7 +522,7 @@ public class UtilityCommands {
         int size = radius != null ? Math.max(1, radius) : defaultRadius;
         we.checkMaxRadius(size);
 
-        Mask mask = new BlockTypeMask(editSession, BlockTypes.FIRE);
+        Mask mask = BlockTypes.FIRE.toMask();
         int affected = editSession.removeNear(session.getPlacementPosition(actor), mask, size);
         BBC.VISITOR_BLOCK.send(actor, affected);
     }

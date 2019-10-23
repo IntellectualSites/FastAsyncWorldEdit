@@ -116,6 +116,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/copy",
+        aliases = "/cp",
         desc = "Copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.copy")
@@ -365,13 +366,7 @@ public class ClipboardCommands {
                     ClipboardWriter writer = format.getWriter(baos);
                     writer.write(target);
                     baos.flush();
-                    String json = ImgurUtility
-                        .getImgurContent(ImgurUtility.CLIENT_ID, baos.toByteArray());
-                    Gson gson = new Gson();
-                    JsonObject obj = gson.fromJson(json, JsonObject.class);
-                    JsonObject data = obj.get("data").getAsJsonObject();
-                    String link = data.get("link").getAsString();
-                    url = new URL(link);
+                    url = ImgurUtility.uploadImage(baos.toByteArray());
                 } catch (IOException e) {
                     e.printStackTrace();
                     url = null;
@@ -434,6 +429,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/paste",
+        aliases = { "/p", "/pa" },
         desc = "Paste the clipboard's contents"
 
     )

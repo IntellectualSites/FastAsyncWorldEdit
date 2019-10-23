@@ -22,7 +22,7 @@ package com.sk89q.jnbt;
 /**
  * The {@code TAG_Byte} tag.
  */
-public final class ByteTag extends Tag {
+public final class ByteTag extends NumberTag {
 
     private final byte value;
 

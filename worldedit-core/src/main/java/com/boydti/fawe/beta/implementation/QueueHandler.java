@@ -2,13 +2,14 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
@@ -39,8 +40,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
     private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
 
-    private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkCache = new HashMap<>();
-    private IterableThreadLocal<IQueueExtent> queuePool = new IterableThreadLocal<>(QueueHandler.this::create);
+    private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
+    private CleanableThreadLocal<IQueueExtent> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
     /**
      * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
      * server
@@ -198,8 +199,8 @@ public abstract class QueueHandler implements Trimable, Runnable {
     public IChunkCache<IChunkGet> getOrCreateWorldCache(World world) {
         world = WorldWrapper.unwrap(world);
 
-        synchronized (chunkCache) {
-            final WeakReference<IChunkCache<IChunkGet>> ref = chunkCache.get(world);
+        synchronized (chunkGetCache) {
+            final WeakReference<IChunkCache<IChunkGet>> ref = chunkGetCache.get(world);
             if (ref != null) {
                 final IChunkCache<IChunkGet> cached = ref.get();
                 if (cached != null) {
@@ -207,7 +208,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                 }
             }
             final IChunkCache<IChunkGet> created = new ChunkCache<>(world);
-            chunkCache.put(world, new WeakReference<>(created));
+            chunkGetCache.put(world, new WeakReference<>(created));
             return created;
         }
     }
@@ -221,18 +222,25 @@ public abstract class QueueHandler implements Trimable, Runnable {
     public abstract void endSet(boolean parallel);
 
     public IQueueExtent getQueue(World world) {
+        return getQueue(world, null);
+    }
+
+    public IQueueExtent getQueue(World world, IBatchProcessor processor) {
         final IQueueExtent queue = queuePool.get();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);
+        if (processor != null) {
+            queue.setProcessor(processor);
+        }
         return queue;
     }
 
     @Override
     public boolean trim(boolean aggressive) {
         boolean result = true;
-        synchronized (chunkCache) {
-            final Iterator<Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>>> iter = chunkCache
+        synchronized (chunkGetCache) {
+            final Iterator<Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>>> iter = chunkGetCache
                 .entrySet().iterator();
             while (iter.hasNext()) {
                 final Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>> entry = iter.next();

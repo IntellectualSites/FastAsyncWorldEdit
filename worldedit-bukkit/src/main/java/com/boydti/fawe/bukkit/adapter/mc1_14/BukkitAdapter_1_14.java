@@ -38,21 +38,6 @@ import java.util.function.Supplier;
 public class BukkitAdapter_1_14 {
 
     /*
-
-    World world = WorldWrapper.unwrap(extent);
-    if (world == null) throw new IllegalArgumentException("Get must be a world.");
-    if (world instanceof BukkitWorld) {
-        this.bukkitWorld = ((BukkitWorld) world).getWorld();
-    } else {
-        this.bukkitWorld = Bukkit.getWorld(world.getName());
-    }
-    checkNotNull(this.bukkitWorld);
-    CraftWorld craftWorld = ((CraftWorld) bukkitWorld);
-    this.nmsWorld = craftWorld.getHandle();
-
-     */
-
-    /*
         NMS fields
         */
     public final static Field fieldBits;
@@ -89,15 +74,15 @@ public class BukkitAdapter_1_14 {
 
             fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
             fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("h");
+            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
 
             {
                 Field tmp = null;
                 try {
-                    tmp = DataPaletteBlock.class.getDeclaredField("j");
-                } catch (NoSuchFieldException paper) {
                     tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
+                } catch (NoSuchFieldException paper) {
+                    tmp = DataPaletteBlock.class.getDeclaredField("j");
                 }
                 fieldLock = tmp;
                 fieldLock.setAccessible(true);
@@ -310,8 +295,8 @@ public class BukkitAdapter_1_14 {
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
-        fieldFluidCount.set(section, 0); // TODO FIXME
-        fieldTickingBlockCount.set(section, tickingBlockCount);
-        fieldNonEmptyBlockCount.set(section, nonEmptyBlockCount);
+        fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
+        fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
+        fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
     }
 }

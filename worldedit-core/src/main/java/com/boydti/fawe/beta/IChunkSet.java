@@ -3,6 +3,7 @@ package com.boydti.fawe.beta;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -22,6 +23,8 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     @Override
     boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
+    void setBlocks(int layer, char[] data);
+
     boolean isEmpty();
 
     @Override
@@ -31,17 +34,13 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     void removeEntity(UUID uuid);
 
-    BlockState getBlock(int x, int y, int z);
-
-    char[] getArray(int layer);
+    Set<UUID> getEntityRemoves();
 
     BiomeType[] getBiomes();
 
-    Map<Short, CompoundTag> getTiles();
+    Map<BlockVector3, CompoundTag> getTiles();
 
     Set<CompoundTag> getEntities();
-
-    Set<UUID> getEntityRemoves();
 
     @Override
     IChunkSet reset();

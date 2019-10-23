@@ -15,7 +15,6 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.internal.command.ActorAuthorizer;
 import com.sk89q.worldedit.internal.expression.Expression;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.Map;
 public class DefaultTransformParser extends FaweParser<ResettableExtent> {
 
     public DefaultTransformParser(WorldEdit worldEdit) {
-        super(worldEdit, ResettableExtent.class);
+        super(worldEdit);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        transform = Iterables.getFirst(parse(cmdArgs, actor), null);
+                        transform = parse(cmdArgs, actor);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {

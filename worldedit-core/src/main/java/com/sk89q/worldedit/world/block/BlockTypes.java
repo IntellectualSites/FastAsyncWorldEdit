@@ -55,7 +55,7 @@ import java.util.stream.Stream;
  */
 public final class BlockTypes {
     // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
-    @Nullable public static final BlockType __RESERVED__ = null;
+    @Nullable public static final BlockType __RESERVED__ = null; // Placeholder for null index (i.e. when block types are represented as primitives)
     @Nullable public static final BlockType ACACIA_BUTTON = null;
     @Nullable public static final BlockType ACACIA_DOOR = null;
     @Nullable public static final BlockType ACACIA_FENCE = null;
@@ -931,10 +931,6 @@ public final class BlockTypes {
                 }
             }
 
-            // Add to $Registry
-//            for (BlockType type : values) {
-//                BlockType.REGISTRY.register(type.getId().toLowerCase(Locale.ROOT), type);
-//            }
             states = stateList.toArray(new BlockState[stateList.size()]);
 
 

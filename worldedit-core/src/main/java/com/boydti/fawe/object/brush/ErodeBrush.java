@@ -18,14 +18,25 @@ import java.util.Arrays;
 public class ErodeBrush implements Brush {
 
     private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(Direction::toBlockVector).toArray(BlockVector3[]::new);
+    private final int erodeFaces, erodeRec, fillFaces, fillRec;
+
+    public ErodeBrush() {
+        this(2, 1, 5, 1);
+    }
+
+    public ErodeBrush(int erodeFaces, int erodeRec, int fillFaces, int fillRec) {
+        this.erodeFaces = erodeFaces;
+        this.erodeRec = erodeRec;
+        this.fillFaces = fillFaces;
+        this.fillRec = fillRec;
+    }
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        this.erosion(editSession, 2, 1, 5, position, size);
+        this.erosion(editSession, erodeFaces, erodeRec, fillFaces, fillRec, position, size);
     }
 
-    void erosion(EditSession es, int erodeFaces, int erodeRec, int fillFaces,
-        BlockVector3 target, double size) {
+    public void erosion(final EditSession es, int erodeFaces, int erodeRec, int fillFaces, int fillRec, BlockVector3 target, double size) {
         int brushSize = (int) size + 1;
         int brushSizeSquared = (int) (size * size);
         int dimension = brushSize * 2 + 1;
@@ -55,7 +66,7 @@ public class ErodeBrush implements Brush {
             swap++;
         }
 
-        for (int i = 0; i < 1; ++i) {
+        for (int i = 0; i < fillRec; ++i) {
             fillIteration(brushSize, brushSizeSquared, fillFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
             swap++;
         }

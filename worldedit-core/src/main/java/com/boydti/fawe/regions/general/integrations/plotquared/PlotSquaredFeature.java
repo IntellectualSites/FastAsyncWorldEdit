@@ -1,6 +1,7 @@
-package com.boydti.fawe.bukkit.regions.plotquared;
+package com.boydti.fawe.regions.general.integrations.plotquared;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
@@ -20,16 +21,18 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.regions.RegionIntersection;
+
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
-import org.bukkit.Bukkit;
+import java.util.stream.Collectors;
+
+import com.sk89q.worldedit.world.World;
 
 public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
@@ -138,42 +141,11 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (regions.size() == 1) {
             maskedRegion = new CuboidRegion(pos1, pos2);
         } else {
-            maskedRegion = new AbstractRegion(BukkitAdapter.adapt(Bukkit.getWorld(area.worldname))) {
-                @Override
-                public BlockVector3 getMinimumPoint() {
-                    return pos1;
-                }
-
-                @Override
-                public BlockVector3 getMaximumPoint() {
-                    return pos2;
-                }
-
-                @Override
-                public void expand(BlockVector3... changes) throws RegionOperationException {
-                    throw new UnsupportedOperationException("Region is immutable");
-                }
-
-                @Override
-                public void contract(BlockVector3... changes) throws RegionOperationException {
-                    throw new UnsupportedOperationException("Region is immutable");
-                }
-
-                @Override
-                public boolean contains(int x, int y, int z) {
-                    return WEManager.maskContains(regions, x, y, z);
-                }
-
-                @Override
-                public boolean contains(int x, int z) {
-                    return WEManager.maskContains(regions, x, z);
-                }
-
-                @Override
-                public boolean contains(BlockVector3 position) {
-                    return contains(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-                }
-            };
+            World world = FaweAPI.getWorld(area.worldname);
+            List<Region> weRegions = regions.stream()
+                    .map(r -> new CuboidRegion(world, BlockVector3.at(r.minX, r.minY, r.minZ), BlockVector3.at(r.maxX, r.maxY, r.maxZ)))
+                    .collect(Collectors.toList());
+            maskedRegion = new RegionIntersection(world, weRegions);
         }
 
         return new FaweMask(maskedRegion) {

@@ -31,6 +31,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -225,6 +226,11 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return this.toBaseBlock();
     }
 
+    @Override
+    public void applyTileEntity(OutputExtent output, int x, int y, int z) {
+
+    }
+
     /**
      * The internal id with no type information
      * @return
@@ -296,7 +302,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
-        return (Map<Property<?>, Object>) map;
+        return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
     }
 
     @Override

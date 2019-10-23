@@ -1,24 +1,30 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.IBatchProcessorHolder;
 import com.boydti.fawe.beta.implementation.IChunkCache;
+import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import javax.annotation.Nullable;
 import java.io.Flushable;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
  * uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, Extent {
+public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcessorHolder {
 
     @Override
     default boolean isQueueEnabled() {
@@ -54,6 +60,12 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     void disableQueue();
 
 
+    /**
+     * Initialize the queue (for reusability)
+     * @param extent
+     * @param get
+     * @param set
+     */
     void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 
     /**
@@ -82,7 +94,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * @param z
      * @return IChunk
      */
-    IChunk getCachedChunk(int x, int z);
+    IChunk getOrCreateChunk(int x, int z);
 
     /**
      * Submit the chunk so that it's changes are applied to the world
@@ -96,36 +108,36 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     @Override
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }
 
     @Override
     default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.setTile(x & 15, y, z & 15, tile);
     }
 
     @Override
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.setBiome(x & 15, y, z & 15, biome);
     }
 
     @Override
     default BlockState getBlock(int x, int y, int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getBlock(x & 15, y, z & 15);
     }
 
     @Override
     default BaseBlock getFullBlock(int x, int y, int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getFullBlock(x & 15, y, z & 15);
     }
 
     default BiomeType getBiome(int x, int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getBiomeType(x & 15, z & 15);
     }
 
@@ -157,6 +169,13 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      */
     default IChunk wrap(IChunk root) {
         return root;
+    }
+
+    @Nullable
+    @Override
+    default Operation commit() {
+        flush();
+        return null;
     }
 
     /**

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.block;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
+import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -152,6 +153,8 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
     default BaseBlock apply(BlockVector3 position) {
         return toBaseBlock();
     }
+
+    void applyTileEntity(OutputExtent output, int x, int y, int z);
 
     /**
      * Return the name of the title entity ID.

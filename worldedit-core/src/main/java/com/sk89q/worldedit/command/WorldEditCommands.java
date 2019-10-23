@@ -29,7 +29,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.CommandQueued;
+import com.sk89q.worldedit.command.util.SkipQueue;
 import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.entity.Player;
@@ -73,7 +73,7 @@ public class WorldEditCommands {
         aliases = { "ver" },
         desc = "Get WorldEdit/FAWE version"
     )
-    @CommandQueued
+    @SkipQueue
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
@@ -128,7 +128,7 @@ public class WorldEditCommands {
         aliases = { "debugpaste" },
         desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
-    @CommandQueued
+    @SkipQueue
     @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
     public void report(Actor actor) throws WorldEditException, IOException {
         BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
@@ -138,7 +138,7 @@ public class WorldEditCommands {
         name = "threads",
         desc = "Print all thread stacks"
     )
-    @CommandQueued
+    @SkipQueue
     @CommandPermissions("worldedit.threads")
     public void threads(Actor actor) throws WorldEditException {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
@@ -188,7 +188,7 @@ public class WorldEditCommands {
         name = "help",
         desc = "Displays help for FAWE commands"
     )
-    @CommandQueued
+    @SkipQueue
     @CommandPermissions("worldedit.help")
     public void help(Actor actor,
                      @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")

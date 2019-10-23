@@ -1,7 +1,5 @@
 package com.boydti.fawe.util;
 
-import static java.lang.System.arraycopy;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -26,7 +24,17 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import java.awt.Graphics2D;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4InputStream;
+import net.jpountz.lz4.LZ4Utils;
+
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -75,26 +83,10 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
+
+import static java.lang.System.arraycopy;
 
 public class MainUtil {
-
-    public static void sendAdmin(final String s) {
-        for (final Player player : Fawe.get().getCachedPlayers()) {
-            if (player.hasPermission("fawe.admin")) {
-                player.print(s);
-            }
-        }
-        Fawe.debug(s);
-    }
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -754,7 +746,6 @@ public class MainUtil {
         if (time >= 33868800) {
             int years = (int) (time / 33868800);
             int time1 = years * 33868800;
-            System.out.println(time1);
             time -= time1;
             toreturn.append(years + "y ");
         }

@@ -24,6 +24,8 @@ import org.enginehub.piston.Command;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 import java.util.Set;
 
 public class PermissionCondition implements Command.Condition {

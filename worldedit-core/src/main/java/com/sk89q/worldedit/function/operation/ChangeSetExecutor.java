@@ -35,7 +35,23 @@ import java.util.List;
  */
 public class ChangeSetExecutor implements Operation {
 
-    public enum Type {UNDO, REDO}
+    public enum Type {
+        UNDO {
+            @Override
+            public void perform(Change change, UndoContext context) {
+                change.undo(context);
+            }
+        },
+        REDO {
+            @Override
+            public void perform(Change change, UndoContext context) {
+                change.redo(context);
+            }
+        }
+        ;
+
+        public void perform(Change change, UndoContext context) {}
+    }
 
     private final Iterator<Change> iterator;
     private final Type type;
@@ -68,13 +84,8 @@ public class ChangeSetExecutor implements Operation {
     public Operation resume(RunContext run) throws WorldEditException {
         while (iterator.hasNext()) {
             Change change = iterator.next();
-            if (type == Type.UNDO) {
-                change.undo(context);
-            } else {
-                change.redo(context);
-            }
+            type.perform(change, context);
         }
-
         return null;
     }
 

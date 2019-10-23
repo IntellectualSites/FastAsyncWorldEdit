@@ -160,4 +160,9 @@ public class HistoryExtent extends AbstractDelegateExtent {
             return this.entity.setLocation(location);
         }
     }
+
+    @Override
+    public Extent disableHistory() {
+        return getExtent();
+    }
 }

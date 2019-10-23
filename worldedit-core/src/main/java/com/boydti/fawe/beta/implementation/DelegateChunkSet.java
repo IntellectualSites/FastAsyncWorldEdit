@@ -64,7 +64,7 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default Map<Short, CompoundTag> getTiles() {
+    default Map<BlockVector3, CompoundTag> getTiles() {
         return getParent().getTiles();
     }
 

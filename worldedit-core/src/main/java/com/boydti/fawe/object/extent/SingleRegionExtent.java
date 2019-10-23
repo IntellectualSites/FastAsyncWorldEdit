@@ -1,5 +1,8 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
@@ -34,5 +37,10 @@ public class SingleRegionExtent extends FaweRegionExtent {
     @Override
     public Collection<Region> getRegions() {
         return Collections.singletonList(region);
+    }
+
+    @Override
+    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return region.processBatch(chunk, get, set);
     }
 }

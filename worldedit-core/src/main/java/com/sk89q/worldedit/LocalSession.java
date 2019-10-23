@@ -50,6 +50,8 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockTool;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
+import com.sk89q.worldedit.command.tool.NavigationWand;
+import com.sk89q.worldedit.command.tool.SelectionWand;
 import com.sk89q.worldedit.command.tool.SinglePickaxe;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
@@ -78,6 +80,10 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,6 +91,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -130,8 +137,7 @@ public class LocalSession implements TextureHolder {
     private transient ClipboardHolder clipboard;
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-    private transient boolean hasTool = false;
-    private transient Tool[] tools = new Tool[ItemTypes.size()];
+    private transient final Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -153,12 +159,14 @@ public class LocalSession implements TextureHolder {
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
 
+    private transient boolean loadDefaults = true;
+
     // Saved properties
     private String lastScript;
     private RegionSelectorType defaultSelector;
     private boolean useServerCUI = false; // Save this to not annoy players.
-    private String wandItem;
-    private String navWandItem;
+    private ItemType wandItem;
+    private ItemType navWandItem;
 
     /**
      * Construct the object.
@@ -579,9 +587,11 @@ public class LocalSession implements TextureHolder {
     }
 
     public void unregisterTools(Player player) {
-        for (Tool tool : tools) {
-            if (tool instanceof BrushTool) {
-                ((BrushTool) tool).clear(player);
+        synchronized (tools) {
+            for (Tool tool : tools.values()) {
+                if (tool instanceof BrushTool) {
+                    ((BrushTool) tool).clear(player);
+                }
             }
         }
     }
@@ -721,7 +731,7 @@ public class LocalSession implements TextureHolder {
      * @return clipboard
      * @throws EmptyClipboardException thrown if no clipboard is set
      */
-    public ClipboardHolder getClipboard() throws EmptyClipboardException {
+    public synchronized ClipboardHolder getClipboard() throws EmptyClipboardException {
         if (clipboard == null) {
             throw new EmptyClipboardException();
         }
@@ -729,11 +739,11 @@ public class LocalSession implements TextureHolder {
     }
 
     @Nullable
-    public ClipboardHolder getExistingClipboard() {
+    public synchronized ClipboardHolder getExistingClipboard() {
         return clipboard;
     }
 
-    public void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
+    public synchronized void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
         checkNotNull(toAppend);
         ClipboardHolder existing = getExistingClipboard();
         MultiClipboardHolder multi;
@@ -758,7 +768,7 @@ public class LocalSession implements TextureHolder {
      *
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
      */
-    public void setClipboard(@Nullable ClipboardHolder clipboard) {
+    public synchronized void setClipboard(@Nullable ClipboardHolder clipboard) {
         if (this.clipboard == clipboard) return;
 
         if (this.clipboard != null) {
@@ -946,13 +956,17 @@ public class LocalSession implements TextureHolder {
      * @return the tool, which may be {@code null}
      */
     @Nullable
+    @Deprecated
     public Tool getTool(ItemType item) {
-        return tools[item.getInternalId()];
+        synchronized (this.tools) {
+            return tools.get(item.getInternalId());
+        }
     }
 
     @Nullable
     public Tool getTool(Player player) {
-        if (!Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && !hasTool) {
+        loadDefaults(player, false);
+        if (!Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && tools.isEmpty()) {
             return null;
         }
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
@@ -964,7 +978,29 @@ public class LocalSession implements TextureHolder {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) return tool;
         }
+        loadDefaults(player, false);
         return getTool(item.getType());
+    }
+
+    public void loadDefaults(Actor actor, boolean force) {
+        if (loadDefaults || force) {
+            loadDefaults = false;
+            LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
+            if (wandItem == null) {
+                wandItem = ItemTypes.parse(config.wandItem);
+            }
+            if (navWandItem == null) {
+                navWandItem = ItemTypes.parse(config.navigationWand);
+            }
+            synchronized (this.tools) {
+                if (tools.get(navWandItem.getInternalId()) == null && NavigationWand.INSTANCE.canUse(actor)) {
+                    tools.put(navWandItem.getInternalId(), NavigationWand.INSTANCE);
+                }
+                if (tools.get(wandItem.getInternalId()) == null && SelectionWand.INSTANCE.canUse(actor)) {
+                    tools.put(wandItem.getInternalId(), SelectionWand.INSTANCE);
+                }
+            }
+        }
     }
 
     /**
@@ -1015,10 +1051,14 @@ public class LocalSession implements TextureHolder {
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.hasBlockType()) {
             throw new InvalidToolBindException(item, "Blocks can't be used");
-        } else if (item.getId().equalsIgnoreCase(config.wandItem)) {
-            throw new InvalidToolBindException(item, "Already used for the wand");
-        } else if (item.getId().equalsIgnoreCase(config.navigationWand)) {
-            throw new InvalidToolBindException(item, "Already used for the navigation wand");
+        } else if (tool instanceof SelectionWand) {
+            changeTool(this.wandItem, this.wandItem = item, tool);
+            setDirty();
+            return;
+        } else if (tool instanceof NavigationWand) {
+            changeTool(this.navWandItem, this.navWandItem = item, tool);
+            setDirty();
+            return;
         }
         setTool(item.getDefaultState(), tool, null);
     }
@@ -1028,14 +1068,33 @@ public class LocalSession implements TextureHolder {
         setTool(item, tool, player);
     }
 
+    private void changeTool(ItemType oldType, ItemType newType, Tool newTool) {
+        if (oldType != null) {
+            synchronized (this.tools) {
+                this.tools.remove(oldType.getInternalId());
+            }
+        }
+        synchronized (this.tools) {
+            if (newTool == null) {
+                this.tools.remove(newType.getInternalId());
+            } else {
+                this.tools.put(newType.getInternalId(), newTool);
+            }
+        }
+    }
+
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
         ItemType type = item.getType();
         if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
             throw new InvalidToolBindException(type, "Blocks can't be used");
-        } else if (type.getId().equalsIgnoreCase(config.wandItem)) {
-            throw new InvalidToolBindException(type, "Already used for the wand");
-        } else if (type.getId().equalsIgnoreCase(config.navigationWand)) {
-            throw new InvalidToolBindException(type, "Already used for the navigation wand");
+        } else if (tool instanceof SelectionWand) {
+            changeTool(this.wandItem, this.wandItem = item.getType(), tool);
+            setDirty();
+            return;
+        } else if (tool instanceof NavigationWand) {
+            changeTool(this.navWandItem, this.navWandItem = item.getType(), tool);
+            setDirty();
+            return;
         }
 
         Tool previous;
@@ -1045,18 +1104,17 @@ public class LocalSession implements TextureHolder {
             if (tool != null) {
                 ((BrushTool) tool).setHolder(item);
             } else {
-                this.tools[type.getInternalId()] = null;
+                synchronized (this.tools) {
+                    this.tools.remove(type.getInternalId());
+                }
             }
         } else {
-            previous = this.tools[type.getInternalId()];
-            this.tools[type.getInternalId()] = tool;
-            if (tool != null) {
-                hasTool = true;
-            } else {
-                hasTool = false;
-                for (Tool i : this.tools) if (i != null) {
-                    hasTool = true;
-                    break;
+            synchronized (this.tools) {
+                previous = this.tools.get(type.getInternalId());
+                if (tool != null) {
+                    this.tools.put(type.getInternalId(), tool);
+                } else {
+                    this.tools.remove(type.getInternalId());
                 }
             }
         }
@@ -1477,7 +1535,7 @@ public class LocalSession implements TextureHolder {
      * @return item id of wand item, or {@code null}
      */
     public String getWandItem() {
-        return wandItem;
+        return wandItem.getId();
     }
 
     /**
@@ -1485,7 +1543,7 @@ public class LocalSession implements TextureHolder {
      * @return item id of nav wand item, or {@code null}
      */
     public String getNavWandItem() {
-        return navWandItem;
+        return navWandItem.getId();
     }
 
     /**

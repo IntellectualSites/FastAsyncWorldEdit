@@ -95,20 +95,9 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return getExtent().setBlock(position.getX(),position.getY(), position.getZ(), block);
-    }
-
-    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
         return getExtent().setBlock(x,y, z, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return getExtent().setBiome(position.getX(),0, position.getZ(), biome);
     }
 
     @Override

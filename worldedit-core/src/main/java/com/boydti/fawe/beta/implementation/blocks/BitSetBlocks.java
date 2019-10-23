@@ -39,24 +39,28 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
+    public void setBlocks(int layer, char[] data) {
+        row.reset(layer);
+        int by = layer << 4;
+        for (int y = 0, index = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    if (data[index] != 0) {
+                        row.set(null, x, by + y, z);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean isEmpty() {
         return row.isEmpty();
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return setBlock(position.getX(), position.getY(), position.getZ(), block);
-    }
-
-    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) {
         return false;
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(),0, position.getZ(), biome);
     }
 
     @Override
@@ -112,7 +116,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public Map<Short, CompoundTag> getTiles() {
+    public Map<BlockVector3, CompoundTag> getTiles() {
         return null;
     }
 

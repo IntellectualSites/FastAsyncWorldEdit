@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -85,14 +87,7 @@ public class BaseEntity implements NbtValued {
     }
 
     public Location getLocation(Extent extent) {
-        ListTag posTag = nbtData.getListTag("Pos");
-        ListTag rotTag = nbtData.getListTag("Rotation");
-        double x = posTag.getDouble(0);
-        double y = posTag.getDouble(1);
-        double z = posTag.getDouble(2);
-        float yaw = rotTag.getFloat(0);
-        float pitch = rotTag.getFloat(1);
-        return new Location(extent, x, y, z, yaw, pitch);
+        return nbtData.getEntityLocation(extent);
     }
 
     @Override

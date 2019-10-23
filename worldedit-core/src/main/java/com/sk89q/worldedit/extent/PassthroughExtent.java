@@ -1,5 +1,7 @@
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -66,23 +68,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         getExtent().removeEntity(x, y, z, uuid);
-    }
-
-    public boolean isQueueEnabled() {
-        return getExtent().isQueueEnabled();
-    }
-
-    public void enableQueue() {
-        getExtent().enableQueue();
-    }
-
-    public void disableQueue() {
-        getExtent().disableQueue();
-    }
-
-    @Override
-    public boolean isWorld() {
-        return getExtent().isWorld();
     }
 
     @Override
@@ -173,17 +158,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
         return getExtent().getBlockDistributionWithData(region);
-    }
-
-    @Override
-    @Nullable
-    public Operation commit() {
-        return getExtent().commit();
-    }
-
-    @Override
-    public boolean cancel() {
-        return getExtent().cancel();
     }
 
     @Override
@@ -291,5 +265,47 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
+    }
+
+    // special
+    public Extent disableHistory() {
+        return super.disableHistory();
+    }
+
+    @Override
+    public Extent addProcessor(IBatchProcessor processor) {
+        return super.addProcessor(processor);
+    }
+
+    public Extent enableHistory(FaweChangeSet changeSet) {
+        return super.enableHistory(changeSet);
+    }
+
+    @Override
+    @Nullable
+    public Operation commit() {
+        return getExtent().commit();
+    }
+
+    @Override
+    public boolean cancel() {
+        return getExtent().cancel();
+    }
+
+    public boolean isQueueEnabled() {
+        return getExtent().isQueueEnabled();
+    }
+
+    public void enableQueue() {
+        getExtent().enableQueue();
+    }
+
+    public void disableQueue() {
+        getExtent().disableQueue();
+    }
+
+    @Override
+    public boolean isWorld() {
+        return getExtent().isWorld();
     }
 }

@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 /**
  * The {@code TAG_List} tag.
  */
-public final class ListTag extends Tag {
+public class ListTag extends Tag {
 
     private final Class<? extends Tag> type;
     private final List<Tag> value;

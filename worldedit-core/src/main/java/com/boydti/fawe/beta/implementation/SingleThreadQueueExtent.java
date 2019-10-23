@@ -3,6 +3,7 @@ package com.boydti.fawe.beta.implementation;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.CharFilterBlock;
 import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -11,17 +12,16 @@ import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
  * <p>
  * This queue is reusable {@link #init(IChunkCache)}
  */
-public class SingleThreadQueueExtent implements IQueueExtent {
+public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQueueExtent {
 
 //    // Pool discarded chunks for reuse (can safely be cleared by another thread)
 //    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
@@ -86,19 +86,20 @@ public class SingleThreadQueueExtent implements IQueueExtent {
      * Resets the queue.
      */
     protected synchronized void reset() {
-        if (!initialized) return;
+        if (!this.initialized) return;
         checkThread();
-        if (!chunks.isEmpty()) {
-            for (IChunk chunk : chunks.values()) {
+        if (!this.chunks.isEmpty()) {
+            for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
             }
-            chunks.clear();
+            this.chunks.clear();
         }
-        enabledQueue = true;
-        lastChunk = null;
-        lastPair = Long.MAX_VALUE;
-        currentThread = null;
-        initialized = false;
+        this.enabledQueue = true;
+        this.lastChunk = null;
+        this.lastPair = Long.MAX_VALUE;
+        this.currentThread = null;
+        this.initialized = false;
+        this.setProcessor(EmptyBatchProcessor.INSTANCE);
     }
 
     /**
@@ -118,7 +119,25 @@ public class SingleThreadQueueExtent implements IQueueExtent {
         }
         this.cacheGet = get;
         this.cacheSet = set;
+        this.setProcessor(EmptyBatchProcessor.INSTANCE);
         initialized = true;
+    }
+
+    @Override
+    public Extent addProcessor(IBatchProcessor processor) {
+        join(processor);
+        return this;
+    }
+
+    @Override
+    public Extent enableHistory(FaweChangeSet changeSet) {
+        return this.addProcessor(changeSet);
+    }
+
+    @Override
+    public Extent disableHistory() {
+        this.remove(FaweChangeSet.class);
+        return this;
     }
 
     @Override
@@ -165,7 +184,6 @@ public class SingleThreadQueueExtent implements IQueueExtent {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
-        // TODO trim individial chunk sections
         cacheGet.trim(aggressive);
         cacheSet.trim(aggressive);
         if (Thread.currentThread() == currentThread) {
@@ -200,7 +218,7 @@ public class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public final IChunk getCachedChunk(int x, int z) {
+    public final IChunk getOrCreateChunk(int x, int z) {
         final long pair = (long) x << 32 | z & 0xffffffffL;
         if (pair == lastPair) {
             return lastChunk;
@@ -310,17 +328,5 @@ public class SingleThreadQueueExtent implements IQueueExtent {
     @Override
     public ChunkFilterBlock initFilterBlock() {
         return new CharFilterBlock(this);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return setBlock(position.getX(),position.getY(), position.getZ(), block);
-
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(),0, position.getZ(), biome);
     }
 }

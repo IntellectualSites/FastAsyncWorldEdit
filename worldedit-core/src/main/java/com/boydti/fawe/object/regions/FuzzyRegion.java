@@ -123,4 +123,10 @@ public class FuzzyRegion extends AbstractRegion {
     public void setExtent(EditSession extent) {
         this.extent = extent;
     }
+
+    @Override
+    public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
+        // TODO optimize (switch from BlockVectorSet to the new bitset)
+        return false;
+    }
 }

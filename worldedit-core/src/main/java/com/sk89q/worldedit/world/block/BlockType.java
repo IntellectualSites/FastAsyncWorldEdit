@@ -25,6 +25,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -285,6 +286,10 @@ public class BlockType implements FawePattern, Keyed {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.getDefaultState().toBaseBlock();
+    }
+
+    public SingleBlockTypeMask toMask() {
+        return toMask(new NullExtent());
     }
 
     public SingleBlockTypeMask toMask(Extent extent) {

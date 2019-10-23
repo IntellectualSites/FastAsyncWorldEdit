@@ -3,7 +3,7 @@ package com.boydti.fawe;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -53,7 +53,7 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
-    private final IdentityHashMap<Class, IterableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
+    private final IdentityHashMap<Class, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
     private final IdentityHashMap<Class, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
 
     public interface Pool<T> {
@@ -108,7 +108,7 @@ public enum FaweCache implements Trimable {
         MUTABLE_VECTOR3.clean();
         MUTABLE_BLOCKVECTOR3.clean();
         SECTION_BITS_TO_CHAR.clean();
-        for (Map.Entry<Class, IterableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
+        for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
             entry.getValue().clean();
         }
         for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
@@ -141,13 +141,13 @@ public enum FaweCache implements Trimable {
     }
 
     public final <T> T getSingleton(Class<T> clazz) {
-        IterableThreadLocal<T> cache = REGISTERED_SINGLETONS.get(clazz);
+        CleanableThreadLocal<T> cache = REGISTERED_SINGLETONS.get(clazz);
         if (cache == null) {
             synchronized (this) {
                 cache = REGISTERED_SINGLETONS.get(clazz);
                 if (cache == null) {
                     Fawe.debug("Not registered " + clazz);
-                    cache = new IterableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
+                    cache = new CleanableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
                     REGISTERED_SINGLETONS.put(clazz, cache);
                 }
             }
@@ -155,10 +155,10 @@ public enum FaweCache implements Trimable {
         return cache.get();
     }
 
-    public synchronized <T> IterableThreadLocal<T> registerSingleton(Class<T> clazz, Supplier<T> cache) {
+    public synchronized <T> CleanableThreadLocal<T> registerSingleton(Class<T> clazz, Supplier<T> cache) {
         checkNotNull(cache);
-        IterableThreadLocal<T> local = new IterableThreadLocal<>(cache);
-        IterableThreadLocal previous = REGISTERED_SINGLETONS.putIfAbsent(clazz, local);
+        CleanableThreadLocal<T> local = new CleanableThreadLocal<>(cache);
+        CleanableThreadLocal previous = REGISTERED_SINGLETONS.putIfAbsent(clazz, local);
         if (previous != null) {
             throw new IllegalStateException("Previous key");
         }
@@ -180,27 +180,27 @@ public enum FaweCache implements Trimable {
         return pool;
     }
 
-    public final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<>(() -> {
+    public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypes.states.length];
         Arrays.fill(result, Integer.MAX_VALUE);
         return result;
     });
 
-    public final IterableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new IterableThreadLocal<>(() -> new char[4096]);
+    public final CleanableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new CleanableThreadLocal<>(() -> new char[4096]);
 
-    public final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
+    public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK = new CleanableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
 
-    public final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<>(
+    public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
         () -> new char[Character.MAX_VALUE + 1], a -> {
             Arrays.fill(a, Character.MAX_VALUE);
         }
     );
 
-    public final IterableThreadLocal<long[]> BLOCK_STATES = new IterableThreadLocal<>(() -> new long[2048]);
+    public final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<>(() -> new long[2048]);
 
-    public final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<>(() -> new int[4096]);
+    public final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<>(() -> new int[4096]);
 
-    public final IterableThreadLocal<int[]> INDEX_STORE = new IterableThreadLocal<>(() -> new int[256]);
+    public final CleanableThreadLocal<int[]> INDEX_STORE = new CleanableThreadLocal<>(() -> new int[256]);
 
     /**
      * Holds data for a palette used in a chunk section
@@ -219,7 +219,7 @@ public enum FaweCache implements Trimable {
         public long[] blockStates;
     }
 
-    private final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<>(Palette::new);
+    private final CleanableThreadLocal<Palette> PALETTE_CACHE = new CleanableThreadLocal<>(Palette::new);
 
     /**
      * Convert raw char array to palette
@@ -315,9 +315,9 @@ public enum FaweCache implements Trimable {
      * Vector cache
      */
 
-    public IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<>(MutableBlockVector3::new);
+    public CleanableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new CleanableThreadLocal<>(MutableBlockVector3::new);
 
-    public IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>(MutableVector3::new) {
+    public CleanableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new CleanableThreadLocal<MutableVector3>(MutableVector3::new) {
         @Override
         public MutableVector3 init() {
             return new MutableVector3();

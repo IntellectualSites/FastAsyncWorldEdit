@@ -1,11 +1,16 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
@@ -127,6 +132,26 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     @Override
     default boolean isEmpty() {
         return getParent().isEmpty();
+    }
+
+    @Override
+    default Map<BlockVector3, CompoundTag> getTiles() {
+        return getParent().getTiles();
+    }
+
+    @Override
+    default Set<CompoundTag> getEntities() {
+        return getParent().getEntities();
+    }
+
+    @Override
+    default CompoundTag getEntity(UUID uuid) {
+        return getParent().getEntity(uuid);
+    }
+
+    @Override
+    default char[] getArray(int layer) {
+        return getParent().getArray(layer);
     }
 
     default <T extends IChunk> T findParent(Class<T> clazz) {

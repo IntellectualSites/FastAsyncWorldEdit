@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.extent.Extent;
@@ -209,8 +209,8 @@ public abstract class MCAWriter implements Extent {
         }
         pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         pool.shutdown();
-        IterableThreadLocal.clean(byteStore1);
-        IterableThreadLocal.clean(byteStore2);
-        IterableThreadLocal.clean(deflateStore);
+        CleanableThreadLocal.clean(byteStore1);
+        CleanableThreadLocal.clean(byteStore2);
+        CleanableThreadLocal.clean(deflateStore);
     }
 }

@@ -80,6 +80,8 @@ public class Naturalizer implements LayerFunction {
     }
 
     private boolean naturalize(BlockVector3 position, int depth) throws WorldEditException {
+        return editSession.setBlock(position, getTargetBlock(depth));
+        /*
         BlockState block = editSession.getBlock(position);
         BlockState targetBlock = getTargetBlock(depth);
 
@@ -88,6 +90,7 @@ public class Naturalizer implements LayerFunction {
         }
 
         return editSession.setBlock(position, targetBlock);
+         */
     }
 
     @Override

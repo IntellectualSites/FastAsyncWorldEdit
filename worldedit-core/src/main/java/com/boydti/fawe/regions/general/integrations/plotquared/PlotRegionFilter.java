@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.regions.plotquared;
+package com.boydti.fawe.regions.general.integrations.plotquared;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

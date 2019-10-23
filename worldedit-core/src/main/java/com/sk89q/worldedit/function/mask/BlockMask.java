@@ -151,7 +151,9 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
-        blocks.forEach(baseBlock -> add(baseBlock.toBlockState()));
+        for (BaseBlock block : blocks) {
+            add(block.toBlockState());
+        }
     }
 
     /**

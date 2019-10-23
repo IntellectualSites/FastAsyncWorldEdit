@@ -98,6 +98,7 @@ public class SelectionCommands {
 
     @Command(
         name = "/pos1",
+        aliases = "/1",
         desc = "Set position 1"
     )
     @Logging(POSITION)
@@ -126,6 +127,7 @@ public class SelectionCommands {
 
     @Command(
         name = "/pos2",
+            aliases = "/2",
         desc = "Set position 2"
     )
     @Logging(POSITION)
@@ -261,6 +263,7 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.wand")
     public void wand(Player player, LocalSession session,
                         @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand) throws WorldEditException {
+        session.loadDefaults(player, true);
         String wandId = navWand ? session.getNavWandItem() : session.getWandItem();
         if (wandId == null) {
             wandId = navWand ? we.getConfiguration().navigationWand : we.getConfiguration().wandItem;
@@ -272,10 +275,10 @@ public class SelectionCommands {
         }
         player.giveItem(new BaseItemStack(itemType, 1));
         if (navWand) {
-            session.setTool(itemType, new NavigationWand());
+            session.setTool(itemType, NavigationWand.INSTANCE);
             player.print("Left click: jump to location; Right click: pass through walls");
         } else {
-            session.setTool(itemType, new SelectionWand());
+            session.setTool(itemType, SelectionWand.INSTANCE);
             player.print(BBC.SELECTION_WAND.s());
         }
         if (!player.hasPermission("fawe.tips"))

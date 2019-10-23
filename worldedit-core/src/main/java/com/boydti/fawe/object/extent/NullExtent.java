@@ -1,5 +1,8 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
@@ -320,5 +323,10 @@ public class NullExtent extends FaweRegionExtent {
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
         throw reason;
+    }
+
+    @Override
+    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return null;
     }
 }

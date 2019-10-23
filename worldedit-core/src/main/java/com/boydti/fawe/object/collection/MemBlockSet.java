@@ -869,6 +869,10 @@ public final class MemBlockSet extends BlockSet {
             return true;
         }
 
+        public void reset(int layer) {
+            this.rows[layer] = NULL_ROW_Y;
+        }
+
         public void reset() {
             for (int i = 0; i < FaweCache.IMP.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
         }

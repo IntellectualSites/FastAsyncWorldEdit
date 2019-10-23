@@ -5,12 +5,17 @@ import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 public enum NullChunkGet implements IChunkGet {
@@ -37,6 +42,21 @@ public enum NullChunkGet implements IChunkGet {
     }
 
     @Override
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Set<CompoundTag> getEntities() {
+        return null;
+    }
+
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        return null;
+    }
+
+    @Override
     public boolean trim(boolean aggressive) {
         return true;
     }
@@ -54,6 +74,11 @@ public enum NullChunkGet implements IChunkGet {
     @Override
     public boolean hasSection(int layer) {
         return false;
+    }
+
+    @Override
+    public char[] getArray(int layer) {
+        return new char[0];
     }
 
     @Override

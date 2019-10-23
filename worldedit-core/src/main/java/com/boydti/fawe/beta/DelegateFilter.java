@@ -1,6 +1,6 @@
 package com.boydti.fawe.beta;
 
-public class DelegateFilter<T extends Filter> implements IDelegateFilter {
+public abstract class DelegateFilter<T extends Filter> implements IDelegateFilter {
 
     private final Filter parent;
 
@@ -9,12 +9,7 @@ public class DelegateFilter<T extends Filter> implements IDelegateFilter {
     }
 
     @Override
-    public T getParent() {
+    public final T getParent() {
         return (T) parent;
-    }
-
-    @Override
-    public Filter newInstance(Filter other) {
-        return new DelegateFilter(other);
     }
 }

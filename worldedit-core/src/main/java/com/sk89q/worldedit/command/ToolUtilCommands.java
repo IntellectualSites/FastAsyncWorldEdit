@@ -88,7 +88,6 @@ public class ToolUtilCommands {
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-        System.out.println(lastArg + " TODO check this is not the whole command");
         settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
         settings.setMask(maskOpt);
         tool.update();

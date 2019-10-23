@@ -1,6 +1,9 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.util.StringMan;
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
+import com.boydti.fawe.wrappers.PlayerWrapper;
+import com.boydti.fawe.wrappers.SilentPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -39,9 +42,10 @@ public class CommandBrush implements Brush {
             position = position.add(face.getDirection().toBlockPoint());
         }
         player.setSelection(selector);
+        PlayerWrapper wePlayer = new SilentPlayerWrapper(new LocationMaskedPlayerWrapper(player, new Location(player.getExtent(), position.toVector3())));
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
-            CommandEvent event = new CommandEvent(player, cmd);
+            CommandEvent event = new CommandEvent(wePlayer, cmd);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }

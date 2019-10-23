@@ -7,14 +7,15 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Future;
 
 public class FallbackChunkGet implements IChunkGet {
@@ -47,6 +48,40 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return null;
+    }
+
+    @Override
+    public Set<CompoundTag> getEntities() {
+        List<? extends Entity> result = extent.getEntities(new CuboidRegion(BlockVector3.at(bx, 0, bz), BlockVector3.at(bx + 15, 255, bz + 15)));
+        if (result.isEmpty()) {
+            return Collections.emptySet();
+        }
+        HashSet<CompoundTag> set = new HashSet<>(result.size());
+        for (Entity entity : result) {
+            set.add(entity.getState().getNbtData());
+        }
+        return set;
+    }
+
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        long checkMost = uuid.getMostSignificantBits();
+        long checkLeast = uuid.getLeastSignificantBits();
+        for (CompoundTag entityTag : getEntities()) {
+            long entMost = entityTag.getLong("UUIDMost");
+            if (entMost == checkMost) {
+                long entLeast = entityTag.getLong("UUIDLeast");
+                if (entLeast == checkLeast) {
+                    return entityTag;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean trim(boolean aggressive) {
         return true;
     }
@@ -71,14 +106,11 @@ public class FallbackChunkGet implements IChunkGet {
 
             }
         }
-        Map<Short, CompoundTag> tiles = set.getTiles();
+        Map<BlockVector3, CompoundTag> tiles = set.getTiles();
         if (!tiles.isEmpty()) {
-            for (Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
-                short blockHash = entry.getKey();
-                final int x = (blockHash >> 12 & 0xF) + bx;
-                final int y = (blockHash & 0xFF);
-                final int z = (blockHash >> 8 & 0xF) + bz;
-                extent.setTile(bx + x, y, bz + z, entry.getValue());
+            for (Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
+                BlockVector3 pos = entry.getKey();
+                extent.setTile(bx + pos.getX(), pos.getY(), bz + pos.getZ(), entry.getValue());
             }
 
         }
@@ -126,6 +158,11 @@ public class FallbackChunkGet implements IChunkGet {
     @Override
     public boolean hasSection(int layer) {
         return true;
+    }
+
+    @Override
+    public char[] getArray(int layer) {
+        return new char[0];
     }
 
     @Override

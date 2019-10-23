@@ -473,4 +473,20 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         return points;
     }
 
+    @Override
+    public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
+        for (int x = bx; x <= tx; x++) {
+            if (!contains(x, 0, bz)) return false;
+        }
+        for (int x = bx; x <= tx; x++) {
+            if (!contains(x, 0, tz)) return false;
+        }
+        for (int z = bz; z <= tz; z++) {
+            if (!contains(bx, 0, z)) return false;
+        }
+        for (int z = bz; z <= tz; z++) {
+            if (!contains(tx, 0, z)) return false;
+        }
+        return true;
+    }
 }

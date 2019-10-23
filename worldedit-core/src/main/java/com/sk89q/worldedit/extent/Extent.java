@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.object.HistoryExtent;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -629,4 +632,21 @@ public interface Extent extends InputExtent, OutputExtent {
         return count;
     }
 
+    /**
+     * Have an extent processed
+     *  - Either block (Extent) processing or chunk processing
+     * @param processor
+     * @return processed Extent
+     */
+    default Extent addProcessor(IBatchProcessor processor) {
+        return processor.construct(this);
+    }
+
+    default Extent enableHistory(FaweChangeSet changeSet) {
+        return addProcessor(changeSet);
+    }
+
+    default Extent disableHistory() {
+        return this;
+    }
 }

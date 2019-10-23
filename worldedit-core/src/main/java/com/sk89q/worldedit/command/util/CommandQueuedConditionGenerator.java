@@ -17,10 +17,10 @@ public final class CommandQueuedConditionGenerator implements CommandConditionGe
 
     @Override
     public Command.Condition generateCondition(Method commandMethod) {
-        CommandQueued annotation = commandMethod.getAnnotation(CommandQueued.class);
-        if (annotation == null) {
+        SkipQueue skip = commandMethod.getAnnotation(SkipQueue.class);
+        if (skip == null) {
             return Command.Condition.TRUE;
         }
-        return new CommandQueuedCondition(annotation.value());
+        return new CommandQueuedCondition(!skip.value());
     }
 }

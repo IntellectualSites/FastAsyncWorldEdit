@@ -246,9 +246,17 @@ public class EllipsoidRegion extends AbstractRegion {
        return cxd + cyd + czd <= 1;
     }
 
+    /*
+    /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         return position.subtract(center).toVector3().divide(radius).lengthSq() <= 1;
+    }
+    */
+
+    @Override
+    public boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
     }
 
     @Override

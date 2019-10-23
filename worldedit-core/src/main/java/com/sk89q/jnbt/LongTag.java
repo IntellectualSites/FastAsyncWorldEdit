@@ -23,7 +23,7 @@ package com.sk89q.jnbt;
  * The {@code TAG_Long} tag.
  * 
  */
-public final class LongTag extends Tag {
+public final class LongTag extends NumberTag {
 
     private final long value;
 

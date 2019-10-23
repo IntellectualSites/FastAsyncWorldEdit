@@ -2,10 +2,14 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.InputExtent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 /**
@@ -24,6 +28,10 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent {
 
     CompoundTag getTag(int x, int y, int z);
 
+    Map<BlockVector3, CompoundTag> getTiles();
+
+    Set<CompoundTag> getEntities();
+
     @Override
     boolean trim(boolean aggressive);
 
@@ -34,4 +42,6 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent {
     <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
 
     char[] load(int layer);
+
+    CompoundTag getEntity(UUID uuid);
 }

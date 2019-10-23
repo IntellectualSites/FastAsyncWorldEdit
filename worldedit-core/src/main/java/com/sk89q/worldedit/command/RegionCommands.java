@@ -168,6 +168,7 @@ public class RegionCommands {
 
     @Command(
             name = "/nbtinfo",
+            aliases = "/nbt",
             desc = "View nbt info for a block"
     )
     @CommandPermissions("worldedit.nbtinfo")
@@ -266,7 +267,7 @@ public class RegionCommands {
 
     @Command(
         name = "/replace",
-        aliases = { "/re", "/rep" },
+        aliases = { "/re", "/rep", "/r" },
         desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.region.replace")

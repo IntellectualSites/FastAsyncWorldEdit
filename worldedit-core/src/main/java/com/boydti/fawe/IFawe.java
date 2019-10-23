@@ -5,6 +5,7 @@ import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
@@ -33,10 +34,6 @@ public interface IFawe {
 
     default ImageViewer getImageViewer(Player player) {
         return null;
-    }
-
-    default int getPlayerCount() {
-        return Fawe.get().getCachedPlayers().size();
     }
 
     String getPlatformVersion();

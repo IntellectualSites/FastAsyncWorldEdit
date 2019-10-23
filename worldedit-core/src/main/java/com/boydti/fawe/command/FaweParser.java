@@ -12,23 +12,17 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import java.util.*;
 
 public abstract class FaweParser<T> extends InputParser<T> {
-    private final Class<T> type;
 
-    protected FaweParser(WorldEdit worldEdit, Class<T> type) {
+    protected FaweParser(WorldEdit worldEdit) {
         super(worldEdit);
-        this.type = type;
     }
 
     public PlatformCommandManager getPlatform() {
         return PlatformCommandManager.getInstance();
     }
 
-    public Class<T> getType() {
-        return type;
-    }
-
-    public Collection<T> parse(String input, Actor actor) {
-        return getPlatform().parse(getType(), "pattern " + input, actor);
+    public T parse(String input, Actor actor) {
+        return getPlatform().parse("pattern " + input, actor);
     }
 
     public T catchSuggestion(String currentInput, String nextInput, ParserContext context) throws InputParseException {

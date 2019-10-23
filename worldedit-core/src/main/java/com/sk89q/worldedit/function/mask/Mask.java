@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.DelegateFilter;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -38,15 +37,8 @@ public interface Mask {
      */
     boolean test(BlockVector3 vector);
 
-    default <T extends Filter> DelegateFilter<T> toFilter(T filter) {
-        return new DelegateFilter<T>(filter) {
-            @Override
-            public void applyBlock(FilterBlock block) {
-                if (test(block)) {
-                    filter.applyBlock(block);
-                }
-            }
-        };
+    default <T extends Filter> MaskFilter<T> toFilter(T filter) {
+        return new MaskFilter<>(filter, this);
     }
 
     /**
@@ -81,15 +73,15 @@ public interface Mask {
         return value == null ? this : value;
     }
 
-//    default Mask and(Mask other) {
-//        Mask value = and(other);
-//        return value == null ? new MaskIntersection(this, other) : value;
-//    }
+    default Mask and(Mask other) {
+        Mask value = and(other);
+        return value == null ? MaskIntersection.of(this, other) : value;
+    }
 
-//    default Mask or(Mask other) {
-//        Mask value = or(other);
-//        return value == null ? new MaskUnion(this, other) : value;
-//    }
+    default Mask or(Mask other) {
+        Mask value = or(other);
+        return value == null ? MaskUnion.of(this, other) : value;
+    }
 
     default Mask inverse() {
         if (this instanceof Masks.AlwaysTrue) {
@@ -98,5 +90,16 @@ public interface Mask {
             return Masks.ALWAYS_TRUE;
         }
         return new InverseMask(this);
+    }
+
+    default Filter toFilter(Runnable run) {
+        return new Filter() {
+            @Override
+            public void applyBlock(FilterBlock block) {
+                if (test(block)) {
+                    run.run();
+                }
+            }
+        };
     }
 }

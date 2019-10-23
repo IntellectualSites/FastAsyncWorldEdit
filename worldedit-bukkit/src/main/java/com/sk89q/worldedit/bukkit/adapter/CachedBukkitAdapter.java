@@ -48,7 +48,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public ItemType asItemType(Material material) {
         try {
-            return ItemTypes.get(material.getKey().getKey());
+            return ItemTypes.get(itemTypes[material.ordinal()]);
         } catch (NullPointerException e) {
             if (init()) return asItemType(material);
             return ItemTypes.get(itemTypes[material.ordinal()]);

@@ -18,14 +18,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <T>
  */
 public class AdaptedSetCollection<T, V> implements Set<V> {
-    private final Function<T, V> adapter;
     private final Collection<V> adapted;
     private final Collection<T> original;
 
     public AdaptedSetCollection(Collection<T> collection, Function<T, V> adapter) {
         this.original = collection;
         this.adapted = Collections2.transform(collection, adapter);
-        this.adapter = adapter;
     }
 
     public Collection<T> getOriginal() {

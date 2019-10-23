@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.IChunkCache;
+import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -80,8 +81,8 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default IChunk getCachedChunk(int x, int z) {
-        return getParent().getCachedChunk(x, z);
+    default IChunk getOrCreateChunk(int x, int z) {
+        return getParent().getOrCreateChunk(x, z);
     }
 
     @Override

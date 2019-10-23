@@ -54,11 +54,6 @@ public class SingleFilterBlock extends FilterBlock {
         return block;
     }
 
-//    @Override
-//    public BaseBlock getFullBlockRelative(int x, int y, int z) {
-//        return block;
-//    }
-
     @Override
     public void setFullBlock(BaseBlock block) {
         this.block = block;
@@ -100,20 +95,13 @@ public class SingleFilterBlock extends FilterBlock {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return getExtent().setBlock(position.getX(),position.getY(), position.getZ(), block);
-    }
-
-    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
+        if (x == this.x && y == this.y && z == this.z) {
+            setFullBlock(block.toBaseBlock());
+            return true;
+        }
         return getExtent().setBlock(x,y, z, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return getExtent().setBiome(position.getX(),0, position.getZ(), biome);
     }
 
     @Override

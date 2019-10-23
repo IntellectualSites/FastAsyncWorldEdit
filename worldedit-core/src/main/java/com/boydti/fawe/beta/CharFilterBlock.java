@@ -7,7 +7,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -79,8 +78,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock init(IChunkGet iget, IChunkSet iset,
-        int layer) {
+    public final ChunkFilterBlock init(IChunkGet iget, IChunkSet iset, int layer) {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
         if (!get.hasSection(layer)) {
@@ -123,12 +121,18 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         int yis = minY << 8;
         int zis = minZ << 4;
+        int zie = (15 - maxZ) << 4;
+        int xie = (15 - maxX);
         for (y = minY, index = yis; y <= maxY; y++) {
-            for (z = minZ, index += zis; z <= maxZ; z++) {
-                for (x = minX, index += minX; x <= maxX; x++, index++) {
+            index += zis;
+            for (z = minZ; z <= maxZ; z++) {
+                index += minX;
+                for (x = minX; x <= maxX; x++, index++) {
                     filter.applyBlock(this);
                 }
+                index += xie;
             }
+            index += zie;
         }
     }
 
@@ -251,7 +255,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public final CompoundTag getNbtData() {
-        return get.getTag(x, y + (layer << 4), z);
+        return get.getTag(x, y + yy, z);
     }
     /*
     NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
@@ -411,20 +415,14 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
-        return false;
-    }
-
-    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
-        return false;
+        return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return false;
+        return setBiome(position.getX(), 0, position.getBlockZ(), biome);
     }
 
     @Override

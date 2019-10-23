@@ -1929,11 +1929,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(), 0, position.getBlockZ(), biome);
-    }
-
-    @Override
     public int getBlockLightLevel(BlockVector3 position) {
         return 0;
     }

@@ -22,22 +22,28 @@ package com.sk89q.worldedit.regions;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -631,14 +637,15 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         int z = chunk.getZ();
         block = block.init(x, z, get);
 
+
         if ((minX + 15) >> 4 <= x && (maxX - 15) >> 4 >= x && (minZ + 15) >> 4 <= z && (maxZ - 15) >> 4 >= z) {
             filter(chunk, filter, block, get, set, minY, maxY);
             return;
         }
         int localMinX = Math.max(minX, x << 4) & 15;
-        int localMaxX = Math.min(maxX, 15 + x << 4) & 15;
+        int localMaxX = Math.min(maxX, 15 + (x << 4)) & 15;
         int localMinZ = Math.max(minZ, z << 4) & 15;
-        int localMaxZ = Math.min(maxZ, 15 + z << 4) & 15;
+        int localMaxZ = Math.min(maxZ, 15 + (z << 4)) & 15;
 
         int yStart = (minY & 15);
         int yEnd = (maxY & 15);
@@ -657,8 +664,87 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ);
             maxSection--;
         }
-        for (int layer = minSection; layer < maxSection; layer++) {
+        for (int layer = minSection; layer <= maxSection; layer++) {
             filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
         }
     }
+
+    @Override
+    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
+            // contains all X/Z
+            if (minY <= 0 && maxY >= 255) {
+                return set;
+            }
+            trimY(set, minY, maxY);
+            trimNBT(set, this::contains);
+            return set;
+        }
+        else if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
+            trimY(set, minY, maxY);
+            final int lowerX = Math.max(0, minX - bx);
+            final int upperX = Math.min(15, 15 + maxX - tx);
+
+            final int lowerZ = Math.max(0, minZ - bz);
+            final int upperZ = Math.min(15, 15 + maxZ - tz);
+
+            final int upperZi = ((upperZ + 1) << 4);
+            final int lowerZi = (lowerZ << 4);
+
+            boolean trimX = lowerX != 0 || upperX != 15;
+            boolean trimZ = lowerZ != 0 || upperZ != 15;
+
+            int indexY, index;
+            for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+                if (set.hasSection(layer)) {
+                    char[] arr = set.getArray(layer);
+                    if (trimX || trimZ) {
+                        indexY = 0;
+                        for (int y = 0; y < 16; y++, indexY += 256) {
+                            if (trimZ) {
+                                index = indexY;
+                                for (int z = 0; z < lowerZ; z++) {
+                                    // null the z values
+                                    for (int x = 0; x < 16; x++, index++) {
+                                        arr[index] = 0;
+                                    }
+                                }
+                                index = indexY + upperZi;
+                                for (int z = upperZ + 1; z < 16; z++) {
+                                    // null the z values
+                                    for (int x = 0; x < 16; x++, index++) {
+                                        arr[index] = 0;
+                                    }
+                                }
+                            }
+                            if (trimX) {
+                                index = indexY + lowerZi;
+                                for (int z = lowerZ; z <= upperZ; z++, index += 16) {
+                                    for (int x = 0; x < lowerX; x++) {
+                                        // null the x values
+                                        arr[index + x] = 0;
+                                    }
+                                    for (int x = upperX + 1; x < 16; x++) {
+                                        // null the x values
+                                        arr[index + x] = 0;
+                                    }
+                                }
+                            }
+                        }
+                        set.setBlocks(layer, arr);
+                    }
+                }
+            }
+            trimNBT(set, this::contains);
+            return set;
+        } else {
+            return null;
+        }
+    }
+
+
 }

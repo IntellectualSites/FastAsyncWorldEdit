@@ -19,12 +19,12 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class ProcessedWEExtent extends AbstractDelegateExtent {
     private final FaweLimit limit;
-    private final AbstractDelegateExtent extent;
+    private final Extent extent;
 
     public ProcessedWEExtent(Extent parent, FaweLimit limit) {
         super(parent);
         this.limit = limit;
-        this.extent = (AbstractDelegateExtent) parent;
+        this.extent = parent;
     }
 
     public void setLimit(FaweLimit other) {

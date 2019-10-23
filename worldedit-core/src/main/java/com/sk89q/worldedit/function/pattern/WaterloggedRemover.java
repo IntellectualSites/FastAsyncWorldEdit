@@ -65,10 +65,9 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
-        @SuppressWarnings("unchecked")
-        Property<Object> prop = (Property<Object>) remap[block.getOrdinal()].getBlockType().getPropertyMap().getOrDefault("waterlogged", null);
-        if (prop != null) {
-            return block.with(prop, false);
+        BlockState newState = remap[block.getOrdinal()];
+        if (newState != null) {
+            return newState.toBaseBlock(block.getNbtData());
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }

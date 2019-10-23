@@ -2,6 +2,14 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.util.Map;
+import java.util.Set;
 
 public class CharBlocks implements IBlocks {
 
@@ -79,6 +87,16 @@ public class CharBlocks implements IBlocks {
     @Override
     public boolean hasSection(int layer) {
         return sections[layer] == FULL;
+    }
+
+    @Override
+    public char[] getArray(int layer) {
+        return sections[layer].get(this, layer);
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return BlockTypes.states[get(x, y, z)];
     }
 
     public char get(int x, int y, int z) {

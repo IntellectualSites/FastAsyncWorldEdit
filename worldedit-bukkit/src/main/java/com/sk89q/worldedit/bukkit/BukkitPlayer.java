@@ -31,6 +31,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -73,7 +74,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        Fawe.get().register(this);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -176,8 +176,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(),
-                pos.getZ(), yaw, pitch));
+        org.bukkit.World world = player.getWorld();
+        if (pos instanceof com.sk89q.worldedit.util.Location) {
+            com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
+            Extent extent = loc.getExtent();
+            if (extent instanceof World) {
+                world = Bukkit.getWorld(((World) extent).getName());
+            }
+        }
+        player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
     }
 
     @Override

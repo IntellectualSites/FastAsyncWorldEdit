@@ -18,7 +18,6 @@ import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.regions.WorldguardFlag;
-import com.boydti.fawe.bukkit.regions.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
@@ -31,6 +30,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.world.World;
 import io.papermc.lib.PaperLib;
 import java.io.File;
@@ -83,13 +83,6 @@ public class FaweBukkit implements IFawe, Listener {
             }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
-            }
-            if (Bukkit.getPluginManager().getPlugin("PlotSquared") != null) {
-                try {
-                    WEManager.IMP.managers.add(new PlotSquaredFeature());
-                } catch (Exception ignored) {
-                    //Not everyone uses or needs PlotSquared.
-                }
             }
         } catch (final Throwable e) {
             e.printStackTrace();
@@ -160,11 +153,6 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public int getPlayerCount() {
-        return plugin.getServer().getOnlinePlayers().size();
-    }
-
-    @Override
     public boolean isOnlineMode() {
         return Bukkit.getOnlineMode();
     }
@@ -203,25 +191,22 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public com.sk89q.worldedit.entity.Player wrap(final Object obj) {
-        if (obj.getClass() == String.class) {
+        Player player = null;
+        if (obj.getClass() == Player.class) {
+            player = (Player) obj;
+        }
+        else if (obj.getClass() == String.class) {
             String name = (String) obj;
-            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(name);
-            if (existing != null) {
-                return existing;
-            }
-            Player player = Bukkit.getPlayer(name);
-            return player != null ? BukkitAdapter.adapt(player) : null;
+            player = Bukkit.getPlayer(name);
         }
-        if (obj.getClass() == UUID.class) {
+        else if (obj.getClass() == UUID.class) {
             UUID uuid = (UUID) obj;
-            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(uuid);
-            if (existing != null) {
-                return existing;
-            }
-            Player player = Bukkit.getPlayer(uuid);
-            return player != null ? BukkitAdapter.adapt(player) : null;
+            player = Bukkit.getPlayer(uuid);
         }
-        return null;
+        if (player == null) {
+            throw new IllegalArgumentException("Unknown player type: " + obj);
+        }
+        return BukkitAdapter.adapt(player);
     }
 
     @Override public void startMetrics() {
@@ -379,12 +364,8 @@ public class FaweBukkit implements IFawe, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        String name = player.getName();
-        com.sk89q.worldedit.entity.Player wePlayer = Fawe.get().getCachedPlayer(name);
-        if (wePlayer != null) {
-            wePlayer.unregister();
-            Fawe.get().unregister(name);
-        }
+        BukkitPlayer wePlayer = BukkitAdapter.adapt(player);
+        wePlayer.unregister();
     }
 
     @Override

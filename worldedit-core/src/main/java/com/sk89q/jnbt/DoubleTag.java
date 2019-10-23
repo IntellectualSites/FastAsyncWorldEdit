@@ -23,7 +23,7 @@ package com.sk89q.jnbt;
  * The {@code TAG_Double} tag.
  * 
  */
-public final class DoubleTag extends Tag {
+public final class DoubleTag extends NumberTag {
 
     private final double value;
 

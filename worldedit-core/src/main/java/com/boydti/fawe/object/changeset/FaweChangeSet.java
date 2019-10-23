@@ -3,8 +3,13 @@ package com.boydti.fawe.object.changeset;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
+import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
@@ -12,6 +17,7 @@ import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
@@ -23,17 +29,19 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class FaweChangeSet implements ChangeSet {
+public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
 
     private World world;
     private final String worldName;
-    private final boolean mainThread;
-    private final int layers;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
 
@@ -51,15 +59,11 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public FaweChangeSet(String world) {
         this.worldName = world;
-        this.mainThread = Fawe.get() == null || Fawe.isMainThread();
-        this.layers = FaweCache.IMP.CHUNK_LAYERS;
     }
 
     public FaweChangeSet(World world) {
         this.world = world;
         this.worldName = world.getName();
-        this.mainThread = Fawe.isMainThread();
-        this.layers = this.world.getMaxY() + 1 >> 4;
     }
 
     public String getWorldName() {
@@ -122,6 +126,92 @@ public abstract class FaweChangeSet implements ChangeSet {
     @Override
     public Iterator<Change> forwardIterator() {
         return getIterator(true);
+    }
+
+    @Override
+    public Extent construct(Extent child) {
+        return new HistoryExtent(child, this);
+    }
+
+    @Override
+    public synchronized IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+
+        Map<BlockVector3, CompoundTag> tilesFrom = get.getTiles();
+        Map<BlockVector3, CompoundTag> tilesTo = set.getTiles();
+        if (!tilesFrom.isEmpty()) {
+            for (Map.Entry<BlockVector3, CompoundTag> entry : tilesFrom.entrySet()) {
+                BlockVector3 pos = entry.getKey();
+                BlockState fromBlock = get.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
+                BlockState toBlock = set.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
+                if (fromBlock != toBlock || tilesTo.containsKey(pos)) {
+                    addTileRemove(entry.getValue());
+                }
+            }
+        }
+        if (!tilesTo.isEmpty()) {
+            for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
+                addTileCreate(entry.getValue());
+            }
+        }
+        Set<UUID> entRemoves = set.getEntityRemoves();
+        if (!entRemoves.isEmpty()) {
+            for (UUID uuid : entRemoves) {
+                CompoundTag found = get.getEntity(uuid);
+                if (found != null) {
+                    addEntityRemove(found);
+                }
+            }
+        }
+        Set<CompoundTag> ents = set.getEntities();
+        if (!ents.isEmpty()) {
+            for (CompoundTag tag : ents) {
+                addEntityCreate(tag);
+            }
+        }
+        for (int layer = 0; layer < 16; layer++) {
+            if (!set.hasSection(layer)) continue;
+            // add each block and tile
+            char[] blocksGet = get.getArray(layer);
+            if (blocksGet == null) {
+                blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
+            }
+            char[] blocksSet = set.getArray(layer);
+
+            int by = layer << 4;
+            for (int y = 0, index = 0; y < 16; y++) {
+                int yy = y + by;
+                for (int z = 0; z < 16; z++) {
+                    int zz = z + bz;
+                    for (int x = 0; x < 16; x++, index++) {
+                        int xx = bx + x;
+                        int combinedFrom = blocksGet[index];
+                        int combinedTo = blocksSet[index];
+                        if (combinedTo != 0) {
+                            add(xx, yy, zz, combinedFrom, combinedTo);
+                        }
+                    }
+                }
+            }
+        }
+
+        BiomeType[] biomes = set.getBiomes();
+        if (biomes != null) {
+            for (int z = 0, index = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    BiomeType newBiome = biomes[index];
+                    if (newBiome != null) {
+                        BiomeType oldBiome = get.getBiomeType(x, z);
+                        if (oldBiome != newBiome) {
+                            addBiomeChange(bx + x, bz + z, oldBiome, newBiome);
+                        }
+                    }
+                }
+            }
+        }
+
+        return set;
     }
 
     public abstract void addTileCreate(CompoundTag tag);

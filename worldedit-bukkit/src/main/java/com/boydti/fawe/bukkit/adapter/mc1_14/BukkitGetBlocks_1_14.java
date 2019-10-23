@@ -6,8 +6,11 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
+import com.boydti.fawe.object.collection.AdaptedMap;
+import com.boydti.fawe.object.collection.AdaptedSetCollection;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongTag;
@@ -17,7 +20,9 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -40,16 +45,13 @@ import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public ChunkSection[] sections;
@@ -82,8 +84,112 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 
     @Override
     public CompoundTag getTag(int x, int y, int z) {
-        // TODO
+        TileEntity tile = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        return (CompoundTag) adapter.toNative(tile);
+    }
+
+    private static final Function<BlockPosition, BlockVector3> posNms2We = new Function<BlockPosition, BlockVector3>() {
+        @Override
+        public BlockVector3 apply(BlockPosition v) {
+            return BlockVector3.at(v.getX(), v.getY(), v.getZ());
+        }
+    };
+
+    private final static Function<TileEntity, CompoundTag> nmsTile2We = new Function<TileEntity, CompoundTag>() {
+        @Override
+        public CompoundTag apply(TileEntity tileEntity) {
+            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+            return (CompoundTag) adapter.toNative(tileEntity.b());
+        }
+    };
+
+    @Override
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        Map<BlockPosition, TileEntity> nmsTiles = getChunk().getTileEntities();
+        if (nmsTiles.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
+    }
+
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        org.bukkit.entity.Entity bukkitEnt = world.getEntity(uuid);
+        if (bukkitEnt != null) {
+            return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
+        }
+        for (List<Entity> entry : getChunk().getEntitySlices()) {
+            if (entry != null) {
+                for (Entity entity : entry) {
+                    if (uuid.equals(entity.getUniqueID())) {
+                        return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
+                    }
+                }
+            }
+        }
         return null;
+    }
+
+    @Override
+    public Set<CompoundTag> getEntities() {
+        List<Entity>[] slices = getChunk().getEntitySlices();
+        int size = 0;
+        for (List<Entity> slice : slices) {
+            if (slice != null) size += slice.size();
+        }
+        if (slices.length == 0) {
+            return Collections.emptySet();
+        }
+        int finalSize = size;
+        return new AbstractSet<CompoundTag>() {
+            @Override
+            public int size() {
+                return finalSize;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object get) {
+                if (!(get instanceof CompoundTag)) {
+                    return false;
+                }
+                CompoundTag getTag = (CompoundTag) get;
+                Map<String, Tag> value = getTag.getValue();
+                CompoundTag getParts = (CompoundTag) value.get("UUID");
+                UUID getUUID = new UUID(getParts.getLong("Most"), getParts.getLong("Least"));
+                for (List<Entity> slice : slices) {
+                    if (slice != null) {
+                        for (Entity entity : slice) {
+                            UUID uuid = entity.getUniqueID();
+                            if (uuid.equals(getUUID)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            @NotNull
+            @Override
+            public Iterator<CompoundTag> iterator() {
+                Iterable<CompoundTag> result = Iterables.transform(Iterables.concat(slices), new com.google.common.base.Function<Entity, CompoundTag>() {
+                    @Nullable
+                    @Override
+                    public CompoundTag apply(@Nullable Entity input) {
+                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+                        NBTTagCompound tag = new NBTTagCompound();
+                        return (CompoundTag) adapter.toNative(input.save(tag));
+                    }
+                });
+                return result.iterator();
+            }
+        };
     }
 
     @Override
@@ -120,7 +226,6 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             Chunk nmsChunk = BukkitAdapter_1_14.ensureLoaded(nmsWorld, X, Z);
 
             // Remove existing tiles
-
             {
                 Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
                 if (!tiles.isEmpty()) {
@@ -299,19 +404,19 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                 }
 
                 // set tiles
-                Map<Short, CompoundTag> tiles = set.getTiles();
+                Map<BlockVector3, CompoundTag> tiles = set.getTiles();
                 if (tiles != null && !tiles.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[1];
 
                     syncTasks[0] = new Runnable() {
                         @Override
                         public void run() {
-                            for (final Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
+                            for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
                                 final CompoundTag nativeTag = entry.getValue();
-                                final short blockHash = entry.getKey();
-                                final int x = (blockHash >> 12 & 0xF) + bx;
-                                final int y = (blockHash & 0xFF);
-                                final int z = (blockHash >> 8 & 0xF) + bz;
+                                final BlockVector3 blockHash = entry.getKey();
+                                final int x = blockHash.getX()+ bx;
+                                final int y = blockHash.getY();
+                                final int z = blockHash.getZ() + bz;
                                 final BlockPosition pos = new BlockPosition(x, y, z);
                                 synchronized (nmsWorld) {
                                     TileEntity tileEntity = nmsWorld.getTileEntity(pos);

@@ -32,20 +32,26 @@ public class MultiTransform extends RandomTransform {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return Arrays.stream(extents).map(extent -> extent.setBlock(x, y, z, block))
-            .reduce(false, (a, b) -> a || b);
+        // don't use streams for each block place, it'd be incredibly slow
+        boolean result = false;
+        for (AbstractDelegateExtent extent : extents) result |= extent.setBlock(x, y, z, block);
+        return result;
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        return Arrays.stream(extents).map(extent -> extent.setBlock(location, block))
-            .reduce(false, (a, b) -> a || b);
+        // don't use streams for each block place, it'd be incredibly slow
+        boolean result = false;
+        for (AbstractDelegateExtent extent : extents) result |= extent.setBlock(location, block);
+        return result;
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return Arrays.stream(extents).map(extent -> extent.setBiome(position, biome))
-            .reduce(false, (a, b) -> a || b);
+        // don't use streams for each block place, it'd be incredibly slow
+        boolean result = false;
+        for (AbstractDelegateExtent extent : extents) result |= extent.setBiome(position, biome);
+        return result;
     }
 
     @Nullable

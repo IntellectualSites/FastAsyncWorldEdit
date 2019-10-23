@@ -149,14 +149,13 @@ public class BlockMaskBuilder {
                             Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
                             throw new SuggestInputParseException("No value for " + input, input, () -> {
                                 HashSet<String> values = new HashSet<>();
-                                types.forEach(t -> {
-                                    if (t.hasProperty(fKey)) {
-                                        Property p = t.getProperty(fKey);
-                                        for (int j = 0; j < p.getValues().size(); j++) {
-                                            if (has(t, p, j)) {
-                                                String o = p.getValues().get(j).toString();
-                                                if (o.startsWith(value)) values.add(o);
-                                            }
+                                types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
+                                    Property p = t.getProperty(fKey);
+                                    for (int j = 0; j < p.getValues().size(); j++) {
+                                        if (has(t, p, j)) {
+                                            String o = p.getValues().get(j).toString();
+                                            if (o.startsWith(value))
+                                                values.add(o);
                                         }
                                     }
                                 });
@@ -224,7 +223,6 @@ public class BlockMaskBuilder {
         AbstractProperty prop = (AbstractProperty) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return false;
-        List values = prop.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
         return (states == ALL || FastBitSet.get(states, localI));
     }

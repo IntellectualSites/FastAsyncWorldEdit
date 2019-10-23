@@ -199,13 +199,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final World world;
     private final String worldName;
     private boolean wrapped;
-    private final HistoryExtent history;
-    private AbstractDelegateExtent bypassHistory;
-    private AbstractDelegateExtent bypassAll;
+    private Extent bypassHistory;
+    private Extent bypassAll;
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
     private final Player player;
     private FaweChangeSet changeTask;
+    private boolean history;
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
@@ -230,8 +230,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.world = builder.getWorld();
         this.worldName = builder.getWorldName();
         this.wrapped = builder.isWrapped();
-//        this.fastMode = builder.hasFastMode(); Not used
-        this.history = builder.getHistory();
         this.bypassHistory = builder.getBypassHistory();
         this.bypassAll = builder.getBypassAll();
         this.originalLimit = builder.getLimit();
@@ -240,6 +238,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.changeTask = builder.getChangeTask();
         this.maxY = builder.getMaxY();
         this.blockBag = builder.getBlockBag();
+        this.history = changeTask != null;
     }
 
     /**
@@ -404,7 +403,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return the change set
      */
     public ChangeSet getChangeSet() {
-        return changeTask != null ? changeTask : history != null ? history.getChangeSet() : null;
+        return changeTask;
     }
 
     /**
@@ -585,8 +584,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (survivalExtent != null) {
             return survivalExtent.get();
         } else {
-            SurvivalModeExtent survival = new SurvivalModeExtent(bypassAll.getExtent(), getWorld());
-            new ExtentTraverser(bypassAll).setNext(survival);
+            SurvivalModeExtent survival = new SurvivalModeExtent(bypassAll, getWorld());
+            bypassAll = survival;
             return survival;
         }
     }
@@ -609,25 +608,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param disableHistory
      */
     public void disableHistory(boolean disableHistory) {
-        if (history == null) {
-            return;
-        }
-        ExtentTraverser<HistoryExtent> traverseHistory = new ExtentTraverser<>(getExtent()).find(HistoryExtent.class);
         if (disableHistory) {
-            if (traverseHistory != null && traverseHistory.exists()) {
-                ExtentTraverser<HistoryExtent> beforeHistory = traverseHistory.previous();
-                ExtentTraverser<HistoryExtent> afterHistory = traverseHistory.next();
-                if (beforeHistory != null && beforeHistory.exists()) {
-                    beforeHistory.setNext(afterHistory.get());
-                } else {
-                    new ExtentTraverser<>(getExtent()).setNext(afterHistory.get());
-                }
+            if (this.history) {
+                disableHistory();
+                this.history = false;
+                return;
             }
-        } else if (traverseHistory == null || !traverseHistory.exists()) {
-            ExtentTraverser traverseBypass = new ExtentTraverser<>(getExtent()).find(bypassHistory);
-            if (traverseBypass != null) {
-                ExtentTraverser<AbstractDelegateExtent> beforeHistory = traverseBypass.previous();
-                beforeHistory.setNext(history);
+        } else {
+            if (this.history) {
+                if (this.changeTask == null) {
+                    throw new IllegalArgumentException("History was never provided, cannot enable");
+                }
+                enableHistory(this.changeTask);
             }
         }
     }
@@ -948,22 +940,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
     }
 
-    /**
-     * Set blocks that are in a set of positions and return the number of times
-     * that the block set calls returned true.
-     *
-     * @param vset a set of positions
-     * @param pattern the pattern
-     * @return the number of changed blocks
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int setBlocks(Set<BlockVector3> vset, Pattern pattern) throws MaxChangedBlocksException {
-        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern));
-        Operations.completeBlindly(visitor);
-        changes += visitor.getAffected();
-        return changes;
-    }
-
     @Override
     @Nullable
     public Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity entity) {
@@ -987,8 +963,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public void setBlocks(ChangeSet changeSet, ChangeSetExecutor.Type type) {
         final UndoContext context = new UndoContext();
-        Extent bypass = (history == null) ? bypassAll : history;
-        context.setExtent(bypass);
+        context.setExtent(bypassAll);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, type, getBlockBag(), getLimit().INVENTORY_MODE));
         flushQueue();
         changes = 1;
@@ -1082,7 +1057,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Reset limit
         limit.set(originalLimit);
         // Enqueue it
-        super.commit();
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
                 ((FaweChangeSet) getChangeSet()).closeAsync();
@@ -1159,33 +1133,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Execute
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
-    }
-
-    /**
-     * Count the number of blocks of a list of types in a region.
-     *
-     * @param region the region
-     * @param searchBlocks the list of blocks to search
-     * @return the number of blocks that matched the block
-     */
-    public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
-        BlockMask mask = new BlockMask(this, searchBlocks);
-        return countBlocks(region, mask);
-    }
-
-    /**
-     * Count the number of blocks of a list of types in a region.
-     *
-     * @param region the region
-     * @param searchMask mask to match
-     * @return the number of blocks that matched the mask
-     */
-    public int countBlocks(Region region, Mask searchMask) {
-        Counter count = new Counter();
-        RegionMaskingFilter filter = new RegionMaskingFilter(searchMask, count);
-        RegionVisitor visitor = new RegionVisitor(region, filter);
-        Operations.completeBlindly(visitor); // We can't throw exceptions, nor do we expect any
-        return count.getCount();
     }
 
     /**
@@ -1310,36 +1257,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return this.replaceBlocks(region, mask, pattern);
     }
 
-    public boolean canBypassAll(Region region, boolean get, boolean set) {
-        if (wrapped) return false;
-        if (history != null) return false;
-        FaweRegionExtent regionExtent = getRegionExtent();
-        if (!(region instanceof CuboidRegion)) return false;
-        if (regionExtent != null) {
-            BlockVector3 pos1 = region.getMinimumPoint();
-            BlockVector3 pos2 = region.getMaximumPoint();
-            boolean contains = false;
-            for (Region current : regionExtent.getRegions()) {
-                if (current.contains(pos1.getX(), pos1.getBlockY(), pos1.getBlockZ()) && current.contains(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ())) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) return false;
-        }
-        long area = region.getArea();
-        FaweLimit left = getLimitLeft();
-        if (!left.isUnlimited() && (((get || getChangeTask() != null) && left.MAX_CHECKS <= area) || (set && left.MAX_CHANGES <= area)))
-            return false;
-        if (getChangeTask() != getChangeSet()) return false;
-        if (!Masks.isNull(getMask()) || !Masks.isNull(getSourceMask())) return false;
-        return getBlockBag() == null;
-    }
-
-    public boolean hasExtraExtents() {
-        return wrapped || getMask() != null || getSourceMask() != null || history != null;
-    }
-
     /**
      * Remove blocks of a certain type nearby a given position.
      *
@@ -1360,87 +1277,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 position.add(adjustment.multiply(-1)),
                 position.add(adjustment));
         return replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());
-    }
-
-    /**
-     * Sets all the blocks inside a region to a given block type.
-     *
-     * @param region the region
-     * @param block the block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return setBlocks(region, (Pattern) block);
-    }
-
-    /**
-     * Sets all the blocks inside a region to a given pattern.
-     *
-     * @param region the region
-     * @param pattern the pattern that provides the replacement block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(pattern);
-
-        BlockReplace replace = new BlockReplace(this, pattern);
-        RegionVisitor visitor = new RegionVisitor(region, replace);
-        Operations.completeLegacy(visitor);
-        return visitor.getAffected();
-    }
-
-    /**
-     * Replaces all the blocks matching a given filter, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
-     * @param replacement the replacement block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return replaceBlocks(region, filter, (Pattern) replacement);
-    }
-
-    /**
-     * Replaces all the blocks matching a given filter, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
-     * @param pattern the pattern that provides the new blocks
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
-        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
-        return replaceBlocks(region, mask, pattern);
-    }
-
-    /**
-     * Replaces all the blocks matching a given mask, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param mask the mask that blocks must match
-     * @param pattern the pattern that provides the new blocks
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(mask);
-        checkNotNull(pattern);
-
-        BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
-        RegionVisitor visitor = new RegionVisitor(region, filter);
-        Operations.completeLegacy(visitor);
-        return visitor.getAffected();
     }
 
     /**
@@ -2472,109 +2308,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public List<Countable<BlockState>> getBlockDistribution(Region region, boolean separateStates) {
         if (separateStates) return getBlockDistributionWithData(region);
-        int[] counter = new int[BlockTypes.size()];
-
-        if (region instanceof CuboidRegion) {
-            // Doing this for speed
-            final BlockVector3 min = region.getMinimumPoint();
-            final BlockVector3 max = region.getMaximumPoint();
-
-            final int minX = min.getBlockX();
-            final int minY = min.getBlockY();
-            final int minZ = min.getBlockZ();
-            final int maxX = max.getBlockX();
-            final int maxY = max.getBlockY();
-            final int maxZ = max.getBlockZ();
-
-            MutableBlockVector3 mutable = new MutableBlockVector3(minX, minY, minZ);
-            for (int x = minX; x <= maxX; ++x) {
-                for (int y = minY; y <= maxY; ++y) {
-                    for (int z = minZ; z <= maxZ; ++z) {
-                        BlockType type = getBlockType(x, y, z);
-                        counter[type.getInternalId()]++;
-                    }
-                }
-            }
-        } else {
-            for (final BlockVector3 pt : region) {
-                BlockType type = getBlock(pt).getBlockType();
-                counter[type.getInternalId()]++;
-            }
-        }
+        List<Countable<BlockType>> normalDistr = getBlockDistribution(region);
         List<Countable<BlockState>> distribution = new ArrayList<>();
-        for (int i = 0; i < counter.length; i++) {
-            int count = counter[i];
-            if (count != 0) {
-                distribution.add(new Countable<>(BlockTypes.get(i).getDefaultState(), count));
-            }
+        for (Countable<BlockType> count : normalDistr) {
+            distribution.add(new Countable<>(count.getID().getDefaultState(), count.getAmount()));
         }
-        Collections.sort(distribution);
-        return distribution;
-    }
-
-    /**
-     * Generate a shape for the given expression.
-     *
-     * @param region the region to generate the shape in
-     * @return number of blocks changed
-     * @throws ExpressionException
-     * @throws MaxChangedBlocksException
-     */
-    public List<Countable<BlockState>> getBlockDistributionWithData(final Region region) {
-        int[][] counter = new int[BlockTypes.size()][];
-
-        if (region instanceof CuboidRegion) {
-            // Doing this for speed
-            final BlockVector3 min = region.getMinimumPoint();
-            final BlockVector3 max = region.getMaximumPoint();
-
-            final int minX = min.getBlockX();
-            final int minY = min.getBlockY();
-            final int minZ = min.getBlockZ();
-            final int maxX = max.getBlockX();
-            final int maxY = max.getBlockY();
-            final int maxZ = max.getBlockZ();
-
-            for (int x = minX; x <= maxX; ++x) {
-                for (int y = minY; y <= maxY; ++y) {
-                    for (int z = minZ; z <= maxZ; ++z) {
-                        BlockState blk = getBlock(x, y, z);
-                        BlockType type = blk.getBlockType();
-                        int[] stateCounter = counter[type.getInternalId()];
-                        if (stateCounter == null) {
-                            counter[type.getInternalId()] = stateCounter = new int[type.getMaxStateId() + 1];
-                        }
-                        stateCounter[blk.getInternalPropertiesId()]++;
-                    }
-                }
-            }
-        } else {
-            for (BlockVector3 pt : region) {
-                BlockState blk = this.getBlock(pt);
-                BlockType type = blk.getBlockType();
-                int[] stateCounter = counter[type.getInternalId()];
-                if (stateCounter == null) {
-                    counter[type.getInternalId()] = stateCounter = new int[type.getMaxStateId() + 1];
-                }
-                stateCounter[blk.getInternalPropertiesId()]++;
-            }
-        }
-        List<Countable<BlockState>> distribution = new ArrayList<>();
-        for (int typeId = 0; typeId < counter.length; typeId++) {
-            BlockType type = BlockTypes.get(typeId);
-            int[] stateCount = counter[typeId];
-            if (stateCount != null) {
-                for (int propId = 0; propId < stateCount.length; propId++) {
-                    int count = stateCount[propId];
-                    if (count != 0) {
-                        BlockState state = type.withPropertyId(propId);
-                        distribution.add(new Countable<>(state, count));
-                    }
-
-                }
-            }
-        }
-        // Collections.reverse(distribution);
         return distribution;
     }
 
@@ -2684,7 +2422,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     final Vector3 scaled = position.toVector3().subtract(zero).divide(unit);
 
                     // transform
-                    expression.evaluate(new double[]{scaled.getX(), scaled.getY(), scaled.getZ()}, timeout);
+                    expression.evaluateTimeout(timeout, scaled.getX(), scaled.getY(), scaled.getZ());
                     int xv = (int) (x.getValue() * unit.getX() + zero2.getX());
                     int yv = (int) (y.getValue() * unit.getY() + zero2.getY());
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());
@@ -3045,7 +2783,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();
 
                 try {
-                    if (expression.evaluate(new double[]{scaledX, scaledZ}, timeout) <= 0) {
+                    if (expression.evaluate(timeout, scaledX, scaledZ) <= 0) {
                         return null;
                     }
 

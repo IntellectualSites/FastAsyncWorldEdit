@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extent;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
@@ -261,5 +262,23 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Extent addProcessor(IBatchProcessor processor) {
+        Extent result = this.extent.addProcessor(processor);
+        if (result != this.extent) {
+            new ExtentTraverser<Extent>(this).setNext(result);
+        }
+        return this;
+    }
+
+    @Override
+    public Extent disableHistory() {
+        Extent result = this.extent.disableHistory();
+        if (result != this.extent) {
+            new ExtentTraverser<Extent>(this).setNext(result);
+        }
+        return this;
     }
 }

@@ -23,7 +23,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.sk89q.worldedit.entity.Metadatable;
+import com.sk89q.worldedit.entity.MapMetadatable;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -33,16 +33,16 @@ import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.auth.Subject;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.text.NumberFormat;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An object that can perform actions in WorldEdit.
  */
-public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable {
+public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatable {
 
     /**
      * Get the name of the actor.
@@ -135,20 +135,20 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
     boolean runAction(Runnable ifFree, boolean checkFree, boolean async);
 
     default void checkConfirmationStack(@NotNull Runnable task, @NotNull String command,
-        Region region, int times, InjectedValueAccess context) throws RegionOperationException {
+                                        Region region, int times, InjectedValueAccess context) throws RegionOperationException {
         if (!getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
                 long area =
-                    (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
+                        (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
                     long volume = (long) base.getX() * base.getZ() * base.getY() * times;
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(min, max, command,
-                            NumberFormat.getNumberInstance().format(volume)));
+                            .format(min, max, command,
+                                    NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }
@@ -156,7 +156,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
     }
 
     default void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command,
-        Region region, InjectedValueAccess context) throws RegionOperationException {
+                                         Region region, InjectedValueAccess context) throws RegionOperationException {
         if (!getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 BlockVector3 min = region.getMinimumPoint();
@@ -167,8 +167,8 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
                     long volume = (long) base.getX() * base.getZ() * base.getY();
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(min, max, command,
-                            NumberFormat.getNumberInstance().format(volume)));
+                            .format(min, max, command,
+                                    NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }
@@ -176,7 +176,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
     }
 
     default void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context,
-        @NotNull String command) {
+                                @NotNull String command) {
         CommandEvent event = new CommandEvent(this, command);
         Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
             task.run();
@@ -186,28 +186,28 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
     }
 
     default void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times,
-        int limit, InjectedValueAccess context) throws RegionOperationException {
+                                   int limit, InjectedValueAccess context) throws RegionOperationException {
         if (!getMeta("cmdConfirmRunning", false)) {
             if (times > limit) {
                 setConfirmTask(task, context, command);
                 String volume = "<unspecified>";
                 throw new RegionOperationException(
-                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
+                        BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
             }
         }
         task.run();
     }
 
     default void checkConfirmationRadius(@NotNull Runnable task, String command, int radius,
-        InjectedValueAccess context) throws RegionOperationException {
+                                         InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (radius > 0) {
                 if (radius > 448) {
                     setConfirmTask(task, context, command);
                     long volume = (long) (Math.PI * ((double) radius * radius));
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                        .format(0, radius, command,
-                            NumberFormat.getNumberInstance().format(volume)));
+                            .format(0, radius, command,
+                                    NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }
@@ -248,5 +248,13 @@ public interface Actor extends Identifiable, SessionOwner, Subject, Metadatable 
 
     default FaweLimit getLimit() {
         return Settings.IMP.getLimit(this);
+    }
+
+    default boolean runAsyncIfFree(Runnable r) {
+        return runAction(r, true, true);
+    }
+
+    default boolean runIfFree(Runnable r) {
+        return runAction(r, true, false);
     }
 }

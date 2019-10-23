@@ -19,23 +19,32 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.extent.SingleRegionExtent;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 
 /**
  * Represents a physical shape.
  */
-public interface Region extends Iterable<BlockVector3>, Cloneable {
+public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcessor {
 
     /**
      * Get the lower point of a region.
@@ -221,7 +230,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
             filter(chunk, filter, block, get, set, minSection, 0, yEnd);
             maxSection--;
         }
-        for (int layer = minSection; layer < maxSection; layer++) {
+        for (int layer = minSection; layer <= maxSection; layer++) {
             filter(chunk, filter, block, get, set, layer);
         }
         return;
@@ -243,5 +252,67 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
         if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
         block = block.init(get, set, layer);
         block.filter(filter, yStart, yEnd);
+    }
+
+    default boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
+        return contains(bx, by, bz) &&
+                contains(bx, by, tz) &&
+                contains(tx, by, bz) &&
+                contains(tx, by, tz) &&
+                contains(bx, ty, bz) &&
+                contains(bx, ty, tz) &&
+                contains(tx, ty, bz) &&
+                contains(tx, ty, tz);
+    }
+
+    default IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        boolean processExtra = false;
+        if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
+            // contains some
+            for (int layer = 0; layer < 16; layer++) {
+                int by = layer << 4;
+                int ty = by + 15;
+                if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                    continue;
+                } else {
+                    boolean changed = true;
+                    processExtra = true;
+                    char[] arr = set.getArray(layer);
+                    for (int y = 0, index = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            for (int x = 0; x < 16; x++, index++) {
+                                if (arr[index] != 0 && !contains(x, y, z)) {
+                                    changed = true;
+                                    arr[index] = 0;
+                                }
+                            }
+                        }
+                    }
+                    if (changed) {
+                        set.setBlocks(layer, arr);
+                    }
+                }
+            }
+            if (processExtra) {
+                trimNBT(set, this::contains);
+            }
+            return set;
+        } else {
+            return null;
+        }
+    }
+
+    default Extent construct(Extent child) {
+        if (isGlobal()) {
+            return child;
+        }
+        return new SingleRegionExtent(child, FaweLimit.MAX, this);
     }
 }

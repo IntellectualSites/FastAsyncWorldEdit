@@ -62,7 +62,7 @@ public class BrushSettings {
         if (constructor == null) {
             return new BrushSettings();
         }
-        BrushSettings bs = (BrushSettings) manager.parse(BrushSettings.class, constructor, player);
+        BrushSettings bs = manager.parse(constructor, player);
         bs.constructor.put(SettingType.BRUSH, constructor);
         if (settings.containsKey(SettingType.PERMISSIONS.name())) {
             bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));

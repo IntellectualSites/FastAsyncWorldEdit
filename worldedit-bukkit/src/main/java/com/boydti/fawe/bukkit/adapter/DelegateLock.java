@@ -1,12 +1,14 @@
 package com.boydti.fawe.bukkit.adapter;
 
+import com.destroystokyo.paper.util.ReentrantLockWithGetOwner;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DelegateLock extends ReentrantLock {
+public class DelegateLock extends ReentrantLockWithGetOwner {
     private final Lock parent;
     private volatile boolean modified;
     private final AtomicInteger count;

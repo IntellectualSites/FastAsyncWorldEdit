@@ -22,6 +22,7 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
+import com.bekvon.bukkit.residence.commands.message;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
@@ -84,6 +85,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -311,28 +314,33 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             Field descriptionField = JavaPlugin.class.getDeclaredField("dataFolder");
             descriptionField.setAccessible(true);
             descriptionField.set(this, dir);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        File pluginsFolder = MainUtil.getJarFile().getParentFile();
-        for (File file : pluginsFolder.listFiles()) {
-            if (file.length() == 2009) return;
-        }
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
-        File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
-        if (dummy != null && dummy.exists() && plugin == this) {
-            try {
-                Bukkit.getPluginManager().loadPlugin(dummy);
-            } catch (Throwable e) {
-                if (Bukkit.getUpdateFolderFile().mkdirs()) {
-                    MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, Bukkit.getUpdateFolder() + File.separator + "DummyFawe.jar");
-                } else {
-                    getLogger().info("Please delete DummyFawe.jar and restart");
-                }
+        try {
+            File pluginsFolder = MainUtil.getJarFile().getParentFile();
+
+            for (File file : pluginsFolder.listFiles()) {
+                if (file.length() == 2009) return;
             }
-            getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
-        } else if (dummy == null) {
-            MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "update" + File.separator + "DummyFawe.jar");
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
+            File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
+            if (dummy != null && dummy.exists() && plugin == this) {
+                try {
+                    Bukkit.getPluginManager().loadPlugin(dummy);
+                } catch (Throwable e) {
+                    if (Bukkit.getUpdateFolderFile().mkdirs()) {
+                        MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, Bukkit.getUpdateFolder() + File.separator + "DummyFawe.jar");
+                    } else {
+                        getLogger().info("Please delete DummyFawe.jar and restart");
+                    }
+                }
+                getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
+            } else if (dummy == null) {
+                MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "update" + File.separator + "DummyFawe.jar");
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
@@ -458,7 +466,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + commandLabel;
+        split[0] = commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);
@@ -551,7 +559,15 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      * @return a wrapped player
      */
     public BukkitPlayer wrapPlayer(Player player) {
-        return new BukkitPlayer(this, player);
+        synchronized (player) {
+            @NotNull List<MetadataValue> meta = player.getMetadata("WE");
+            if (meta == null || meta.isEmpty()) {
+                BukkitPlayer wePlayer = new BukkitPlayer(this, player);
+                player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
+                return wePlayer;
+            }
+            return (BukkitPlayer) meta.get(0).value();
+        }
     }
 
     public Actor wrapCommandSender(CommandSender sender) {
