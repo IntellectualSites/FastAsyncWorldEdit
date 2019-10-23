@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.object.HistoryExtent;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -142,9 +141,10 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Create an entity at the given location.
      *
-     * @param entity the entity
-     * @param location the location
-     * @return a reference to the created entity, or null if the entity could not be created
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @param uuid the unique identifier of the entity
      */
     default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
 

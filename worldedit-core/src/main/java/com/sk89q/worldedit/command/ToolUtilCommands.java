@@ -82,7 +82,7 @@ public class ToolUtilCommands {
             return;
         }
         if (maskOpt == null) {
-            BBC.BRUSH_MASK_DISABLED.send(player);
+            player.print(BBC.BRUSH_MASK_DISABLED.s());
             tool.setMask(null);
             return;
         }
@@ -91,7 +91,7 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
         settings.setMask(maskOpt);
         tool.update();
-        BBC.BRUSH_MASK.send(player);
+        player.print(BBC.BRUSH_MASK.s());
     }
 
     @Command(
@@ -101,7 +101,8 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.options.material")
     public void material(Player player, LocalSession session,
-                         @Arg(desc = "brush material pattern", def = "") Pattern patternOpt,
+                         @Arg(desc = "The pattern of blocks to use")
+                             Pattern pattern,
                          @Switch(name = 'h', desc = "TODO")
                                  boolean offHand,
                          Arguments arguments) throws WorldEditException {
@@ -110,17 +111,17 @@ public class ToolUtilCommands {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
-        if (patternOpt == null) {
-            BBC.BRUSH_MATERIAL.send(player);
+        if (pattern == null) {
+            player.print(BBC.BRUSH_MATERIAL.s());
             tool.setFill(null);
             return;
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        settings.setFill(patternOpt);
+        settings.setFill(pattern);
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
         tool.update();
-        BBC.BRUSH_MATERIAL.send(player);
+        player.print(BBC.BRUSH_MATERIAL.s());
     }
 
     @Command(
@@ -129,7 +130,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.options.range")
     public void range(Player player, LocalSession session,
-                      @Arg(desc = "Range")
+                      @Arg(desc = "The range of the brush")
                               int range) throws WorldEditException {
         range = Math.max(0, Math.min(256, range));
         BrushTool tool = session.getBrushTool(player, false);
@@ -138,7 +139,7 @@ public class ToolUtilCommands {
             return;
         }
         tool.setRange(range);
-        BBC.BRUSH_RANGE.send(player);
+        player.print(BBC.BRUSH_RANGE.s());
     }
 
     @Command(
@@ -148,19 +149,19 @@ public class ToolUtilCommands {
     @CommandPermissions("worldedit.brush.options.size")
     public void size(Player player, LocalSession session,
                      @Arg(desc = "The size of the brush", def = "5")
-                             int radius,
+                             int size,
                      @Switch(name = 'h', desc = "TODO")
                              boolean offHand) throws WorldEditException {
-        we.checkMaxBrushRadius(radius);
+        we.checkMaxBrushRadius(size);
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        settings.setSize(radius);
+        settings.setSize(size);
         tool.update();
-        BBC.BRUSH_SIZE.send(player);
+        player.print(BBC.BRUSH_SIZE.s());
     }
 
     @Command(
@@ -174,13 +175,14 @@ public class ToolUtilCommands {
                              Mask maskOpt) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            BBC.BRUSH_NONE.send(player);
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         tool.setTraceMask(maskOpt);
         BBC.BRUSH_TARGET_MASK_SET.send(player, maskOpt.toString());
     }
 
+    //todo none should be moved to the same class where it is in upstream
     @Command(
             name = "none",
             aliases = {"/none"},
@@ -269,11 +271,13 @@ public class ToolUtilCommands {
                     "2 = Glass showing what blocks will be changed"
     )
     @CommandPermissions("worldedit.brush.visualize")
-    public void visual(Player player, LocalSession session, @Arg(name = "mode", desc = "int", def = "0") @Range(min = 0, max = 2) int mode)
+    public void visual(Player player, LocalSession session,
+        @Arg(name = "mode", desc = "int", def = "0") @Range(min = 0, max = 2)
+            int mode)
             throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            BBC.BRUSH_NONE.send(player);
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         VisualMode[] modes = VisualMode.values();
@@ -292,7 +296,7 @@ public class ToolUtilCommands {
                        @Arg(name = "mode", desc = "int", def = "0") int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            BBC.BRUSH_NONE.send(player);
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         TargetMode[] modes = TargetMode.values();
@@ -311,7 +315,7 @@ public class ToolUtilCommands {
                              int offset) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            BBC.BRUSH_NONE.send(player);
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         tool.setTargetOffset(offset);
@@ -333,7 +337,7 @@ public class ToolUtilCommands {
         // TODO NOT IMPLEMENTED Convert ScrollAction to an argument converter
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
-            BBC.BRUSH_NONE.send(player);
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         BrushSettings settings = offHand ? bt.getOffHand() : bt.getContext();
@@ -369,7 +373,7 @@ public class ToolUtilCommands {
             return;
         }
         if (maskArg == null) {
-            BBC.BRUSH_SOURCE_MASK_DISABLED.send(player);
+            player.print(BBC.BRUSH_SOURCE_MASK_DISABLED.s());
             tool.setSourceMask(null);
             return;
         }
@@ -378,7 +382,7 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
         settings.setSourceMask(maskArg);
         tool.update();
-        BBC.BRUSH_SOURCE_MASK.send(player);
+        player.print(BBC.BRUSH_SOURCE_MASK.s());
     }
 
     @Command(
@@ -397,7 +401,7 @@ public class ToolUtilCommands {
             return;
         }
         if (transform == null) {
-            BBC.BRUSH_TRANSFORM_DISABLED.send(player);
+            player.print(BBC.BRUSH_TRANSFORM_DISABLED.s());
             tool.setTransform(null);
             return;
         }
@@ -406,6 +410,6 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
         settings.setTransform(transform);
         tool.update();
-        BBC.BRUSH_TRANSFORM.send(player);
+        player.print(BBC.BRUSH_TRANSFORM.s());
     }
 }

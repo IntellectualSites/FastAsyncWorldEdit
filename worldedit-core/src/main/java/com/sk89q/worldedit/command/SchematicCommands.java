@@ -19,6 +19,10 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.boydti.fawe.util.ReflectionUtils.as;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -59,16 +63,6 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -91,10 +85,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-
-import static com.boydti.fawe.util.ReflectionUtils.as;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import com.boydti.fawe.object.schematic.visualizer.SchemVis;
 
@@ -579,15 +577,17 @@ public class SchematicCommands {
         descFooter = "Note: Format is not fully verified until loading."
     )
     @CommandPermissions("worldedit.schematic.list")
-    public void list(Actor actor, LocalSession session, @Arg(name = "filter", desc = "Filter for schematics", def = "all")
-            String filter, @ArgFlag(name = 'f', desc = "Restricts by format.", def = "")
-            String formatName,
+    public void list(Actor actor, LocalSession session,
                      @ArgFlag(name = 'p', desc = "Page to view.", def = "-1")
                          int page,
                      @Switch(name = 'd', desc = "Sort by date, oldest first")
                          boolean oldFirst,
                      @Switch(name = 'n', desc = "Sort by date, newest first")
                          boolean newFirst,
+                     @ArgFlag(name = 'f', desc = "Restricts by format.")
+                         String formatName,
+                     @Arg(name = "filter", desc = "Filter for schematics", def = "all")
+                         String filter,
                      Arguments arguments
                     ) throws WorldEditException {
         if (oldFirst && newFirst) {

@@ -260,7 +260,9 @@ public class GenerationCommands {
         BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
         actor.checkConfirmationRadius(() -> {
             int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
-            if (actor instanceof Player) ((Player) actor).findFreePosition();
+            if (actor instanceof Player) {
+                ((Player) actor).findFreePosition();
+            }
             BBC.VISITOR_BLOCK.send(actor, affected);
         }, "sphere", (int) max, context);
     }
@@ -336,7 +338,9 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size);
         actor.checkConfirmationRadius(() -> {
             int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-            if (actor instanceof Player) ((Player) actor).findFreePosition();
+            if (actor instanceof Player) {
+                ((Player) actor).findFreePosition();
+            }
             BBC.VISITOR_BLOCK.send(actor, affected);
         }, getArguments(context), size, context);
     }
@@ -397,7 +401,9 @@ public class GenerationCommands {
         actor.checkConfirmationRegion(() -> {
             try {
                 final int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
-                if (actor instanceof Player) ((Player) actor).findFreePosition();
+                if (actor instanceof Player) {
+                    ((Player) actor).findFreePosition();
+                }
                 BBC.VISITOR_BLOCK.send(actor, affected);
             } catch (ExpressionException e) {
                 actor.printError(e.getMessage());

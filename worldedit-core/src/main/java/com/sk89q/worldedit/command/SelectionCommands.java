@@ -117,7 +117,7 @@ public class SelectionCommands {
         }
 
         if (!session.getRegionSelector(world).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.print(BBC.SELECTOR_ALREADY_SET.s());
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -146,7 +146,7 @@ public class SelectionCommands {
         }
 
         if (!session.getRegionSelector(world).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.print(BBC.SELECTOR_ALREADY_SET.s());
+            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
             return;
         }
 
@@ -165,14 +165,14 @@ public class SelectionCommands {
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.print(BBC.SELECTOR_ALREADY_SET.s());
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainPrimarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.print(BBC.NO_BLOCK.s());
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -187,14 +187,14 @@ public class SelectionCommands {
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.print(BBC.SELECTOR_ALREADY_SET.s());
+                player.printError(BBC.SELECTOR_ALREADY_SET.s());
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainSecondarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.print(BBC.NO_BLOCK.s());
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 

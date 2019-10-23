@@ -104,18 +104,18 @@ public interface ClipboardFormat {
     Set<String> getFileExtensions();
 
     /**
-     * Set the player's clipboard
-     * @param player
+     * Set the actor's clipboard
+     * @param actor
      * @param uri
-     * @param in
-     * @throws IOException
+     * @param inputStream the input stream
+     * @throws IOException thrown on I/O error
      */
-    default URIClipboardHolder hold(Actor actor, URI uri, InputStream in) throws IOException {
+    default URIClipboardHolder hold(Actor actor, URI uri, InputStream inputStream) throws IOException {
         checkNotNull(actor);
         checkNotNull(uri);
-        checkNotNull(in);
+        checkNotNull(inputStream);
 
-        final ClipboardReader reader = getReader(in);
+        final ClipboardReader reader = getReader(inputStream);
 
         final Clipboard clipboard;
 

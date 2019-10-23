@@ -41,6 +41,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -232,7 +233,7 @@ public class HistoryCommands {
         times = Math.max(1, times);
         LocalSession undoSession;
         if (session.hasFastMode()) {
-            BBC.COMMAND_UNDO_DISABLED.send(player);
+            player.print(BBC.COMMAND_UNDO_DISABLED.s());
             return;
         }
         if (playerName != null && !playerName.isEmpty()) {
@@ -259,7 +260,7 @@ public class HistoryCommands {
                 worldEdit.flushBlockBag(player, undone);
             }
             if (undone == null) {
-                BBC.COMMAND_UNDO_ERROR.send(player);
+                player.printError(BBC.COMMAND_UNDO_ERROR.s());
             }
         }, "undo", times, 50, context);
     }
@@ -298,7 +299,7 @@ public class HistoryCommands {
         if (timesRedone > 0) {
             BBC.COMMAND_REDO_SUCCESS.send(player, timesRedone == 1 ? "" : " x" + timesRedone);
         } else {
-            BBC.COMMAND_REDO_ERROR.send(player);
+            player.printError(BBC.COMMAND_REDO_ERROR.s());
         }
     }
 
@@ -308,9 +309,9 @@ public class HistoryCommands {
         desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
-    public void clearHistory(Player player, LocalSession session) {
+    public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        BBC.COMMAND_HISTORY_CLEAR.send(player);
+        actor.print(BBC.COMMAND_HISTORY_CLEAR.s());
     }
 
 }

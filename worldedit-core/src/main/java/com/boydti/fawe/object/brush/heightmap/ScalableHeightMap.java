@@ -6,8 +6,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
+import com.sk89q.worldedit.world.block.BlockState;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class ScalableHeightMap implements HeightMap {
             MutableBlockVector3 bv = new MutableBlockVector3(pos);
             for (int y = minY; y <= maxY; y++) {
                 bv.mutY(y);
-                BlockStateHolder block = clipboard.getBlock(bv);
+                BlockState block = clipboard.getBlock(bv);
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }

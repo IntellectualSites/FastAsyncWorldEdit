@@ -534,7 +534,7 @@ public class ClipboardCommands {
         BBC.COMMAND_PASTE.send(actor, to);
 
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_COPYPASTE.send(actor);
+            actor.print(BBC.TIP_COPYPASTE.s());
         }
     }
 

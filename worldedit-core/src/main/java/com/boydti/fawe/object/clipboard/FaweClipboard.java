@@ -27,7 +27,17 @@ public abstract class FaweClipboard {
 
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block);
 
-    public abstract boolean hasBiomes();
+    /**
+     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
+     * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null}
+     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
+     * to ocean, instead of having biomes explicitly set.
+     *
+     * @return true if the clipboard has biome data set
+     */
+    public boolean hasBiomes() {
+        return false;
+    }
 
     public abstract boolean setBiome(int x, int z, BiomeType biome);
 

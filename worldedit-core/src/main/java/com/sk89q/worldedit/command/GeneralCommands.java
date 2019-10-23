@@ -144,10 +144,10 @@ public class GeneralCommands {
         }
         if (hasFastMode) {
             session.setFastMode(false);
-            BBC.FAST_DISABLED.send(actor);
+            actor.print(BBC.FAST_DISABLED.s());
         } else {
             session.setFastMode(true);
-            BBC.FAST_ENABLED.send(actor);
+            actor.print(BBC.FAST_ENABLED.s());
         }
     }
 
@@ -219,9 +219,9 @@ public class GeneralCommands {
     public void gmask(Actor actor, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
         session.setMask(mask);
         if (mask == null) {
-            BBC.MASK_DISABLED.send(actor);
+            actor.print(BBC.MASK_DISABLED.s());
         } else {
-            BBC.MASK.send(actor);
+            actor.print(BBC.MASK.s());
         }
     }
 
@@ -232,9 +232,9 @@ public class GeneralCommands {
     )
     public void togglePlace(Player player, LocalSession session) {
         if (session.togglePlacementPosition()) {
-            BBC.PLACE_ENABLED.send(player);
+            player.print(BBC.PLACE_ENABLED.s());
         } else {
-            BBC.PLACE_DISABLED.send(player);
+            player.print(BBC.PLACE_DISABLED.s());
         }
     }
 

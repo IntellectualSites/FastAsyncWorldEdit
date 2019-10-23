@@ -50,7 +50,7 @@ public class SuperPickaxeCommands {
     public void single(Player player, LocalSession session) throws WorldEditException {
         session.setSuperPickaxe(new SinglePickaxe());
         session.enableSuperPickAxe();
-        BBC.SUPERPICKAXE_AREA_ENABLED.send(player);
+        player.print(BBC.SUPERPICKAXE_AREA_ENABLED.s());
     }
 
     @Command(
@@ -71,7 +71,7 @@ public class SuperPickaxeCommands {
 
         session.setSuperPickaxe(new AreaPickaxe(range));
         session.enableSuperPickAxe();
-        BBC.SUPERPICKAXE_AREA_ENABLED.send(player);
+        player.print(BBC.SUPERPICKAXE_AREA_ENABLED.s());
     }
 
     @Command(
@@ -93,6 +93,6 @@ public class SuperPickaxeCommands {
 
         session.setSuperPickaxe(new RecursivePickaxe(range));
         session.enableSuperPickAxe();
-        BBC.SUPERPICKAXE_AREA_ENABLED.send(player);
+        player.print(BBC.SUPERPICKAXE_AREA_ENABLED.s());
     }
 }
