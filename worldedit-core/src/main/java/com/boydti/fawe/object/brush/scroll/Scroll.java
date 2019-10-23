@@ -12,6 +12,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class Scroll implements ScrollTool {
@@ -26,6 +27,13 @@ public abstract class Scroll implements ScrollTool {
         RANGE,
         SIZE,
         TARGET
+    }
+
+    public static Scroll fromArguments(BrushTool tool, Player player, LocalSession session, String actionArgs, boolean message) {
+        String[] split = actionArgs.split(" ");
+        Action mode = Action.valueOf(split[0].toUpperCase());
+        List<String> args = Arrays.asList(Arrays.copyOfRange(split, 1, split.length));
+        return fromArguments(tool, player, session, mode, args, message);
     }
 
     public static com.boydti.fawe.object.brush.scroll.Scroll fromArguments(BrushTool tool, Player player, LocalSession session, Action mode, List<String> arguments, boolean message) throws InputParseException {
