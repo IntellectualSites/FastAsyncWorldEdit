@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.argument;
 
+import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.command.util.HookMode;
@@ -48,7 +49,9 @@ public final class EnumConverter {
                 r -> ImmutableSet.of(r.getDisplayName()),
                 null));
         commandManager.registerConverter(Key.of(HookMode.class),
-            basic(HookMode.class));
+                basic(HookMode.class));
+        commandManager.registerConverter(Key.of(Scroll.Action.class),
+                basic(Scroll.Action.class));
     }
 
     private static <E extends Enum<E>> ArgumentConverter<E> basic(Class<E> enumClass) {

@@ -5,7 +5,7 @@ import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.mask.Mask;
 
-public class ScrollMask extends ScrollAction {
+public class ScrollMask extends Scroll {
     private final Mask[] masks;
     private int index;
 

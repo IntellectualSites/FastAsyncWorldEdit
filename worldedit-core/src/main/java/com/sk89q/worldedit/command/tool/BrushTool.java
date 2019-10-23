@@ -28,7 +28,7 @@ import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.MovableTool;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.scroll.ScrollAction;
+import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.boydti.fawe.object.brush.scroll.ScrollTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.brush.visualization.VisualMode;
@@ -555,7 +555,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
 
 
-    public void setScrollAction(ScrollAction scrollAction) {
+    public void setScrollAction(Scroll scrollAction) {
         this.getContext().setScrollAction(scrollAction);
         update();
     }
@@ -603,7 +603,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     @Override
     public boolean increment(Player player, int amount) {
         BrushSettings current = getContext();
-        ScrollAction tmp = current.getScrollAction();
+        Scroll tmp = current.getScrollAction();
         if (tmp != null) {
             tmp.setTool(this);
             if (tmp.increment(player, amount)) {

@@ -5,7 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 
-public class ScrollRange extends ScrollAction {
+public class ScrollRange extends Scroll {
     public ScrollRange(BrushTool tool) {
         super(tool);
     }

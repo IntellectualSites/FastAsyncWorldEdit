@@ -1,11 +1,9 @@
 package com.boydti.fawe.object.brush.scroll;
 
-import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 
-public class ScrollTargetOffset extends ScrollAction {
+public class ScrollTargetOffset extends Scroll {
     public ScrollTargetOffset(BrushTool tool) {
         super(tool);
     }

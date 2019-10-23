@@ -2,37 +2,46 @@ package com.boydti.fawe.object.brush.scroll;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
-import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import java.io.IOException;
+import java.util.List;
 
-public abstract class ScrollAction implements ScrollTool {
+public abstract class Scroll implements ScrollTool {
     private BrushTool tool;
 
-    public static ScrollAction fromArguments(BrushTool tool, Player player, LocalSession session, String arguments, boolean message) throws InputParseException {
+    public enum Action {
+        NONE,
+        CLIPBOARD,
+        MASK,
+        PATTERN,
+        TARGET_OFFSET,
+        RANGE,
+        SIZE,
+        TARGET
+    }
+
+    public static com.boydti.fawe.object.brush.scroll.Scroll fromArguments(BrushTool tool, Player player, LocalSession session, Action mode, List<String> arguments, boolean message) throws InputParseException {
         ParserContext parserContext = new ParserContext();
         parserContext.setActor(player);
         parserContext.setWorld(player.getWorld());
         parserContext.setSession(session);
-        String[] split = arguments.split(" ");
-        switch (split[0].toLowerCase()) {
-            case "none":
+        switch (mode) {
+            case NONE:
                 return null;
-            case "clipboard":
-                if (split.length != 2) {
+            case CLIPBOARD:
+                if (arguments.size() != 2) {
                     if (message) BBC.COMMAND_SYNTAX.send(player, "clipboard [file]");
                     return null;
                 }
-                String filename = split[1];
+                String filename = arguments.get(1);
                 try {
                     MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player, filename, null, message);
                     if (multi == null) {
@@ -42,35 +51,35 @@ public abstract class ScrollAction implements ScrollTool {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            case "mask":
-                if (split.length < 2) {
+            case MASK:
+                if (arguments.size() < 2) {
                     if (message) BBC.COMMAND_SYNTAX.send(player, "mask [mask 1] [mask 2] [mask 3]...");
                     return null;
                 }
-                Mask[] masks = new Mask[split.length - 1];
-                for (int i = 1; i < split.length; i++) {
-                    String arg = split[i];
+                Mask[] masks = new Mask[arguments.size() - 1];
+                for (int i = 1; i < arguments.size(); i++) {
+                    String arg = arguments.get(i);
                     masks[i - 1] = WorldEdit.getInstance().getMaskFactory().parseFromInput(arg, parserContext);
                 }
                 return (new ScrollMask(tool, masks));
-            case "pattern":
-                if (split.length < 2) {
+            case PATTERN:
+                if (arguments.size() < 2) {
                     if (message) BBC.COMMAND_SYNTAX.send(player, "pattern [pattern 1] [pattern 2] [pattern 3]...");
                     return null;
                 }
-                Pattern[] patterns = new Pattern[split.length - 1];
-                for (int i = 1; i < split.length; i++) {
-                    String arg = split[i];
+                Pattern[] patterns = new Pattern[arguments.size() - 1];
+                for (int i = 1; i < arguments.size(); i++) {
+                    String arg = arguments.get(i);
                     patterns[i - 1] = WorldEdit.getInstance().getPatternFactory().parseFromInput(arg, parserContext);
                 }
                 return (new ScrollPattern(tool, patterns));
-            case "targetoffset":
+            case TARGET_OFFSET:
                 return (new ScrollTargetOffset(tool));
-            case "range":
+            case RANGE:
                 return (new ScrollRange(tool));
-            case "size":
+            case SIZE:
                 return (new ScrollSize(tool));
-            case "target":
+            case TARGET:
                 return (new ScrollTarget(tool));
             default:
                 return null;
@@ -78,7 +87,7 @@ public abstract class ScrollAction implements ScrollTool {
         }
     }
 
-    public ScrollAction(BrushTool tool) {
+    public Scroll(BrushTool tool) {
         this.tool = tool;
     }
 

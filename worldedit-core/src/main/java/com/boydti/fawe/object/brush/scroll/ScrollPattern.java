@@ -5,7 +5,7 @@ import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 
-public class ScrollPattern extends ScrollAction {
+public class ScrollPattern extends Scroll {
     private final Pattern[] patterns;
     private int index;
 
