@@ -168,7 +168,10 @@ public abstract class PaginationBox extends MessageBox {
                     iterIndex++;
                 } while (iterIndex < number);
             }
-            return TextComponent.of(obj.toString());
+            if (obj instanceof Component) {
+                return (Component) obj;
+            }
+            return TextComponent.of(obj + "");
         }
 
         @Override

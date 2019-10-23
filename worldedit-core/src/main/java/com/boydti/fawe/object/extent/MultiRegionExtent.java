@@ -5,7 +5,6 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 
@@ -51,6 +50,16 @@ public class MultiRegionExtent extends FaweRegionExtent {
     }
 
     @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        for (Region region : regions) {
+            if (region.containsChunk(chunkX, chunkZ)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean contains(int x, int z) {
         if (region.contains(x, z)) {
             return true;
@@ -74,7 +83,7 @@ public class MultiRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return intersection.processBatch(chunk, get, set);
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return intersection.processSet(chunk, get, set);
     }
 }

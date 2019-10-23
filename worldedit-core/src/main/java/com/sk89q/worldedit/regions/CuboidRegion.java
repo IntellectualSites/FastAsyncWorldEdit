@@ -670,7 +670,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;

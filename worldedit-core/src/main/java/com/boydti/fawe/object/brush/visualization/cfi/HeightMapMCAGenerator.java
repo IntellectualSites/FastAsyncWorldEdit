@@ -14,6 +14,7 @@ import com.boydti.fawe.object.collection.DifferentialArray;
 import com.boydti.fawe.object.collection.DifferentialBlockBuffer;
 import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
 import com.boydti.fawe.object.collection.SummedAreaTable;
+import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
@@ -883,14 +884,14 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
         return BiomeTypes.get(biomes.getByte(index));
     }
 
 //    @Override
-    public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
+    public int getCombinedId4Data(int x, int y, int z) throws FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (y < 0) return 0;
         if (index < 0 || index >= getArea() || x < 0 || x >= getWidth()) return 0;

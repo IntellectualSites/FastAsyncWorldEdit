@@ -414,7 +414,7 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
     public T call(IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
-            set = getExtent().processBatch(this, get, set);
+            set = getExtent().processSet(this, get, set);
             if (set != null) {
                 return get.call(set, finalize);
             }

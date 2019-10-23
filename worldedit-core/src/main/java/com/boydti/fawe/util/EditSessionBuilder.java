@@ -2,6 +2,7 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.ParallelQueueExtent;
 import com.boydti.fawe.config.BBC;
@@ -223,11 +224,11 @@ public class EditSessionBuilder {
         event.setExtent(extent);
         eventBus.post(event);
         if (event.isCancelled()) {
-            return new NullExtent(extent, FaweException.MANUAL);
+            return new NullExtent(extent, FaweCache.MANUAL);
         }
         final Extent toReturn = event.getExtent();
         if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
-            return new NullExtent(toReturn, FaweException.MANUAL);
+            return new NullExtent(toReturn, FaweCache.MANUAL);
         }
 //        if (!(toReturn instanceof AbstractDelegateExtent)) {
 //            Fawe.debug("Extent " + toReturn + " must be AbstractDelegateExtent");
@@ -307,7 +308,7 @@ public class EditSessionBuilder {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
                     BBC.WORLDEDIT_OOM_ADMIN.send(player);
                 }
-                throw FaweException.LOW_MEMORY;
+                throw FaweCache.LOW_MEMORY;
             }
         }
 //        this.originalLimit = limit;
@@ -409,7 +410,7 @@ public class EditSessionBuilder {
             FaweRegionExtent regionExtent = null;
             if (allowedRegions != null) {
                 if (allowedRegions.length == 0) {
-                    regionExtent = new NullExtent(this.extent, FaweException.NO_REGION);
+                    regionExtent = new NullExtent(this.extent, FaweCache.NO_REGION);
                 } else {
 //                    this.extent = new ProcessedWEExtent(this.extent, this.limit);
                     if (allowedRegions.length == 1) {

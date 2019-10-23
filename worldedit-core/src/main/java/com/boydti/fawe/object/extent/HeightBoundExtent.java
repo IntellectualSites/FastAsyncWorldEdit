@@ -50,7 +50,7 @@ public class HeightBoundExtent extends FaweRegionExtent implements IBatchProcess
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         if (trimY(set, min, max) | trimNBT(set, this::contains)) {
             return set;
         }

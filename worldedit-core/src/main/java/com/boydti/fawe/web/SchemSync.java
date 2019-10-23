@@ -1,6 +1,7 @@
 package com.boydti.fawe.web;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MainUtil;
@@ -57,7 +58,7 @@ public class SchemSync implements Runnable {
 
     private void close(Error error) throws IOException {
         this.clientSocket.getOutputStream().write(error.ordinal());
-        throw FaweException.MANUAL;
+        throw FaweCache.MANUAL;
     }
 
     @Override

@@ -99,7 +99,6 @@ public class ProvideBindings extends Bindings {
         if (extent != null) {
             return extent;
         }
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
         Player plr = getPlayer(actor);
         EditSession editSession = editSession(getLocalSession(plr), plr);
         store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));

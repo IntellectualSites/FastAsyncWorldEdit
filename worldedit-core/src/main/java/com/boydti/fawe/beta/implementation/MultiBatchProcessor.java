@@ -10,7 +10,6 @@ import com.sk89q.worldedit.extent.Extent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class MultiBatchProcessor implements IBatchProcessor {
     private IBatchProcessor[] processors;
@@ -55,14 +54,24 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         for (IBatchProcessor processor : this.processors) {
-            set = processor.processBatch(chunk, get, set);
+            set = processor.processSet(chunk, get, set);
             if (set == null) {
                 return null;
             }
         }
         return set;
+    }
+
+    @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        for (IBatchProcessor processor : this.processors) {
+            if (!processor.processGet(chunkX, chunkZ)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

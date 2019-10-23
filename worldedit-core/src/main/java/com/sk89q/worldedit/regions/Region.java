@@ -265,7 +265,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 contains(tx, ty, tz);
     }
 
-    default IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    default boolean containsChunk(int chunkX, int chunkZ) {
+        int bx = chunkX << 4;
+        int bz = chunkZ << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        return tx >= min.getX() && bx <= max.getX() && tx >= min.getZ() && bx <= max.getZ();
+    }
+
+    default IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;

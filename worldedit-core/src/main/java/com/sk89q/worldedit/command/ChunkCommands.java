@@ -30,7 +30,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
@@ -98,9 +97,8 @@ public class ChunkCommands {
                             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
         final Region region = session.getSelection(world);
 
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor,
-                () -> new ChunkListPaginationBox(region).create(page),
-                "Listing chunks for " + actor.getName());
+        actor.print("Listing chunks for " + actor.getName());
+        actor.print(new ChunkListPaginationBox(region).create(page));
     }
 
     @Command(

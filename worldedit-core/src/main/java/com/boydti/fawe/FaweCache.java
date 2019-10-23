@@ -1,9 +1,13 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
+import com.boydti.fawe.object.exception.FaweBlockBagException;
+import com.boydti.fawe.object.exception.FaweChunkLoadException;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -179,6 +183,24 @@ public enum FaweCache implements Trimable {
         }
         return pool;
     }
+
+    /*
+    Exceptions
+     */
+    public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
+    public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
+    public static final FaweException MANUAL = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+    public static final FaweException NO_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
+    public static final FaweException OUTSIDE_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+    public static final FaweException MAX_CHECKS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+    public static final FaweException MAX_CHANGES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+    public static final FaweException LOW_MEMORY = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
+    public static final FaweException MAX_ENTITIES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ENTITIES);
+    public static final FaweException MAX_TILES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
+
+    /*
+    thread cache
+     */
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypes.states.length];

@@ -29,7 +29,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -82,7 +81,6 @@ public class BiomeCommands {
     public void biomeList(Actor actor,
                           @ArgFlag(name = 'p', desc = "Page number.", def = "1")
                               int page) {
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
 
@@ -99,8 +97,7 @@ public class BiomeCommands {
                                 }
                             })
                             .collect(Collectors.toList()));
-             return paginationBox.create(page);
-        }, null);
+             actor.print(paginationBox.create(page));
     }
 
     @Command(

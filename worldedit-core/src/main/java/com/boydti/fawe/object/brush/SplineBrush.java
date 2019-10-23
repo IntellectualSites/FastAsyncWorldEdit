@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.exception.FaweException;
@@ -62,7 +63,7 @@ public class SplineBrush implements Brush, ResettableTool {
         this.position = position;
         if (newPos) {
             if (positionSets.size() >= MAX_POINTS) {
-                throw FaweException.MAX_CHECKS;
+                throw FaweCache.MAX_CHECKS;
             }
             final ArrayList<BlockVector3> points = new ArrayList<>();
             if (size > 0) {

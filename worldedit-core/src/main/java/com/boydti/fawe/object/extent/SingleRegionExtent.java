@@ -6,7 +6,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
-import java.util.Arrays;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -40,7 +40,12 @@ public class SingleRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return region.processBatch(chunk, get, set);
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return region.processSet(chunk, get, set);
+    }
+
+    @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        return region.containsChunk(chunkX, chunkZ);
     }
 }

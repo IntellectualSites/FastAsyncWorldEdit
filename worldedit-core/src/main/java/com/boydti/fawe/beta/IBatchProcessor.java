@@ -20,7 +20,11 @@ public interface IBatchProcessor {
      * @param set
      * @return
      */
-    IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set);
+    IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
+
+    default boolean processGet(int chunkX, int chunkZ) {
+        return true;
+    }
 
     /**
      * Convert this processor into an Extent based processor instead of a queue batch based on

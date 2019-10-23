@@ -252,7 +252,7 @@ public class GeneralCommands {
                            @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
                                int page,
                            @Arg(desc = "Search query", variable = true)
-                               List<String> query) {
+                               List<String> query) throws Exception {
         String search = String.join(" ", query);
         if (search.length() <= 2) {
             actor.printError("Enter a longer search string (len > 2).");
@@ -263,8 +263,7 @@ public class GeneralCommands {
             return;
         }
 
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new ItemSearcher(search, blocksOnly, itemsOnly, page),
-                "(Please wait... searching items.)");
+        actor.print(new ItemSearcher(search, blocksOnly, itemsOnly, page).call());
     }
 
     public static class ItemSearcher implements Callable<Component> {

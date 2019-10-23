@@ -20,8 +20,13 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     void setProcessor(IBatchProcessor set);
 
     @Override
-    default IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return getProcessor().processBatch(chunk, get, set);
+    default IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return getProcessor().processSet(chunk, get, set);
+    }
+
+    @Override
+    default boolean processGet(int chunkX, int chunkZ) {
+        return getProcessor().processGet(chunkX, chunkZ);
     }
 
     @Override

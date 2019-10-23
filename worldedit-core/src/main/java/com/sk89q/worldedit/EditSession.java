@@ -25,6 +25,7 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -332,7 +333,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public boolean cancel() {
         ExtentTraverser traverser = new ExtentTraverser<>(getExtent());
-        NullExtent nullExtent = new NullExtent(world, FaweException.MANUAL);
+        NullExtent nullExtent = new NullExtent(world, FaweCache.MANUAL);
         while (traverser != null) {
             Extent get = traverser.get();
             ExtentTraverser next = traverser.next();
@@ -2844,7 +2845,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             BlockVector3 max = region.getMaximumPoint();
             BlockVector3 min = region.getMinimumPoint();
             if (!fe.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ()) && !fe.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ())) {
-                throw FaweException.OUTSIDE_REGION;
+                throw FaweCache.OUTSIDE_REGION;
             }
         }
         final Set<BlockVector2> chunks = region.getChunks();

@@ -30,6 +30,7 @@ import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
@@ -410,7 +411,7 @@ public class RegionCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = fp.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         fp.checkConfirmationRegion(() -> {
             try {

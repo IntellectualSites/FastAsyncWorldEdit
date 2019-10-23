@@ -24,6 +24,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -135,7 +136,7 @@ public class ClipboardCommands {
             ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         actor.checkConfirmationRegion(() -> {
             session.setClipboard(null);
@@ -216,10 +217,10 @@ public class ClipboardCommands {
         long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw FaweException.MAX_CHANGES;
+            throw FaweCache.MAX_CHANGES;
         }
         session.setClipboard(null);
 
@@ -255,10 +256,10 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw FaweException.MAX_CHANGES;
+            throw FaweCache.MAX_CHANGES;
         }
         actor.checkConfirmationRegion(() -> {
             session.setClipboard(null);
@@ -378,19 +379,19 @@ public class ClipboardCommands {
                 }
                 url = FaweAPI.upload(target, format);
             }
-            if (url == null) {
-                BBC.GENERATING_LINK_FAILED.send(player);
-            } else {
-                String urlText = url.toString();
-                if (Settings.IMP.WEB.SHORTEN_URLS) {
-                    try {
-                        urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        }
+        if (url == null) {
+            BBC.GENERATING_LINK_FAILED.send(player);
+        } else {
+            String urlText = url.toString();
+            if (Settings.IMP.WEB.SHORTEN_URLS) {
+                try {
+                    urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                BBC.DOWNLOAD_LINK.send(player, urlText);
             }
+            BBC.DOWNLOAD_LINK.send(player, urlText);
         }
     }
 

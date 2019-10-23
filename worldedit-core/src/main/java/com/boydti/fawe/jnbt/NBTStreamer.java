@@ -1,5 +1,6 @@
 package com.boydti.fawe.jnbt;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.exception.FaweException;
 
@@ -40,7 +41,7 @@ public class NBTStreamer {
         try {
             is.readNamedTagLazy(node -> {
                 if (readers.isEmpty()) {
-                    throw FaweException.MANUAL;
+                    throw FaweCache.MANUAL;
                 }
                 return readers.remove(node);
             });

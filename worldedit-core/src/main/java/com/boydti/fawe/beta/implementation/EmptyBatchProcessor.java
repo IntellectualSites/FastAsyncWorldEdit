@@ -10,7 +10,7 @@ public enum EmptyBatchProcessor implements IBatchProcessor {
     INSTANCE
     ;
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return set;
     }
 

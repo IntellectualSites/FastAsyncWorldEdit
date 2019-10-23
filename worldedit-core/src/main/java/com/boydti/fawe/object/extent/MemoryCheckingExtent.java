@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MemUtil;
@@ -26,7 +27,7 @@ public class MemoryCheckingExtent extends PassthroughExtent {
                     BBC.WORLDEDIT_OOM_ADMIN.send(this.player);
                 }
             }
-            WEManager.IMP.cancelEdit(this, FaweException.LOW_MEMORY);
+            WEManager.IMP.cancelEdit(this, FaweCache.LOW_MEMORY);
         }
         return super.getExtent();
     }

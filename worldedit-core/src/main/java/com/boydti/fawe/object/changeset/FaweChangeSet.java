@@ -134,7 +134,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public synchronized IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public synchronized IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
 

@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -52,7 +53,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     public NullExtent() {
-        this(new com.sk89q.worldedit.extent.NullExtent(), FaweException.MANUAL);
+        this(new com.sk89q.worldedit.extent.NullExtent(), FaweCache.MANUAL);
     }
 
     @Override
@@ -326,7 +327,12 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return null;
+    }
+
+    @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        return false;
     }
 }

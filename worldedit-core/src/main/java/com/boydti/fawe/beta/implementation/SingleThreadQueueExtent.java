@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.CharFilterBlock;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.IBatchProcessor;
@@ -13,6 +14,7 @@ import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
@@ -219,6 +221,9 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
 
     @Override
     public final IChunk getOrCreateChunk(int x, int z) {
+        if (!processGet(x, z)) {
+            throw FaweCache.CHUNK;
+        }
         final long pair = (long) x << 32 | z & 0xffffffffL;
         if (pair == lastPair) {
             return lastChunk;

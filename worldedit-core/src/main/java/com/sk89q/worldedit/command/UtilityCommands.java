@@ -19,17 +19,16 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
-import com.boydti.fawe.object.RunnableVal3;
+import com.boydti.fawe.object.function.QuadFunction;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.image.ImageUtil;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -39,12 +38,11 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.SkipQueue;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
+import com.sk89q.worldedit.command.util.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -65,13 +63,18 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
-import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
-import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+
+import javax.imageio.ImageIO;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -80,19 +83,18 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.imageio.ImageIO;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.NotNull;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 
 /**
  * Utility commands.
@@ -651,7 +653,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.calc")
     public void calc(Actor actor,
                      @Arg(desc = "Expression to evaluate", variable = true)
-                         List<String> input) {
+                         List<String> input) throws EvaluationException {
         Expression expression;
         try {
             expression = Expression.compile(String.join(" ", input));
@@ -660,12 +662,11 @@ public class UtilityCommands {
                 "'%s' could not be parsed as a valid expression", input));
             return;
         }
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            double result = expression.evaluate(
-                    new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
-            String formatted = Double.isNaN(result) ? "NaN" : formatter.format(result);
-            return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
-        }, null);
+        double result = expression.evaluate(
+            new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
+        String formatted = Double.isNaN(result) ? "NaN" : formatter.format(result);
+        TextComponent msg = SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
+        actor.print(msg);
     }
 
     @Command(
@@ -695,36 +696,64 @@ public class UtilityCommands {
             we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
     }
 
-    public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
-        list(dir, actor, args, page, -1, formatName, playerFolder, false, false, new RunnableVal3<Builder, URI, String>() {
-            @Override
-            public void run(Builder m, URI uri, String fileName) {
-                m.append(BBC.SCHEMATIC_LIST_ELEM.format(fileName, ""));
-                if (onClickCmd != null) { m.hoverEvent(HoverEvent.showText(TextComponent.of(onClickCmd + " " + fileName)))
-                    .clickEvent(ClickEvent.runCommand(onClickCmd + " " + fileName));
-                }
-            }
+    public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
+        return Lists.transform(files, input -> { // Keep this functional, as transform is evaluated lazily
+            URI uri = input.toURI();
+            String path = getPath(root, input, uuid);
+            return new AbstractMap.SimpleEntry<>(uri, path);
         });
     }
 
-    public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst, RunnableVal3<Builder, URI, String> eachMsg) {
-        List<File> fileList = new ArrayList<>();
-        if (perPage == -1) perPage = actor instanceof Player ? 12 : 20; // More pages for console
-        page = getFiles(dir, actor, args, page, perPage, formatName, playerFolder, fileList::add);
+    public static enum URIType {
+        URL,
+        FILE,
+        DIRECTORY,
+        OTHER
+    }
+
+    public static List<Component> entryToComponent(File root, List<Map.Entry<URI, String>> entries, Function<URI, Boolean> isLoaded, QuadFunction<String, String, URIType, Boolean, Component> adapter) {
+        return Lists.transform(entries, input -> {
+            URI uri = input.getKey();
+            String path = input.getValue();
+
+            boolean url = false;
+            boolean loaded = isLoaded.apply(uri);
+
+            URIType type = URIType.FILE;
+
+            String name = path;
+            String uriStr = uri.toString();
+            if (uriStr.startsWith("file:/")) {
+                File file = new File(uri.getPath());
+                name = file.getName();
+                if (file.isDirectory()) {
+                    type = URIType.DIRECTORY;
+                } else {
+                    if (name.indexOf('.') != -1) name = name.substring(0, name.lastIndexOf('.'));
+                }
+                try {
+                    if (!MainUtil.isInSubDirectory(root, file)) {
+                        throw new RuntimeException(new CommandException("Invalid path"));
+                    }
+                } catch (IOException ignore) {
+                }
+            } else if (uriStr.startsWith("http://") || uriStr.startsWith("https://")) {
+                type = URIType.URL;
+            } else {
+                type = URIType.OTHER;
+            }
+
+            return adapter.apply(name, path, type, loaded);
+        });
+    }
+
+    public static List<File> getFiles(File dir, Actor actor, List<String> args, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst) {
+        List<File> fileList = new LinkedList<>();
+        getFiles(dir, actor, args, formatName, playerFolder, fileList::add);
 
         if (fileList.isEmpty()) {
             BBC.SCHEMATIC_NONE.send(actor);
-            return;
-        }
-
-        int pageCount = (fileList.size() + perPage - 1) / perPage;
-        if (page < 1) {
-            BBC.SCHEMATIC_PAGE.send(actor, ">0");
-            return;
-        }
-        if (page > pageCount) {
-            BBC.SCHEMATIC_PAGE.send(actor, "<" + (pageCount + 1));
-            return;
+            return Collections.emptyList();
         }
 
         final int sortType = oldFirst ? -1 : newFirst ? 1 : 0;
@@ -750,30 +779,10 @@ public class UtilityCommands {
             return res;
         });
 
-        int offset = (page - 1) * perPage;
-
-        int limit = Math.min(offset + perPage, fileList.size());
-
-//        String fullArgs = (String) args.getLocals().get("arguments");
-//        String baseCmd = null;
-//        if (fullArgs != null) {
-//            baseCmd = fullArgs.endsWith(" " + page) ? fullArgs.substring(0, fullArgs.length() - (" " + page).length()) : fullArgs;
-//        }
-        @NotNull Builder m = TextComponent.builder(BBC.SCHEMATIC_LIST.format(page, pageCount));
-
-        UUID uuid = playerFolder ? actor.getUniqueId() : null;
-        for (int i = offset; i < limit; i++) {
-            m.append(newline());
-            File file = fileList.get(i);
-            eachMsg.run(m, file.toURI(), getPath(dir, file, uuid));
-        }
-//        if (baseCmd != null) {
-//            //TODO m.newline().paginate(baseCmd, page, pageCount);
-//        }
-        actor.print(m.build());
+        return fileList;
     }
 
-    public static int getFiles(File dir, Actor actor, List<String> args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
+    public static void getFiles(File dir, Actor actor, List<String> args, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;
         //schem list all <path>
 
@@ -785,10 +794,6 @@ public class UtilityCommands {
         boolean listMine = false;
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
-            int max = len;
-            if (MathMan.isInteger(args.get(len - 1))) {
-                page = Integer.parseInt(args.get(--len));
-            }
             for (int i = 0; i < len; i++) {
                 String arg = "";
                 switch (arg.toLowerCase()) {
@@ -872,7 +877,7 @@ public class UtilityCommands {
                     public void accept(File f) {
                         try {
                             if (f.isDirectory()) {
-                                UUID uuid = UUID.fromString(f.getName());
+                                UUID.fromString(f.getName());
                                 return;
                             }
                         } catch (IllegalArgumentException ignored) {}
@@ -889,7 +894,6 @@ public class UtilityCommands {
             List<File> result = filter(toFilter, filters);
             for (File file : result) rootFunction.accept(file);
         }
-        return page;
     }
 
     private static List<File> filter(List<File> fileList, List<String> filters) {
@@ -946,7 +950,7 @@ public class UtilityCommands {
         }
     }
 
-    private static String getPath(File root, File file, UUID uuid) {
+    public static String getPath(File root, File file, UUID uuid) {
         File dir;
         if (uuid != null) {
             dir = new File(root, uuid.toString());

@@ -551,13 +551,13 @@
 //    public void sendChunk(int x, int z, int bitMask) { /* do nothing - never used*/ }
 //
 //    @Override
-//    public BiomeType getBiomeType(int x, int z) throws FaweException.CHUNK {
+//    public BiomeType getBiomeType(int x, int z) throws FaweCache.CHUNK {
 //        // TODO later (currently not used)
 //        return BiomeTypes.FOREST;
 //    }
 //
 //    @Override
-//    public int getCombinedId4Data(int x, int y, int z) throws FaweException.CHUNK {
+//    public int getCombinedId4Data(int x, int y, int z) throws FaweCache.CHUNK {
 //        MCAChunk chunk = getChunk(x >> 4, z >> 4);
 //        if (y < 0 || y > 255) return 0;
 //        return chunk.getBlockCombinedId(x & 15, y, z & 15);

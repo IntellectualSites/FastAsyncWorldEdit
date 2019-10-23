@@ -155,7 +155,7 @@ public class RegionIntersection extends AbstractRegion {
     }
 
     @Override
-    public IChunkSet processBatch(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;
@@ -164,7 +164,7 @@ public class RegionIntersection extends AbstractRegion {
             BlockVector3 regMin = region.getMinimumPoint();
             BlockVector3 regMax = region.getMaximumPoint();
             if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
-                return region.processBatch(chunk, get, set);
+                return region.processSet(chunk, get, set);
             }
         }
         return null;
