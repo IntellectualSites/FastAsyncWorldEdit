@@ -134,7 +134,7 @@ public class CommandUtil {
             .findAny();
     }
 
-    private static int deprecatedCommandWarning(
+    private static Object deprecatedCommandWarning(
         CommandParameters parameters,
         Command command,
         String reason,
