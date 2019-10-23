@@ -56,6 +56,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -649,7 +650,7 @@ public class SchematicCommands {
                         break;
                 }
 
-                TextComponent.Builder msg = TextComponent.builder();
+                TextComponentProducer msg = new TextComponentProducer();
 
                 msg.append(TextComponent.of(" - ", color));
 
@@ -663,21 +664,27 @@ public class SchematicCommands {
                             .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Add to clipboard"))));
                 }
                 if (type != UtilityCommands.URIType.DIRECTORY) {
-                    msg.append(TextComponent.of("[X]", TextColor.DARK_RED).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path)));
+                    msg.append(TextComponent.of("[X]", TextColor.DARK_RED)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("delete")))
+                    );
                 } else if (hasShow) {
-                    msg.append(TextComponent.of("[O]", TextColor.DARK_AQUA).clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path)));
+                    msg.append(TextComponent.of("[O]", TextColor.DARK_AQUA)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("visualize")))
+                    );
                 }
                 TextComponent msgElem = TextComponent.of(name, color);
                 if (type != UtilityCommands.URIType.DIRECTORY) {
-                    msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Load")));
+                    msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + path));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Load")));
                 } else {
-                    msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("List")));
+                    msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + path));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("List")));
                 }
                 msg.append(msgElem);
 
-                return msg.build();
+                return msg.create();
             }
         });
         PaginationBox paginationBox = PaginationBox.fromStrings("Available schematics", pageCommand, components);

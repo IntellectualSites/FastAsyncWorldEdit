@@ -44,10 +44,12 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -72,6 +74,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
+import javax.xml.soap.Text;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -1234,12 +1238,34 @@ public class CFICommands {
 
     @SuppressWarnings("unused")
     protected static void mainMenu(Player player) {
-        //TODO
-//        msg("What do you want to do now?").append(newline())
-//                .cmdOptions("/cfi ", "", "Coloring", "Component", "Populate", "Brush")
-//                .append(newline()).text("<> [View]").command("/cfi " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
-//                .append(newline()).text(">< [Cancel]").cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "cancel"))
-//                .append(newline()).text("&2>> [Done]").cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "done"))
-//                .send(fp);
+        TextComponentProducer producer = new TextComponentProducer();
+        producer.append(TextComponent.of("What do you want to do now?"));
+        producer.newline();
+        String prefix = "/cfi ";
+        String[] options = {"Coloring", "Component", "Populate", "Brush"};
+        for (int i = 0; i < options.length; i++) {
+            if (i != 0) {
+                producer.append(TextComponent.of(" | ", TextColor.DARK_GRAY));
+            }
+            String option = options[i];
+            String cmd = prefix + option;
+            producer.append(TextComponent.of(option, TextColor.GREEN)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, cmd))
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(option))));
+        }
+        producer.newline();
+        producer.newline().append(TextComponent.of("<> [View]", TextColor.DARK_AQUA)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "download"))
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("View full res image"))));
+
+        producer.newline().append(TextComponent.of(">< [Cancel]", TextColor.RED)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "cancel"))
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("cancel"))));
+
+        producer.newline().append(TextComponent.of(">> [Done]", TextColor.DARK_GREEN)
+                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "done"))
+                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("done"))));
+
+        player.print(producer.create());
     }
 }

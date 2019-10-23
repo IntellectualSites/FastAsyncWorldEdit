@@ -3,7 +3,7 @@ package com.boydti.fawe.object.brush;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.brush.scroll.ScrollAction;
+import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -48,7 +48,7 @@ public class BrushSettings {
     private Pattern material;
     private Expression size = new Expression(1);
     private Set<String> permissions;
-    private ScrollAction scrollAction;
+    private Scroll scrollAction;
     private String lastWorld;
 
     public BrushSettings() {
@@ -107,7 +107,7 @@ public class BrushSettings {
         }
         if (settings.containsKey(SettingType.SCROLL_ACTION.name())) {
             String actionArgs = (String) settings.get(SettingType.SCROLL_ACTION.name());
-            ScrollAction action = ScrollAction.fromArguments(tool, player, session, actionArgs, false);
+            Scroll action = Scroll.fromArguments(tool, player, session, actionArgs, false);
             if (action != null) {
                 bs.setScrollAction(action);
                 bs.constructor.put(SettingType.SCROLL_ACTION, actionArgs);
@@ -194,7 +194,7 @@ public class BrushSettings {
         return setSize(new Expression(size));
     }
 
-    public BrushSettings setScrollAction(ScrollAction scrollAction) {
+    public BrushSettings setScrollAction(Scroll scrollAction) {
         if (scrollAction == null) constructor.remove(SettingType.SCROLL_ACTION);
         this.scrollAction = scrollAction;
         return this;
@@ -260,7 +260,7 @@ public class BrushSettings {
         return Collections.unmodifiableSet(permissions);
     }
 
-    public ScrollAction getScrollAction() {
+    public Scroll getScrollAction() {
         return scrollAction;
     }
 

@@ -22,7 +22,7 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.scroll.ScrollAction;
+import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.MathMan;
@@ -330,24 +330,25 @@ public class ToolUtilCommands {
     public void scroll(Player player, EditSession editSession, LocalSession session,
                        @Switch(name = 'h', desc = "TODO")
                                boolean offHand,
-                       @Arg(desc = "Target Modes")
-                               String modes,
+                       @Arg(desc = "Target Modes", def = "none")
+                               Scroll.Action mode,
                        @Arg(desc = "The scroll action", variable = true)
                                List<String> commandStr) throws WorldEditException {
-        // TODO NOT IMPLEMENTED Convert ScrollAction to an argument converter
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
+
         BrushSettings settings = offHand ? bt.getOffHand() : bt.getContext();
-        ScrollAction action = ScrollAction.fromArguments(bt, player, session, StringMan.join(commandStr, " "), true);
+        Scroll action = Scroll.fromArguments(bt, player, session, mode, commandStr, true);
         settings.setScrollAction(action);
-        if (modes.equalsIgnoreCase("none")) {
+        if (mode == Scroll.Action.NONE) {
             BBC.BRUSH_SCROLL_ACTION_UNSET.send(player);
         } else if (action != null) {
-            settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, modes);
-            BBC.BRUSH_SCROLL_ACTION_SET.send(player, modes);
+            String full = (mode.name().toLowerCase() + " " + StringMan.join(commandStr, " ")).trim();
+            settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, full);
+            BBC.BRUSH_SCROLL_ACTION_SET.send(player, mode);
         }
         bt.update();
     }

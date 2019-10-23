@@ -64,17 +64,17 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         this.world = (CraftWorld) world;
         this.X = X;
         this.Z = Z;
-        if (forceLoad) {
-            this.world.getHandle().setForceLoaded(X, Z, this.forceLoad = true);
-        }
+//        if (forceLoad) {
+//            this.world.getHandle().setForceLoaded(X, Z, this.forceLoad = true);
+//        }
     }
 
-    @Override
-    protected void finalize() {
-        if (forceLoad) {
-            this.world.getHandle().setForceLoaded(X, Z, forceLoad = false);
-        }
-    }
+//    @Override
+//    protected void finalize() {
+//        if (forceLoad) {
+//            this.world.getHandle().setForceLoaded(X, Z, forceLoad = false);
+//        }
+//    }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
