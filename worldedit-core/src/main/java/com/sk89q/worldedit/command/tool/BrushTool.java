@@ -283,6 +283,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      *
      * @return the filter
      */
+    //TODO A better description is needed here to explain what makes a source-mask different from a regular mask.
     public Mask getSourceMask() {
         return getContext().getSourceMask();
     }

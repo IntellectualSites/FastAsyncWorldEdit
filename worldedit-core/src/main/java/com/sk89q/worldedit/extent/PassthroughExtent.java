@@ -5,8 +5,6 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
@@ -18,19 +16,18 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class PassthroughExtent extends AbstractDelegateExtent {
+
     /**
      * Create a new instance.
      *
@@ -40,32 +37,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         super(extent);
     }
 
-    public BlockVector3 getMinimumPoint() {
-        return getExtent().getMinimumPoint();
-    }
-
-    public BlockVector3 getMaximumPoint() {
-        return getExtent().getMaximumPoint();
-    }
-
     @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return getExtent().getEntities(region);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return getExtent().getEntities();
-    }
-
-    @Override
-    @Nullable
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return getExtent().createEntity(location, entity);
-    }
-
-    @Override
-    @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         getExtent().removeEntity(x, y, z, uuid);
     }
@@ -161,11 +133,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public int getMaxY() {
-        return getExtent().getMaxY();
-    }
-
-    @Override
     public BlockArrayClipboard lazyCopy(Region region) {
         return getExtent().lazyCopy(region);
     }
@@ -215,12 +182,9 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().setBlocks(vset, pattern);
     }
 
+    @Override
     public BlockState getBlock(BlockVector3 position) {
         return getExtent().getBlock(position);
-    }
-
-    public BlockState getBlock(int x, int y, int z) {
-        return getExtent().getBlock(x, y, z);
     }
 
     @Override
@@ -228,28 +192,10 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().getFullBlock(position);
     }
 
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        return getExtent().getFullBlock(x, y, z);
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return getExtent().getBiome(position);
-    }
-
-    public BiomeType getBiomeType(int x, int z) {
-        return getExtent().getBiomeType(x, z);
-    }
-
     @Override
     @Deprecated
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return getExtent().setBlock(position, block);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
@@ -260,11 +206,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x, y, z, biome);
     }
 
     // special

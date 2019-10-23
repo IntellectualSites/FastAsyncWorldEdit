@@ -476,10 +476,10 @@ public class RegionCommands {
                         boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
                         boolean ignoreAirBlocks,
-                    @Switch(name = 'b', desc = "Copy Biomes")
-                        boolean copyBiomes,
                     @Switch(name = 'e', desc = "Ignore entities")
                         boolean skipEntities,
+                    @Switch(name = 'b', desc = "Also copy biomes")
+                        boolean copyBiomes,
                     InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
         actor.checkConfirmationRegion(() -> {
@@ -534,12 +534,12 @@ public class RegionCommands {
                          BlockVector3 direction,
                      @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                          boolean moveSelection,
-                     @Switch(name = 'b', desc = "Copy Biomes")
-                         boolean copyBiomes,
-                     @Switch(name = 'e', desc = "Skip entities")
-                         boolean skipEntities,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
+                     @Switch(name = 'e', desc = "Skip entities")
+                         boolean skipEntities,
+                     @Switch(name = 'b', desc = "Also copy biomes")
+                         boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Source mask")
                          Mask sourceMask,
                     InjectedValueAccess context) throws WorldEditException {

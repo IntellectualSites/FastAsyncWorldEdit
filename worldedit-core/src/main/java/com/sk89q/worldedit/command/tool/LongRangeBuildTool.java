@@ -100,7 +100,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
             target = player.getBlockTrace(MAX_RANGE, false, mask);
         }
         if (target == null) {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
             return null;
         }
 

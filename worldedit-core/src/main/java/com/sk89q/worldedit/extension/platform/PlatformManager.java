@@ -56,8 +56,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
-
-import com.sk89q.worldedit.world.block.BlockType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -370,7 +368,7 @@ public class PlatformManager {
                             if (!(tool instanceof BrushTool)) {
                                 blockTool = reset(blockTool);
                             }
-                            ((BlockTool) blockTool).actPrimary(queryCapability(Capability.WORLD_EDITING),
+                            blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
                                     getConfiguration(), player, session, location);
                         }, false, true);
                         event.setCancelled(true);
@@ -420,7 +418,7 @@ public class PlatformManager {
                         if (pos != null) {
                             player.findFreePosition(pos);
                         } else {
-                            BBC.NO_BLOCK.send(player);
+                            player.printError(BBC.NO_BLOCK.s());
                         }
 
                         event.setCancelled(true);
@@ -444,7 +442,7 @@ public class PlatformManager {
                         }
 
                         if (!player.passThroughForwardWall(40)) {
-                            BBC.NAVIGATION_WAND_ERROR.send(player);
+                            player.printError(BBC.NAVIGATION_WAND_ERROR.s());
                         }
 
                         event.setCancelled(true);

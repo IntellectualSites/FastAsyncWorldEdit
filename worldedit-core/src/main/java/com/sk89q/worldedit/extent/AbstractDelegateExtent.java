@@ -30,15 +30,20 @@ import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -69,7 +74,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-       return getBlock(position.getX(),position.getY(),position.getZ());
+       return extent.getBlock(position.getX(),position.getY(),position.getZ());
     }
 
     /*
@@ -124,24 +129,37 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         }
     }
 
-
-    /*
-    Bounds
-    */
     @Override
     public int getMaxY() {
         return extent.getMaxY();
     }
 
-
-    /*
-    Input + Output
-     */
-
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return extent.getBlock(x, y, z);
     }
+
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity) {
+        return extent.createEntity(location, entity);
+    }
+
+    @Override
+    public List<? extends Entity> getEntities() {
+        return extent.getEntities();
+    }
+
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return extent.getEntities(region);
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector2 position) {
+        return extent.getBiome(position);
+    }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         return extent.getFullBlock(x, y, z);

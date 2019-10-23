@@ -29,13 +29,11 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.object.extent.ProcessedWEExtent;
@@ -49,8 +47,6 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -63,13 +59,10 @@ import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.sk89q.worldedit.function.block.Counter;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
-import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -83,7 +76,6 @@ import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.WaterloggedRemover;
@@ -322,9 +314,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Get the FawePlayer or null
+     * Get the Player or null
      *
-     * @return
+     * @return the player
      */
     @Nullable
     public Player getPlayer() {
@@ -752,11 +744,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    public BiomeType getBiome(final BlockVector2 position) {
-        return this.getExtent().getBiome(position);
-    }
-
-    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         this.changes++;
         return this.getExtent().setBiome(position, biome);
@@ -766,20 +753,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         this.changes++;
         return this.getExtent().setBiome(x, y, z, biome);
-    }
-
-    public BlockState getBlock(int x, int y, int z) {
-        return getExtent().getBlock(x, y, z);
-    }
-
-    @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return getExtent().getBlock(position);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return getExtent().getFullBlock(position);
     }
 
     /**
@@ -941,12 +914,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
     }
 
-    @Override
-    @Nullable
-    public Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity entity) {
-        return getExtent().createEntity(location, entity);
-    }
-
     /**
      * Restores all blocks to their initial state.
      *
@@ -998,26 +965,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.changes = size;
     }
 
-    @Override
-    public BlockVector3 getMinimumPoint() {
-        return getExtent().getMinimumPoint();
-    }
-
-    @Override
-    public BlockVector3 getMaximumPoint() {
-        return getExtent().getMaximumPoint();
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return getExtent().getEntities(region);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return getExtent().getEntities();
-    }
-
     /**
      * Closing an EditSession {@linkplain #flushSession() flushes its buffers}.
      */
@@ -1032,11 +979,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public void flushSession() {
         flushQueue();
-    }
-
-    @Override
-    public @Nullable Operation commit() {
-        return getExtent().commit();
     }
 
     /**
@@ -1404,18 +1346,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (region instanceof CuboidRegion) {
             return makeCuboidWalls(region, pattern);
         } else {
-            replaceBlocks(region, new Mask() {
-                @Override
-                public boolean test(BlockVector3 position) {
-                    int x = position.getBlockX();
-                    int y = position.getBlockY();
-                    int z = position.getBlockZ();
-                    if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
-                        return true;
-                    }
-
-                    return false;
+            replaceBlocks(region, position -> {
+                int x = position.getBlockX();
+                int y = position.getBlockY();
+                int z = position.getBlockZ();
+                if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
+                    return true;
                 }
+
+                return false;
             }, pattern);
         }
         return changes;
@@ -1479,7 +1418,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     /**
      * Stack a cuboid region. For compatibility, entities are copied but biomes are not.
-     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, Mask)} to fine tune.
+     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, boolean)} to fine tune.
      *
      * @param region the region to stack
      * @param dir the direction to stack
