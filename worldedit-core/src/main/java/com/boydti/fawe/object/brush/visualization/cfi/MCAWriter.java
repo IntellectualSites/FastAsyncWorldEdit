@@ -80,34 +80,15 @@ public abstract class MCAWriter implements Extent {
         final ForkJoinPool pool = new ForkJoinPool();
         int tcx = (width - 1) >> 4;
         int tcz = (length - 1) >> 4;
-        final ThreadLocal<WritableMCAChunk> chunkStore = new ThreadLocal<WritableMCAChunk>() {
-            @Override
-            protected WritableMCAChunk initialValue() {
-                WritableMCAChunk chunk = new WritableMCAChunk();
-                Arrays.fill(chunk.blocks, BlockID.AIR);
-//                Arrays.fill(chunk.skyLight, (byte) 255);
-                return chunk;
-            }
-        };
-        final ThreadLocal<byte[]> byteStore1 = new ThreadLocal<byte[]>() {
-            @Override
-            protected byte[] initialValue() {
-                return new byte[500000];
-            }
-        };
-        final ThreadLocal<byte[]> byteStore2 = new ThreadLocal<byte[]>() {
-            @Override
-            protected byte[] initialValue() {
-                return new byte[500000];
-            }
-        };
-        final ThreadLocal<Deflater> deflateStore = new ThreadLocal<Deflater>() {
-            @Override
-            protected Deflater initialValue() {
-                Deflater deflater = new Deflater(Deflater.BEST_SPEED, false);
-                return deflater;
-            }
-        };
+        final ThreadLocal<WritableMCAChunk> chunkStore = ThreadLocal.withInitial(() -> {
+            WritableMCAChunk chunk = new WritableMCAChunk();
+            Arrays.fill(chunk.blocks, BlockID.AIR);
+            return chunk;
+        });
+        final ThreadLocal<byte[]> byteStore1 = ThreadLocal.withInitial(() -> new byte[500000]);
+        final ThreadLocal<byte[]> byteStore2 = ThreadLocal.withInitial(() -> new byte[500000]);
+        final ThreadLocal<Deflater> deflateStore = ThreadLocal
+            .withInitial(() -> new Deflater(Deflater.BEST_SPEED, false));
         byte[] fileBuf = new byte[1 << 16];
         int mcaXMin = 0;
         int mcaZMin = 0;

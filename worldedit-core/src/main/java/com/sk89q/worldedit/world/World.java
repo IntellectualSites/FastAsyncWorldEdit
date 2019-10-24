@@ -300,7 +300,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param chunkZ
      * @param bitMask
      */
-    void sendChunk(final int X, final int Z, final int mask);
+    void sendChunk(final int chunkX, final int chunkZ, final int bitMask);
 
     @Override
     IChunkGet get(int x, int z);

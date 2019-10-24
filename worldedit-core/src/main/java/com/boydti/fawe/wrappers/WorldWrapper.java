@@ -235,8 +235,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
-        parent.sendChunk(X, Z, mask);
+    public void sendChunk(int chunkX, int chunkZ, int bitMask) {
+        parent.sendChunk(chunkX, chunkZ, bitMask);
     }
 
     @Override

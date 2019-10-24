@@ -320,7 +320,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
+    public void sendChunk(int chunkX, int chunkZ, int bitMask) {
         throw new UnsupportedOperationException("TODO NOT IMPLEMENTED"); // add method to adapter to send custom chunk
     }
 

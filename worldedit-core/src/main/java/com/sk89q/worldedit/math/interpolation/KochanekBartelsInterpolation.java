@@ -31,8 +31,8 @@ import java.util.List;
 /**
  * A Kochanek-Bartels interpolation; continuous in the 2nd derivative.
  *
- * <p>Supports {@link Node#tension tension}, {@link Node#bias bias} and
- * {@link Node#continuity continuity} parameters per {@link Node}.</p>
+ * <p>Supports {@link Node#getTension() tension}, {@link Node#getBias() bias} and
+ * {@link Node#getContinuity() continuity} parameters per {@link Node}.</p>
  */
 public class KochanekBartelsInterpolation implements Interpolation {
 

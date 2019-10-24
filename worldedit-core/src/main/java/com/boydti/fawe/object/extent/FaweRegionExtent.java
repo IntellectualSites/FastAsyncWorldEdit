@@ -2,12 +2,9 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.WEManager;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -22,9 +19,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
@@ -56,6 +50,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     }
 
     @Override
+
     public Extent construct(Extent child) {
         if (getExtent() != child) {
             new ExtentTraverser<Extent>(this).setNext(child);

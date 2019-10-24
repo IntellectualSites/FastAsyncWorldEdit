@@ -516,7 +516,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
+    public void sendChunk(int chunkX, int chunkZ, int bitMask) {
     }
 
     @Override
