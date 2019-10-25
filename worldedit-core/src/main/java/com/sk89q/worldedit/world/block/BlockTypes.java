@@ -892,7 +892,9 @@ public final class BlockTypes {
             Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
 
             int size = blockMap.size();
-            for (Field field : BlockID.class.getDeclaredFields()) size = Math.max(field.getInt(null) + 1, size);
+            for (Field field : BlockID.class.getDeclaredFields()) {
+                size = Math.max(field.getInt(null) + 1, size);
+            }
             BIT_OFFSET = MathMan.log2nlz(size);
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
             values = new BlockType[size];
@@ -920,15 +922,16 @@ public final class BlockTypes {
                 }
             }
 
-            { // Register new blocks
-                int internalId = 1;
-                for (Map.Entry<String, String> entry : blockMap.entrySet()) {
-                    String defaultState = entry.getValue();
-                    // Skip already registered ids
-                    for (; values[internalId] != null; internalId++);
-                    BlockType type = register(defaultState, internalId, stateList);
-                    values[internalId] = type;
+            // Register new blocks
+            int internalId = 1;
+            for (Map.Entry<String, String> entry : blockMap.entrySet()) {
+                String defaultState = entry.getValue();
+                // Skip already registered ids
+                while(values[internalId] != null) {
+                    internalId++;
                 }
+                BlockType type = register(defaultState, internalId, stateList);
+                values[internalId] = type;
             }
 
             states = stateList.toArray(new BlockState[stateList.size()]);
