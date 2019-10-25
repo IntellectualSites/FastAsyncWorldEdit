@@ -89,10 +89,10 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
     }
 
     public void print(Actor actor, long size) {
-        for (Countable c : getDistribution()) {
+        for (Countable<BlockState> c : getDistribution()) {
             final String name = c.getID().toString();
             final String str = String.format("%-7s (%.3f%%) %s",
-                String.valueOf(c.getAmount()),
+                c.getAmount(),
                 c.getAmount() / (double) size * 100,
                 name);
             actor.print(str);

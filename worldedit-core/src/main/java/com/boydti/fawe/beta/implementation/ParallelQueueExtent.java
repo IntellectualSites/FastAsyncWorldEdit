@@ -27,14 +27,11 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrapper {
 
@@ -229,7 +226,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      * returned by a given pattern.
      *
      * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
      * @param replacement the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -244,7 +241,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      * returned by a given pattern.
      *
      * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed

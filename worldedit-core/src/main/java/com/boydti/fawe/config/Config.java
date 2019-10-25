@@ -203,7 +203,7 @@ public class Config {
     private Map<String, Object> getFields(Class clazz) {
         HashMap<String, Object> map = new HashMap<>();
         for (Field field : clazz.getFields()) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+            if (Modifier.isStatic(field.getModifiers())) {
                 try {
                     map.put(toNodeName(field.getName()), field.get(null));
                 } catch (IllegalAccessException e) {
