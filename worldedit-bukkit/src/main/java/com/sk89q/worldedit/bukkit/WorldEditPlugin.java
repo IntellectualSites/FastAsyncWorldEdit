@@ -84,6 +84,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -560,14 +561,22 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      */
     public BukkitPlayer wrapPlayer(Player player) {
         synchronized (player) {
-            @NotNull List<MetadataValue> meta = player.getMetadata("WE");
-            if (meta == null || meta.isEmpty()) {
-                BukkitPlayer wePlayer = new BukkitPlayer(this, player);
+            BukkitPlayer wePlayer = getCachedPlayer(player);
+            if (wePlayer == null) {
+                wePlayer = new BukkitPlayer(this, player);
                 player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
                 return wePlayer;
             }
-            return (BukkitPlayer) meta.get(0).value();
+            return wePlayer;
         }
+    }
+
+    public BukkitPlayer getCachedPlayer(Player player) {
+        List<MetadataValue> meta = player.getMetadata("WE");
+        if (meta == null || meta.isEmpty()) {
+            return null;
+        }
+        return (BukkitPlayer) meta.get(0).value();
     }
 
     public Actor wrapCommandSender(CommandSender sender) {

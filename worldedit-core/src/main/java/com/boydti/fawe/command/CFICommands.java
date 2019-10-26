@@ -432,7 +432,7 @@ public class CFICommands {
                 Clipboard clipboard = holder.getClipboard();
                 boolean[] ids = new boolean[BlockTypes.size()];
                 for (BlockVector3 pt : clipboard.getRegion()) {
-                    ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
+                    ids[clipboard.getBlock(pt).getBlockType().getInternalId()] = true;
                 }
                 blocks = new HashSet<>();
                 for (int combined = 0; combined < ids.length; combined++) {
@@ -606,7 +606,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterId(Player fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
-        settings.getGenerator().setWaterId(block.getBlockType().getInternalId());
+        settings.getGenerator().setWater(block.toImmutableState());
 
         fp.print("Set water id!");
         settings.resetComponent();
@@ -621,7 +621,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void baseId(Player fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
-        settings.getGenerator().setBedrockId(block.getBlockType().getInternalId());
+        settings.getGenerator().setBedrock(block.toImmutableState());
         fp.print(TextComponent.of("Set base id!"));
         settings.resetComponent();
         component(fp);

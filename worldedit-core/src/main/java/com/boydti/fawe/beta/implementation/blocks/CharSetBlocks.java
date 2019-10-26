@@ -44,6 +44,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return biomes[(z << 4) | x];
+    }
+
+    @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         return tiles == null ? Collections.emptyMap() : tiles;
     }

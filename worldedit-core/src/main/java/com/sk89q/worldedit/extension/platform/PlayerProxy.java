@@ -41,6 +41,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class PlayerProxy extends AbstractPlayerActor {
 
@@ -209,6 +210,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
         basePlayer.sendFakeBlock(pos, block);
+    }
+
+    @Override
+    public void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data) {
+        basePlayer.sendFakeChunk(chunkX, chunkZ, data);
     }
 
     @Override

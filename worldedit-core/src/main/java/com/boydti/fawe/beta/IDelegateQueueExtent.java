@@ -46,16 +46,6 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default void clearBlockUpdates(Player... players) {
-        getParent().clearBlockUpdates(players);
-    }
-
-    @Override
-    default void sendBlockUpdates(Player... players) {
-        getParent().sendBlockUpdates(players);
-    }
-
-    @Override
     default void enableQueue() {
         getParent().enableQueue();
     }

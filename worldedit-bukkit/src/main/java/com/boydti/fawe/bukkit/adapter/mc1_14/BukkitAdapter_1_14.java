@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
@@ -21,6 +22,7 @@ import net.minecraft.server.v1_14_R1.DataPaletteBlock;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
@@ -133,8 +135,6 @@ public class BukkitAdapter_1_14 {
         }
     }
 
-    private static boolean PAPER = true;
-
     public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
@@ -143,7 +143,7 @@ public class BukkitAdapter_1_14 {
         if (Fawe.isMainThread()) {
             return nmsWorld.getChunkAt(X, Z);
         }
-        if (PAPER) {
+        if (FaweBukkit.PAPER) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
             try {
@@ -154,8 +154,7 @@ public class BukkitAdapter_1_14 {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (Throwable e) {
-                System.out.println("Error, cannot load chunk async (paper not installed?)");
-                PAPER = false;
+                e.printStackTrace();
             }
         }
         // TODO optimize

@@ -51,7 +51,7 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color, int biomePriority) {
+    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color, int biomePriority) {
         return parent.getIsBlockCloserThanBiome(blockAndBiomeIdOutput, color, biomePriority);
     }
 

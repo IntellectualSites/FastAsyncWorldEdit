@@ -28,8 +28,10 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent {
 
     CompoundTag getTag(int x, int y, int z);
 
+    @Override
     Map<BlockVector3, CompoundTag> getTiles();
 
+    @Override
     Set<CompoundTag> getEntities();
 
     @Override

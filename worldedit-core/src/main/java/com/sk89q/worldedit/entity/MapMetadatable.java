@@ -23,6 +23,10 @@ public interface MapMetadatable extends Metadatable {
         return !getRawMeta().isEmpty();
     }
 
+    default Object putIfAbsent(String key, Object value) {
+        return getRawMeta().putIfAbsent(key, value);
+    }
+
     /**
      * Get the metadata for a key.
      *

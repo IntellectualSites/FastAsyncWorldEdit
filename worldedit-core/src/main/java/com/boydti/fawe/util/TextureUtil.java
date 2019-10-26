@@ -497,13 +497,13 @@ public class TextureUtil implements TextureHolder {
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color,
+    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color,
         int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
-        blockAndBiomeIdOutput[1] = biome.id;
+        blockAndBiomeIdOutput[1] = (char) biome.id;
         if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
             color)) {
             return true;

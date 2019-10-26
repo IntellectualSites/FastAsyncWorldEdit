@@ -19,6 +19,7 @@
 
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
+import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.Fawe;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -132,6 +133,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -588,6 +590,13 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         } else {
             throw new IllegalArgumentException("Don't know how to make NMS " + foreign.getClass().getCanonicalName());
         }
+    }
+
+    @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
+        IBlockData mcState = material.getCraftBlockData().getState();
+        return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
     }
 
     @Override

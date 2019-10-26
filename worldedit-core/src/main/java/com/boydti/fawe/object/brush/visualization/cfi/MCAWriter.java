@@ -84,7 +84,7 @@ public abstract class MCAWriter implements Extent {
             @Override
             protected WritableMCAChunk initialValue() {
                 WritableMCAChunk chunk = new WritableMCAChunk();
-                Arrays.fill(chunk.blocks, BlockID.AIR);
+                Arrays.fill(chunk.blocks, (char) BlockID.AIR);
 //                Arrays.fill(chunk.skyLight, (byte) 255);
                 return chunk;
             }
@@ -142,11 +142,12 @@ public abstract class MCAWriter implements Extent {
                             pool.submit(() -> {
                                 try {
                                     WritableMCAChunk chunk = chunkStore.get();
-                                    chunk.clear(fcx, fcz);
+                                    chunk.reset();
+                                    chunk.setPosition(fcx, fcz);
                                     chunk = write(chunk, csx, cex, csz, cez);
                                     if (chunk != null) {
                                         // Generation offset
-                                        chunk.setLoc( fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
+                                        chunk.setPosition( fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
 
                                         // Compress
                                         byte[] bytes = chunk.toBytes(byteStore1.get());

@@ -220,4 +220,15 @@ public class FastByteArrayOutputStream extends OutputStream {
         size += index;
         index = 0;
     }
+
+    @Override
+    public void close() {
+    }
+
+    public void reset() {
+        Arrays.fill(buffer, (byte) 0);
+        index = 0;
+        size = 0;
+        buffers.clear();
+    }
 }

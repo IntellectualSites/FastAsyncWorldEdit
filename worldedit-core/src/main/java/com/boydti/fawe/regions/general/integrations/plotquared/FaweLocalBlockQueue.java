@@ -122,7 +122,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public void refreshChunk(int x, int z) {
-        world.sendChunk(x, z, 0);
+        world.refreshChunk(x, z);
     }
 
     @Override

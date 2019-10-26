@@ -21,7 +21,9 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -317,8 +319,19 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-
-        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
+        int X = pt.getBlockX() >> 4;
+        int Z = pt.getBlockZ() >> 4;
+        if (Fawe.isMainThread()) {
+            world.getChunkAt(X, Z);
+        } else if (!world.isChunkLoaded(X, Z)) {
+            if (FaweBukkit.PAPER) {
+                world.getChunkAtAsync(X, Z, true);
+            } else {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    world.getChunkAt(X, Z);
+                });
+            }
+        }
     }
 
     @Override
@@ -516,7 +529,8 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int X, int Z, int mask) {
+    public void refreshChunk(int X, int Z) {
+        getWorld().refreshChunk(X, Z);
     }
 
     @Override

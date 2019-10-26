@@ -32,22 +32,6 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcess
     }
 
     /**
-     * Clear any block updates
-     * @param players
-     */
-    default void clearBlockUpdates(Player... players) {
-        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED");
-    }
-
-    /**
-     * Send all the chunks as block updates
-     * @param players
-     */
-    default void sendBlockUpdates(Player... players) {
-        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED");
-    }
-
-    /**
      * Must ensure that it is enqueued with QueueHandler
      */
     @Override

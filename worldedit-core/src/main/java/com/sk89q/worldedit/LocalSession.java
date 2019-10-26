@@ -682,7 +682,12 @@ public class LocalSession implements TextureHolder {
     public Region getSelection(World world) throws IncompleteRegionException {
         checkNotNull(world);
         if (selector.getIncompleteRegion().getWorld() == null || !selector.getIncompleteRegion().getWorld().equals(world)) {
-            throw new IncompleteRegionException();
+            throw new IncompleteRegionException() {
+                @Override
+                public synchronized Throwable fillInStackTrace() {
+                    return this;
+                }
+            };
         }
         return selector.getRegion();
     }
@@ -1287,6 +1292,8 @@ public class LocalSession implements TextureHolder {
      */
     public void describeCUI(Actor actor) {
         checkNotNull(actor);
+
+        // TODO preload
 
         if (!hasCUISupport) {
             return;

@@ -170,6 +170,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         if (vset instanceof Region) {
             setBlocks((Region) vset, pattern);
         }
+        // TODO optimize parallel
         for (BlockVector3 blockVector3 : vset) {
             pattern.apply(this, blockVector3, blockVector3);
         }

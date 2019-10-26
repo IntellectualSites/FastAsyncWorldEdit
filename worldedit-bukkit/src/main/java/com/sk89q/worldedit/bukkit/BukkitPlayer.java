@@ -24,6 +24,10 @@ import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.injector.netty.WirePacket;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -47,10 +51,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -355,6 +362,21 @@ public class BukkitPlayer extends AbstractPlayerActor {
                         adapter.sendFakeOP(player);
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data) {
+        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+        // check if the chunk is in range
+        if (true) {
+            try {
+                byte[] raw = data.get();
+                WirePacket packet = new WirePacket(PacketType.Play.Server.MAP_CHUNK, raw);
+                manager.sendWirePacket(getPlayer(), packet);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
             }
         }
     }

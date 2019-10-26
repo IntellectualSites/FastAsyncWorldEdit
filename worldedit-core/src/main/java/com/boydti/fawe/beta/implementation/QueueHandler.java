@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +40,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
     private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
     private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
     private CleanableThreadLocal<IQueueExtent> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
@@ -60,53 +62,61 @@ public abstract class QueueHandler implements Trimable, Runnable {
             throw new IllegalStateException("Not main thread");
         }
         if (!syncTasks.isEmpty()) {
-            long now = System.currentTimeMillis();
-            targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
-            long diff = 50 + this.last - (this.last = now);
-            long absDiff = Math.abs(diff);
-            if (diff == 0) {
-                allocate = Math.min(50, allocate + 1);
-            } else if (diff < 0) {
-                allocate = Math.max(5, allocate + diff);
-            } else if (!Fawe.get().getTimer().isAbove(targetTPS)) {
-                allocate = Math.max(5, allocate - 1);
-            }
-            long currentAllocate = allocate - absDiff;
+            long currentAllocate = getAllocate();
 
             if (!MemUtil.isMemoryFree()) {
                 // TODO reduce mem usage
+                // FaweCache trim
+                // Preloader trim
             }
 
-            boolean wait = false;
-            do {
-                Runnable task = syncTasks.poll();
-                if (task == null) {
-                    if (wait) {
-                        synchronized (syncTasks) {
-                            try {
-                                syncTasks.wait(1);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        task = syncTasks.poll();
-                        wait = false;
-                    } else {
-                        break;
-                    }
-                }
-                if (task != null) {
-                    task.run();
-                    wait = true;
-                }
-            } while (System.currentTimeMillis() - now < currentAllocate);
+            operate(syncTasks, last, currentAllocate);
+        } else if (!syncWhenFree.isEmpty()) {
+            operate(syncWhenFree, last, getAllocate());
+        } else {
+            // trim??
         }
-        while (!syncTasks.isEmpty()) {
-            final FutureTask task = syncTasks.poll();
+    }
+
+    private long getAllocate() {
+        long now = System.currentTimeMillis();
+        targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
+        long diff = 50 + this.last - (this.last = now);
+        long absDiff = Math.abs(diff);
+        if (diff == 0) {
+            allocate = Math.min(50, allocate + 1);
+        } else if (diff < 0) {
+            allocate = Math.max(5, allocate + diff);
+        } else if (!Fawe.get().getTimer().isAbove(targetTPS)) {
+            allocate = Math.max(5, allocate - 1);
+        }
+        return allocate - absDiff;
+    }
+
+    private void operate(Queue<FutureTask> queue, long start, long currentAllocate) {
+        boolean wait = false;
+        do {
+            Runnable task = queue.poll();
+            if (task == null) {
+                if (wait) {
+                    synchronized (syncTasks) {
+                        try {
+                            queue.wait(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    task = queue.poll();
+                    wait = false;
+                } else {
+                    break;
+                }
+            }
             if (task != null) {
                 task.run();
+                wait = true;
             }
-        }
+        } while (System.currentTimeMillis() - start < currentAllocate);
     }
 
     public <T extends Future<T>> void complete(Future<T> task) {
@@ -136,50 +146,83 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public <T> Future<T> sync(Runnable run, T value) {
+        return sync(run, value, syncTasks);
+    }
+
+    public <T> Future<T> sync(Runnable run) {
+        return sync(run, syncTasks);
+    }
+
+    public <T> Future<T> sync(Callable<T> call) throws Exception {
+        return sync(call, syncTasks);
+    }
+
+    public <T> Future<T> sync(Supplier<T> call) {
+        return sync(call, syncTasks);
+    }
+
+    // Lower priorty sync task (runs only when there are no other tasks)
+    public <T> Future<T> syncWhenFree(Runnable run, T value) {
+        return sync(run, value, syncWhenFree);
+    }
+
+    public <T> Future<T> syncWhenFree(Runnable run) {
+        return sync(run, syncWhenFree);
+    }
+
+    public <T> Future<T> syncWhenFree(Callable<T> call) throws Exception {
+        return sync(call, syncWhenFree);
+    }
+
+    public <T> Future<T> syncWhenFree(Supplier<T> call) {
+        return sync(call, syncWhenFree);
+    }
+
+    private <T> Future<T> sync(Runnable run, T value, Queue<FutureTask> queue) {
         if (Fawe.isMainThread()) {
             run.run();
             return Futures.immediateFuture(value);
         }
         final FutureTask<T> result = new FutureTask<>(run, value);
-        syncTasks.add(result);
-        notifySync();
+        queue.add(result);
+        notifySync(queue);
         return result;
     }
 
-    public <T> Future<T> sync(Runnable run) {
+    private <T> Future<T> sync(Runnable run, Queue<FutureTask> queue) {
         if (Fawe.isMainThread()) {
             run.run();
             return Futures.immediateCancelledFuture();
         }
         final FutureTask<T> result = new FutureTask<>(run, null);
-        syncTasks.add(result);
-        notifySync();
+        queue.add(result);
+        notifySync(queue);
         return result;
     }
 
-    public <T> Future<T> sync(Callable<T> call) throws Exception {
+    private <T> Future<T> sync(Callable<T> call, Queue<FutureTask> queue) throws Exception {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.call());
         }
         final FutureTask<T> result = new FutureTask<>(call);
-        syncTasks.add(result);
-        notifySync();
+        queue.add(result);
+        notifySync(queue);
         return result;
     }
 
-    public <T> Future<T> sync(Supplier<T> call) {
+    private <T> Future<T> sync(Supplier<T> call, Queue<FutureTask> queue) {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.get());
         }
         final FutureTask<T> result = new FutureTask<>(call::get);
-        syncTasks.add(result);
-        notifySync();
+        queue.add(result);
+        notifySync(queue);
         return result;
     }
 
-    private void notifySync() {
-        synchronized (syncTasks) {
-            syncTasks.notifyAll();
+    private void notifySync(Object object) {
+        synchronized (object) {
+            object.notifyAll();
         }
     }
 

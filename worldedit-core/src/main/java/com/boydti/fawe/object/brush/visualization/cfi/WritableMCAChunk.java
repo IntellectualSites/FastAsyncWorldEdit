@@ -1,39 +1,44 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class WritableMCAChunk {
+public class WritableMCAChunk implements IChunkSet {
     public final boolean[] hasSections = new boolean[16];
-    public final byte[] skyLight = new byte[65536];
-    public final byte[] blockLight = new byte[65536];
 
     public boolean hasBiomes = false;
-    public final int[] biomes = new int[256];
+    public final byte[] biomes = new byte[256];
 
-    public final int[] blocks = new int[65536];
+    public final char[] blocks = new char[65536];
 
-    public Map<Short, CompoundTag> tiles = new HashMap<>();
+    public BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<CompoundTag>();
     public Map<UUID, CompoundTag> entities = new HashMap<>();
     public long inhabitedTime = System.currentTimeMillis();
     public long lastUpdate;
@@ -54,14 +59,18 @@ public class WritableMCAChunk {
         return chunkZ;
     }
 
-    public void setLoc(int X, int Z) {
+    @Override
+    public boolean hasSection(int layer) {
+        return hasSections[layer];
+    }
+
+    public void setPosition(int X, int Z) {
         this.chunkX = X;
         this.chunkZ = Z;
     }
 
-    public void clear(int X, int Z) {
-        this.chunkX = X;
-        this.chunkZ = Z;
+    @Override
+    public IChunkSet reset() {
         if (!tiles.isEmpty()) {
             tiles.clear();
         }
@@ -76,6 +85,7 @@ public class WritableMCAChunk {
             blocks[i] = BlockID.AIR;
         }
         Arrays.fill(hasSections, false);
+        return this;
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
@@ -192,13 +202,13 @@ public class WritableMCAChunk {
                     }
 
 
-                    out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
-                    out.writeInt(2048);
-                    out.write(blockLight, layer << 11, 1 << 11);
-
-                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
-                    out.writeInt(2048);
-                    out.write(skyLight, layer << 11, 1 << 11);
+//                    out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
+//                    out.writeInt(2048);
+//                    out.write(blockLight, layer << 11, 1 << 11);
+//
+//                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
+//                    out.writeInt(2048);
+//                    out.write(skyLight, layer << 11, 1 << 11);
 
 
                     out.writeEndTag();
@@ -250,6 +260,15 @@ public class WritableMCAChunk {
         return deleted;
     }
 
+    @Override
+    public boolean isEmpty() {
+        if (deleted) return true;
+        for (boolean hasSection : hasSections) {
+            if (hasSection) return false;
+        }
+        return true;
+    }
+
     public boolean isModified() {
         return modified != 0;
     }
@@ -272,14 +291,17 @@ public class WritableMCAChunk {
         return bitMask;
     }
 
-    public void setTile(int x, int y, int z, CompoundTag tile) {
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) {
         setModified();
-        short pair = MathMan.tripleBlockCoord(x, y, z);
         if (tile != null) {
-            tiles.put(pair, tile);
+            tiles.put(x, y, z, tile);
         } else {
-            tiles.remove(pair);
+            if (tiles.remove(x, y, z) == null) {
+                return false;
+            }
         }
+        return true;
     }
 
     public void setEntity(CompoundTag entityTag) {
@@ -289,17 +311,39 @@ public class WritableMCAChunk {
         entities.put(new UUID(most, least), entityTag);
     }
 
-    public void setBiome(int x, int z, BiomeType biome) {
+    @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return BiomeTypes.get(this.biomes[(z << 4) | x] & 0xFF);
+    }
+
+    @Override
+    public BiomeType[] getBiomes() {
+        BiomeType[] tmp = new BiomeType[256];
+        for (int i = 0; i < 256; i++) {
+            tmp[i] = BiomeTypes.get(this.biomes[i] & 0xFF);
+        }
+        return tmp;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 pos, BiomeType biome) {
+        return this.setBiome(pos.getX(), 0, pos.getZ(), biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[x + (z << 4)] = biome.getInternalId();
+        biomes[x + (z << 4)] = (byte) biome.getInternalId();
+        return true;
     }
 
     public Set<CompoundTag> getEntities() {
         return new HashSet<>(entities.values());
     }
 
-    public Map<Short, CompoundTag> getTiles() {
-        return tiles == null ? new HashMap<>() : tiles;
+    @Override
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return tiles == null ? Collections.emptyMap() : tiles;
     }
 
     public CompoundTag getTile(int x, int y, int z) {
@@ -310,94 +354,51 @@ public class WritableMCAChunk {
         return tiles.get(pair);
     }
 
-    public boolean doesSectionExist(int cy) {
-        return hasSections[cy];
-    }
-
     private final int getIndex(int x, int y, int z) {
         return x | (z << 4) | (y << 8);
     }
 
-    public int getBlockCombinedId(int x, int y, int z) {
+    public int getBlockOrdinal(int x, int y, int z) {
         return blocks[x | (z << 4) | (y << 8)];
     }
 
-    public BiomeType[] getBiomeArray() {
-        return null;
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        int ordinal = getBlockOrdinal(x, y, z);
+        return BlockState.getFromOrdinal(ordinal);
     }
 
     public Set<UUID> getEntityRemoves() {
         return new HashSet<>();
     }
 
-    public void setSkyLight(int x, int y, int z, int value) {
-        setNibble(getIndex(x, y, z), skyLight, value);
+    @Override
+    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+        setBlock(x, y, z, holder.getOrdinalChar());
+        holder.applyTileEntity(this, x, y, z);
+        return true;
     }
 
-    public void setBlockLight(int x, int y, int z, int value) {
-        setNibble(getIndex(x, y, z), blockLight, value);
-    }
-
-    public int getSkyLight(int x, int y, int z) {
-        if (!hasSections[y >> 4]) {
-            return 0;
-        }
-        return getNibble(getIndex(x, y, z), skyLight);
-    }
-
-    public int getBlockLight(int x, int y, int z) {
-        if (!hasSections[y >> 4]) {
-            return 0;
-        }
-        return getNibble(getIndex(x, y, z), blockLight);
-    }
-
-    public void setFullbright() {
-        for (int layer = 0; layer < 16; layer++) {
-            if (hasSections[layer]) {
-                Arrays.fill(skyLight, layer << 7, ((layer + 1) << 7), (byte) 255);
-            }
+    @Override
+    public void setBlocks(int layer, char[] data) {
+        int offset = layer << 12;
+        for (int i = 0; i < 4096; i++) {
+            blocks[offset + i] = data[i];
         }
     }
 
-    public void removeLight() {
-        for (int i = 0; i < 16; i++) {
-            removeLight(i);
+    @Override
+    public char[] getArray(int layer) {
+        char[] tmp = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        int offset = layer << 12;
+        for (int i = 0; i < 4096; i++) {
+            tmp[i] = blocks[offset + i];
         }
+        return tmp;
     }
 
-    public void removeLight(int i) {
-        if (hasSections[i]) {
-            Arrays.fill(skyLight, i << 7, ((i + 1) << 7), (byte) 0);
-            Arrays.fill(blockLight, i << 7, ((i + 1) << 7), (byte) 0);
-        }
-    }
-
-    public int getNibble(int index, byte[] array) {
-        int indexShift = index >> 1;
-        if ((index & 1) == 0) {
-            return array[indexShift] & 15;
-        } else {
-            return array[indexShift] >> 4 & 15;
-        }
-    }
-
-    public void setNibble(int index, byte[] array, int value) {
-        int indexShift = index >> 1;
-        byte existing = array[indexShift];
-        int valueShift = value << 4;
-        if (existing == value + valueShift) {
-            return;
-        }
-        if ((index & 1) == 0) {
-            array[indexShift] = (byte) (existing & 240 | value);
-        } else {
-            array[indexShift] = (byte) (existing & 15 | valueShift);
-        }
-    }
-
-    public void setBlock(int x, int y, int z, int combinedId) {
-        blocks[getIndex(x, y, z)] = combinedId;
+    public void setBlock(int x, int y, int z, char ordinal) {
+        blocks[getIndex(x, y, z)] = ordinal;
     }
 
     public void setBiome(BiomeType biome) {
@@ -406,5 +407,10 @@ public class WritableMCAChunk {
 
     public void removeEntity(UUID uuid) {
         entities.remove(uuid);
+    }
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        return isEmpty();
     }
 }

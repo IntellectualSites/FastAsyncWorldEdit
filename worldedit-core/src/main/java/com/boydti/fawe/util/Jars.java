@@ -10,11 +10,11 @@ import java.util.Base64;
 
 public enum Jars {
 
-    MM_v1_4_0("https://github.com/InventivetalentDev/MapManager/releases/download/1.4.0-SNAPSHOT/MapManager_v1.4.0-SNAPSHOT.jar",
-            "AEO5SKBUGN4YJRS8XGGNLBM2QRZPTI1KF0/1W1URTGA=", 163279),
+    MM_v1_4_0("https://github.com/InventivetalentDev/MapManager/releases/download/1.7.3-SNAPSHOT/MapManager_v1.7.3-SNAPSHOT.jar",
+            "M3YLUQZZ66K2DMVDCYLEU38U3ZKRKHRAXQGGPVKFO6G=", 554831),
 
-    PL_v3_6_0("https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.6.0-SNAPSHOT/PacketListenerAPI_v3.6.0-SNAPSHOT.jar",
-            "OYBE75VIU+NNWHRVREBLDARWA+/TBDQZ1RC562QULBA=", 166508),
+    PL_v3_6_0("https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.3-SNAPSHOT/PacketListenerAPI_v3.7.3-SNAPSHOT.jar",
+            "ETDBRZLN5PRVDFR/MSQDPM6JJER3WQOKHCN8FUXO5ZM=", 167205),
 
     ;
 

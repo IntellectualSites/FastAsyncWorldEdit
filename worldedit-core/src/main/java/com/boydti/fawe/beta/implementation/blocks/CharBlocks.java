@@ -11,7 +11,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Map;
 import java.util.Set;
 
-public class CharBlocks implements IBlocks {
+public abstract class CharBlocks implements IBlocks {
 
     public static final Section FULL = new Section() {
         @Override

@@ -3,6 +3,8 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.preloader.AsyncPreloader;
+import com.boydti.fawe.beta.preloader.Preloader;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
@@ -55,14 +57,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class FaweBukkit implements IFawe, Listener {
 
-//    private final WorldEditPlugin plugin;
     private final Plugin plugin;
     private VaultUtil vault;
     private ItemUtil itemUtil;
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
-    //private CFIPacketListener packetListener;
+
+    public static boolean PAPER;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -70,6 +72,13 @@ public class FaweBukkit implements IFawe, Listener {
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
+        try {
+            Class.forName("com.destroystokyo.paper.Namespaced");
+            PAPER = true;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            // TODO no paper
+        }
         try {
             Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
@@ -397,5 +406,13 @@ public class FaweBukkit implements IFawe, Listener {
         }
         return null;
 //        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
+    }
+
+    @Override
+    public Preloader getPreloader() {
+        if (PAPER) {
+            return new AsyncPreloader();
+        }
+        return null;
     }
 }

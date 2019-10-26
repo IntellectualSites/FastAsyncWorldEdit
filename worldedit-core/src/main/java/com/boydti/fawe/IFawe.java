@@ -1,6 +1,8 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.preloader.AsyncPreloader;
+import com.boydti.fawe.beta.preloader.Preloader;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
@@ -53,5 +55,7 @@ public interface IFawe {
     }
 
     QueueHandler getQueueHandler();
+
+    Preloader getPreloader();
 
 }

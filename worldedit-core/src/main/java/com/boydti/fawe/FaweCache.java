@@ -228,6 +228,8 @@ public enum FaweCache implements Trimable {
      * Holds data for a palette used in a chunk section
      */
     public final class Palette {
+        public int bitsPerEntry;
+
         public int paletteToBlockLength;
         /**
          * Reusable buffer array, MUST check paletteToBlockLength for actual length
@@ -319,6 +321,7 @@ public enum FaweCache implements Trimable {
 
             // Construct palette
             Palette palette = PALETTE_CACHE.get();
+            palette.bitsPerEntry = bitsPerEntry;
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
 

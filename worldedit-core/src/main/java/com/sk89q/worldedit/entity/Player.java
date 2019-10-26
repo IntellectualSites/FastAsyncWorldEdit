@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
@@ -39,7 +38,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Direction;
@@ -49,11 +47,10 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-import java.io.File;
-import java.text.NumberFormat;
+
 import javax.annotation.Nullable;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
+import java.io.File;
+import java.util.function.Supplier;
 
 /**
  * Represents a player
@@ -323,6 +320,8 @@ public interface Player extends Entity, Actor {
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
+
+    void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data);
 
     public Region[] getCurrentRegions();
 
