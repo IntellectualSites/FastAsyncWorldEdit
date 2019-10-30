@@ -47,6 +47,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
+    protected static final BlockType DUMMY = new BlockType();
 
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
 
@@ -55,6 +56,12 @@ public class BlockType implements FawePattern, Keyed {
 
     private boolean initItemType;
     private ItemType itemType;
+
+    // Dummy
+    private BlockType() {
+        this.id = null;
+        this.settings = null;
+    }
 
     protected BlockType(String id, int internalId, List<BlockState> states) {
         int i = id.indexOf("[");
