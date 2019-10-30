@@ -38,8 +38,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -101,6 +104,7 @@ public enum FaweCache implements Trimable {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
+        BYTE_BUFFER_8192.clean();
         BLOCK_TO_PALETTE.clean();
         PALETTE_TO_BLOCK.clean();
         BLOCK_STATES.clean();
@@ -201,6 +205,8 @@ public enum FaweCache implements Trimable {
     /*
     thread cache
      */
+
+    public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypes.states.length];
@@ -502,6 +508,31 @@ public enum FaweCache implements Trimable {
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue
                 , Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                new ThreadPoolExecutor.CallerRunsPolicy()) {
+            protected void afterExecute(Runnable r, Throwable t) {
+                try {
+                    super.afterExecute(r, t);
+                    if (t == null && r instanceof Future<?>) {
+                        try {
+                            Future<?> future = (Future<?>) r;
+                            if (future.isDone()) {
+                                future.get();
+                            }
+                        } catch (CancellationException ce) {
+                            t = ce;
+                        } catch (ExecutionException ee) {
+                            t = ee.getCause();
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    if (t != null) {
+                        t.printStackTrace();
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 }

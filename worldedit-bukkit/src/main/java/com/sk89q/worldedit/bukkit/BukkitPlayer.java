@@ -24,10 +24,6 @@ import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.injector.netty.WirePacket;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -51,14 +47,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -69,6 +57,12 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+
 public class BukkitPlayer extends AbstractPlayerActor {
 
     private Player player;
@@ -76,6 +70,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     public BukkitPlayer(Player player) {
         this(WorldEditPlugin.getInstance(), player);
+        Fawe.debug("Should not construct BukkitPlayer. Instead use BukkitAdapter.adapt(player)");
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
@@ -94,16 +89,16 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public BaseItemStack getItemInHand(HandSide handSide) {
         ItemStack itemStack = handSide == HandSide.MAIN_HAND
-                ? player.getInventory().getItemInMainHand()
-                : player.getInventory().getItemInOffHand();
+                ? getPlayer().getInventory().getItemInMainHand()
+                : getPlayer().getInventory().getItemInOffHand();
         return BukkitAdapter.adapt(itemStack);
     }
 
     @Override
     public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
         ItemStack itemStack = handSide == HandSide.MAIN_HAND
-                ? player.getInventory().getItemInMainHand()
-                : player.getInventory().getItemInOffHand();
+                ? getPlayer().getInventory().getItemInMainHand()
+                : getPlayer().getInventory().getItemInOffHand();
         return BukkitAdapter.asBlockState(itemStack).toBaseBlock();
     }
 
@@ -114,18 +109,18 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public String getDisplayName() {
-        return player.getDisplayName();
+        return getPlayer().getDisplayName();
     }
 
     @Override
     public void giveItem(BaseItemStack itemStack) {
-        final PlayerInventory inv = player.getInventory();
+        final PlayerInventory inv = getPlayer().getInventory();
         ItemStack newItem = BukkitAdapter.adapt(itemStack);
         if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
             inv.remove(newItem);
         }
-        final ItemStack item = player.getInventory().getItemInMainHand();
-        player.getInventory().setItemInMainHand(newItem);
+        final ItemStack item = getPlayer().getInventory().getItemInMainHand();
+        getPlayer().getInventory().setItemInMainHand(newItem);
         HashMap<Integer, ItemStack> overflow = inv.addItem(item);
         if (!overflow.isEmpty()) {
             TaskManager.IMP.sync(new RunnableVal<Object>() {
@@ -135,7 +130,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
                         ItemStack stack = entry.getValue();
                         if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
                             Item
-                                dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                                dropped = getPlayer().getWorld().dropItem(getPlayer().getLocation(), stack);
                             PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
                             if (event.isCancelled()) {
                                 dropped.remove();
@@ -145,45 +140,45 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 }
             });
         }
-        player.updateInventory();
+        getPlayer().updateInventory();
     }
 
     @Override
     public void printRaw(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage(part);
+            getPlayer().sendMessage(part);
         }
     }
 
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7d" + part);
+            getPlayer().sendMessage("\u00A7d" + part);
         }
     }
 
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A77" + part);
+            getPlayer().sendMessage("\u00A77" + part);
         }
     }
 
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
+            getPlayer().sendMessage("\u00A7c" + part);
         }
     }
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(player, WorldEditText.format(component));
+        TextAdapter.sendComponent(getPlayer(), WorldEditText.format(component));
     }
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-        org.bukkit.World world = player.getWorld();
+        org.bukkit.World world = getPlayer().getWorld();
         if (pos instanceof com.sk89q.worldedit.util.Location) {
             com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
             Extent extent = loc.getExtent();
@@ -191,42 +186,41 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 world = Bukkit.getWorld(((World) extent).getName());
             }
         }
-        player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
+        getPlayer().teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
     }
 
     @Override
     public String[] getGroups() {
-        return plugin.getPermissionsResolver().getGroups(player);
+        return plugin.getPermissionsResolver().getGroups(getPlayer());
     }
 
     @Override
     public BlockBag getInventoryBlockBag() {
-        return new BukkitPlayerBlockBag(player);
+        return new BukkitPlayerBlockBag(getPlayer());
     }
 
     @Override
     public GameMode getGameMode() {
-        return GameModes.get(player.getGameMode().name().toLowerCase(Locale.ROOT));
+        return GameModes.get(getPlayer().getGameMode().name().toLowerCase(Locale.ROOT));
     }
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
+        getPlayer().setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
     }
 
     @Override
     public boolean hasPermission(String perm) {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
-                || plugin.getPermissionsResolver().hasPermission(
-                        player.getWorld().getName(), player, perm);
+            || plugin.getPermissionsResolver().hasPermission(player.getWorld().getName(), player, perm);
     }
 
     @Override public boolean togglePermission(String permission) {
         if (this.hasPermission(permission)) {
-            player.addAttachment(plugin).setPermission(permission, false);
+            getPlayer().addAttachment(plugin).setPermission(permission, false);
             return false;
         } else {
-            player.addAttachment(plugin).setPermission(permission, true);
+            getPlayer().addAttachment(plugin).setPermission(permission, true);
             return true;
         }
     }
@@ -238,19 +232,19 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *   - The `/wea` command will give/remove the required bypass permission
          */
         if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
-            player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+            getPlayer().addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
         } else if (value) {
             if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
-                player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+                getPlayer().addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
             }
         } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
-            player.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(permission, value);
+            getPlayer().addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(permission, value);
         }
     }
 
     @Override
     public World getWorld() {
-        return BukkitAdapter.adapt(player.getWorld());
+        return BukkitAdapter.adapt(getPlayer().getWorld());
     }
 
     @Override
@@ -260,21 +254,30 @@ public class BukkitPlayer extends AbstractPlayerActor {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+        getPlayer().sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
     }
 
     public Player getPlayer() {
+        if (!player.isValid()) {
+            Player tmp = Bukkit.getPlayer(getUniqueId());
+            if (tmp != null) {
+                player = tmp;
+            } else {
+                System.out.println("Invalid player " + player.getName());
+                new Exception().printStackTrace();
+            }
+        }
         return player;
     }
 
     @Override
     public boolean isAllowedToFly() {
-        return player.getAllowFlight();
+        return getPlayer().getAllowFlight();
     }
 
     @Override
     public void setFlying(boolean flying) {
-        player.setFlying(flying);
+        getPlayer().setFlying(flying);
     }
 
     @Override
@@ -284,7 +287,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public com.sk89q.worldedit.util.Location getLocation() {
-        Location nativeLocation = player.getLocation();
+        Location nativeLocation = getPlayer().getLocation();
         Vector3 position = BukkitAdapter.asVector(nativeLocation);
         return new com.sk89q.worldedit.util.Location(
                 getWorld(),
@@ -295,7 +298,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean setLocation(com.sk89q.worldedit.util.Location location) {
-        return player.teleport(BukkitAdapter.adapt(location));
+        return getPlayer().teleport(BukkitAdapter.adapt(location));
     }
 
     @Nullable
@@ -306,7 +309,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public SessionKey getSessionKey() {
-        return new SessionKeyImpl(this.player.getUniqueId(), player.getName());
+        return new SessionKeyImpl(getUniqueId(), getName());
     }
 
     private static class SessionKeyImpl implements SessionKey {
@@ -349,11 +352,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
-        Location loc = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        Location loc = new Location(getPlayer().getWorld(), pos.getX(), pos.getY(), pos.getZ());
         if (block == null) {
-            player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
+            getPlayer().sendBlockChange(loc, getPlayer().getWorld().getBlockAt(loc).getBlockData());
         } else {
-            player.sendBlockChange(loc, BukkitAdapter.adapt(block));
+            getPlayer().sendBlockChange(loc, BukkitAdapter.adapt(block));
             if (block instanceof BaseBlock && ((BaseBlock) block).hasNbtData()) {
                 BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
                 if (adapter != null) {
@@ -367,24 +370,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data) {
-        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-        // check if the chunk is in range
-        if (true) {
-            try {
-                byte[] raw = data.get();
-                WirePacket packet = new WirePacket(PacketType.Play.Server.MAP_CHUNK, raw);
-                manager.sendWirePacket(getPlayer(), packet);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
+    public void sendTitle(String title, String sub) {
+        getPlayer().sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
     }
 
     @Override
-    public void sendTitle(String title, String sub) {
-        player.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
-        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
-        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
+    public void unregister() {
+        getPlayer().removeMetadata("WE", WorldEditPlugin.getInstance());
     }
 }

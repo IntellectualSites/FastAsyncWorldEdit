@@ -37,6 +37,7 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     @Override
     default IBatchProcessor join(IBatchProcessor other) {
         setProcessor(getProcessor().join(other));
+        System.out.println("Join " + other + " | " + getProcessor());
         return this;
     }
 

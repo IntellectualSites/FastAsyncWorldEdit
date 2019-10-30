@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
@@ -320,8 +321,6 @@ public interface Player extends Entity, Actor {
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
-
-    void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data);
 
     public Region[] getCurrentRegions();
 

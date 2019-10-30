@@ -540,6 +540,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/rotate",
+        aliases = {"/rt"},
         desc = "Rotate the contents of the clipboard",
         descFooter = "Non-destructively rotate the contents of the clipboard.\n" +
             "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +

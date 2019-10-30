@@ -80,7 +80,7 @@ public class BukkitAdapter_1_14 {
             fieldDirtyBits.setAccessible(true);
 
             {
-                Field tmp = null;
+                Field tmp;
                 try {
                     tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
                 } catch (NoSuchFieldException paper) {
@@ -161,7 +161,7 @@ public class BukkitAdapter_1_14 {
         return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
     }
 
-    private static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
+    public static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
         if (playerChunk == null) {

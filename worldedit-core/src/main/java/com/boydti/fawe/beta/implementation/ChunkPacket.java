@@ -4,42 +4,100 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.world.block.BlockID;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
+import com.sk89q.jnbt.CompoundTag;
 
+import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
 
     private final boolean full;
-    private final boolean biomes;
-    private final IBlocks chunk;
-    private final int chunkX;
-    private final int chunkZ;
+    private final Supplier<IBlocks> chunkSupplier;
+    private IBlocks chunk;
 
-    public ChunkPacket(int chunkX, int chunkZ, IBlocks chunk, boolean replaceAllSections, boolean sendBiomeData) {
+    private int chunkX;
+    private int chunkZ;
+    private byte[] sectionBytes;
+    private Object nativePacket;
+
+    public ChunkPacket(int chunkX, int chunkZ, Supplier<IBlocks> chunkSupplier, boolean replaceAllSections) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        this.chunk = chunk;
+        this.chunkSupplier = chunkSupplier;
         this.full = replaceAllSections;
-        this.biomes = sendBiomeData;
+    }
+
+    public int getChunkX() {
+        return chunkX;
+    }
+
+    public int getChunkZ() {
+        return chunkZ;
+    }
+
+    public synchronized void setPosition(int chunkX, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+        nativePacket = null;
+    }
+
+    public boolean isFull() {
+        return full;
+    }
+
+    public IBlocks getChunk() {
+        if (this.chunk == null) {
+            synchronized (this) {
+                if (this.chunk == null) {
+                    this.chunk = chunkSupplier.get();
+                }
+            }
+        }
+        return chunk;
+    }
+
+    private byte[] getSectionBytes() {
+        byte[] tmp = this.sectionBytes;
+        if (tmp == null) {
+            synchronized (this) {
+                if (sectionBytes == null) {
+                    sectionBytes = getChunk().toByteArray(FaweCache.IMP.BYTE_BUFFER_8192.get(), this.full);
+                }
+                tmp = sectionBytes;
+            }
+        }
+        return tmp;
+    }
+
+    public Object getNativePacket() {
+        return nativePacket;
+    }
+
+    public void setNativePacket(Object nativePacket) {
+        this.nativePacket = nativePacket;
     }
 
     @Override
     @Deprecated
     public byte[] get() {
-        System.out.println("TODO deprecated, use buffer");
-        return apply(new byte[8192]);
+        return apply(FaweCache.IMP.BYTE_BUFFER_8192.get());
+    }
+
+    public CompoundTag getHeightMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("MOTION_BLOCKING", new long[36]);
+        CompoundTag tag = FaweCache.IMP.asTag(map);
+        // TODO
+        return tag;
     }
 
     @Override
     public byte[] apply(byte[] buffer) {
         try {
-            FastByteArrayOutputStream baos = new FastByteArrayOutputStream();
+            byte[] sectionBytes = getSectionBytes();
+
+            FastByteArrayOutputStream baos = new FastByteArrayOutputStream(buffer);
             FaweOutputStream fos = new FaweOutputStream(baos);
 
             fos.writeInt(this.chunkX);
@@ -47,75 +105,16 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
 
             fos.writeBoolean(this.full);
 
-            fos.writeVarInt(this.chunk.getBitMask()); // writeVarInt
+            fos.writeVarInt(getChunk().getBitMask());
 
-            // TODO write NBTTagCompound of HeightMaps
-            fos.writeVarInt(0); // (Entities / NBT)
 
-            // TODO write chunk data to byte[]
-            {
-                BlockRegistry registry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
-                try (FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer); FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
-                    for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
-                        if (!this.chunk.hasSection(layer)) continue;
-                        char[] ids = this.chunk.getArray(layer);
-                        FaweCache.Palette palette = FaweCache.IMP.toPalette(0, ids);
+            fos.writeNBT("", getHeightMap());
 
-                        int nonEmpty = 0; // TODO optimize into same loop as toPalette
-                        for (char id :ids) {
-                            if (id != 0) nonEmpty++;
-                        }
-                        sectionWriter.writeShort(nonEmpty); // non empty
-                        sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
-                        sectionWriter.writeVarInt(palette.paletteToBlockLength);
-                        for (int i = 0; i < palette.paletteToBlockLength; i++) {
-                            int ordinal = palette.paletteToBlock[i];
-                            switch (ordinal) {
-                                case BlockID.CAVE_AIR:
-                                case BlockID.VOID_AIR:
-                                case BlockID.AIR:
-                                case BlockID.__RESERVED__:
-                                    sectionWriter.writeByte(0);
-                                    break;
-                                default:
-                                    BlockState state = BlockState.getFromOrdinal(ordinal);
-                                    int mcId = registry.getInternalBlockStateId(state).getAsInt();
-                                    sectionWriter.writeVarInt(mcId);
-                            }
-                        }
-                        sectionWriter.writeVarInt(palette.blockStatesLength);
-                        for (int i = 0; i < palette.blockStatesLength; i++) {
-                            sectionWriter.writeLong(palette.blockStates[i]);
-                        }
-                    }
-
-                    // TODO write biomes
-//                    boolean writeBiomes = true;
-//                    for (int x = 0; x < 16; x++) {
-//                        for (int z = 0; z < 16; z++) {
-//                            BiomeType biome = this.chunk.getBiomeType(x, z);
-//                            if (biome == null) {
-//                                if (writeBiomes) {
-//                                    break;
-//                                } else {
-//                                    biome = BiomeTypes.FOREST;
-//                                }
-//                            }
-//                        }
-//                    }
-                    if (this.full) {
-                        for (int i = 0; i < 256; i++) {
-                            sectionWriter.writeInt(0);
-                        }
-                    }
-
-                    fos.writeVarInt(sectionByteArray.getSize());
-                    for (byte[] arr : sectionByteArray.toByteArrays()) {
-                        fos.write(arr);
-                    }
-                }
-            }
+            fos.writeVarInt(sectionBytes.length);
+            fos.write(sectionBytes);
             // TODO entities / NBT
+//            Set<CompoundTag> entities = chunk.getEntities();
+//            Map<BlockVector3, CompoundTag> tiles = chunk.getTiles();
             fos.writeVarInt(0); // (Entities / NBT)
             return baos.toByteArray();
         } catch (Throwable e) {

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -140,6 +141,13 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param player The player
      */
     void sendFakeOP(Player player);
+
+    /**
+     * Send a fake chunk packet to a player
+     * @param player
+     * @param packet
+     */
+    void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet);
 
     /**
      * Simulates a player using an item.

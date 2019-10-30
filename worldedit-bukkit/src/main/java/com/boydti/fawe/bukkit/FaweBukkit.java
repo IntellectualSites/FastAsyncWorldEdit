@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.preloader.AsyncPreloader;
 import com.boydti.fawe.beta.preloader.Preloader;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
+import com.boydti.fawe.bukkit.adapter.mc1_14.test.TestChunkPacketSend;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;
@@ -29,7 +30,6 @@ import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
@@ -113,6 +113,8 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (ClassNotFoundException e) {
                 new ChunkListener_9();
             }
+
+            new TestChunkPacketSend(plugin);
 
         });
     }

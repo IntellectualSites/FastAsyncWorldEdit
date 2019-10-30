@@ -213,11 +213,6 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
-    public void sendFakeChunk(int chunkX, int chunkZ, Supplier<byte[]> data) {
-        basePlayer.sendFakeChunk(chunkX, chunkZ, data);
-    }
-
-    @Override
     public void sendTitle(String title, String sub) {
         basePlayer.sendTitle(title, sub);
     }

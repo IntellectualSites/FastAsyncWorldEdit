@@ -2,6 +2,7 @@ package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.ChunkPacket;
@@ -21,6 +22,7 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
@@ -69,7 +71,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-// TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
@@ -282,51 +283,53 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (viewer != null) {
             viewer.view(this);
         }
-//        if (chunkOffset != null && player != null) { TODO NOT IMPLEMENTED
-//            IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
-//
-//            if (!packetQueue.supports(Capability.CHUNK_PACKETS)) {
-//                return;
-//            }
-//
-//            int lenCX = (getWidth() + 15) >> 4;
-//            int lenCZ = (getLength() + 15) >> 4;
-//
-//            int OX = chunkOffset.getBlockX();
-//            int OZ = chunkOffset.getBlockZ();
-//
-//            Location position = player.getLocation();
-//            int pcx = (position.getBlockX() >> 4) - OX;
-//            int pcz = (position.getBlockZ() >> 4) - OZ;
-//
-//            int scx = Math.max(0, pcx - 15);
-//            int scz = Math.max(0, pcz - 15);
-//            int ecx = Math.min(lenCX - 1, pcx + 15);
-//            int ecz = Math.min(lenCZ - 1, pcz + 15);
-//
-//            for (int cz = scz; cz <= ecz; cz++) {
-//                for (int cx = scx; cx <= ecx; cx++) {
-//                    final int finalCX = cx;
-//                    final int finalCZ = cz;
-//                    TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
-//                        try {
-//                            FaweChunk toSend = getSnapshot(finalCX, finalCZ);
-//                            toSend.setLoc(HeightMapMCAGenerator.this, finalCX + OX, finalCZ + OZ);
-//                            packetQueue.sendChunkUpdate(toSend, player);
-//                        } catch (Throwable e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
-//                }
-//            }
-//        }
+        if (chunkOffset != null && player != null) {
+            World world = player.getWorld();
+
+            int lenCX = (getWidth() + 15) >> 4;
+            int lenCZ = (getLength() + 15) >> 4;
+
+            int OX = chunkOffset.getBlockX();
+            int OZ = chunkOffset.getBlockZ();
+
+            Location position = player.getLocation();
+            int pcx = (position.getBlockX() >> 4) - OX;
+            int pcz = (position.getBlockZ() >> 4) - OZ;
+
+            int scx = Math.max(0, pcx - 15);
+            int scz = Math.max(0, pcz - 15);
+            int ecx = Math.min(lenCX - 1, pcx + 15);
+            int ecz = Math.min(lenCZ - 1, pcz + 15);
+
+            for (int chunkZ = scz; chunkZ <= ecz; chunkZ++) {
+                for (int chunkX = scx; chunkX <= ecx; chunkX++) {
+                    int finalChunkX = chunkX;
+                    int finalChunkZ = chunkZ;
+
+                    int realWorldX = chunkX + OX;
+                    int realWorldZ = chunkZ + OZ;
+
+                    Supplier<IBlocks> blocksSupplier = () -> getChunk(finalChunkX, finalChunkZ);
+
+                    ChunkPacket packet = new ChunkPacket(realWorldX, realWorldZ, blocksSupplier, true);
+                    world.sendFakeChunk(player, packet);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+        if (this.player != null) {
+            player.getWorld().sendFakeChunk(player, packet);
+        }
     }
 
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
-        IChunkSet chunk = getChunk(chunkX, chunkZ);
-        ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, chunk, true, true);
-        player.sendFakeChunk(chunkX, chunkZ, packet::get);
+        if (chunkOffset != null && player != null) {
+            player.getWorld().refreshChunk(chunkX, chunkZ);
+        }
     }
 
     public IChunkSet getChunk(int chunkX, int chunkZ) {

@@ -19,8 +19,8 @@
 
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -76,6 +76,7 @@ import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.EnumDirection;
 import net.minecraft.server.v1_14_R1.EnumHand;
@@ -103,7 +104,9 @@ import net.minecraft.server.v1_14_R1.NBTTagLongArray;
 import net.minecraft.server.v1_14_R1.NBTTagShort;
 import net.minecraft.server.v1_14_R1.NBTTagString;
 import net.minecraft.server.v1_14_R1.PacketPlayOutEntityStatus;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PacketPlayOutTileEntityData;
+import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.Vec3D;
@@ -138,6 +141,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -655,6 +659,30 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityStatus(
                 ((CraftPlayer) player).getHandle(), (byte) 28
         ));
+    }
+
+    @Override
+    public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
+        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+        PlayerChunk map = BukkitAdapter_1_14.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
+        if (map != null && map.hasBeenLoaded()) {
+            boolean flag = false;
+            PlayerChunk.d players = map.players;
+            Stream<EntityPlayer> stream = players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag);
+
+            EntityPlayer checkPlayer = player == null ? null : ((CraftPlayer) player).getHandle();
+            stream.filter(entityPlayer -> checkPlayer == null || entityPlayer == checkPlayer)
+                .forEach(entityPlayer -> {
+                synchronized (packet) {
+                    PacketPlayOutMapChunk nmsPacket = (PacketPlayOutMapChunk) packet.getNativePacket();
+                    if (nmsPacket == null) {
+                        nmsPacket = MapChunkUtil_1_14.create(this, packet);
+                        packet.setNativePacket(nmsPacket);
+                    }
+                    entityPlayer.playerConnection.sendPacket(nmsPacket);
+                }
+            });
+        }
     }
 
     private static EnumDirection adapt(Direction face) {

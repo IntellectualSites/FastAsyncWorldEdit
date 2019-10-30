@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world;
 
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.beta.implementation.IChunkCache;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.EditSession;
@@ -27,6 +28,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -304,4 +306,11 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
 
     @Override
     IChunkGet get(int x, int z);
+
+    /**
+     * Send a fake chunk to a player/s
+     * @param player may be null to send to everyone
+     * @param packet the chunk packet
+     */
+    void sendFakeChunk(@Nullable Player player, ChunkPacket packet);
 }

@@ -421,7 +421,7 @@ public class UtilityCommands {
 
     @Command(
         name = "replacenear",
-        aliases = { "/replacenear" },
+        aliases = { "/replacenear", "/rn" },
         desc = "Replace nearby blocks"
     )
     @CommandPermissions("worldedit.replacenear")

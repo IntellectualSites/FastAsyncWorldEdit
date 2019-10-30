@@ -560,15 +560,18 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      * @return a wrapped player
      */
     public BukkitPlayer wrapPlayer(Player player) {
-        synchronized (player) {
-            BukkitPlayer wePlayer = getCachedPlayer(player);
-            if (wePlayer == null) {
-                wePlayer = new BukkitPlayer(this, player);
-                player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
-                return wePlayer;
+        BukkitPlayer wePlayer = getCachedPlayer(player);
+        if (wePlayer == null) {
+            synchronized (player) {
+                wePlayer = getCachedPlayer(player);
+                if (wePlayer == null) {
+                    wePlayer = new BukkitPlayer(this, player);
+                    player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
+                    return wePlayer;
+                }
             }
-            return wePlayer;
         }
+        return wePlayer;
     }
 
     public BukkitPlayer getCachedPlayer(Player player) {

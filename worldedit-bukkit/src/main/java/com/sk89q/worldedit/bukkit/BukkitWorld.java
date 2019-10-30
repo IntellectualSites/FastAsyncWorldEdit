@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.config.Settings;
@@ -33,6 +34,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -536,5 +539,11 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
         return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
+    }
+
+    @Override
+    public void sendFakeChunk(Player player, ChunkPacket packet) {
+        org.bukkit.entity.Player bukkitPlayer = BukkitAdapter.adapt(player);
+        WorldEditPlugin.getInstance().getBukkitImplAdapter().sendFakeChunk(getWorld(), bukkitPlayer, packet);
     }
 }
