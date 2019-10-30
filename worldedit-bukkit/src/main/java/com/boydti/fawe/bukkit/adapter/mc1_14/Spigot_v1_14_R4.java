@@ -20,6 +20,7 @@
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -679,7 +680,12 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
                         nmsPacket = MapChunkUtil_1_14.create(this, packet);
                         packet.setNativePacket(nmsPacket);
                     }
-                    entityPlayer.playerConnection.sendPacket(nmsPacket);
+                    try {
+                        FaweCache.IMP.CHUNK_FLAG.get().set(true);
+                        entityPlayer.playerConnection.sendPacket(nmsPacket);
+                    } finally {
+                        FaweCache.IMP.CHUNK_FLAG.get().set(false);
+                    }
                 }
             });
         }

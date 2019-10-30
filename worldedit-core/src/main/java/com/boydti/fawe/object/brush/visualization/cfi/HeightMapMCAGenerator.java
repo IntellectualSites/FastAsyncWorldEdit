@@ -289,12 +289,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int lenCX = (getWidth() + 15) >> 4;
             int lenCZ = (getLength() + 15) >> 4;
 
-            int OX = chunkOffset.getBlockX();
-            int OZ = chunkOffset.getBlockZ();
 
             Location position = player.getLocation();
-            int pcx = (position.getBlockX() >> 4) - OX;
-            int pcz = (position.getBlockZ() >> 4) - OZ;
+            int pcx = (position.getBlockX() >> 4) - chunkOffset.getBlockX();
+            int pcz = (position.getBlockZ() >> 4) - chunkOffset.getBlockZ();
 
             int scx = Math.max(0, pcx - 15);
             int scz = Math.max(0, pcz - 15);
@@ -303,19 +301,21 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
             for (int chunkZ = scz; chunkZ <= ecz; chunkZ++) {
                 for (int chunkX = scx; chunkX <= ecx; chunkX++) {
-                    int finalChunkX = chunkX;
-                    int finalChunkZ = chunkZ;
 
-                    int realWorldX = chunkX + OX;
-                    int realWorldZ = chunkZ + OZ;
-
-                    Supplier<IBlocks> blocksSupplier = () -> getChunk(finalChunkX, finalChunkZ);
-
-                    ChunkPacket packet = new ChunkPacket(realWorldX, realWorldZ, blocksSupplier, true);
-                    world.sendFakeChunk(player, packet);
+                    refreshChunk(world, chunkX, chunkZ);
                 }
             }
         }
+    }
+
+    public void refreshChunk(World world, int chunkX, int chunkZ) {
+        Supplier<IBlocks> blocksSupplier = () -> getChunk(chunkX, chunkZ);
+
+        int realChunkX = chunkX + chunkOffset.getBlockX();
+        int realChunkZ = chunkZ + chunkOffset.getBlockZ();
+
+        ChunkPacket packet = new ChunkPacket(realChunkX, realChunkZ, blocksSupplier, true);
+        world.sendFakeChunk(player, packet);
     }
 
     @Override
@@ -328,7 +328,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
         if (chunkOffset != null && player != null) {
-            player.getWorld().refreshChunk(chunkX, chunkZ);
+            refreshChunk(player.getWorld(), chunkX, chunkZ);
         }
     }
 

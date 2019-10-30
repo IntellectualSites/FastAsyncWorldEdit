@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -104,6 +105,7 @@ public enum FaweCache implements Trimable {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
+        CHUNK_FLAG.clean();
         BYTE_BUFFER_8192.clean();
         BLOCK_TO_PALETTE.clean();
         PALETTE_TO_BLOCK.clean();
@@ -205,6 +207,7 @@ public enum FaweCache implements Trimable {
     /*
     thread cache
      */
+    public final CleanableThreadLocal<AtomicBoolean> CHUNK_FLAG = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
 
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
