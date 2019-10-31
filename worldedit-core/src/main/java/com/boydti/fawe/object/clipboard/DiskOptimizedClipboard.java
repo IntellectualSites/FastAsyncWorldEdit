@@ -39,11 +39,13 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -129,7 +131,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             if (braf.length() - HEADER_SIZE == (getVolume() << 1) + getArea()) {
                 hasBiomes = true;
             }
-            autoCloseTask();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -283,105 +284,14 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         }
     }
 
-    private void autoCloseTask() {
-//        TaskManager.IMP.laterAsync(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (raf != null && System.currentTimeMillis() - lastAccessed > 10000) {
-//                    close();
-//                } else if (raf == null) {
-//                    return;
-//                } else {
-//                    TaskManager.IMP.laterAsync(this, 200);
-//                }
-//            }
-//        }, 200);
-    }
-
     private int ylast;
     private int ylasti;
     private int zlast;
     private int zlasti;
 
     @Override
-    public void streamOrdinals(NBTStreamer.ByteReader task) {
-        try {
-            byteBuffer.force();
-            int pos = HEADER_SIZE;
-            int index = 0;
-            for (int y = 0; y < getHeight(); y++) {
-                for (int z = 0; z < getLength(); z++) {
-                    for (int x = 0; x < getWidth(); x++, pos += 2) {
-                        char ordinal = byteBuffer.getChar(pos);
-                        task.run(index++, ordinal);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public List<CompoundTag> getTileEntities() {
-        return new ArrayList<>(nbtMap.values());
-    }
-
-    @Override
-    public void forEach(BlockReader task, boolean air) {
-        byteBuffer.force();
-        int pos = HEADER_SIZE;
-        IntegerTrio trio = new IntegerTrio();
-        final boolean hasTile = !nbtMap.isEmpty();
-        if (air) {
-            if (hasTile) {
-                for (int y = 0; y < getHeight(); y++) {
-                    for (int z = 0; z < getLength(); z++) {
-                        for (int x = 0; x < getWidth(); x++, pos += 2) {
-                            int combinedId = byteBuffer.getChar(pos);
-                            BlockState state = BlockState.getFromOrdinal(combinedId);
-                            if (state.getMaterial().hasContainer()) {
-                                trio.set(x, y, z);
-                                CompoundTag nbt = nbtMap.get(trio);
-                                if (nbt != null) {
-                                    task.run(x, y, z, state.toBaseBlock(nbt));
-                                    continue;
-                                }
-                            }
-                            task.run(x, y, z, state);
-                        }
-                    }
-                }
-            } else {
-                for (int y = 0; y < getHeight(); y++) {
-                    for (int z = 0; z < getLength(); z++) {
-                        for (int x = 0; x < getWidth(); x++, pos += 2) {
-                            int combinedId = byteBuffer.getChar(pos);
-                            BlockState state = BlockState.getFromOrdinal(combinedId);
-                            task.run(x, y, z, state);
-                        }
-                    }
-                }
-            }
-        } else {
-            for (int y = 0; y < getHeight(); y++) {
-                for (int z = 0; z < getLength(); z++) {
-                    for (int x = 0; x < getWidth(); x++, pos += 2) {
-                        char combinedId = byteBuffer.getChar(pos);
-                        BlockState state = BlockState.getFromOrdinal(combinedId);
-                        if (state.getMaterial().hasContainer()) {
-                            trio.set(x, y, z);
-                            CompoundTag nbt = nbtMap.get(trio);
-                            if (nbt != null) {
-                                task.run(x, y, z, state.toBaseBlock(nbt));
-                                continue;
-                            }
-                            task.run(x, y, z, state);
-                        }
-                    }
-                }
-            }
-        }
+    public Collection<CompoundTag> getTileEntities() {
+        return nbtMap.values();
     }
 
     public int getIndex(int x, int y, int z) {

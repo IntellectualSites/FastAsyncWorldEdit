@@ -31,6 +31,8 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import java.util.Comparator;
 
 /**
@@ -697,7 +699,8 @@ public abstract class BlockVector3 {
         return orDefault.setBlock(this, BlockState.getFromOrdinal(ordinal));
     }
 
-    public boolean setBlock(Extent orDefault, BlockState state) {
+
+    public <T extends BlockStateHolder<T>> boolean setBlock(Extent orDefault, T state) {
         return orDefault.setBlock(this, state);
     }
 

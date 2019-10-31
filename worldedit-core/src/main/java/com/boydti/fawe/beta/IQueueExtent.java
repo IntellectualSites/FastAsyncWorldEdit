@@ -9,7 +9,9 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -17,7 +19,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 import java.io.Flushable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
@@ -188,4 +192,35 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcess
      * @return <tt>true</tt> if this queue contains no elements
      */
     boolean isEmpty();
+
+    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int X, int Z) {
+        if (!filter.appliesChunk(X, Z)) {
+            return block;
+        }
+        IChunk chunk = this.getOrCreateChunk(X, Z);
+        // Initialize
+        chunk.init(this, X, Z);
+
+        IChunk newChunk = filter.applyChunk(chunk, region);
+        if (newChunk != null) {
+            chunk = newChunk;
+            if (block == null) {
+                block = this.initFilterBlock();
+            }
+            chunk.filterBlocks(filter, block, region);
+        }
+        this.submit(chunk);
+        return block;
+    }
+
+    @Override
+    default <T extends Filter> T apply(Region region, T filter) {
+        final Set<BlockVector2> chunks = region.getChunks();
+        ChunkFilterBlock block = null;
+        for (BlockVector2 chunk : chunks) {
+            block = apply(block, filter, region, chunk.getX(), chunk.getZ());
+        }
+        flush();
+        return filter;
+    }
 }

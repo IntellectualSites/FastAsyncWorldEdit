@@ -5,17 +5,24 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import javax.annotation.Nullable;
 import java.util.List;
 
-public abstract class ReadOnlyClipboard extends LinearClipboard {
+public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public final Region region;
 
     public ReadOnlyClipboard(Region region) {
+        super(region.getDimensions());
         this.region = region;
     }
 
@@ -32,51 +39,9 @@ public abstract class ReadOnlyClipboard extends LinearClipboard {
     }
 
     @Override
-    public BlockVector3 getDimensions() {
-        return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-    }
-
-    @Override
-    public void setDimensions(BlockVector3 dimensions) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
-
-    @Override
-    public BaseBlock getBlock(int index) {
-        throw new UnsupportedOperationException("World based clipboards do not provide index access");
-    }
-
-    @Override
-    public BiomeType getBiome(int index) {
-        throw new UnsupportedOperationException("World based clipboards do not provide index access");
-    }
-
-    @Override
-    public boolean setBiome(int x, int z, BiomeType biome) {
-        throw new UnsupportedOperationException("Clipboard is immutable");
-    }
-
-    @Override
-    public void setBiome(int index, BiomeType biome) {
-        throw new UnsupportedOperationException("Clipboard is immutable");
-    }
-
-    @Override
-    public void streamBiomes(NBTStreamer.ByteReader task) {
-        BlockVector3 dim = getDimensions();
-        int index = 0;
-        for (int z = 0; z <= dim.getBlockZ(); z++) {
-            for (int x = 0; x <= dim.getBlockX(); x++, index++) {
-                task.run(index, getBiome(x, z).getInternalId());
-            }
-        }
-    }
-
-    @Override
-    public abstract BaseBlock getBlock(int x, int y, int z);
-
-    @Override
-    public abstract BiomeType getBiome(int x, int z);
 
     @Override
     public abstract List<? extends Entity> getEntities();
@@ -87,22 +52,17 @@ public abstract class ReadOnlyClipboard extends LinearClipboard {
     }
 
     @Override
-    public boolean setBlock(int index, BlockStateHolder block) {
-        throw new UnsupportedOperationException("Clipboard is immutable");
-    }
-
-    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
     @Override
-    public Entity createEntity(Extent world, double x, double y, double z, float yaw, float pitch, BaseEntity entity) {
+    public Entity createEntity(Location location, BaseEntity entity) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
     @Override
-    public boolean remove(ClipboardEntity clipboardEntity) {
+    public void removeEntity(Entity entity) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 }

@@ -21,6 +21,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -193,20 +194,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public void streamOrdinals(NBTStreamer.ByteReader task) {
-        int index = 0;
-        for (int y = 0; y < getHeight(); y++) {
-            for (int z = 0; z < getLength(); z++) {
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    int id = getOrdinal(index);
-                    task.run(index, id);
-                }
-            }
-        }
-    }
-
-    @Override
-    public List<CompoundTag> getTileEntities() {
+    public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
         for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
             int index = entry.getKey();
@@ -222,7 +210,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
                 values.put("z", new IntTag(z));
             }
         }
-        return new ArrayList<>(nbtMapIndex.values());
+        return nbtMapIndex.values();
     }
 
     private int ylast;
@@ -252,31 +240,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             }
         }
         return base;
-    }
-
-    @Override
-    public void forEach(final BlockReader task, final boolean air) {
-        if (air) {
-            for (int y = 0, index = 0; y < getHeight(); y++) {
-                for (int z = 0; z < getLength(); z++) {
-                    for (int x = 0; x < getWidth(); x++, index++) {
-                        BaseBlock block = getFullBlock(index);
-                        task.run(x, y, z, block);
-                    }
-                }
-            }
-        } else {
-            for (int y = 0, index = 0; y < getHeight(); y++) {
-                for (int z = 0; z < getLength(); z++) {
-                    for (int x = 0; x < getWidth(); x++, index++) {
-                        BaseBlock block = getFullBlock(index);
-                        if (!block.getMaterial().isAir()) {
-                            task.run(x, y, z, block);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public int size() {

@@ -22,10 +22,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypeSwitch;
@@ -159,13 +161,13 @@ public class SchematicStreamer extends NBTStreamer {
             if (id.isEmpty()) {
                 return;
             }
-            ListTag positionTag = compound.getListTag("Pos");
-            ListTag directionTag = compound.getListTag("Rotation");
             EntityType type = EntityTypes.parse(id);
             if (type != null) {
                 compound.getValue().put("Id", new StringTag(type.getId()));
                 BaseEntity state = new BaseEntity(type, compound);
-                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+
+                Location loc = compound.getEntityLocation(fc);
+                fc.createEntity(loc, state);
             } else {
                 Fawe.debug("Invalid entity: " + id);
             }
@@ -200,81 +202,84 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     private void fixStates() {
-        fc.forEach(new LinearClipboard.BlockReader() {
-            @Override
-            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-                BlockType type = block.getBlockType();
-                if (BlockCategories.STAIRS.contains(type)) {
-                    Object half = block.getState(PropertyKey.HALF);
-                    Direction facing = block.getState(PropertyKey.FACING);
+        for (BlockVector3 pos : fc) {
+            BlockStateHolder block = pos.getBlock(fc);
+            if (block.getMaterial().isAir()) continue;
 
-                    BlockVector3 forward = facing.toBlockVector();
-                    Direction left = facing.getLeft();
-                    Direction right = facing.getRight();
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
 
-                    BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
-                    BlockType forwardType = forwardBlock.getBlockType();
-                    if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
-                        Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
-                        if (forwardFacing == left) {
-                            BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
-                            BlockType rightType = rightBlock.getBlockType();
-                            if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
-                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
-                            }
-                            return;
-                        } else if (forwardFacing == right) {
-                            BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
-                            BlockType leftType = leftBlock.getBlockType();
-                            if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
-                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
-                            }
-                            return;
+            BlockType type = block.getBlockType();
+            if (BlockCategories.STAIRS.contains(type)) {
+                Direction facing = (Direction) block.getState(PropertyKey.FACING);
+
+                BlockVector3 forward = facing.toBlockVector();
+                Direction left = facing.getLeft();
+                Direction right = facing.getRight();
+
+                BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
+                BlockType forwardType = forwardBlock.getBlockType();
+                if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
+                    Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
+                    if (forwardFacing == left) {
+                        BlockState rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                        BlockType rightType = rightBlock.getBlockType();
+                        if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
+                            pos.setBlock(fc, block.with(PropertyKey.SHAPE, "inner_left"));
                         }
-                    }
-
-                    BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
-                    BlockType backwardsType = backwardsBlock.getBlockType();
-                    if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
-                        Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
-                        if (backwardsFacing == left) {
-                            BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
-                            BlockType rightType = rightBlock.getBlockType();
-                            if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
-                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
-                            }
-                            return;
-                        } else if (backwardsFacing == right) {
-                            BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
-                            BlockType leftType = leftBlock.getBlockType();
-                            if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
-                                fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
-                            }
-                            return;
+                        return;
+                    } else if (forwardFacing == right) {
+                        BlockState leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                        BlockType leftType = leftBlock.getBlockType();
+                        if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
+                            fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
                         }
+                        return;
                     }
-                } else {
-                    int group = group(type);
-                    if (group == -1) return;
-                    BlockStateHolder set = block;
-
-                    if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
-                    if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
-                    if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
-                    if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
-
-                    if (group == 2) {
-                        int ns = ((Boolean) set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
-                        int ew = ((Boolean) set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
-                        if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
-                            set = set.with(PropertyKey.UP, true);
-                        }
-                    }
-
-                    if (set != block) fc.setBlock(x, y, z, set);
                 }
+
+                BlockState backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
+                BlockType backwardsType = backwardsBlock.getBlockType();
+                if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
+                    Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
+                    if (backwardsFacing == left) {
+                        BlockState rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                        BlockType rightType = rightBlock.getBlockType();
+                        if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
+                            pos.setBlock(fc, block.with(PropertyKey.SHAPE, "outer_left"));
+                        }
+                        return;
+                    } else if (backwardsFacing == right) {
+                        BlockState leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                        BlockType leftType = leftBlock.getBlockType();
+                        if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
+                            pos.setBlock(fc, block.with(PropertyKey.SHAPE, "outer_right"));
+                        }
+                        return;
+                    }
+                }
+            } else {
+                int group = group(type);
+                if (group == -1) return;
+                BlockStateHolder set = block;
+
+                if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
+                if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
+                if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
+                if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
+
+                if (group == 2) {
+                    int ns = ((Boolean) set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
+                    int ew = ((Boolean) set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
+                    if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
+                        set = set.with(PropertyKey.UP, true);
+                    }
+                }
+
+                if (set != block) pos.setBlock(fc, set);
             }
-        }, false);
+        }
     }
 
     private BlockTypeSwitch<Boolean> fullCube = new BlockTypeSwitchBuilder<>(false).add(type -> {
@@ -283,7 +288,7 @@ public class SchematicStreamer extends NBTStreamer {
     }, true).build();
 
     private boolean merge(int group, int x, int y, int z) {
-        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> block = fc.getBlock(x, y, z);
+        BlockState block = fc.getBlock(x, y, z);
         BlockType type = block.getBlockType();
         return group(type) == group || fullCube.apply(type);
     }

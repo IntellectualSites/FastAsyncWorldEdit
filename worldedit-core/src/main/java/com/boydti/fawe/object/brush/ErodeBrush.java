@@ -2,10 +2,10 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.LinearClipboard;
-import com.boydti.fawe.object.clipboard.OffsetFaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
@@ -39,23 +39,23 @@ public class ErodeBrush implements Brush {
     public void erosion(final EditSession es, int erodeFaces, int erodeRec, int fillFaces, int fillRec, BlockVector3 target, double size) {
         int brushSize = (int) size + 1;
         int brushSizeSquared = (int) (size * size);
-        int dimension = brushSize * 2 + 1;
-        LinearClipboard buffer1 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
-        LinearClipboard buffer2 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
+        BlockVector3 dimension = BlockVector3.ONE.multiply(brushSize * 2 + 1);
+        Clipboard buffer1 = new CPUOptimizedClipboard(dimension);
+        Clipboard buffer2 = new CPUOptimizedClipboard(dimension);
 
         final int bx = target.getBlockX();
         final int by = target.getBlockY();
         final int bz = target.getBlockZ();
 
-        for (int x = -brushSize; x <= brushSize; x++) {
+        for (int x = -brushSize, relx = 0; x <= brushSize; x++, relx++) {
             int x0 = x + bx;
-            for (int y = -brushSize; y <= brushSize; y++) {
+            for (int y = -brushSize, rely = 0; y <= brushSize; y++, rely++) {
                 int y0 = y + by;
-                for (int z = -brushSize; z <= brushSize; z++) {
+                for (int z = -brushSize, relz = 0; z <= brushSize; z++, relz++) {
                     int z0 = z + bz;
                     BlockState state = es.getBlock(x0, y0, z0);
-                    buffer1.setBlock(x, y, z, state);
-                    buffer2.setBlock(x, y, z, state);
+                    buffer1.setBlock(relx, rely, relz, state);
+                    buffer2.setBlock(relx, rely, relz, state);
                 }
             }
         }
@@ -70,30 +70,28 @@ public class ErodeBrush implements Brush {
             fillIteration(brushSize, brushSizeSquared, fillFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
             swap++;
         }
-        LinearClipboard finalBuffer = swap % 2 == 0 ? buffer1 : buffer2;
+        Clipboard finalBuffer = swap % 2 == 0 ? buffer1 : buffer2;
 
-        finalBuffer.forEach(new LinearClipboard.BlockReader() {
-            @Override
-            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-                es.setBlock(x + bx, y + by, z + bz, block);
-            }
-        }, true);
+        for (BlockVector3 pos : finalBuffer) {
+            BlockState block = pos.getBlock(finalBuffer);
+            es.setBlock(pos.getX() + bx - brushSize, pos.getY() + by - brushSize, pos.getZ() + bz - brushSize, block);
+        }
     }
 
     private void fillIteration(int brushSize, int brushSizeSquared, int fillFaces,
-                               LinearClipboard current, LinearClipboard target) {
+                               Clipboard current, Clipboard target) {
         int[] frequency = null;
-        for (int x = -brushSize; x <= brushSize; x++) {
+        for (int x = -brushSize, relx = 0; x <= brushSize; x++, relx++) {
             int x2 = x * x;
-            for (int z = -brushSize; z <= brushSize; z++) {
+            for (int z = -brushSize, relz = 0; z <= brushSize; z++, relz++) {
                 int x2y2 = x2 + z * z;
-                for (int y = -brushSize; y <= brushSize; y++) {
+                for (int y = -brushSize, rely = 0; y <= brushSize; y++, rely++) {
                     int cube = x2y2 + y * y;
-                    target.setBlock(x, y, z, current.getBlock(x, y, z));
+                    target.setBlock(x, y, z, current.getBlock(relx, rely, relz));
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
-                    BaseBlock state = current.getBlock(x, y, z);
+                    BaseBlock state = current.getFullBlock(relx, rely, relz);
                     if (state.getBlockType().getMaterial().isMovementBlocker()) {
                         continue;
                     }
@@ -106,7 +104,7 @@ public class ErodeBrush implements Brush {
                         Arrays.fill(frequency, 0);
                     }
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BaseBlock next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
+                        BaseBlock next = current.getFullBlock(relx + offs.getBlockX(), rely + offs.getBlockY(), relz + offs.getBlockZ());
                         if (!next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
                         }
@@ -118,7 +116,7 @@ public class ErodeBrush implements Brush {
                         }
                     }
                     if (total >= fillFaces) {
-                        target.setBlock(x, y, z, highestState);
+                        target.setBlock(relx, rely, relz, highestState);
                     }
                 }
             }
@@ -126,19 +124,20 @@ public class ErodeBrush implements Brush {
     }
 
     private void erosionIteration(int brushSize, int brushSizeSquared, int erodeFaces,
-                                  LinearClipboard current, LinearClipboard target) {
+                                  Clipboard current, Clipboard target) {
         int[] frequency = null;
-        for (int x = -brushSize; x <= brushSize; x++) {
+
+        for (int x = -brushSize, relx = 0; x <= brushSize; x++, relx++) {
             int x2 = x * x;
-            for (int z = -brushSize; z <= brushSize; z++) {
+            for (int z = -brushSize, relz = 0; z <= brushSize; z++, relz++) {
                 int x2y2 = x2 + z * z;
-                for (int y = -brushSize; y <= brushSize; y++) {
+                for (int y = -brushSize, rely = 0; y <= brushSize; y++, rely++) {
                     int cube = x2y2 + y * y;
-                    target.setBlock(x, y, z, current.getBlock(x, y, z));
+                    target.setBlock(x, y, z, current.getBlock(relx, rely, relz));
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
-                    BaseBlock state = current.getBlock(x, y, z);
+                    BaseBlock state = current.getFullBlock(relx, rely, relz);
                     if (!state.getBlockType().getMaterial().isMovementBlocker()) {
                         continue;
                     }
@@ -151,7 +150,7 @@ public class ErodeBrush implements Brush {
                         Arrays.fill(frequency, 0);
                     }
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BaseBlock next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
+                        BaseBlock next = current.getFullBlock(relx + offs.getBlockX(), rely + offs.getBlockY(), relz + offs.getBlockZ());
                         if (next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
                         }
@@ -163,7 +162,7 @@ public class ErodeBrush implements Brush {
                         }
                     }
                     if (total >= erodeFaces) {
-                        target.setBlock(x, y, z, highestState);
+                        target.setBlock(relx, rely, relz, highestState);
                     }
                 }
             }

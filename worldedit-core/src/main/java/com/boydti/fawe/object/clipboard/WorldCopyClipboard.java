@@ -17,6 +17,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +47,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BaseBlock getBlock(int x, int y, int z) {
+    public BaseBlock getFullBlock(int x, int y, int z) {
         return extent.getFullBlock(BlockVector3.at(mx + x, my + y, mz + z));
     }
 
@@ -54,7 +56,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
+    public BiomeType getBiomeType(int x, int z) {
         return extent.getBiome(MutableBlockVector2.setComponents(mx + x, mz + z));
     }
 
@@ -70,84 +72,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public void forEach(BlockReader task, boolean air) {
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 max = region.getMaximumPoint();
-        MutableBlockVector3 pos = new MutableBlockVector3();
-        if (region instanceof CuboidRegion) {
-            if (air) {
-                ((CuboidRegion) region).setUseOldIterator(true);
-                RegionVisitor visitor = new RegionVisitor(region, pos1 -> {
-                    BaseBlock block = getBlockAbs(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ());
-                    int x = pos1.getBlockX() - mx;
-                    int y = pos1.getBlockY() - my;
-                    int z = pos1.getBlockZ() - mz;
-                    if (block.hasNbtData()) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
-                        values.put("x", new IntTag(x));
-                        values.put("y", new IntTag(y));
-                        values.put("z", new IntTag(z));
-                    }
-                    task.run(x, y, z, block);
-                    return true;
-                });
-                Operations.completeBlindly(visitor);
-            } else {
-                CuboidRegion cuboidEquivalent = new CuboidRegion(region.getMinimumPoint(), region.getMaximumPoint());
-                cuboidEquivalent.setUseOldIterator(true);
-                RegionVisitor visitor = new RegionVisitor(cuboidEquivalent, new RegionFunction() {
-                    @Override
-                    public boolean apply(BlockVector3 pos) throws WorldEditException {
-                        int x = pos.getBlockX() - mx;
-                        int y = pos.getBlockY() - my;
-                        int z = pos.getBlockZ() - mz;
-                        if (region.contains(pos)) {
-                            BaseBlock block = extent.getFullBlock(pos);
-                            if (block.hasNbtData()) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
-                                values.put("x", new IntTag(x));
-                                values.put("y", new IntTag(y));
-                                values.put("z", new IntTag(z));
-                            }
-                            if (!block.getBlockType().getMaterial().isAir()) {
-                                task.run(x, y, z, block);
-                            }
-                        }
+    public void close() throws IOException {
 
-                        return true;
-                    }
-                });
-                Operations.completeBlindly(visitor);
-            }
-        } else {
-            for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
-                pos.mutY(y);
-                int yy = pos.getBlockY() - my;
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                    pos.mutZ(z);
-                    int zz = pos.getBlockZ() - mz;
-                    for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                        pos.mutX(x);
-                        int xx = pos.getBlockX() - mx;
-                        if (region.contains(pos)) {
-//                            BlockState block = getBlockAbs(x, y, z);
-                            BaseBlock block = extent.getFullBlock(pos);
-                            if (!air && block.getBlockType().getMaterial().isAir()) {
-                                continue;
-                            }
-                            if (block.hasNbtData()) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
-                                values.put("x", new IntTag(xx));
-                                values.put("y", new IntTag(yy));
-                                values.put("z", new IntTag(zz));
-                            }
-                            task.run(xx, yy, zz, block);
-                        } else if (air) {
-                            task.run(xx, yy, zz, BlockTypes.AIR.getDefaultState());
-                        }
-                    }
-                }
-            }
-        }
     }
 }

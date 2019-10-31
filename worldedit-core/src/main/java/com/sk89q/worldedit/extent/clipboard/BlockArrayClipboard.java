@@ -19,19 +19,12 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.DelegateClipboard;
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.LinearClipboard;
-import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -41,15 +34,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import jdk.vm.ci.meta.Local;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
@@ -189,46 +181,62 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        int x = position.getBlockX()- origin.getX();
-        int z = position.getBlockZ()- origin.getZ();
+        int x = position.getBlockX() - origin.getX();
+        int z = position.getBlockZ() - origin.getZ();
         return getParent().setBiome(x, 0, z, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return parent.setBiome(x, y, z, biome);
+        x -= origin.getX();
+        y -= origin.getY();
+        z -= origin.getZ();
+        return getParent().setBiome(x, y, z, biome);
     }
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return parent.getEntities(region);
+        region = region.clone();
+        region.shift(origin);
+        return getParent().getEntities(region);
     }
 
     @Override
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
-        return parent.createEntity(location, entity);
+        return getParent().createEntity(location, entity);
     }
 
     @Override
     @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
-        parent.removeEntity(x, y, z, uuid);
+        x -= origin.getX();
+        y -= origin.getY();
+        z -= origin.getZ();
+        getParent().removeEntity(x, y, z, uuid);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return parent.getBlock(x, y, z);
+        x -= origin.getX();
+        y -= origin.getY();
+        z -= origin.getZ();
+        return getParent().getBlock(x, y, z);
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return parent.getFullBlock(x, y, z);
+        x -= origin.getX();
+        y -= origin.getY();
+        z -= origin.getZ();
+        return getParent().getFullBlock(x, y, z);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return parent.getBiomeType(x, z);
+        x -= origin.getX();
+        z -= origin.getZ();
+        return getParent().getBiomeType(x, z);
     }
 
     /**

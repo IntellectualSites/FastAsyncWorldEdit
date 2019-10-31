@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
@@ -27,16 +28,19 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.UUID;
 
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
-public interface Clipboard extends Extent {
+public interface Clipboard extends Extent, Iterable<BlockVector3> {
     static Clipboard create(BlockVector3 size, UUID uuid) {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             return new DiskOptimizedClipboard(size, uuid);
@@ -94,4 +98,41 @@ public interface Clipboard extends Extent {
      * @param entity
      */
     void removeEntity(Entity entity);
+
+    default int getWidth() {
+        return getDimensions().getBlockX();
+    }
+
+    default int getHeight() {
+        return getDimensions().getBlockY();
+    }
+
+    default int getLength() {
+        return getDimensions().getBlockZ();
+    }
+
+    default int getArea() {
+        return getWidth() * getLength();
+    }
+
+    default int getVolume() {
+        return getWidth() * getHeight() * getLength();
+    }
+
+    default Iterator<BlockVector3> iterator() {
+        return getRegion().iterator();
+    }
+
+    default Iterator<BlockVector2> iterator2d() {
+        return Regions.asFlatRegion(getRegion()).asFlatRegion().iterator();
+    }
+
+    @Override
+    default <T extends Filter> T apply(Region region, T filter) {
+        if (region.equals(getRegion())) {
+            return apply(this, filter);
+        } else {
+            return apply((Iterable<BlockVector3>) region, filter);
+        }
+    }
 }

@@ -70,26 +70,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         return super.enableHistory(changeSet);
     }
 
-    private ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, IQueueExtent queue, Region region, int X, int Z) {
-        if (!filter.appliesChunk(X, Z)) {
-            return block;
-        }
-        IChunk chunk = queue.getOrCreateChunk(X, Z);
-        // Initialize
-        chunk.init(queue, X, Z);
-
-        IChunk newChunk = filter.applyChunk(chunk, region);
-        if (newChunk != null) {
-            chunk = newChunk;
-            if (block == null) {
-                block = queue.initFilterBlock();
-            }
-            chunk.filterBlocks(filter, block, region);
-        }
-        queue.submit(chunk);
-        return block;
-    }
-
+    @Override
     public <T extends Filter> T apply(Region region, T filter) {
         // The chunks positions to iterate over
         final Set<BlockVector2> chunks = region.getChunks();
@@ -99,7 +80,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         final int size = Math.min(chunks.size(), Settings.IMP.QUEUE.PARALLEL_THREADS);
         if (size <= 1) {
             BlockVector2 pos = chunksIter.next();
-            apply(null, filter, getExtent(), region, pos.getX(), pos.getZ());
+            getExtent().apply(null, filter, region, pos.getX(), pos.getZ());
         } else {
             final ForkJoinTask[] tasks = IntStream.range(0, size).mapToObj(i -> handler.submit(() -> {
                 try {
@@ -120,7 +101,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                                 X = pos.getX();
                                 Z = pos.getZ();
                             }
-                            block = apply(block, newFilter, queue, region, X, Z);
+                            block = queue.apply(block, newFilter, region, X, Z);
                         }
                         queue.flush();
                     }

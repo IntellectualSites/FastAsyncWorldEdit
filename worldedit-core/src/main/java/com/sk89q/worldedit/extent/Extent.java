@@ -21,6 +21,9 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.AbstractFilterBlock;
+import com.boydti.fawe.beta.ExtentFilterBlock;
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -65,6 +68,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -648,5 +652,17 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default Extent disableHistory() {
         return this;
+    }
+
+    default <T extends Filter> T apply(Region region, T filter) {
+        return apply((Iterable<BlockVector3>) region, filter);
+    }
+
+    default <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
+        ExtentFilterBlock block = new ExtentFilterBlock(this);
+        for (BlockVector3 pos : positions) {
+            filter.applyBlock(block.init(pos));
+        }
+        return filter;
     }
 }
