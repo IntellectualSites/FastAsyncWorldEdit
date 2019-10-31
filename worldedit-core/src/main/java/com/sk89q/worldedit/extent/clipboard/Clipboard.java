@@ -34,6 +34,7 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 
 import javax.annotation.Nullable;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -126,6 +127,14 @@ public interface Clipboard extends Extent, Iterable<BlockVector3> {
     default Iterator<BlockVector2> iterator2d() {
         return Regions.asFlatRegion(getRegion()).asFlatRegion().iterator();
     }
+
+    default URI getURI() {
+        return null;
+    }
+
+//    default void paste(Extent other, BlockVector3 to) {
+//      TODO FIXME
+//    }
 
     @Override
     default <T extends Filter> T apply(Region region, T filter) {

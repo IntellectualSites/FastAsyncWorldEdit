@@ -63,20 +63,25 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        Iterator<BlockVector3> iter = getRegion().iterator_old();
-        LinearFilter filter = new LinearFilter();
+        Region region = getRegion();
+        if (region instanceof CuboidRegion) {
+            Iterator<BlockVector3> iter = ((CuboidRegion) region).iterator_old();
+            LinearFilter filter = new LinearFilter();
 
-        return new ForwardingIterator<BlockVector3>() {
-            @Override
-            protected Iterator<BlockVector3> delegate() {
-                return iter;
-            }
+            return new ForwardingIterator<BlockVector3>() {
+                @Override
+                protected Iterator<BlockVector3> delegate() {
+                    return iter;
+                }
 
-            @Override
-            public BlockVector3 next() {
-                return filter.next(super.next());
-            }
-        };
+                @Override
+                public BlockVector3 next() {
+                    return filter.next(super.next());
+                }
+            };
+        } else {
+            return super.iterator();
+        }
     }
 
     private class LinearFilter extends AbstractFilterBlock {

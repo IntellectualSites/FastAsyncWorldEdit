@@ -193,13 +193,13 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcess
      */
     boolean isEmpty();
 
-    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int X, int Z) {
-        if (!filter.appliesChunk(X, Z)) {
+    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ) {
+        if (!filter.appliesChunk(chunkX, chunkZ)) {
             return block;
         }
-        IChunk chunk = this.getOrCreateChunk(X, Z);
+        IChunk chunk = this.getOrCreateChunk(chunkX, chunkZ);
         // Initialize
-        chunk.init(this, X, Z);
+        chunk.init(this, chunkX, chunkZ);
 
         IChunk newChunk = filter.applyChunk(chunk, region);
         if (newChunk != null) {

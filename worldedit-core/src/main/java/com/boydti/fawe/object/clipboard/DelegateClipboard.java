@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import javax.annotation.Nullable;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +43,11 @@ public class DelegateClipboard implements Clipboard {
 
     public Clipboard getParent() {
         return parent;
+    }
+
+    @Override
+    public URI getURI() {
+        return parent.getURI();
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.jnbt.NBTStreamer;
+import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
@@ -9,6 +11,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
+import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -20,6 +23,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +43,8 @@ public class WritableMCAChunk implements IChunkSet {
 
     public final char[] blocks = new char[65536];
 
-    public BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<CompoundTag>();
-    public Map<UUID, CompoundTag> entities = new HashMap<>();
+    public final BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<CompoundTag>();
+    public final Map<UUID, CompoundTag> entities = new HashMap<>();
     public long inhabitedTime = System.currentTimeMillis();
     public long lastUpdate;
 
@@ -48,7 +53,82 @@ public class WritableMCAChunk implements IChunkSet {
 
     public int chunkX, chunkZ;
 
-    protected WritableMCAChunk() {
+    public WritableMCAChunk() {}
+
+    public WritableMCAChunk(NBTInputStream nis, int chunkX, int chunkZ, boolean readPos) throws IOException {
+        NBTStreamer streamer = new NBTStreamer(nis);
+        streamer.addReader(".Level.InhabitedTime", new RunnableVal2<Integer, Long>() {
+            @Override
+            public void run(Integer index, Long value) {
+                inhabitedTime = value;
+            }
+        });
+        streamer.addReader(".Level.LastUpdate", new RunnableVal2<Integer, Long>() {
+            @Override
+            public void run(Integer index, Long value) {
+                lastUpdate = value;
+            }
+        });
+        streamer.addReader(".Level.Sections.#", new RunnableVal2<Integer, CompoundTag>() {
+            @Override
+            public void run(Integer index, CompoundTag tag) {
+                int layer = tag.getByte("Y");
+                // "Palette"
+            }
+        });
+        streamer.addReader(".Level.Sections.Palette.#", new RunnableVal2<Integer, CompoundTag>() {
+            @Override
+            public void run(Integer index, CompoundTag entry) {
+                String name = entry.getString("Name");
+                entry.
+            }
+        });
+        streamer.addReader(".Level.TileEntities.#", new RunnableVal2<Integer, CompoundTag>() {
+            @Override
+            public void run(Integer index, CompoundTag tile) {
+                int x = tile.getInt("x") & 15;
+                int y = tile.getInt("y");
+                int z = tile.getInt("z") & 15;
+                tiles.put(x, y, z, tile);
+            }
+        });
+        streamer.addReader(".Level.Entities.#", new RunnableVal2<Integer, CompoundTag>() {
+            @Override
+            public void run(Integer index, CompoundTag entityTag) {
+                long least = entityTag.getLong("UUIDLeast");
+                long most = entityTag.getLong("UUIDMost");
+                entities.put(new UUID(most, least), entityTag);
+            }
+        });
+        streamer.addReader(".Level.Biomes", new RunnableVal2<Integer, byte[]>() {
+            @Override
+            public void run(Integer index, byte[] value) {
+                for (int i = 0; i < 256; i++) {
+                    biomes[i] = value[i];
+                }
+            }
+        });
+//        streamer.addReader(".Level.HeightMap", new RunnableVal2<Integer, int[]>() {
+//            @Override
+//            public void run(Integer index, int[] value) {
+//                heightMap = value;
+//            }
+//        });
+        if (readPos) {
+            streamer.addReader(".Level.xPos", new RunnableVal2<Integer, Integer>() {
+                @Override
+                public void run(Integer index, Integer value) {
+                    WritableMCAChunk.this.chunkX = value;
+                }
+            });
+            streamer.addReader(".Level.zPos", new RunnableVal2<Integer, Integer>() {
+                @Override
+                public void run(Integer index, Integer value) {
+                    WritableMCAChunk.this.chunkZ = value;
+                }
+            });
+        }
+        streamer.readFully();
     }
 
     public int getX() {
@@ -71,6 +151,10 @@ public class WritableMCAChunk implements IChunkSet {
 
     @Override
     public IChunkSet reset() {
+        return this.reset(true);
+    }
+
+    public IChunkSet reset(boolean full) {
         if (!tiles.isEmpty()) {
             tiles.clear();
         }
@@ -80,9 +164,10 @@ public class WritableMCAChunk implements IChunkSet {
         modified = 0;
         deleted = false;
         hasBiomes = false;
-        // TODO optimize
-        for (int i = 0; i < 65536; i++) {
-            blocks[i] = BlockID.AIR;
+        if (full) {
+            for (int i = 0; i < 65536; i++) {
+                blocks[i] = BlockID.AIR;
+            }
         }
         Arrays.fill(hasSections, false);
         return this;
@@ -137,11 +222,10 @@ public class WritableMCAChunk implements IChunkSet {
                 int num_palette = 0;
                 try {
                     for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
-                        int stateId = blocks[i];
-                        int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
+                        int ordinal = blocks[i];
                         int palette = blockToPalette[ordinal];
                         if (palette == Integer.MAX_VALUE) {
-                            BlockState state = BlockTypes.states[ordinal];
+//                            BlockState state = BlockTypes.states[ordinal];
                             blockToPalette[ordinal] = palette = num_palette;
                             paletteToBlock[num_palette] = ordinal;
                             num_palette++;

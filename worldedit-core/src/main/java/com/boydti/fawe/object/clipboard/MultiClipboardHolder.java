@@ -35,11 +35,8 @@ public class MultiClipboardHolder extends URIClipboardHolder {
         super(URI.create(""), EmptyClipboard.INSTANCE);
         holders = new ArrayList<>();
         URI uri = URI.create("");
-        if (clipboard instanceof BlockArrayClipboard) {
-            LinearClipboard fc = ((BlockArrayClipboard) clipboard).IMP;
-            if (fc instanceof DiskOptimizedClipboard) {
-                uri = ((DiskOptimizedClipboard) fc).getFile().toURI();
-            }
+        if (clipboard.getURI() != null) {
+            uri = clipboard.getURI();
         }
         add(uri, clipboard);
     }

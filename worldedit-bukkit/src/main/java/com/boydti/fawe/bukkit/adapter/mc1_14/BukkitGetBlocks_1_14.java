@@ -58,7 +58,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public Chunk nmsChunk;
     public CraftWorld world;
     public int X, Z;
-    private boolean forceLoad;
+//    private boolean forceLoad;
 
     public BukkitGetBlocks_1_14(World world, int X, int Z, boolean forceLoad) {
         this.world = (CraftWorld) world;
@@ -75,6 +75,15 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 //            this.world.getHandle().setForceLoaded(X, Z, forceLoad = false);
 //        }
 //    }
+
+
+    public int getX() {
+        return X;
+    }
+
+    public int getZ() {
+        return Z;
+    }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {

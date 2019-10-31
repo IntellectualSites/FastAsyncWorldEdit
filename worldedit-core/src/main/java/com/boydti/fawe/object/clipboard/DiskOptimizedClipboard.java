@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -107,6 +108,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public URI getURI() {
+        return file.toURI();
     }
 
     private static BlockVector3 readSize(File file) {

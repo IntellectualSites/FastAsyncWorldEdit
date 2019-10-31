@@ -2,6 +2,8 @@ package com.boydti.fawe.object.schematic;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -178,8 +180,7 @@ public class Schematic {
         if (transform != null) {
             copy.setTransform(transform);
         }
-        copy.setCopyingBiomes(!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
-                        .hasBiomes());
+        copy.setCopyingBiomes(clipboard.hasBiomes());
         if (extent instanceof EditSession) {
             EditSession editSession = (EditSession) extent;
             Mask sourceMask = editSession.getSourceMask();
@@ -200,89 +201,47 @@ public class Schematic {
         final BlockVector3 bot = clipboard.getMinimumPoint();
         final BlockVector3 origin = clipboard.getOrigin();
 
-        final boolean copyBiomes =
-            !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
-                .hasBiomes();
+        final boolean copyBiomes = clipboard.hasBiomes();
+        clipboard.apply(clipboard, new Filter() {
+            @Override
+            public void applyBlock(FilterBlock block) {
 
-        // Optimize for BlockArrayClipboard
-        if (clipboard instanceof BlockArrayClipboard && region instanceof CuboidRegion) {
-            // To is relative to the world origin (player loc + small clipboard offset) (As the positions supplied are relative to the clipboard min)
-            final int relx = to.getBlockX() + bot.getBlockX() - origin.getBlockX();
-            final int rely = to.getBlockY() + bot.getBlockY() - origin.getBlockY();
-            final int relz = to.getBlockZ() + bot.getBlockZ() - origin.getBlockZ();
-
-            BlockArrayClipboard bac = (BlockArrayClipboard) clipboard;
-            if (copyBiomes) {
-                bac.IMP.forEach(new LinearClipboard.BlockReader() {
-                    MutableBlockVector2 mpos2d = new MutableBlockVector2();
-
-                    {
-                        mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
-                    }
-
-                    @Override
-                    public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-                        try {
-                            int xx = x + relx;
-                            int zz = z + relz;
-                            if (xx != mpos2d.getBlockX() || zz != mpos2d.getBlockZ()) {
-                                mpos2d.setComponents(xx, zz);
-                                extent.setBiome(mpos2d, bac.IMP.getBiome(x, z));
-                            }
-                            if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
-                                return;
-                            }
-                            extent.setBlock(xx, y + rely, zz, block);
-                        } catch (WorldEditException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }, true);
-            } else {
-                bac.IMP.forEach(new LinearClipboard.BlockReader() {
-                    @Override
-                    public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-                        try {
-                            extent.setBlock(x + relx, y + rely, z + relz, block);
-                        } catch (WorldEditException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }, pasteAir);
             }
-        } else {
-            // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
-            final int relx = to.getBlockX() - origin.getBlockX();
-            final int rely = to.getBlockY() - origin.getBlockY();
-            final int relz = to.getBlockZ() - origin.getBlockZ();
-            Operation visitor = new RegionVisitor(region, new RegionFunction() {
-                //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
-                MutableBlockVector2 mpos2d = new MutableBlockVector2();
+        });
 
-                {
-                    mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
-                }
+        System.out.println("TODO optimize paste using above apply");
+        // Optimize for BlockArrayClipboard
+        // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
+        final int relx = to.getBlockX() - origin.getBlockX();
+        final int rely = to.getBlockY() - origin.getBlockY();
+        final int relz = to.getBlockZ() - origin.getBlockZ();
+        Operation visitor = new RegionVisitor(region, new RegionFunction() {
+            //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
+            MutableBlockVector2 mpos2d = new MutableBlockVector2();
 
-                @Override
-                public boolean apply(BlockVector3 mutable) throws WorldEditException {
-                    BlockState block = clipboard.getBlock(mutable);
-                    int xx = mutable.getBlockX() + relx;
-                    int zz = mutable.getBlockZ() + relz;
-                    if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
-                        mpos2d.setComponents(xx, zz);
+            {
+                mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
+            }
+
+            @Override
+            public boolean apply(BlockVector3 mutable) throws WorldEditException {
+                BlockState block = clipboard.getBlock(mutable);
+                int xx = mutable.getBlockX() + relx;
+                int zz = mutable.getBlockZ() + relz;
+                if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
+                    mpos2d.setComponents(xx, zz);
 //                        extent.setBiome(mpos2d, clipboard.getBiome(mpos2d_2.setComponents(mutable.getBlockX(), mutable.getBlockZ())));
-                        extent.setBiome(mpos2d, clipboard
+                    extent.setBiome(mpos2d, clipboard
                             .getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
-                    }
-                    if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
-                        return false;
-                    }
-                    extent.setBlock(xx, mutable.getBlockY() + rely, zz, block);
+                }
+                if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                     return false;
                 }
-            });
-            Operations.completeBlindly(visitor);
-        }
+                extent.setBlock(xx, mutable.getBlockY() + rely, zz, block);
+                return false;
+            }
+        });
+        Operations.completeBlindly(visitor);
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
         final int entityOffsetX = to.getBlockX() - origin.getBlockX();
         final int entityOffsetY = to.getBlockY() - origin.getBlockY();

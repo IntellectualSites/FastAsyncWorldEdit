@@ -64,21 +64,18 @@ public class SchematicStreamer extends NBTStreamer {
         NBTStreamReader<? extends Integer, ? extends Integer> idInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
-                setupClipboard(length);
                 ids = new FaweOutputStream(new LZ4BlockOutputStream(idOut));
             }
         };
         NBTStreamReader<? extends Integer, ? extends Integer> dataInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
-                setupClipboard(length);
                 datas = new FaweOutputStream(new LZ4BlockOutputStream(dataOut));
             }
         };
         NBTStreamReader<? extends Integer, ? extends Integer> addInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
-                setupClipboard(length*2);
                 addOut = new FastByteArrayOutputStream();
                 adds = new FaweOutputStream(new LZ4BlockOutputStream(addOut));
             }
@@ -203,7 +200,7 @@ public class SchematicStreamer extends NBTStreamer {
 
     private void fixStates() {
         for (BlockVector3 pos : fc) {
-            BlockStateHolder block = pos.getBlock(fc);
+            BlockState block = pos.getBlock(fc);
             if (block.getMaterial().isAir()) continue;
 
             int x = pos.getX();
@@ -262,7 +259,7 @@ public class SchematicStreamer extends NBTStreamer {
             } else {
                 int group = group(type);
                 if (group == -1) return;
-                BlockStateHolder set = block;
+                BlockState set = block;
 
                 if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
                 if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
@@ -370,7 +367,7 @@ public class SchematicStreamer extends NBTStreamer {
     private LinearClipboard setupClipboard(int size) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(BlockVector3.at(size, 1, 1));
+//                fc.setDimensions(BlockVector3.at(size, 1, 1));
             }
             return fc;
         }
@@ -409,10 +406,10 @@ public class SchematicStreamer extends NBTStreamer {
             BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
             BlockVector3 origin = min.subtract(offset);
             BlockVector3 dimensions = BlockVector3.at(width, height, length);
-            fc.setDimensions(dimensions);
+//            fc.setDimensions(dimensions);
             fixStates();
             CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
-            clipboard.init(region, fc);
+//            clipboard.init(region, fc);
             clipboard.setOrigin(origin);
             return clipboard;
         } catch (Throwable e) {

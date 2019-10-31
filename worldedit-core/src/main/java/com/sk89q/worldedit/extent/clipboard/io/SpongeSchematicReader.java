@@ -48,6 +48,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -113,7 +114,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private LinearClipboard setupClipboard(int size, UUID uuid) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(BlockVector3.at(size, 1, 1));
+//                fc.setDimensions(BlockVector3.at(size, 1, 1));
             }
             return fc;
         }
@@ -237,20 +238,19 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 value.remove("Id");
             }
 
-            ListTag positionTag = compound.getListTag("Pos");
-            ListTag directionTag = compound.getListTag("Rotation");
             EntityType type = EntityTypes.parse(id.getValue());
             if (type != null) {
                 compound = fixEntity(compound);
                 BaseEntity state = new BaseEntity(type, compound);
-                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+                Location loc = compound.getEntityLocation(fc);
+                fc.createEntity(loc, state);
             } else {
                 Fawe.debug("Invalid entity: " + id);
             }
         });
         streamer.readFully();
         if (fc == null) setupClipboard(length * width * height, uuid);
-        fc.setDimensions(BlockVector3.at(width, height, length));
+//        fc.setDimensions(BlockVector3.at(width, height, length));
         BlockVector3 origin = min;
         CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
@@ -281,7 +281,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-        clipboard.init(region, fc);
+//        clipboard.init(region, fc);
         clipboard.setOrigin(origin);
         return clipboard;
     }
