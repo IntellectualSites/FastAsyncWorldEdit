@@ -211,7 +211,6 @@ public class ToolUtilCommands {
             BBC.SUPERPICKAXE_DISABLED.send(player);
         } else {
             if ("off".equals(state)) {
-
                 BBC.SUPERPICKAXE_DISABLED.send(player);
                 return;
             }

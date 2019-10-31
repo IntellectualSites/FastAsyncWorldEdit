@@ -12,7 +12,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.List;
 
-public abstract class ReadOnlyClipboard extends FaweClipboard {
+public abstract class ReadOnlyClipboard extends LinearClipboard {
     public final Region region;
 
     public ReadOnlyClipboard(Region region) {

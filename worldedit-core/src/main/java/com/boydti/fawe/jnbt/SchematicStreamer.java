@@ -6,7 +6,7 @@ import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.io.FastByteArraysInputStream;
@@ -200,7 +200,7 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     private void fixStates() {
-        fc.forEach(new FaweClipboard.BlockReader() {
+        fc.forEach(new LinearClipboard.BlockReader() {
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 BlockType type = block.getBlockType();
@@ -360,9 +360,9 @@ public class SchematicStreamer extends NBTStreamer {
     private int offsetZ;
 
     private BlockArrayClipboard clipboard;
-    private FaweClipboard fc;
+    private LinearClipboard fc;
 
-    private FaweClipboard setupClipboard(int size) {
+    private LinearClipboard setupClipboard(int size) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
                 fc.setDimensions(BlockVector3.at(size, 1, 1));
@@ -370,11 +370,11 @@ public class SchematicStreamer extends NBTStreamer {
             return fc;
         }
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
-            return fc = new DiskOptimizedClipboard(size, 1, 1, uuid);
+            return fc = new DiskOptimizedClipboard(BlockVector3.at(size, 1, 1), uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
-            return fc = new CPUOptimizedClipboard(size, 1, 1);
+            return fc = new CPUOptimizedClipboard(BlockVector3.at(size, 1, 1));
         } else {
-            return fc = new MemoryOptimizedClipboard(size, 1, 1);
+            return fc = new MemoryOptimizedClipboard(BlockVector3.at(size, 1, 1));
         }
     }
 
@@ -390,7 +390,7 @@ public class SchematicStreamer extends NBTStreamer {
         return BlockVector3.at(width, height, length);
     }
 
-    public void setClipboard(FaweClipboard clipboard) {
+    public void setClipboard(LinearClipboard clipboard) {
         this.fc = clipboard;
     }
 

@@ -22,7 +22,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -146,7 +146,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
 
             int[] numTiles = {0};
-            FaweClipboard.BlockReader reader = new FaweClipboard.BlockReader() {
+            LinearClipboard.BlockReader reader = new LinearClipboard.BlockReader() {
                 @Override
                 public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                     try {

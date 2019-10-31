@@ -19,15 +19,33 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
+import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
+import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
+
+import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
 public interface Clipboard extends Extent {
+    static Clipboard create(BlockVector3 size, UUID uuid) {
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            return new DiskOptimizedClipboard(size, uuid);
+        } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
+            return new CPUOptimizedClipboard(size);
+        } else {
+            return new MemoryOptimizedClipboard(size);
+        }
+    }
 
     /**
      * Get the bounding region of this extent.
@@ -70,4 +88,10 @@ public interface Clipboard extends Extent {
     default boolean hasBiomes() {
         return false;
     }
+
+    /**
+     * Remove entity from clipboard
+     * @param entity
+     */
+    void removeEntity(Entity entity);
 }

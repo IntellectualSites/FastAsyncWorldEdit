@@ -60,6 +60,10 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     BlockVector3 getMaximumPoint();
 
+    default BlockVector3 getDimensions() {
+        return getMaximumPoint().subtract(getMinimumPoint()).add(1, 1, 1);
+    }
+
     /**
      * Get the center point of a region.
      * Note: Coordinates will not be integers

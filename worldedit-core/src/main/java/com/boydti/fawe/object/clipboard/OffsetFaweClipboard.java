@@ -1,22 +1,25 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
+public class OffsetClipboard extends DelegateClipboard {
     private final int ox, oy, oz;
 
-    public OffsetFaweClipboard(FaweClipboard parent, int ox, int oy, int oz) {
+    public OffsetClipboard(Clipboard parent, int ox, int oy, int oz) {
         super(parent);
         this.ox = ox;
         this.oy = oy;
         this.oz = oz;
     }
 
-    public OffsetFaweClipboard(FaweClipboard parent, int offset) {
-        this(parent, offset, offset, offset);
+    @Override
+    public Region getRegion() {
+        return parent.getRegion();
     }
 
     @Override

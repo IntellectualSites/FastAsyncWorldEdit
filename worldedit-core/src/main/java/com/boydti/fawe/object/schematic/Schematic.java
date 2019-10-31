@@ -2,7 +2,7 @@ package com.boydti.fawe.object.schematic;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MaskTraverser;
@@ -213,7 +213,7 @@ public class Schematic {
 
             BlockArrayClipboard bac = (BlockArrayClipboard) clipboard;
             if (copyBiomes) {
-                bac.IMP.forEach(new FaweClipboard.BlockReader() {
+                bac.IMP.forEach(new LinearClipboard.BlockReader() {
                     MutableBlockVector2 mpos2d = new MutableBlockVector2();
 
                     {
@@ -239,7 +239,7 @@ public class Schematic {
                     }
                 }, true);
             } else {
-                bac.IMP.forEach(new FaweClipboard.BlockReader() {
+                bac.IMP.forEach(new LinearClipboard.BlockReader() {
                     @Override
                     public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                         try {

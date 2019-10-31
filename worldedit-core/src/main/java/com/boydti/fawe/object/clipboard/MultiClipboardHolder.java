@@ -36,7 +36,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
         holders = new ArrayList<>();
         URI uri = URI.create("");
         if (clipboard instanceof BlockArrayClipboard) {
-            FaweClipboard fc = ((BlockArrayClipboard) clipboard).IMP;
+            LinearClipboard fc = ((BlockArrayClipboard) clipboard).IMP;
             if (fc instanceof DiskOptimizedClipboard) {
                 uri = ((DiskOptimizedClipboard) fc).getFile().toURI();
             }

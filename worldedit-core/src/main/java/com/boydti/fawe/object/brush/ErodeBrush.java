@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.clipboard.OffsetFaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -40,8 +40,8 @@ public class ErodeBrush implements Brush {
         int brushSize = (int) size + 1;
         int brushSizeSquared = (int) (size * size);
         int dimension = brushSize * 2 + 1;
-        FaweClipboard buffer1 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
-        FaweClipboard buffer2 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
+        LinearClipboard buffer1 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
+        LinearClipboard buffer2 = new OffsetFaweClipboard(new CPUOptimizedClipboard(dimension, dimension, dimension), brushSize);
 
         final int bx = target.getBlockX();
         final int by = target.getBlockY();
@@ -70,9 +70,9 @@ public class ErodeBrush implements Brush {
             fillIteration(brushSize, brushSizeSquared, fillFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
             swap++;
         }
-        FaweClipboard finalBuffer = swap % 2 == 0 ? buffer1 : buffer2;
+        LinearClipboard finalBuffer = swap % 2 == 0 ? buffer1 : buffer2;
 
-        finalBuffer.forEach(new FaweClipboard.BlockReader() {
+        finalBuffer.forEach(new LinearClipboard.BlockReader() {
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 es.setBlock(x + bx, y + by, z + bz, block);
@@ -81,7 +81,7 @@ public class ErodeBrush implements Brush {
     }
 
     private void fillIteration(int brushSize, int brushSizeSquared, int fillFaces,
-        FaweClipboard current, FaweClipboard target) {
+                               LinearClipboard current, LinearClipboard target) {
         int[] frequency = null;
         for (int x = -brushSize; x <= brushSize; x++) {
             int x2 = x * x;
@@ -126,7 +126,7 @@ public class ErodeBrush implements Brush {
     }
 
     private void erosionIteration(int brushSize, int brushSizeSquared, int erodeFaces,
-        FaweClipboard current, FaweClipboard target) {
+                                  LinearClipboard current, LinearClipboard target) {
         int[] frequency = null;
         for (int x = -brushSize; x <= brushSize; x++) {
             int x2 = x * x;
