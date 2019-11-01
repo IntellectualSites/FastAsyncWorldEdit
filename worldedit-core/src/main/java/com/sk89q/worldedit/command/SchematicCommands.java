@@ -585,12 +585,13 @@ public class SchematicCommands {
                          boolean oldFirst,
                      @Switch(name = 'n', desc = "Sort by date, newest first")
                          boolean newFirst,
-                     @ArgFlag(name = 'f', desc = "Restricts by format.")
+                     @ArgFlag(name = 'f', desc = "Restricts by format.", def = "")
                          String formatName,
                      @Arg(name = "filter", desc = "Filter for schematics", def = "all")
                          String filter,
                      Arguments arguments
                     ) throws WorldEditException {
+        if (formatName.isEmpty()) formatName = null;
         if (oldFirst && newFirst) {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
