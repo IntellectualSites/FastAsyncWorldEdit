@@ -156,11 +156,11 @@ public class StreamDelegate {
     }
 
     public StreamDelegate withLong(LongValueReader valueReader) {
-        return withValue(valueReader);
+        return withElem(valueReader);
     }
 
     public StreamDelegate withInt(IntValueReader valueReader) {
-        return withValue(valueReader);
+        return withElem(valueReader);
     }
 
     public StreamDelegate withValue(ValueReader valueReader) {

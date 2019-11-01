@@ -251,7 +251,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
         }
-        if (blocksOut.getSize() != 0) {
+        if (blocksOut != null && blocksOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(blocksOut.toByteArrays())))) {
                 if (clipboard instanceof LinearClipboard) {
                     LinearClipboard linear = (LinearClipboard) clipboard;
@@ -286,7 +286,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-        if (biomesOut.getSize() != 0) {
+        if (biomesOut != null && biomesOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
                 if (clipboard instanceof LinearClipboard) {
                     LinearClipboard linear = (LinearClipboard) clipboard;

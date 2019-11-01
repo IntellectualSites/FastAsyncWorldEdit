@@ -591,7 +591,6 @@ public class SchematicCommands {
                          String filter,
                      Arguments arguments
                     ) throws WorldEditException {
-        if (formatName.isEmpty()) formatName = null;
         if (oldFirst && newFirst) {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
