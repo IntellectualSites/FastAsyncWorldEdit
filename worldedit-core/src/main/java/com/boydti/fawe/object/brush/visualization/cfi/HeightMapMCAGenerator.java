@@ -7,6 +7,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.beta.implementation.FallbackChunkGet;
+import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.Metadatable;
@@ -335,7 +336,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public IChunkSet getChunk(int chunkX, int chunkZ) {
         // TODO don't generate new Writeable MCA chunk
         System.out.println("TODO don't generate new Writeable MCA chunk");
-        WritableMCAChunk tmp = new WritableMCAChunk();
+        MCAChunk tmp = new MCAChunk();
         int bx = chunkX << 4;
         int bz = chunkZ << 4;
         write(tmp, bx, bx + 15, bz, bz + 15);
@@ -767,13 +768,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 //        return getSnapshot(null, chunkX, chunkZ);
 //    }
 //
-//    private FaweChunk getSnapshot(final WritableMCAChunk chunk, int chunkX, int chunkZ) {
-//        return new LazyFaweChunk<WritableMCAChunk>(this, chunkX, chunkZ) {
+//    private FaweChunk getSnapshot(final MCAChunk chunk, int chunkX, int chunkZ) {
+//        return new LazyFaweChunk<MCAChunk>(this, chunkX, chunkZ) {
 //            @Override
-//            public WritableMCAChunk getChunk() {
-//                WritableMCAChunk tmp = chunk;
+//            public MCAChunk getChunk() {
+//                MCAChunk tmp = chunk;
 //                if (tmp == null) {
-//                    tmp = new WritableMCAChunk();
+//                    tmp = new MCAChunk();
 //                }
 //                tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
 //                int cbx = chunkX << 4;
@@ -789,7 +790,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 //
 //            @Override
 //            public void addToQueue() {
-//                WritableMCAChunk cached = getCachedChunk();
+//                MCAChunk cached = getCachedChunk();
 //                if (cached != null) setChunk(cached);
 //            }
 //        };
@@ -1574,7 +1575,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public WritableMCAChunk write(WritableMCAChunk chunk, int csx, int cex, int csz, int cez) {
+    public MCAChunk write(MCAChunk chunk, int csx, int cex, int csz, int cez) {
         byte[] heights = this.heights.get();
         byte[] biomes = this.biomes.get();
         char[] main = this.main.get();
