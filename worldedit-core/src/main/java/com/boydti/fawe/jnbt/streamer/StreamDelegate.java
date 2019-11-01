@@ -190,10 +190,10 @@ public class StreamDelegate {
         if (lazyReader != null) {
             lazyReader.apply(0, is);
         } else if (elemReader != null) {
-            Object raw = is.readTagPaylodRaw(type, depth);
+            Object raw = is.readTagPayloadRaw(type, depth);
             elemReader.apply(0, raw);
         } else if (valueReader != null) {
-            Object raw = is.readTagPaylodRaw(type, depth);
+            Object raw = is.readTagPayloadRaw(type, depth);
             valueReader.apply(0, raw);
         } else {
             is.readTagPaylodLazy(type, depth + 1, this);

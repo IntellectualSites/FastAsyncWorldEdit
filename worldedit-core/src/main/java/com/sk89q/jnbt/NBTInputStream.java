@@ -283,7 +283,7 @@ public final class NBTInputStream implements Closeable {
                 ValueReader valueReader = scope.getValueReader();
                 if (valueReader != null) {
                     for (int i = 0; i < length; ++i) {
-                        valueReader.apply(i, readTagPaylodRaw(childType, depth + 1));
+                        valueReader.apply(i, readTagPayloadRaw(childType, depth + 1));
                     }
                     return;
                 }
@@ -316,7 +316,7 @@ public final class NBTInputStream implements Closeable {
                             return;
                         }
                         is.skipBytes(is.readShort() & 0xFFFF);
-                        Object child = readTagPaylodRaw(childType, depth);
+                        Object child = readTagPayloadRaw(childType, depth);
                         elem.apply(i, child);
                     }
                 }
@@ -390,7 +390,7 @@ public final class NBTInputStream implements Closeable {
         }
     }
 
-    public Object readTagPaylodRaw(int type, int depth) throws IOException {
+    public Object readTagPayloadRaw(int type, int depth) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
@@ -421,30 +421,31 @@ public final class NBTInputStream implements Closeable {
                 bytes = new byte[length];
                 is.readFully(bytes);
                 return (new String(bytes, NBTConstants.CHARSET));
-            case NBTConstants.TYPE_LIST:
+            case NBTConstants.TYPE_LIST: {
                 int childType = is.readByte();
                 length = is.readInt();
-                List<Tag> tagList = new ArrayList<>();
+                List<Object> tagList = new ArrayList<>(length);
                 for (int i = 0; i < length; ++i) {
-                    Tag tag = readTagPayload(childType, depth + 1);
-                    if (tag instanceof EndTag) {
+                    Object tag = readTagPayloadRaw(childType, depth + 1);
+                    if (tag == null) {
                         throw new IOException("TAG_End not permitted in a list.");
                     }
                     tagList.add(tag);
                 }
                 return (tagList);
-            case NBTConstants.TYPE_COMPOUND:
-                Map<String, Tag> tagMap = new HashMap<>();
+            }
+            case NBTConstants.TYPE_COMPOUND: {
+                Map<String, Object> tagMap = new HashMap<>();
                 while (true) {
-                    NamedTag namedTag = readNamedTag(depth + 1);
-                    Tag tag = namedTag.getTag();
-                    if (tag instanceof EndTag) {
-                        break;
-                    } else {
-                        tagMap.put(namedTag.getName(), tag);
+                    int childType = is.readByte();
+                    if (childType == NBTConstants.TYPE_END) {
+                        return tagMap;
                     }
+                    String name = readNamedTagName(childType);
+                    Object value = readTagPayloadRaw(childType, depth + 1);
+                    tagMap.put(name, value);
                 }
-                return (tagMap);
+            }
             case NBTConstants.TYPE_INT_ARRAY: {
                 length = is.readInt();
                 int[] data = new int[length];

@@ -209,6 +209,8 @@ public enum FaweCache implements Trimable {
      */
     public final CleanableThreadLocal<AtomicBoolean> CHUNK_FLAG = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
 
+    public final CleanableThreadLocal<long[]> LONG_BUFFER_1024 = new CleanableThreadLocal<>(() -> new long[1024]);
+
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
