@@ -19,10 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.clipboard.LinearClipboard;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -36,7 +33,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -45,8 +41,10 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
@@ -59,8 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge schematic format.
@@ -242,9 +240,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         int[] palette = new int[BiomeTypes.getMaxId() + 1];
         Arrays.fill(palette, Integer.MAX_VALUE);
         int[] paletteMax = {0};
-        NBTStreamer.ByteReader task = new NBTStreamer.ByteReader() {
+        IntValueReader task = new IntValueReader() {
             @Override
-            public void run(int index, int ordinal) {
+            public void applyInt(int index, int ordinal) {
                 try {
                     int value = palette[ordinal];
                     if (value == Integer.MAX_VALUE) {
@@ -268,7 +266,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 int x0 = min.getBlockX() + x;
                 BlockVector2 pt = BlockVector2.at(x0, z0);
                 BiomeType biome = clipboard.getBiome(pt);
-                task.run(i, biome.getInternalId());
+                task.applyInt(i, biome.getInternalId());
             }
         }
         biomesOut.close();

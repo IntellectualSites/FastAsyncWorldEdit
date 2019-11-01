@@ -39,13 +39,15 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 // TODO FIXME
-public class SchematicStreamer extends NBTStreamer {
+public class SchematicStreamer implements Closeable {
     private final UUID uuid;
+    private final NBTInputStream input;
     private FastByteArrayOutputStream idOut = new FastByteArrayOutputStream();
     private FastByteArrayOutputStream dataOut = new FastByteArrayOutputStream();
     private FastByteArrayOutputStream addOut;
@@ -55,148 +57,148 @@ public class SchematicStreamer extends NBTStreamer {
     private FaweOutputStream adds;
 
     public SchematicStreamer(NBTInputStream stream, UUID uuid) {
-        super(stream);
+        this.input = stream;
         this.uuid = uuid;
         clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
     }
 
     public void addBlockReaders() throws IOException {
-        NBTStreamReader<? extends Integer, ? extends Integer> idInit = new NBTStreamReader<Integer, Integer>() {
-            @Override
-            public void accept(Integer length, Integer type) {
-                ids = new FaweOutputStream(new LZ4BlockOutputStream(idOut));
-            }
-        };
-        NBTStreamReader<? extends Integer, ? extends Integer> dataInit = new NBTStreamReader<Integer, Integer>() {
-            @Override
-            public void accept(Integer length, Integer type) {
-                datas = new FaweOutputStream(new LZ4BlockOutputStream(dataOut));
-            }
-        };
-        NBTStreamReader<? extends Integer, ? extends Integer> addInit = new NBTStreamReader<Integer, Integer>() {
-            @Override
-            public void accept(Integer length, Integer type) {
-                addOut = new FastByteArrayOutputStream();
-                adds = new FaweOutputStream(new LZ4BlockOutputStream(addOut));
-            }
-        };
-
-        addReader("Schematic.Blocks", NBTStreamer.ReadType.INFO, idInit);
-        addReader("Schematic.Data", NBTStreamer.ReadType.INFO, dataInit);
-        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.INFO, addInit);
-        addReader("Schematic.Blocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
-            @Override
-            public void run(int index, int value) {
-                try {
-                    ids.write(value);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        addReader("Schematic.Data", NBTStreamer.ReadType.ELEM, new ByteReader() {
-            @Override
-            public void run(int index, int value) {
-                try {
-                    datas.write(value);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
-            @Override
-            public void run(int index, int value) {
-                if (value != 0) {
-                    int first = value & 0x0F;
-                    int second = (value & 0xF0) >> 4;
-                    try {
-                        if (first != 0) adds.write(first);
-                        if (second != 0) adds.write(second);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        ByteReader biomeReader = new ByteReader() {
-            @Override
-            public void run(int index, int value) {
-                BiomeType biome = BiomeTypes.getLegacy(value);
-                if (biome != null) {
-                    fc.setBiome(index, biome);
-                }
-            }
-        };
-        NBTStreamReader<Integer, Integer> initializer23 = new NBTStreamReader<Integer, Integer>() {
-            @Override
-            public void accept(Integer value1, Integer value2) {
-                if (fc == null) setupClipboard(length * width * height);
-            }
-        };
-        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.INFO,initializer23);
-        addReader("Schematic.Biomes", NBTStreamer.ReadType.INFO,initializer23);
-        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.ELEM,biomeReader); // AWE stores as an int[]
-        addReader("Schematic.Biomes", NBTStreamer.ReadType.ELEM,biomeReader); // FAWE stores as a byte[] (4x smaller)
-
-        // Tiles
-        addReader("Schematic.TileEntities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, value) -> {
-            if (fc == null) {
-                setupClipboard(0);
-            }
-            int x = value.getInt("x");
-            int y = value.getInt("y");
-            int z = value.getInt("z");
-            fc.setTile(x, y, z, value);
-        });
-        // Entities
-        addReader("Schematic.Entities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, compound) -> {
-            if (fc == null) {
-                setupClipboard(0);
-            }
-            String id = compound.getString("id");
-            if (id.isEmpty()) {
-                return;
-            }
-            EntityType type = EntityTypes.parse(id);
-            if (type != null) {
-                compound.getValue().put("Id", new StringTag(type.getId()));
-                BaseEntity state = new BaseEntity(type, compound);
-
-                Location loc = compound.getEntityLocation(fc);
-                fc.createEntity(loc, state);
-            } else {
-                Fawe.debug("Invalid entity: " + id);
-            }
-        });
+//        NBTStreamReader<? extends Integer, ? extends Integer> idInit = new NBTStreamReader<Integer, Integer>() {
+//            @Override
+//            public void accept(Integer length, Integer type) {
+//                ids = new FaweOutputStream(new LZ4BlockOutputStream(idOut));
+//            }
+//        };
+//        NBTStreamReader<? extends Integer, ? extends Integer> dataInit = new NBTStreamReader<Integer, Integer>() {
+//            @Override
+//            public void accept(Integer length, Integer type) {
+//                datas = new FaweOutputStream(new LZ4BlockOutputStream(dataOut));
+//            }
+//        };
+//        NBTStreamReader<? extends Integer, ? extends Integer> addInit = new NBTStreamReader<Integer, Integer>() {
+//            @Override
+//            public void accept(Integer length, Integer type) {
+//                addOut = new FastByteArrayOutputStream();
+//                adds = new FaweOutputStream(new LZ4BlockOutputStream(addOut));
+//            }
+//        };
+//
+//        addReader("Schematic.Blocks", NBTStreamer.ReadType.INFO, idInit);
+//        addReader("Schematic.Data", NBTStreamer.ReadType.INFO, dataInit);
+//        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.INFO, addInit);
+//        addReader("Schematic.Blocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
+//            @Override
+//            public void run(int index, int value) {
+//                try {
+//                    ids.write(value);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
+//        addReader("Schematic.Data", NBTStreamer.ReadType.ELEM, new ByteReader() {
+//            @Override
+//            public void run(int index, int value) {
+//                try {
+//                    datas.write(value);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
+//        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
+//            @Override
+//            public void run(int index, int value) {
+//                if (value != 0) {
+//                    int first = value & 0x0F;
+//                    int second = (value & 0xF0) >> 4;
+//                    try {
+//                        if (first != 0) adds.write(first);
+//                        if (second != 0) adds.write(second);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            }
+//        });
+//        ByteReader biomeReader = new ByteReader() {
+//            @Override
+//            public void run(int index, int value) {
+//                BiomeType biome = BiomeTypes.getLegacy(value);
+//                if (biome != null) {
+//                    fc.setBiome(index, biome);
+//                }
+//            }
+//        };
+//        NBTStreamReader<Integer, Integer> initializer23 = new NBTStreamReader<Integer, Integer>() {
+//            @Override
+//            public void accept(Integer value1, Integer value2) {
+//                if (fc == null) setupClipboard(length * width * height);
+//            }
+//        };
+//        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.INFO,initializer23);
+//        addReader("Schematic.Biomes", NBTStreamer.ReadType.INFO,initializer23);
+//        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.ELEM,biomeReader); // AWE stores as an int[]
+//        addReader("Schematic.Biomes", NBTStreamer.ReadType.ELEM,biomeReader); // FAWE stores as a byte[] (4x smaller)
+//
+//        // Tiles
+//        addReader("Schematic.TileEntities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, value) -> {
+//            if (fc == null) {
+//                setupClipboard(0);
+//            }
+//            int x = value.getInt("x");
+//            int y = value.getInt("y");
+//            int z = value.getInt("z");
+//            fc.setTile(x, y, z, value);
+//        });
+//        // Entities
+//        addReader("Schematic.Entities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, compound) -> {
+//            if (fc == null) {
+//                setupClipboard(0);
+//            }
+//            String id = compound.getString("id");
+//            if (id.isEmpty()) {
+//                return;
+//            }
+//            EntityType type = EntityTypes.parse(id);
+//            if (type != null) {
+//                compound.getValue().put("Id", new StringTag(type.getId()));
+//                BaseEntity state = new BaseEntity(type, compound);
+//
+//                Location loc = compound.getEntityLocation(fc);
+//                fc.createEntity(loc, state);
+//            } else {
+//                Fawe.debug("Invalid entity: " + id);
+//            }
+//        });
     }
-
-    @Override
-    public void readFully() throws IOException {
-        super.readFully();
-        if (ids != null) ids.close();
-        if (datas != null) datas.close();
-        if (adds != null) adds.close();
-        FaweInputStream idIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays())));
-        FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
-
-        LegacyMapper remap = LegacyMapper.getInstance();
-        BlockVector3 dimensions = fc.getDimensions();
-        int length = dimensions.getBlockX() * dimensions.getBlockY() * dimensions.getBlockZ();
-        if (adds == null) {
-            for (int i = 0; i < length; i++) {
-                fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
-            }
-        } else {
-            FaweInputStream addIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
-            for (int i = 0; i < length; i++) {
-                fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((addIn.read() & 0xFF) << 8) + ((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
-            }
-            addIn.close();
-        }
-        idIn.close();
-        dataIn.close();
-    }
+//
+//    @Override
+//    public void readFully() throws IOException {
+//        super.readFully();
+//        if (ids != null) ids.close();
+//        if (datas != null) datas.close();
+//        if (adds != null) adds.close();
+//        FaweInputStream idIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays())));
+//        FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
+//
+//        LegacyMapper remap = LegacyMapper.getInstance();
+//        BlockVector3 dimensions = fc.getDimensions();
+//        int length = dimensions.getBlockX() * dimensions.getBlockY() * dimensions.getBlockZ();
+//        if (adds == null) {
+//            for (int i = 0; i < length; i++) {
+//                fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
+//            }
+//        } else {
+//            FaweInputStream addIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
+//            for (int i = 0; i < length; i++) {
+//                fc.setBlock(i, remap.getBlockFromLegacyCombinedId(((addIn.read() & 0xFF) << 8) + ((idIn.read() & 0xFF) << 4) + (dataIn.read() & 0xF)));
+//            }
+//            addIn.close();
+//        }
+//        idIn.close();
+//        dataIn.close();
+//    }
 
     private void fixStates() {
         for (BlockVector3 pos : fc) {
@@ -330,23 +332,23 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     public void addDimensionReaders() {
-        addReader("Schematic.Height",
-            (BiConsumer<Integer, Short>) (index, value) -> height = (value));
-        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = (value));
-        addReader("Schematic.Length",
-            (BiConsumer<Integer, Short>) (index, value) -> length = (value));
-        addReader("Schematic.WEOriginX",
-            (BiConsumer<Integer, Integer>) (index, value) -> originX = (value));
-        addReader("Schematic.WEOriginY",
-            (BiConsumer<Integer, Integer>) (index, value) -> originY = (value));
-        addReader("Schematic.WEOriginZ",
-            (BiConsumer<Integer, Integer>) (index, value) -> originZ = (value));
-        addReader("Schematic.WEOffsetX",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = (value));
-        addReader("Schematic.WEOffsetY",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = (value));
-        addReader("Schematic.WEOffsetZ",
-            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = (value));
+//        addReader("Schematic.Height",
+//            (BiConsumer<Integer, Short>) (index, value) -> height = (value));
+//        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = (value));
+//        addReader("Schematic.Length",
+//            (BiConsumer<Integer, Short>) (index, value) -> length = (value));
+//        addReader("Schematic.WEOriginX",
+//            (BiConsumer<Integer, Integer>) (index, value) -> originX = (value));
+//        addReader("Schematic.WEOriginY",
+//            (BiConsumer<Integer, Integer>) (index, value) -> originY = (value));
+//        addReader("Schematic.WEOriginZ",
+//            (BiConsumer<Integer, Integer>) (index, value) -> originZ = (value));
+//        addReader("Schematic.WEOffsetX",
+//            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = (value));
+//        addReader("Schematic.WEOffsetY",
+//            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = (value));
+//        addReader("Schematic.WEOffsetZ",
+//            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = (value));
     }
 
     private int height;
@@ -401,7 +403,7 @@ public class SchematicStreamer extends NBTStreamer {
             setupClipboard(0);
             addDimensionReaders();
             addBlockReaders();
-            readFully();
+//            readFully();
             BlockVector3 min = BlockVector3.at(originX, originY, originZ);
             BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
             BlockVector3 origin = min.subtract(offset);
@@ -418,5 +420,10 @@ public class SchematicStreamer extends NBTStreamer {
             }
             throw e;
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.input.close();
     }
 }

@@ -2,8 +2,6 @@ package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
@@ -11,10 +9,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -26,14 +21,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -74,112 +67,6 @@ public class WritableMCAChunk implements IChunkSet {
         public int layer = -1;
         public long[] blocks;
         public BlockState[] palette;
-    }
-
-    public WritableMCAChunk(NBTInputStream nis, int chunkX, int chunkZ, boolean readPos) throws IOException {
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
-        NBTStreamer streamer = new NBTStreamer(nis);
-        streamer.addReader(".Level.InhabitedTime", new RunnableVal2<Integer, Long>() {
-            @Override
-            public void run(Integer index, Long value) {
-                inhabitedTime = value;
-            }
-        });
-        streamer.addReader(".Level.LastUpdate", new RunnableVal2<Integer, Long>() {
-            @Override
-            public void run(Integer index, Long value) {
-                lastUpdate = value;
-            }
-        });
-
-
-        Section section = new Section();
-        streamer.addReader(".Level.Sections.Y", new RunnableVal2<Integer, Byte>() {
-            @Override
-            public void run(Integer index, Byte y) {
-                section.layer = y;
-                readLayer(section);
-            }
-        });
-        streamer.addReader(".Level.Sections.Palette", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
-            @Override
-            public void run(Integer index, CompoundTag compound) {
-                String name = compound.getString("Name");
-                BlockType type = BlockTypes.get(name);
-                BlockState state = type.getDefaultState();
-                CompoundTag properties = (CompoundTag) compound.getValue().get("Properties");
-                if (properties != null) {
-                    for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
-                        String key = entry.getKey();
-                        String value = ((StringTag) entry.getValue()).getValue();
-                        Property property = type.getProperty(key);
-                        state = state.with(property, property.getValueFor(value));
-                    }
-                }
-                section.palette[index] = state;
-                readLayer(section);
-            }
-        });
-        streamer.addReader(".Level.Sections", NBTStreamer.ReadType.INFO,new RunnableVal2<Integer, Integer>() {
-            @Override
-            public void run(Integer value1, Integer value2) {
-                section.layer = -1;
-            }
-        });
-        streamer.addReader(".Level.Sections.BlockStates", new RunnableVal2<Integer, long[]>() {
-            @Override
-            public void run(Integer value1, long[] values) {
-                section.blocks = values;
-                readLayer(section);
-            }
-        });
-        streamer.addReader(".Level.TileEntities", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
-            @Override
-            public void run(Integer index, CompoundTag tile) {
-                int x = tile.getInt("x") & 15;
-                int y = tile.getInt("y");
-                int z = tile.getInt("z") & 15;
-                tiles.put(x, y, z, tile);
-            }
-        });
-        streamer.addReader(".Level.Entities", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
-            @Override
-            public void run(Integer index, CompoundTag entityTag) {
-                long least = entityTag.getLong("UUIDLeast");
-                long most = entityTag.getLong("UUIDMost");
-                entities.put(new UUID(most, least), entityTag);
-            }
-        });
-        streamer.addReader(".Level.Biomes", new RunnableVal2<Integer, byte[]>() {
-            @Override
-            public void run(Integer index, byte[] value) {
-                for (int i = 0; i < 256; i++) {
-                    biomes[i] = value[i];
-                }
-            }
-        });
-//        streamer.addReader(".Level.HeightMap", new RunnableVal2<Integer, int[]>() {
-//            @Override
-//            public void run(Integer index, int[] value) {
-//                heightMap = value;
-//            }
-//        });
-        if (readPos) {
-            streamer.addReader(".Level.xPos", new RunnableVal2<Integer, Integer>() {
-                @Override
-                public void run(Integer index, Integer value) {
-                    WritableMCAChunk.this.chunkX = value;
-                }
-            });
-            streamer.addReader(".Level.zPos", new RunnableVal2<Integer, Integer>() {
-                @Override
-                public void run(Integer index, Integer value) {
-                    WritableMCAChunk.this.chunkZ = value;
-                }
-            });
-        }
-        streamer.readFully();
     }
 
     public int getX() {
