@@ -23,7 +23,6 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
     private int maxY = Integer.MIN_VALUE;
     private int maxZ = Integer.MIN_VALUE;
 
-
     public ResizableClipboardBuilder(World world) {
         super(world);
     }

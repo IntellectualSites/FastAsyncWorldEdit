@@ -113,7 +113,7 @@ public class MCAChunk implements IChunkSet {
             section.blocksLength = -1;
         });
         layer.add("Y").withInt((i, y) -> section.layer = y);
-        layer.add("Palette").withValue((ValueReader<Map<String, Object>>) (index, map) -> {
+        layer.add("Palette").withElem((ValueReader<Map<String, Object>>) (index, map) -> {
             String name = (String) map.get("Name");
             BlockType type = BlockTypes.get(name);
             BlockState state = type.getDefaultState();
@@ -137,14 +137,14 @@ public class MCAChunk implements IChunkSet {
             section.blocksLength = length;
         });
         blockStates.withLong((index, value) -> section.blocks[index] = value);
-        level.add("TileEntities").withValue((ValueReader<Map<String, Object>>) (index, value) -> {
+        level.add("TileEntities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
             CompoundTag tile = FaweCache.IMP.asTag(value);
             int x = tile.getInt("x") & 15;
             int y = tile.getInt("y");
             int z = tile.getInt("z") & 15;
             tiles.put(x, y, z, tile);
         });
-        level.add("Entities").withValue((ValueReader<Map<String, Object>>) (index, value) -> {
+        level.add("Entities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
             CompoundTag entity = FaweCache.IMP.asTag(value);
             entities.put(entity.getUUID(), entity);
         });

@@ -15,7 +15,7 @@ public class StreamDelegate {
     private StreamDelegate[] values;
 
     private LazyReader lazyReader;
-    private ElemReader elemReader;
+    private ValueReader elemReader;
     private InfoReader infoReader;
     private ValueReader valueReader;
 
@@ -176,7 +176,7 @@ public class StreamDelegate {
         return this;
     }
 
-    public StreamDelegate withElem(ElemReader elemReader) {
+    public StreamDelegate withElem(ValueReader elemReader) {
         this.elemReader = elemReader;
         return this;
     }
@@ -204,7 +204,7 @@ public class StreamDelegate {
         return valueReader;
     }
 
-    public ElemReader getElemReader() {
+    public ValueReader getElemReader() {
         return elemReader;
     }
 
