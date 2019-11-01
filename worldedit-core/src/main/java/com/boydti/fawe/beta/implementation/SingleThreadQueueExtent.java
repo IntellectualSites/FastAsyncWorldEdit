@@ -289,7 +289,7 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
             for (int i = 0; i < overflow; i++) {
                 Future first = submissions.poll();
                 try {
-                    while ((first = (Future) first.get()) != null);
+                    while (first != null) first = (Future) first.get();
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
