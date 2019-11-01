@@ -155,7 +155,6 @@ public class RegionCommands {
         editSession.addProcessor(new ChunkSendProcessor(world, () -> Stream.of(player)));
         editSession.addProcessor(NullProcessor.INSTANCE);
         editSession.setBlocks(region, pattern);
-        System.out.println("Done");
     }
 
     @Command(

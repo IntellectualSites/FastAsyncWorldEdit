@@ -22,17 +22,12 @@ public class TestChunkPacketSend {
                     @Override
                     public void onPacketSending(PacketEvent event) {
                         if (event.getPacketType() != PacketType.Play.Server.MAP_CHUNK) {
-                            System.out.println("Wrong packet");
                             return;
                         }
                         PacketContainer packet = event.getPacket();
                         StructureModifier<Byte> bytes = packet.getBytes();
                         StructureModifier<WrappedBlockData> blockData = packet.getBlockData();
                         List<WrappedBlockData> values = blockData.getValues();
-                        System.out.println("Packet " + values.size() + " | " + blockData.size());
-                        System.out.println(bytes.size());
-                        System.out.println(packet.getByteArrays().size());
-                        System.out.println(packet.getBlocks().size());
                     }
                 });
     }

@@ -247,7 +247,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public String toString() {
-        return super.toString() + ":" + extent.toString();
+        return super.toString() + ":" + (extent == this ? "" : extent.toString());
     }
 
     @Override

@@ -113,9 +113,6 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (ClassNotFoundException e) {
                 new ChunkListener_9();
             }
-
-            new TestChunkPacketSend(plugin);
-
         });
     }
 

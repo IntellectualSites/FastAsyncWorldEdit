@@ -47,7 +47,6 @@ public class VisualExtent extends AbstractDelegateExtent {
     @Override
     public Operation commit() {
         IQueueExtent queue = (IQueueExtent) getExtent();
-        System.out.println("Send block updates");
         return null;
     }
 
@@ -59,7 +58,6 @@ public class VisualExtent extends AbstractDelegateExtent {
 
     public void clear() {
         IQueueExtent queue = (IQueueExtent) getExtent();
-        System.out.println("Clear");
         queue.cancel();
     }
 }

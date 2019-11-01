@@ -15,8 +15,6 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        System.out.println("Process set");
-        System.out.println(getProcessor());
         return getProcessor().processSet(chunk, get, set);
     }
 
@@ -27,6 +25,7 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
 
     @Override
     public String toString() {
-        return super.toString() + "{" + getProcessor() + "}";
+        IBatchProcessor tmp = getProcessor();
+        return super.toString() + "{" + (tmp == this ? "" : getProcessor()) + "}";
     }
 }

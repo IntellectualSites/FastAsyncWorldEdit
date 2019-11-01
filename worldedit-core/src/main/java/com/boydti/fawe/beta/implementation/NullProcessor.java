@@ -11,7 +11,6 @@ public enum NullProcessor implements IBatchProcessor {
     INSTANCE;
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        System.out.println("Null process " + chunk.getX() + "," + chunk.getZ());
         return null;
     }
 

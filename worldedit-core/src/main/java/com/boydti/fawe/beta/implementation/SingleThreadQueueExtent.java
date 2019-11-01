@@ -89,8 +89,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
      */
     protected synchronized void reset() {
         if (!this.initialized) return;
-        System.out.println("Reset");
-        new Exception().printStackTrace();
         checkThread();
         if (!this.chunks.isEmpty()) {
             for (IChunk chunk : this.chunks.values()) {
@@ -130,7 +128,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
     @Override
     public Extent addProcessor(IBatchProcessor processor) {
         join(processor);
-        System.out.println("Add processor " + this.getClass());
         return this;
     }
 
@@ -339,7 +336,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
             chunks.clear();
         }
         pollSubmissions(0, true);
-        System.out.println(submissions.size());
     }
 
     @Override

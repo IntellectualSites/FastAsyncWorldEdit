@@ -39,7 +39,6 @@ public interface IBlocks extends Trimable {
         int mask = 0;
         for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
             if (hasSection(layer)) {
-                System.out.println("Has layer 0 " + layer);
                 mask += (1 << layer);
             }
         }
