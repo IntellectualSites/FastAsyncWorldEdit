@@ -307,58 +307,63 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        try {
-            int index = HEADER_SIZE + (getIndex(x, y, z) << 1);
-            int combinedId = byteBuffer.getChar(index);
-            BlockState state = BlockState.getFromOrdinal(combinedId);
-            if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-                CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
-                return state.toBaseBlock(nbt);
+        return toBaseBlock(getBlock(x, y, z), x, y, z);
+    }
+
+    private BaseBlock toBaseBlock(BlockState state, int i) {
+        if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
+            CompoundTag nbt;
+            if (nbtMap.size() < 4) {
+                nbt = null;
+                for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
+                    IntegerTrio key = entry.getKey();
+                    int index = getIndex(key.x, key.y, key.z);
+                    if (index == i) {
+                        nbt = entry.getValue();
+                        break;
+                    }
+                }
+            } else {
+                int y = i / getArea();
+                int newI = i - y * getArea();
+                int z = newI / getWidth();
+                int x = newI - z * getWidth();
+                nbt = nbtMap.get(new IntegerTrio(x, y, z));
             }
-            return state.toBaseBlock();
-        } catch (IndexOutOfBoundsException ignore) {
-        } catch (Exception e) {
-            e.printStackTrace();
+            return state.toBaseBlock(nbt);
         }
-        return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        return state.toBaseBlock();
+    }
+
+    private BaseBlock toBaseBlock(BlockState state, int x, int y, int z) {
+        if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
+            CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
+            return state.toBaseBlock(nbt);
+        }
+        return state.toBaseBlock();
     }
 
     @Override
     public BaseBlock getFullBlock(int i) {
+        return toBaseBlock(getBlock(i), i);
+    }
+
+    @Override
+    public BlockState getBlock(int index) {
         try {
-            int diskIndex = HEADER_SIZE + (i << 1);
+            int diskIndex = HEADER_SIZE + (index << 1);
             char ordinal = byteBuffer.getChar(diskIndex);
-            BlockState state = BlockState.getFromOrdinal(ordinal);
-            if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-                CompoundTag nbt;
-                if (nbtMap.size() < 4) {
-                    nbt = null;
-                    for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
-                        IntegerTrio key = entry.getKey();
-                        int index = getIndex(key.x, key.y, key.z);
-                        if (index == i) {
-                            nbt = entry.getValue();
-                            break;
-                        }
-                    }
-                } else {
-                    // x + z * getWidth() + y * area;
-                    int y = i / getArea();
-                    int newI = i - y * getArea();
-                    int z = newI / getWidth();
-                    int x = newI - z * getWidth();
-                    nbt = nbtMap.get(new IntegerTrio(x, y, z));
-                }
-                if (nbt != null) {
-                    return state.toBaseBlock(nbt);
-                }
-            }
-            return state.toBaseBlock();
+            return BlockState.getFromOrdinal(ordinal);
         } catch (IndexOutOfBoundsException ignore) {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        return BlockTypes.AIR.getDefaultState();
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return getBlock(getIndex(x, y, z));
     }
 
     @Override

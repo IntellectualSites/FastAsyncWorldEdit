@@ -16,6 +16,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -227,16 +228,25 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BaseBlock getFullBlock(int index) {
-        int combinedId = getOrdinal(index);
-        BlockType type = BlockTypes.getFromStateId(combinedId);
-        BaseBlock base = type.withStateId(combinedId).toBaseBlock();
-        if (type.getMaterial().hasContainer()) {
+        BlockState block = getBlock(index);
+        if (block.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return base.toBaseBlock(nbt);
+                return block.toBaseBlock(nbt);
             }
         }
-        return base;
+        return block.toBaseBlock();
+    }
+
+    @Override
+    public BlockState getBlock(int index) {
+        int ordinal = getOrdinal(index);
+        return BlockState.getFromOrdinal(ordinal);
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return getBlock(getIndex(x, y, z));
     }
 
     public int size() {

@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Closeable;
@@ -28,6 +29,8 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int i, B block);
 
     public abstract BaseBlock getFullBlock(int i);
+
+    public abstract BlockState getBlock(int i);
 
     public abstract void setBiome(int index, BiomeType biome);
 

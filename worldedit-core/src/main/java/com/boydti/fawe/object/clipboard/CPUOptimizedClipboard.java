@@ -121,15 +121,25 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BaseBlock getFullBlock(int index) {
-        char ordinal = states[index];
-        BlockState state = BlockState.getFromOrdinal(ordinal);
-        if (state.getMaterial().hasContainer()) {
+        BlockState block = getBlock(index);
+        if (block.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return state.toBaseBlock(nbt);
+                return block.toBaseBlock(nbt);
             }
         }
-        return state.toBaseBlock();
+        return block.toBaseBlock();
+    }
+
+    @Override
+    public BlockState getBlock(int index) {
+        char ordinal = states[index];
+        return BlockState.getFromOrdinal(ordinal);
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return getBlock(getIndex(x, y, z));
     }
 
     @Override
