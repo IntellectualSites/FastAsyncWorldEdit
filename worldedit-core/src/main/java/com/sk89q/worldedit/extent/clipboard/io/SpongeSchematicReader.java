@@ -60,6 +60,7 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -228,6 +229,17 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         });
         return root;
     }
+
+    private BlockState getBlockState(int id) {
+        return BlockTypes.states[palette[id]];
+    }
+
+    private BiomeType getBiomeType(FaweInputStream fis) throws IOException {
+        char biomeId = biomePalette[fis.readVarInt()];
+        BiomeType biome = BiomeTypes.get(biomeId);
+        return biome;
+    }
+
     @Override
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
@@ -236,32 +248,58 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         Clipboard clipboard = createOutput.apply(dimensions);
 
         BlockVector3 origin = min;
-        CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
         }
-        region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
         if (blocksOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(blocksOut.toByteArrays())))) {
-                int volume = width * height * length;
-                if (palette.length < 128) {
-                    for (int index = 0; index < volume; index++) {
-                        BlockState state = BlockTypes.states[palette[fis.read()]];
-                        clipboard.setBlock(index, state);
+                if (clipboard instanceof LinearClipboard) {
+                    LinearClipboard linear = (LinearClipboard) clipboard;
+                    int volume = width * height * length;
+                    if (palette.length < 128) {
+                        for (int index = 0; index < volume; index++) {
+                            linear.setBlock(index, getBlockState(fis.read()));
+                        }
+                    } else {
+                        for (int index = 0; index < volume; index++) {
+                            linear.setBlock(index, getBlockState(fis.readVarInt()));
+                        }
                     }
                 } else {
-                    for (int index = 0; index < volume; index++) {
-                        BlockState state = BlockTypes.states[palette[fis.readVarInt()]];
-                        clipboard.setBlock(index, state);
+                    if (palette.length < 128) {
+                        for (int y = 0; y < height; y++) {
+                            for (int z = 0; z < length; z++) {
+                                for (int x = 0; x < width; x++) {
+                                    clipboard.setBlock(x, y, z, getBlockState(fis.read()));
+                                }
+                            }
+                        }
+                    } else {
+                        for (int y = 0; y < height; y++) {
+                            for (int z = 0; z < length; z++) {
+                                for (int x = 0; x < width; x++) {
+                                    clipboard.setBlock(x, y, z, getBlockState(fis.readVarInt()));
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         if (biomesOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
-                int volume = width * length;
-                for (int index = 0; index < volume; index++) {
-                    clipboard.setBiome(index, BiomeTypes.get(fis.read()));
+                if (clipboard instanceof LinearClipboard) {
+                    LinearClipboard linear = (LinearClipboard) clipboard;
+                    int volume = width * length;
+                    for (int index = 0; index < volume; index++) {
+                        linear.setBiome(index, getBiomeType(fis));
+                    }
+                } else {
+                    for (int z = 0; z < length; z++) {
+                        for (int x = 0; x < width; x++) {
+                            clipboard.setBiome(x, 0, z, getBiomeType(fis));
+                        }
+                    }
                 }
             }
         }
