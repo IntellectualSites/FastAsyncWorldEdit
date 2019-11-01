@@ -26,6 +26,8 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
+
+import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
 
@@ -112,8 +114,8 @@ public class ClipboardHolder {
     }
 
     public void close() {
-        if (clipboard instanceof BlockArrayClipboard) {
-            ((BlockArrayClipboard) clipboard).close();
+        if (clipboard != null) {
+            clipboard.close();
         }
         clipboard = null;
     }

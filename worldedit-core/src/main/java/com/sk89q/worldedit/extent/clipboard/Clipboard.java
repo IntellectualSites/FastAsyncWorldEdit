@@ -34,6 +34,7 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 
 import javax.annotation.Nullable;
+import java.io.Closeable;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
@@ -41,7 +42,7 @@ import java.util.UUID;
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
-public interface Clipboard extends Extent, Iterable<BlockVector3> {
+public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     static Clipboard create(BlockVector3 size, UUID uuid) {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             return new DiskOptimizedClipboard(size, uuid);
@@ -143,5 +144,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3> {
         } else {
             return apply((Iterable<BlockVector3>) region, filter);
         }
+    }
+
+    @Override
+    default void close() {
+
     }
 }

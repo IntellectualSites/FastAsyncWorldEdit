@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.NBTStreamer;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
@@ -10,7 +10,6 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
@@ -20,6 +19,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,10 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import net.jpountz.util.SafeUtils;
-
-import javax.annotation.Nullable;
 
 public class MemoryOptimizedClipboard extends LinearClipboard {
 
@@ -101,12 +98,12 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public void streamBiomes(NBTStreamer.ByteReader task) {
+    public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
         int index = 0;
         for (int z = 0; z < getLength(); z++) {
             for (int x = 0; x < getWidth(); x++, index++) {
-                task.run(index, biomes[index] & 0xFF);
+                task.applyInt(index, biomes[index] & 0xFF);
             }
         }
     }

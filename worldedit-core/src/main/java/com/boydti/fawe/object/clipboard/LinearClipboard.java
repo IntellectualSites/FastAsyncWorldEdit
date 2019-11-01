@@ -1,29 +1,20 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.beta.AbstractFilterBlock;
-import com.boydti.fawe.beta.SingleFilterBlock;
-import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.collection.DoubleArrayList;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Closeable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Best used when clipboard selections are small, or using legacy formats
@@ -48,7 +39,7 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
      * @param task
      * @param air
      */
-    public abstract void streamBiomes(NBTStreamer.ByteReader task);
+    public abstract void streamBiomes(IntValueReader task);
 
     public abstract Collection<CompoundTag> getTileEntities();
 

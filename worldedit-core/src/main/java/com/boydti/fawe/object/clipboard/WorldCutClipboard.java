@@ -35,7 +35,7 @@ public class WorldCutClipboard extends WorldCopyClipboard {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (extent instanceof EditSession) {
             ((EditSession) extent).flushQueue();
         } else {

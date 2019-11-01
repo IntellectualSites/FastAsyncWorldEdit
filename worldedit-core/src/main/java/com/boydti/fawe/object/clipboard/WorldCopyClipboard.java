@@ -72,7 +72,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 }

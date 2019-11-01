@@ -78,13 +78,6 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
     }
 
     @Override
-    public void close() throws IOException {
-        if (getParent() instanceof Closeable) {
-            ((Closeable) getParent()).close();
-        }
-    }
-
-    @Override
     public Region getRegion() {
         return region;
     }

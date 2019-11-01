@@ -13,6 +13,8 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -31,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -55,7 +58,27 @@ public class WritableMCAChunk implements IChunkSet {
 
     public WritableMCAChunk() {}
 
+    private boolean readLayer(Section section) {
+        if (section.palette == null || section.palette[section.palette.length - 1] == null || section.layer == -1 || section.blocks == null) {
+            // not initialized
+            return false;
+        }
+        // TODO load
+        section.layer = -1;
+        section.blocks = null;
+        section.palette = null;
+        return true;
+    }
+
+    private static class Section {
+        public int layer = -1;
+        public long[] blocks;
+        public BlockState[] palette;
+    }
+
     public WritableMCAChunk(NBTInputStream nis, int chunkX, int chunkZ, boolean readPos) throws IOException {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
         NBTStreamer streamer = new NBTStreamer(nis);
         streamer.addReader(".Level.InhabitedTime", new RunnableVal2<Integer, Long>() {
             @Override
@@ -69,21 +92,49 @@ public class WritableMCAChunk implements IChunkSet {
                 lastUpdate = value;
             }
         });
-        streamer.addReader(".Level.Sections.#", new RunnableVal2<Integer, CompoundTag>() {
+
+
+        Section section = new Section();
+        streamer.addReader(".Level.Sections.Y", new RunnableVal2<Integer, Byte>() {
             @Override
-            public void run(Integer index, CompoundTag tag) {
-                int layer = tag.getByte("Y");
-                // "Palette"
+            public void run(Integer index, Byte y) {
+                section.layer = y;
+                readLayer(section);
             }
         });
-        streamer.addReader(".Level.Sections.Palette.#", new RunnableVal2<Integer, CompoundTag>() {
+        streamer.addReader(".Level.Sections.Palette", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
             @Override
-            public void run(Integer index, CompoundTag entry) {
-                String name = entry.getString("Name");
-                entry.
+            public void run(Integer index, CompoundTag compound) {
+                String name = compound.getString("Name");
+                BlockType type = BlockTypes.get(name);
+                BlockState state = type.getDefaultState();
+                CompoundTag properties = (CompoundTag) compound.getValue().get("Properties");
+                if (properties != null) {
+                    for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
+                        String key = entry.getKey();
+                        String value = ((StringTag) entry.getValue()).getValue();
+                        Property property = type.getProperty(key);
+                        state = state.with(property, property.getValueFor(value));
+                    }
+                }
+                section.palette[index] = state;
+                readLayer(section);
             }
         });
-        streamer.addReader(".Level.TileEntities.#", new RunnableVal2<Integer, CompoundTag>() {
+        streamer.addReader(".Level.Sections", NBTStreamer.ReadType.INFO,new RunnableVal2<Integer, Integer>() {
+            @Override
+            public void run(Integer value1, Integer value2) {
+                section.layer = -1;
+            }
+        });
+        streamer.addReader(".Level.Sections.BlockStates", new RunnableVal2<Integer, long[]>() {
+            @Override
+            public void run(Integer value1, long[] values) {
+                section.blocks = values;
+                readLayer(section);
+            }
+        });
+        streamer.addReader(".Level.TileEntities", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
             @Override
             public void run(Integer index, CompoundTag tile) {
                 int x = tile.getInt("x") & 15;
@@ -92,7 +143,7 @@ public class WritableMCAChunk implements IChunkSet {
                 tiles.put(x, y, z, tile);
             }
         });
-        streamer.addReader(".Level.Entities.#", new RunnableVal2<Integer, CompoundTag>() {
+        streamer.addReader(".Level.Entities", NBTStreamer.ReadType.ELEM,new RunnableVal2<Integer, CompoundTag>() {
             @Override
             public void run(Integer index, CompoundTag entityTag) {
                 long least = entityTag.getLong("UUIDLeast");

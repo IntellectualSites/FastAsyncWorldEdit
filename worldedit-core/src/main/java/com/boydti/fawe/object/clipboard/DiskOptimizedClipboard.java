@@ -2,7 +2,7 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.NBTStreamer;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
@@ -197,14 +197,14 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
-    public void streamBiomes(NBTStreamer.ByteReader task) {
+    public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
         int index = 0;
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
         for (int z = 0; z < getLength(); z++) {
             for (int x = 0; x < getWidth(); x++, index++, mbbIndex++) {
                 int biome = byteBuffer.get(mbbIndex) & 0xFF;
-                task.run(index, biome);
+                task.applyInt(index, biome);
             }
         }
     }

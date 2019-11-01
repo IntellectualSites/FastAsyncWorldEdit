@@ -81,10 +81,10 @@ public class SchematicStreamer extends NBTStreamer {
             }
         };
 
-        addReader("Schematic.Blocks.?", idInit);
-        addReader("Schematic.Data.?", dataInit);
-        addReader("Schematic.AddBlocks.?", addInit);
-        addReader("Schematic.Blocks.#", new ByteReader() {
+        addReader("Schematic.Blocks", NBTStreamer.ReadType.INFO, idInit);
+        addReader("Schematic.Data", NBTStreamer.ReadType.INFO, dataInit);
+        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.INFO, addInit);
+        addReader("Schematic.Blocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
             @Override
             public void run(int index, int value) {
                 try {
@@ -94,7 +94,7 @@ public class SchematicStreamer extends NBTStreamer {
                 }
             }
         });
-        addReader("Schematic.Data.#", new ByteReader() {
+        addReader("Schematic.Data", NBTStreamer.ReadType.ELEM, new ByteReader() {
             @Override
             public void run(int index, int value) {
                 try {
@@ -104,7 +104,7 @@ public class SchematicStreamer extends NBTStreamer {
                 }
             }
         });
-        addReader("Schematic.AddBlocks.#", new ByteReader() {
+        addReader("Schematic.AddBlocks", NBTStreamer.ReadType.ELEM, new ByteReader() {
             @Override
             public void run(int index, int value) {
                 if (value != 0) {
@@ -134,13 +134,13 @@ public class SchematicStreamer extends NBTStreamer {
                 if (fc == null) setupClipboard(length * width * height);
             }
         };
-        addReader("Schematic.AWEBiomes.?", initializer23);
-        addReader("Schematic.Biomes.?", initializer23);
-        addReader("Schematic.AWEBiomes.#", biomeReader); // AWE stores as an int[]
-        addReader("Schematic.Biomes.#", biomeReader); // FAWE stores as a byte[] (4x smaller)
+        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.INFO,initializer23);
+        addReader("Schematic.Biomes", NBTStreamer.ReadType.INFO,initializer23);
+        addReader("Schematic.AWEBiomes", NBTStreamer.ReadType.ELEM,biomeReader); // AWE stores as an int[]
+        addReader("Schematic.Biomes", NBTStreamer.ReadType.ELEM,biomeReader); // FAWE stores as a byte[] (4x smaller)
 
         // Tiles
-        addReader("Schematic.TileEntities.#", (BiConsumer<Integer, CompoundTag>) (index, value) -> {
+        addReader("Schematic.TileEntities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, value) -> {
             if (fc == null) {
                 setupClipboard(0);
             }
@@ -150,7 +150,7 @@ public class SchematicStreamer extends NBTStreamer {
             fc.setTile(x, y, z, value);
         });
         // Entities
-        addReader("Schematic.Entities.#", (BiConsumer<Integer, CompoundTag>) (index, compound) -> {
+        addReader("Schematic.Entities", NBTStreamer.ReadType.ELEM,(BiConsumer<Integer, CompoundTag>) (index, compound) -> {
             if (fc == null) {
                 setupClipboard(0);
             }
