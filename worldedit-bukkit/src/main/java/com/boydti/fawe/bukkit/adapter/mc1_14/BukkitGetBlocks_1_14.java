@@ -21,6 +21,7 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -311,7 +312,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
-                                updateGet(this, nmsChunk, sections, newSection, setArr, layer);
+                                updateGet(this, nmsChunk, sections, newSection, getArr, layer);
                             }
                         }
                     }
