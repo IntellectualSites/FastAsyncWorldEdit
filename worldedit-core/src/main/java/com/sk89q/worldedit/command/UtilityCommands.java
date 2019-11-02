@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -68,13 +70,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-
-import javax.imageio.ImageIO;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -93,8 +88,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import javax.imageio.ImageIO;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
 
 /**
  * Utility commands.
@@ -176,9 +175,9 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.cancel")
     @SkipQueue
-    public void cancel(Player fp) {
-        int cancelled = fp.cancel(false);
-        BBC.WORLDEDIT_CANCEL_COUNT.send(fp, cancelled);
+    public void cancel(Player player) {
+        int cancelled = player.cancel(false);
+        BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
     }
 
     @Command(

@@ -80,10 +80,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -91,7 +88,6 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -464,9 +460,9 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
-        Player fp = editSession.getPlayer();
-        if (fp != null) {
-            loadSessionHistoryFromDisk(fp.getUniqueId(), editSession.getWorld());
+        Player player = editSession.getPlayer();
+        if (player != null) {
+            loadSessionHistoryFromDisk(player.getUniqueId(), editSession.getWorld());
         }
         // Destroy any sessions after this undo point
         if (append) {

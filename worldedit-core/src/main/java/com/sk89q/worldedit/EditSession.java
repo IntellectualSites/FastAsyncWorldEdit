@@ -992,9 +992,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 BBC.WORLDEDIT_SOME_FAILS.send(player, used.MAX_FAILS);
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null){
-                BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION.send(player);
+                player.printError(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION.s());
             } else {
-                BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_LEVEL.send(player);
+                player.printError(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_LEVEL.s());
             }
         }
         // Reset limit

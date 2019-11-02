@@ -186,7 +186,7 @@ public class HistoryCommands {
 
         Region[] allowedRegions = player.getCurrentRegions(FaweMaskManager.MaskType.OWNER);
         if (allowedRegions == null) {
-            BBC.NO_REGION.send(player);
+            player.printError(BBC.NO_REGION.s());
             return;
         }
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions

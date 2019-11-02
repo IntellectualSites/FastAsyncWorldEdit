@@ -30,7 +30,7 @@ public abstract class FaweCommand<T> {
                 TaskManager.IMP.async(() -> execute(player, args));
             } else {
                 if (!player.runAction(() -> execute(player, args), true, true)) {
-                    BBC.WORLDEDIT_COMMAND_LIMIT.send(player);
+                    player.printError(BBC.WORLDEDIT_COMMAND_LIMIT.s());
                     return true;
                 }
             }

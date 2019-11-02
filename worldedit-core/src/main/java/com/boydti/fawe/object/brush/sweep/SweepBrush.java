@@ -48,14 +48,18 @@ public class SweepBrush implements Brush, ResettableTool {
         boolean newPos = !position.equals(this.position);
         this.position = position;
         Player player = editSession.getPlayer();
+        if (player == null) {
+            //TODO Insert Error Message here or modify EditSession to not require a player.
+            return;
+        }
         if (newPos) {
-            BBC.BRUSH_SPLINE_PRIMARY_2.send(player);
+            player.print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
             positions.add(position);
             return;
         }
 
         if (positions.size() < 2) {
-            BBC.BRUSH_SPLINE_SECONDARY_ERROR.send(player);
+            player.printError(BBC.BRUSH_SPLINE_SECONDARY_ERROR.s());
             return;
         }
 
@@ -118,7 +122,7 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
         }
-        BBC.BRUSH_SPLINE_SECONDARY.send(player);
+        player.print(BBC.BRUSH_SPLINE_SECONDARY.s());
         reset();
     }
 

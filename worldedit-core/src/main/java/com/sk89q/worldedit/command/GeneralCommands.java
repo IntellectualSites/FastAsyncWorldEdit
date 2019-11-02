@@ -37,7 +37,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -318,7 +317,7 @@ public class GeneralCommands {
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
             session.setTextureUtil(null);
-            BBC.TEXTURE_DISABLED.send(player);
+            player.print(BBC.TEXTURE_DISABLED.s());
         } else {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
@@ -375,9 +374,9 @@ public class GeneralCommands {
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
-            BBC.SOURCE_MASK_DISABLED.send(player);
+            player.print(BBC.SOURCE_MASK_DISABLED.s());
         } else {
-            BBC.SOURCE_MASK.send(player);
+            player.print(BBC.SOURCE_MASK.s());
         }
     }
 
@@ -391,9 +390,9 @@ public class GeneralCommands {
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
-            BBC.TRANSFORM_DISABLED.send(player);
+            player.print(BBC.TRANSFORM_DISABLED.s());
         } else {
-            BBC.TRANSFORM.send(player);
+            player.print(BBC.TRANSFORM.s());
         }
     }
 
@@ -405,9 +404,9 @@ public class GeneralCommands {
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         if (player.togglePermission("fawe.tips")) {
-            BBC.WORLDEDIT_TOGGLE_TIPS_ON.send(player);
+            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_ON.s());
         } else {
-            BBC.WORLDEDIT_TOGGLE_TIPS_OFF.send(player);
+            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_OFF.s());
         }
     }
 }

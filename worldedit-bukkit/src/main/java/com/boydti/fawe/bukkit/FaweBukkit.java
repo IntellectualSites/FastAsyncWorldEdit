@@ -27,7 +27,6 @@ import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
@@ -122,7 +121,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player fp) {
+    public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
@@ -143,7 +142,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(fp));
+            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(player));
             if (imageListener == null) {
                 this.imageListener = new BukkitImageListener(plugin);
             }

@@ -42,7 +42,7 @@ public interface Metadatable {
      */
     @NotNull
     default <V> V getMeta(String key, @NotNull V defaultValue) {
-        V value = (V) getMeta(key);
+        V value = getMeta(key);
         return value == null ? defaultValue : value;    }
 
     /**

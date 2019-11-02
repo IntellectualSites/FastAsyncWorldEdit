@@ -28,7 +28,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
-import com.boydti.fawe.object.function.QuadFunction;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -152,7 +151,7 @@ public class SchematicCommands {
     @CommandPermissions({"worldedit.clipboard.clear", "worldedit.schematic.clear"})
     public void clear(Player player, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
-        BBC.CLIPBOARD_CLEARED.send(player);
+        player.print(BBC.CLIPBOARD_CLEARED.s());
     }
 
     @Command(
@@ -182,7 +181,7 @@ public class SchematicCommands {
                 } else {
                     session.setClipboard(null);
                 }
-                BBC.CLIPBOARD_CLEARED.send(player);
+                player.print(BBC.CLIPBOARD_CLEARED.s());
                 return;
             }
         }
@@ -398,7 +397,7 @@ public class SchematicCommands {
         ClipboardHolder clipboard = session.getClipboard();
         List<File> sources = getFiles(clipboard);
         if (sources.isEmpty()) {
-            BBC.SCHEMATIC_NONE.send(player);
+            player.printError(BBC.SCHEMATIC_NONE.s());
             return;
         }
         if (!destDir.exists() && !destDir.mkdirs()) {
@@ -449,7 +448,7 @@ public class SchematicCommands {
         }
 
         if (files.isEmpty()) {
-            BBC.SCHEMATIC_NONE.send(actor);
+            actor.printError(BBC.SCHEMATIC_NONE.s());
             return;
         }
         for (File f : files) {
@@ -604,12 +603,12 @@ public class SchematicCommands {
         File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
 
         String schemCmd = "/schematic";
-        String loadSingle = schemCmd + " " + "load";
-        String loadMulti = schemCmd + " " + "loadall";
-        String unload = schemCmd + " " + "unload";
-        String delete = schemCmd + " " + "delete";
-        String list = schemCmd + " " + "list";
-        String showCmd = schemCmd + " " + "show";
+        String loadSingle = schemCmd + " load";
+        String loadMulti = schemCmd + " loadall";
+        String unload = schemCmd + " unload";
+        String delete = schemCmd + " delete";
+        String list = schemCmd + " list";
+        String showCmd = schemCmd + " show";
 
         List<String> args = filter.isEmpty() ? Collections.emptyList() : Arrays.asList(filter.split(" "));
 
@@ -634,9 +633,8 @@ public class SchematicCommands {
 
         Function<URI, Boolean> isLoaded = multi == null ? f -> false : multi::contains;
 
-        List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded, new QuadFunction<String, String, UtilityCommands.URIType, Boolean, Component>() {
-            @Override
-            public Component apply(String name, String path, UtilityCommands.URIType type, Boolean loaded) {
+        List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
+            (name, path, type, loaded) -> {
                 TextColor color = TextColor.GRAY;
                 switch (type) {
                     case URL:
@@ -685,8 +683,7 @@ public class SchematicCommands {
                 msg.append(msgElem);
 
                 return msg.create();
-            }
-        });
+            });
         PaginationBox paginationBox = PaginationBox.fromStrings("Available schematics", pageCommand, components);
         actor.print(paginationBox.create(page));
     }
@@ -764,7 +761,7 @@ public class SchematicCommands {
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
                     BBC.SCHEMATIC_SAVED.send(actor, file.getName());
                 } else {
-                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(actor);
+                    actor.printError(BBC.WORLDEDIT_CANCEL_REASON_MANUAL.s());
                 }
             }
             return null;

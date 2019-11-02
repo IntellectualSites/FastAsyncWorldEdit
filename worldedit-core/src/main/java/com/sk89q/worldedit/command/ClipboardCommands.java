@@ -39,8 +39,6 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -381,7 +379,7 @@ public class ClipboardCommands {
             }
         }
         if (url == null) {
-            BBC.GENERATING_LINK_FAILED.send(player);
+            player.printError(BBC.GENERATING_LINK_FAILED.s());
         } else {
             String urlText = url.toString();
             if (Settings.IMP.WEB.SHORTEN_URLS) {
@@ -422,7 +420,7 @@ public class ClipboardCommands {
         }
         URL url = format.uploadPublic(target, category.replaceAll("[/|\\\\]", "."), player.getName());
         if (url == null) {
-            BBC.GENERATING_LINK_FAILED.send(player);
+            player.printError(BBC.GENERATING_LINK_FAILED.s());
         } else {
             BBC.DOWNLOAD_LINK.send(player, Settings.IMP.WEB.ASSETS);
         }

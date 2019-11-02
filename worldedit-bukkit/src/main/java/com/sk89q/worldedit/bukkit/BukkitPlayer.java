@@ -165,7 +165,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
+            player.sendMessage("§c" + part);
         }
     }
 

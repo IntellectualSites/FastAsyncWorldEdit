@@ -61,7 +61,6 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.Step;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -383,7 +382,7 @@ public class BrushCommands {
                 switch (type.getInternalId()) {
                     case BlockID.SAND:
                     case BlockID.GRAVEL:
-                        BBC.BRUSH_TRY_OTHER.send(player);
+                        player.print(BBC.BRUSH_TRY_OTHER.s());
                         falling = true;
                 }
             }
@@ -1017,7 +1016,7 @@ public class BrushCommands {
             }
             BBC.SCHEMATIC_SAVED.send(player, name);
         } else {
-            BBC.BRUSH_NONE.send(player);
+            player.printError(BBC.BRUSH_NONE.s());
         }
     }
 
@@ -1050,7 +1049,7 @@ public class BrushCommands {
             BBC.BRUSH_EQUIPPED.send(player, name);
         } catch (Throwable e) {
             e.printStackTrace();
-            BBC.BRUSH_INCOMPATIBLE.send(player);
+            player.printError(BBC.BRUSH_INCOMPATIBLE.s());
         }
     }
 

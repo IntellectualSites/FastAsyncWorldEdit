@@ -31,6 +31,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
@@ -74,8 +75,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
-import javax.xml.soap.Text;
-
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -373,9 +372,9 @@ public class CFICommands {
                     "Below 50 will prefer to color with blocks"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biomepriority(Player fp, int value) {
-        assertSettings(fp).getGenerator().setBiomePriority(value);
-        coloring(fp);
+    public void biomepriority(Player player, int value) {
+        assertSettings(player).getGenerator().setBiomePriority(value);
+        coloring(player);
     }
 
     @Command(
@@ -553,10 +552,10 @@ public class CFICommands {
             desc = "Generate vanilla caves"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void caves(Player fp) throws WorldEditException {
-        assertSettings(fp).getGenerator().addCaves();
-        fp.print(TextComponent.of("Added caves!"));
-        populate(fp);
+    public void caves(Player player) throws WorldEditException {
+        assertSettings(player).getGenerator().addCaves();
+        player.print(TextComponent.of("Added caves!"));
+        populate(player);
     }
 
     @Command(
@@ -565,10 +564,10 @@ public class CFICommands {
             descFooter = "Use a specific pattern and settings to generate ore"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void ore(Player fp, @Arg(name = "mask", desc = "Mask") Mask mask, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
-        assertSettings(fp).getGenerator().addOre(mask, patternArg, size, frequency, rariry, minY, maxY);
-        fp.print(TextComponent.of("Added ore!"));
-        populate(fp);
+    public void ore(Player player, @Arg(name = "mask", desc = "Mask") Mask mask, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
+        assertSettings(player).getGenerator().addOre(mask, patternArg, size, frequency, rariry, minY, maxY);
+        player.print(TextComponent.of("Added ore!"));
+        populate(player);
     }
 
     @Command(
@@ -576,10 +575,10 @@ public class CFICommands {
             desc = "Generate the vanilla ores"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void ores(Player fp, @Arg(name = "mask", desc = "Mask") Mask mask) throws WorldEditException {
-        assertSettings(fp).getGenerator().addDefaultOres(mask);
-        fp.print(TextComponent.of("Added ores!"));
-        populate(fp);
+    public void ores(Player player, @Arg(name = "mask", desc = "Mask") Mask mask) throws WorldEditException {
+        assertSettings(player).getGenerator().addDefaultOres(mask);
+        player.print(TextComponent.of("Added ores!"));
+        populate(player);
     }
 
     @Command(
@@ -588,15 +587,15 @@ public class CFICommands {
             descFooter = "Set the terrain height either based on an image heightmap, or a numeric value."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void height(Player fp, String imageStr) throws WorldEditException {
-        HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
+    public void height(Player player, String imageStr) throws WorldEditException {
+        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (!MathMan.isInteger(imageStr)) {
             gen.setHeight(ImageUtil.getImage(imageStr));
         } else {
             gen.setHeights(Integer.parseInt(imageStr));
         }
-        fp.print("Set Height!");
-        component(fp);
+        player.print("Set Height!");
+        component(player);
     }
 
     @Command(
@@ -604,13 +603,13 @@ public class CFICommands {
             desc = "Change the block used for water\ne.g. Lava"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void waterId(Player fp, BlockStateHolder block) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void waterId(Player player, BlockStateHolder block) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         settings.getGenerator().setWaterId(block.getBlockType().getInternalId());
 
-        fp.print("Set water id!");
+        player.print("Set water id!");
         settings.resetComponent();
-        component(fp);
+        component(player);
     }
 
     @Command(
@@ -619,12 +618,12 @@ public class CFICommands {
             desc = "Change the block used for the base\ne.g. Bedrock"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void baseId(Player fp, BlockStateHolder block) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void baseId(Player player, BlockStateHolder block) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         settings.getGenerator().setBedrockId(block.getBlockType().getInternalId());
-        fp.print(TextComponent.of("Set base id!"));
+        player.print(TextComponent.of("Set base id!"));
         settings.resetComponent();
-        component(fp);
+        component(player);
     }
 
     @Command(
@@ -634,10 +633,10 @@ public class CFICommands {
                     " - A value of 0 is the default and will not modify the height"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void worldthickness(Player fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(fp).getGenerator().setWorldThickness(heightArg);
-        fp.print("Set world thickness!");
-        component(fp);
+    public void worldthickness(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(player).getGenerator().setWorldThickness(heightArg);
+        player.print("Set world thickness!");
+        component(player);
     }
 
     @Command(
@@ -647,10 +646,10 @@ public class CFICommands {
                     " - A value of 0 is the default and will only set the top block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorthickness(Player fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(fp).getGenerator().setFloorThickness(heightArg);
-        fp.print("Set floor thickness!");
-        component(fp);
+    public void floorthickness(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(player).getGenerator().setFloorThickness(heightArg);
+        player.print("Set floor thickness!");
+        component(player);
     }
 
     @Command(
@@ -659,10 +658,10 @@ public class CFICommands {
             desc = "Resend the CFI chunks"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void update(Player fp) throws WorldEditException {
-        assertSettings(fp).getGenerator().update();
-        fp.print("Chunks refreshed!");
-        mainMenu(fp);
+    public void update(Player player) throws WorldEditException {
+        assertSettings(player).getGenerator().update();
+        player.print("Chunks refreshed!");
+        mainMenu(player);
     }
 
     @Command(
@@ -688,10 +687,10 @@ public class CFICommands {
                     " - By default water is disabled (with a value of 0)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void waterheight(Player fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(fp).getGenerator().setWaterHeight(heightArg);
-        fp.print("Set water height!");
-        component(fp);
+    public void waterheight(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(player).getGenerator().setWaterHeight(heightArg);
+        player.print("Set water height!");
+        component(player);
     }
 
     @Command(
@@ -701,12 +700,12 @@ public class CFICommands {
     )
     // ![79,174,212,5:3,5:4,18,161,20]
     @CommandPermissions("worldedit.anvil.cfi")
-    public void glass(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void glass(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         settings.getGenerator().setColorWithGlass(load(image));
-        fp.print("Set color with glass!");
+        player.print("Set color with glass!");
         settings.resetColoring();
-        mainMenu(fp);
+        mainMenu(player);
     }
 
     @Command(
@@ -718,8 +717,8 @@ public class CFICommands {
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void color(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void color(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         HeightMapMCAGenerator gen = settings.getGenerator();
         if (imageMask != null) {
             gen.setColor(load(image), load(imageMask), !disableWhiteOnly);
@@ -729,8 +728,8 @@ public class CFICommands {
             gen.setColor(load(image));
         }
         settings.resetColoring();
-        fp.print("Set color with blocks!");
-        mainMenu(fp);
+        player.print("Set color with blocks!");
+        mainMenu(player);
     }
 
     @Command(
@@ -742,12 +741,12 @@ public class CFICommands {
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void blockbiome(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void blockbiome(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         settings.getGenerator().setBlockAndBiomeColor(load(image), maskOpt, load(imageMask), !disableWhiteOnly);
-        fp.print(TextComponent.of("Set color with blocks and biomes!"));
+        player.print(TextComponent.of("Set color with blocks and biomes!"));
         settings.resetColoring();
-        mainMenu(fp);
+        mainMenu(player);
     }
 
     @Command(
@@ -758,12 +757,12 @@ public class CFICommands {
                     " - If you changed the block to something other than grass you will not see anything."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biomecolor(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
-        CFISettings settings = assertSettings(fp);
+    public void biomecolor(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+        CFISettings settings = assertSettings(player);
         settings.getGenerator().setBiomeColor(load(image));
-        fp.print(TextComponent.of("Set color with biomes!"));
+        player.print(TextComponent.of("Set color with biomes!"));
         settings.resetColoring();
-        mainMenu(fp);
+        mainMenu(player);
     }
 
 
@@ -773,9 +772,9 @@ public class CFICommands {
             desc = "Color the world using an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void coloring(Player fp) {
-        CFISettings settings = assertSettings(fp);
-        settings.popMessages(fp);
+    public void coloring(Player player) {
+        CFISettings settings = assertSettings(player);
+        settings.popMessages(player);
         settings.setCategory(this::coloring);
         HeightMapMCAGenerator gen = settings.getGenerator();
         boolean rand = gen.getTextureRandomVariation();
@@ -850,7 +849,7 @@ public class CFICommands {
                     .append("[None]");//.cmdTip("/cfi " + Commands.getAlias(Command.class, "image")).append(newline());
         }
         builder.append("< [Back]");//.cmdTip(alias()).send(fp);
-        fp.print(builder.build());
+        player.print(builder.build());
     }
 
     @Command(
@@ -858,8 +857,8 @@ public class CFICommands {
             desc = "Select a mask"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mask(Player fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context){
-        CFISettings settings = assertSettings(fp);
+    public void mask(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context){
+        CFISettings settings = assertSettings(player);
         String[] split = getArguments(context).split(" ");
         int index = 2;
         settings.imageMask = imageMask;
@@ -885,7 +884,7 @@ public class CFICommands {
             .append(
                 TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(s2)))
                     .clickEvent(ClickEvent.runCommand(s2))).build();
-        fp.print(build);
+        player.print(build);
     }
 
     @Command(
@@ -893,8 +892,8 @@ public class CFICommands {
             desc = "Select a pattern"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void pattern(Player fp, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern patternArg, InjectedValueAccess context)throws CommandException {
-        CFISettings settings = assertSettings(fp);
+    public void pattern(Player player, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern patternArg, InjectedValueAccess context)throws CommandException {
+        CFISettings settings = assertSettings(player);
         String[] split = getArguments(context).split(" ");
         int index = 2;
         settings.pattern = patternArg;
@@ -903,7 +902,7 @@ public class CFICommands {
         StringBuilder cmd = new StringBuilder("/cfi pattern ");
 
         if (patternArg != null) {
-            settings.getCategory().accept(fp);
+            settings.getCategory().accept(player);
         } else {
             String s = cmd + " stone";
             String s1 = "/cfi " + settings.getCategory();
@@ -915,7 +914,7 @@ public class CFICommands {
                 .append(TextComponent.of("< [Back]")
                     .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
                     .clickEvent(ClickEvent.runCommand(s1))).build();
-            fp.print(build);
+            player.print(build);
         }
     }
 
@@ -945,8 +944,8 @@ public class CFICommands {
             desc = "Select an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void image(Player fp, @Arg(desc = "image url or filename", def = "") ProvideBindings.ImageUri image, InjectedValueAccess context)throws CommandException {
-        CFISettings settings = getSettings(fp);
+    public void image(Player player, @Arg(desc = "image url or filename", def = "") ProvideBindings.ImageUri image, InjectedValueAccess context)throws CommandException {
+        CFISettings settings = getSettings(player);
         String[] split = getArguments(context).split(" ");
         int index = 2;
 
@@ -960,14 +959,12 @@ public class CFICommands {
                 .append(newline())
                 .append("From a file: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image file://")))
                 .build();
-            fp.print(build);
+            player.print(build);
         } else {
             if (settings.hasGenerator()) {
-                coloring(fp);
-                return;
+                coloring(player);
             } else {
-                heightmap(fp, image, 1);
-                return;
+                heightmap(player, image, 1);
             }
         }
     }
@@ -1061,12 +1058,12 @@ public class CFICommands {
 
         if (pattern != null) {
             String disabled = "You must specify a pattern";
-            msg.append(TextComponent.of("[&cWaterId]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline())
-                    .append(TextComponent.of("[&cBedrockId]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[&cFloor]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[&cMain]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[&cColumn]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[&cOverlay]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline());
+            msg.append(TextComponent.of("[WaterId]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline())
+                    .append(TextComponent.of("[BedrockId]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[Floor]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[Main]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[Column]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[Overlay]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline());
         } else {
             StringBuilder compArgs = new StringBuilder();
             compArgs.append(" " + settings.patternArg + maskArgs);
@@ -1110,9 +1107,9 @@ public class CFICommands {
     }
 
 
-    protected static CFISettings getSettings(Player fp) {
-        CFISettings settings = fp.getMeta("CFISettings");
-        return settings == null ? new CFISettings(fp) : settings;
+    protected static CFISettings getSettings(Player player) {
+        CFISettings settings = player.getMeta("CFISettings");
+        return settings == null ? new CFISettings(player) : settings;
     }
 
     public static class CFISettings {
@@ -1237,7 +1234,7 @@ public class CFICommands {
     }
 
     @SuppressWarnings("unused")
-    protected static void mainMenu(Player player) {
+    protected static void mainMenu(Actor actor) {
         TextComponentProducer producer = new TextComponentProducer();
         producer.append(TextComponent.of("What do you want to do now?"));
         producer.newline();
@@ -1266,6 +1263,6 @@ public class CFICommands {
                 .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "done"))
                 .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("done"))));
 
-        player.print(producer.create());
+        actor.print(producer.create());
     }
 }

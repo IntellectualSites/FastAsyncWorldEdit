@@ -190,7 +190,7 @@ public class ToolUtilCommands {
     )
     public void none(Player player, LocalSession session) throws WorldEditException {
         session.setTool(player, null);
-        BBC.TOOL_NONE.send(player);
+        player.print(BBC.TOOL_NONE.s());
     }
 
     @Command(
@@ -203,20 +203,19 @@ public class ToolUtilCommands {
                               @Arg(desc = "state", def = "on") String state) throws WorldEditException {
         if (session.hasSuperPickAxe()) {
             if ("on".equals(state)) {
-                BBC.SUPERPICKAXE_ENABLED.send(player);
+                player.print(BBC.SUPERPICKAXE_ENABLED.s());
                 return;
             }
 
             session.disableSuperPickAxe();
-            BBC.SUPERPICKAXE_DISABLED.send(player);
+            player.print(BBC.SUPERPICKAXE_DISABLED.s());
         } else {
             if ("off".equals(state)) {
-
-                BBC.SUPERPICKAXE_DISABLED.send(player);
+                player.print(BBC.SUPERPICKAXE_DISABLED.s());
                 return;
             }
             session.enableSuperPickAxe();
-            BBC.SUPERPICKAXE_ENABLED.send(player);
+            player.print(BBC.SUPERPICKAXE_ENABLED.s());
         }
     }
 

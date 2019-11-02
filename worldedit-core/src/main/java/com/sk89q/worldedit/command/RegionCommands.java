@@ -175,14 +175,14 @@ public class RegionCommands {
     public void nbtinfo(Player player, EditSession editSession) {
         Location pos = player.getBlockTrace(128);
         if (pos == null) {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
             return;
         }
         CompoundTag nbt = editSession.getFullBlock(pos.toBlockPoint()).getNbtData();
         if (nbt != null) {
             player.print(nbt.getValue().toString());
         } else {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
         }
     }
 
@@ -314,8 +314,8 @@ public class RegionCommands {
 )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
-    public void lay(Player fp, EditSession editSession, @Selection Region region, @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
+    public void lay(Player player, EditSession editSession, @Selection Region region, @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
+        player.checkConfirmationRegion(() -> {
             BlockVector3 max = region.getMaximumPoint();
             int maxY = max.getBlockY();
             Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
@@ -330,7 +330,7 @@ public class RegionCommands {
                 editSession.setBlock(x, y, z, patternArg);
                 affected++;
             }
-            BBC.VISITOR_BLOCK.send(fp, affected);
+            BBC.VISITOR_BLOCK.send(player, affected);
         }, getArguments(context), region, context);
     }
 
@@ -629,27 +629,27 @@ public class RegionCommands {
 )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
-    public void regenerateChunk(Player fp, LocalSession session, EditSession editSession, @Selection Region region,
+    public void regenerateChunk(Player player, LocalSession session, EditSession editSession, @Selection Region region,
                                 @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
                                 @Arg(def = "", desc = "Regenerate with seed") Long seed,
                                 InjectedValueAccess context) throws WorldEditException {
-        fp.checkConfirmationRegion(() -> {
+        player.checkConfirmationRegion(() -> {
             Mask mask = session.getMask();
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
             editSession.regenerate(region, biome, seed);
             session.setMask(mask);
             session.setSourceMask(mask);
-            if (!fp.hasPermission("fawe.tips")) {
-                BBC.COMMAND_REGEN_2.send(fp);
+            if (!player.hasPermission("fawe.tips")) {
+                player.print(BBC.COMMAND_REGEN_2.s());
             } else if (biome == null) {
-                BBC.COMMAND_REGEN_0.send(fp);
-                if (!fp.hasPermission("fawe.tips")) BBC.TIP_REGEN_0.send(fp);
+                BBC.COMMAND_REGEN_0.send(player);
+                if (!player.hasPermission("fawe.tips")) player.print(BBC.TIP_REGEN_0.s());
             } else if (seed == null) {
-                BBC.COMMAND_REGEN_1.send(fp);
-                if (!fp.hasPermission("fawe.tips")) BBC.TIP_REGEN_1.send(fp);
+                player.print(BBC.COMMAND_REGEN_1.s());
+                if (!player.hasPermission("fawe.tips")) BBC.TIP_REGEN_1.send(player);
             } else {
-                BBC.COMMAND_REGEN_2.send(fp);
+                player.print(BBC.COMMAND_REGEN_2.s());
             }
         }, getArguments(context), region, context);
 

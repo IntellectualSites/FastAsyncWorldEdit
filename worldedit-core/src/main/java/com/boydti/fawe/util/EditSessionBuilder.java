@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
@@ -18,7 +20,6 @@ import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
 import com.boydti.fawe.object.extent.NullExtent;
@@ -35,13 +36,10 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
-import org.jetbrains.annotations.NotNull;
-
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.UUID;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.jetbrains.annotations.NotNull;
 
 public class EditSessionBuilder {
     private World world;
@@ -106,10 +104,10 @@ public class EditSessionBuilder {
         return limit(FaweLimit.MAX.copy());
     }
 
-    public EditSessionBuilder limitUnprocessed(@Nonnull Player fp) {
-        checkNotNull(fp);
+    public EditSessionBuilder limitUnprocessed(@Nonnull Player player) {
+        checkNotNull(player);
         limitUnlimited();
-        FaweLimit tmp = fp.getLimit();
+        FaweLimit tmp = player.getLimit();
         limit.INVENTORY_MODE = tmp.INVENTORY_MODE;
         return setDirty();
     }
@@ -306,7 +304,7 @@ public class EditSessionBuilder {
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
-                    BBC.WORLDEDIT_OOM_ADMIN.send(player);
+                    player.print(BBC.WORLDEDIT_OOM_ADMIN.s());
                 }
                 throw FaweCache.LOW_MEMORY;
             }
