@@ -7,6 +7,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Map;
 import java.util.Set;
@@ -96,7 +97,7 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockTypes.states[get(x, y, z)];
+        return BlockTypesCache.states[get(x, y, z)];
     }
 
     public char get(int x, int y, int z) {

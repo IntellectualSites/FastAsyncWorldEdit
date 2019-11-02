@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -102,7 +103,7 @@ public class BlockMaskBuilder {
             } else {
                 String regex = charSequence.toString();
                 blockTypeList = new ArrayList<>();
-                for (BlockType myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypesCache.values) {
                     if (myType.getId().matches(regex)) {
                         blockTypeList.add(myType);
                         add(myType);
@@ -209,7 +210,7 @@ public class BlockMaskBuilder {
             if (StringMan.isAlphanumericUnd(input)) {
                 add(BlockTypes.parse(input));
             } else {
-                for (BlockType myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypesCache.values) {
                     if (myType.getId().matches(input)) {
                         add(myType);
                     }
@@ -223,7 +224,7 @@ public class BlockMaskBuilder {
         AbstractProperty prop = (AbstractProperty) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return false;
-        int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+        int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         return (states == ALL || FastBitSet.get(states, localI));
     }
 
@@ -357,7 +358,7 @@ public class BlockMaskBuilder {
             for (AbstractProperty prop : properties) {
                 List values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
-                    int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+                    int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                     if (states == ALL || FastBitSet.get(states, localI)) {
                         if (!allowed.test(type, new AbstractMap.SimpleEntry(prop, values.get(j)))) {
                             if (states == ALL) {
@@ -435,7 +436,7 @@ public class BlockMaskBuilder {
             for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
                 List values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
-                    int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+                    int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                     if (states == null || !FastBitSet.get(states, localI)) {
                         if (propPredicate.test(type, new AbstractMap.SimpleEntry(prop, values.get(j)))) {
                             if (states == null) {
@@ -457,7 +458,7 @@ public class BlockMaskBuilder {
         if (states == ALL) return this;
 
         List values = property.getValues();
-        int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+        int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         if (states == null || !FastBitSet.get(states, localI)) {
             if (states == null) {
                 bitSets[type.getInternalId()] = states = FastBitSet.create(type.getMaxStateId() + 1);
@@ -473,7 +474,7 @@ public class BlockMaskBuilder {
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return this;
         List values = property.getValues();
-        int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+        int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         if (states == ALL || FastBitSet.get(states, localI)) {
             if (states == ALL) {
                 bitSets[type.getInternalId()] = states = FastBitSet.create(type.getMaxStateId() + 1);
@@ -495,7 +496,7 @@ public class BlockMaskBuilder {
             }
         } else {
             for (int i = 0; i < values.size(); i++) {
-                int index = current.modifyIndex(state, i) >> BlockTypes.BIT_OFFSET;
+                int index = current.modifyIndex(state, i) >> BlockTypesCache.BIT_OFFSET;
                 if (set) FastBitSet.set(states, index);
                 else FastBitSet.clear(states, index);
             }
@@ -543,7 +544,7 @@ public class BlockMaskBuilder {
                 for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
                     List values = prop.getValues();
                     for (int j = 0; j < values.size(); j++) {
-                        int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+                        int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                         if (FastBitSet.get(bitSet, localI)) set++;
                         else clear++;
                     }
@@ -558,11 +559,11 @@ public class BlockMaskBuilder {
 
     private boolean[] getOrdinals() {
         if (ordinals == null) {
-            ordinals = new boolean[BlockTypes.states.length];
-            for (int i = 0; i < BlockTypes.values.length; i++) {
+            ordinals = new boolean[BlockTypesCache.states.length];
+            for (int i = 0; i < BlockTypesCache.values.length; i++) {
                 long[] bitSet = bitSets[i];
                 if (bitSet == null) continue;
-                BlockType type = BlockTypes.values[i];
+                BlockType type = BlockTypesCache.values[i];
                 if (bitSet == ALL) {
                     for (BlockState state : type.getAllStates()) {
                         ordinals[state.getOrdinal()] = true;

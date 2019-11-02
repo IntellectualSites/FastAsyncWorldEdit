@@ -1,6 +1,6 @@
 package com.boydti.fawe.beta.implementation.filter.block;
 
-import static com.sk89q.worldedit.world.block.BlockTypes.states;
+import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
@@ -19,6 +19,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import javax.annotation.Nullable;
 
@@ -231,7 +232,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlock() {
         final int ordinal = getArr[index];
-        return BlockTypes.states[ordinal];
+        return BlockTypesCache.states[ordinal];
     }
 
     @Override

@@ -51,7 +51,7 @@ public class BlockType implements FawePattern, Keyed {
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
 
     private final String id;
-    private final BlockTypes.Settings settings;
+    private final BlockTypesCache.Settings settings;
 
     private boolean initItemType;
     private ItemType itemType;
@@ -59,7 +59,7 @@ public class BlockType implements FawePattern, Keyed {
     protected BlockType(String id, int internalId, List<BlockState> states) {
         int i = id.indexOf("[");
         this.id = i == -1 ? id : id.substring(0, i);
-        this.settings = new BlockTypes.Settings(this, id, internalId, states);
+        this.settings = new BlockTypesCache.Settings(this, id, internalId, states);
     }
 
     @Deprecated
@@ -105,12 +105,12 @@ public class BlockType implements FawePattern, Keyed {
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) return settings.defaultState;
-        return BlockTypes.states[settings.stateOrdinals[propertyId]];
+        return BlockTypesCache.states[settings.stateOrdinals[propertyId]];
     }
 
     @Deprecated
     public BlockState withStateId(int internalStateId) { //
-        return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
+        return this.withPropertyId(internalStateId >> BlockTypesCache.BIT_OFFSET);
     }
 
     /**
@@ -180,7 +180,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
-        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypes.states[i]).collect(Collectors.toList());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
     }
 
     /**

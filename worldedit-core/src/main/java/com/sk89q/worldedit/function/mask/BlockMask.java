@@ -28,6 +28,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,7 +52,7 @@ public class BlockMask extends ABlockMask {
     }
 
     public BlockMask(Extent extent) {
-        this(extent, new boolean[BlockTypes.states.length]);
+        this(extent, new boolean[BlockTypesCache.states.length]);
     }
 
     public BlockMask(Extent extent, boolean[] ordinals) {
@@ -86,7 +87,7 @@ public class BlockMask extends ABlockMask {
     public BlockMask add(Predicate<BlockState> predicate) {
         for (int i = 0; i < ordinals.length; i++) {
             if (!ordinals[i]) {
-                BlockState state = BlockTypes.states[i];
+                BlockState state = BlockTypesCache.states[i];
                 if (state != null) {
                     ordinals[i] = predicate.test(state);
                 }
@@ -221,7 +222,7 @@ public class BlockMask extends ABlockMask {
         BlockType unsetType = null;
         int totalTypes = 0;
 
-        for (BlockType type : BlockTypes.values) {
+        for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;

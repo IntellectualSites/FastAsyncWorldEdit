@@ -56,6 +56,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -438,7 +440,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = minX; x <= maxX; x++, index++, localIndex++) {
                         int combined = floor[index];
                         if (BlockTypes.getFromStateOrdinal(combined) == BlockTypes.SNOW) {
-                            layers[localIndex] = (char) (((heights[index] & 0xFF) << 3) + (floor[index] >> BlockTypes.BIT_OFFSET) - 7);
+                            layers[localIndex] = (char) (((heights[index] & 0xFF) << 3) + (floor[index] >> BlockTypesCache.BIT_OFFSET) - 7);
                         } else {
                             layers[localIndex] = (char) ((heights[index] & 0xFF) << 3);
                         }
@@ -526,7 +528,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int i = 0; i < heights.length; i++) {
                     int combined = floor[i];
                     if (BlockTypes.getFromStateOrdinal(combined) == BlockTypes.SNOW) {
-                        layers[i] = (char) (((heights[i] & 0xFF) << 3) + (floor[i] >> BlockTypes.BIT_OFFSET) - 7);
+                        layers[i] = (char) (((heights[i] & 0xFF) << 3) + (floor[i] >> BlockTypesCache.BIT_OFFSET) - 7);
                     } else {
                         layers[i] = (char) ((heights[i] & 0xFF) << 3);
                     }

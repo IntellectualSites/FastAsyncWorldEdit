@@ -23,6 +23,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -251,7 +252,7 @@ public class MCAChunk implements IChunkSet {
                         int ordinal = blocks[i];
                         int palette = blockToPalette[ordinal];
                         if (palette == Integer.MAX_VALUE) {
-//                            BlockState state = BlockTypes.states[ordinal];
+//                            BlockState state = BlockTypesCache.states[ordinal];
                             blockToPalette[ordinal] = palette = num_palette;
                             paletteToBlock[num_palette] = ordinal;
                             num_palette++;
@@ -269,7 +270,7 @@ public class MCAChunk implements IChunkSet {
 
                     for (int i = 0; i < num_palette; i++) {
                         int ordinal = paletteToBlock[i];
-                        BlockState state = BlockTypes.states[ordinal];
+                        BlockState state = BlockTypesCache.states[ordinal];
                         BlockType type = state.getBlockType();
                         out.writeNamedTag("Name", type.getId());
 

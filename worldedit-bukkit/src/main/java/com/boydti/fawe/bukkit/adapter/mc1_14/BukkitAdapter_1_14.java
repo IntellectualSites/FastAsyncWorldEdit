@@ -11,6 +11,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -273,7 +274,7 @@ public class BukkitAdapter_1_14 {
             for (int i = 0; i < num_palette; i++) {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
-                final BlockState state = BlockTypes.states[ordinal];
+                final BlockState state = BlockTypesCache.states[ordinal];
                 final IBlockData ibd = ((BlockMaterial_1_14) state.getMaterial()).getState();
                 palette.a(ibd);
             }

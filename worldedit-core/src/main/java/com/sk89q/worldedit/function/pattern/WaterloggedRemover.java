@@ -27,6 +27,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.lang.ref.SoftReference;
 
 /**
@@ -39,7 +41,7 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     private synchronized BlockState[] getRemap() {
         BlockState[] remap = cache.get();
         if (remap != null) return remap;
-        cache = new SoftReference<>(remap = new BlockState[BlockTypes.states.length]);
+        cache = new SoftReference<>(remap = new BlockState[BlockTypesCache.states.length]);
 
         // init
         for (int i = 0; i < remap.length; i++) {

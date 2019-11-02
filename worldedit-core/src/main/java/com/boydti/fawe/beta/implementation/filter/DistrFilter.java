@@ -7,6 +7,8 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +16,7 @@ import java.util.List;
 
 public class DistrFilter extends ForkedFilter<DistrFilter> {
 
-    private final int[] counter = new int[BlockTypes.states.length];
+    private final int[] counter = new int[BlockTypesCache.states.length];
 
     public DistrFilter() {
         super(null);
@@ -45,7 +47,7 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
         int total = 0;
         for (int i = 0; i < counter.length; i++) {
             int value = counter[i];
-            if (value != 0 && mask.test(BlockTypes.states[i])) {
+            if (value != 0 && mask.test(BlockTypesCache.states[i])) {
                 total += value;
             }
         }
@@ -61,7 +63,7 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
         for (int i = 0; i < counter.length; i++) {
             final int count = counter[i];
             if (count != 0) {
-                distribution.add(new Countable<>(BlockTypes.states[i], count));
+                distribution.add(new Countable<>(BlockTypesCache.states[i], count));
             }
         }
         Collections.sort(distribution);
@@ -70,18 +72,18 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
 
     public List<Countable<BlockType>> getTypeDistribution() {
         final List<Countable<BlockType>> distribution = new ArrayList<>();
-        int[] typeCounter = new int[BlockTypes.values.length];
+        int[] typeCounter = new int[BlockTypesCache.values.length];
         for (int i = 0; i < counter.length; i++) {
             final int count = counter[i];
             if (count != 0) {
-                BlockState state = BlockTypes.states[i];
+                BlockState state = BlockTypesCache.states[i];
                 typeCounter[state.getBlockType().getInternalId()] += count;
             }
         }
         for (int i = 0; i < typeCounter.length; i++) {
             final int count = typeCounter[i];
             if (count != 0) {
-                distribution.add(new Countable<>(BlockTypes.values[i], count));
+                distribution.add(new Countable<>(BlockTypesCache.values[i], count));
             }
         }
         Collections.sort(distribution);

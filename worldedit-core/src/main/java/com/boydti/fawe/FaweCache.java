@@ -28,6 +28,7 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -219,7 +220,7 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
-        int[] result = new int[BlockTypes.states.length];
+        int[] result = new int[BlockTypesCache.states.length];
         Arrays.fill(result, Integer.MAX_VALUE);
         return result;
     });
@@ -296,7 +297,7 @@ public enum FaweCache implements Trimable {
                     int ordinal = blocksChars[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-//                        BlockState state = BlockTypes.states[ordinal];
+//                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -308,7 +309,7 @@ public enum FaweCache implements Trimable {
                     int ordinal = blocksInts[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-                        BlockState state = BlockTypes.states[ordinal];
+                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;

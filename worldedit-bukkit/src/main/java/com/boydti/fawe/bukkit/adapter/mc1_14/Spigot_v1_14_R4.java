@@ -64,6 +64,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_14_R1.Block;
@@ -178,7 +179,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         if (idbToStateOrdinal != null) return false;
         idbToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < idbToStateOrdinal.length; i++) {
-            BlockState state = BlockTypes.states[i];
+            BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
             idbToStateOrdinal[id] = state.getOrdinalChar();
@@ -612,7 +613,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
     }
 
     public BlockState adapt(IBlockData ibd) {
-        return BlockTypes.states[adaptToInt(ibd)];
+        return BlockTypesCache.states[adaptToInt(ibd)];
     }
 
     public int adaptToInt(IBlockData ibd) {

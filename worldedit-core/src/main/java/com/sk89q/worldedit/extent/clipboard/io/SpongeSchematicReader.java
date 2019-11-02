@@ -53,6 +53,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
@@ -198,7 +199,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     }
 
     private BlockState getBlockState(int id) {
-        return BlockTypes.states[palette[id]];
+        return BlockTypesCache.states[palette[id]];
     }
 
     private BiomeType getBiomeType(FaweInputStream fis) throws IOException {

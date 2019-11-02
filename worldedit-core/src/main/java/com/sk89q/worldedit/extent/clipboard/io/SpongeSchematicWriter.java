@@ -42,6 +42,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
@@ -138,7 +139,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             NBTOutputStream tilesOut = new NBTOutputStream(new LZ4BlockOutputStream(tilesCompressed));
 
             List<Integer> paletteList = new ArrayList<>();
-            char[] palette = new char[BlockTypes.states.length];
+            char[] palette = new char[BlockTypesCache.states.length];
             Arrays.fill(palette, Character.MAX_VALUE);
             int[] paletteMax = {0};
             int numTiles = 0;
@@ -175,7 +176,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             out.writeLazyCompoundTag("Palette", out12 -> {
                 for (int i = 0; i < paletteList.size(); i++) {
                     int stateOrdinal = paletteList.get(i);
-                    BlockState state = BlockTypes.states[stateOrdinal];
+                    BlockState state = BlockTypesCache.states[stateOrdinal];
                     out12.writeNamedTag(state.getAsString(), i);
                 }
             });

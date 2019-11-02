@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,7 +58,7 @@ public class AsyncBlock implements Block {
     }
 
     public int getPropertyId() {
-        return world.getBlock(x, y, z).getInternalId() >> BlockTypes.BIT_OFFSET;
+        return world.getBlock(x, y, z).getInternalId() >> BlockTypesCache.BIT_OFFSET;
     }
 
     public int getCombinedId() {
@@ -105,7 +106,7 @@ public class AsyncBlock implements Block {
 
     @Deprecated
     public boolean setTypeIdAndPropertyId(int id, int propertyId) {
-        return setCombinedId(id + (propertyId << BlockTypes.BIT_OFFSET));
+        return setCombinedId(id + (propertyId << BlockTypesCache.BIT_OFFSET));
     }
 
     @Deprecated

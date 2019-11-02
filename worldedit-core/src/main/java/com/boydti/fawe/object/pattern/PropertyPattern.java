@@ -15,6 +15,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class PropertyPattern extends AbstractExtentPattern {
 
     public PropertyPattern(Extent extent) {
         super(extent);
-        this.transformed = new int[BlockTypes.states.length];
+        this.transformed = new int[BlockTypesCache.states.length];
         for (int i = 0; i < transformed.length; i++) {
             transformed[i] = i;
         }
@@ -107,13 +109,13 @@ public class PropertyPattern extends AbstractExtentPattern {
             }
         } else {
             for (int i = 0; i < values.size(); i++) {
-                int statesIndex = current.modifyIndex(stateId, i) >> BlockTypes.BIT_OFFSET;
+                int statesIndex = current.modifyIndex(stateId, i) >> BlockTypesCache.BIT_OFFSET;
                 BlockState state = type.withPropertyId(statesIndex);
 
                 int existingOrdinal = transformed[state.getOrdinal()];
-                int existing = BlockTypes.states[existingOrdinal].getInternalId();
-                        //states[statesIndex] << BlockTypes.BIT_OFFSET;
-                BlockState newState = state.withPropertyId(property.modifyIndex(existing, index) >> BlockTypes.BIT_OFFSET);
+                int existing = BlockTypesCache.states[existingOrdinal].getInternalId();
+                        //states[statesIndex] << BlockTypesCache.BIT_OFFSET;
+                BlockState newState = state.withPropertyId(property.modifyIndex(existing, index) >> BlockTypesCache.BIT_OFFSET);
                 transformed[state.getOrdinal()] = newState.getOrdinal();
             }
         }
@@ -135,7 +137,7 @@ public class PropertyPattern extends AbstractExtentPattern {
             } else {
                 String regex = charSequence.toString();
                 blockTypeList = new ArrayList<>();
-                for (BlockType myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypesCache.values) {
                     if (myType.getId().matches(regex)) {
                         blockTypeList.add(myType);
                     }
