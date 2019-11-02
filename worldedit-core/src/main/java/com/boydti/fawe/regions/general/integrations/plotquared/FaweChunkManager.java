@@ -93,7 +93,7 @@ public class FaweChunkManager extends ChunkManager {
                 EditSession editSession = new EditSessionBuilder(pos1.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 World world = editSession.getWorld();
                 CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-                world.regenerate(region, editSession);
+                editSession.regenerate(region);
                 editSession.flushQueue();
                 TaskManager.IMP.task(whenDone);
             }
