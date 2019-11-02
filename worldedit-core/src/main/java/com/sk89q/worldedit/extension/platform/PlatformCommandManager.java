@@ -630,6 +630,7 @@ public final class PlatformCommandManager {
             Command cmd = optional.get();
             CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
+                System.out.println("Not queued");
                 handleCommandOnCurrentThread(event);
                 return;
             }
@@ -728,8 +729,7 @@ public final class PlatformCommandManager {
             } else {
                 System.out.println("Invalid context " + context);
             }
-            Optional<EditSession> editSessionOpt =
-                context.injectedValue(Key.of(EditSession.class));
+            Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();

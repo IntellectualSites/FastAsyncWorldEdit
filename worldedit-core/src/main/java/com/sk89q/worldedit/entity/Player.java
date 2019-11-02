@@ -25,6 +25,7 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -40,6 +41,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -50,6 +52,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Represents a player
@@ -381,32 +384,36 @@ public interface Player extends Entity, Actor {
     }
 
     default int cancel(boolean close) {
-//        Collection<IQueueExtent> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
-//        int cancelled = 0;
-//        clearActions();
-//        for (IQueueExtent queue : queues) {
-//            Collection<EditSession> sessions = queue.getEditSessions();
-//            for (EditSession session : sessions) {
-//                FawePlayer currentPlayer = session.getPlayer();
-//                if (currentPlayer == this) {
-//                    if (session.cancel()) {
-//                        cancelled++;
-//                    }
-//                }
-//            }
-//        }
-//        VirtualWorld world = getSession().getVirtualWorld();
-//        if (world != null) {
-//            if (close) {
-//                try {
-//                    world.close(false);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            else world.clear();
-//        }
-        return 0;
+        int cancelled = 0;
+
+        for (Request request : Request.getAll()) {
+            EditSession editSession = request.getEditSession();
+            if (editSession != null) {
+                Player player = editSession.getPlayer();
+                if (equals(player)) {
+                    editSession.cancel();
+                    cancelled++;
+                }
+            }
+        }
+        VirtualWorld world = getSession().getVirtualWorld();
+        if (world != null) {
+            if (close) {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return cancelled;
     }
 
     void sendTitle(String title, String sub);

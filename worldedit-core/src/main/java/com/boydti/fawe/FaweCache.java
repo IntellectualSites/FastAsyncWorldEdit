@@ -105,21 +105,25 @@ public enum FaweCache implements Trimable {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
-        CHUNK_FLAG.clean();
-        BYTE_BUFFER_8192.clean();
-        BLOCK_TO_PALETTE.clean();
-        PALETTE_TO_BLOCK.clean();
-        BLOCK_STATES.clean();
-        SECTION_BLOCKS.clean();
-        PALETTE_CACHE.clean();
-        PALETTE_TO_BLOCK_CHAR.clean();
-        INDEX_STORE.clean();
+        if (aggressive) {
+            CleanableThreadLocal.cleanAll();
+        } else {
+            CHUNK_FLAG.clean();
+            BYTE_BUFFER_8192.clean();
+            BLOCK_TO_PALETTE.clean();
+            PALETTE_TO_BLOCK.clean();
+            BLOCK_STATES.clean();
+            SECTION_BLOCKS.clean();
+            PALETTE_CACHE.clean();
+            PALETTE_TO_BLOCK_CHAR.clean();
+            INDEX_STORE.clean();
 
-        MUTABLE_VECTOR3.clean();
-        MUTABLE_BLOCKVECTOR3.clean();
-        SECTION_BITS_TO_CHAR.clean();
-        for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
-            entry.getValue().clean();
+            MUTABLE_VECTOR3.clean();
+            MUTABLE_BLOCKVECTOR3.clean();
+            SECTION_BITS_TO_CHAR.clean();
+            for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
+                entry.getValue().clean();
+            }
         }
         for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
             Pool pool = entry.getValue();

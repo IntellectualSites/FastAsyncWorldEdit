@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-public class NullExtent extends FaweRegionExtent {
+public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     private final FaweException reason;
 
@@ -328,11 +329,16 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return null;
+        throw reason;
     }
 
     @Override
     public boolean processGet(int chunkX, int chunkZ) {
-        return false;
+        throw reason;
+    }
+
+    @Override
+    public Extent construct(Extent child) {
+        throw reason;
     }
 }
