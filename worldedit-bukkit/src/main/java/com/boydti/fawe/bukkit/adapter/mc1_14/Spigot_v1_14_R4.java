@@ -21,7 +21,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

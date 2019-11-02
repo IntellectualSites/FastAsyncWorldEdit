@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.function.generator;
 
-import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -45,12 +44,11 @@ public class SchemGen implements Resource {
             holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
         Clipboard clipboard = holder.getClipboard();
-        Schematic schematic = new Schematic(clipboard);
         Transform transform = holder.getTransform();
         if (transform.isIdentity()) {
-            schematic.paste(extent, mutable, false);
+            clipboard.paste(extent, mutable, false);
         } else {
-            schematic.paste(extent, mutable, false, transform);
+            clipboard.paste(extent, mutable, false, transform);
         }
         mutable.mutY(y);
         return true;

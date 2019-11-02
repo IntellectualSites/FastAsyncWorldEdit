@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
@@ -51,7 +50,6 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.function.Supplier;
 
 /**
  * Represents a player

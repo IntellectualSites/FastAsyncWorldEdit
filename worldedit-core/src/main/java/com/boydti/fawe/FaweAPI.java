@@ -7,7 +7,6 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -192,7 +191,7 @@ public class FaweAPI {
      * @see ClipboardFormat
      * @see Schematic
      */
-    public static Schematic load(File file) throws IOException {
+    public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
     }
 

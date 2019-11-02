@@ -23,27 +23,22 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import java.util.AbstractSet;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;

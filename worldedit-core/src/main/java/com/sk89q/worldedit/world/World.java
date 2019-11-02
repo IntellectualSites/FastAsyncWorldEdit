@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.world;
 
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
-import com.boydti.fawe.beta.implementation.IChunkCache;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.beta.IChunkCache;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;

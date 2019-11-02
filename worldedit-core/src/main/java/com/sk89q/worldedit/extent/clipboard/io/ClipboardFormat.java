@@ -25,7 +25,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
 import com.google.gson.Gson;
 import com.sk89q.worldedit.LocalSession;
@@ -127,12 +126,12 @@ public interface ClipboardFormat {
         return holder;
     }
 
-    default Schematic load(File file) throws IOException {
+    default Clipboard load(File file) throws IOException {
         return load(new FileInputStream(file));
     }
 
-    default Schematic load(InputStream stream) throws IOException {
-        return new Schematic(getReader(stream).read());
+    default Clipboard load(InputStream stream) throws IOException {
+        return getReader(stream).read();
     }
 
 

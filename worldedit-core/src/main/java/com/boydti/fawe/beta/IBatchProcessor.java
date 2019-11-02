@@ -1,8 +1,8 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.EmptyBatchProcessor;
-import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;

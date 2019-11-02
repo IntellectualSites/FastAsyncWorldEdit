@@ -1,9 +1,8 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.RunnableVal;
 
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +12,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;

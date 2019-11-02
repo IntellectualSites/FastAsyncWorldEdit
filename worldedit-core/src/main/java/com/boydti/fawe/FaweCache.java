@@ -203,6 +203,7 @@ public enum FaweCache implements Trimable {
     public static final FaweException LOW_MEMORY = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
     public static final FaweException MAX_ENTITIES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ENTITIES);
     public static final FaweException MAX_TILES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
+    public static final FaweException MAX_ITERATIONS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ITERATIONS);
 
     /*
     thread cache

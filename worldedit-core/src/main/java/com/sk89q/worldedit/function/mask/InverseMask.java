@@ -2,7 +2,6 @@ package com.sk89q.worldedit.function.mask;
 
 import javax.annotation.Nullable;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class InverseMask extends AbstractMask {

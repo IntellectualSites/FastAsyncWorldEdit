@@ -118,7 +118,7 @@ public class MCAFile implements Trimable {
 
     public MCAFile init(File file, int mcrX, int mcrZ) throws FileNotFoundException {
         if (raf != null) {
-            flush(pool);
+            flush(true);
             for (int i = 0; i < 4096; i++) {
                 locations[i] = 0;
             }
@@ -484,11 +484,11 @@ public class MCAFile implements Trimable {
         }
     }
 
-    public void close(ForkJoinPool pool) {
+    public void close() {
         if (raf == null) return;
         synchronized (raf) {
             if (raf != null) {
-                flush(pool);
+                flush(true);
                 try {
                     raf.close();
                 } catch (IOException e) {

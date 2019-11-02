@@ -6,7 +6,7 @@ import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.beta.SingleFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -74,7 +74,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
-import javax.xml.soap.Text;
 
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;

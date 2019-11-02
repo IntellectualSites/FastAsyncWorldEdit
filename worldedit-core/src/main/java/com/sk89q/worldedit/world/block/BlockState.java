@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;

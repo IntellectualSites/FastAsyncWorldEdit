@@ -1,8 +1,8 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.DelegateFilter;
+import com.boydti.fawe.beta.implementation.filter.block.DelegateFilter;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 
 import java.util.function.Supplier;
 

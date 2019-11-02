@@ -1,7 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.SingleFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;

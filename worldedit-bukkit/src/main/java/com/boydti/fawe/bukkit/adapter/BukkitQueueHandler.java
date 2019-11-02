@@ -1,7 +1,7 @@
 package com.boydti.fawe.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
 
 import java.lang.reflect.Field;

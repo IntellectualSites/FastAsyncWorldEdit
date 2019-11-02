@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;

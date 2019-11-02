@@ -2,7 +2,6 @@ package com.boydti.fawe.object.pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -47,12 +46,11 @@ public class RandomFullClipboardPattern extends AbstractPattern {
             holder.setTransform(transform);
         }
         Clipboard clipboard = holder.getClipboard();
-        Schematic schematic = new Schematic(clipboard);
         Transform newTransform = holder.getTransform();
         if (newTransform.isIdentity()) {
-            schematic.paste(extent, set, false);
+            clipboard.paste(extent, set, false);
         } else {
-            schematic.paste(extent, set, false, newTransform);
+            clipboard.paste(extent, set, false, newTransform);
         }
         return true;
     }

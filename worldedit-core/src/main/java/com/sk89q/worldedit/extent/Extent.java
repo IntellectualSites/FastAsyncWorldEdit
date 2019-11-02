@@ -21,8 +21,7 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.AbstractFilterBlock;
-import com.boydti.fawe.beta.ExtentFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
@@ -68,7 +67,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

@@ -2,11 +2,10 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.preloader.AsyncPreloader;
-import com.boydti.fawe.beta.preloader.Preloader;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
+import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
-import com.boydti.fawe.bukkit.adapter.mc1_14.test.TestChunkPacketSend;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;

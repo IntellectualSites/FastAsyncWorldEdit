@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.beta.AbstractFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.AbstractFilterBlock;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;

@@ -2,7 +2,7 @@ package com.boydti.fawe.util.task;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;

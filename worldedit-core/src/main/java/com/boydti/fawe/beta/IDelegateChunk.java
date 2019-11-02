@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -36,11 +37,6 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     @Override
     default <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
         return getParent().call(set, finalize);
-    }
-
-    @Override
-    default IQueueExtent getQueue() {
-        return getParent().getQueue();
     }
 
     @Override

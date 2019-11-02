@@ -26,6 +26,7 @@ import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
@@ -664,8 +665,7 @@ public final class PlatformCommandManager {
 
         MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
 
-        ThrowableSupplier<Throwable> task =
-                () -> commandManager.execute(context, ImmutableList.copyOf(split));
+        ThrowableSupplier<Throwable> task = () -> commandManager.execute(context, ImmutableList.copyOf(split));
 
         handleCommandTask(task, context, session, event);
     }
@@ -699,6 +699,8 @@ public final class PlatformCommandManager {
             } else {
                 actor.print(e.getRichMessage());
             }
+        } catch (FaweException e) {
+            actor.printError("Edit cancelled: " + e.getMessage());
         } catch (UsageException e) {
             actor.print(TextComponent.builder("")
                 .color(TextColor.RED)

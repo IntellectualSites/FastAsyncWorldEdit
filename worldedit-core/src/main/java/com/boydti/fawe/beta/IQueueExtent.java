@@ -1,12 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.IBatchProcessorHolder;
-import com.boydti.fawe.beta.implementation.IChunkCache;
-import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.IBatchProcessorHolder;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -19,8 +17,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 import java.io.Flushable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 

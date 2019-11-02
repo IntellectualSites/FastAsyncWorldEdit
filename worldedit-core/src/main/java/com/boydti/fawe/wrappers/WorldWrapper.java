@@ -1,7 +1,7 @@
 package com.boydti.fawe.wrappers;
 
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;

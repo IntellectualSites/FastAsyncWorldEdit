@@ -1,6 +1,6 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
@@ -16,7 +16,6 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
@@ -30,12 +29,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;

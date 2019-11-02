@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -26,12 +27,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      * @param z
      */
     void init(IQueueExtent extent, int x, int z);
-
-    /**
-     * Get the queue
-     * @return
-     */
-    IQueueExtent getQueue();
 
     /**
      * Get chunkX

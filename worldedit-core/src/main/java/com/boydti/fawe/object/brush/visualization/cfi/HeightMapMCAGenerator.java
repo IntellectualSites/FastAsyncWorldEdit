@@ -5,8 +5,8 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.ChunkPacket;
-import com.boydti.fawe.beta.implementation.FallbackChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.beta.implementation.blocks.FallbackChunkGet;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -19,15 +19,12 @@ import com.boydti.fawe.object.collection.DifferentialBlockBuffer;
 import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
 import com.boydti.fawe.object.collection.SummedAreaTable;
 import com.boydti.fawe.object.exception.FaweChunkLoadException;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -626,12 +623,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
                 Clipboard clipboard = holder.getClipboard();
-                Schematic schematic = new Schematic(clipboard);
                 Transform transform = holder.getTransform();
                 if (transform.isIdentity()) {
-                    schematic.paste(this, mutable, false);
+                    clipboard.paste(this, mutable, false);
                 } else {
-                    schematic.paste(this, mutable, false, transform);
+                    clipboard.paste(this, mutable, false, transform);
                 }
                 if (x + distance < getWidth()) {
                     x += distance;
@@ -675,12 +671,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
                 Clipboard clipboard = holder.getClipboard();
-                Schematic schematic = new Schematic(clipboard);
                 Transform transform = holder.getTransform();
                 if (transform.isIdentity()) {
-                    schematic.paste(this, mutable, false);
+                    clipboard.paste(this, mutable, false);
                 } else {
-                    schematic.paste(this, mutable, false, transform);
+                    clipboard.paste(this, mutable, false, transform);
                 }
                 if (x + distance < getWidth()) {
                     x += distance;

@@ -31,8 +31,8 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.ChunkSendProcessor;
-import com.boydti.fawe.beta.implementation.NullProcessor;
+import com.boydti.fawe.beta.implementation.processors.ChunkSendProcessor;
+import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.jnbt.CompoundTag;
@@ -76,10 +76,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.sk89q.worldedit.world.block.BlockTypes;

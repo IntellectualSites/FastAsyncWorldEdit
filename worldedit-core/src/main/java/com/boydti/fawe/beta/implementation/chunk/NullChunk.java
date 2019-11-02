@@ -1,0 +1,137 @@
+package com.boydti.fawe.beta.implementation.chunk;
+
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.FilterBlockMask;
+import com.boydti.fawe.beta.Flood;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Future;
+
+public enum NullChunk implements IChunk {
+    INSTANCE;
+
+    @Override
+    public void init(IQueueExtent extent, int x, int z) {}
+
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getZ() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
+
+    @Override
+    public Future call() {
+        return null;
+    }
+
+    @Override
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+
+    }
+
+    @Override
+    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
+
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return false;
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+        return false;
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+        return false;
+    }
+
+    @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return null;
+    }
+
+    @Override
+    public boolean hasSection(int layer) {
+        return false;
+    }
+
+    @Override
+    public char[] getArray(int layer) {
+        return null;
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return BlockTypes.__RESERVED__.getDefaultState();
+    }
+
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return BlockTypes.__RESERVED__.getDefaultState().toBaseBlock();
+    }
+
+    @Override
+    public CompoundTag getTag(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Set<CompoundTag> getEntities() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public char[] load(int layer) {
+        return null;
+    }
+
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public Future call(IChunkSet set, Runnable finalize) {
+        return null;
+    }
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        return true;
+    }
+}
+

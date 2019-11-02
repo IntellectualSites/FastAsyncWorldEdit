@@ -38,6 +38,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -686,14 +687,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
      *
      * @return an array of allowed regions
      */
-    @Deprecated
     public Region[] getCurrentRegions() {
-        return WEManager.IMP.getMask(this);
+        return getCurrentRegions(FaweMaskManager.MaskType.MEMBER);
     }
 
-    @Deprecated
     public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
-        return WEManager.IMP.getMask(this, type);
+        BlockVector3 pos1 = BlockVector3.at(20, 20, 20);
+        BlockVector3 pos2 = BlockVector3.at(40, 40, 40);
+        Region[] regions = {new CuboidRegion(getWorld(), pos1, pos2)};
+        return regions;
+//        return WEManager.IMP.getMask(this, type);
     }
 
     /**

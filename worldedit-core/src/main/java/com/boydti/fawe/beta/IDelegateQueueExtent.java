@@ -1,13 +1,11 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.beta.implementation.IChunkCache;
-import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.generator.GenBase;

@@ -3,8 +3,10 @@ package com.boydti.fawe.util;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.ParallelQueueExtent;
+import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
+import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.LoggingChangeSet;
@@ -18,7 +20,6 @@ import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
 import com.boydti.fawe.object.extent.NullExtent;
@@ -422,10 +423,14 @@ public class EditSessionBuilder {
             } else {
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, maxY);
             }
+            IBatchProcessor limitProcessor = regionExtent;
+            if (limit != null && !limit.isUnlimited()) {
+                limitProcessor = new LimitProcessor(limit, limitProcessor);
+            }
             if (regionExtent != null && queue != null && combineStages) {
-                queue.addProcessor(regionExtent);
+                queue.addProcessor(limitProcessor);
             } else if (regionExtent != null) {
-                this.extent = regionExtent;
+                this.extent = limitProcessor.construct(regionExtent.getExtent());
             }
             if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
                 System.out.println("TODO add batch processor for strip nbt");

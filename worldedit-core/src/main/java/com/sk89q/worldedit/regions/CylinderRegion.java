@@ -21,7 +21,7 @@ package com.sk89q.worldedit.regions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
