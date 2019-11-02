@@ -68,6 +68,14 @@ public enum PropertyKey {
     WATERLOGGED,
     WEST,
     UNSTABLE,
+    LEAVES,
+    ATTACHMENT,
+    SIGNAL_FIRE,
+    HANGING,
+    HAS_BOOK,
+    BOTTOM,
+
+
 
     ;
 
