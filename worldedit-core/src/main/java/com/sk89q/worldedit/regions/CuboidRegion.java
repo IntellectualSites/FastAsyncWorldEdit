@@ -670,6 +670,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;
         int tz = bz + 15;
+
         if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
             // contains all X/Z
             if (minY <= 0 && maxY >= 255) {

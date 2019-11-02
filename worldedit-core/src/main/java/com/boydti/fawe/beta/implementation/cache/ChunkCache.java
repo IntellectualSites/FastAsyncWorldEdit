@@ -14,7 +14,7 @@ public class ChunkCache<T extends Trimable> implements IChunkCache<T> {
     protected final Long2ObjectLinkedOpenHashMap<WeakReference<T>> getCache;
     private final IChunkCache<T> delegate;
 
-    protected ChunkCache(IChunkCache<T> delegate) {
+    public ChunkCache(IChunkCache<T> delegate) {
         this.getCache = new Long2ObjectLinkedOpenHashMap<>();
         this.delegate = delegate;
     }

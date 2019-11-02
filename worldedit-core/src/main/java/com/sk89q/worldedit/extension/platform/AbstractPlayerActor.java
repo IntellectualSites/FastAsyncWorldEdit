@@ -692,11 +692,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
-        BlockVector3 pos1 = BlockVector3.at(20, 20, 20);
-        BlockVector3 pos2 = BlockVector3.at(40, 40, 40);
-        Region[] regions = {new CuboidRegion(getWorld(), pos1, pos2)};
-        return regions;
-//        return WEManager.IMP.getMask(this, type);
+        return WEManager.IMP.getMask(this, type);
     }
 
     /**
