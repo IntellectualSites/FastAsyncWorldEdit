@@ -3,11 +3,10 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.object.collection.AdaptedMap;
-import com.boydti.fawe.object.collection.AdaptedSetCollection;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.google.common.collect.Iterables;
@@ -58,7 +57,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public Chunk nmsChunk;
     public CraftWorld world;
     public int X, Z;
-    private boolean forceLoad;
+//    private boolean forceLoad;
 
     public BukkitGetBlocks_1_14(World world, int X, int Z, boolean forceLoad) {
         this.world = (CraftWorld) world;
@@ -75,6 +74,15 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 //            this.world.getHandle().setForceLoaded(X, Z, forceLoad = false);
 //        }
 //    }
+
+
+    public int getX() {
+        return X;
+    }
+
+    public int getZ() {
+        return Z;
+    }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
@@ -304,7 +312,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
-                                updateGet(this, nmsChunk, sections, newSection, setArr, layer);
+                                updateGet(this, nmsChunk, sections, newSection, getArr, layer);
                             }
                         }
                     }

@@ -41,6 +41,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class PlayerProxy extends AbstractPlayerActor {
 

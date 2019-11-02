@@ -26,6 +26,7 @@ import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
@@ -629,6 +630,7 @@ public final class PlatformCommandManager {
             Command cmd = optional.get();
             CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
+                System.out.println("Not queued");
                 handleCommandOnCurrentThread(event);
                 return;
             }
@@ -664,8 +666,7 @@ public final class PlatformCommandManager {
 
         MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
 
-        ThrowableSupplier<Throwable> task =
-                () -> commandManager.execute(context, ImmutableList.copyOf(split));
+        ThrowableSupplier<Throwable> task = () -> commandManager.execute(context, ImmutableList.copyOf(split));
 
         handleCommandTask(task, context, session, event);
     }
@@ -699,6 +700,8 @@ public final class PlatformCommandManager {
             } else {
                 actor.print(e.getRichMessage());
             }
+        } catch (FaweException e) {
+            actor.printError("Edit cancelled: " + e.getMessage());
         } catch (UsageException e) {
             actor.print(TextComponent.builder("")
                 .color(TextColor.RED)
@@ -726,13 +729,12 @@ public final class PlatformCommandManager {
             } else {
                 System.out.println("Invalid context " + context);
             }
-            Optional<EditSession> editSessionOpt =
-                context.injectedValue(Key.of(EditSession.class));
+            Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();
-                session.remember(editSession);
                 editSession.flushQueue();
+                session.remember(editSession);
 
                 long time = System.currentTimeMillis() - start;
                 if (time > 1000) {

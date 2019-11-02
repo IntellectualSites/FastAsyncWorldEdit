@@ -21,7 +21,10 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -31,6 +34,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -52,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
+
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -317,8 +322,19 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-
-        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
+        int X = pt.getBlockX() >> 4;
+        int Z = pt.getBlockZ() >> 4;
+        if (Fawe.isMainThread()) {
+            world.getChunkAt(X, Z);
+        } else if (!world.isChunkLoaded(X, Z)) {
+            if (FaweBukkit.PAPER) {
+                world.getChunkAtAsync(X, Z, true);
+            } else {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    world.getChunkAt(X, Z);
+                });
+            }
+        }
     }
 
     @Override
@@ -516,11 +532,18 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int chunkX, int chunkZ, int bitMask) {
+    public void refreshChunk(int X, int Z) {
+        getWorld().refreshChunk(X, Z);
     }
 
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
         return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
+    }
+
+    @Override
+    public void sendFakeChunk(Player player, ChunkPacket packet) {
+        org.bukkit.entity.Player bukkitPlayer = BukkitAdapter.adapt(player);
+        WorldEditPlugin.getInstance().getBukkitImplAdapter().sendFakeChunk(getWorld(), bukkitPlayer, packet);
     }
 }

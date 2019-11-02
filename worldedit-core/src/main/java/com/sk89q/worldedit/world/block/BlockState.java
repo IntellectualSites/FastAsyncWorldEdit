@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -78,7 +77,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Deprecated
     public static BlockState getFromOrdinal(int ordinal) {
-        return BlockTypes.states[ordinal];
+        return BlockTypesCache.states[ordinal];
     }
 
     /**
@@ -123,7 +122,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             type = BlockTypes.get(key);
             if (type == null) {
                 String input = key.toString();
-                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypes.values)
+                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypesCache.values)
                         .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
                         .sorted(StringMan.blockStateComparator(input))
@@ -204,7 +203,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                     continue;
             }
         }
-        return type.withPropertyId(stateId >> BlockTypes.BIT_OFFSET);
+        return type.withPropertyId(stateId >> BlockTypesCache.BIT_OFFSET);
     }
 
     @Override
@@ -238,13 +237,13 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     @Deprecated
     @Override
     public final int getInternalPropertiesId() {
-        return this.getInternalId() >> BlockTypes.BIT_OFFSET;
+        return this.getInternalId() >> BlockTypesCache.BIT_OFFSET;
     }
 
     @Deprecated
     @Override
     public final int getInternalBlockTypeId() {
-        return this.getInternalId() & BlockTypes.BIT_MASK;
+        return this.getInternalId() & BlockTypesCache.BIT_MASK;
     }
 
     @Override

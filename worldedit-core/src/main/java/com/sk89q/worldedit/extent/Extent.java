@@ -21,6 +21,8 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -648,5 +650,17 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default Extent disableHistory() {
         return this;
+    }
+
+    default <T extends Filter> T apply(Region region, T filter) {
+        return apply((Iterable<BlockVector3>) region, filter);
+    }
+
+    default <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
+        ExtentFilterBlock block = new ExtentFilterBlock(this);
+        for (BlockVector3 pos : positions) {
+            filter.applyBlock(block.init(pos));
+        }
+        return filter;
     }
 }

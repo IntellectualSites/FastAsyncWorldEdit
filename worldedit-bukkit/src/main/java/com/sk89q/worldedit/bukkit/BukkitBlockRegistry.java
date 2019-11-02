@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.OptionalInt;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
@@ -93,6 +94,10 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             this.material = bukkitMaterial;
         }
 
+        public int getId() {
+            return material.getId();
+        }
+
         @Override
         public boolean isAir() {
             switch (material) {
@@ -131,5 +136,10 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             }
         }
         return blocks;
+    }
+
+    @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
     }
 }

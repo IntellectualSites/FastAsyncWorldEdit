@@ -19,13 +19,15 @@
 
 package com.sk89q.worldedit.function;
 
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 
 /**
  * Performs a function on points in a region.
  */
-public interface RegionFunction {
+public interface RegionFunction extends Filter {
 
     /**
      * Apply the function to the given position.
@@ -36,4 +38,9 @@ public interface RegionFunction {
      */
     boolean apply(BlockVector3 position) throws WorldEditException;
 
+
+    @Override
+    default void applyBlock(FilterBlock block) {
+        apply(block);
+    }
 }

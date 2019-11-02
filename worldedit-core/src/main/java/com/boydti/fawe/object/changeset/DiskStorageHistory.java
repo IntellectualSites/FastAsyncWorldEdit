@@ -17,6 +17,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -457,7 +459,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         public int maxZ;
 
         public DiskStorageSummary(int x, int z) {
-            blocks = new int[BlockTypes.states.length];
+            blocks = new int[BlockTypesCache.states.length];
             minX = x;
             maxX = x;
             minZ = z;
@@ -482,7 +484,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             HashMap<BlockState, Integer> map = new HashMap<>();
             for (int i = 0; i < blocks.length; i++) {
                 if (blocks[i] != 0) {
-                    BlockState state = BlockTypes.states[i];
+                    BlockState state = BlockTypesCache.states[i];
                     map.put(state, blocks[i]);
                 }
             }

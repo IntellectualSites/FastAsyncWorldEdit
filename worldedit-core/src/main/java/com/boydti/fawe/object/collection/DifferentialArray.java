@@ -265,9 +265,9 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
         return dataBytes[index];
     }
 
-//    public char getChar(int index) {
-//        return dataChars[index];
-//    }
+    public char getChar(int index) {
+        return dataChars[index];
+    }
 
     public int getInt(int index) {
         return dataInts[index];

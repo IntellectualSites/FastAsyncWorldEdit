@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.NBTStreamer;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
@@ -10,32 +10,33 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import net.jpountz.util.SafeUtils;
+import java.util.UUID;
 
-public class MemoryOptimizedClipboard extends FaweClipboard {
+public class MemoryOptimizedClipboard extends LinearClipboard {
 
-    private static final int BLOCK_SIZE = 1048576 * 4;
+    private static final int BLOCK_SIZE = 1048576 * 2;
     private static final int BLOCK_MASK = 1048575;
     private static final int BLOCK_SHIFT = 20;
-
-    private int length;
-    private int height;
-    private int width;
-    private int area;
-    private int volume;
 
     private byte[][] states;
 
@@ -45,7 +46,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
-    private final HashSet<ClipboardEntity> entities;
+    private final HashSet<BlockArrayClipboard.ClipboardEntity> entities;
 
     private int lastCombinedIdsI = -1;
 
@@ -55,17 +56,13 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
 
     private int compressionLevel;
 
-    public MemoryOptimizedClipboard(int width, int height, int length) {
-        this(width, height, length, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
+    public MemoryOptimizedClipboard(BlockVector3 dimensions) {
+        this(dimensions, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
     }
 
-    public MemoryOptimizedClipboard(int width, int height, int length, int compressionLevel) {
-        this.width = width;
-        this.height = height;
-        this.length = length;
-        this.area = width * length;
-        this.volume = area * height;
-        states = new byte[1 + (volume >> BLOCK_SHIFT)][];
+    public MemoryOptimizedClipboard(BlockVector3 dimensions, int compressionLevel) {
+        super(dimensions);
+        states = new byte[1 + (getVolume() >> BLOCK_SHIFT)][];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
         entities = new HashSet<>();
@@ -89,7 +86,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
@@ -97,19 +94,24 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     @Override
     public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
-            biomes = new byte[area];
+            biomes = new byte[getArea()];
         }
         biomes[index] = (byte) biome.getInternalId();
     }
 
     @Override
-    public void streamBiomes(NBTStreamer.ByteReader task) {
+    public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
         int index = 0;
-        for (int z = 0; z < length; z++) {
-            for (int x = 0; x < width; x++, index++) {
-                task.run(index, biomes[index] & 0xFF);
+        try {
+            for (int z = 0; z < getLength(); z++) {
+                for (int x = 0; x < getWidth(); x++, index++) {
+                    task.applyInt(index, biomes[index] & 0xFF);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -122,7 +124,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
+    public BiomeType getBiomeType(int x, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 
@@ -131,22 +133,24 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         return nbtMapIndex.get(index);
     }
 
-    public int getCombinedId(int index) {
+    public int getOrdinal(int index) {
         int i = index >> BLOCK_SHIFT;
-        if (i == lastCombinedIdsI) {
-            if (lastCombinedIds == null) {
+        int li = (index & BLOCK_MASK) << 1;
+        if (i != lastCombinedIdsI) {
+            saveCombinedIds();
+            byte[] compressed = states[lastCombinedIdsI = i];
+            if (compressed != null) {
+                lastCombinedIds = MainUtil.decompress(compressed, lastCombinedIds, BLOCK_SIZE, compressionLevel);
+            } else {
+                lastCombinedIds = null;
                 return 0;
             }
-            return lastCombinedIds[index & BLOCK_MASK] & 0xFF;
         }
-        saveCombinedIds();
-        byte[] compressed = states[lastCombinedIdsI = i];
-        if (compressed == null) {
-            lastCombinedIds = null;
-            return BlockTypes.AIR.getInternalId();
+        if (lastCombinedIds == null) {
+            return 0;
         }
-        lastCombinedIds = MainUtil.decompress(compressed, lastCombinedIds, BLOCK_SIZE, compressionLevel);
-        return SafeUtils.readIntBE(lastCombinedIds, index & BLOCK_MASK);
+        int ordinal = ((lastCombinedIds[li] << 8) + lastCombinedIds[li + 1]);
+        return ordinal;
     }
 
     private void saveCombinedIds() {
@@ -154,26 +158,6 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
             states[lastCombinedIdsI] = MainUtil.compress(lastCombinedIds, buffer, compressionLevel);
         }
         saveCombinedIds = false;
-    }
-
-    @Override
-    public void setDimensions(BlockVector3 dimensions) {
-        width = dimensions.getBlockX();
-        height = dimensions.getBlockY();
-        length = dimensions.getBlockZ();
-        area = width * length;
-        int newVolume = area * height;
-        if (newVolume != volume) {
-            volume = newVolume;
-            states = new byte[1 + (volume >> BLOCK_SHIFT)][];
-            lastCombinedIdsI = -1;
-            saveCombinedIds = false;
-        }
-    }
-
-    @Override
-    public BlockVector3 getDimensions() {
-        return BlockVector3.at(width, height, length);
     }
 
     private int lastI;
@@ -207,45 +191,30 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
             }
             lastCombinedIds = new byte[BLOCK_SIZE];
         }
-        int li = (index & BLOCK_MASK) << 2;
-        lastCombinedIds[li] = (byte) ((v >>> 24) & 0xFF);
-        lastCombinedIds[li + 1] = (byte) ((v >>> 16) & 0xFF);
-        lastCombinedIds[li + 2] = (byte) ((v >>>  8) & 0xFF);
-        lastCombinedIds[li + 3] = (byte) ((v >>>  0) & 0xFF);
+        int li = (index & BLOCK_MASK) << 1;
+        lastCombinedIds[li] = (byte) ((v >>> 8) & 0xFF);
+        lastCombinedIds[li + 1] = (byte) (v & 0xFF);
         saveCombinedIds = true;
     }
 
     @Override
-    public void streamCombinedIds(NBTStreamer.ByteReader task) {
-        int index = 0;
-        for (int y = 0; y < height; y++) {
-            for (int z = 0; z < length; z++) {
-                for (int x = 0; x < width; x++) {
-                    int id = getCombinedId(index);
-                    task.run(index++, id);
-                }
-            }
-        }
-    }
-
-    @Override
-    public List<CompoundTag> getTileEntities() {
+    public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
         for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
             int index = entry.getKey();
             CompoundTag tag = entry.getValue();
             Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
             if (!values.containsKey("x")) {
-                int y = index / area;
-                index -= y * area;
-                int z = index / width;
-                int x = index - (z * width);
+                int y = index / getArea();
+                index -= y * getArea();
+                int z = index / getWidth();
+                int x = index - (z * getWidth());
                 values.put("x", new IntTag(x));
                 values.put("y", new IntTag(y));
                 values.put("z", new IntTag(z));
             }
         }
-        return new ArrayList<>(nbtMapIndex.values());
+        return nbtMapIndex.values();
     }
 
     private int ylast;
@@ -254,52 +223,36 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     private int zlasti;
 
     public int getIndex(int x, int y, int z) {
-        return x + ((ylast == y) ? ylasti : (ylasti = (ylast = y) * area)) + ((zlast == z) ? zlasti : (zlasti = (zlast = z) * width));
+        return x + ((ylast == y) ? ylasti : (ylasti = (ylast = y) * getArea())) + ((zlast == z) ? zlasti : (zlasti = (zlast = z) * getWidth()));
     }
 
     @Override
-    public BaseBlock getBlock(int x, int y, int z) {
+    public BaseBlock getFullBlock(int x, int y, int z) {
         int index = getIndex(x, y, z);
-        return getBlock(index);
+        return getFullBlock(index);
     }
 
     @Override
-    public BaseBlock getBlock(int index) {
-        int combinedId = getCombinedId(index);
-        BlockType type = BlockTypes.getFromStateId(combinedId);
-        BaseBlock base = type.withStateId(combinedId).toBaseBlock();
-        if (type.getMaterial().hasContainer()) {
+    public BaseBlock getFullBlock(int index) {
+        BlockState block = getBlock(index);
+        if (block.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return base.toBaseBlock(nbt);
+                return block.toBaseBlock(nbt);
             }
         }
-        return base;
+        return block.toBaseBlock();
     }
 
     @Override
-    public void forEach(final BlockReader task, final boolean air) {
-        if (air) {
-            for (int y = 0, index = 0; y < height; y++) {
-                for (int z = 0; z < length; z++) {
-                    for (int x = 0; x < width; x++, index++) {
-                        BaseBlock block = getBlock(index);
-                        task.run(x, y, z, block);
-                    }
-                }
-            }
-        } else {
-            for (int y = 0, index = 0; y < height; y++) {
-                for (int z = 0; z < length; z++) {
-                    for (int x = 0; x < width; x++, index++) {
-                        BaseBlock block = getBlock(index);
-                        if (!block.getMaterial().isAir()) {
-                            task.run(x, y, z, block);
-                        }
-                    }
-                }
-            }
-        }
+    public BlockState getBlock(int index) {
+        int ordinal = getOrdinal(index);
+        return BlockState.getFromOrdinal(ordinal);
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return getBlock(getIndex(x, y, z));
     }
 
     public int size() {
@@ -344,9 +297,10 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         return true;
     }
 
+    @Nullable
     @Override
-    public Entity createEntity(Extent world, double x, double y, double z, float yaw, float pitch, BaseEntity entity) {
-        FaweClipboard.ClipboardEntity ret = new ClipboardEntity(world, x, y, z, yaw, pitch, entity);
+    public Entity createEntity(Location location, BaseEntity entity) {
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
         entities.add(ret);
         return ret;
     }
@@ -357,7 +311,21 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean remove(ClipboardEntity clipboardEntity) {
-        return entities.remove(clipboardEntity);
+    public void removeEntity(Entity entity) {
+        this.entities.remove(entity);
+    }
+
+    @Nullable
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
+        while (iter.hasNext()) {
+            BlockArrayClipboard.ClipboardEntity entity = iter.next();
+            UUID entUUID = entity.getState().getNbtData().getUUID();
+            if (uuid.equals(entUUID)) {
+                iter.remove();
+                return;
+            }
+        }
     }
 }

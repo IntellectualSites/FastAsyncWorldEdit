@@ -111,6 +111,15 @@ public class UtilityCommands {
     }
 
     @Command(
+            name = "/macro",
+            desc = "Generate or run a macro"
+    )
+    @CommandPermissions("worldedit.macro")
+    public void macro(Player player, LocalSession session, String name, String argument) throws IOException {
+
+    }
+
+    @Command(
             name = "/heightmapinterface",
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
@@ -420,7 +429,7 @@ public class UtilityCommands {
 
     @Command(
         name = "replacenear",
-        aliases = { "/replacenear" },
+        aliases = { "/replacenear", "/rn" },
         desc = "Replace nearby blocks"
     )
     @CommandPermissions("worldedit.replacenear")

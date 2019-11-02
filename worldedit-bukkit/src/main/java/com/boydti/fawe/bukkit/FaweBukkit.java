@@ -2,7 +2,9 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
+import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
@@ -54,14 +56,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class FaweBukkit implements IFawe, Listener {
 
-//    private final WorldEditPlugin plugin;
     private final Plugin plugin;
     private VaultUtil vault;
     private ItemUtil itemUtil;
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
-    //private CFIPacketListener packetListener;
+
+    public static boolean PAPER;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -69,6 +71,13 @@ public class FaweBukkit implements IFawe, Listener {
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
+        try {
+            Class.forName("com.destroystokyo.paper.Namespaced");
+            PAPER = true;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            // TODO no paper
+        }
         try {
             Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
@@ -103,7 +112,6 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (ClassNotFoundException e) {
                 new ChunkListener_9();
             }
-
         });
     }
 
@@ -129,15 +137,15 @@ public class FaweBukkit implements IFawe, Listener {
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.6.0-SNAPSHOT.jar");
-                byte[] jarData = Jars.PL_v3_6_0.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.7.3-SNAPSHOT.jar");
+                byte[] jarData = Jars.PL_v3_7_3.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
             }
             if (manager.getPlugin("MapManager") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.4.0-SNAPSHOT.jar");
-                byte[] jarData = Jars.MM_v1_4_0.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.7.3-SNAPSHOT.jar");
+                byte[] jarData = Jars.MM_v1_7_3.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
@@ -396,5 +404,13 @@ public class FaweBukkit implements IFawe, Listener {
         }
         return null;
 //        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
+    }
+
+    @Override
+    public Preloader getPreloader() {
+        if (PAPER) {
+            return new AsyncPreloader();
+        }
+        return null;
     }
 }

@@ -38,6 +38,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -80,7 +81,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
-    private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
+    private final Map<String, Object> meta;
+
+    public AbstractPlayerActor(Map<String, Object> meta) {
+        this.meta = meta;
+    }
+
+    public AbstractPlayerActor() {
+        this(new ConcurrentHashMap<>());
+    }
 
     @Override
     public Map<String, Object> getRawMeta() {
@@ -686,12 +695,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
      *
      * @return an array of allowed regions
      */
-    @Deprecated
     public Region[] getCurrentRegions() {
-        return WEManager.IMP.getMask(this);
+        return getCurrentRegions(FaweMaskManager.MaskType.MEMBER);
     }
 
-    @Deprecated
     public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
         return WEManager.IMP.getMask(this, type);
     }

@@ -1,7 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.SingleFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
@@ -12,6 +12,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -497,13 +498,13 @@ public class TextureUtil implements TextureHolder {
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color,
+    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color,
         int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
-        blockAndBiomeIdOutput[1] = biome.id;
+        blockAndBiomeIdOutput[1] = (char) biome.id;
         if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
             color)) {
             return true;
@@ -593,7 +594,7 @@ public class TextureUtil implements TextureHolder {
         if (folder.exists()) {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-            for (BlockType blockType : BlockTypes.values) {
+            for (BlockType blockType : BlockTypesCache.values) {
                 BlockMaterial material = blockType.getMaterial();
                 if (!material.isSolid() || !material.isFullCube()) {
                     continue;
@@ -635,7 +636,7 @@ public class TextureUtil implements TextureHolder {
                     Type typeToken = new TypeToken<Map<String, Object>>() {
                     }.getType();
 
-                    for (BlockType blockType : BlockTypes.values) {
+                    for (BlockType blockType : BlockTypesCache.values) {
                         if (!blockType.getMaterial().isFullCube()) {
                             continue;
                         }

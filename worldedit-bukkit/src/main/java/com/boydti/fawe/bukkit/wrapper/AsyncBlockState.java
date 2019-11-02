@@ -9,6 +9,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,7 +43,7 @@ public class AsyncBlockState implements BlockState {
     }
 
     public int getPropertyId() {
-        return state.getInternalId() >> BlockTypes.BIT_OFFSET;
+        return state.getInternalId() >> BlockTypesCache.BIT_OFFSET;
     }
 
     @Override
@@ -158,12 +159,12 @@ public class AsyncBlockState implements BlockState {
 
     @Override
     public byte getRawData() {
-        return (byte) (state.getInternalId() >> BlockTypes.BIT_OFFSET);
+        return (byte) (state.getInternalId() >> BlockTypesCache.BIT_OFFSET);
     }
 
     @Override
     public void setRawData(byte data) {
-        int combinedId = getTypeId() + (data << BlockTypes.BIT_OFFSET);
+        int combinedId = getTypeId() + (data << BlockTypesCache.BIT_OFFSET);
         state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock(state.getNbtData());
         this.blockData = BukkitAdapter.adapt(state);
     }

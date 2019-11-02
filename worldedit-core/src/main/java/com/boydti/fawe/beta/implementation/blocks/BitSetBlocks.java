@@ -116,6 +116,11 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return null;
+    }
+
+    @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         return null;
     }

@@ -13,6 +13,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -44,6 +45,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return biomes[(z << 4) | x];
+    }
+
+    @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
@@ -69,7 +75,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockTypes.states[get(x, y, z)];
+        return BlockTypesCache.states[get(x, y, z)];
     }
 
     @Override

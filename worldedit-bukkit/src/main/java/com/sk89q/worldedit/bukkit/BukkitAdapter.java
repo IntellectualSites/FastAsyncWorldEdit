@@ -139,7 +139,7 @@ public enum BukkitAdapter {
      */
     public static Player adapt(com.sk89q.worldedit.entity.Player player) {
         player = PlayerProxy.unwrap(player);
-        return ((BukkitPlayer) player).getPlayer();
+        return player == null ? null : ((BukkitPlayer) player).getPlayer();
     }
 
     /**

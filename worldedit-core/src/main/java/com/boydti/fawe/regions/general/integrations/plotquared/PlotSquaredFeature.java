@@ -38,14 +38,16 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         Fawe.debug("Optimizing PlotSquared");
-        setupBlockQueue();
-        setupSchematicHandler();
-        setupChunkManager();
-        if (Settings.PLATFORM.equalsIgnoreCase("bukkit")) {
-            new FaweTrim();
+        if (com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_HOOK) {
+            setupBlockQueue();
+            setupSchematicHandler();
+            setupChunkManager();
+            if (Settings.PLATFORM.equalsIgnoreCase("bukkit")) {
+                new FaweTrim();
+            }
+            if (MainCommand.getInstance().getCommand("generatebiome") == null) {
+                new PlotSetBiome();
         }
-        if (MainCommand.getInstance().getCommand("generatebiome") == null) {
-            new PlotSetBiome();
         }
 // TODO: revisit this later on
 /*

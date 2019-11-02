@@ -59,8 +59,8 @@ public class StringMan {
     }
 
     public static String prettyFormat(double d) {
-        if (d == Double.MIN_VALUE) return "-∞";
-        if (d == Double.MAX_VALUE) return "∞";
+        if (d == Double.MIN_VALUE || d == Double.NEGATIVE_INFINITY) return "-∞";
+        if (d == Double.MAX_VALUE || d == Double.POSITIVE_INFINITY) return "∞";
         if(d == (long) d) return String.format("%d",(long)d);
         else return String.format("%s",d);
     }

@@ -1,8 +1,8 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.EmptyBatchProcessor;
-import com.boydti.fawe.beta.implementation.MultiBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -46,7 +46,7 @@ public interface IBatchProcessor {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.getArray(layer);
-                    int index = (minY & 15) << 12;
+                    int index = (minY & 15) << 8;
                     for (int i = 0; i < index; i++) arr[i] = 0;
                     set.setBlocks(layer, arr);
                 } else {
@@ -59,7 +59,7 @@ public interface IBatchProcessor {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.getArray(layer);
-                    int index = ((maxY + 1) & 15) << 12;
+                    int index = ((maxY + 1) & 15) << 8;
                     for (int i = index; i < arr.length; i++) arr[i] = 0;
                     set.setBlocks(layer, arr);
                 } else {

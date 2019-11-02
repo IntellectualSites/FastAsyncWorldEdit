@@ -5,7 +5,10 @@ import com.boydti.fawe.util.MainUtil;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -51,31 +54,76 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> {
         }
     }
 
-    public static void clean(ThreadLocal instance) {
+    public List<T> getAll() {
+        List<T> list = new ArrayList<>();
+        iterate(this, new Consumer<Object>() {
+            Method methodGetEntry;
+            Field fieldValue;
+            @Override
+            public void accept(Object tlm) {
+                try {
+                    if (methodGetEntry == null) {
+                        methodGetEntry = tlm.getClass().getDeclaredMethod("getEntry", ThreadLocal.class);
+                        methodGetEntry.setAccessible(true);
+                    }
+                    Object entry = methodGetEntry.invoke(tlm, CleanableThreadLocal.this);
+                    if (entry != null) {
+                        if (fieldValue == null) {
+                            fieldValue = entry.getClass().getDeclaredField("value");
+                            fieldValue.setAccessible(true);
+                        }
+                        Object value = fieldValue.get(entry);
+                        if (value != null) {
+                            list.add((T) value);
+                        }
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        return list;
+    }
+
+    public static void iterate(ThreadLocal instance, Consumer<Object> withMap) {
         try {
             Thread[] threads = MainUtil.getThreads();
             Field tl = Thread.class.getDeclaredField("threadLocals");
             tl.setAccessible(true);
-            Method methodRemove = null;
             for (Thread thread : threads) {
                 if (thread != null) {
                     Object tlm = tl.get(thread);
                     if (tlm != null) {
-                        if (methodRemove == null) {
-                            methodRemove = tlm.getClass().getDeclaredMethod("remove", ThreadLocal.class);
-                            methodRemove.setAccessible(true);
-                        }
-                        if (methodRemove != null) {
-                            try {
-                                methodRemove.invoke(tlm, instance);
-                            } catch (Throwable ignore) {}
-                        }
+                        withMap.accept(tlm);
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void clean(ThreadLocal instance) {
+        iterate(instance, new Consumer<Object>() {
+            Method methodRemove;
+            @Override
+            public void accept(Object tlm) {
+                try {
+                    if (methodRemove == null) {
+                        methodRemove = tlm.getClass().getDeclaredMethod("remove", ThreadLocal.class);
+                        methodRemove.setAccessible(true);
+                    }
+                    if (methodRemove != null) {
+                        try {
+                            methodRemove.invoke(tlm, instance);
+                        } catch (Throwable ignore) {
+                        }
+                    }
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public static void cleanAll() {

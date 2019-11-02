@@ -6,7 +6,7 @@ import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.beta.SingleFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -75,6 +75,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -431,7 +432,7 @@ public class CFICommands {
                 Clipboard clipboard = holder.getClipboard();
                 boolean[] ids = new boolean[BlockTypes.size()];
                 for (BlockVector3 pt : clipboard.getRegion()) {
-                    ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
+                    ids[clipboard.getBlock(pt).getBlockType().getInternalId()] = true;
                 }
                 blocks = new HashSet<>();
                 for (int combined = 0; combined < ids.length; combined++) {
@@ -605,7 +606,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterId(Player player, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(player);
-        settings.getGenerator().setWaterId(block.getBlockType().getInternalId());
+        settings.getGenerator().setWater(block.toImmutableState());
 
         player.print("Set water id!");
         settings.resetComponent();
@@ -620,7 +621,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void baseId(Player player, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(player);
-        settings.getGenerator().setBedrockId(block.getBlockType().getInternalId());
+        settings.getGenerator().setBedrock(block.toImmutableState());
         player.print(TextComponent.of("Set base id!"));
         settings.resetComponent();
         component(player);

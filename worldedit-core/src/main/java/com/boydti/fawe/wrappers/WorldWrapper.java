@@ -1,6 +1,7 @@
 package com.boydti.fawe.wrappers;
 
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -235,8 +237,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void sendChunk(int chunkX, int chunkZ, int bitMask) {
-        parent.sendChunk(chunkX, chunkZ, bitMask);
+    public void refreshChunk(int X, int Z) {
+        parent.refreshChunk(X, Z);
     }
 
     @Override
@@ -303,5 +305,10 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public IChunkGet get(int x, int z) {
         return parent.get(x, z);
+    }
+
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+        parent.sendFakeChunk(player, packet);
     }
 }

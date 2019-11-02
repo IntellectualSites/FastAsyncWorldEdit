@@ -19,10 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -36,7 +33,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -45,8 +41,11 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
@@ -59,8 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge schematic format.
@@ -140,61 +139,32 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             NBTOutputStream tilesOut = new NBTOutputStream(new LZ4BlockOutputStream(tilesCompressed));
 
             List<Integer> paletteList = new ArrayList<>();
-            char[] palette = new char[BlockTypes.states.length];
+            char[] palette = new char[BlockTypesCache.states.length];
             Arrays.fill(palette, Character.MAX_VALUE);
             int[] paletteMax = {0};
+            int numTiles = 0;
+            for (BlockVector3 pos : clipboard) {
+                BaseBlock block = pos.getFullBlock(clipboard);
+                CompoundTag nbt = block.getNbtData();
+                if (nbt != null) {
+                    Map<String, Tag> values = nbt.getValue();
 
+                    values.remove("id"); // Remove 'id' if it exists. We want 'Id'
 
-            int[] numTiles = {0};
-            FaweClipboard.BlockReader reader = new FaweClipboard.BlockReader() {
-                @Override
-                public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-                    try {
-                        if (block.hasNbtData()) {
-                            CompoundTag nbt = block.getNbtData();
-                            if (nbt != null) {
-                                Map<String, Tag> values = nbt.getValue();
-
-                                values.remove("id"); // Remove 'id' if it exists. We want 'Id'
-
-                                // Positions are kept in NBT, we don't want that.
-                                values.remove("x");
-                                values.remove("y");
-                                values.remove("z");
-                                if (!values.containsKey("Id")) {
-                                    values.put("Id", new StringTag(block.getNbtId()));
-                                }
-                                values.put("Pos", new IntArrayTag(new int[]{
-                                        x,
-                                        y,
-                                        z
-                                }));
-                                numTiles[0]++;
-                                tilesOut.writeTagPayload(block.getNbtData());
-                            }
-                        }
-                        int ordinal = block.getOrdinal();
-                        char value = palette[ordinal];
-                        if (value == Character.MAX_VALUE) {
-                            int size = paletteMax[0]++;
-                            palette[ordinal] = value = (char) size;
-                            paletteList.add(ordinal);
-                        }
-                        IOUtil.writeVarInt(blocksOut, value);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    // Positions are kept in NBT, we don't want that.
+                    values.remove("x");
+                    values.remove("y");
+                    values.remove("z");
+                    if (!values.containsKey("Id")) {
+                        values.put("Id", new StringTag(block.getNbtId()));
                     }
-                }
-            };
-            if (clipboard instanceof BlockArrayClipboard) {
-                ((BlockArrayClipboard) clipboard).IMP.forEach(reader, true);
-            } else {
-                for (BlockVector3 pt : region) {
-                    BaseBlock block = clipboard.getFullBlock(pt);
-                    int x = pt.getBlockX() - min.getBlockX();
-                    int y = pt.getBlockY() - min.getBlockY();
-                    int z = pt.getBlockZ() - min.getBlockY();
-                    reader.run(x, y, z, block);
+                    values.put("Pos", new IntArrayTag(new int[]{
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ()
+                    }));
+                    numTiles++;
+                    tilesOut.writeTagPayload(block.getNbtData());
                 }
             }
             // close
@@ -206,7 +176,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             out.writeLazyCompoundTag("Palette", out12 -> {
                 for (int i = 0; i < paletteList.size(); i++) {
                     int stateOrdinal = paletteList.get(i);
-                    BlockState state = BlockTypes.states[stateOrdinal];
+                    BlockState state = BlockTypesCache.states[stateOrdinal];
                     out12.writeNamedTag(state.getAsString(), i);
                 }
             });
@@ -217,10 +187,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 IOUtil.copy(in, rawStream);
             }
 
-            if (numTiles[0] != 0) {
+            if (numTiles != 0) {
                 out.writeNamedTagName("TileEntities", NBTConstants.TYPE_LIST);
                 rawStream.write(NBTConstants.TYPE_COMPOUND);
-                rawStream.writeInt(numTiles[0]);
+                rawStream.writeInt(numTiles);
                 try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(tilesCompressed.toByteArray()))) {
                     IOUtil.copy(in, rawStream);
                 }
@@ -271,9 +241,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         int[] palette = new int[BiomeTypes.getMaxId() + 1];
         Arrays.fill(palette, Integer.MAX_VALUE);
         int[] paletteMax = {0};
-        NBTStreamer.ByteReader task = new NBTStreamer.ByteReader() {
+        IntValueReader task = new IntValueReader() {
             @Override
-            public void run(int index, int ordinal) {
+            public void applyInt(int index, int ordinal) {
                 try {
                     int value = palette[ordinal];
                     if (value == Integer.MAX_VALUE) {
@@ -287,20 +257,17 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 }
             }
         };
-        if (clipboard instanceof BlockArrayClipboard) {
-            ((BlockArrayClipboard) clipboard).IMP.streamBiomes(task);
-        } else {
-            BlockVector3 min = clipboard.getMinimumPoint();
-            int width = clipboard.getRegion().getWidth();
-            int length = clipboard.getRegion().getLength();
-            for (int z = 0, i = 0; z < length; z++) {
-                int z0 = min.getBlockZ() + z;
-                for (int x = 0; x < width; x++, i++) {
-                    int x0 = min.getBlockX() + x;
-                    BlockVector2 pt = BlockVector2.at(x0, z0);
-                    BiomeType biome = clipboard.getBiome(pt);
-                    task.run(i, biome.getInternalId());
-                }
+        System.out.println("TODO Optimize biome write");
+        BlockVector3 min = clipboard.getMinimumPoint();
+        int width = clipboard.getRegion().getWidth();
+        int length = clipboard.getRegion().getLength();
+        for (int z = 0, i = 0; z < length; z++) {
+            int z0 = min.getBlockZ() + z;
+            for (int x = 0; x < width; x++, i++) {
+                int x0 = min.getBlockX() + x;
+                BlockVector2 pt = BlockVector2.at(x0, z0);
+                BiomeType biome = clipboard.getBiome(pt);
+                task.applyInt(i, biome.getInternalId());
             }
         }
         biomesOut.close();

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.session.request;
 
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -26,13 +27,14 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Describes the current request using a {@link ThreadLocal}.
  */
 public final class Request {
 
-    private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
+    private static final CleanableThreadLocal<Request> threadLocal = new CleanableThreadLocal<>(Request::new);
 
     private @Nullable World world;
     private @Nullable Actor actor;
@@ -42,6 +44,10 @@ public final class Request {
     private boolean valid;
 
     private Request() {
+    }
+
+    public static List<Request> getAll() {
+        return threadLocal.getAll();
     }
 
     /**

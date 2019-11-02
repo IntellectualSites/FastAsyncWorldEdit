@@ -19,10 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
@@ -35,7 +31,6 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.WorldCutClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
@@ -75,6 +70,13 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -86,12 +88,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 
 /**
@@ -516,8 +516,7 @@ public class ClipboardCommands {
         final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
 
-        Schematic schem = new Schematic(clipboard);
-        schem.paste(editSession, to, !ignoreAirBlocks);
+        clipboard.paste(editSession, to, !ignoreAirBlocks);
 
         Region region = clipboard.getRegion().clone();
         if (selectPasted) {
@@ -538,6 +537,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/rotate",
+        aliases = {"/rt"},
         desc = "Rotate the contents of the clipboard",
         descFooter = "Non-destructively rotate the contents of the clipboard.\n" +
             "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +

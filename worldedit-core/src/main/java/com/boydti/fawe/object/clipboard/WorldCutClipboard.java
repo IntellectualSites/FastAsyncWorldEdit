@@ -6,6 +6,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.io.IOException;
+
 public class WorldCutClipboard extends WorldCopyClipboard {
     public WorldCutClipboard(EditSession editSession, Region region, boolean copyEntities, boolean copyBiome) {
         super(editSession, region, copyEntities, copyBiome);
@@ -16,7 +18,7 @@ public class WorldCutClipboard extends WorldCopyClipboard {
     }
 
     @Override
-    public BaseBlock getBlock(int x, int y, int z) {
+    public BaseBlock getFullBlock(int x, int y, int z) {
         int xx = mx + x;
         int yy = my + y;
         int zz = mz + z;
@@ -33,8 +35,7 @@ public class WorldCutClipboard extends WorldCopyClipboard {
     }
 
     @Override
-    public void forEach(BlockReader task, boolean air) {
-        super.forEach(task, air);
+    public void close() {
         if (extent instanceof EditSession) {
             ((EditSession) extent).flushQueue();
         } else {

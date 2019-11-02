@@ -194,8 +194,8 @@ public class ToolUtilCommands {
     }
 
     @Command(
-            name = "/",
-            aliases = {","},
+            name = "/superpickaxe",
+            aliases = {",", "/sp", "/pickaxe"},
             desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")

@@ -4,6 +4,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public class PropertyGroup<G, A> {
         public PropertyGroup build() {
             PropertyFunction[] states = new PropertyFunction[BlockTypes.size()];
             Property prop;
-            for (BlockType type : BlockTypes.values) {
+            for (BlockType type : BlockTypesCache.values) {
                 for (Object[] func : funcs) {
                     if ((prop = type.getProperty((PropertyKey) func[0])) != null) {
                         PropertyFunction pf = new PropertyFunction(prop, (Function) func[1], (Function) func[2]);

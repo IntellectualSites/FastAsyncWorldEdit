@@ -28,6 +28,10 @@ public final class BitArray4096 {
         this.data = new long[longLen];
     }
 
+    public long[] getData() {
+        return data;
+    }
+
     public final void setAt(int index, int value) {
         if (longLen == 0) return;
         int bitIndexStart = index * bitsPerEntry;

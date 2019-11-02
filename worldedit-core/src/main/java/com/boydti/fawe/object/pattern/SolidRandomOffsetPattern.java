@@ -9,6 +9,8 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.util.SplittableRandom;
 
 public class SolidRandomOffsetPattern extends AbstractPattern {
@@ -21,7 +23,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
 
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
-        for (BlockType type : BlockTypes.values) {
+        for (BlockType type : BlockTypesCache.values) {
             types[type.getInternalId()] = type.getMaterial().isSolid();
         }
         return types;

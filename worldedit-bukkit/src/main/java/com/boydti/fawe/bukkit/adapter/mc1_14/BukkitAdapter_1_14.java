@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
@@ -10,6 +11,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -21,6 +23,7 @@ import net.minecraft.server.v1_14_R1.DataPaletteBlock;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
@@ -78,7 +81,7 @@ public class BukkitAdapter_1_14 {
             fieldDirtyBits.setAccessible(true);
 
             {
-                Field tmp = null;
+                Field tmp;
                 try {
                     tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
                 } catch (NoSuchFieldException paper) {
@@ -133,8 +136,6 @@ public class BukkitAdapter_1_14 {
         }
     }
 
-    private static boolean PAPER = true;
-
     public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
@@ -143,7 +144,7 @@ public class BukkitAdapter_1_14 {
         if (Fawe.isMainThread()) {
             return nmsWorld.getChunkAt(X, Z);
         }
-        if (PAPER) {
+        if (FaweBukkit.PAPER) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
             try {
@@ -154,15 +155,14 @@ public class BukkitAdapter_1_14 {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (Throwable e) {
-                System.out.println("Error, cannot load chunk async (paper not installed?)");
-                PAPER = false;
+                e.printStackTrace();
             }
         }
         // TODO optimize
         return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
     }
 
-    private static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
+    public static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
         if (playerChunk == null) {
@@ -274,7 +274,7 @@ public class BukkitAdapter_1_14 {
             for (int i = 0; i < num_palette; i++) {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
-                final BlockState state = BlockTypes.states[ordinal];
+                final BlockState state = BlockTypesCache.states[ordinal];
                 final IBlockData ibd = ((BlockMaterial_1_14) state.getMaterial()).getState();
                 palette.a(ibd);
             }

@@ -20,6 +20,7 @@ repositories {
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
     maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
+    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
 }
 
 configurations.all {
@@ -49,6 +50,9 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
+    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
+    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
+
     "implementation"("com.massivecraft:factions:2.8.0") { isTransitive = false }
     "implementation"("com.drtshock:factions:1.6.9.5") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }

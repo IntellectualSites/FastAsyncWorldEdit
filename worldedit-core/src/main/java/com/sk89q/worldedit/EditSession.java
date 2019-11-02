@@ -332,6 +332,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
                 traverser.setNext(nullExtent);
             }
+            get.addProcessor(nullExtent);
             traverser = next;
         }
         return super.cancel();

@@ -219,8 +219,8 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "undo",
-        aliases = { "/undo" },
+        name = "/undo",
+        aliases = { "/un", "/ud", "undo" },
         desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
@@ -266,8 +266,8 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "redo",
-        aliases = { "/redo" },
+        name = "/redo",
+        aliases = { "/do", "/rd", "redo" },
         desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})

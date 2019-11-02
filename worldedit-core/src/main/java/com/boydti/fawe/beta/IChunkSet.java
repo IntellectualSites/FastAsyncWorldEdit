@@ -38,8 +38,13 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     BiomeType[] getBiomes();
 
+    @Override
+    BiomeType getBiomeType(int x, int z);
+
+    @Override
     Map<BlockVector3, CompoundTag> getTiles();
 
+    @Override
     Set<CompoundTag> getEntities();
 
     @Override

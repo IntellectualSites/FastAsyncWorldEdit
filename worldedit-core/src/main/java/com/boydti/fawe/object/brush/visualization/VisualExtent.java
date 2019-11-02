@@ -47,7 +47,6 @@ public class VisualExtent extends AbstractDelegateExtent {
     @Override
     public Operation commit() {
         IQueueExtent queue = (IQueueExtent) getExtent();
-        queue.sendBlockUpdates(this.player);
         return null;
     }
 
@@ -59,7 +58,6 @@ public class VisualExtent extends AbstractDelegateExtent {
 
     public void clear() {
         IQueueExtent queue = (IQueueExtent) getExtent();
-        queue.clearBlockUpdates(player);
         queue.cancel();
     }
 }

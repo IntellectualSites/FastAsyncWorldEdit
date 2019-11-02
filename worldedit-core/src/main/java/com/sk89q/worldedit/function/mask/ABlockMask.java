@@ -5,6 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
     @Override
     public String toString() {
         List<String> strings = new ArrayList<>();
-        for (BlockType type : BlockTypes.values) {
+        for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 boolean hasAll;
                 List<BlockState> all = type.getAllStates();
@@ -43,7 +44,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
-            for (BlockState state : BlockTypes.states) {
+            for (BlockState state : BlockTypesCache.states) {
                 if (state != null) {
                     if (test(state) && other.test(state)) {
                         newMask.add(state);
@@ -62,7 +63,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
-            for (BlockState state : BlockTypes.states) {
+            for (BlockState state : BlockTypesCache.states) {
                 if (state != null) {
                     if (test(state) || other.test(state)) {
                         newMask.add(state);

@@ -9,12 +9,12 @@ import java.lang.reflect.Array;
  * Records changes made through the {@link #set(int, int, int, int)} method<br/>
  * Changes are not recorded if you edit the raw data
  */
-public final class DifferentialBlockBuffer implements DifferentialCollection<int[][][][][]> {
+public final class DifferentialBlockBuffer implements DifferentialCollection<char[][][][][]> {
 
     private final int width, length;
     private final int t1, t2;
-    private int[][][][][] data;
-    private int[][][][][] changes;
+    private char[][][][][] data;
+    private char[][][][][] changes;
 
     public DifferentialBlockBuffer(int width, int length) {
         this.width = width;
@@ -24,7 +24,7 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<int
     }
 
     @Override
-    public int[][][][][] get() {
+    public char[][][][][] get() {
         return data;
     }
 
@@ -116,72 +116,72 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<int
         changes = null;
     }
 
-    public void set(int x, int y, int z, int combined) {
+    public void set(int x, int y, int z, char combined) {
         if (combined == 0) combined = 1;
         int localX = x & 15;
         int localZ = z & 15;
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
         if (data == null) {
-            data = new int[t1][][][][];
-            changes = new int[0][][][][];
+            data = new char[t1][][][][];
+            changes = new char[0][][][][];
         }
 
-        int[][][][] arr = data[chunkZ];
+        char[][][][] arr = data[chunkZ];
         if (arr == null) {
-            arr = data[chunkZ] = new int[t2][][][];
+            arr = data[chunkZ] = new char[t2][][][];
         }
-        int[][][] arr2 = arr[chunkX];
+        char[][][] arr2 = arr[chunkX];
         if (arr2 == null) {
-            arr2 = arr[chunkX] = new int[256][][];
+            arr2 = arr[chunkX] = new char[256][][];
         }
 
-        int[][] yMap = arr2[y];
+        char[][] yMap = arr2[y];
         if (yMap == null) {
-            arr2[y] = yMap = new int[16][];
+            arr2[y] = yMap = new char[16][];
         }
         boolean newSection;
         int current;
-        int[] zMap = yMap[localZ];
+        char[] zMap = yMap[localZ];
         if (zMap == null) {
-            yMap[localZ] = zMap = new int[16];
+            yMap[localZ] = zMap = new char[16];
 
             if (changes == null) {
-                changes = new int[t1][][][][];
+                changes = new char[t1][][][][];
             } else if (changes != null && changes.length != 0) {
-                initialChange(changes, chunkX, chunkZ, localX, localZ, y, (int) -combined);
+                initialChange(changes, chunkX, chunkZ, localX, localZ, y, (char) -combined);
             }
 
         } else {
-            if (changes == null || changes.length == 0) changes = new int[t1][][][][];
-            appendChange(changes, chunkX, chunkZ, localX, localZ, y, (int) (zMap[localX] - combined));
+            if (changes == null || changes.length == 0) changes = new char[t1][][][][];
+            appendChange(changes, chunkX, chunkZ, localX, localZ, y, (char) (zMap[localX] - combined));
         }
 
         zMap[localX] = combined;
     }
 
-    private void initialChange(int[][][][][] src, int chunkX, int chunkZ, int localX, int localZ, int y, int combined) {
-        int[][][][] arr = src[chunkZ];
+    private void initialChange(char[][][][][] src, int chunkX, int chunkZ, int localX, int localZ, int y, char combined) {
+        char[][][][] arr = src[chunkZ];
         if (arr == null) {
-            src[chunkZ] = new int[0][][][];
+            src[chunkZ] = new char[0][][][];
             return;
         } else if (arr.length == 0) return;
 
-        int[][][] arr2 = arr[chunkX];
+        char[][][] arr2 = arr[chunkX];
         if (arr2 == null) {
-            arr[chunkX] = new int[0][][];
+            arr[chunkX] = new char[0][][];
             return;
         } else if (arr2.length == 0) return;
 
-        int[][] yMap = arr2[y];
+        char[][] yMap = arr2[y];
         if (yMap == null) {
-            arr2[y] = new int[0][];
+            arr2[y] = new char[0][];
             return;
         } else if (yMap.length == 0) return;
 
-        int[] zMap = yMap[localZ];
+        char[] zMap = yMap[localZ];
         if (zMap == null) {
-            yMap[localZ] = new int[0];
+            yMap[localZ] = new char[0];
             return;
         } else if (zMap.length == 0) return;
 
@@ -189,23 +189,23 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<int
         zMap[localX] = combined;
     }
 
-    private void appendChange(int[][][][][] src, int chunkX, int chunkZ, int localX, int localZ, int y, int combined) {
-        int[][][][] arr = src[chunkZ];
+    private void appendChange(char[][][][][] src, int chunkX, int chunkZ, int localX, int localZ, int y, char combined) {
+        char[][][][] arr = src[chunkZ];
         if (arr == null || arr.length == 0) {
-            arr = src[chunkZ] = new int[t2][][][];
+            arr = src[chunkZ] = new char[t2][][][];
         }
-        int[][][] arr2 = arr[chunkX];
+        char[][][] arr2 = arr[chunkX];
         if (arr2 == null || arr2.length == 0) {
-            arr2 = arr[chunkX] = new int[256][][];
+            arr2 = arr[chunkX] = new char[256][][];
         }
 
-        int[][] yMap = arr2[y];
+        char[][] yMap = arr2[y];
         if (yMap == null || yMap.length == 0) {
-            arr2[y] = yMap = new int[16][];
+            arr2[y] = yMap = new char[16][];
         }
-        int[] zMap = yMap[localZ];
+        char[] zMap = yMap[localZ];
         if (zMap == null || zMap.length == 0) {
-            yMap[localZ] = zMap = new int[16];
+            yMap[localZ] = zMap = new char[16];
         }
         zMap[localX] = combined;
     }

@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
+import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.util.MainUtil;
@@ -71,7 +72,7 @@ public abstract class MCAWriter implements Extent {
 
     public abstract boolean shouldWrite(int chunkX, int chunkZ);
 
-    public abstract WritableMCAChunk write(WritableMCAChunk input, int startX, int endX, int startZ, int endZ);
+    public abstract MCAChunk write(MCAChunk input, int startX, int endX, int startZ, int endZ);
 
     public void generate() throws IOException {
         if (!folder.exists()) {
@@ -80,9 +81,12 @@ public abstract class MCAWriter implements Extent {
         final ForkJoinPool pool = new ForkJoinPool();
         int tcx = (width - 1) >> 4;
         int tcz = (length - 1) >> 4;
-        final ThreadLocal<WritableMCAChunk> chunkStore = ThreadLocal.withInitial(() -> {
-            WritableMCAChunk chunk = new WritableMCAChunk();
-            Arrays.fill(chunk.blocks, BlockID.AIR);
+        final ThreadLocal<MCAChunk> chunkStore = new ThreadLocal<MCAChunk>() {
+            @Override
+            protected MCAChunk initialValue() {
+                MCAChunk chunk = new MCAChunk();
+                Arrays.fill(chunk.blocks, (char) BlockID.AIR);
+//                Arrays.fill(chunk.skyLight, (byte) 255);
             return chunk;
         });
         final ThreadLocal<byte[]> byteStore1 = ThreadLocal.withInitial(() -> new byte[500000]);
@@ -122,12 +126,13 @@ public abstract class MCAWriter implements Extent {
                         if (shouldWrite(cx, cz)) {
                             pool.submit(() -> {
                                 try {
-                                    WritableMCAChunk chunk = chunkStore.get();
-                                    chunk.clear(fcx, fcz);
+                                    MCAChunk chunk = chunkStore.get();
+                                    chunk.reset();
+                                    chunk.setPosition(fcx, fcz);
                                     chunk = write(chunk, csx, cex, csz, cez);
                                     if (chunk != null) {
                                         // Generation offset
-                                        chunk.setLoc( fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
+                                        chunk.setPosition( fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
 
                                         // Compress
                                         byte[] bytes = chunk.toBytes(byteStore1.get());
