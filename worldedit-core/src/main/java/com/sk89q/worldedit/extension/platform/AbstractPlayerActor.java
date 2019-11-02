@@ -81,7 +81,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
-    private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
+    private final Map<String, Object> meta;
+
+    public AbstractPlayerActor(Map<String, Object> meta) {
+        this.meta = meta;
+    }
+
+    public AbstractPlayerActor() {
+        this(new ConcurrentHashMap<>());
+    }
 
     @Override
     public Map<String, Object> getRawMeta() {

@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -69,16 +70,29 @@ public class BukkitPlayer extends AbstractPlayerActor {
     private WorldEditPlugin plugin;
 
     public BukkitPlayer(Player player) {
-        this(WorldEditPlugin.getInstance(), player);
-        Fawe.debug("Should not construct BukkitPlayer. Instead use BukkitAdapter.adapt(player)");
+        super(getExistingMap(WorldEditPlugin.getInstance(), player));
+        this.plugin = WorldEditPlugin.getInstance();
+        this.player = player;
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        init();
+    }
+
+    private void init() {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
+    }
+
+    private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, Player player) {
+        BukkitPlayer cached = plugin.getCachedPlayer(player);
+        if (cached != null) {
+            return cached.getRawMeta();
+        }
+        return new ConcurrentHashMap<>();
     }
 
     @Override

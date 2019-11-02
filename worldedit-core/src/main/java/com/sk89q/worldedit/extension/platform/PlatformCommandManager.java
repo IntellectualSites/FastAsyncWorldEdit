@@ -727,14 +727,13 @@ public final class PlatformCommandManager {
             if (context instanceof MemoizingValueAccess) {
                 context = ((MemoizingValueAccess) context).snapshotMemory();
             } else {
-                System.out.println("Invalid context " + context);
             }
             Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();
-                session.remember(editSession);
                 editSession.flushQueue();
+                session.remember(editSession);
 
                 long time = System.currentTimeMillis() - start;
                 if (time > 1000) {
