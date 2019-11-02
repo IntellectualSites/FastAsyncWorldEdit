@@ -208,13 +208,13 @@ public class StreamDelegate {
         return elemReader;
     }
 
-    public void acceptInfo(int length, int type) {
+    public void acceptInfo(int length, int type) throws IOException {
         if (infoReader != null) {
             infoReader.apply(length, type);
         }
     }
 
-    public boolean acceptLazy(int length, NBTInputStream is) {
+    public boolean acceptLazy(int length, NBTInputStream is) throws IOException {
         if (lazyReader != null) {
             lazyReader.apply(length, is);
             return true;

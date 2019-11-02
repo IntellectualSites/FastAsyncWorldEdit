@@ -57,7 +57,7 @@ import java.util.Map;
 public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
-    private static LegacyMapper INSTANCE;
+    private static LegacyMapper INSTANCE = new LegacyMapper();
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
@@ -267,10 +267,7 @@ public final class LegacyMapper {
         }
     }
 
-    public static LegacyMapper getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LegacyMapper();
-        }
+    public final static LegacyMapper getInstance() {
         return INSTANCE;
     }
 

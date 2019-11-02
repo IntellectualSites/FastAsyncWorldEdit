@@ -198,10 +198,14 @@ public class Schematic {
 
     public void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
         Region region = clipboard.getRegion().clone();
-        final BlockVector3 bot = clipboard.getMinimumPoint();
         final BlockVector3 origin = clipboard.getOrigin();
 
         final boolean copyBiomes = clipboard.hasBiomes();
+        // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
+        final int relx = to.getBlockX() - origin.getBlockX();
+        final int rely = to.getBlockY() - origin.getBlockY();
+        final int relz = to.getBlockZ() - origin.getBlockZ();
+
         clipboard.apply(clipboard, new Filter() {
             @Override
             public void applyBlock(FilterBlock block) {
@@ -209,12 +213,10 @@ public class Schematic {
             }
         });
 
+        System.out.println("Rel " + relx + "," + rely + "," + relz + " | " + to + " | " + origin);
+
         System.out.println("TODO optimize paste using above apply");
-        // Optimize for BlockArrayClipboard
-        // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
-        final int relx = to.getBlockX() - origin.getBlockX();
-        final int rely = to.getBlockY() - origin.getBlockY();
-        final int relz = to.getBlockZ() - origin.getBlockZ();
+
         Operation visitor = new RegionVisitor(region, new RegionFunction() {
             //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
             MutableBlockVector2 mpos2d = new MutableBlockVector2();
@@ -226,6 +228,7 @@ public class Schematic {
             @Override
             public boolean apply(BlockVector3 mutable) throws WorldEditException {
                 BlockState block = clipboard.getBlock(mutable);
+                System.out.println("Pos " + mutable);
                 int xx = mutable.getBlockX() + relx;
                 int zz = mutable.getBlockZ() + relz;
                 if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
@@ -261,3 +264,4 @@ public class Schematic {
         }
     }
 }
+

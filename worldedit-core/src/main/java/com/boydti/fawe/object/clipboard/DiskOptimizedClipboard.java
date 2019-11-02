@@ -201,11 +201,16 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (!hasBiomes()) return;
         int index = 0;
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
-        for (int z = 0; z < getLength(); z++) {
-            for (int x = 0; x < getWidth(); x++, index++, mbbIndex++) {
-                int biome = byteBuffer.get(mbbIndex) & 0xFF;
-                task.applyInt(index, biome);
+        try {
+            for (int z = 0; z < getLength(); z++) {
+                for (int x = 0; x < getWidth(); x++, index++, mbbIndex++) {
+                    int biome = byteBuffer.get(mbbIndex) & 0xFF;
+                    task.applyInt(index, biome);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
