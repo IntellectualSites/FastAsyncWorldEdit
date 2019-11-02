@@ -17,6 +17,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,10 +68,15 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
         int index = 0;
-        for (int z = 0; z < getLength(); z++) {
-            for (int x = 0; x < getWidth(); x++, index++) {
-                task.applyInt(index, biomes[index].getInternalId());
+        try {
+            for (int z = 0; z < getLength(); z++) {
+                for (int x = 0; x < getWidth(); x++, index++) {
+                    task.applyInt(index, biomes[index].getInternalId());
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

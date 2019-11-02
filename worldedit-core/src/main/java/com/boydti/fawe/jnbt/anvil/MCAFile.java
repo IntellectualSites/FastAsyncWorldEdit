@@ -1,6 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal4;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
@@ -32,7 +34,7 @@ import java.util.zip.InflaterInputStream;
  * Chunk format: http://minecraft.gamepedia.com/Chunk_format#Entity_format
  * e.g.: `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
  */
-public class MCAFile {
+public class MCAFile implements Trimable {
 
     private static Field fieldBuf2;
     private static Field fieldBuf3;
@@ -48,13 +50,17 @@ public class MCAFile {
         }
     }
 
-    private final World world;
-    private final File file;
+    private final ForkJoinPool pool;
+    private final byte[] locations;
+    private boolean readLocations;
+
+    private File file;
     private RandomAccessFile raf;
-    private byte[] locations;
+
     private boolean deleted;
-    private final int X, Z;
-    private final Int2ObjectOpenHashMap<MCAChunk> chunks = new Int2ObjectOpenHashMap<>();
+    private int X, Z;
+    private MCAChunk[] chunks;
+    private boolean[] chunkInitialized;
 
     final ThreadLocal<byte[]> byteStore1 = new ThreadLocal<byte[]>() {
         @Override
@@ -75,26 +81,93 @@ public class MCAFile {
         }
     };
 
-    public MCAFile(World world, File file) throws FileNotFoundException {
-        this.world = world;
+    public MCAFile(ForkJoinPool pool) {
+        this.pool = pool;
+        this.locations = new byte[4096];
+        this.chunks = new MCAChunk[32 * 32];
+        this.chunkInitialized = new boolean[this.chunks.length];
+    }
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        boolean hasChunk = false;
+        for (int i = 0; i < chunkInitialized.length; i++) {
+            if (!chunkInitialized[i]) {
+                chunks[i] = null;
+            } else {
+                hasChunk = true;
+            }
+        }
+        CleanableThreadLocal.clean(byteStore1);
+        CleanableThreadLocal.clean(byteStore2);
+        CleanableThreadLocal.clean(byteStore3);
+        return !hasChunk;
+    }
+
+    public MCAFile init(File file) throws FileNotFoundException {
+        String[] split = file.getName().split("\\.");
+        X = Integer.parseInt(split[1]);
+        Z = Integer.parseInt(split[2]);
+        return init(file, X, Z);
+    }
+
+    public MCAFile init(File file, int mcrX, int mcrZ) throws FileNotFoundException {
+        if (raf != null) {
+            synchronized (raf) {
+                if (raf != null) {
+                    flush(pool);
+                    for (int i = 0; i < 4096; i++) {
+                        locations[i] = 0;
+                    }
+                    try {
+                        raf.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    raf = null;
+                    deleted = false;
+                    Arrays.fill(chunkInitialized, false);
+                    readLocations = false;
+                }
+            }
+            this.X = mcrX;
+            this.Z = mcrZ;
+        }
+
         this.file = file;
         if (!file.exists()) {
             throw new FileNotFoundException(file.getName());
         }
-        String[] split = file.getName().split("\\.");
-        X = Integer.parseInt(split[1]);
-        Z = Integer.parseInt(split[2]);
+        return this;
     }
 
-    public MCAFile(World world, int mcrX, int mcrZ) {
-        this(world, mcrX, mcrZ, new File(world.getStoragePath().toFile(), "r." + mcrX + "." + mcrZ + ".mca"));
+    public MCAFile init(World world, int mcrX, int mcrZ) throws FileNotFoundException {
+        return init(new File(world.getStoragePath().toFile(), File.separator + "regions" + File.separator + "r." + mcrX + "." + mcrZ + ".mca"));
     }
 
-    public MCAFile(World world, int mcrX, int mcrZ, File file) {
-        this.world = world;
-        this.file = file;
-        X = mcrX;
-        Z = mcrZ;
+    public int getIndex(int chunkX, int chunkZ) {
+        return ((chunkX & 31) << 2) + ((chunkZ & 31) << 7);
+    }
+
+
+    private RandomAccessFile getRaf() throws FileNotFoundException {
+        if (this.raf == null) {
+            this.raf = new RandomAccessFile(file, "rw");
+        }
+        return this.raf;
+    }
+
+    private void readHeader() throws IOException {
+        if (!readLocations) {
+            readLocations = true;
+            getRaf();
+            if (raf.length() < 8192) {
+                raf.setLength(8192);
+            } else {
+                raf.seek(0);
+                raf.readFully(locations);
+            }
+        }
     }
 
     public void clear() {
@@ -106,12 +179,8 @@ public class MCAFile {
             }
         }
         synchronized (chunks) {
-            chunks.clear();
+            Arrays.fill(chunkInitialized, false);
         }
-        locations = null;
-        CleanableThreadLocal.clean(byteStore1);
-        CleanableThreadLocal.clean(byteStore2);
-        CleanableThreadLocal.clean(byteStore3);
     }
 
     @Override
@@ -128,32 +197,6 @@ public class MCAFile {
 
     public boolean isDeleted() {
         return deleted;
-    }
-
-    public World getWorld() {
-        return world;
-    }
-
-    /**
-     * Loads the location header from disk
-     */
-    public void init() {
-        try {
-            if (raf == null) {
-                this.locations = new byte[4096];
-                if (file != null) {
-                    this.raf = new RandomAccessFile(file, "rw");
-                    if (raf.length() < 8192) {
-                        raf.setLength(8192);
-                    } else {
-                        raf.seek(0);
-                        raf.readFully(locations);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
     }
 
     public int getX() {
@@ -173,44 +216,46 @@ public class MCAFile {
     }
 
     public MCAChunk getCachedChunk(int cx, int cz) {
-        int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
-        synchronized (chunks) {
-            return chunks.get(pair);
+        int pair = getIndex(cx, cz);
+        MCAChunk chunk = chunks[pair];
+        if (chunk != null && chunkInitialized[pair]) {
+            return chunk;
         }
+        return null;
     }
 
     public void setChunk(MCAChunk chunk) {
         int cx = chunk.getX();
         int cz = chunk.getZ();
-        int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
-        synchronized (chunks) {
-            chunks.put(pair, chunk);
-        }
+        int pair = getIndex(cx, cz);
+        chunks[pair] = chunk;
     }
 
     public MCAChunk getChunk(int cx, int cz) throws IOException {
-        MCAChunk cached = getCachedChunk(cx, cz);
-        if (cached != null) {
-            return cached;
-        } else {
-            return readChunk(cx, cz);
+        int pair = getIndex(cx, cz);
+        MCAChunk chunk = chunks[pair];
+        if (chunk == null) {
+            chunk = new MCAChunk();
+            chunk.setPosition(cx, cz);
+            chunks[pair] = chunk;
+        } else if (chunkInitialized[pair]) {
+            return chunk;
         }
+        readChunk(chunk, pair);
+        chunkInitialized[pair] = true;
+        return chunk;
     }
 
-    public MCAChunk readChunk(int cx, int cz) throws IOException {
-        int i = ((cx & 31) << 2) + ((cz & 31) << 7);
+    private MCAChunk readChunk(MCAChunk chunk, int i) throws IOException {
         int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF))) << 12;
-        int size = (locations[i + 3] & 0xFF) << 12;
         if (offset == 0) {
             return null;
         }
-        NBTInputStream nis = getChunkIS(offset);
-        MCAChunk chunk = new MCAChunk(nis, cx, cz, false);
-        nis.close();
-        int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
-        synchronized (chunks) {
-            chunks.put(pair, chunk);
+        int size = (locations[i + 3] & 0xFF) << 12;
+        try (NBTInputStream nis = getChunkIS(offset)) {
+            chunk.read(nis, false);
         }
+        System.out.println("TODO multithreaded"); // TODO
         return chunk;
     }
 
@@ -266,7 +311,7 @@ public class MCAFile {
         }
     }
 
-    public void forEachChunk(RunnableVal<MCAChunk> onEach) {
+    public void forEachChunk(Consumer<MCAChunk> onEach) {
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
@@ -274,7 +319,7 @@ public class MCAFile {
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     try {
-                        onEach.run(getChunk(x, z));
+                        onEach.accept(getChunk(x, z));
                     } catch (Throwable ignore) {
                     }
                 }
@@ -283,26 +328,14 @@ public class MCAFile {
     }
 
     public int getOffset(int cx, int cz) {
-        int i = ((cx & 31) << 2) + ((cz & 31) << 7);
+        int i = getIndex(cx, cz);
         int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
         return offset << 12;
     }
 
     public int getSize(int cx, int cz) {
-        int i = ((cx & 31) << 2) + ((cz & 31) << 7);
+        int i = getIndex(cx, cz);
         return (locations[i + 3] & 0xFF) << 12;
-    }
-
-    public List<Integer> getChunks() {
-        final List<Integer> values;
-        synchronized (chunks) {
-            values = new ArrayList<>(chunks.size());
-        }
-        for (int i = 0; i < locations.length; i += 4) {
-            int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
-            values.add(offset);
-        }
-        return values;
     }
 
     public byte[] getChunkCompressedBytes(int offset) throws IOException {
@@ -363,25 +396,28 @@ public class MCAFile {
     /**
      * @param onEach chunk
      */
-    public void forEachCachedChunk(RunnableVal<MCAChunk> onEach) {
-        synchronized (chunks) {
-            for (Map.Entry<Integer, MCAChunk> entry : chunks.entrySet()) {
-                onEach.run(entry.getValue());
+    public void forEachCachedChunk(Consumer<MCAChunk> onEach) {
+        for (int i = 0; i < chunks.length; i++) {
+            MCAChunk chunk = chunks[i];
+            if (chunk != null && this.chunkInitialized[i]) {
+                onEach.accept(chunk);
             }
         }
     }
 
     public List<MCAChunk> getCachedChunks() {
-        synchronized (chunks) {
-            return new ArrayList<>(chunks.values());
+        int size = 0;
+        for (int i = 0; i < chunks.length; i++) {
+            if (chunks[i] != null && this.chunkInitialized[i]) size++;
         }
-    }
-
-    public void uncache(int cx, int cz) {
-        int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
-        synchronized (chunks) {
-            chunks.remove(pair);
+        ArrayList<MCAChunk> list = new ArrayList<>(size);
+        for (int i = 0; i < chunks.length; i++) {
+            MCAChunk chunk = chunks[i];
+            if (chunk != null && this.chunkInitialized[i]) {
+                list.add(chunk);
+            }
         }
+        return list;
     }
 
     private byte[] toBytes(MCAChunk chunk) throws Exception {
@@ -420,7 +456,7 @@ public class MCAFile {
     }
 
     private void writeHeader(RandomAccessFile raf, int cx, int cz, int offsetMedium, int sizeByte, boolean writeTime) throws IOException {
-        int i = ((cx & 31) << 2) + ((cz & 31) << 7);
+        int i = getIndex(cx, cz);
         locations[i] = (byte) (offsetMedium >> 16);
         locations[i + 1] = (byte) (offsetMedium >> 8);
         locations[i + 2] = (byte) (offsetMedium);
@@ -449,7 +485,6 @@ public class MCAFile {
                     e.printStackTrace();
                 }
                 raf = null;
-                locations = null;
             }
         }
     }
@@ -459,10 +494,12 @@ public class MCAFile {
             return true;
         }
         synchronized (chunks) {
-            for (Int2ObjectMap.Entry<MCAChunk> entry : chunks.int2ObjectEntrySet()) {
-                MCAChunk chunk = entry.getValue();
-                if (chunk.isModified() || chunk.isDeleted()) {
-                    return true;
+            for (int i = 0; i < chunks.length; i++) {
+                MCAChunk chunk = chunks[i];
+                if (chunk != null && this.chunkInitialized[i]) {
+                    if (chunk.isModified() || chunk.isDeleted()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -571,7 +608,7 @@ public class MCAFile {
 
                         nextOffset += size;
                         end = Math.min(start + size, end);
-                        int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
+                        int pair = getIndex(cx, cz);
                         byte[] newBytes = relocate.get(pair);
 
                         // newBytes is null if the chunk isn't modified or marked for moving

@@ -88,6 +88,10 @@ public class MCAChunk implements IChunkSet {
     public MCAChunk(NBTInputStream nis, int chunkX, int chunkZ, boolean readPos) throws IOException {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        read(nis, readPos);
+    }
+
+    public void read(NBTInputStream nis, boolean readPos) throws IOException {
         StreamDelegate root = createDelegate(nis, readPos);
         nis.readNamedTagLazy(root);
     }

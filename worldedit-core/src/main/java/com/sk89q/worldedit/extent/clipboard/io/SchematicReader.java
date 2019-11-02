@@ -21,11 +21,6 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.jnbt.CorruptSchematicStreamer;
-import com.boydti.fawe.jnbt.SchematicStreamer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.jnbt.streamer.InfoReader;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
@@ -35,14 +30,9 @@ import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.io.FastByteArraysInputStream;
-import com.google.common.collect.ImmutableList;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.EntityNBTCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.FlowerPotCompatibilityHandler;
@@ -55,7 +45,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -80,6 +69,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files based that are compatible with MCEdit and other editors.

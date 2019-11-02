@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -102,10 +103,15 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
         int index = 0;
-        for (int z = 0; z < getLength(); z++) {
-            for (int x = 0; x < getWidth(); x++, index++) {
-                task.applyInt(index, biomes[index] & 0xFF);
+        try {
+            for (int z = 0; z < getLength(); z++) {
+                for (int x = 0; x < getWidth(); x++, index++) {
+                    task.applyInt(index, biomes[index] & 0xFF);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
