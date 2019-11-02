@@ -3,7 +3,6 @@ package com.boydti.fawe.jnbt.anvil;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
@@ -14,6 +13,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,7 +23,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -33,6 +32,7 @@ import java.util.zip.InflaterInputStream;
 /**
  * Chunk format: http://minecraft.gamepedia.com/Chunk_format#Entity_format
  * e.g.: `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
+ * Note: This class isn't thread safe. You can use it in an async thread, but not multiple at the same time
  */
 public class MCAFile implements Trimable {
 
@@ -61,6 +61,7 @@ public class MCAFile implements Trimable {
     private int X, Z;
     private MCAChunk[] chunks;
     private boolean[] chunkInitialized;
+    private Object[] locks;
 
     final ThreadLocal<byte[]> byteStore1 = new ThreadLocal<byte[]>() {
         @Override
@@ -86,6 +87,10 @@ public class MCAFile implements Trimable {
         this.locations = new byte[4096];
         this.chunks = new MCAChunk[32 * 32];
         this.chunkInitialized = new boolean[this.chunks.length];
+        this.locks = new Object[this.chunks.length];
+        for (int i = 0; i < locks.length; i++) {
+            locks[i] = new Object();
+        }
     }
 
     @Override
@@ -106,34 +111,29 @@ public class MCAFile implements Trimable {
 
     public MCAFile init(File file) throws FileNotFoundException {
         String[] split = file.getName().split("\\.");
-        X = Integer.parseInt(split[1]);
-        Z = Integer.parseInt(split[2]);
+        int X = Integer.parseInt(split[1]);
+        int Z = Integer.parseInt(split[2]);
         return init(file, X, Z);
     }
 
     public MCAFile init(File file, int mcrX, int mcrZ) throws FileNotFoundException {
         if (raf != null) {
-            synchronized (raf) {
-                if (raf != null) {
-                    flush(pool);
-                    for (int i = 0; i < 4096; i++) {
-                        locations[i] = 0;
-                    }
-                    try {
-                        raf.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    raf = null;
-                    deleted = false;
-                    Arrays.fill(chunkInitialized, false);
-                    readLocations = false;
-                }
+            flush(pool);
+            for (int i = 0; i < 4096; i++) {
+                locations[i] = 0;
             }
-            this.X = mcrX;
-            this.Z = mcrZ;
+            try {
+                raf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            raf = null;
         }
-
+        deleted = false;
+        Arrays.fill(chunkInitialized, false);
+        readLocations = false;
+        this.X = mcrX;
+        this.Z = mcrZ;
         this.file = file;
         if (!file.exists()) {
             throw new FileNotFoundException(file.getName());
@@ -178,9 +178,9 @@ public class MCAFile implements Trimable {
                 e.printStackTrace();
             }
         }
-        synchronized (chunks) {
-            Arrays.fill(chunkInitialized, false);
-        }
+        deleted = false;
+        readLocations = false;
+        Arrays.fill(chunkInitialized, false);
     }
 
     @Override
@@ -235,14 +235,24 @@ public class MCAFile implements Trimable {
         int pair = getIndex(cx, cz);
         MCAChunk chunk = chunks[pair];
         if (chunk == null) {
-            chunk = new MCAChunk();
-            chunk.setPosition(cx, cz);
-            chunks[pair] = chunk;
+            Object lock = locks[pair];
+            synchronized (lock) {
+                chunk = chunks[pair];
+                if (chunk == null) {
+                    chunk = new MCAChunk();
+                    chunk.setPosition(cx, cz);
+                    chunks[pair] = chunk;
+                }
+            }
         } else if (chunkInitialized[pair]) {
             return chunk;
         }
-        readChunk(chunk, pair);
-        chunkInitialized[pair] = true;
+        synchronized (chunk) {
+            if (!chunkInitialized[pair]) {
+                readChunk(chunk, pair);
+                chunkInitialized[pair] = true;
+            }
+        }
         return chunk;
     }
 
@@ -493,13 +503,11 @@ public class MCAFile implements Trimable {
         if (isDeleted()) {
             return true;
         }
-        synchronized (chunks) {
-            for (int i = 0; i < chunks.length; i++) {
-                MCAChunk chunk = chunks[i];
-                if (chunk != null && this.chunkInitialized[i]) {
-                    if (chunk.isModified() || chunk.isDeleted()) {
-                        return true;
-                    }
+        for (int i = 0; i < chunks.length; i++) {
+            MCAChunk chunk = chunks[i];
+            if (chunk != null && this.chunkInitialized[i]) {
+                if (chunk.isModified() || chunk.isDeleted()) {
+                    return true;
                 }
             }
         }
@@ -508,9 +516,9 @@ public class MCAFile implements Trimable {
 
     /**
      * Write the chunk to the file
-     * @param pool
+     * @param wait - If the flush method needs to wait for the pool
      */
-    public void flush(ForkJoinPool pool) {
+    public void flush(boolean wait) {
         synchronized (raf) {
             // If the file is marked as deleted, nothing is written
             if (isDeleted()) {
@@ -518,12 +526,6 @@ public class MCAFile implements Trimable {
                 file.delete();
                 return;
             }
-
-            boolean wait; // If the flush method needs to wait for the pool
-            if (pool == null) {
-                wait = true;
-                pool = new ForkJoinPool();
-            } else wait = false;
 
             // Chunks that need to be relocated
             Int2ObjectOpenHashMap<byte[]> relocate = new Int2ObjectOpenHashMap<>();
@@ -533,42 +535,40 @@ public class MCAFile implements Trimable {
             final Int2ObjectOpenHashMap<byte[]> compressedMap = new Int2ObjectOpenHashMap<>();
             // The data of each chunk that needs to be moved
             final Int2ObjectOpenHashMap<byte[]> append = new Int2ObjectOpenHashMap<>();
-            boolean modified = false;
+            boolean[] modified = new boolean[1];
             // Get the current time for the chunk timestamp
             long now = System.currentTimeMillis();
 
             // Load the chunks into the append or compressed map
-            for (MCAChunk chunk : getCachedChunks()) {
+            final ForkJoinPool finalPool = this.pool;
+            forEachCachedChunk(chunk -> {
                 if (chunk.isModified() || chunk.isDeleted()) {
-                    modified = true;
+                    modified[0] = true;
                     chunk.setLastUpdate(now);
                     if (!chunk.isDeleted()) {
-                        pool.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    byte[] compressed = toBytes(chunk);
-                                    int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
-                                    Int2ObjectOpenHashMap map;
-                                    if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
-                                        map = append;
-                                    } else {
-                                        map = compressedMap;
-                                    }
-                                    synchronized (map) {
-                                        map.put(pair, compressed);
-                                    }
-                                } catch (Throwable e) {
-                                    e.printStackTrace();
+                        MCAFile.this.pool.submit(() -> {
+                            try {
+                                byte[] compressed = toBytes(chunk);
+                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
+                                Int2ObjectOpenHashMap map;
+                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
+                                    map = append;
+                                } else {
+                                    map = compressedMap;
                                 }
+                                synchronized (map) {
+                                    map.put(pair, compressed);
+                                }
+                            } catch (Throwable e) {
+                                e.printStackTrace();
                             }
                         });
                     }
                 }
-            }
+            });
 
             // If any changes were detected
-            if (modified) {
+            if (modified[0]) {
                 file.setLastModified(now);
 
                 // Load the offset data into the offset map
@@ -700,13 +700,9 @@ public class MCAFile implements Trimable {
                     e.printStackTrace();
                 }
                 if (wait) {
-                    pool.shutdown();
                     pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
                 }
             }
         }
-        CleanableThreadLocal.clean(byteStore1);
-        CleanableThreadLocal.clean(byteStore2);
-        CleanableThreadLocal.clean(byteStore3);
     }
 }
