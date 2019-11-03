@@ -36,9 +36,10 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class BukkitAdapter_1_14 {
+public final class BukkitAdapter_1_14 {
 
     /*
         NMS fields
@@ -87,13 +88,13 @@ public class BukkitAdapter_1_14 {
                 } catch (NoSuchFieldException paper) {
                     tmp = DataPaletteBlock.class.getDeclaredField("j");
                 }
-                fieldLock = tmp;
-                fieldLock.setAccessible(true);
                 Field modifiersField = Field.class.getDeclaredField("modifiers");
                 modifiersField.setAccessible(true);
-                int modifiers = modifiersField.getInt(fieldLock);
+                int modifiers = modifiersField.getInt(tmp);
                 int newModifiers = modifiers & (~Modifier.FINAL);
-                if (newModifiers != modifiers) modifiersField.setInt(fieldLock, newModifiers);
+                if (newModifiers != modifiers) modifiersField.setInt(tmp, newModifiers);
+                fieldLock = tmp;
+                fieldLock.setAccessible(true);
             }
 
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
@@ -213,23 +214,41 @@ public class BukkitAdapter_1_14 {
     /*
     NMS conversion
      */
-
     public static ChunkSection newChunkSection(final int layer, final char[] blocks) {
-        ChunkSection section = new ChunkSection(layer << 4);
-        if (blocks == null) {
-            return section;
+        return newChunkSection(layer, null, blocks);
+    }
+
+    private static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set) {
+        int air = 0;
+        int num_palette = 0;
+        int i = 0;
+        outer:
+        for (; i < 4096; i++) {
+            char ordinal = set[i];
+            switch (ordinal) {
+                case 0:
+                    break outer;
+                case BlockID.AIR:
+                case BlockID.CAVE_AIR:
+                case BlockID.VOID_AIR:
+                    air++;
+            }
+            int palette = blockToPalette[ordinal];
+            if (palette == Integer.MAX_VALUE) {
+                blockToPalette[ordinal] = palette = num_palette;
+                paletteToBlock[num_palette] = ordinal;
+                num_palette++;
+            }
+            blocksCopy[i] = palette;
         }
-        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
-        try {
-            int num_palette = 0;
-            int air = 0;
-            for (int i = 0; i < 4096; i++) {
-                char ordinal = blocks[i];
+        if (i != 4096) {
+            char[] getArr = get.apply(layer);
+            for (; i < 4096; i++) {
+                char ordinal = set[i];
                 switch (ordinal) {
                     case 0:
+                        ordinal = getArr[i];
+                        set[i] = ordinal;
                     case BlockID.AIR:
                     case BlockID.CAVE_AIR:
                     case BlockID.VOID_AIR:
@@ -243,7 +262,54 @@ public class BukkitAdapter_1_14 {
                 }
                 blocksCopy[i] = palette;
             }
+        }
 
+        num_palette_buffer[0] = num_palette;
+        return air;
+    }
+    private static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, char[] set) {
+        int air = 0;
+        int num_palette = 0;
+        char airOrdinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
+        for (int i = 0; i < 4096; i++) {
+            char ordinal = set[i];
+            switch (ordinal) {
+                case 0:
+                    ordinal = airOrdinal;
+                case BlockID.AIR:
+                case BlockID.CAVE_AIR:
+                case BlockID.VOID_AIR:
+                    air++;
+            }
+            int palette = blockToPalette[ordinal];
+            if (palette == Integer.MAX_VALUE) {
+                blockToPalette[ordinal] = palette = num_palette;
+                paletteToBlock[num_palette] = ordinal;
+                num_palette++;
+            }
+            blocksCopy[i] = palette;
+        }
+        num_palette_buffer[0] = num_palette;
+        return air;
+    }
+
+    public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set) {
+        if (set == null) {
+            return newChunkSection(layer);
+        }
+        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        try {
+            int[] num_palette_buffer = new int[1];
+            int air;
+            if (get == null) {
+                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set);
+            } else {
+                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set);
+            }
+            int num_palette = num_palette_buffer[0];
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
             if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
@@ -260,6 +326,7 @@ public class BukkitAdapter_1_14 {
                 bitArray.fromRaw(blocksCopy);
             }
 
+            ChunkSection section = newChunkSection(layer);
             // set palette & data bits
             final DataPaletteBlock<IBlockData> dataPaletteBlocks = section.getBlocks();
             // private DataPalette<T> h;
@@ -292,6 +359,10 @@ public class BukkitAdapter_1_14 {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             throw e;
         }
+    }
+
+    private static ChunkSection newChunkSection(int layer) {
+        return new ChunkSection(layer << 4);
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws NoSuchFieldException, IllegalAccessException {

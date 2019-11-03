@@ -164,7 +164,7 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public BlockState getDefaultState() {
+    public final BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 

@@ -2,6 +2,8 @@ package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MainUtil;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -14,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class CleanableThreadLocal<T> extends ThreadLocal<T> {
+public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable {
     private final Supplier<T> supplier;
     private final Function<T, T> modifier;
     private LongAdder count = new LongAdder();
@@ -166,5 +168,10 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> {
     protected void finalize() throws Throwable {
         clean(this);
         super.finalize();
+    }
+
+    @Override
+    public void close() throws IOException {
+        clean();
     }
 }

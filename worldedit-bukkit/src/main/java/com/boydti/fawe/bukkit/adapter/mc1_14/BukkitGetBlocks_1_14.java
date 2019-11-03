@@ -300,19 +300,12 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                                     this.reset(layer);
                                 }
                             }
-                            char[] getArr = this.load(layer);
-                            for (int i = 0; i < 4096; i++) {
-                                char value = setArr[i];
-                                if (value != 0) {
-                                    getArr[i] = value;
-                                }
-                            }
-                            newSection = BukkitAdapter_1_14.newChunkSection(layer, getArr);
+                            newSection = BukkitAdapter_1_14.newChunkSection(layer, this::load, setArr);
                             if (!BukkitAdapter_1_14.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
-                                updateGet(this, nmsChunk, sections, newSection, getArr, layer);
+                                updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             }
                         }
                     }
