@@ -51,6 +51,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     private boolean useOldIterator;
     private int minX, minY, minZ, maxX, maxY, maxZ;
+    private BlockVector3 min;
+    private BlockVector3 max;
     private BlockVector3 pos1;
     private BlockVector3 pos2;
 
@@ -139,6 +141,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         maxX = max.getBlockX();
         maxY = max.getBlockY();
         maxZ = max.getBlockZ();
+        min = BlockVector3.at(minX, minY, minZ);
+        max = BlockVector3.at(maxX, maxY, maxZ);
     }
 
     /**
@@ -186,22 +190,22 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return pos1.getMinimum(pos2);
+        return min;
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return pos1.getMaximum(pos2);
+        return max;
     }
 
     @Override
     public int getMinimumY() {
-        return Math.min(pos1.getBlockY(), pos2.getBlockY());
+        return minY;
     }
 
     @Override
     public int getMaximumY() {
-        return Math.max(pos1.getBlockY(), pos2.getBlockY());
+        return maxY;
     }
 
     @Override
