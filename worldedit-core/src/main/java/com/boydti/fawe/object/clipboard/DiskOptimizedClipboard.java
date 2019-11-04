@@ -97,9 +97,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long volume = (long) getArea() * 2L + (long) HEADER_SIZE;
+            long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
             braf.setLength(0);
-            braf.setLength(volume);
+            braf.setLength(fileLength);
             init();
             // write getLength() etc
             byteBuffer.putChar(2, (char) getWidth());
