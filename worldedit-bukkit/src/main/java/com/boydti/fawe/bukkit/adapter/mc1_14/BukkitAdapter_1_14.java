@@ -249,6 +249,13 @@ public final class BukkitAdapter_1_14 {
                     case 0:
                         ordinal = getArr[i];
                         set[i] = ordinal;
+                        switch (ordinal) {
+                            case BlockID.AIR:
+                            case BlockID.CAVE_AIR:
+                            case BlockID.VOID_AIR:
+                                air++;
+                        }
+                        break;
                     case BlockID.AIR:
                     case BlockID.CAVE_AIR:
                     case BlockID.VOID_AIR:
@@ -270,12 +277,11 @@ public final class BukkitAdapter_1_14 {
     private static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, char[] set) {
         int air = 0;
         int num_palette = 0;
-        char airOrdinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
                 case 0:
-                    ordinal = airOrdinal;
+                    ordinal = BlockID.AIR;
                 case BlockID.AIR:
                 case BlockID.CAVE_AIR:
                 case BlockID.VOID_AIR:

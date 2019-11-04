@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -25,7 +26,7 @@ public class ChunkSendProcessor implements IBatchProcessor {
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
-        boolean replaceAll = true;
+        boolean replaceAll = set.getBiomeType(0, 0) != null;
         ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, () -> set, replaceAll);
         Stream<Player> stream = this.players.get();
         if (stream == null) {

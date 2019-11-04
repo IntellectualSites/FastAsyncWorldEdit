@@ -328,31 +328,67 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             @NotNull @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {
-                    private MutableBlockVector2 pos = new MutableBlockVector2().setComponents(maxX + 1, maxZ);
+                    final MutableBlockVector2 mutable = new MutableBlockVector2(0, 0);
+
+                    int bx = minX;
+                    int bz = minZ;
+
+                    int tx = maxX;
+                    int tz = maxZ;
+
+                    private int x = minX;
+                    private int z = minZ;
+
+                    int regionX = x >> 5;
+                    int regionZ = z >> 5;
+                    int rbx = Math.max(bx, regionX << 5);
+                    int rbz = Math.max(bz, regionZ << 5);
+                    int rtx = Math.min(tx, 31 + (regionX << 5));
+                    int rtz = Math.min(tz, 31 + (regionZ << 5));
+
+                    boolean hasNext = true;
+
 
                     @Override
                     public boolean hasNext() {
-                        return pos != null;
+                        return hasNext;
                     }
 
                     @Override
                     public BlockVector2 next() {
-                        MutableBlockVector2 result = pos;
-                        // calc next
-                        pos.setComponents(pos.getX() - 1, pos.getZ());
-                        if (pos.getX() <= minX) {
-                            if (pos.getZ() == minZ) {
-                                pos = null;
-                            } else if (pos.getX() < minX) {
-                                pos.setComponents(maxX, pos.getZ() - 1);
+                        mutable.mutX(x);
+                        mutable.mutZ(z);
+                        if (++x > rtx) {
+                            if (++z > rtz) {
+                                if (x > tx) {
+                                    x = bx;
+                                    if (z > tz) {
+                                        if (!hasNext) {
+                                            throw new NoSuchElementException("End of iterator") {
+                                                @Override
+                                                public Throwable fillInStackTrace() {
+                                                    return this;
+                                                }
+                                            };
+                                        }
+                                        x = tx;
+                                        hasNext = false;
+                                        return mutable;
+                                    }
+                                } else {
+                                    z = rbz;
+                                }
+                                regionX = x >> 5;
+                                regionZ = z >> 5;
+                                rbx = Math.max(bx, regionX << 5);
+                                rbz = Math.max(bz, regionZ << 5);
+                                rtx = Math.min(tx, 31 + (regionX << 5));
+                                rtz = Math.min(tz, 31 + (regionZ << 5));
+                            } else {
+                                x = rbx;
                             }
                         }
-                        return result;
-                    }
-
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException("This set is immutable.");
+                        return mutable;
                     }
                 };
             }
@@ -628,19 +664,19 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
-        int x = chunk.getX();
-        int z = chunk.getZ();
-        block = block.init(x, z, get);
+        int chunkX = chunk.getX();
+        int chunkZ = chunk.getZ();
+        block = block.init(chunkX, chunkZ, get);
 
 
-        if ((minX + 15) >> 4 <= x && (maxX - 15) >> 4 >= x && (minZ + 15) >> 4 <= z && (maxZ - 15) >> 4 >= z) {
+        if ((minX + 15) >> 4 <= chunkX && (maxX - 15) >> 4 >= chunkX && (minZ + 15) >> 4 <= chunkZ && (maxZ - 15) >> 4 >= chunkZ) {
             filter(chunk, filter, block, get, set, minY, maxY);
             return;
         }
-        int localMinX = Math.max(minX, x << 4) & 15;
-        int localMaxX = Math.min(maxX, 15 + (x << 4)) & 15;
-        int localMinZ = Math.max(minZ, z << 4) & 15;
-        int localMaxZ = Math.min(maxZ, 15 + (z << 4)) & 15;
+        int localMinX = Math.max(minX, chunkX << 4) & 15;
+        int localMaxX = Math.min(maxX, 15 + (chunkX << 4)) & 15;
+        int localMinZ = Math.max(minZ, chunkZ << 4) & 15;
+        int localMaxZ = Math.min(maxZ, 15 + (chunkZ << 4)) & 15;
 
         int yStart = (minY & 15);
         int yEnd = (maxY & 15);

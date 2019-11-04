@@ -57,7 +57,7 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
         return chunk;
     }
 
-    private byte[] getSectionBytes() {
+    public byte[] getSectionBytes() {
         byte[] tmp = this.sectionBytes;
         if (tmp == null) {
             synchronized (this) {
@@ -106,7 +106,6 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
             fos.writeBoolean(this.full);
 
             fos.writeVarInt(getChunk().getBitMask());
-
 
             fos.writeNBT("", getHeightMap());
 

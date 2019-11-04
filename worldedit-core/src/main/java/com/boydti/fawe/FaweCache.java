@@ -297,7 +297,6 @@ public enum FaweCache implements Trimable {
                     int ordinal = blocksChars[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-//                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -309,7 +308,7 @@ public enum FaweCache implements Trimable {
                     int ordinal = blocksInts[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-                        BlockState state = BlockTypesCache.states[ordinal];
+//                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -326,6 +325,11 @@ public enum FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+                bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+            } else {
+                bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+            }
             int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
                 // Set a value, because minecraft needs it for some  reason
@@ -347,8 +351,8 @@ public enum FaweCache implements Trimable {
 
             return palette;
         } catch (Throwable e) {
-            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             e.printStackTrace();
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             throw e;
         }
     }

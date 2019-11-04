@@ -115,7 +115,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public void filter(Filter filter, int yStart, int yEnd) {
-        for (y = yStart, index = yStart << 8; y < yEnd; y++) {
+        for (y = yStart, index = yStart << 8; y <= yEnd; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
                     filter.applyBlock(this);
