@@ -139,7 +139,7 @@ public class ClipboardCommands {
         actor.checkConfirmationRegion(() -> {
             session.setClipboard(null);
 
-            BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
+            Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
 
             session.setClipboard(new ClipboardHolder(clipboard));
 

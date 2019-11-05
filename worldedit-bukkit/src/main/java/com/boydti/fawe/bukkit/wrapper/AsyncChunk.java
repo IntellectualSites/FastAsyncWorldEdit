@@ -86,10 +86,8 @@ public class AsyncChunk implements Chunk {
         }
         if (world.isWorld()) {
             if (world.isChunkLoaded(x, z)) {
-                if (world.isChunkLoaded(x, z)) {
-                    task.run();
-                    return task.value;
-                }
+                task.run();
+                return task.value;
             }
         }
         return TaskManager.IMP.sync(task);
