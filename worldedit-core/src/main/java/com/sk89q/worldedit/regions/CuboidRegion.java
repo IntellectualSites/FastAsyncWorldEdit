@@ -133,16 +133,14 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         }
         pos1 = pos1.clampY(world == null ? Integer.MIN_VALUE : 0, world == null ? Integer.MAX_VALUE : world.getMaxY());
         pos2 = pos2.clampY(world == null ? Integer.MIN_VALUE : 0, world == null ? Integer.MAX_VALUE : world.getMaxY());
-        BlockVector3 min = getMinimumPoint();
-        BlockVector3 max = getMaximumPoint();
-        minX = min.getBlockX();
-        minY = min.getBlockY();
-        minZ = min.getBlockZ();
-        maxX = max.getBlockX();
-        maxY = max.getBlockY();
-        maxZ = max.getBlockZ();
-        min = BlockVector3.at(minX, minY, minZ);
-        max = BlockVector3.at(maxX, maxY, maxZ);
+        minX = Math.min(pos1.getX(), pos2.getX());
+        minY = Math.min(pos1.getY(), pos2.getY());
+        minZ = Math.min(pos1.getZ(), pos2.getZ());
+        maxX = Math.max(pos1.getX(), pos2.getX());
+        maxY = Math.max(pos1.getY(), pos2.getY());
+        maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        this.min = BlockVector3.at(minX, minY, minZ);
+        this.max = BlockVector3.at(maxX, maxY, maxZ);
     }
 
     /**
