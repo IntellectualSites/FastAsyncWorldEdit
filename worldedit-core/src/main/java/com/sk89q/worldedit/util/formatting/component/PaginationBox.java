@@ -105,6 +105,9 @@ public abstract class PaginationBox extends MessageBox {
                 .append(TextComponent.of(" of "))
                 .append(TextComponent.of(String.valueOf(pageCount), TextColor.GOLD));
         if (pageCommand != null) {
+            if (!pageCommand.startsWith("/")) {
+				pageCommand = "/" + pageCommand;
+			}
             TextComponentProducer navProducer = new TextComponentProducer();
             if (page > 1) {
                 TextComponent prevComponent = TextComponent.of("<<< ", TextColor.GOLD)
