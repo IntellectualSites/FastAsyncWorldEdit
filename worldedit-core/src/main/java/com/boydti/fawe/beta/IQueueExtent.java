@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.IBatchProcessorHolder;
 import com.sk89q.jnbt.CompoundTag;
@@ -24,7 +25,7 @@ import java.util.concurrent.Future;
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
  * uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcessorHolder {
+public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchProcessorHolder {
 
     @Override
     default boolean isQueueEnabled() {
@@ -72,58 +73,12 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, IBatchProcess
     IChunkSet getCachedSet(int x, int z);
 
     /**
-     * Get the IChunk at a position (and cache it if it's not already)
-     *
-     * @param x
-     * @param z
-     * @return IChunk
-     */
-    IChunk getOrCreateChunk(int x, int z);
-
-    /**
      * Submit the chunk so that it's changes are applied to the world
      *
      * @param chunk
      * @return result
      */
     <T extends Future<T>> T submit(IChunk<T> chunk);
-
-    // standard get / set
-
-    @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.setBlock(x & 15, y, z & 15, state);
-    }
-
-    @Override
-    default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.setTile(x & 15, y, z & 15, tile);
-    }
-
-    @Override
-    default boolean setBiome(int x, int y, int z, BiomeType biome) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.setBiome(x & 15, y, z & 15, biome);
-    }
-
-    @Override
-    default BlockState getBlock(int x, int y, int z) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.getBlock(x & 15, y, z & 15);
-    }
-
-    @Override
-    default BaseBlock getFullBlock(int x, int y, int z) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.getFullBlock(x & 15, y, z & 15);
-    }
-
-    default BiomeType getBiome(int x, int z) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.getBiomeType(x & 15, z & 15);
-    }
 
     @Override
     default BlockVector3 getMinimumPoint() {

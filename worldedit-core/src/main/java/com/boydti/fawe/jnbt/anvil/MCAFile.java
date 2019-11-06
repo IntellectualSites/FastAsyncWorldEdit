@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.object.RunnableVal4;
@@ -41,7 +42,7 @@ import java.util.zip.InflaterInputStream;
  * e.g.: `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
  * Note: This class isn't thread safe. You can use it in an async thread, but not multiple at the same time
  */
-public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, Extent {
+public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, IChunkExtent {
 
     private static Field fieldBuf2;
     private static Field fieldBuf3;
@@ -253,6 +254,16 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, Ext
         int cz = chunk.getZ();
         int pair = getIndex(cx, cz);
         chunks[pair] = chunk;
+    }
+
+    @Override
+    public MCAChunk getOrCreateChunk(int chunkX, int chunkZ) {
+        try {
+            return getChunk(chunkX, chunkZ);
+        } catch (IOException e) {
+            // TODO generate?
+            return null;
+        }
     }
 
     public MCAChunk getChunk(int cx, int cz) throws IOException {
