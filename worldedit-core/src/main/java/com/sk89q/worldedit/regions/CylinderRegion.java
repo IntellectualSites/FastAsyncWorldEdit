@@ -385,16 +385,6 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return Polygons.polygonizeCylinder(center, radius, maxPoints);
     }
 
-    @Override
-    public int getMinY() {
-        return minY;
-    }
-
-    @Override
-    public int getMaxY() {
-        return maxY;
-    }
-
     /**
      * Return a new instance with the given center and radius in the X and Z
      * axes with a Y that extends from the bottom of the extent to the top

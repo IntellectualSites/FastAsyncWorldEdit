@@ -15,7 +15,6 @@ import com.github.intellectualsites.plotsquared.plot.listener.WEManager;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
 import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
 import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
@@ -29,6 +28,7 @@ import com.sk89q.worldedit.regions.RegionIntersection;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,7 +47,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             }
             if (MainCommand.getInstance().getCommand("generatebiome") == null) {
                 new PlotSetBiome();
-        }
+          }
         }
 // TODO: revisit this later on
 /*
@@ -107,7 +107,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     @Override
     public FaweMask getMask(Player player, MaskType type) {
         final PlotPlayer pp = PlotPlayer.wrap(player);
-        final HashSet<RegionWrapper> regions;
+        final Set<CuboidRegion> regions;
         Plot plot = pp.getCurrentPlot();
         if (isAllowed(player, plot, type)) {
             regions = plot.getRegions();
@@ -115,8 +115,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             plot = null;
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
-                RegionWrapper region = regions.iterator().next();
-                if (region.minX == Integer.MIN_VALUE && region.maxX == Integer.MAX_VALUE) {
+                CuboidRegion region = regions.iterator().next();
+                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE && region.getMaximumPoint().getX() == Integer.MAX_VALUE) {
                     regions.clear();
                 }
             }
@@ -128,12 +128,12 @@ public class PlotSquaredFeature extends FaweMaskManager {
         int min = area != null ? area.MIN_BUILD_HEIGHT : 0;
         int max = area != null ? Math.min(255, area.MAX_BUILD_HEIGHT) : 255;
         final HashSet<com.boydti.fawe.object.RegionWrapper> faweRegions = new HashSet<>();
-        for (RegionWrapper current : regions) {
-            faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.minX, current.maxX, min, max, current.minZ, current.maxZ));
+        for (CuboidRegion current : regions) {
+            faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
         }
-        final RegionWrapper region = regions.iterator().next();
-        final BlockVector3 pos1 = BlockVector3.at(region.minX, min, region.minZ);
-        final BlockVector3 pos2 = BlockVector3.at(region.maxX, max, region.maxZ);
+        final CuboidRegion region = regions.iterator().next();
+        final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());
+        final BlockVector3 pos2 = BlockVector3.at(region.getMaximumX(), max, region.getMaximumZ());
         final Plot finalPlot = plot;
         if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot) || regions.isEmpty()) {
             return null;
@@ -145,7 +145,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         } else {
             World world = FaweAPI.getWorld(area.worldname);
             List<Region> weRegions = regions.stream()
-                    .map(r -> new CuboidRegion(world, BlockVector3.at(r.minX, r.minY, r.minZ), BlockVector3.at(r.maxX, r.maxY, r.maxZ)))
+                    .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
                     .collect(Collectors.toList());
             maskedRegion = new RegionIntersection(world, weRegions);
         }

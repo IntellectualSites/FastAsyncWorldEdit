@@ -8,6 +8,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -292,7 +293,7 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default BlockArrayClipboard lazyCopy(Region region) {
+    default Clipboard lazyCopy(Region region) {
         return getParent().lazyCopy(region);
     }
 

@@ -15,6 +15,7 @@ import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.chunk.ReferenceChunk;
 import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.util.MathMan;
@@ -33,7 +34,7 @@ import java.util.concurrent.Future;
  * <p>
  * This queue is reusable {@link #init(IChunkCache)}
  */
-public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQueueExtent {
+public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent {
 
 //    // Pool discarded chunks for reuse (can safely be cleared by another thread)
 //    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
@@ -88,7 +89,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
      */
     protected synchronized void reset() {
         if (!this.initialized) return;
-        checkThread();
         if (!this.chunks.isEmpty()) {
             for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
@@ -122,23 +122,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
         this.cacheSet = set;
         this.setProcessor(EmptyBatchProcessor.INSTANCE);
         initialized = true;
-    }
-
-    @Override
-    public Extent addProcessor(IBatchProcessor processor) {
-        join(processor);
-        return this;
-    }
-
-    @Override
-    public Extent enableHistory(FaweChangeSet changeSet) {
-        return this.addProcessor(changeSet);
-    }
-
-    @Override
-    public Extent disableHistory() {
-        this.remove(FaweChangeSet.class);
-        return this;
     }
 
     @Override
@@ -241,8 +224,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
         if (chunk != null) {
             return chunk;
         }
-
-        checkThread();
         final int size = chunks.size();
         final boolean lowMem = MemUtil.isMemoryLimited();
         if (enabledQueue && (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE)) {
@@ -316,7 +297,6 @@ public class SingleThreadQueueExtent extends BatchProcessorHolder implements IQu
 
     @Override
     public synchronized void flush() {
-        checkThread();
         if (!chunks.isEmpty()) {
             if (MemUtil.isMemoryLimited()) {
                 for (IChunk chunk : chunks.values()) {

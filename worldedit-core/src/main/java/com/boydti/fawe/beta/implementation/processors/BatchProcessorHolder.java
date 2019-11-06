@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.worldedit.extent.Extent;
 
 public class BatchProcessorHolder implements IBatchProcessorHolder {
     private IBatchProcessor processor = EmptyBatchProcessor.INSTANCE;

@@ -74,11 +74,11 @@ public final class MemBlockSet extends BlockSet {
     }
 
     public BlockVector3 getMinimumPoint() {
-        return BlockVector3.at(getMinX(), getMinY(), getMinZ());
+        return BlockVector3.at(getMinX(), getMinimumY(), getMinZ());
     }
 
     public BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(getMaxX(), getMaxY(), getMaxZ());
+        return BlockVector3.at(getMaxX(), getMaximumY(), getMaxZ());
     }
 
     @Override
@@ -280,7 +280,7 @@ public final class MemBlockSet extends BlockSet {
     }
 
     @Override
-    public int getMinY() {
+    public int getMinimumY() {
         int maxY = 15;
         int maxy = 16;
         int by = Integer.MAX_VALUE;
@@ -325,7 +325,7 @@ public final class MemBlockSet extends BlockSet {
     }
 
     @Override
-    public int getMaxY() {
+    public int getMaximumY() {
         int maxY = 0;
         int maxy = 0;
         int by = Integer.MIN_VALUE;

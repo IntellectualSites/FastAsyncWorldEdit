@@ -6,6 +6,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -133,7 +134,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockArrayClipboard lazyCopy(Region region) {
+    public Clipboard lazyCopy(Region region) {
         return getExtent().lazyCopy(region);
     }
 

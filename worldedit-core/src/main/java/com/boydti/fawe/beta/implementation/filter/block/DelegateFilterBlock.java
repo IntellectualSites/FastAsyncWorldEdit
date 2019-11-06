@@ -7,6 +7,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -699,7 +700,7 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BlockArrayClipboard lazyCopy(Region region) {
+    public Clipboard lazyCopy(Region region) {
         return parent.lazyCopy(region);
     }
 

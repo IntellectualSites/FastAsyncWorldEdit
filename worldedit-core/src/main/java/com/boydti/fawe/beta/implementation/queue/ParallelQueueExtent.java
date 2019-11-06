@@ -14,6 +14,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -187,11 +188,10 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      * @return
      */
     @Override
-    public BlockArrayClipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
-        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
-        weClipboard.setOrigin(region.getMinimumPoint());
-        return weClipboard;
+    public Clipboard lazyCopy(Region region) {
+        WorldCopyClipboard clipboard = new WorldCopyClipboard(() -> this, region);
+        clipboard.setOrigin(region.getMinimumPoint());
+        return clipboard;
     }
 
     /**

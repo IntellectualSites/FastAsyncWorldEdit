@@ -2,7 +2,6 @@ package com.boydti.fawe.regions.general.integrations.plotquared;
 
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
-import com.github.intellectualsites.plotsquared.plot.object.ChunkLoc;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
@@ -10,6 +9,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -29,12 +29,12 @@ public class FaweChunkManager extends ChunkManager {
     }
 
     @Override
-    public CompletableFuture loadChunk(String world, ChunkLoc loc, boolean force) {
+    public CompletableFuture loadChunk(String world, BlockVector2 loc, boolean force) {
         return parent.loadChunk(world, loc, force);
     }
 
     @Override
-    public void unloadChunk(String world, ChunkLoc loc, boolean save) {
+    public void unloadChunk(String world, BlockVector2 loc, boolean save) {
         parent.unloadChunk(world, loc, save);
     }
 

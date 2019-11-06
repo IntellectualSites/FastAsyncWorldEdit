@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.world.registry;
 
-import com.github.intellectualsites.plotsquared.plot.object.LegacyPlotBlock;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
-import com.github.intellectualsites.plotsquared.plot.object.StringPlotBlock;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.Resources;
@@ -242,29 +239,6 @@ public final class LegacyMapper {
     public int[] getLegacyFromBlock(BlockState blockState) {
         Integer combinedId = getLegacyCombined(blockState);
         return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
-    }
-
-    public BaseBlock getBaseBlockFromPlotBlock(PlotBlock plotBlock) {
-        if(plotBlock instanceof StringPlotBlock) {
-            try {
-                return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
-            } catch (Throwable failed) {
-                log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
-                failed.printStackTrace();
-                return null;
-            }
-        }else if(plotBlock instanceof LegacyPlotBlock) {
-            try {
-                return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
-            } catch (Throwable failed) {
-                log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-                failed.printStackTrace();
-                return null;
-            }
-        }else {
-            log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-            return null;
-        }
     }
 
     public final static LegacyMapper getInstance() {

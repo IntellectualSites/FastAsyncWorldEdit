@@ -12,7 +12,6 @@ import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
@@ -22,14 +21,13 @@ import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -56,7 +54,7 @@ public class PlotSetBiome extends Command {
             return null;
         }
         checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
-        final HashSet<RegionWrapper> regions = plot.getRegions();
+        final Set<CuboidRegion> regions = plot.getRegions();
         BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
         Collection<BiomeType> knownBiomes = BiomeTypes.values();
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
@@ -81,9 +79,8 @@ public class PlotSetBiome extends Command {
                         .limitUnlimited()
                         .build();
                 long seed = ThreadLocalRandom.current().nextLong();
-                for (RegionWrapper region : regions) {
-                    CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
-                    session.regenerate(cuboid, biome, seed);
+                for (CuboidRegion region : regions) {
+                    session.regenerate(region, biome, seed);
                 }
                 session.flushQueue();
                 plot.removeRunning();

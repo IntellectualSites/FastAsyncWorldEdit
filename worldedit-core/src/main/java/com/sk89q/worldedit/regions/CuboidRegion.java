@@ -131,8 +131,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         if (pos1 == null || pos2 == null) {
             return;
         }
-        pos1 = pos1.clampY(world == null ? Integer.MIN_VALUE : 0, world == null ? Integer.MAX_VALUE : world.getMaxY());
-        pos2 = pos2.clampY(world == null ? Integer.MIN_VALUE : 0, world == null ? Integer.MAX_VALUE : world.getMaxY());
+        pos1 = pos1.clampY(world == null ? 0 : 0, world == null ? FaweCache.IMP.WORLD_MAX_Y : world.getMaxY());
+        pos2 = pos2.clampY(world == null ? 0 : 0, world == null ? FaweCache.IMP.WORLD_MAX_Y : world.getMaxY());
         minX = Math.min(pos1.getX(), pos2.getX());
         minY = Math.min(pos1.getY(), pos2.getY());
         minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -194,16 +194,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     @Override
     public BlockVector3 getMaximumPoint() {
         return max;
-    }
-
-    @Override
-    public int getMinimumY() {
-        return minY;
-    }
-
-    @Override
-    public int getMaximumY() {
-        return maxY;
     }
 
     @Override
@@ -655,13 +645,29 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public int getMinY() {
+    public int getMinimumY() {
         return minY;
     }
 
     @Override
-    public int getMaxY() {
+    public int getMaximumY() {
         return maxY;
+    }
+
+    public int getMinimumX() {
+        return minX;
+    }
+
+    public int getMinimumZ() {
+        return minZ;
+    }
+
+    public int getMaximumX() {
+        return maxX;
+    }
+
+    public int getMaximumZ() {
+        return maxZ;
     }
 
     @Override

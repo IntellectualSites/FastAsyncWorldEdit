@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
@@ -71,8 +70,8 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public boolean setBlock(final int x, final int y, final int z, final PlotBlock id) {
-        return setBlock(x, y, z, legacyMapper.getBaseBlockFromPlotBlock(id));
+    public boolean setBlock(final int x, final int y, final int z, final BlockState id) {
+        return setBlock(x, y, z, id);
     }
 
     @Override
@@ -81,9 +80,8 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public PlotBlock getBlock(int x, int y, int z) {
-        BlockState block = IMP.getBlock(x, y, z);
-        return PlotBlock.get(block.toBaseBlock());
+    public BlockState getBlock(int x, int y, int z) {
+        return IMP.getBlock(x, y, z);
     }
 
     private BiomeType biome;

@@ -45,6 +45,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -69,6 +70,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -86,6 +88,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -186,7 +189,7 @@ public class ClipboardCommands {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
         }
         session.setClipboard(null);
-        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(editSession, region, !skipEntities, copyBiomes);
+        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
         clipboard.setOrigin(session.getPlacementPosition(actor));
@@ -197,37 +200,37 @@ public class ClipboardCommands {
         }
     }
 
-    @Command(
-            name = "/lazycut",
-            desc = "Lazily cut the selection to the clipboard"
-    )
-    @CommandPermissions("worldedit.clipboard.lazycut")
-    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
-                        @Selection final Region region,
-                        @Switch(name = 'e', desc = "Skip copy entities")
-                                boolean skipEntities,
-                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                                Mask maskOpt,
-                        @Switch(name = 'b', desc = "Also copy biomes")
-                                boolean copyBiomes) throws WorldEditException {
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 max = region.getMaximumPoint();
-        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
-        FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
-            throw FaweCache.MAX_CHECKS;
-        }
-        if (volume >= limit.MAX_CHANGES) {
-            throw FaweCache.MAX_CHANGES;
-        }
-        session.setClipboard(null);
-
-        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
-        clipboard.setOrigin(session.getPlacementPosition(actor));
-        session.setClipboard(new ClipboardHolder(clipboard));
-        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
-    }
+//    @Command(
+//            name = "/lazycut",
+//            desc = "Lazily cut the selection to the clipboard"
+//    )
+//    @CommandPermissions("worldedit.clipboard.lazycut")
+//    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
+//                        @Selection final Region region,
+//                        @Switch(name = 'e', desc = "Skip copy entities")
+//                                boolean skipEntities,
+//                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
+//                                Mask maskOpt,
+//                        @Switch(name = 'b', desc = "Also copy biomes")
+//                                boolean copyBiomes) throws WorldEditException {
+//        BlockVector3 min = region.getMinimumPoint();
+//        BlockVector3 max = region.getMaximumPoint();
+//        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
+//        FaweLimit limit = actor.getLimit();
+//        if (volume >= limit.MAX_CHECKS) {
+//            throw FaweCache.MAX_CHECKS;
+//        }
+//        if (volume >= limit.MAX_CHANGES) {
+//            throw FaweCache.MAX_CHANGES;
+//        }
+//        session.setClipboard(null);
+//
+//        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
+//        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
+//        clipboard.setOrigin(session.getPlacementPosition(actor));
+//        session.setClipboard(new ClipboardHolder(clipboard));
+//        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
+//    }
 
     @Command(
         name = "/cut",

@@ -32,6 +32,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.generator.CavesGen;
@@ -465,11 +466,10 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param region
      * @return
      */
-    default BlockArrayClipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
-        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
-        weClipboard.setOrigin(region.getMinimumPoint());
-        return weClipboard;
+    default Clipboard lazyCopy(Region region) {
+        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
+        faweClipboard.setOrigin(region.getMinimumPoint());
+        return faweClipboard;
     }
 
 

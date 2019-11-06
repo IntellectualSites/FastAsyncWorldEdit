@@ -262,6 +262,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return new SingleThreadQueueExtent();
     }
 
+    public void uncache() {
+        queuePool.set(null);
+    }
+
     public abstract void startSet(boolean parallel);
 
     public abstract void endSet(boolean parallel);

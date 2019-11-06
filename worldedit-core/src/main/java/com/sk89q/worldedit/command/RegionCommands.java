@@ -72,6 +72,10 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -146,13 +150,13 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
-    public void test(World world, Player player, EditSession editSession,
-                    @Selection Region region,
-                    @Arg(desc = "The pattern of blocks to set")
-                            Pattern pattern, InjectedValueAccess context) throws WorldEditException {
-        editSession.addProcessor(new ChunkSendProcessor(world, () -> Stream.of(player)));
-        editSession.addProcessor(NullProcessor.INSTANCE);
-        editSession.setBlocks(region, pattern);
+    public void test(Player player, @Arg(desc = "hello there") String message) throws WorldEditException {
+
+        TextComponent test = LegacyComponentSerializer.legacy().deserialize(message, '&');
+        player.print(message);
+        player.print(test);
+        test = test.hoverEvent(HoverEvent.showText(TextComponent.of("Blah")));
+        player.print(test);
     }
 
     @Command(

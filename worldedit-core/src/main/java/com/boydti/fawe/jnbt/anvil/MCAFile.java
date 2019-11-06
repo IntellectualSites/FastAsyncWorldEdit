@@ -1,7 +1,10 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
@@ -9,7 +12,11 @@ import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.object.io.FastByteArrayInputStream;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -34,7 +41,7 @@ import java.util.zip.InflaterInputStream;
  * e.g.: `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
  * Note: This class isn't thread safe. You can use it in an async thread, but not multiple at the same time
  */
-public class MCAFile implements Trimable {
+public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, Extent {
 
     private static Field fieldBuf2;
     private static Field fieldBuf3;
@@ -143,6 +150,23 @@ public class MCAFile implements Trimable {
 
     public MCAFile init(World world, int mcrX, int mcrZ) throws FileNotFoundException {
         return init(new File(world.getStoragePath().toFile(), File.separator + "regions" + File.separator + "r." + mcrX + "." + mcrZ + ".mca"));
+    }
+
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return BlockVector3.at(this.X << 9, 0, this.Z << 9);
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return BlockVector3.at((this.X << 9) + 511, FaweCache.IMP.WORLD_MAX_Y, (this.Z << 9) + 511);
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+//        final IChunk chunk = getChunk(x >> 4, z >> 4);
+//        return chunk.setTile(x & 15, y, z & 15, tile);
+        return false;
     }
 
     public int getIndex(int chunkX, int chunkZ) {

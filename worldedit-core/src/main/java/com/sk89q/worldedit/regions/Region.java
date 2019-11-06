@@ -195,17 +195,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     List<BlockVector2> polygonize(int maxPoints);
 
-    default int getMinY() {
+    default int getMinimumY() {
         return getMinimumPoint().getY();
     }
 
-    default int getMaxY() {
+    default int getMaximumY() {
         return getMaximumPoint().getY();
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
-        int minSection = Math.max(0, getMinY() >> 4);
-        int maxSection = Math.min(15, getMaxY() >> 4);
+        int minSection = Math.max(0, getMinimumY() >> 4);
+        int maxSection = Math.min(15, getMaximumY() >> 4);
         for (int layer = minSection; layer <= maxSection; layer++) {
             if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
             block = block.init(get, set, layer);

@@ -8,7 +8,6 @@ import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
@@ -47,7 +46,7 @@ public class FaweSchematicHandler extends SchematicHandler {
     }
 
     @Override
-    public void getCompoundTag(final String world, final Set<RegionWrapper> regions, final RunnableVal<CompoundTag> whenDone) {
+    public void getCompoundTag(final String world, final Set<CuboidRegion> regions, final RunnableVal<CompoundTag> whenDone) {
         TaskManager.IMP.async(() -> {
             Location[] corners = MainUtil.getCorners(world, regions);
             Location pos1 = corners[0];
