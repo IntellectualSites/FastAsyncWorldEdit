@@ -71,7 +71,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setBlock(final int x, final int y, final int z, final BlockState id) {
-        return setBlock(x, y, z, id);
+        return IMP.setBlock(x, y, z, id);
     }
 
     @Override
