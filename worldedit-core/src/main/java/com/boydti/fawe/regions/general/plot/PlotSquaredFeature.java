@@ -32,10 +32,10 @@ import java.util.UUID;
 public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
-        Fawe.debug("Optimizing PlotSquared");
-        setupBlockQueue();
-        setupSchematicHandler();
-        setupChunkManager();
+//        Fawe.debug("Optimizing PlotSquared");
+//        setupBlockQueue();
+//        setupSchematicHandler();
+//        setupChunkManager();
         if (Settings.PLATFORM.equalsIgnoreCase("bukkit")) {
             new FaweTrim();
         }
