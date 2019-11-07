@@ -630,7 +630,6 @@ public final class PlatformCommandManager {
             Command cmd = optional.get();
             CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
-                System.out.println("Not queued");
                 handleCommandOnCurrentThread(event);
                 return;
             }

@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
 import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 
 import java.lang.ref.Reference;
@@ -11,7 +12,7 @@ import java.lang.ref.WeakReference;
  */
 public class WeakChunk extends ReferenceChunk {
 
-    public WeakChunk(IChunk parent, IQueueExtent queueExtent) {
+    public WeakChunk(IQueueChunk parent, IQueueExtent queueExtent) {
         super(parent, queueExtent);
     }
 

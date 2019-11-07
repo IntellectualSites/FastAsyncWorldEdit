@@ -77,11 +77,6 @@ public enum NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public char[] getArray(int layer) {
-        return new char[0];
-    }
-
-    @Override
     public IBlocks reset() {
         return null;
     }

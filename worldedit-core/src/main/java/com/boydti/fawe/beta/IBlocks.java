@@ -2,19 +2,16 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +23,7 @@ public interface IBlocks extends Trimable {
 
     boolean hasSection(int layer);
 
-    char[] getArray(int layer);
+    char[] load(int layer);
 
     BlockState getBlock(int x, int y, int z);
 
@@ -64,7 +61,7 @@ public interface IBlocks extends Trimable {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (!this.hasSection(layer)) continue;
 
-                char[] ids = this.getArray(layer);
+                char[] ids = this.load(layer);
 
                 int nonEmpty = 0; // TODO optimize into same loop as toPalette
                 for (int i = 0; i < ids.length; i++) {

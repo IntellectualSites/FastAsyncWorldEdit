@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.cache.ChunkCache;
@@ -228,7 +229,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
-    public <T extends Future<T>> T submit(IChunk<T> chunk) {
+    public <T extends Future<T>> T submit(IQueueChunk<T> chunk) {
 //        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
 //            return (T) forkJoinPoolSecondary.submit(chunk);
 //        }

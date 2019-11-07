@@ -1,7 +1,11 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
 import com.boydti.fawe.object.collection.BitArray4096;
@@ -15,9 +19,11 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -25,6 +31,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,12 +41,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
-public class MCAChunk implements IChunkSet {
+public class MCAChunk implements IChunk {
     public final boolean[] hasSections = new boolean[16];
 
     public boolean hasBiomes = false;
-    public final byte[] biomes = new byte[256];
+    public final BiomeType[] biomes = new BiomeType[256];
 
     public final char[] blocks = new char[65536];
 
@@ -90,6 +98,13 @@ public class MCAChunk implements IChunkSet {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         read(nis, readPos);
+    }
+
+    @Override
+    public void init(IQueueExtent extent, int x, int z) {
+        if (x != chunkX || z != chunkZ) {
+            throw new UnsupportedOperationException("Not reuse capable");
+        }
     }
 
     public void read(NBTInputStream nis, boolean readPos) throws IOException {
@@ -153,7 +168,7 @@ public class MCAChunk implements IChunkSet {
             CompoundTag entity = FaweCache.IMP.asTag(value);
             entities.put(entity.getUUID(), entity);
         });
-        level.add("Biomes").withInt((index, value) -> biomes[index] = (byte) value);
+        level.add("Biomes").withInt((index, value) -> biomes[index] = BiomeTypes.getLegacy(value));
 
         return root;
     }
@@ -177,11 +192,11 @@ public class MCAChunk implements IChunkSet {
     }
 
     @Override
-    public IChunkSet reset() {
+    public MCAChunk reset() {
         return this.reset(true);
     }
 
-    public IChunkSet reset(boolean full) {
+    public MCAChunk reset(boolean full) {
         if (!tiles.isEmpty()) {
             tiles.clear();
         }
@@ -226,7 +241,12 @@ public class MCAChunk implements IChunkSet {
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
             if (hasBiomes) {
-                out.writeNamedTag("Biomes", biomes);
+                int type = NBTConstants.TYPE_BYTE_ARRAY;
+                out.writeNamedTagName("Biomes", type);
+                out.writeInt(biomes.length);
+                for (int i = 0; i < biomes.length; i++) {
+                    out.write(biomes[i].getLegacyId());
+                }
             }
             int len = 0;
             for (boolean hasSection : hasSections) {
@@ -424,16 +444,12 @@ public class MCAChunk implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return BiomeTypes.get(this.biomes[(z << 4) | x] & 0xFF);
+        return this.biomes[(z << 4) | x];
     }
 
     @Override
     public BiomeType[] getBiomes() {
-        BiomeType[] tmp = new BiomeType[256];
-        for (int i = 0; i < 256; i++) {
-            tmp[i] = BiomeTypes.get(this.biomes[i] & 0xFF);
-        }
-        return tmp;
+        return this.biomes;
     }
 
     @Override
@@ -444,7 +460,7 @@ public class MCAChunk implements IChunkSet {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[x + (z << 4)] = (byte) biome.getInternalId();
+        biomes[x + (z << 4)] = biome;
         return true;
     }
 
@@ -479,6 +495,16 @@ public class MCAChunk implements IChunkSet {
         return BlockState.getFromOrdinal(ordinal);
     }
 
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public CompoundTag getTag(int x, int y, int z) {
+        return null;
+    }
+
     public Set<UUID> getEntityRemoves() {
         return new HashSet<>();
     }
@@ -499,7 +525,7 @@ public class MCAChunk implements IChunkSet {
     }
 
     @Override
-    public char[] getArray(int layer) {
+    public char[] load(int layer) {
         char[] tmp = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         int offset = layer << 12;
         for (int i = 0; i < 4096; i++) {
@@ -513,7 +539,7 @@ public class MCAChunk implements IChunkSet {
     }
 
     public void setBiome(BiomeType biome) {
-        Arrays.fill(biomes, (byte) biome.getInternalId());
+        Arrays.fill(this.biomes, biome);
     }
 
     public void removeEntity(UUID uuid) {
@@ -523,5 +549,35 @@ public class MCAChunk implements IChunkSet {
     @Override
     public boolean trim(boolean aggressive) {
         return isEmpty();
+    }
+
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        return this.entities.get(uuid);
+    }
+
+    @Override
+    public Future call(IChunkSet set, Runnable finalize) {
+        return null;
+    }
+
+    @Override
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+        try {
+            if (region != null) {
+                region.filter(this, filter, block, this, this);
+            } else {
+                block = block.init(chunkX, chunkZ, this);
+                for (int layer = 0; layer < 16; layer++) {
+                    if (!this.hasSection(layer) || !filter.appliesLayer(this, layer)) {
+                        continue;
+                    }
+                    block.init(this, this, layer);
+                    block.filter(filter);
+                }
+            }
+        } finally {
+            filter.finishChunk(this);
+        }
     }
 }

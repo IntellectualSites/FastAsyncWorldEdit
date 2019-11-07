@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation.queue;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.IBatchProcessor;
@@ -34,12 +35,12 @@ import java.util.concurrent.Future;
  * <p>
  * This queue is reusable {@link #init(IChunkCache)}
  */
-public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent {
+public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
 //    // Pool discarded chunks for reuse (can safely be cleared by another thread)
 //    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
     // Chunks currently being queued / worked on
-    private final Long2ObjectLinkedOpenHashMap<IChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
+    private final Long2ObjectLinkedOpenHashMap<IQueueChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
 
     private IChunkCache<IChunkGet> cacheGet;
     private IChunkCache<IChunkSet> cacheSet;
@@ -48,7 +49,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private Thread currentThread;
     private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
     // Last access pointers
-    private IChunk lastChunk;
+    private IQueueChunk lastChunk;
     private long lastPair = Long.MAX_VALUE;
 
     private boolean enabledQueue = true;
@@ -135,7 +136,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public <T extends Future<T>> T submit(IChunk<T> chunk) {
+    public <V extends Future<V>> V submit(IQueueChunk chunk) {
         if (lastChunk == chunk) {
             lastPair = Long.MAX_VALUE;
             lastChunk = null;
@@ -152,18 +153,18 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * @param <T>
      * @return
      */
-    private <T extends Future<T>> T submitUnchecked(IChunk<T> chunk) {
+    private <V extends Future<V>> V submitUnchecked(IQueueChunk chunk) {
         if (chunk.isEmpty()) {
             chunk.recycle();
             Future result = Futures.immediateFuture(null);
-            return (T) result;
+            return (V) result;
         }
 
         if (Fawe.isMainThread()) {
-            return chunk.call();
+            return (V) chunk.call();
         }
 
-        return Fawe.get().getQueueHandler().submit(chunk);
+        return (V) Fawe.get().getQueueHandler().submit(chunk);
     }
 
     @Override
@@ -195,14 +196,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * @param Z
      * @return IChunk
      */
-    private IChunk poolOrCreate(int X, int Z) {
-        IChunk next = create(false);
+    private ChunkHolder poolOrCreate(int X, int Z) {
+        ChunkHolder next = create(false);
         next.init(this, X, Z);
         return next;
     }
 
     @Override
-    public final IChunk getOrCreateChunk(int x, int z) {
+    public final IQueueChunk getOrCreateChunk(int x, int z) {
         final long pair = (long) x << 32 | z & 0xffffffffL;
         if (pair == lastPair) {
             return lastChunk;
@@ -213,7 +214,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return NullChunk.INSTANCE;
         }
 
-        IChunk chunk = chunks.get(pair);
+        IQueueChunk chunk = chunks.get(pair);
         if (chunk instanceof ReferenceChunk) {
             chunk = ((ReferenceChunk) chunk).getParent();
         }
@@ -251,7 +252,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public IChunk create(boolean isFull) {
+    public ChunkHolder create(boolean isFull) {
         return ChunkHolder.newInstance();
     }
 
@@ -299,7 +300,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public synchronized void flush() {
         if (!chunks.isEmpty()) {
             if (MemUtil.isMemoryLimited()) {
-                for (IChunk chunk : chunks.values()) {
+                for (IQueueChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, true);
@@ -307,7 +308,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
             } else {
-                for (IChunk chunk : chunks.values()) {
+                for (IQueueChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         submissions.add(future);

@@ -94,7 +94,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         this.set = iset;
         getArr = get.sections[layer].get(get, layer);
         if (set.hasSection(layer)) {
-            setArr = set.getArray(layer);
+            setArr = set.load(layer);
             delegate = FULL;
         } else {
             delegate = NULL;
@@ -409,7 +409,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     Set delegate
      */
     private SetDelegate initSet() {
-        setArr = set.getArray(layer);
+        setArr = set.load(layer);
         return delegate = FULL;
     }
 

@@ -29,7 +29,7 @@ public interface Filter {
      * @param chunk
      * @return
      */
-    default IChunk applyChunk(IChunk chunk, @Nullable Region region) {
+    default <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         return chunk;
     }
 

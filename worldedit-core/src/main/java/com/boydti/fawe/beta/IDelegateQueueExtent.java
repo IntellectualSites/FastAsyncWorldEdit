@@ -35,9 +35,9 @@ import java.util.concurrent.Future;
 /**
  * Delegate for IQueueExtent
  */
-public interface IDelegateQueueExtent extends IQueueExtent {
+public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExtent<T> {
 
-    IQueueExtent getParent();
+    IQueueExtent<T> getParent();
 
     @Override
     default boolean isQueueEnabled() {
@@ -70,12 +70,12 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default IChunk getOrCreateChunk(int x, int z) {
+    default T getOrCreateChunk(int x, int z) {
         return getParent().getOrCreateChunk(x, z);
     }
 
     @Override
-    default <T extends Future<T>> T submit(IChunk<T> chunk) {
+    default <V extends Future<V>> V submit(T chunk) {
         return getParent().submit(chunk);
     }
 
@@ -120,12 +120,12 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default IChunk create(boolean isFull) {
+    default T create(boolean isFull) {
         return getParent().create(isFull);
     }
 
     @Override
-    default IChunk wrap(IChunk root) {
+    default T wrap(T root) {
         return getParent().wrap(root);
     }
 

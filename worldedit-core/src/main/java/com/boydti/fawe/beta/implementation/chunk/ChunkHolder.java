@@ -1,10 +1,9 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlockMask;
-import com.boydti.fawe.beta.Flood;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -27,7 +26,7 @@ import javax.annotation.Nullable;
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
  */
-public class ChunkHolder<T extends Future<T>> implements IChunk {
+public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
 
     private static FaweCache.Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
 
@@ -61,7 +60,32 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        return false;
+        return delegate.set(this).setTile(x, y, z, tag);
+    }
+
+    @Override
+    public void setEntity(CompoundTag tag) {
+        delegate.set(this).setEntity(tag);
+    }
+
+    @Override
+    public void removeEntity(UUID uuid) {
+        delegate.set(this).removeEntity(uuid);
+    }
+
+    @Override
+    public Set<UUID> getEntityRemoves() {
+        return delegate.set(this).getEntityRemoves();
+    }
+
+    @Override
+    public BiomeType[] getBiomes() {
+        return delegate.set(this).getBiomes(); // TODO return get?
+    }
+
+    @Override
+    public void setBlocks(int layer, char[] data) {
+        delegate.set(this).setBlocks(layer, data);
     }
 
     @Override
@@ -259,10 +283,10 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
         }
     };
 
-    @Override
-    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
-//        block.flood(get, set, mask, block, );
-    }
+//    @Override
+//    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
+////        block.flood(get, set, mask, block, );
+//    }
 
     @Override
     public CompoundTag getTag(int x, int y, int z) {
@@ -283,11 +307,6 @@ public class ChunkHolder<T extends Future<T>> implements IChunk {
     @Override
     public boolean hasSection(int layer) {
         return chunkExisting != null && chunkExisting.hasSection(layer);
-    }
-
-    @Override
-    public char[] getArray(int layer) {
-        return delegate.get(this).getArray(layer);
     }
 
     @Override

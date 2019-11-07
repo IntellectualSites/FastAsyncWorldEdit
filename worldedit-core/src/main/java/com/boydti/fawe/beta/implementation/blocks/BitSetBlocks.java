@@ -80,7 +80,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public char[] getArray(int layer) {
+    public char[] load(int layer) {
         char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
         if (nullRowY instanceof MemBlockSet.RowY) {

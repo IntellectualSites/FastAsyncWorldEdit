@@ -54,10 +54,6 @@ public class FaweSchematicHandler extends SchematicHandler {
             final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
             final EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
-            final int mx = pos1.getX();
-            final int my = pos1.getY();
-            final int mz = pos1.getZ();
-
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
 
             Clipboard holder = new BlockArrayClipboard(region, clipboard);

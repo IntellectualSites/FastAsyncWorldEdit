@@ -1,6 +1,6 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
-import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 
 /**
@@ -11,7 +11,7 @@ public class FinalizedChunk extends DelegateChunk {
 
     private final IQueueExtent queueExtent;
 
-    public FinalizedChunk(IChunk parent, IQueueExtent queueExtent) {
+    public FinalizedChunk(IQueueChunk parent, IQueueExtent queueExtent) {
         super(parent);
         this.queueExtent = queueExtent;
     }

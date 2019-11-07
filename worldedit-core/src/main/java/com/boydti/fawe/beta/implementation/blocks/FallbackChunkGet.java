@@ -4,7 +4,6 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -90,7 +89,7 @@ public class FallbackChunkGet implements IChunkGet {
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
         for (int layer = 0; layer < 16; layer++) {
             if (set.hasSection(layer)) {
-                char[] arr = set.getArray(layer);
+                char[] arr = set.load(layer);
                 int by = layer << 4;
                 for (int y = 0, i = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
@@ -158,11 +157,6 @@ public class FallbackChunkGet implements IChunkGet {
     @Override
     public boolean hasSection(int layer) {
         return true;
-    }
-
-    @Override
-    public char[] getArray(int layer) {
-        return new char[0];
     }
 
     @Override

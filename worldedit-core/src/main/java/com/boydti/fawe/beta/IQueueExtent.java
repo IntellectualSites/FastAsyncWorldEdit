@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
  * uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchProcessorHolder {
+public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, IChunkExtent<T>, IBatchProcessorHolder {
 
     @Override
     default boolean isQueueEnabled() {
@@ -78,7 +78,7 @@ public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchP
      * @param chunk
      * @return result
      */
-    <T extends Future<T>> T submit(IChunk<T> chunk);
+    <V extends Future<V>> V submit(T chunk);
 
     @Override
     default BlockVector3 getMinimumPoint() {
@@ -93,12 +93,12 @@ public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchP
     /**
      * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
      * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
-     * #wrap(IChunk)}
+     * #wrap(T)}
      *
      * @param isFull true if a more optimized chunk should be returned
      * @return a more optimized chunk object
      */
-    IChunk create(boolean isFull);
+    T create(boolean isFull);
 
     /**
      * Wrap the chunk object (i.e. for region restrictions / limits etc.)
@@ -106,7 +106,7 @@ public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchP
      * @param root
      * @return wrapped chunk
      */
-    default IChunk wrap(IChunk root) {
+    default T wrap(T root) {
         return root;
     }
 
@@ -148,11 +148,11 @@ public interface IQueueExtent extends Flushable, Trimable, IChunkExtent, IBatchP
         if (!filter.appliesChunk(chunkX, chunkZ)) {
             return block;
         }
-        IChunk chunk = this.getOrCreateChunk(chunkX, chunkZ);
+        T chunk = this.getOrCreateChunk(chunkX, chunkZ);
         // Initialize
         chunk.init(this, chunkX, chunkZ);
 
-        IChunk newChunk = filter.applyChunk(chunk, region);
+        T newChunk = filter.applyChunk(chunk, region);
         if (newChunk != null) {
             chunk = newChunk;
             if (block == null) {

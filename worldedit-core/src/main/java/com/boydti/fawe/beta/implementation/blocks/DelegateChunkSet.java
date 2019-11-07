@@ -54,8 +54,8 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default char[] getArray(int layer) {
-        return getParent().getArray(layer);
+    default char[] load(int layer) {
+        return getParent().load(layer);
     }
 
     @Override

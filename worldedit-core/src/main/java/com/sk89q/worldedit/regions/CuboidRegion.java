@@ -741,7 +741,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             int indexY, index;
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (set.hasSection(layer)) {
-                    char[] arr = set.getArray(layer);
+                    char[] arr = set.load(layer);
                     if (trimX || trimZ) {
                         indexY = 0;
                         for (int y = 0; y < 16; y++, indexY += 256) {

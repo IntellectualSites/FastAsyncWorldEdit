@@ -1584,7 +1584,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            byte[] heightMap = chunk.biomes;
+            byte[] heightMap = FaweCache.IMP.BYTE_BUFFER_256.get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;
@@ -1717,7 +1717,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             }
 
             for (int i = 0; i < 256; i++) {
-                chunk.biomes[i] = biomes[indexes[i]];
+                byte biomeId = biomes[indexes[i]];
+                if (biomeId != 0) {
+                    chunk.biomes[i] = BiomeTypes.get(biomeId);
+                }
             }
 
 

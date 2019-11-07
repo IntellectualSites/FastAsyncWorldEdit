@@ -9,7 +9,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public interface IChunkExtent extends Extent {
+public interface IChunkExtent<T extends IChunk> extends Extent {
     /**
      * Get the IChunk at a position (and cache it if it's not already)
      *
@@ -17,7 +17,7 @@ public interface IChunkExtent extends Extent {
      * @param z
      * @return IChunk
      */
-    IChunk getOrCreateChunk(int chunkX, int chunkZ);
+    T getOrCreateChunk(int chunkX, int chunkZ);
 
     @Override
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) {

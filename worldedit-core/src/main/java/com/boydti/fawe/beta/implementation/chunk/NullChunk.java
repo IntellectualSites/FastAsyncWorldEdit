@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
@@ -23,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-public enum NullChunk implements IChunk {
+public enum NullChunk implements IQueueChunk {
     INSTANCE;
 
     @Override
@@ -54,10 +55,10 @@ public enum NullChunk implements IChunk {
 
     }
 
-    @Override
-    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
-
-    }
+//    @Override
+//    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
+//
+//    }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -70,8 +71,33 @@ public enum NullChunk implements IChunk {
     }
 
     @Override
+    public void setEntity(CompoundTag tag) {
+
+    }
+
+    @Override
+    public void removeEntity(UUID uuid) {
+
+    }
+
+    @Override
+    public Set<UUID> getEntityRemoves() {
+        return null;
+    }
+
+    @Override
+    public BiomeType[] getBiomes() {
+        return null;
+    }
+
+    @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
         return false;
+    }
+
+    @Override
+    public void setBlocks(int layer, char[] data) {
+
     }
 
     @Override
@@ -82,11 +108,6 @@ public enum NullChunk implements IChunk {
     @Override
     public boolean hasSection(int layer) {
         return false;
-    }
-
-    @Override
-    public char[] getArray(int layer) {
-        return null;
     }
 
     @Override

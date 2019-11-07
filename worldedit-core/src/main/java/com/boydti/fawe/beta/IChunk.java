@@ -7,17 +7,13 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent} Used for getting and setting blocks / biomes
  * / entities
  */
-public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChunkGet {
-
+public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     /**
      * Initialize at the location
      * (allows for reuse)
@@ -26,8 +22,7 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      * @param x
      * @param z
      */
-    void init(IQueueExtent extent, int x, int z);
-
+    default void init(IQueueExtent extent, int x, int z) {}
     /**
      * Get chunkX
      * @return
@@ -57,30 +52,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     boolean isEmpty();
 
     /**
-     * Apply the queued changes to the world containing this chunk.
-     * <p>The future returned may return another future. To ensure completion keep calling {@link
-     * Future#get()} on each result.</p>
-     *
-     * @return Future
-     */
-    @Override
-    T call();
-
-    /**
-     * Call and join
-     * - Should be done async, if at all
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    default void join() throws ExecutionException, InterruptedException {
-        T future = call();
-        while (future != null) {
-            future = future.get();
-        }
-        return;
-    }
-
-    /**
      * Filter through all the blocks in the chunk
      *
      * @param filter the filter
@@ -89,14 +60,14 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 
-    /**
-     * Flood through all the blocks in the chunk
-     * TODO not implemented
-     * @param flood
-     * @param mask
-     * @param block
-     */
-    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
+//    /**
+//     * Flood through all the blocks in the chunk
+//     * TODO not implemented
+//     * @param flood
+//     * @param mask
+//     * @param block
+//     */
+//    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
 
     /* set - queues a change */
     boolean setBiome(int x, int y, int z, BiomeType biome);
@@ -117,13 +88,8 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     @Override
     CompoundTag getTag(int x, int y, int z);
 
-    /**
-     * Reset (defaults to just calling init)
-     * @return
-     */
     @Override
-    default IBlocks reset() {
-        init(null, getX(), getZ());
+    default IChunk reset() {
         return this;
     }
 }

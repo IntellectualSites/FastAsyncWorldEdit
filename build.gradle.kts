@@ -41,6 +41,15 @@ ext {
         buildNumber = index.toString();
     }
 }
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile::class) {
+            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+        }
+    }
+}
+
 //def rootVersion = "1.13"
 //def revision = ""
 //def buildNumber = ""

@@ -21,13 +21,13 @@ import javax.annotation.Nullable;
  *
  * @param <U> parent class
  */
-public interface IDelegateChunk<U extends IChunk> extends IChunk {
+public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
 
     U getParent();
 
     @Override
-    default IChunk getRoot() {
-        IChunk root = getParent();
+    default IQueueChunk getRoot() {
+        IQueueChunk root = getParent();
         while (root instanceof IDelegateChunk) {
             root = ((IDelegateChunk) root).getParent();
         }
@@ -49,10 +49,10 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
         return getParent().hasSection(layer);
     }
 
-    @Override
-    default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
-        getParent().flood(flood, mask, block);
-    }
+//    @Override
+//    default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
+//        getParent().flood(flood, mask, block);
+//    }
 
     @Override
     default boolean setTile(int x, int y, int z, CompoundTag tag) {
@@ -82,11 +82,6 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     @Override
     default BaseBlock getFullBlock(int x, int y, int z) {
         return getParent().getFullBlock(x, y, z);
-    }
-
-    @Override
-    default char[] load(int layer) {
-        return getParent().load(layer);
     }
 
     @Override
@@ -146,8 +141,33 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default char[] getArray(int layer) {
-        return getParent().getArray(layer);
+    default char[] load(int layer) {
+        return getParent().load(layer);
+    }
+
+    @Override
+    default void setBlocks(int layer, char[] data) {
+        getParent().setBlocks(layer, data);
+    }
+
+    @Override
+    default void setEntity(CompoundTag tag) {
+        getParent().setEntity(tag);
+    }
+
+    @Override
+    default void removeEntity(UUID uuid) {
+        getParent().removeEntity(uuid);
+    }
+
+    @Override
+    default Set<UUID> getEntityRemoves() {
+        return getParent().getEntityRemoves();
+    }
+
+    @Override
+    default BiomeType[] getBiomes() {
+        return getParent().getBiomes();
     }
 
     default <T extends IChunk> T findParent(Class<T> clazz) {

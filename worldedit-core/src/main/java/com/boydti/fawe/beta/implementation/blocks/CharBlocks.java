@@ -2,15 +2,8 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkSet;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-
-import java.util.Map;
-import java.util.Set;
 
 public abstract class CharBlocks implements IBlocks {
 
@@ -26,9 +19,9 @@ public abstract class CharBlocks implements IBlocks {
             blocks.sections[layer] = FULL;
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.load(layer);
+                arr = blocks.blocks[layer] = blocks.update(layer, null);
             } else {
-                blocks.blocks[layer] = blocks.load(layer, arr);
+                blocks.blocks[layer] = blocks.update(layer, arr);
             }
             return arr;
         }
@@ -74,11 +67,10 @@ public abstract class CharBlocks implements IBlocks {
         sections[layer] = EMPTY;
     }
 
-    public char[] load(int layer) {
-        return new char[4096];
-    }
-
-    public char[] load(int layer, char[] data) {
+    public char[] update(int layer, char[] data) {
+        if (data == null) {
+            return new char[4096];
+        }
         for (int i = 0; i < 4096; i++) {
             data[i] = 0;
         }
@@ -91,7 +83,7 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public char[] getArray(int layer) {
+    public char[] load(int layer) {
         return sections[layer].get(this, layer);
     }
 

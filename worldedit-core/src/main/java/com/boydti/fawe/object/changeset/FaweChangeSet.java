@@ -173,11 +173,11 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
         for (int layer = 0; layer < 16; layer++) {
             if (!set.hasSection(layer)) continue;
             // add each block and tile
-            char[] blocksGet = get.getArray(layer);
+            char[] blocksGet = get.load(layer);
             if (blocksGet == null) {
                 blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
             }
-            char[] blocksSet = set.getArray(layer);
+            char[] blocksSet = set.load(layer);
 
             int by = layer << 4;
             for (int y = 0, index = 0; y < 16; y++) {

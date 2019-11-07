@@ -294,7 +294,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 } else {
                     boolean changed = true;
                     processExtra = true;
-                    char[] arr = set.getArray(layer);
+                    char[] arr = set.load(layer);
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {

@@ -21,12 +21,10 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Chunk;
-import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.DataBits;
 import net.minecraft.server.v1_14_R1.DataPalette;
@@ -36,11 +34,8 @@ import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.LightEngineThreaded;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.NBTTagInt;
-import net.minecraft.server.v1_14_R1.SectionPosition;
-import net.minecraft.server.v1_14_R1.SystemUtils;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.World;
@@ -51,7 +46,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -205,11 +199,6 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         };
     }
 
-    @Override
-    public char[] load(int layer) {
-        return load(layer, null);
-    }
-
     private void updateGet(BukkitGetBlocks_1_14 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
             if (this.nmsChunk != nmsChunk) {
@@ -271,7 +260,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.getArray(layer);
+                    char[] setArr = set.load(layer);
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
@@ -506,7 +495,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     }
 
     @Override
-    public synchronized char[] load(int layer, char[] data) {
+    public synchronized char[] update(int layer, char[] data) {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
