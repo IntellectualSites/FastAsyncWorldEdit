@@ -36,6 +36,8 @@ public interface IFawe {
         return null;
     }
 
+    public default void registerPacketListener() {}
+
     String getPlatformVersion();
 
     boolean isOnlineMode();

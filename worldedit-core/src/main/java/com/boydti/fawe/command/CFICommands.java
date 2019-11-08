@@ -1,9 +1,5 @@
 package com.boydti.fawe.command;
 
-import static com.boydti.fawe.util.image.ImageUtil.load;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
-import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
@@ -19,6 +15,7 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -28,6 +25,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -39,6 +37,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -48,6 +47,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -56,6 +56,18 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.CommandManagerService;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.enginehub.piston.part.SubCommandPart;
+import org.jetbrains.annotations.NotNull;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -73,16 +85,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.imageio.ImageIO;
 
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
+import static com.boydti.fawe.util.image.ImageUtil.load;
+import static com.sk89q.worldedit.command.MethodCommands.getArguments;
+import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class CFICommands {
@@ -132,7 +140,7 @@ public class CFICommands {
             desc = "Start CFI with an empty map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void heightMap(Player player, int width, int length) {
+    public void empty(Player player, @Arg(desc = "Map width (x)") int width, @Arg(desc = "Map length (z)")  int length) {
         HeightMapMCAGenerator generator = new HeightMapMCAGenerator(width, length, getFolder(generateName()));
         setup(generator, player);
     }
@@ -148,6 +156,7 @@ public class CFICommands {
         settings.setGenerator(generator).bind();
         generator.setImageViewer(Fawe.imp().getImageViewer(player));
         generator.update();
+        settings.bind();
         mainMenu(player);
     }
 
@@ -588,7 +597,7 @@ public class CFICommands {
             descFooter = "Set the terrain height either based on an image heightmap, or a numeric value."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void height(Player player, String imageStr) throws WorldEditException {
+    public void height(Player player, @Arg(name = "height", desc = "Int height, or image") String imageStr) throws WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (!MathMan.isInteger(imageStr)) {
             gen.setHeight(ImageUtil.getImage(imageStr));
@@ -604,7 +613,7 @@ public class CFICommands {
             desc = "Change the block used for water\ne.g. Lava"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void waterId(Player player, BlockStateHolder block) throws WorldEditException {
+    public void waterId(Player player, @Arg(desc = "block") BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(player);
         settings.getGenerator().setWater(block.toImmutableState());
 
@@ -619,7 +628,7 @@ public class CFICommands {
             desc = "Change the block used for the base\ne.g. Bedrock"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void baseId(Player player, BlockStateHolder block) throws WorldEditException {
+    public void baseId(Player player, @Arg(desc = "block") BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(player);
         settings.getGenerator().setBedrock(block.toImmutableState());
         player.print(TextComponent.of("Set base id!"));

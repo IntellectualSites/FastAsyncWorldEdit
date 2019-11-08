@@ -26,6 +26,8 @@ import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
@@ -140,6 +142,7 @@ import org.enginehub.piston.converter.ArgumentConverters;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.CommandExecutionException;
 import org.enginehub.piston.exception.ConditionFailedException;
+import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.exception.UsageException;
 import org.enginehub.piston.gen.CommandRegistration;
 import org.enginehub.piston.impl.CommandManagerServiceImpl;
@@ -293,6 +296,9 @@ public final class PlatformCommandManager {
                                 return editSession;
                             });
                 });
+        globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
+                context -> context.injectedValue(Key.of(Actor.class))
+                        .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
         globalInjectedValues.injectValue(Key.of(World.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
@@ -741,6 +747,21 @@ public final class PlatformCommandManager {
                 }
 
                 worldEdit.flushBlockBag(actor, editSession);
+            }
+
+            Optional<CFICommands.CFISettings> cfiOpt = context.injectedValue(Key.of(CFICommands.CFISettings.class));
+            if (cfiOpt.isPresent()) {
+                CFICommands.CFISettings settings = cfiOpt.get();
+                HeightMapMCAGenerator gen = settings.getGenerator();
+                if (gen != null && gen.isModified()) {
+                    try {
+                        gen.update();
+                        CFIChangeSet set = new CFIChangeSet(gen, actor.getUniqueId());
+                        session.remember(actor, gen, set, actor.getLimit());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             Request.reset();
         }

@@ -57,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+import io.papermc.lib.PaperLib;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -328,7 +329,7 @@ public class BukkitWorld extends AbstractWorld {
         if (Fawe.isMainThread()) {
             world.getChunkAt(X, Z);
         } else if (!world.isChunkLoaded(X, Z)) {
-            if (FaweBukkit.PAPER) {
+            if (PaperLib.isPaper()) {
                 world.getChunkAtAsync(X, Z, true);
             } else {
                 Fawe.get().getQueueHandler().sync(() -> {

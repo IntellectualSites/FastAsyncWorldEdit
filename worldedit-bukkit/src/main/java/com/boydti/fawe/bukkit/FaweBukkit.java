@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
+import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
@@ -62,8 +63,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
-
-    public static boolean PAPER;
+    private CFIPacketListener packetListener;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -71,13 +71,6 @@ public class FaweBukkit implements IFawe, Listener {
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
-        try {
-            Class.forName("com.destroystokyo.paper.Namespaced");
-            PAPER = true;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            // TODO no paper
-        }
         try {
             Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
@@ -115,13 +108,13 @@ public class FaweBukkit implements IFawe, Listener {
         });
     }
 
-//    @Override // Please don't delete this again, it's WIP
-//    public void registerPacketListener() {
-//        PluginManager manager = Bukkit.getPluginManager();
-//        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
-//            packetListener = new CFIPacketListener(plugin);
-//        }
-//    }
+    @Override // Please don't delete this again, it's WIP
+    public void registerPacketListener() {
+        PluginManager manager = Bukkit.getPluginManager();
+        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
+            packetListener = new CFIPacketListener(plugin);
+        }
+    }
 
     @Override
     public QueueHandler getQueueHandler() {
@@ -133,7 +126,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
-            //registerPacketListener();
+            registerPacketListener();
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
@@ -408,7 +401,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public Preloader getPreloader() {
-        if (PAPER) {
+        if (PaperLib.isPaper()) {
             return new AsyncPreloader();
         }
         return null;

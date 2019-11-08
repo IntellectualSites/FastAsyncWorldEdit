@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -145,7 +146,7 @@ public final class BukkitAdapter_1_14 {
         if (Fawe.isMainThread()) {
             return nmsWorld.getChunkAt(X, Z);
         }
-        if (FaweBukkit.PAPER) {
+        if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
             try {

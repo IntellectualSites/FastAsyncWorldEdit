@@ -219,8 +219,6 @@ public enum FaweCache implements Trimable {
 
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
-    public final CleanableThreadLocal<byte[]> BYTE_BUFFER_256 = new CleanableThreadLocal<>(() -> new byte[256]);
-
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypesCache.states.length];
         Arrays.fill(result, Integer.MAX_VALUE);
@@ -242,6 +240,8 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<>(() -> new int[4096]);
 
     public final CleanableThreadLocal<int[]> INDEX_STORE = new CleanableThreadLocal<>(() -> new int[256]);
+
+    public final CleanableThreadLocal<int[]> HEIGHT_STORE = new CleanableThreadLocal<>(() -> new int[256]);
 
     /**
      * Holds data for a palette used in a chunk section

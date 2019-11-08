@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
+import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;

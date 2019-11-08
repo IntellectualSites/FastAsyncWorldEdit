@@ -726,7 +726,7 @@ public class LocalSession implements TextureHolder {
             }
         }
         if (world != null) {
-            //TODO FIXME Fawe.imp().registerPacketListener();
+            Fawe.imp().registerPacketListener();
             world.update();
         }
     }

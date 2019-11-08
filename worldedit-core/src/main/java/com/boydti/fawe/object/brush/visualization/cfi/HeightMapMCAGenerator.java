@@ -90,8 +90,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         int worldThickness;
         boolean randomVariation = true;
         int biomePriority;
-        char waterOrdinal = BlockID.WATER;
-        char bedrockOrdinal = BlockID.BEDROCK;
+        char waterOrdinal = BlockTypes.WATER.getDefaultState().getOrdinalChar();
+        char bedrockOrdinal = BlockTypes.BEDROCK.getDefaultState().getOrdinalChar();
         boolean modifiedMain;
 
         @Override
@@ -232,10 +232,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         floor = new DifferentialArray<>(new char[getArea()]);
         main = new DifferentialArray<>(new char[getArea()]);
 
-        char stone = BlockID.STONE;
-        char grass = BlockTypes.GRASS_BLOCK.getDefaultState().with(PropertyKey.SNOWY, false).getOrdinalChar();
-        Arrays.fill(overlay.getCharArray(), stone);
-        Arrays.fill(overlay.getCharArray(), grass);
+        char stone = BlockTypes.STONE.getDefaultState().getOrdinalChar();
+        char grass = BlockTypes.GRASS_BLOCK.getDefaultState().getOrdinalChar();
+        Arrays.fill(main.getCharArray(), stone);
+        Arrays.fill(floor.getCharArray(), grass);
     }
 
     public Metadatable getMetaData() {
@@ -1584,7 +1584,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            byte[] heightMap = FaweCache.IMP.BYTE_BUFFER_256.get();
+            int[] heightMap = FaweCache.IMP.HEIGHT_STORE.get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;
@@ -1592,7 +1592,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = csx; x <= cex; x++, index++, globalIndex++) {
                     indexes[index] = globalIndex;
                     int height = heights[globalIndex] & 0xFF;
-                    heightMap[index] = (byte) height;
+                    heightMap[index] = height;
                     maxY = Math.max(maxY, height);
                     minY = Math.min(minY, height);
                 }
@@ -1638,7 +1638,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 index = (z & 15) << 4;
                 for (int x = csx; x <= cex; x++, index++) {
                     globalIndex = indexes[index];
-                    int height = heightMap[index] & 0xFF;
+                    int height = heightMap[index];
                     int maxMainY = height;
                     int minMainY = minY;
 
