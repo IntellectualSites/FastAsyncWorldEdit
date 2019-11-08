@@ -470,7 +470,7 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                 "cfi",
-                ImmutableList.of(),
+                ImmutableList.of("/cfi"),
                 "CFI commands",
                 CFICommandsRegistration.builder(),
                 new CFICommands(worldEdit)

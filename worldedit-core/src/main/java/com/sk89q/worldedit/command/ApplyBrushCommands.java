@@ -84,18 +84,12 @@ public class ApplyBrushCommands {
             );
 
             builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.apply")));
+            builder.addParts(REGION_FACTORY, RADIUS);
             builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type"), TextComponent.of("Type of brush to use"))
                     .withCommands(manager.getAllCommands().collect(Collectors.toList()))
                     .required()
                     .build());
-            builder.addParts(REGION_FACTORY, RADIUS);
-            builder.action(new org.enginehub.piston.Command.Action() {
-                @Override
-                public Object run(CommandParameters commandParameters) throws Exception {
-                    System.out.println("Action " + commandParameters);
-                    return null;
-                }
-            });
+
         });
     }
 
@@ -115,7 +109,6 @@ public class ApplyBrushCommands {
                        Player player, LocalSession localSession,
                        @Arg(desc = "The type of tree to plant")
                            TreeGenerator.TreeType type) throws WorldEditException {
-        System.out.println("FOREST");
         setApplyBrush(parameters, player, localSession, new TreeGeneratorFactory(type));
     }
 
