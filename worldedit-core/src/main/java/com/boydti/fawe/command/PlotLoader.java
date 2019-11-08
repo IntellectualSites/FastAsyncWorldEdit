@@ -36,8 +36,7 @@ public class PlotLoader {
             () -> autoClaimFromDatabase(player, area, plot.getId(), whenDone));
     }
 
-    public void load(Actor actor, CFISettings  settings,
-        Function<File, Boolean> createTask) throws IOException {
+    public void load(Actor actor, CFISettings  settings, Function<File, Boolean> createTask) throws IOException {
         PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;

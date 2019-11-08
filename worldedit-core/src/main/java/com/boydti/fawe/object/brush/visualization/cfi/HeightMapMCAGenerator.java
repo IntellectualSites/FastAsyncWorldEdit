@@ -80,6 +80,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     protected final DifferentialArray<char[]> floor;
     protected final DifferentialArray<char[]> main;
     protected DifferentialArray<char[]> overlay;
+    protected Metadatable metaData = new Metadatable();
+    protected TextureUtil textureUtil;
 
     protected final CFIPrimitives primitives = new CFIPrimitives();
     private CFIPrimitives oldPrimitives = new CFIPrimitives();
@@ -114,10 +116,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             return super.clone();
         }
     }
-
-
-    protected Metadatable metaData = new Metadatable();
-    protected TextureUtil textureUtil;
 
     @Override
     public void flushChanges(FaweOutputStream out) throws IOException {
@@ -301,19 +299,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
             for (int chunkZ = scz; chunkZ <= ecz; chunkZ++) {
                 for (int chunkX = scx; chunkX <= ecx; chunkX++) {
-
                     refreshChunk(world, chunkX, chunkZ);
                 }
             }
         }
+
     }
 
     public void refreshChunk(World world, int chunkX, int chunkZ) {
         Supplier<IBlocks> blocksSupplier = () -> getChunk(chunkX, chunkZ);
-
         int realChunkX = chunkX + chunkOffset.getBlockX();
         int realChunkZ = chunkZ + chunkOffset.getBlockZ();
-
         ChunkPacket packet = new ChunkPacket(realChunkX, realChunkZ, blocksSupplier, true);
         world.sendFakeChunk(player, packet);
     }

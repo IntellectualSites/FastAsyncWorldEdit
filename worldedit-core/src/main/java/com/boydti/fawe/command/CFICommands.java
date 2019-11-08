@@ -156,7 +156,6 @@ public class CFICommands {
         settings.setGenerator(generator).bind();
         generator.setImageViewer(Fawe.imp().getImageViewer(player));
         generator.update();
-        settings.bind();
         mainMenu(player);
     }
 
@@ -398,26 +397,26 @@ public class CFICommands {
     public void paletteblocks(Player player, LocalSession session, @Arg(name = "arg", desc = "String", def = "") String argOpt) throws EmptyClipboardException, InputParseException, FileNotFoundException {
         if (argOpt == null) {
             TextComponent build = TextComponent.builder("What blocks do you want to color with?")
-                .append(newline())
-                .append(TextComponent.of("[All]")
-                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks *")))
-                .append(" - All available blocks")
-                .append(newline())
-                .append(TextComponent.of("[Clipboard]")
-                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks #clipboard")))
-                .append(" - The blocks in your clipboard")
-                .append(newline())
-                .append(TextComponent.of("[List]")
-                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks stone,gravel")))
-                .append(" - A comma separated list of blocks")
-                .append(newline())
-                .append(TextComponent.of("[Complexity]")
-                    .clickEvent(ClickEvent.runCommand("/cfi Complexity")))
-                .append(" - Block textures within a complexity range")
-                .append(newline())
-                .append(TextComponent.of("< [Back]").clickEvent(ClickEvent
-                    .runCommand("/cfi coloring")))
-                .build();
+                    .append(newline())
+                    .append(TextComponent.of("[All]")
+                            .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks *")))
+                    .append(" - All available blocks")
+                    .append(newline())
+                    .append(TextComponent.of("[Clipboard]")
+                            .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks #clipboard")))
+                    .append(" - The blocks in your clipboard")
+                    .append(newline())
+                    .append(TextComponent.of("[List]")
+                            .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks stone,gravel")))
+                    .append(" - A comma separated list of blocks")
+                    .append(newline())
+                    .append(TextComponent.of("[Complexity]")
+                            .clickEvent(ClickEvent.runCommand("/cfi Complexity")))
+                    .append(" - Block textures within a complexity range")
+                    .append(newline())
+                    .append(TextComponent.of("< [Back]").clickEvent(ClickEvent
+                            .runCommand("/cfi coloring")))
+                    .build();
             player.print(build);
             return;
         }
@@ -881,19 +880,19 @@ public class CFICommands {
         String s1 = "/cfi mask <mask>";
         String s2 = "/cfi " + settings.getCategory();
         TextComponent build = TextComponent.builder(">> Current Settings <<")
-            .append(newline())
-            .append("Image Mask ").append(
-                TextComponent.of("[" + settings.imageMaskArg + "]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi mask http://")))
-            .append(newline())
-            .append("WorldEdit Mask ").append(TextComponent.of("[" + settings.maskArg + "]")
-                .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
-                .clickEvent(ClickEvent.suggestCommand(s1)))
-            .append(newline())
-            .append(
-                TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(s2)))
-                    .clickEvent(ClickEvent.runCommand(s2))).build();
+                .append(newline())
+                .append("Image Mask ").append(
+                        TextComponent.of("[" + settings.imageMaskArg + "]")
+                                .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
+                                .clickEvent(ClickEvent.suggestCommand("/cfi mask http://")))
+                .append(newline())
+                .append("WorldEdit Mask ").append(TextComponent.of("[" + settings.maskArg + "]")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
+                        .clickEvent(ClickEvent.suggestCommand(s1)))
+                .append(newline())
+                .append(
+                        TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(s2)))
+                                .clickEvent(ClickEvent.runCommand(s2))).build();
         player.print(build);
     }
 
@@ -917,13 +916,13 @@ public class CFICommands {
             String s = cmd + " stone";
             String s1 = "/cfi " + settings.getCategory();
             TextComponent build = TextComponent.builder(">> Current Settings <<").append(newline())
-                .append("Pattern ").append(TextComponent.of("[Click Here]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
-                    .clickEvent(ClickEvent.suggestCommand(s)))
-                .append(newline())
-                .append(TextComponent.of("< [Back]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
-                    .clickEvent(ClickEvent.runCommand(s1))).build();
+                    .append("Pattern ").append(TextComponent.of("[Click Here]")
+                            .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
+                            .clickEvent(ClickEvent.suggestCommand(s)))
+                    .append(newline())
+                    .append(TextComponent.of("< [Back]")
+                            .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
+                            .clickEvent(ClickEvent.runCommand(s1))).build();
             player.print(build);
         }
     }
@@ -964,11 +963,11 @@ public class CFICommands {
 
         if (image == null) {
             TextComponent build = TextComponent.builder("Please provide an image:")
-                .append(newline())
-                .append("From a URL: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image http://")))
-                .append(newline())
-                .append("From a file: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image file://")))
-                .build();
+                    .append(newline())
+                    .append("From a URL: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image http://")))
+                    .append(newline())
+                    .append("From a file: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image file://")))
+                    .build();
             player.print(build);
         } else {
             if (settings.hasGenerator()) {
@@ -989,12 +988,12 @@ public class CFICommands {
         settings.popMessages(player);
         settings.setCategory(this::populate);
         TextComponent build = TextComponent.builder("What would you like to populate?")
-            .append(newline())
-            .append("(You will need to type these commands)").append(newline())
-            //TODO .cmdOptions("/cfi ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
-            .append(newline())
-            .append(TextComponent.of("< [Back]").clickEvent(ClickEvent.runCommand("/cfi")))
-            .build();
+                .append(newline())
+                .append("(You will need to type these commands)").append(newline())
+                //TODO .cmdOptions("/cfi ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
+                .append(newline())
+                .append(TextComponent.of("< [Back]").clickEvent(ClickEvent.runCommand("/cfi")))
+                .build();
         player.print(build);
     }
 
@@ -1038,32 +1037,32 @@ public class CFICommands {
         //TODO
         @NotNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
                 .append("Mask ").append(TextComponent.of("[" + mask + "]")
-                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi mask")))
-                .clickEvent(ClickEvent.runCommand("/cfi mask")))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi mask")))
+                        .clickEvent(ClickEvent.runCommand("/cfi mask")))
                 .append(newline())
                 .append("Pattern ").append(TextComponent.of("[" + pattern + "]")
-                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi pattern")))
-                .clickEvent(ClickEvent.runCommand("/cfi pattern")))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi pattern")))
+                        .clickEvent(ClickEvent.runCommand("/cfi pattern")))
                 .append(newline())
                 .append(newline())
                 .append(">> Components <<")
                 .append(newline())
                 .append(TextComponent.of("[Height]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi height 120")))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi height 120"))).append(" - Terrain height for whole map")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi height 120")))
+                        .clickEvent(ClickEvent.suggestCommand("/cfi height 120"))).append(" - Terrain height for whole map")
                 .append(newline())
                 .append(TextComponent.of("[WaterHeight]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterheight 60")))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi waterheight 60"))).append(" - Sea level for whole map")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterheight 60")))
+                        .clickEvent(ClickEvent.suggestCommand("/cfi waterheight 60"))).append(" - Sea level for whole map")
                 .append(newline())
                 .append(TextComponent.of("[FloorThickness]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floorthickness 60")))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi floorthickness 60"))).append(" - Floor thickness of entire map")
+                        .clickEvent(ClickEvent.suggestCommand("/cfi floorthickness 60"))).append(" - Floor thickness of entire map")
                 .append(newline())
                 .append(TextComponent.of("[WorldThickness]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi worldthickness 60")))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi worldthickness 60"))).append(" - World thickness of entire map")
+                        .clickEvent(ClickEvent.suggestCommand("/cfi worldthickness 60"))).append(" - World thickness of entire map")
                 .append(newline())
                 .append(TextComponent.of("[Snow]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi snow" + maskArgs)))
-                    .clickEvent(ClickEvent.suggestCommand("/cfi snow" + maskArgs))).append(" - Set snow in the masked areas")
+                        .clickEvent(ClickEvent.suggestCommand("/cfi snow" + maskArgs))).append(" - Set snow in the masked areas")
                 .append(newline());
 
         if (pattern != null) {
@@ -1080,27 +1079,27 @@ public class CFICommands {
 
             msg
                     .append(TextComponent.of("[WaterId]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterId " + pattern)))
-                        .clickEvent(ClickEvent.runCommand("/cfi waterId " + pattern)))
-                .append(" - Water id for whole map")
-                .append(newline())
+                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterId " + pattern)))
+                            .clickEvent(ClickEvent.runCommand("/cfi waterId " + pattern)))
+                    .append(" - Water id for whole map")
+                    .append(newline())
                     .append(TextComponent.of("[BedrockId]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi baseId " + pattern)))
-                        .clickEvent(ClickEvent.runCommand("/cfi baseId " + pattern)))
-                .append(TextComponent.of(" - Bedrock id for whole map"))
-                .append(newline())
+                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi baseId " + pattern)))
+                            .clickEvent(ClickEvent.runCommand("/cfi baseId " + pattern)))
+                    .append(TextComponent.of(" - Bedrock id for whole map"))
+                    .append(newline())
                     .append(TextComponent.of("[Floor]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floor " + compArgs)))
-                        .clickEvent(ClickEvent.runCommand("/cfi floor " + compArgs)))
-                .append(TextComponent.of(" - Set the floor in the masked areas")).append(newline())
+                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floor " + compArgs)))
+                            .clickEvent(ClickEvent.runCommand("/cfi floor " + compArgs)))
+                    .append(TextComponent.of(" - Set the floor in the masked areas")).append(newline())
                     .append(TextComponent.of("[Main]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi main " + compArgs)))
-                        .clickEvent(ClickEvent.runCommand("/cfi main " + compArgs)))
-                .append(TextComponent.of(" - Set the main block in the masked areas")).append(newline())
+                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi main " + compArgs)))
+                            .clickEvent(ClickEvent.runCommand("/cfi main " + compArgs)))
+                    .append(TextComponent.of(" - Set the main block in the masked areas")).append(newline())
                     .append(TextComponent.of("[Column]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi column" + compArgs)))
-                        .clickEvent(ClickEvent.runCommand("/cfi column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
+                            .clickEvent(ClickEvent.runCommand("/cfi column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
                     .append(TextComponent.of("[Overlay]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi overlay" + compArgs)))
-                        .clickEvent(ClickEvent.runCommand("/cfi overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
+                            .clickEvent(ClickEvent.runCommand("/cfi overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
         }
 
         msg.append(newline())
@@ -1119,7 +1118,10 @@ public class CFICommands {
 
     protected static CFISettings getSettings(Player player) {
         CFISettings settings = player.getMeta("CFISettings");
-        return settings == null ? new CFISettings(player) : settings;
+        if (settings == null) {
+            settings = new CFISettings(player);
+        }
+        return settings;
     }
 
     public static class CFISettings {
@@ -1257,8 +1259,8 @@ public class CFICommands {
             String option = options[i];
             String cmd = prefix + option;
             producer.append(TextComponent.of(option, TextColor.GREEN)
-                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, cmd))
-                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(option))));
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, cmd))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(option))));
         }
         producer.newline();
         producer.newline().append(TextComponent.of("<> [View]", TextColor.DARK_AQUA)

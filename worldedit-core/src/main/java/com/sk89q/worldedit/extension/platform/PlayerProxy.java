@@ -56,6 +56,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     public PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
+        super(basePlayer.getRawMeta());
         checkNotNull(basePlayer);
         checkNotNull(permActor);
         checkNotNull(cuiActor);

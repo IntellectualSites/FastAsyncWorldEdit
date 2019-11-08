@@ -748,11 +748,9 @@ public final class PlatformCommandManager {
 
                 worldEdit.flushBlockBag(actor, editSession);
             }
-
-            Optional<CFICommands.CFISettings> cfiOpt = context.injectedValue(Key.of(CFICommands.CFISettings.class));
-            if (cfiOpt.isPresent()) {
-                CFICommands.CFISettings settings = cfiOpt.get();
-                HeightMapMCAGenerator gen = settings.getGenerator();
+            CFICommands.CFISettings cfi = actor.getMeta("CFISettings");
+            if (cfi != null) {
+                HeightMapMCAGenerator gen = cfi.getGenerator();
                 if (gen != null && gen.isModified()) {
                     try {
                         gen.update();

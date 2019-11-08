@@ -15,6 +15,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
     private final Material material;
     private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
+    private final org.bukkit.Material craftMaterial;
 
     public BlockMaterial_1_14(Block block) {
         this(block, block.getBlockData());
@@ -25,6 +26,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
+        this.craftMaterial = craftBlockData.getMaterial();
         this.isTranslucent = ReflectionUtil.getField(Block.class, block, "v");
     }
 
@@ -51,7 +53,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public boolean isFullCube() {
-        return defaultState.g();
+        return craftMaterial.isOccluding();
     }
 
     @Override

@@ -276,9 +276,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
             Player tmp = Bukkit.getPlayer(getUniqueId());
             if (tmp != null) {
                 player = tmp;
-            } else {
-                System.out.println("Invalid player " + player.getName());
-                new Exception().printStackTrace();
             }
         }
         return player;

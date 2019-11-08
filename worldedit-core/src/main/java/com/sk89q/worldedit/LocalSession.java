@@ -716,6 +716,9 @@ public class LocalSession implements TextureHolder {
         VirtualWorld tmp;
         synchronized (dirty) {
             tmp = this.virtual;
+            if (tmp == world) {
+                return;
+            }
             this.virtual = world;
         }
         if (tmp != null) {

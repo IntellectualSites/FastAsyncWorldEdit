@@ -29,12 +29,14 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.processors.ChunkSendProcessor;
 import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -79,11 +81,14 @@ import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponen
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -150,13 +155,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
-    public void test(Player player, @Arg(desc = "hello there") String message) throws WorldEditException {
-
-        TextComponent test = LegacyComponentSerializer.legacy().deserialize(message, '&');
-        player.print(message);
-        player.print(test);
-        test = test.hoverEvent(HoverEvent.showText(TextComponent.of("Blah")));
-        player.print(test);
+    public void test(Player player, @Arg(desc = "hello there")BlockType type) throws WorldEditException {
     }
 
     @Command(
