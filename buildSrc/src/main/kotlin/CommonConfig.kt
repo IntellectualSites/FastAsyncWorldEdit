@@ -8,7 +8,7 @@ fun Project.applyCommonConfiguration() {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven { url = uri("http://ci.athion.net/job/PlotSquared-we/ws/mvn/") }
+        maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
         maven { url = uri("https://maven.sk89q.com/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         maven { url = uri("http://empcraft.com/maven2") }

@@ -7,7 +7,7 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("http://ci.athion.net/job/PlotSquared-we/ws/mvn/") }
+    maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
 }
 
 applyPlatformAndCoreConfiguration()

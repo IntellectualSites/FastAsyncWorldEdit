@@ -6,6 +6,7 @@ import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockID;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,11 +139,14 @@ public abstract class MCAWriter implements Extent {
                                             chunk.setPosition(fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
 
                                             // Compress
-                                            byte[] bytes = chunk.toBytes(byteStore1.get());
-                                            byte[] compressedBytes = MainUtil.compress(bytes, byteStore2.get(), deflateStore.get());
+                                            FastByteArrayOutputStream uncompressed = chunk.toBytes(byteStore1.get());
+                                            int len = uncompressed.length;
+                                            uncompressed.reset();
+                                            MainUtil.compress(uncompressed.array, len , byteStore2.get(), uncompressed, deflateStore.get());
+                                            byte[] clone = Arrays.copyOf(uncompressed.array, uncompressed.length);
 
                                             // TODO optimize (avoid cloning) by add a synchronized block and write to the RAF here instead of below
-                                            compressed[((fcx & 31)) + ((fcz & 31) << 5)] = compressedBytes.clone();
+                                            compressed[((fcx & 31)) + ((fcz & 31) << 5)] = clone;
                                         }
                                     } catch (Throwable e) {
                                         e.printStackTrace();

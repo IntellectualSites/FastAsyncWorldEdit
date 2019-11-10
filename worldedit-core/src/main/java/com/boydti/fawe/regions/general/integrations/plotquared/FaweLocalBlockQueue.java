@@ -4,20 +4,16 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import java.util.Collection;
 
 // TODO FIXME
 public class FaweLocalBlockQueue extends LocalBlockQueue {
@@ -25,6 +21,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     public final IQueueExtent IMP;
     private final LegacyMapper legacyMapper;
     private final World world;
+    private BlockVector3 mutable = new MutableBlockVector3();
 
     public FaweLocalBlockQueue(String worldName) {
         super(worldName);
@@ -75,6 +72,12 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
+    public boolean setBlock(int x, int y, int z, Pattern pattern) {
+        mutable.setComponents(x, y, z);
+        return pattern.apply(IMP, mutable, mutable);
+    }
+
+    @Override
     public boolean setBlock(final int x, final int y, final int z, final BaseBlock id) {
         return IMP.setBlock(x, y, z, id);
     }
@@ -84,21 +87,9 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
         return IMP.getBlock(x, y, z);
     }
 
-    private BiomeType biome;
-    private String lastBiome;
-    private BiomeRegistry reg;
-
     @Override
-    public boolean setBiome(int x, int z, String biome) {
-        if (!StringMan.isEqual(biome, lastBiome)) {
-            if (reg == null) {
-                reg = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS).getRegistries().getBiomeRegistry();
-            }
-            Collection<BiomeType> biomes = BiomeTypes.values();
-            lastBiome = biome;
-            this.biome = Biomes.findBiomeByName(biomes, biome, reg);
-        }
-        return IMP.setBiome(x, 0, z, this.biome);
+    public boolean setBiome(int x, int z, BiomeType biomeType) {
+        return IMP.setBiome(x, 0, z, biomeType);
     }
 
     @Override
