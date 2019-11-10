@@ -601,6 +601,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                     end = Math.min(start + size, end);
                     int pair = getIndex(cx, cz);
 
+                    Future<byte[]> future = null;
                     byte[] newBytes = relocate.get(pair);
                     int newBytesLength = 0;
 
@@ -623,9 +624,13 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                             if (future == null) {
                                 if (cached == null || !cached.isDeleted()) {
                                     FastByteArrayInputStream result = getChunkCompressedBytes(getOffset(cx, cz));
+                                    newBytes = result.array;
+                                    newBytesLength = result.length;
                                 }
                             }
                         }
+                    } else {
+                        newBytesLength = newBytes.length;
                     }
                     if (future != null) {
                         newBytes = future.get();
