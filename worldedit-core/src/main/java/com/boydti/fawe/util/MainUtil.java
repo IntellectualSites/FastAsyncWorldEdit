@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
@@ -236,7 +237,7 @@ public class MainUtil {
         return LZ4Utils.maxCompressedLength(size);
     }
 
-    public static byte[] compress(byte[] bytes, byte[] buffer, Deflater deflate) {
+    public static int compress(byte[] bytes, int length, byte[] buffer, OutputStream out, Deflater deflate) throws IOException {
         if (buffer == null) {
             buffer = new byte[8192];
         }
@@ -245,14 +246,17 @@ public class MainUtil {
         } else {
             deflate.reset();
         }
-        deflate.setInput(bytes);
+        deflate.setInput(bytes, 0, length);
         deflate.finish();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int written = 0;
         while (!deflate.finished()) {
             int n = deflate.deflate(buffer);
-            if (n != 0) baos.write(buffer, 0, n);
+            if (n != 0) {
+                written += n;
+                out.write(buffer, 0, n);
+            }
         }
-        return baos.toByteArray();
+        return written;
     }
 
     public static byte[] decompress(byte[] bytes, byte[] buffer, Inflater inflater) throws DataFormatException {

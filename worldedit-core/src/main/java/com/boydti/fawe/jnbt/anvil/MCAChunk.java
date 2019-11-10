@@ -10,7 +10,6 @@ import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
@@ -30,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -355,7 +355,7 @@ public class MCAChunk implements IChunk {
         nbtOut.writeEndTag();
     }
 
-    public byte[] toBytes(byte[] buffer) throws IOException {
+    public FastByteArrayOutputStream toBytes(byte[] buffer) throws IOException {
         if (buffer == null) {
             buffer = new byte[8192];
         }
@@ -363,7 +363,7 @@ public class MCAChunk implements IChunk {
         try (NBTOutputStream nbtOut = new NBTOutputStream(buffered)) {
             write(nbtOut);
         }
-        return buffered.toByteArray();
+        return buffered;
     }
 
     public long getInhabitedTime() {

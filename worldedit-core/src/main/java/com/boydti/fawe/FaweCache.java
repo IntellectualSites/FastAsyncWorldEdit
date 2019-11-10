@@ -5,6 +5,7 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
+import com.boydti.fawe.object.collection.VariableThreadLocal;
 import com.boydti.fawe.object.exception.FaweBlockBagException;
 import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.object.exception.FaweException;
@@ -218,6 +219,8 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<long[]> LONG_BUFFER_1024 = new CleanableThreadLocal<>(() -> new long[1024]);
 
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
+
+    public final VariableThreadLocal BYTE_BUFFER_VAR = new VariableThreadLocal();
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypesCache.states.length];

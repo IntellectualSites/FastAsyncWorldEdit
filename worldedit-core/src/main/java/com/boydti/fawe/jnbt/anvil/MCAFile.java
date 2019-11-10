@@ -2,13 +2,10 @@ package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
-import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.object.RunnableVal4;
-import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.object.io.FastByteArrayInputStream;
 import com.boydti.fawe.util.MainUtil;
@@ -16,24 +13,28 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
@@ -45,14 +46,11 @@ import java.util.zip.InflaterInputStream;
 public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, IChunkExtent {
 
     private static Field fieldBuf2;
-    private static Field fieldBuf3;
 
     static {
         try {
             fieldBuf2 = InflaterInputStream.class.getDeclaredField("buf");
             fieldBuf2.setAccessible(true);
-            fieldBuf3 = NBTInputStream.class.getDeclaredField("buf");
-            fieldBuf3.setAccessible(true);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -70,25 +68,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     private MCAChunk[] chunks;
     private boolean[] chunkInitialized;
     private Object[] locks;
-
-    final ThreadLocal<byte[]> byteStore1 = new ThreadLocal<byte[]>() {
-        @Override
-        protected byte[] initialValue() {
-            return new byte[4096];
-        }
-    };
-    final ThreadLocal<byte[]> byteStore2 = new ThreadLocal<byte[]>() {
-        @Override
-        protected byte[] initialValue() {
-            return new byte[4096];
-        }
-    };
-    final ThreadLocal<byte[]> byteStore3 = new ThreadLocal<byte[]>() {
-        @Override
-        protected byte[] initialValue() {
-            return new byte[1024];
-        }
-    };
+    private Deflater deflater = new Deflater(1, false);
 
     public MCAFile(ForkJoinPool pool) {
         this.pool = pool;
@@ -111,9 +91,6 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                 hasChunk = true;
             }
         }
-        CleanableThreadLocal.clean(byteStore1);
-        CleanableThreadLocal.clean(byteStore2);
-        CleanableThreadLocal.clean(byteStore3);
         return !hasChunk;
     }
 
@@ -206,14 +183,6 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         deleted = false;
         readLocations = false;
         Arrays.fill(chunkInitialized, false);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        CleanableThreadLocal.clean(byteStore1);
-        CleanableThreadLocal.clean(byteStore2);
-        CleanableThreadLocal.clean(byteStore3);
-        super.finalize();
     }
 
     public void setDeleted(boolean deleted) {
@@ -383,7 +352,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         return (locations[i + 3] & 0xFF) << 12;
     }
 
-    public byte[] getChunkCompressedBytes(int offset) throws IOException {
+    public FastByteArrayInputStream getChunkCompressedBytes(int offset) throws IOException {
         if (offset == 0) {
             return null;
         }
@@ -391,51 +360,28 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
             raf.seek(offset);
             int size = raf.readInt();
             int compression = raf.read();
-            byte[] data = new byte[size];
-            raf.readFully(data);
-            return data;
+            byte[] data = FaweCache.IMP.BYTE_BUFFER_VAR.get(size);
+            raf.readFully(data, 0, size);
+            FastByteArrayInputStream result = new FastByteArrayInputStream(data, 0, size);
+            return result;
         }
     }
 
     private NBTInputStream getChunkIS(int offset) throws IOException {
         try {
-            byte[] data = getChunkCompressedBytes(offset);
-            FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-            InflaterInputStream iis = new InflaterInputStream(bais, new Inflater(), 1);
-            fieldBuf2.set(iis, byteStore2.get());
-            BufferedInputStream bis = new BufferedInputStream(iis);
-            NBTInputStream nis = new NBTInputStream(bis);
-            fieldBuf3.set(nis, byteStore3.get());
-            return nis;
+            return getChunkIS(getChunkCompressedBytes(offset));
         } catch (IllegalAccessException unlikely) {
             unlikely.printStackTrace();
             return null;
         }
     }
 
-    public void streamChunk(int cx, int cz, StreamDelegate delegate) throws IOException {
-        streamChunk(getOffset(cx, cz), delegate);
-    }
-
-    public void streamChunk(int offset, StreamDelegate delegate) throws IOException {
-        byte[] data = getChunkCompressedBytes(offset);
-        streamChunk(data, delegate);
-    }
-
-    public void streamChunk(byte[] data, StreamDelegate delegate) throws IOException {
-        if (data != null) {
-            try {
-                FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-                InflaterInputStream iis = new InflaterInputStream(bais, new Inflater(), 1);
-                fieldBuf2.set(iis, byteStore2.get());
-                BufferedInputStream bis = new BufferedInputStream(iis);
-                NBTInputStream nis = new NBTInputStream(bis);
-                fieldBuf3.set(nis, byteStore3.get());
-                nis.readNamedTagLazy(delegate);
-            } catch (IllegalAccessException unlikely) {
-                unlikely.printStackTrace();
-            }
-        }
+    private NBTInputStream getChunkIS(InputStream is) throws IllegalAccessException {
+        InflaterInputStream iis = new InflaterInputStream(is, new Inflater(), 1);
+        fieldBuf2.set(iis, FaweCache.IMP.BYTE_BUFFER_8192.get());
+        BufferedInputStream bis = new BufferedInputStream(iis);
+        NBTInputStream nis = new NBTInputStream(bis);
+        return nis;
     }
 
     /**
@@ -465,39 +411,35 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         return list;
     }
 
-    private byte[] toBytes(MCAChunk chunk) throws Exception {
+    private FastByteArrayOutputStream toBytes(MCAChunk chunk) throws IOException {
         if (chunk.isDeleted()) {
             return null;
         }
-        byte[] uncompressed = chunk.toBytes(byteStore3.get());
-        byte[] compressed = MainUtil.compress(uncompressed, byteStore2.get(), null);
-        return compressed;
-    }
-
-    private byte[] getChunkBytes(int cx, int cz) throws Exception {
-        MCAChunk mca = getCachedChunk(cx, cz);
-        if (mca == null) {
-            int offset = getOffset(cx, cz);
-            if (offset == 0) {
-                return null;
-            }
-            return getChunkCompressedBytes(offset);
+        byte[] writeBuffer = FaweCache.IMP.BYTE_BUFFER_VAR.get(4096);
+        FastByteArrayOutputStream uncompressed = chunk.toBytes(writeBuffer);
+        if (uncompressed.array.length > writeBuffer.length) {
+            FaweCache.IMP.BYTE_BUFFER_VAR.set(uncompressed.array);
         }
-        return toBytes(mca);
+        writeBuffer = uncompressed.array;
+        byte[] buffer = FaweCache.IMP.BYTE_BUFFER_8192.get();
+        int length = uncompressed.length;
+        uncompressed.reset();
+        // cheat, reusing the same buffer to read/write
+        int compressedLength = MainUtil.compress(uncompressed.array, length, buffer, uncompressed, deflater);
+        return uncompressed;
     }
 
-
-    private void writeSafe(RandomAccessFile raf, int offset, byte[] data) throws IOException {
-        int len = data.length + 5;
+    private void writeSafe(RandomAccessFile raf, int offset, byte[] data, int length) throws IOException {
+        int len = length + 5;
         raf.seek(offset);
         if (raf.length() - offset < len) {
             raf.setLength(((offset + len + 4095) / 4096) * 4096);
         }
         // Length of remaining data
-        raf.writeInt(data.length + 1);
+        raf.writeInt(length + 1);
         // Compression type
         raf.write(2);
-        raf.write(data);
+        raf.write(data, 0, length);
     }
 
     private void writeHeader(RandomAccessFile raf, int cx, int cz, int offsetMedium, int sizeByte, boolean writeTime) throws IOException {
@@ -561,182 +503,202 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                 file.delete();
                 return;
             }
-
             // Chunks that need to be relocated
             Int2ObjectOpenHashMap<byte[]> relocate = new Int2ObjectOpenHashMap<>();
             // The position of each chunk
             final Int2ObjectOpenHashMap<Integer> offsetMap = new Int2ObjectOpenHashMap<>(); // Offset -> <byte cx, byte cz, short size>
             // The data of each modified chunk
-            final Int2ObjectOpenHashMap<byte[]> compressedMap = new Int2ObjectOpenHashMap<>();
+            final Int2ObjectOpenHashMap<Future<byte[]>> compressedMap = new Int2ObjectOpenHashMap<>();
             // The data of each chunk that needs to be moved
-            final Int2ObjectOpenHashMap<byte[]> append = new Int2ObjectOpenHashMap<>();
-            boolean[] modified = new boolean[1];
+            final Int2ObjectOpenHashMap<Future<byte[]>> append = new Int2ObjectOpenHashMap<>();
             // Get the current time for the chunk timestamp
             long now = System.currentTimeMillis();
 
             // Load the chunks into the append or compressed map
             final ForkJoinPool finalPool = this.pool;
-            forEachCachedChunk(chunk -> {
-                if (chunk.isModified() || chunk.isDeleted()) {
-                    modified[0] = true;
-                    chunk.setLastUpdate(now);
-                    if (!chunk.isDeleted()) {
-                        MCAFile.this.pool.submit(() -> {
-                            try {
-                                byte[] compressed = toBytes(chunk);
-                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
-                                Int2ObjectOpenHashMap map;
-                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
-                                    map = append;
-                                } else {
-                                    map = compressedMap;
-                                }
-                                synchronized (map) {
-                                    map.put(pair, compressed);
-                                }
-                            } catch (Throwable e) {
-                                e.printStackTrace();
-                            }
+
+
+            boolean modified = false;
+            for (int i = 0; i < chunks.length; i++) {
+                if (this.chunkInitialized[i]) {
+                    MCAChunk chunk = chunks[i];
+                    if (chunk != null && chunk.isModified() && !chunk.isDeleted()) {
+                        modified = true;
+                        ForkJoinTask<byte[]> future = pool.submit(() -> {
+                            FastByteArrayOutputStream compressed = toBytes(chunk);
+                            return Arrays.copyOf(compressed.array, compressed.length);
                         });
                     }
                 }
+            }
+//
+//            forEachCachedChunk(chunk -> {
+//                if (chunk.isModified() || chunk.isDeleted()) {
+//                    modified[0] = true;
+//                    chunk.setLastUpdate(now);
+//                    if (!chunk.isDeleted()) {
+//                        MCAFile.this.pool.submit(() -> {
+//                            try {
+//                                byte[] compressed = toBytes(chunk);
+//                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
+//                                Int2ObjectOpenHashMap map;
+//                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
+//                                    map = append;
+//                                } else {
+//                                    map = compressedMap;
+//                                }
+//                                synchronized (map) {
+//                                    map.put(pair, compressed);
+//                                }
+//                            } catch (Throwable e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
+//                    }
+//                }
+//            });
+
+            if (!modified) {
+                // Not modified, do nothing
+                return;
+            }
+            // If any changes were detected
+            file.setLastModified(now);
+
+            // Load the offset data into the offset map
+            forEachChunk(new RunnableVal4<Integer, Integer, Integer, Integer>() {
+                @Override
+                public void run(Integer cx, Integer cz, Integer offset, Integer size) {
+                    short pair1 = MathMan.pairByte((byte) (cx & 31), (byte) (cz & 31));
+                    short pair2 = (short) (size >> 12);
+                    offsetMap.put((int) offset, (Integer) MathMan.pair(pair1, pair2));
+                }
             });
 
-            // If any changes were detected
-            if (modified[0]) {
-                file.setLastModified(now);
-
-                // Load the offset data into the offset map
-                forEachChunk(new RunnableVal4<Integer, Integer, Integer, Integer>() {
-                    @Override
-                    public void run(Integer cx, Integer cz, Integer offset, Integer size) {
-                        short pair1 = MathMan.pairByte((byte) (cx & 31), (byte) (cz & 31));
-                        short pair2 = (short) (size >> 12);
-                        offsetMap.put((int) offset, (Integer) MathMan.pair(pair1, pair2));
+            int start = 8192;
+            int written = start;
+            int end = 8192;
+            int nextOffset = 8192;
+            try {
+                for (int count = 0; count < offsetMap.size(); count++) {
+                    // Get the previous position of the next chunk
+                    Integer loc = offsetMap.get(nextOffset);
+                    while (loc == null) {
+                        nextOffset += 4096;
+                        loc = offsetMap.get(nextOffset);
                     }
-                });
-                // Wait for previous tasks
-                pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                    int offset = nextOffset;
 
+                    // Get the x/z from the paired location
+                    short cxz = MathMan.unpairX(loc);
+                    int cx = MathMan.unpairShortX(cxz);
+                    int cz = MathMan.unpairShortY(cxz);
 
-                int start = 8192;
-                int written = start;
-                int end = 8192;
-                int nextOffset = 8192;
-                try {
-                    for (int count = 0; count < offsetMap.size(); count++) {
-                        // Get the previous position of the next chunk
-                        Integer loc = offsetMap.get(nextOffset);
-                        while (loc == null) {
-                            nextOffset += 4096;
-                            loc = offsetMap.get(nextOffset);
-                        }
-                        int offset = nextOffset;
+                    // Get the size from the pair
+                    int size = MathMan.unpairY(loc) << 12;
 
-                        // Get the x/z from the paired location
-                        short cxz = MathMan.unpairX(loc);
-                        int cx = MathMan.unpairShortX(cxz);
-                        int cz = MathMan.unpairShortY(cxz);
+                    nextOffset += size;
+                    end = Math.min(start + size, end);
+                    int pair = getIndex(cx, cz);
 
-                        // Get the size from the pair
-                        int size = MathMan.unpairY(loc) << 12;
+                    byte[] newBytes = relocate.get(pair);
+                    int newBytesLength = 0;
 
-                        nextOffset += size;
-                        end = Math.min(start + size, end);
-                        int pair = getIndex(cx, cz);
-                        byte[] newBytes = relocate.get(pair);
-
-                        // newBytes is null if the chunk isn't modified or marked for moving
-                        if (newBytes == null) {
-                            MCAChunk cached = getCachedChunk(cx, cz);
-                            // If the previous offset marks the current write position (start) then we only write the header
-                            if (offset == start) {
-                                if (cached == null || !cached.isModified()) {
-                                    writeHeader(raf, cx, cz, start >> 12, size >> 12, true);
-                                    start += size;
-                                    written = start + size;
-                                    continue;
-                                } else {
-                                    newBytes = compressedMap.get(pair);
-                                }
+                    // newBytes is null if the chunk isn't modified or marked for moving
+                    if (newBytes == null) {
+                        MCAChunk cached = getCachedChunk(cx, cz);
+                        // If the previous offset marks the current write position (start) then we only write the header
+                        if (offset == start) {
+                            if (cached == null || !cached.isModified()) {
+                                writeHeader(raf, cx, cz, start >> 12, size >> 12, true);
+                                start += size;
+                                written = start + size;
+                                continue;
                             } else {
-                                // The chunk needs to be moved, fetch the data if necessary
-                                newBytes = compressedMap.get(pair);
-                                if (newBytes == null) {
-                                    if (cached == null || !cached.isDeleted()) {
-                                        newBytes = getChunkCompressedBytes(getOffset(cx, cz));
-                                    }
+                                future = compressedMap.get(pair);
+                            }
+                        } else {
+                            // The chunk needs to be moved, fetch the data if necessary
+                            future = compressedMap.get(pair);
+                            if (future == null) {
+                                if (cached == null || !cached.isDeleted()) {
+                                    FastByteArrayInputStream result = getChunkCompressedBytes(getOffset(cx, cz));
                                 }
                             }
                         }
+                    }
+                    if (future != null) {
+                        newBytes = future.get();
+                        newBytesLength = newBytes.length;
+                    }
 
-                        if (newBytes == null) {
-                            writeHeader(raf, cx, cz, 0, 0, false);
-                            continue;
+                    if (newBytes == null) {
+                        writeHeader(raf, cx, cz, 0, 0, false);
+                        continue;
+                    }
+
+                    // The length to be written (compressed data + 5 byte chunk header)
+                    int len = newBytesLength + 5;
+                    int oldSize = (size + 4095) >> 12;
+                    int newSize = (len + 4095) >> 12;
+                    int nextOffset2 = end;
+
+                    // If the current write position (start) + length of data to write (len) are longer than the position of the next chunk, we need to move the next chunks
+                    while (start + len > end) {
+                        Integer nextLoc = offsetMap.get(nextOffset2);
+                        if (nextLoc != null) {
+                            short nextCXZ = MathMan.unpairX(nextLoc);
+                            int nextCX = MathMan.unpairShortX(nextCXZ);
+                            int nextCZ = MathMan.unpairShortY(nextCXZ);
+                            MCAChunk cached = getCachedChunk(nextCX, nextCZ);
+                            if (cached == null || !cached.isModified()) {
+                                FastByteArrayInputStream tmp = getChunkCompressedBytes(nextOffset2);
+                                byte[] nextBytes = Arrays.copyOf(tmp.array, tmp.length);
+                                relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ & 31)), nextBytes);
+                            }
+                            int nextSize = MathMan.unpairY(nextLoc) << 12;
+                            end += nextSize;
+                            nextOffset2 += nextSize;
+                        } else {
+                            end += 4096;
+                            nextOffset2 += 4096;
                         }
+                    }
+                    // Write the chunk + chunk header
+                    writeSafe(raf, start, newBytes, newBytesLength);
+                    // Write the location data (beginning of file)
+                    writeHeader(raf, cx, cz, start >> 12, newSize, true);
 
-                        // The length to be written (compressed data + 5 byte chunk header)
-                        int len = newBytes.length + 5;
-                        int oldSize = (size + 4095) >> 12;
+                    written = start + newBytesLength + 5;
+                    start += newSize << 12;
+                }
+
+                // Write all the chunks which need to be appended
+                if (!append.isEmpty()) {
+                    for (Int2ObjectMap.Entry<Future<byte[]>> entry : append.int2ObjectEntrySet()) {
+                        int pair = entry.getIntKey();
+                        short cx = MathMan.unpairX(pair);
+                        short cz = MathMan.unpairY(pair);
+                        byte[] bytes = entry.getValue().get();
+                        int len = bytes.length + 5;
                         int newSize = (len + 4095) >> 12;
-                        int nextOffset2 = end;
-
-                        // If the current write position (start) + length of data to write (len) are longer than the position of the next chunk, we need to move the next chunks
-                        while (start + len > end) {
-                            Integer nextLoc = offsetMap.get(nextOffset2);
-                            if (nextLoc != null) {
-                                short nextCXZ = MathMan.unpairX(nextLoc);
-                                int nextCX = MathMan.unpairShortX(nextCXZ);
-                                int nextCZ = MathMan.unpairShortY(nextCXZ);
-                                MCAChunk cached = getCachedChunk(nextCX, nextCZ);
-                                if (cached == null || !cached.isModified()) {
-                                    byte[] nextBytes = getChunkCompressedBytes(nextOffset2);
-                                    relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ & 31)), nextBytes);
-                                }
-                                int nextSize = MathMan.unpairY(nextLoc) << 12;
-                                end += nextSize;
-                                nextOffset2 += nextSize;
-                            } else {
-                                end += 4096;
-                                nextOffset2 += 4096;
-                            }
-                        }
-                        // Write the chunk + chunk header
-                        writeSafe(raf, start, newBytes);
-                        // Write the location data (beginning of file)
+                        writeSafe(raf, start, bytes, bytes.length);
                         writeHeader(raf, cx, cz, start >> 12, newSize, true);
-
-                        written = start + newBytes.length + 5;
+                        written = start + bytes.length + 5;
                         start += newSize << 12;
                     }
-
-                    // Write all the chunks which need to be appended
-                    if (!append.isEmpty()) {
-                        for (Int2ObjectMap.Entry<byte[]> entry : append.int2ObjectEntrySet()) {
-                            int pair = entry.getIntKey();
-                            short cx = MathMan.unpairX(pair);
-                            short cz = MathMan.unpairY(pair);
-                            byte[] bytes = entry.getValue();
-                            int len = bytes.length + 5;
-                            int newSize = (len + 4095) >> 12;
-                            writeSafe(raf, start, bytes);
-                            writeHeader(raf, cx, cz, start >> 12, newSize, true);
-                            written = start + bytes.length + 5;
-                            start += newSize << 12;
-                        }
-                    }
-                    // Round the file length, since the vanilla server doesn't like it for some reason
-                    raf.setLength(4096 * ((written + 4095) / 4096));
-                    if (raf instanceof BufferedRandomAccessFile) {
-                        ((BufferedRandomAccessFile) raf).flush();
-                    }
-                    raf.close();
-                } catch (Throwable e) {
-                    e.printStackTrace();
                 }
-                if (wait) {
-                    pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                // Round the file length, since the vanilla server doesn't like it for some reason
+                raf.setLength(4096 * ((written + 4095) / 4096));
+                if (raf instanceof BufferedRandomAccessFile) {
+                    ((BufferedRandomAccessFile) raf).flush();
                 }
+                raf.close();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            if (wait) {
+                pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             }
         }
     }
