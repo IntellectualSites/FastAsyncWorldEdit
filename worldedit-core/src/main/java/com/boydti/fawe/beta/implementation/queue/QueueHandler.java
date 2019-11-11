@@ -267,6 +267,14 @@ public abstract class QueueHandler implements Trimable, Runnable {
         queuePool.set(null);
     }
 
+    private IQueueExtent pool() {
+        IQueueExtent queue = queuePool.get();
+        if (queue == null) {
+            queuePool.set(queue = queuePool.init());
+        }
+        return queue;
+    }
+
     public abstract void startSet(boolean parallel);
 
     public abstract void endSet(boolean parallel);
@@ -276,7 +284,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public IQueueExtent getQueue(World world, IBatchProcessor processor) {
-        final IQueueExtent queue = queuePool.get();
+        final IQueueExtent queue = pool();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);
