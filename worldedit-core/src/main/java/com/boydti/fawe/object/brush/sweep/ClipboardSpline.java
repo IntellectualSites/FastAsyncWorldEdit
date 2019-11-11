@@ -51,9 +51,9 @@ public class ClipboardSpline extends Spline {
      * to the first node, 0.25 to the second, 0.5 to the third, ... .<br>
      * By providing this method with the amount of nodes used by the interpolation implementation the distribution of the
      * nodes is converted to a proportional distribution based on the length between two adjacent nodes calculated by {@link Interpolation#arcLength(double, double)}.<br>
-     * This means that the distance between two positions used to paste the clipboard (e.g. 0.75 - 0.5 = 0.25) on the curve
-     * will always amount to that part of the length (e.g. 40 units) of the curve. In this example it would amount to
-     * 0.25 * 40 = 10 units of curve length between these two positions.
+     * This means that the distance between two positions used to paste the clipboard (e.g., 0.75 - 0.5 = 0.25) on the curve
+     * will always amount to that part of the length (e.g., 40 units) of the curve. In this example it would amount to
+     * 0.25 × 40 = 10 units of curve length between these two positions.
      * <p>
      * Be advised that currently subsequent changes to the interpolation parameters may not be supported.
      * @param editSession     The EditSession which will be used when pasting the clipboard content

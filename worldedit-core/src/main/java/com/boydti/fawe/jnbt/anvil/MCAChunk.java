@@ -173,10 +173,12 @@ public class MCAChunk implements IChunk {
         return root;
     }
 
+    @Override
     public int getX() {
         return chunkX;
     }
 
+    @Override
     public int getZ() {
         return chunkZ;
     }
@@ -435,6 +437,7 @@ public class MCAChunk implements IChunk {
         return true;
     }
 
+    @Override
     public void setEntity(CompoundTag entityTag) {
         setModified();
         long least = entityTag.getLong("UUIDLeast");
@@ -464,6 +467,7 @@ public class MCAChunk implements IChunk {
         return true;
     }
 
+    @Override
     public Set<CompoundTag> getEntities() {
         return new HashSet<>(entities.values());
     }
@@ -505,6 +509,7 @@ public class MCAChunk implements IChunk {
         return null;
     }
 
+    @Override
     public Set<UUID> getEntityRemoves() {
         return new HashSet<>();
     }
@@ -542,6 +547,7 @@ public class MCAChunk implements IChunk {
         Arrays.fill(this.biomes, biome);
     }
 
+    @Override
     public void removeEntity(UUID uuid) {
         entities.remove(uuid);
     }

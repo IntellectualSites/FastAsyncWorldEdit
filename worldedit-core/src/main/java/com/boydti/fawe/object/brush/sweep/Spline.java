@@ -49,7 +49,7 @@ public abstract class Spline {
      * to the first node, 0.25 to the second, 0.5 to the third, ... .<br>
      * By providing this method with the amount of nodes used by the interpolation implementation the distribution of the
      * nodes is converted to a proportional distribution based on the length between two adjacent nodes calculated by {@link Interpolation#arcLength(double, double)}.<br>
-     * This means that the distance between two positions used to paste the clipboard (e.g. 0.75 - 0.5 = 0.25) on the curve
+     * This means that the distance between two positions used to paste the clipboard (e.g., 0.75 - 0.5 = 0.25) on the curve
      * will always amount to that part of the length (e.g. 40 units) of the curve. In this example it would amount to
      * 0.25 * 40 = 10 units of curve length between these two positions.
      * <p>
@@ -73,7 +73,7 @@ public abstract class Spline {
      * Set the forward direction of the structure.<br>
      * This direction is used to determine the rotation of the clipboard to align to the curve. The horizontal slope
      * of the curve for a specific point is calculated by {@link Interpolation#get1stDerivative(double)}.
-     * Subsequently this angle between this vector and the gradient vector is calculated and the clipboard content
+     * Subsequently, this angle between this vector, and the gradient vector is calculated, and the clipboard content
      * is rotated by that angle to follow the curve slope.
      * <p>
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
@@ -87,7 +87,7 @@ public abstract class Spline {
      * Get the forward direction of the structure.<br>
      * This direction is used to determine the rotation of the clipboard to align to the curve. The horizontal slope
      * of the curve for a specific point is calculated by {@link Interpolation#get1stDerivative(double)}.
-     * Subsequently this angle between this vector and the gradient vector is calculated and the clipboard content
+     * Subsequently, this angle between this vector, and the gradient vector is calculated, and the clipboard content
      * is rotated by that angle to follow the curve slope.
      * <p>
      * The default direction is a (1;0) vector (pointing in the positive x-direction).

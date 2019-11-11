@@ -1,10 +1,12 @@
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray4096;
@@ -22,6 +24,19 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -44,12 +59,6 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.function.Function;
 
 public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public ChunkSection[] sections;
@@ -363,7 +372,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                                 final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                                 final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
                                 if (idTag == null || posTag == null || rotTag == null) {
-                                    Fawe.debug("Unknown entity tag: " + nativeTag);
+                                    getLogger(BukkitGetBlocks_1_14.class).debug("Unknown entity tag: " + nativeTag);
                                     continue;
                                 }
                                 final double x = posTag.getDouble(0);

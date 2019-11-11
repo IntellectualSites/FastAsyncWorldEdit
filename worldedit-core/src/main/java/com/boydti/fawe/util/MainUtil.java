@@ -1,5 +1,8 @@
 package com.boydti.fawe.util;
 
+import static java.lang.System.arraycopy;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -24,18 +27,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
-
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -84,8 +76,15 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static java.lang.System.arraycopy;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4InputStream;
+import net.jpountz.lz4.LZ4Utils;
 
 public class MainUtil {
 
@@ -374,7 +373,7 @@ public class MainUtil {
 
     public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
         if (writeTask == null) {
-            Fawe.debug("&cWrite task cannot be null");
+            getLogger(MainUtil.class).debug("Write task cannot be null");
             return null;
         }
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
@@ -422,7 +421,7 @@ public class MainUtil {
                 content = scanner.next().trim();
             }
             if (!content.startsWith("<")) {
-                Fawe.debug(content);
+                getLogger(MainUtil.class).debug(content);
             }
             if (responseCode == 200) {
                 return url;
@@ -600,8 +599,7 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            Fawe.debug("&cCould not save " + resource);
+            getLogger(MainUtil.class).debug("Could not save " + resource, e);
         }
         return null;
     }

@@ -54,6 +54,7 @@ public class LimitExtent extends PassthroughExtent {
         this.limit = limit;
     }
 
+    @Override
     public List<? extends Entity> getEntities(Region region) {
         limit.THROW_MAX_CHECKS(region.getArea());
         try {
@@ -66,6 +67,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public List<? extends Entity> getEntities() {
         limit.THROW_MAX_CHECKS();
         try {
@@ -78,6 +80,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
         limit.THROW_MAX_CHANGES();
@@ -507,6 +510,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
@@ -532,6 +536,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
@@ -544,6 +549,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public BiomeType getBiome(BlockVector2 position) {
         limit.THROW_MAX_CHECKS();
         try {
@@ -556,6 +562,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public BiomeType getBiomeType(int x, int z) {
         limit.THROW_MAX_CHECKS();
         try {
@@ -568,6 +575,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     @Deprecated
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
@@ -582,6 +590,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
         if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
@@ -595,6 +604,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
         limit.MAX_BLOCKSTATES();
@@ -608,6 +618,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         limit.THROW_MAX_CHANGES();
         try {
@@ -620,6 +631,7 @@ public class LimitExtent extends PassthroughExtent {
         }
     }
 
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         limit.THROW_MAX_CHANGES();
         try {

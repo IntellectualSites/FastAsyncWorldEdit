@@ -157,7 +157,7 @@ public class BrushCommands {
             aliases = {"bb", "blend"},
             desc = "Smooths and blends terrain",
             descFooter = "Smooths and blends terrain\n" +
-                    "Pic: https://i.imgur.com/cNUQUkj.png -> https://i.imgur.com/hFOFsNf.png"
+                    "Pic: https://i.imgur.com/cNUQUkj.png → https://i.imgur.com/hFOFsNf.png"
     )
     @CommandPermissions("worldedit.brush.blendball")
     public void blendBallBrush(InjectedValueAccess context,
@@ -203,7 +203,7 @@ public class BrushCommands {
 
     @Command(
             name = "circle",
-            desc = "Creates a circle which revolves around your facing direction"
+            desc = "Creates a circle, which revolves around your facing direction"
     )
     @CommandPermissions("worldedit.brush.sphere")
     public void circleBrush(Player player, InjectedValueAccess context,
@@ -285,7 +285,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.sweep")
     public void sweepBrush(Player player, InjectedValueAccess context,
-        @Arg(name = "copies", desc = "int", def = "-1") int copies) throws WorldEditException {
+        @Arg(desc = "int", def = "-1") int copies) throws WorldEditException {
         player.print(BBC.BRUSH_SPLINE.s());
         set(context, new SweepBrush(copies));
     }
@@ -324,10 +324,11 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
     public void surfaceSpline(Player player, InjectedValueAccess context, Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
-            Expression radius, @Arg(name = "tension", desc = "double", def = "0") double tension,
-        @Arg(name = "bias", desc = "double", def = "0") double bias,
-        @Arg(name = "continuity", desc = "double", def = "0") double continuity,
-        @Arg(name = "quality", desc = "double", def = "10") double quality) throws WorldEditException {
+            Expression radius,
+        @Arg(desc = "double", def = "0") double tension,
+        @Arg(desc = "double", def = "0") double bias,
+        @Arg(desc = "double", def = "0") double continuity,
+        @Arg(desc = "double", def = "10") double quality) throws WorldEditException {
         player.print(BBC.BRUSH_SPLINE.format(radius));
         worldEdit.checkMaxBrushRadius(radius);
         set(context,
@@ -343,13 +344,13 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.rock")
     public void blobBrush(InjectedValueAccess context, Pattern fill,
-        @Arg(name = "radius", desc = "Vector3", def = "10")
+        @Arg(desc = "Vector3", def = "10")
             Vector3 radius,
-        @Arg(name = "sphericity", desc = "double", def = "100")
+        @Arg(desc = "double", def = "100")
             double sphericity,
-        @Arg(name = "frequency", desc = "double", def = "30")
+        @Arg(desc = "double", def = "30")
             double frequency,
-        @Arg(name = "amplitude", desc = "double", def = "50")
+        @Arg(desc = "double", def = "50")
             double amplitude) throws WorldEditException {
         double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
         worldEdit.checkMaxBrushRadius(max);
@@ -424,10 +425,10 @@ public class BrushCommands {
 )
     @CommandPermissions("worldedit.brush.stencil")
     public void stencilBrush(LocalSession session, InjectedValueAccess context, Pattern fill,
-        @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
-        @Arg(name = "image", desc = "String", def = "") String image,
+        @Arg(desc = "Expression", def = "5") Expression radius,
+        @Arg(desc = "String", def = "") String image,
         @Arg(def = "0", desc = "rotation") @Range(min = 0, max = 360) int rotation,
-        @Arg(name = "yscale", desc = "double", def = "1") double yscale,
+        @Arg(desc = "double", def = "1") double yscale,
         @Switch(name = 'w', desc = "Apply at maximum saturation") boolean onlyWhite,
         @Switch(name = 'r', desc = "Apply random rotation") boolean randomRotate) throws WorldEditException, FileNotFoundException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -454,7 +455,7 @@ public class BrushCommands {
             descFooter = "Use a height map to paint any surface.\n")
     @CommandPermissions("worldedit.brush.stencil")
     public void imageBrush(LocalSession session, InjectedValueAccess context,
-        @Arg(name = "radius", desc = "Expression", def = "5")
+        @Arg(desc = "Expression", def = "5")
             Expression radius,
         ProvideBindings.ImageUri imageUri,
         @Arg(def = "1", desc = "scale height") @Range(min = Double.MIN_NORMAL)
@@ -487,7 +488,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.surface")
     public void surfaceBrush(InjectedValueAccess context, Pattern fill,
-        @Arg(name = "radius", desc = "Expression", def = "5")
+        @Arg(desc = "Expression", def = "5")
             Expression radius) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(context, new SurfaceSphereBrush()).setFill(fill).setSize(radius);
@@ -501,16 +502,16 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.scatter")
     public void scatterBrush(InjectedValueAccess context, Pattern fill,
-        @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
-        @Arg(name = "points", desc = "double", def = "5") double pointsOpt,
-        @Arg(name = "distance", desc = "double", def = "1") double distanceOpt,
+        @Arg(desc = "Expression", def = "5") Expression radius,
+        @Arg(desc = "double", def = "5") double points,
+        @Arg(desc = "double", def = "1") double distance,
         @Switch(name = 'o', desc = "Overlay the block") boolean overlay) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush;
         if (overlay) {
-            brush = new ScatterOverlayBrush((int) pointsOpt, (int) distanceOpt);
+            brush = new ScatterOverlayBrush((int) points, (int) distance);
         } else {
-            brush = new ScatterBrush((int) pointsOpt, (int) distanceOpt);
+            brush = new ScatterBrush((int) points, (int) distance);
         }
         set(context, brush).setSize(radius).setFill(fill);
     }
@@ -523,8 +524,8 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.populateschematic")
     public void scatterSchemBrush(Player player, InjectedValueAccess context, Mask mask,
         @Arg(name = "clipboard", desc = "Clipboard uri") String clipboardStr,
-        @Arg(name = "radius", desc = "Expression", def = "30") Expression radius,
-        @Arg(name = "density", desc = "double", def = "50") double density,
+        @Arg(desc = "Expression", def = "30") Expression radius,
+        @Arg(desc = "double", def = "50") double density,
         @Switch(name = 'r', desc = "Apply random rotation") boolean rotate) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         try {
@@ -555,7 +556,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.layer")
     public void surfaceLayer(InjectedValueAccess context,
-        @Arg(name = "radius", desc = "Expression") Expression radius, List<BlockState> blockLayers) throws WorldEditException {
+        @Arg(desc = "Expression") Expression radius, List<BlockState> blockLayers) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(context, new LayerBrush(blockLayers.toArray(new BlockState[0]))).setSize(radius);
     }
@@ -570,12 +571,12 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.splatter")
     public void splatterBrush(InjectedValueAccess context, Pattern fill,
-        @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
-        @Arg(name = "points", desc = "double", def = "1") double pointsOpt,
-        @Arg(name = "recursion", desc = "double", def = "5") double recursion,
-        @Arg(name = "solid", desc = "boolean", def = "true") boolean solid) throws WorldEditException {
+        @Arg(desc = "Expression", def = "5") Expression radius,
+        @Arg(desc = "double", def = "1") double points,
+        @Arg(desc = "double", def = "5") double recursion,
+        @Arg(desc = "boolean", def = "true") boolean solid) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        set(context, new SplatterBrush((int) pointsOpt, (int) recursion, solid)).setSize(radius).setFill(fill);
+        set(context, new SplatterBrush((int) points, (int) recursion, solid)).setSize(radius).setFill(fill);
     }
 
     @Command(
@@ -590,7 +591,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.scattercommand")
     public void scatterCommandBrush(Player player, InjectedValueAccess context,
-        @Arg(name = "radius", desc = "Expression") Expression radius, double points,
+        @Arg(desc = "Expression") Expression radius, double points,
         double distance, List<String> commandStr) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(context,
@@ -732,7 +733,7 @@ public class BrushCommands {
                    "Snow Pic: https://i.imgur.com/Hrzn0I4.png"
     )
     @CommandPermissions("worldedit.brush.height")
-    public void heightBrush(LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Range(min = 0, max = 360) int rotation, @Arg(name = "yscale", desc = "double", def = "1") double yscale, @Switch(name = 'r', desc = "TODO") boolean randomRotate, @Switch(name = 'l', desc = "TODO") boolean layers, @Switch(name = 's', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
+    public void heightBrush(LocalSession session, @Arg(desc = "Expression", def = "5") Expression radius, @Arg(desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Range(min = 0, max = 360) int rotation, @Arg(desc = "double", def = "1") double yscale, @Switch(name = 'r', desc = "TODO") boolean randomRotate, @Switch(name = 'l', desc = "TODO") boolean layers, @Switch(name = 's', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         terrainBrush(session, radius, image, rotation, yscale, false, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CONE, context);
     }
 
@@ -744,13 +745,13 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void cliffBrush(LocalSession session,
-                           @Arg(name = "radius", desc = "Expression", def = "5")
+                           @Arg(desc = "Expression", def = "5")
             Expression radius,
-        @Arg(name = "image", desc = "String", def = "")
+        @Arg(desc = "String", def = "")
             String image,
         @Arg(def = "0", desc = "rotation") @Step(90) @Range(min = 0, max = 360)
             int rotation,
-        @Arg(name = "yscale", desc = "double", def = "1")
+        @Arg(desc = "double", def = "1")
             double yscale,
         @Switch(name = 'r', desc = "Enables random off-axis rotation")
             boolean randomRotate,
@@ -767,7 +768,7 @@ public class BrushCommands {
             desc = "This brush raises or lowers land towards the clicked point"
     )
     @CommandPermissions("worldedit.brush.height")
-    public void flattenBrush(LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min = 0, max = 360) int rotation, @Arg(name = "yscale", desc = "double", def = "1") double yscale,
+    public void flattenBrush(LocalSession session, @Arg(desc = "Expression", def = "5") Expression radius, @Arg(desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min = 0, max = 360) int rotation, @Arg(desc = "double", def = "1") double yscale,
         @Switch(name = 'r', desc = "Enables random off-axis rotation")
             boolean randomRotate,
         @Switch(name = 'l', desc = "Will work on snow layers")
@@ -778,7 +779,7 @@ public class BrushCommands {
     }
 
     private void terrainBrush(LocalSession session,
-        @Arg(name = "radius", desc = "Expression") Expression radius, String image, int rotation,
+        @Arg(desc = "Expression") Expression radius, String image, int rotation,
         double yscale, boolean flat, boolean randomRotate, boolean layers, boolean smooth,
         Shape shape, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -826,7 +827,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.copy")
     public void copy(Player player, LocalSession session, InjectedValueAccess context,
-        @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
+        @Arg(desc = "Expression", def = "5") Expression radius,
         @Switch(name = 'r', desc = "Apply random rotation on paste") boolean randomRotate,
         @Switch(name = 'a', desc = "Apply auto view based rotation on paste") boolean autoRotate) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -847,7 +848,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.command")
     public void command(InjectedValueAccess context,
-        @Arg(name = "radius", desc = "Expression") Expression radius,
+        @Arg(desc = "Expression") Expression radius,
         @Arg(desc = "Command to run") List<String> input) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         String cmd = StringMan.join(input, " ");

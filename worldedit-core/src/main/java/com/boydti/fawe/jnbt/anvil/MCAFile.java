@@ -1,6 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
@@ -18,7 +19,6 @@ import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +40,7 @@ import java.util.zip.InflaterInputStream;
 
 /**
  * Chunk format: http://minecraft.gamepedia.com/Chunk_format#Entity_format
- * e.g.: `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
+ * e.g., `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
  * Note: This class isn't thread safe. You can use it in an async thread, but not multiple at the same time
  */
 public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, IChunkExtent {
@@ -291,7 +291,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                     if (offset < offsets.length) {
                         offsets[offset] = i;
                     } else {
-                        Fawe.debug("Ignoring invalid offset " + offset);
+                        getLogger(MCAFile.class).debug("Ignoring invalid offset " + offset);
                     }
                 }
             }

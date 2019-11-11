@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.google.gson.Gson;
@@ -12,7 +13,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -51,8 +51,7 @@ public final class BrushCache {
                 brushCache.put(key, tool);
                 return tool;
             } catch (Exception throwable) {
-                throwable.printStackTrace();
-                Fawe.debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue());
+                getLogger(BrushCache.class).debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue(), throwable);
                 item.setNbtData(null);
                 brushCache.remove(key);
             } finally {

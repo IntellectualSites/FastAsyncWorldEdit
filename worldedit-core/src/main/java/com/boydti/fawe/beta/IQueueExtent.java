@@ -4,22 +4,15 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.IBatchProcessorHolder;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.io.Flushable;
 import java.util.Set;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
@@ -58,7 +51,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      *  - Faster than getting it using NMS and allows for wrapping
      * @param x
      * @param z
-     * @param supplier
      * @return
      */
     IChunkGet getCachedGet(int x, int z);
@@ -67,7 +59,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * Get the cached chunk set object
      * @param x
      * @param z
-     * @param supplier
      * @return
      */
     IChunkSet getCachedSet(int x, int z);
@@ -101,7 +92,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     T create(boolean isFull);
 
     /**
-     * Wrap the chunk object (i.e. for region restrictions / limits etc.)
+     * Wrap the chunk object (i.e., for region restrictions / limits etc.)
      *
      * @param root
      * @return wrapped chunk

@@ -211,6 +211,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     // special
+    @Override
     public Extent disableHistory() {
         return super.disableHistory();
     }
@@ -235,14 +236,17 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().cancel();
     }
 
+    @Override
     public boolean isQueueEnabled() {
         return getExtent().isQueueEnabled();
     }
 
+    @Override
     public void enableQueue() {
         getExtent().enableQueue();
     }
 
+    @Override
     public void disableQueue() {
         getExtent().disableQueue();
     }

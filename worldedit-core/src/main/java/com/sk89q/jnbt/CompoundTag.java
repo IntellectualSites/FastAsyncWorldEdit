@@ -20,10 +20,8 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -269,7 +267,7 @@ public class CompoundTag extends Tag {
      *
      * <p>If the key does not exist or its value is not a list tag,
      * then an empty list will be returned. If the given key references
-     * a list but the list of of a different type, then an empty
+     * a list but the list of a different type, then an empty
      * list will also be returned.</p>
      *
      * @param key the key
@@ -295,7 +293,7 @@ public class CompoundTag extends Tag {
     /**
      * Get a {@code long[]} named with the given key.
      *
-     * <p>If the key does not exist or its value is not an long array tag,
+     * <p>If the key does not exist or its value is not a long array tag,
      * then an empty array will be returned.</p>
      *
      * @param key the key

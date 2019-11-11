@@ -125,9 +125,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 @Override
                 public boolean add(Plugin plugin) {
                     if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                        Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
+                        log.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
                     } else if (plugin.getName().startsWith("BetterShutdown")) {
-                        Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
+                        log.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
                     } else {
                         return super.add(plugin);
                     }

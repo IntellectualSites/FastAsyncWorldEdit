@@ -20,11 +20,8 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.UUID;
@@ -48,12 +45,7 @@ public interface ClipboardReader extends Closeable {
     }
 
     default Clipboard read(UUID uuid) throws IOException {
-        return read(uuid, new Function<BlockVector3, Clipboard>() {
-            @Override
-            public Clipboard apply(BlockVector3 dimensions) {
-                return new DiskOptimizedClipboard(dimensions);
-            }
-        });
+        return read(uuid, DiskOptimizedClipboard::new);
     }
 
     default Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {

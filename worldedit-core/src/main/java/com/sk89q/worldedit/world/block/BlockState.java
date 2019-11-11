@@ -82,7 +82,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     /**
      * Returns a temporary BlockState for a given type and string
-     * @param state String e.g. minecraft:water[level=4]
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(String state) throws InputParseException {
@@ -92,8 +92,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     /**
      * Returns a temporary BlockState for a given type and string
      *  - It's faster if a BlockType is provided compared to parsing the string
-     * @param type BlockType e.g. BlockTypes.STONE (or null)
-     * @param state String e.g. minecraft:water[level=4]
+     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
@@ -103,8 +103,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     /**
      * Returns a temporary BlockState for a given type and string
      *  - It's faster if a BlockType is provided compared to parsing the string
-     * @param type BlockType e.g. BlockTypes.STONE (or null)
-     * @param state String e.g. minecraft:water[level=4]
+     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(@Nullable BlockType type, String state, BlockState defaultState) throws InputParseException {

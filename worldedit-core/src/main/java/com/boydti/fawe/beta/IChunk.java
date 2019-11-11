@@ -36,7 +36,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     int getZ();
 
     /**
-     * If the chunk is a delegate, returns it's parent's root
+     * If the chunk is a delegate, returns its parent's root
      *
      * @return root IChunk
      */
@@ -49,6 +49,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @return true if no changes are queued for this chunk
      */
+    @Override
     boolean isEmpty();
 
     /**
@@ -56,7 +57,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @param filter the filter
      * @param block The filter block
-     * @param region The region allowed to filter (may be null)
+     * @param region The region allowed to filter (maybe null)
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full);
 
@@ -70,10 +71,13 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
 //    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
 
     /* set - queues a change */
+    @Override
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
+    @Override
     boolean setTile(int x, int y, int z, CompoundTag tag);
 
+    @Override
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
     @Override

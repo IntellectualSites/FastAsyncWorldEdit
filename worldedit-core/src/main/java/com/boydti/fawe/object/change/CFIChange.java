@@ -1,6 +1,8 @@
 package com.boydti.fawe.object.change;
 
-import com.boydti.fawe.Fawe;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
@@ -8,9 +10,6 @@ import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import java.io.File;
 import java.io.IOException;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CFIChange implements Change {
     private final File file;
@@ -25,7 +24,7 @@ public class CFIChange implements Change {
         if (found != null) {
             return found.get();
         }
-        Fawe.debug("FAWE does not support: " + context.getExtent() + " for " + getClass() + " (bug Empire92)");
+        getLogger(CFIChange.class).debug("FAWE does not support: " + context.getExtent() + " for " + getClass() + " (bug Empire92)");
         return null;
     }
 

@@ -242,16 +242,16 @@ public class EditSessionBuilder {
                     return toReturn;
                 }
             }
-            if (Settings.IMP.EXTENT.DEBUG) {
-                Fawe.debug("&cPotentially unsafe extent blocked: " + toReturn.getClass().getName());
-                Fawe.debug("&8 - &7For area restrictions, it is recommended to use the FaweAPI");
-                Fawe.debug("&8 - &7For block logging, it is recommended to use use BlocksHub");
-                Fawe.debug("&8 - &7To allow this plugin add it to the FAWE `allowed-plugins` list");
-                Fawe.debug("&8 - &7To hide this message set `debug` to false in the FAWE config.yml");
+            if (Settings.IMP.EXTENT.DEBUG && event.getActor() != null) {
+                event.getActor().printDebug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                event.getActor().printDebug(" - For area restrictions, it is recommended to use the FaweAPI");
+                event.getActor().printDebug(" - For block logging, it is recommended to use use BlocksHub");
+                event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
+                event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
                 if (toReturn.getClass().getName().contains("CoreProtect")) {
-                    Fawe.debug("Note on CoreProtect: ");
-                    Fawe.debug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                    Fawe.debug(" - Use BlocksHub and set `debug` false in the FAWE config");
+                    event.getActor().printDebug("Note on CoreProtect: ");
+                    event.getActor().printDebug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
+                    event.getActor().printDebug(" - Use BlocksHub and set `debug` false in the FAWE config");
                 }
             }
         }

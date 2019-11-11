@@ -189,7 +189,7 @@ public class GeneralCommands {
         } else {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
+            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32×32×32.");
         }
     }
 
@@ -211,7 +211,7 @@ public class GeneralCommands {
     @Command(
             name = "gmask",
             aliases = {"/gmask"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
             desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
@@ -308,7 +308,7 @@ public class GeneralCommands {
     @Command(
             name = "/gtexture",
             aliases = {"gtexture"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
@@ -368,7 +368,7 @@ public class GeneralCommands {
             name = "/gsmask",
             aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
             desc = "Set the global source mask",
-            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)"
+            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {

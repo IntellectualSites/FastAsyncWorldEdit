@@ -6,8 +6,6 @@ import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -84,20 +82,12 @@ public interface IBatchProcessor {
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
         Set<CompoundTag> ents = set.getEntities();
         if (!ents.isEmpty()) {
-            for (Iterator<CompoundTag> iter = ents.iterator(); iter.hasNext();) {
-                CompoundTag ent = iter.next();
-                if (!contains.apply(ent.getEntityPosition().toBlockPoint())) {
-                    iter.remove();
-                }
-            }
+            ents.removeIf(ent -> !contains.apply(ent.getEntityPosition().toBlockPoint()));
         }
         Map<BlockVector3, CompoundTag> tiles = set.getTiles();
         if (!tiles.isEmpty()) {
-            for (Iterator<Map.Entry<BlockVector3, CompoundTag>> iter = tiles.entrySet().iterator(); iter.hasNext();) {
-                if (!contains.apply(iter.next().getKey())) {
-                    iter.remove();
-                }
-            }
+            tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !contains
+                .apply(blockVector3CompoundTagEntry.getKey()));
         }
         return !tiles.isEmpty() || !ents.isEmpty();
     }

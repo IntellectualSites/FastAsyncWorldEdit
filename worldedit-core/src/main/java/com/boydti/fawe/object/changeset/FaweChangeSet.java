@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.changeset;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
@@ -270,7 +272,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
         } else if (change.getClass() == EntityRemove.class) {
             add((EntityRemove) change);
         } else {
-            Fawe.debug("Unknown change: " + change.getClass());
+            getLogger(FaweChangeSet.class).debug("Unknown change: " + change.getClass());
         }
     }
 

@@ -33,9 +33,9 @@ public class ImageUtil {
         BufferedImage scaledImage = image;
         int width, height;
         if (higherQuality) {
-            // Use multi-step technique: start with original size, then
-            // scale down in multiple passes with drawImage()
-            // until the target size is reached
+            /* Use multi-step technique: start with original size, then
+            scale down in multiple passes with drawImage()
+            until the target size is reached. */
             width = scaledImage.getWidth();
             height = scaledImage.getHeight();
         } else {

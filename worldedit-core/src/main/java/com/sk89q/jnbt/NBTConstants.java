@@ -19,8 +19,6 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.math.BlockVector3;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 

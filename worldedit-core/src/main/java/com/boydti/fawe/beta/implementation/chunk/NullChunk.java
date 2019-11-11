@@ -1,13 +1,9 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlockMask;
-import com.boydti.fawe.beta.Flood;
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -16,19 +12,15 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 public enum NullChunk implements IQueueChunk {
     INSTANCE;
-
-    @Override
-    public void init(IQueueExtent extent, int x, int z) {}
 
     @Override
     public int getX() {

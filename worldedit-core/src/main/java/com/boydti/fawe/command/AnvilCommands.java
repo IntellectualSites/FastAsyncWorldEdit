@@ -163,7 +163,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
-    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
+    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
 //        DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
 //        DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) {
@@ -182,7 +182,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
-    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
 //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
 //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
 //        if (debug) {
@@ -205,7 +205,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
-    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
 //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
 //        if (debug) {
 //            filter.enableDebug();
@@ -221,7 +221,7 @@ public class AnvilCommands {
             aliases = {"deloldreg" },
             desc = "Delete regions which haven't been accessed in a certain amount of time",
             descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
-                    "(months are not a unit of time) E.g. 8h5m12s\n"
+                    "(months are not a unit of time) e.g., 8h5m12s\n"
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {

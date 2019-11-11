@@ -1,5 +1,9 @@
 package com.boydti.fawe.command;
 
+import static com.boydti.fawe.util.image.ImageUtil.load;
+import static com.sk89q.worldedit.command.MethodCommands.getArguments;
+import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
@@ -15,7 +19,6 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -25,7 +28,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -37,7 +39,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -47,7 +48,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -56,18 +56,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.CommandManagerService;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.enginehub.piston.part.SubCommandPart;
-import org.jetbrains.annotations.NotNull;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -85,17 +73,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static com.boydti.fawe.util.image.ImageUtil.load;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
-import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
+import javax.imageio.ImageIO;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.NotNull;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class CFICommands {
 
     private final WorldEdit worldEdit;
+    private final @NonNull TextComponent doubleNewLine = TextComponent.of("\n\n");
 
     /**
      * Create a new instance.
@@ -252,14 +245,14 @@ public class CFICommands {
             desc = "Set the floor and main block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void column(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void column(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
-            gen.setColumn(load(image), patternArg, !disableWhiteOnly);
-        } else if (maskOpt != null) {
-            gen.setColumn(maskOpt, patternArg);
+            gen.setColumn(load(image), pattern, !disableWhiteOnly);
+        } else if (mask != null) {
+            gen.setColumn(mask, pattern);
         } else {
-            gen.setColumn(patternArg);
+            gen.setColumn(pattern);
         }
         player.print("Set column!");
         assertSettings(player).resetComponent();
@@ -271,21 +264,21 @@ public class CFICommands {
             desc = "Set the floor (default: grass)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorCmd(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        floor(player, patternArg, image, maskOpt, disableWhiteOnly);
+    public void floorCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        floor(player, pattern, image, mask, disableWhiteOnly);
         player.print("Set floor!");
         assertSettings(player).resetComponent();
         component(player);
     }
 
-    private void floor(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
+    private void floor(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
-            gen.setFloor(load(image), patternArg, !disableWhiteOnly);
-        } else if (maskOpt != null) {
-            gen.setFloor(maskOpt, patternArg);
+            gen.setFloor(load(image), pattern, !disableWhiteOnly);
+        } else if (mask != null) {
+            gen.setFloor(mask, pattern);
         } else {
-            gen.setFloor(patternArg);
+            gen.setFloor(pattern);
         }
     }
 
@@ -294,21 +287,21 @@ public class CFICommands {
             desc = "Set the main block (default: stone)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mainCmd(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        main(player, patternArg, image, maskOpt, disableWhiteOnly);
+    public void mainCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        main(player, pattern, image, maskOpt, disableWhiteOnly);
         player.print("Set main!");
         assertSettings(player).resetComponent();
         component(player);
     }
 
-    public void main(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void main(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
-            gen.setMain(load(image), patternArg, !disableWhiteOnly);
+            gen.setMain(load(image), pattern, !disableWhiteOnly);
         } else if (maskOpt != null) {
-            gen.setMain(maskOpt, patternArg);
+            gen.setMain(maskOpt, pattern);
         } else {
-            gen.setMain(patternArg);
+            gen.setMain(pattern);
         }
     }
 
@@ -317,17 +310,17 @@ public class CFICommands {
             aliases = {"setoverlay"},
             desc = "Set the overlay block",
             descFooter = "Change the block directly above the floor (default: air)\n" +
-                    "e.g. Tallgrass"
+                    "e.g., Tallgrass"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void overlay(Player player, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void overlay(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
-            gen.setOverlay(load(image), patternArg, !disableWhiteOnly);
-        } else if (maskOpt != null) {
-            gen.setOverlay(maskOpt, patternArg);
+            gen.setOverlay(load(image), pattern, !disableWhiteOnly);
+        } else if (mask != null) {
+            gen.setOverlay(mask, pattern);
         } else {
-            gen.setOverlay(patternArg);
+            gen.setOverlay(pattern);
         }
         player.print("Set overlay!");
         component(player);
@@ -342,18 +335,18 @@ public class CFICommands {
                     " - A good value for radius and iterations would be 1 8."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void smoothCmd(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        smooth(player, radius, iterations, image, maskOpt, disableWhiteOnly);
+    public void smoothCmd(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        smooth(player, radius, iterations, image, mask, disableWhiteOnly);
         assertSettings(player).resetComponent();
         component(player);
     }
 
-    private void smooth(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    private void smooth(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
             gen.smooth(load(image), !disableWhiteOnly, radius, iterations);
         } else {
-            gen.smooth(maskOpt, radius, iterations);
+            gen.smooth(mask, radius, iterations);
         }
     }
 
@@ -362,11 +355,11 @@ public class CFICommands {
             desc = "Create some snow"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void snow(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void snow(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
-        floor(player, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, maskOpt, disableWhiteOnly);
-        main(player, BlockTypes.SNOW_BLOCK, image, maskOpt, disableWhiteOnly);
-        smooth(player, 1, 8, image, maskOpt, disableWhiteOnly);
+        floor(player, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, mask, disableWhiteOnly);
+        main(player, BlockTypes.SNOW_BLOCK, image, mask, disableWhiteOnly);
+        smooth(player, 1, 8, image, mask, disableWhiteOnly);
         player.print(TextComponent.of("Added snow!"));
         assertSettings(player).resetComponent();
         component(player);
@@ -390,7 +383,7 @@ public class CFICommands {
             name = "paletteblocks",
             desc = "Set the blocks used for coloring",
             descFooter = "Allow only specific blocks to be used for coloring\n" +
-                    "`blocks` is a list of blocks e.g. stone,bedrock,wool\n" +
+                    "`blocks` is a list of blocks e.g., stone,bedrock,wool\n" +
                     "`#clipboard` will only use the blocks present in your clipboard."
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -516,7 +509,7 @@ public class CFICommands {
                     " - The distance is the spacing between each schematic"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void schem(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask") Mask mask, String schematic, int rarity, int distance, boolean rotate)throws IOException, WorldEditException {
+    public void schem(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask") Mask mask, String schematic, int rarity, int distance, boolean rotate)throws IOException, WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 
         World world = player.getWorld();
@@ -542,14 +535,14 @@ public class CFICommands {
                     " - If a mask is used, the biome will be set anywhere the mask applies"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biome(Player player, @Arg(name = "biome", desc = "Biome type") BiomeType biomeType, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void biome(Player player, @Arg(desc = "Biome type") BiomeType biome, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
         if (image != null) {
-            gen.setBiome(load(image), biomeType, !disableWhiteOnly);
-        } else if (maskOpt != null) {
-            gen.setBiome(maskOpt, biomeType);
+            gen.setBiome(load(image), biome, !disableWhiteOnly);
+        } else if (mask != null) {
+            gen.setBiome(mask, biome);
         } else {
-            gen.setBiome(biomeType);
+            gen.setBiome(biome);
         }
         player.print(TextComponent.of("Set biome!"));
         assertSettings(player).resetComponent();
@@ -573,8 +566,8 @@ public class CFICommands {
             descFooter = "Use a specific pattern and settings to generate ore"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void ore(Player player, @Arg(name = "mask", desc = "Mask") Mask mask, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
-        assertSettings(player).getGenerator().addOre(mask, patternArg, size, frequency, rariry, minY, maxY);
+    public void ore(Player player, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern pattern, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+        assertSettings(player).getGenerator().addOre(mask, pattern, size, frequency, rarity, minY, maxY);
         player.print(TextComponent.of("Added ore!"));
         populate(player);
     }
@@ -584,7 +577,7 @@ public class CFICommands {
             desc = "Generate the vanilla ores"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void ores(Player player, @Arg(name = "mask", desc = "Mask") Mask mask) throws WorldEditException {
+    public void ores(Player player, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
         assertSettings(player).getGenerator().addDefaultOres(mask);
         player.print(TextComponent.of("Added ores!"));
         populate(player);
@@ -609,7 +602,7 @@ public class CFICommands {
 
     @Command(
             name = "water",
-            desc = "Change the block used for water\ne.g. Lava"
+            desc = "Change the block used for water\n e.g., Lava"
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterId(Player player, @Arg(desc = "block") BlockStateHolder block) throws WorldEditException {
@@ -642,8 +635,8 @@ public class CFICommands {
                     " - A value of 0 is the default and will not modify the height"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void worldthickness(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(player).getGenerator().setWorldThickness(heightArg);
+    public void worldthickness(Player player, @Arg(desc = "brush height") int height) throws WorldEditException {
+        assertSettings(player).getGenerator().setWorldThickness(height);
         player.print("Set world thickness!");
         component(player);
     }
@@ -655,8 +648,8 @@ public class CFICommands {
                     " - A value of 0 is the default and will only set the top block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorthickness(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(player).getGenerator().setFloorThickness(heightArg);
+    public void floorthickness(Player player, @Arg( desc = "brush height") int height) throws WorldEditException {
+        assertSettings(player).getGenerator().setFloorThickness(height);
         player.print("Set floor thickness!");
         component(player);
     }
@@ -696,8 +689,8 @@ public class CFICommands {
                     " - By default water is disabled (with a value of 0)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void waterheight(Player player, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
-        assertSettings(player).getGenerator().setWaterHeight(heightArg);
+    public void waterheight(Player player, @Arg(desc = "brush height") int height) throws WorldEditException {
+        assertSettings(player).getGenerator().setWaterHeight(height);
         player.print("Set water height!");
         component(player);
     }
@@ -709,7 +702,7 @@ public class CFICommands {
     )
     // ![79,174,212,5:3,5:4,18,161,20]
     @CommandPermissions("worldedit.anvil.cfi")
-    public void glass(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+    public void glass(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(player);
         settings.getGenerator().setColorWithGlass(load(image));
         player.print("Set color with glass!");
@@ -726,13 +719,13 @@ public class CFICommands {
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void color(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+    public void color(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(player);
         HeightMapMCAGenerator gen = settings.getGenerator();
         if (imageMask != null) {
             gen.setColor(load(image), load(imageMask), !disableWhiteOnly);
-        } else if (maskOpt != null) {
-            gen.setColor(load(image), maskOpt);
+        } else if (mask != null) {
+            gen.setColor(load(image), mask);
         } else {
             gen.setColor(load(image));
         }
@@ -750,9 +743,9 @@ public class CFICommands {
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void blockbiome(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+    public void blockbiome(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(player);
-        settings.getGenerator().setBlockAndBiomeColor(load(image), maskOpt, load(imageMask), !disableWhiteOnly);
+        settings.getGenerator().setBlockAndBiomeColor(load(image), mask, load(imageMask), !disableWhiteOnly);
         player.print(TextComponent.of("Set color with blocks and biomes!"));
         settings.resetColoring();
         mainMenu(player);
@@ -766,7 +759,7 @@ public class CFICommands {
                     " - If you changed the block to something other than grass you will not see anything."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biomecolor(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
+    public void biomecolor(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(player);
         settings.getGenerator().setBiomeColor(load(image));
         player.print(TextComponent.of("Set color with biomes!"));
@@ -821,17 +814,28 @@ public class CFICommands {
         String blockList = materials.size() > 100 ? materials.size() + " blocks" : StringMan.join(materials, ',');
 
         int biomePriority = gen.getBiomePriority();
-
-        //TODO fix this so it can execute commands and show tooltips.
-        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<").append(newline())
-                .append("Randomization ").append("[" + Boolean.toString(rand).toUpperCase() + "]")//.cmdTip("/cfi randomization " + (!rand))
-                .append(newline())
-                .append("Mask ").append("[" + mask + "]")//.cmdTip("/cfi mask")
-                .append(newline())
-                .append("Blocks ").append("[" + blocks + "]")//.tooltip(blockList).command("/cfi paletteBlocks")
-                .append(newline())
-                .append("BiomePriority ").append("[" + biomePriority + "]")//.cmdTip("/cfi biomepriority")
-                .append(newline());
+        TextComponent.empty().clickEvent(ClickEvent.runCommand(
+            "/cfi randomization " + !rand)).hoverEvent(HoverEvent.showText(
+            TextComponent.of("/cfi randomization " + !rand)));
+        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<");
+        builder.append(newline());
+        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase() + "]")
+            .clickEvent(ClickEvent.runCommand(
+                "/cfi randomization " + !rand)).hoverEvent(HoverEvent.showText(
+                TextComponent.of("/cfi randomization " + !rand))));
+        builder.append(newline());
+        builder.append(TextComponent.of("Mask [" + mask + "]").clickEvent(ClickEvent.runCommand(
+            "/cfi mask")).hoverEvent(HoverEvent.showText(
+            TextComponent.of("/cfi mask"))));
+        builder.append(newline());
+        builder.append(TextComponent.of("Blocks [" + blocks + "]").clickEvent(ClickEvent.runCommand(
+            "/cfi mask")).hoverEvent(HoverEvent.showText(
+            TextComponent.of("/cfi mask"))));
+        builder.append(newline());
+        builder.append(TextComponent.of("Biome Priority [" + biomePriority + "]").clickEvent(ClickEvent.runCommand(
+            "/cfi mask")).hoverEvent(HoverEvent.showText(
+            TextComponent.of("/cfi biomepriority"))));
+        builder.append(newline());
 
         if (settings.image != null) {
             StringBuilder colorArgs = new StringBuilder(" " + settings.imageArg);
@@ -845,6 +849,7 @@ public class CFICommands {
                 colorArgs.append(" -w");
             }
 
+            //TODO
             builder.append("Image: ")
                     .append("[" + settings.imageArg + "]")//.cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "image"))
                     .append(newline()).append(newline())
@@ -857,7 +862,7 @@ public class CFICommands {
                     .append("You MUST provide an image: ")
                     .append("[None]");//.cmdTip("/cfi " + Commands.getAlias(Command.class, "image")).append(newline());
         }
-        builder.append("< [Back]");//.cmdTip(alias()).send(fp);
+        builder.append("< [Back]");//.cmdTip(alias()).send(player);
         player.print(builder.build());
     }
 
@@ -866,14 +871,14 @@ public class CFICommands {
             desc = "Select a mask"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mask(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context){
+    public void mask(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context){
         CFISettings settings = assertSettings(player);
         String[] split = getArguments(context).split(" ");
         int index = 2;
         settings.imageMask = imageMask;
         settings.imageMaskArg = imageMask != null ? split[index++] : null;
-        settings.mask = maskOpt;
-        settings.maskArg = maskOpt != null ? split[index++] : null;
+        settings.mask = mask;
+        settings.maskArg = mask != null ? split[index++] : null;
         settings.whiteOnly = !disableWhiteOnly;
 
         String s = "/cfi mask http://";
@@ -901,16 +906,16 @@ public class CFICommands {
             desc = "Select a pattern"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void pattern(Player player, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern patternArg, InjectedValueAccess context)throws CommandException {
+    public void pattern(Player player, @Arg(desc = "Pattern", def = "") Pattern pattern, InjectedValueAccess context)throws CommandException {
         CFISettings settings = assertSettings(player);
         String[] split = getArguments(context).split(" ");
         int index = 2;
-        settings.pattern = patternArg;
-        settings.patternArg = patternArg == null ? null : split[index++];
+        settings.pattern = pattern;
+        settings.patternArg = pattern == null ? null : split[index++];
 
         StringBuilder cmd = new StringBuilder("/cfi pattern ");
 
-        if (patternArg != null) {
+        if (pattern != null) {
             settings.getCategory().accept(player);
         } else {
             String s = cmd + " stone";
@@ -1043,8 +1048,7 @@ public class CFICommands {
                 .append("Pattern ").append(TextComponent.of("[" + pattern + "]")
                         .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi pattern")))
                         .clickEvent(ClickEvent.runCommand("/cfi pattern")))
-                .append(newline())
-                .append(newline())
+                .append(doubleNewLine)
                 .append(">> Components <<")
                 .append(newline())
                 .append(TextComponent.of("[Height]")
@@ -1067,39 +1071,58 @@ public class CFICommands {
 
         if (pattern != null) {
             String disabled = "You must specify a pattern";
-            msg.append(TextComponent.of("[WaterId]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline())
-                    .append(TextComponent.of("[BedrockId]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[Floor]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[Main]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[Column]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
-                    .append(TextComponent.of("[Overlay]", TextColor.RED).hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline());
+            msg.append(TextComponent.of("[WaterId]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(newline());
+            msg.append(TextComponent.of("[BedrockId]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(doubleNewLine);
+            msg.append(TextComponent.of("[Floor]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(doubleNewLine);
+            msg.append(TextComponent.of("[Main]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(doubleNewLine);
+            msg.append(TextComponent.of("[Column]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(doubleNewLine);
+            msg.append(TextComponent.of("[Overlay]", TextColor.RED)
+                .hoverEvent(HoverEvent.showText(TextComponent.of(disabled))));
+            msg.append(doubleNewLine);
         } else {
             StringBuilder compArgs = new StringBuilder();
             compArgs.append(" " + settings.patternArg + maskArgs);
 
-            msg
-                    .append(TextComponent.of("[WaterId]")
-                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterId " + pattern)))
-                            .clickEvent(ClickEvent.runCommand("/cfi waterId " + pattern)))
-                    .append(" - Water id for whole map")
-                    .append(newline())
-                    .append(TextComponent.of("[BedrockId]")
-                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi baseId " + pattern)))
-                            .clickEvent(ClickEvent.runCommand("/cfi baseId " + pattern)))
-                    .append(TextComponent.of(" - Bedrock id for whole map"))
-                    .append(newline())
-                    .append(TextComponent.of("[Floor]")
-                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floor " + compArgs)))
-                            .clickEvent(ClickEvent.runCommand("/cfi floor " + compArgs)))
-                    .append(TextComponent.of(" - Set the floor in the masked areas")).append(newline())
-                    .append(TextComponent.of("[Main]")
-                            .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi main " + compArgs)))
-                            .clickEvent(ClickEvent.runCommand("/cfi main " + compArgs)))
-                    .append(TextComponent.of(" - Set the main block in the masked areas")).append(newline())
-                    .append(TextComponent.of("[Column]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi column" + compArgs)))
-                            .clickEvent(ClickEvent.runCommand("/cfi column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
-                    .append(TextComponent.of("[Overlay]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi overlay" + compArgs)))
-                            .clickEvent(ClickEvent.runCommand("/cfi overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
+            msg.append(TextComponent.of("[WaterId]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterId " + pattern)))
+                .clickEvent(ClickEvent.runCommand("/cfi waterId " + pattern)));
+            msg.append(" - Water id for whole map");
+            msg.append(newline());
+            msg.append(TextComponent.of("[BedrockId]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi baseId " + pattern)))
+                .clickEvent(ClickEvent.runCommand("/cfi baseId " + pattern)));
+            msg.append(TextComponent.of(" - Bedrock id for whole map"));
+            msg.append(newline());
+            msg.append(TextComponent.of("[Floor]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floor " + compArgs)))
+                .clickEvent(ClickEvent.runCommand("/cfi floor " + compArgs)));
+            msg.append(TextComponent.of(" - Set the floor in the masked areas"));
+            msg.append(newline());
+            msg.append(TextComponent.of("[Main]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi main " + compArgs)))
+                .clickEvent(ClickEvent.runCommand("/cfi main " + compArgs)));
+            msg.append(TextComponent.of(" - Set the main block in the masked areas"));
+            msg.append(newline());
+            msg.append(TextComponent.of("[Column]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi column" + compArgs)))
+                .clickEvent(ClickEvent.runCommand("/cfi column" + compArgs)));
+            msg.append(" - Set the columns in the masked areas");
+            msg.append(newline());
+            msg.append(TextComponent.of("[Overlay]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi overlay" + compArgs)))
+                .clickEvent(ClickEvent.runCommand("/cfi overlay" + compArgs)));
+            msg.append(" - Set the overlay in the masked areas");
+            msg.append(newline());
         }
 
         msg.append(newline())
@@ -1263,17 +1286,19 @@ public class CFICommands {
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(option))));
         }
         producer.newline();
-        producer.newline().append(TextComponent.of("<> [View]", TextColor.DARK_AQUA)
-                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "download"))
-                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("View full res image"))));
-
-        producer.newline().append(TextComponent.of(">< [Cancel]", TextColor.RED)
-                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "cancel"))
-                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("cancel"))));
-
-        producer.newline().append(TextComponent.of(">> [Done]", TextColor.DARK_GREEN)
-                .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "done"))
-                .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("done"))));
+        producer.newline();
+        producer.append(TextComponent.of("<> [View]", TextColor.DARK_AQUA)
+            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "download"))
+            .hoverEvent(HoverEvent
+                .of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("View full res image"))));
+        producer.newline();
+        producer.append(TextComponent.of(">< [Cancel]", TextColor.RED)
+            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "cancel"))
+            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("cancel"))));
+        producer.newline();
+        producer.append(TextComponent.of(">> [Done]", TextColor.DARK_GREEN)
+            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, prefix + "done"))
+            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("done"))));
 
         actor.print(producer.create());
     }

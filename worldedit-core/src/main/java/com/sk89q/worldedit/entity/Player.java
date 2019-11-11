@@ -354,7 +354,7 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g. If
+     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g., If
      * they are editing a CFI world.<br/>
      *
      * @return Editing world
@@ -439,12 +439,12 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            Fawe.debug("====== INVALID CLIPBOARD ======");
+            printError("====== INVALID CLIPBOARD ======");
             event.printStackTrace();
-            Fawe.debug("===============---=============");
-            Fawe.debug("This shouldn't result in any failure");
-            Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
-            Fawe.debug("===============---=============");
+            printError("===============---=============");
+            printError("This shouldn't result in any failure");
+            printError("File: " + file.getName() + " (len:" + file.length() + ")");
+            printError("===============---=============");
         }
     }
 }

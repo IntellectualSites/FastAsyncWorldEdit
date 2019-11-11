@@ -39,7 +39,6 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.google.common.collect.Maps;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
@@ -88,10 +87,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -889,7 +886,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the position use for commands that take a center point
-     * (i.e. //forestgen, etc.).
+     * (i.e., //forestgen, etc.).
      *
      * @param actor the actor
      * @return the position to use
