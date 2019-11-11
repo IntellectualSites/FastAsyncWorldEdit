@@ -220,7 +220,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
         BlockVector3 origin = min;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
-            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
+//            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
+            origin = BlockVector3.at(offsetX, offsetY, offsetZ);
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
@@ -339,7 +340,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-
         clipboard.setOrigin(origin);
         return clipboard;
     }
