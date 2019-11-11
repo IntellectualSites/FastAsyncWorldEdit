@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.schematic;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -59,6 +60,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         return read(UUID.randomUUID());
     }
 
+    @Override
     public Clipboard read(UUID clipboardId) throws IOException {
         NamedTag rootTag = inputStream.readNamedTag();
 
@@ -158,7 +160,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         int height = region.getHeight();
         int length = region.getLength();
         if (width > WARN_SIZE || height > WARN_SIZE || length > WARN_SIZE) {
-            Fawe.debug("A structure longer than 32 is unsupported by minecraft (but probably still works)");
+            getLogger(MinecraftStructure.class).debug("A structure longer than 32 is unsupported by minecraft (but probably still works)");
         }
         Map<String, Object> structure = FaweCache.IMP.asMap("version", 1, "author", owner);
         // ignored: version / owner

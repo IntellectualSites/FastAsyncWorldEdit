@@ -445,6 +445,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the queue is enabled
      * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
      */
+    @Override
     @Deprecated
     public boolean isQueueEnabled() {
         return true;
@@ -456,6 +457,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Uses {@link ReorderMode#MULTI_STAGE}
      * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
      */
+    @Override
     @Deprecated
     public void enableQueue() {
         super.enableQueue();
@@ -464,6 +466,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     /**
      * Disable the queue. This will close the queue.
      */
+    @Override
     @Deprecated
     public void disableQueue() {
         super.disableQueue();
@@ -1537,7 +1540,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     /**
      * Drain nearby pools of water or lava, optionally removed waterlogged states from blocks.
      *
-     * @param origin the origin to drain from, which will search a 3x3 area
+     * @param origin the origin to drain from, which will search a 3×3 area
      * @param radius the radius of the removal, where a value should be 0 or greater
      * @param waterlogged true to make waterlogged blocks non-waterlogged as well
      * @return number of blocks affected
@@ -1566,7 +1569,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
 
-        // Around the origin in a 3x3 block
+        // Around the origin in a 3×3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
             if (mask.test(position)) {
                 visitor.visit(position);
@@ -1607,7 +1610,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
-        // Around the origin in a 3x3 block
+        // Around the origin in a 3×3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
             if (liquidMask.test(position)) {
                 visitor.visit(position);

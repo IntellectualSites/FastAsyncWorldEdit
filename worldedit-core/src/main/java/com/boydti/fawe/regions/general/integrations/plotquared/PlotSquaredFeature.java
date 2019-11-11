@@ -1,7 +1,7 @@
 package com.boydti.fawe.regions.general.integrations.plotquared;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
@@ -25,24 +25,31 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
-
+import com.sk89q.worldedit.world.World;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlotSquaredFeature extends FaweMaskManager {
+
+    private static final Logger log = LoggerFactory.getLogger(PlotSquaredFeature.class);
+
     public PlotSquaredFeature() {
         super("PlotSquared");
-        Fawe.debug("Optimizing PlotSquared");
+        log.debug("Optimizing PlotSquared");
         if (com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
-            setupBlockQueue();
-            setupSchematicHandler();
-            setupChunkManager();
+            try {
+                setupBlockQueue();
+                setupSchematicHandler();
+                setupChunkManager();
+            } catch (Throwable ignored) {
+                log.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
+            }
             if (Settings.PLATFORM.equalsIgnoreCase("bukkit")) {
                 new FaweTrim();
             }
@@ -57,7 +64,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 new ReplaceAll();
             }
         } catch (Throwable e) {
-            Fawe.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
+            log.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
         }
 */
     }
@@ -66,35 +73,23 @@ public class PlotSquaredFeature extends FaweMaskManager {
         return UUIDHandler.getName(uuid);
     }
 
-    private void setupBlockQueue() {
-        try {
-            // If it's going to fail, throw an error now rather than later
-            QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
-            GlobalBlockQueue.IMP.setProvider(provider);
-            HybridPlotManager.REGENERATIVE_CLEAR = false;
-            Fawe.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
-            Fawe.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
-        } catch (Throwable e) {
-            Fawe.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
-        }
+    private void setupBlockQueue() throws RuntimeException {
+        // If it's going to fail, throw an error now rather than later
+        QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
+        GlobalBlockQueue.IMP.setProvider(provider);
+        HybridPlotManager.REGENERATIVE_CLEAR = false;
+        log.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
+        log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
     }
 
-    private void setupChunkManager() {
-        try {
-            ChunkManager.manager = new FaweChunkManager(ChunkManager.manager);
-            Fawe.debug(" - ChunkManager: " + ChunkManager.manager);
-        } catch (Throwable e) {
-            Fawe.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
-        }
+    private void setupChunkManager() throws RuntimeException {
+        ChunkManager.manager = new FaweChunkManager(ChunkManager.manager);
+        log.debug(" - ChunkManager: " + ChunkManager.manager);
     }
 
-    private void setupSchematicHandler() {
-        try {
-            SchematicHandler.manager = new FaweSchematicHandler();
-            Fawe.debug(" - SchematicHandler: " + SchematicHandler.manager);
-        } catch (Throwable e) {
-            Fawe.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
-        }
+    private void setupSchematicHandler() throws RuntimeException {
+        SchematicHandler.manager = new FaweSchematicHandler();
+        log.debug(" - SchematicHandler: " + SchematicHandler.manager);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
@@ -128,9 +123,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
         PlotArea area = pp.getApplicablePlotArea();
         int min = area != null ? area.MIN_BUILD_HEIGHT : 0;
         int max = area != null ? Math.min(255, area.MAX_BUILD_HEIGHT) : 255;
-        final HashSet<com.boydti.fawe.object.RegionWrapper> faweRegions = new HashSet<>();
+        final HashSet<RegionWrapper> faweRegions = new HashSet<>();
         for (CuboidRegion current : regions) {
-            faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
+            faweRegions.add(new RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
         }
         final CuboidRegion region = regions.iterator().next();
         final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());

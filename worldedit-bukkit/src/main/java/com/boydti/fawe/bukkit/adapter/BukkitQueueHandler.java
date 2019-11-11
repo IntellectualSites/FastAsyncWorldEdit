@@ -1,9 +1,9 @@
 package com.boydti.fawe.bukkit.adapter;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -40,7 +40,7 @@ public class BukkitQueueHandler extends QueueHandler {
                     if (timingsEnabled) {
                         if (alertTimingsChange) {
                             alertTimingsChange = false;
-                            Fawe.debug("Having `parallel-threads` > 1 interferes with the timings.");
+                            getLogger(BukkitQueueHandler.class).debug("Having `parallel-threads` > 1 interferes with the timings.");
                         }
                         fieldTimingsEnabled.set(null, false);
                         methodCheck.invoke(null);

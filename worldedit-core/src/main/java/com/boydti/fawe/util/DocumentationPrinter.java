@@ -94,7 +94,7 @@ public final class DocumentationPrinter {
             stream.print(" - `[arg]` - An optional parameter     \n");
             stream.print(" - `<arg1|arg2>` - Multiple parameters options     \n");
             stream.print(" - `<arg=value>` - Default or suggested value     \n");
-            stream.print(" - `-a` - A command flag e.g. `//<command> -a [flag-value]`");
+            stream.print(" - `-a` - A command flag e.g., `//<command> -a [flag-value]`");
             stream.println();
             stream.print("## See also\n");
             stream.print(" - [Masks](https://github.com/boy0001/FastAsyncWorldedit/wiki/WorldEdit---FAWE-mask-list)\n");

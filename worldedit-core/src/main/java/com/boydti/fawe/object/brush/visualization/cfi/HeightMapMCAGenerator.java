@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
@@ -1982,7 +1984,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public IChunkGet get(int x, int z) {
-        Fawe.debug("Should not be using buffering with HMMG");
+        getLogger(HeightMapMCAGenerator.class).debug("Should not be using buffering with HMMG");
         return new FallbackChunkGet(this, x, z);
     }
 }

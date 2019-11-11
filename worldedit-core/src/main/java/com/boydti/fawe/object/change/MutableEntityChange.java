@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.change;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -15,7 +16,6 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -59,7 +59,7 @@ public class MutableEntityChange implements Change {
             most = ((LongTag) map.get("PersistentIDMSB")).getValue();
             least = ((LongTag) map.get("PersistentIDLSB")).getValue();
         } else {
-            Fawe.debug("Skipping entity without uuid.");
+            getLogger(MutableEntityChange.class).debug("Skipping entity without uuid.");
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) map.get("Pos").getValue();
@@ -74,7 +74,7 @@ public class MutableEntityChange implements Change {
         Map<String, Tag> map = tag.getValue();
         Tag posTag = map.get("Pos");
         if (posTag == null) {
-            Fawe.debug("Missing pos tag: " + tag);
+            getLogger(MutableEntityChange.class).debug("Missing pos tag: " + tag);
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();

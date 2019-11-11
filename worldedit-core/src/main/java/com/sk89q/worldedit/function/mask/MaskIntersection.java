@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.math.BlockVector3;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -150,7 +150,7 @@ public class MaskIntersection extends AbstractMask {
         while (changed |= combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
-            Fawe.debug("Failed optimize MaskIntersection");
+            getLogger(MaskIntersection.class).debug("Failed optimize MaskIntersection");
             for (Mask mask : masks) {
                 System.out.println(mask.getClass() + " / " + mask);
             }

@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.Fawe;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.jnbt.streamer.InfoReader;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
@@ -51,7 +53,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypeSwitch;
 import com.sk89q.worldedit.world.block.BlockTypeSwitchBuilder;
@@ -59,9 +60,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -69,8 +67,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 
 /**
  * Reads schematic files based that are compatible with MCEdit and other editors.
@@ -180,21 +178,12 @@ public class SchematicReader implements ClipboardReader {
 
         StreamDelegate tilesDelegate = schematic.add("TileEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
-        tilesDelegate.withElem(new ValueReader<Map<String, Object>>() {
-            @Override
-            public void apply(int index, Map<String, Object> tile) {
-                tiles.add(tile);
-            }
-        });
+        tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
 
         StreamDelegate entitiesDelegate = schematic.add("Entities");
         entitiesDelegate.withInfo((length, type) -> entities = new ArrayList<>(length));
-        entitiesDelegate.withElem(new ValueReader<Map<String, Object>>() {
-            @Override
-            public void apply(int index, Map<String, Object> entity) {
-                entities.add(entity);
-            }
-        });
+        entitiesDelegate.withElem(
+            (ValueReader<Map<String, Object>>) (index, entity) -> entities.add(entity));
         return root;
     }
 
@@ -370,7 +359,7 @@ public class SchematicReader implements ClipboardReader {
                     Location loc = ent.getEntityLocation(clipboard);
                     clipboard.createEntity(loc, state);
                 } else {
-                    Fawe.debug("Invalid entity: " + id);
+                    getLogger(SchematicReader.class).debug("Invalid entity: " + id);
                 }
             }
         }
@@ -396,10 +385,10 @@ public class SchematicReader implements ClipboardReader {
                 Direction left = facing.getLeft();
                 Direction right = facing.getRight();
 
-                BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
+                BlockState forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
                 BlockType forwardType = forwardBlock.getBlockType();
                 if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
-                    Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
+                    Direction forwardFacing = forwardBlock.getState(PropertyKey.FACING);
                     if (forwardFacing == left) {
                         BlockState rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                         BlockType rightType = rightBlock.getBlockType();

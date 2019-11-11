@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
@@ -18,8 +20,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -607,8 +607,8 @@ public class TextureUtil implements TextureHolder {
                 }
             }
             if (files.length == 0) {
-                Fawe.debug(
-                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.13.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                getLogger(TextureUtil.class).debug(
+                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.14.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);

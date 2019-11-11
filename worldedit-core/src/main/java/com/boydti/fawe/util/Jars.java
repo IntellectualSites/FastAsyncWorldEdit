@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -10,35 +11,36 @@ import java.util.Base64;
 
 public enum Jars {
 
-    MM_v1_7_3("https://github.com/InventivetalentDev/MapManager/releases/download/1.7.3-SNAPSHOT/MapManager_v1.7.3-SNAPSHOT.jar",
-            "M3YLUQZZ66K2DMVDCYLEU38U3ZKRKHRAXQGGPVKFO6G=", 554831),
+    MM_v1_7_3(
+        "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.3-SNAPSHOT/MapManager_v1.7.3-SNAPSHOT.jar",
+        "M3YLUQZZ66K2DMVDCYLEU38U3ZKRKHRAXQGGPVKFO6G=", 554831),
 
-    PL_v3_7_3("https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.3-SNAPSHOT/PacketListenerAPI_v3.7.3-SNAPSHOT.jar",
-            "ETDBRZLN5PRVDFR/MSQDPM6JJER3WQOKHCN8FUXO5ZM=", 167205),
+    PL_v3_7_3(
+        "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.3-SNAPSHOT/PacketListenerAPI_v3.7.3-SNAPSHOT.jar",
+        "ETDBRZLN5PRVDFR/MSQDPM6JJER3WQOKHCN8FUXO5ZM=", 167205),
 
     ;
 
     public final String url;
-    public final int filesize;
+    public final int fileSize;
     public final String digest;
 
     /**
-     * @param url
-     *            Where this jar can be found and downloaded
-     * @param digest
-     *            The SHA-256 hexadecimal digest
-     * @param filesize
-     *            Size of this jar in bytes
+     * @param url Where this jar can be found and downloaded
+     * @param digest The SHA-256 hexadecimal digest
+     * @param fileSize Size of this jar in bytes
      */
-    Jars(String url, String digest, int filesize) {
+    Jars(String url, String digest, int fileSize) {
         this.url = url;
         this.digest = digest.toUpperCase();
-        this.filesize = filesize;
+        this.fileSize = fileSize;
     }
 
-    /** download a jar, verify hash, return byte[] containing the jar */
+    /**
+     * Download a jar, verify hash, return byte[] containing the jar
+     */
     public byte[] download() throws IOException {
-        byte[] jarBytes = new byte[this.filesize];
+        byte[] jarBytes = new byte[this.fileSize];
         URL url = new URL(this.url);
         try (DataInputStream dis = new DataInputStream(url.openConnection().getInputStream())) {
             dis.readFully(jarBytes);
@@ -51,14 +53,13 @@ public enum Jars {
             String jarDigest = Base64.getEncoder().encodeToString(jarDigestBytes).toUpperCase();
 
             if (this.digest.equals(jarDigest)) {
-                Fawe.debug("++++ HASH CHECK ++++");
-                Fawe.debug(this.url);
-                Fawe.debug(this.digest);
+                getLogger(Jars.class).debug("++++ HASH CHECK ++++");
+                getLogger(Jars.class).debug(this.url);
+                getLogger(Jars.class).debug(this.digest);
                 return jarBytes;
             } else {
-
-                Fawe.debug(jarDigest + " | " + url);
-                throw new IllegalStateException("downloaded jar does not match the hash");
+                getLogger(Jars.class).debug(jarDigest + " | " + url);
+                throw new IllegalStateException("The downloaded jar does not match the hash");
             }
         } catch (NoSuchAlgorithmException e) {
             // Shouldn't ever happen, Minecraft won't even run on such a JRE

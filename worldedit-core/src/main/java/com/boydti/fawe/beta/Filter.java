@@ -38,7 +38,7 @@ public interface Filter {
     }
 
     /**
-     * Make changes to the block here<br> - e.g. block.setId(...)<br> - Note: Performance is
+     * Make changes to the block here<br> - e.g., block.setId(...)<br> - Note: Performance is
      * critical here<br>
      *
      * @param block
@@ -50,7 +50,6 @@ public interface Filter {
      * Do something with the IChunk after block filtering.
      *
      * @param chunk
-     * @return
      */
     default void finishChunk(IChunk chunk) {
     }

@@ -103,9 +103,9 @@ public interface ClipboardFormat {
     Set<String> getFileExtensions();
 
     /**
-     * Set the actor's clipboard
+     * Sets the actor's clipboard.
      * @param actor
-     * @param uri
+     * @param uri the URI of the schematic to hold
      * @param inputStream the input stream
      * @throws IOException thrown on I/O error
      */

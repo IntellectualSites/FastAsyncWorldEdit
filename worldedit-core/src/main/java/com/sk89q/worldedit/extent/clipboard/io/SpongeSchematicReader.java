@@ -335,7 +335,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     Location loc = ent.getEntityLocation(clipboard);
                     clipboard.createEntity(loc, state);
                 } else {
-                    Fawe.debug("Invalid entity: " + id);
+                    log.debug("Invalid entity: " + id);
                 }
             }
         }

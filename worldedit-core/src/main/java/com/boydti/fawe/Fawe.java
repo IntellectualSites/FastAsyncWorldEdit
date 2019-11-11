@@ -36,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * [ WorldEdit action]
@@ -62,19 +64,22 @@ import javax.management.NotificationEmitter;
  * - The chunk is modified directly rather than through the API
  * \ Removes some overhead, and means some processing can be done async
  * - Lighting updates are performed on the chunk level rather than for every block
- * \ e.g. A blob of stone: only the visible blocks need to have the lighting calculated
+ * \ e.g., A blob of stone: only the visible blocks need to have the lighting calculated
  * - Block changes are sent with a chunk packet
  * \ A chunk packet is generally quicker to create and smaller for large world edits
  * - No physics updates
  * \ Physics updates are slow, and are usually performed on each block
  * - Block data shortcuts
- * \ Some known blocks don't need to have the data set or accessed (e.g. air is never going to have data)
+ * \ Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
  * - Remove redundant extents
  * \ Up to 11 layers of extents can be removed
  * - History bypassing
  * \ FastMode bypasses history and means blocks in the world don't need to be checked and recorded
  */
 public class Fawe {
+
+    private static final Logger log = LoggerFactory.getLogger(Fawe.class);
+
     /**
      * The FAWE instance;
      */
@@ -183,7 +188,7 @@ public class Fawe {
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
                 WEManager.IMP.managers.add(new PlotSquaredFeature());
-                Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
+                log.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
             try {
                 imp().startMetrics();
@@ -324,7 +329,7 @@ public class Fawe {
     public static void setupInjector() {
         /*
          * Modify the sessions
-         *  - EditSession supports custom queue and a lot of optimizations
+         *  - EditSession supports a custom queue, and a lot of optimizations
          *  - LocalSession supports VirtualPlayers and undo on disk
          */
         if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {

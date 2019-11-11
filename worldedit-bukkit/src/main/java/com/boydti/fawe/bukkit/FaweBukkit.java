@@ -2,9 +2,9 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
-import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
 import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
@@ -54,8 +54,12 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FaweBukkit implements IFawe, Listener {
+
+    private static final Logger log = LoggerFactory.getLogger(FaweBukkit.class);
 
     private final Plugin plugin;
     private VaultUtil vault;
@@ -78,9 +82,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 new BrushListener(plugin);
             } catch (Throwable e) {
-                debug("====== BRUSH LISTENER FAILED ======");
-                e.printStackTrace();
-                debug("===================================");
+                log.debug("Brush Listener Failed", e);
             }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
@@ -220,9 +222,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
                 Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                debug("===== PERSISTENT BRUSH FAILED =====");
-                e.printStackTrace();
-                debug("===================================");
+                log.debug("Persistent Brushes Failed", e);
             }
         }
         return tmp;
@@ -230,13 +230,12 @@ public class FaweBukkit implements IFawe, Listener {
 
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
-     * @return
      */
     @Override
     public void setupVault() {
         try {
             this.vault = new VaultUtil();
-        } catch (final Throwable e) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -270,7 +269,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     /**
-     * A mask manager handles region restrictions e.g. PlotSquared plots / WorldGuard regions
+     * A mask manager handles region restrictions e.g., PlotSquared plots / WorldGuard regions
      */
     @Override
     public Collection<FaweMaskManager> getMaskManagers() {
@@ -280,7 +279,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new Worldguard(worldguardPlugin));
                 managers.add(new WorldguardFlag(worldguardPlugin));
-                Fawe.debug("Attempting to use plugin 'WorldGuard'");
+                log.debug("Attempting to use plugin 'WorldGuard'");
             } catch (Throwable ignored) {
             }
         }
@@ -288,7 +287,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
                 managers.add(new TownyFeature(townyPlugin));
-                Fawe.debug("Attempting to use plugin 'Towny'");
+                log.debug("Attempting to use plugin 'Towny'");
             } catch (Throwable ignored) {
             }
         }
@@ -296,11 +295,11 @@ public class FaweBukkit implements IFawe, Listener {
         if (factionsPlugin != null && factionsPlugin.isEnabled()) {
             try {
                 managers.add(new FactionsFeature(factionsPlugin));
-                Fawe.debug("Attempting to use plugin 'Factions'");
+                log.debug("Attempting to use plugin 'Factions'");
             } catch (Throwable e) {
                 try {
                     managers.add(new FactionsUUIDFeature(factionsPlugin, this));
-                    Fawe.debug("Attempting to use plugin 'FactionsUUID'");
+                    log.debug("Attempting to use plugin 'FactionsUUID'");
                 } catch (Throwable ignored) {
                 }
             }
@@ -309,7 +308,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
-                Fawe.debug("Attempting to use plugin 'Residence'");
+                log.debug("Attempting to use plugin 'Residence'");
             } catch (Throwable ignored) {
             }
         }
@@ -317,7 +316,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
-                Fawe.debug("Attempting to use plugin 'GriefPrevention'");
+                log.debug("Attempting to use plugin 'GriefPrevention'");
             } catch (Throwable ignored) {
             }
         }
@@ -326,7 +325,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (aSkyBlock != null && aSkyBlock.isEnabled()) {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock));
-                Fawe.debug("Attempting to use plugin  'ASkyBlock' found. Using it now.");
+                log.debug("Attempting to use plugin 'ASkyBlock' found. Using it now.");
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -334,7 +333,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
             try {
                 managers.add(new FreeBuildRegion());
-                Fawe.debug("Attempting to use plugin '<internal.freebuild>'");
+                log.debug("Attempting to use plugin '<internal.freebuild>'");
             } catch (Throwable ignored) {
             }
         }

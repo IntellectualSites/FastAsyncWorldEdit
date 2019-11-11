@@ -1,5 +1,8 @@
 package com.boydti.fawe;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -27,10 +30,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +49,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
     IMP
@@ -141,7 +139,7 @@ public enum FaweCache implements Trimable {
             synchronized (this) {
                 pool = REGISTERED_POOLS.get(clazz);
                 if (pool == null) {
-                    Fawe.debug("Not registered " + clazz);
+                    getLogger(FaweCache.class).debug("Not registered " + clazz);
                     Supplier<T> supplier = IOUtil.supplier(clazz::newInstance);
                     pool = supplier::get;
                     REGISTERED_POOLS.put(clazz, pool);
@@ -162,7 +160,7 @@ public enum FaweCache implements Trimable {
             synchronized (this) {
                 cache = REGISTERED_SINGLETONS.get(clazz);
                 if (cache == null) {
-                    Fawe.debug("Not registered " + clazz);
+                    getLogger(FaweCache.class).debug("Not registered " + clazz);
                     cache = new CleanableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
                     REGISTERED_SINGLETONS.put(clazz, cache);
                 }

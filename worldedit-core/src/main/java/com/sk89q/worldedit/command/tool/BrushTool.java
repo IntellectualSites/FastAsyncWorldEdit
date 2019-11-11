@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
@@ -83,7 +84,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 //    TODO:
     // Serialize methods
     // serialize BrushSettings (primary and secondary only if different)
-    // set transient values e.g. context
+    // set transient values e.g., context
 
     public enum BrushAction {
         PRIMARY,
@@ -126,7 +127,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }.getType();
         Map<String, Object> root = gson.fromJson(json, type);
         if (root == null) {
-            Fawe.debug("Failed to load " + json);
+            getLogger(BrushTool.class).debug("Failed to load " + json);
             return new BrushTool();
         }
         Map<String, Object> primary = (Map<String, Object>) root.get("primary");

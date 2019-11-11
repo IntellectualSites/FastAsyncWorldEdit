@@ -386,7 +386,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     /**
      * Create a wrapped set object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - E.g. caching, optimizations, filtering
+     *  - e.g., caching, optimizations, filtering
      * @return
      */
     private IChunkSet newWrappedSet() {
@@ -396,7 +396,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     /**
      * Create a wrapped get object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - E.g. caching, optimizations, filtering
+     *  - e.g., caching, optimizations, filtering
      * @return
      */
     private IChunkGet newWrappedGet() {

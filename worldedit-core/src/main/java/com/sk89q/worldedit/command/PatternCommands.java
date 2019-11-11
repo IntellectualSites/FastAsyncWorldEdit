@@ -67,7 +67,7 @@ import org.enginehub.piston.annotation.param.Arg;
 //        descFooter = "Patterns determine what blocks are placed\n" +
 //        " - Use [brackets] for arguments\n" +
 //        " - Use , to OR multiple\n" +
-//        "e.g. #surfacespread[10][#existing],andesite\n" +
+//        "e.g., #surfacespread[10][#existing],andesite\n" +
 //        "More Info: https://git.io/vSPmA"
 //)
 @CommandContainer//(superTypes = CommandPermissionsConditionGenerator.Registration.class)
@@ -78,7 +78,7 @@ public class PatternCommands {
             aliases = {"#*", "*", ".*"},
             desc = "Use the block that is already there"
     )
-    public Pattern existing(Extent extent, @Arg(name = "properties", desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
+    public Pattern existing(Extent extent, @Arg(desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
         if (properties == null) return new ExistingPattern(extent);
         return new PropertyPattern(extent).addRegex(".*[" + properties + "]");
     }
@@ -119,16 +119,16 @@ public class PatternCommands {
             name = "#anglecolor",
             desc = "A darker block based on the existing terrain angle"
 )
-    public Pattern anglecolor(Extent extent, LocalSession session, @Arg(name = "distance", desc = "int", def = "1") int distanceOpt) {
-        return new AngleColorPattern(extent, session, distanceOpt);
+    public Pattern anglecolor(Extent extent, LocalSession session, @Arg(desc = "int", def = "1") int distance) {
+        return new AngleColorPattern(extent, session, distance);
     }
 
     @Command(
             name = "#angledata",
             desc = "Block data based on the existing terrain angle"
     )
-    public Pattern angledata(Extent extent, @Arg(name = "distance", desc = "int", def = "1") int distanceOpt) {
-        return new DataAnglePattern(extent, distanceOpt);
+    public Pattern angledata(Extent extent, @Arg(desc = "int", def = "1") int distance) {
+        return new DataAnglePattern(extent, distance);
     }
 
     @Command(
@@ -153,7 +153,7 @@ public class PatternCommands {
             name = "#desaturate",
             desc = "Desaturated color of the existing block"
 )
-    public Pattern desaturate(Extent extent, LocalSession session, @Arg(name = "percent", desc = "double", def = "100") double percent) {
+    public Pattern desaturate(Extent extent, LocalSession session, @Arg(desc = "double", def = "100") double percent) {
         return new DesaturatePattern(extent, percent / 100d, session);
     }
 
@@ -177,7 +177,7 @@ public class PatternCommands {
             name = "#fullcopy",
             desc = "Places your full clipboard at each block"
 )
-    public Pattern fullcopy(Player player, Extent extent, LocalSession session, @Arg(name = "location", desc = "String", def = "#copy") String location, @Arg(name = "rotate", desc = "boolean", def = "false") boolean rotate, @Arg(name = "flip", desc = "boolean", def = "false") boolean flip) throws EmptyClipboardException, InputParseException, IOException {
+    public Pattern fullcopy(Player player, Extent extent, LocalSession session, @Arg(desc = "String", def = "#copy") String location, @Arg(desc = "boolean", def = "false") boolean rotate, @Arg(desc = "boolean", def = "false") boolean flip) throws EmptyClipboardException, InputParseException, IOException {
         List<ClipboardHolder> clipboards;
         switch (location.toLowerCase()) {
             case "#copy":
@@ -313,14 +313,14 @@ public class PatternCommands {
             name = "#offset",
             desc = "Offset a pattern"
 )
-    public Pattern offset(@Arg(name = "x", desc = "x offset") double x, @Arg(name = "y", desc = "y offset") double y, @Arg(name = "z", desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
+    public Pattern offset(@Arg(desc = "x offset") double x, @Arg(desc = "y offset") double y, @Arg(desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
 
         return new OffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
     @Command(
             name = "#surfacespread",
-            desc = "Applies to only blocks on a surface. Selects a block from provided pattern with a given ranomized offset `[0, <distance>)`. e.g. Use `#existing` to randomly offset blocks in the world, or `#copy` to offset blocks in your clipboard"
+            desc = "Applies to only blocks on a surface. Selects a block from provided pattern with a given randomized offset `[0, <distance>)`. e.g., Use `#existing` to randomly offset blocks in the world, or `#copy` to offset blocks in your clipboard"
 )
     public Pattern surfacespread(@Arg(desc = "spread distance (blocks)") double distance, @Arg(desc = "Pattern")Pattern pattern) {
 
@@ -331,7 +331,7 @@ public class PatternCommands {
             name = "#solidspread",
             desc = "Randomly spread solid blocks"
 )
-    public Pattern solidspread(@Arg(name = "x", desc = "x offset") double x, @Arg(name = "y", desc = "y offset") double y, @Arg(name = "z", desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
+    public Pattern solidspread(@Arg(desc = "x offset") double x, @Arg(desc = "y offset") double y, @Arg(desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
 
         return new SolidRandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
@@ -341,7 +341,7 @@ public class PatternCommands {
             aliases = {"#randomoffset"},
             desc = "Randomly spread blocks"
 )
-    public Pattern spread(@Arg(name = "x", desc = "x offset") double x, @Arg(name = "y", desc = "y offset") double y, @Arg(name = "z", desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
+    public Pattern spread(@Arg(desc = "x offset") double x, @Arg(desc = "y offset") double y, @Arg(desc = "z offset") double z, @Arg(desc = "Pattern")Pattern pattern) {
 
         return new RandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }

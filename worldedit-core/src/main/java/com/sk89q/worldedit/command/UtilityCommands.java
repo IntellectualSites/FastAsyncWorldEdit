@@ -221,7 +221,7 @@ public class UtilityCommands {
         descFooter = "Patterns determine what blocks are placed\n" +
             " - Use [brackets] for arguments\n" +
             " - Use , to OR multiple\n" +
-            "e.g. #surfacespread[10][#existing],andesite\n" +
+            "e.g., #surfacespread[10][#existing],andesite\n" +
             "More Info: https://git.io/vSPmA"
     )
     @CommandQueued(false)
@@ -237,7 +237,7 @@ public class UtilityCommands {
             " - Use [brackets] for arguments\n" +
             " - Use , to OR multiple\n" +
             " - Use & to AND multiple\n" +
-            "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
+            "e.g., >[stone,dirt],#light[0][5],$jungle\n" +
             "More Info: https://git.io/v9r4K"
     )
     @CommandQueued(false)

@@ -19,7 +19,8 @@
 
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
-import com.boydti.fawe.Fawe;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
@@ -67,6 +68,20 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.BlockStateBoolean;
@@ -130,23 +145,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -197,7 +195,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         try {
             tileEntity.load(tag);
         } catch (Throwable e) {
-            Fawe.debug("Invalid tag " + tag + " | " + tileEntity);
+            //Fawe.debug("Invalid tag " + tag + " | " + tileEntity);
         }
     }
 
@@ -419,7 +417,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
             worldServer.addEntity(createdEntity, SpawnReason.CUSTOM);
             return createdEntity.getBukkitEntity();
         } else {
-            Fawe.debug("Invalid entity " + state.getType().getId());
+            logger.debug("Invalid entity " + state.getType().getId());
             return null;
         }
     }

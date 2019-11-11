@@ -1,37 +1,33 @@
 package com.boydti.fawe.beta.implementation.queue;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IQueueChunk;
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.IChunkCache;
-import com.boydti.fawe.beta.implementation.chunk.NullChunk;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
+import com.boydti.fawe.beta.implementation.chunk.NullChunk;
 import com.boydti.fawe.beta.implementation.chunk.ReferenceChunk;
-import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
+import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.extent.Extent;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
  * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
- * chunks (that has to implemented by the platform e.g. Bukkit)
+ * chunks (that has to implemented by the platform e.g., Bukkit)
  * <p>
  * This queue is reusable {@link #init(IChunkCache)}
  */

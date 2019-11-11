@@ -130,8 +130,8 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Actor actor, LocalSession session, EditSession editSession, String argStr, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold, @Arg(name = "dimensions", desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
+    public void image(Actor actor, LocalSession session, EditSession editSession, String argStr, @Arg(desc = "boolean", def = "true") boolean randomize,
+                      @Arg(desc = "TODO", def = "100") int threshold, @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(argStr);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com") && !url.getHost().equalsIgnoreCase("empcraft.com")) {
@@ -171,7 +171,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Arg(name="size", desc="Ore vein size") @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
+    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Arg(desc="Ore vein size") @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
         actor.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
             BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
@@ -190,7 +190,7 @@ public class GenerationCommands {
         BlockVector2 radius,
                     @Arg(desc = "The height of the cylinder", def = "1")
                                 int height,
-                    @Range(min = 1) @Arg(name = "thickness", desc = "double", def = "1") double thickness, InjectedValueAccess context) throws WorldEditException {
+                    @Range(min = 1) @Arg(desc = "double", def = "1") double thickness, InjectedValueAccess context) throws WorldEditException {
         double max = MathMan.max(radius.getBlockX(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
@@ -274,15 +274,15 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
     public int forestGen(Actor actor, LocalSession session, EditSession editSession,
-                         @Arg(name = "size", desc = "The size of the forest, in blocks", def = "10")
-                             int sizeOpt,
+                         @Arg(desc = "The size of the forest, in blocks", def = "10")
+                             int size,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
                          @Range(min = 0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         density /= 100;
-        int affected = editSession.makeForest(session.getPlacementPosition(actor), sizeOpt, density, type);
+        int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
         actor.print(affected + " trees created.");
         return affected;
     }
@@ -294,8 +294,8 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
     public int pumpkins(Actor actor, LocalSession session, EditSession editSession,
-                        @Arg(name = "size", desc = "The size of the patch", def = "10")
-                            int sizeOpt,
+                        @Arg(desc = "The size of the patch", def = "10")
+                            int size,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
                         @Arg(desc = "//TODO ", def = "0.02")

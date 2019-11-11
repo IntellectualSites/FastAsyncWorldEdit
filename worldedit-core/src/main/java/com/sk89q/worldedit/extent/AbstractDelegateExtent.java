@@ -20,14 +20,15 @@
 package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
+import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -81,6 +82,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         Queue based methods
         TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
          */
+    @Override
     public boolean isQueueEnabled() {
         return extent.isQueueEnabled();
     }
@@ -97,7 +99,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
             Extent next = ((AbstractDelegateExtent) extent).getExtent();
             new ExtentTraverser(this).setNext(next);
         } else {
-            Fawe.debug("Cannot disable queue");
+            getLogger(AbstractDelegateExtent.class).debug("Cannot disable queue");
         }
     }
 
@@ -197,9 +199,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return extent.setBiome(position.getX(), 0, position.getZ(), biome);
     }
 
-    /*
-        Light
-         */
+    @Override
     public int getSkyLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getSkyLight(x, y, z);
@@ -207,12 +207,14 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return 0;
     }
 
+    @Override
     public int getBlockLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBlockLight(x, y, z);
         }
         return getBrightness(x, y, z);
     }
+    @Override
     public int getOpacity(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getOpacity(x, y, z);

@@ -80,7 +80,7 @@ public class TaskBuilder extends Metadatable {
 
     /**
      * Run some sync tasks in parallel<br>
-     * - All sync parallel tasks which occur directly after each other will be run at the same time
+     * - All sync parallel tasks, which occur directly after each other will be run at the same time
      *
      * @param run
      * @return this
@@ -200,7 +200,7 @@ public class TaskBuilder extends Metadatable {
 
     /**
      * Have all async tasks run on a new thread<br>
-     * - As opposed to trying to using the current thread
+     * - As opposed to trying to use the current thread
      */
     public void buildAsync() {
         TaskManager.IMP.async(this::build);
