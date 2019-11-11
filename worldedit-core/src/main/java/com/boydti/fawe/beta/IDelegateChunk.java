@@ -116,8 +116,8 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
     }
 
     @Override
-    default void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
-        getParent().filterBlocks(filter, block, region);
+    default void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
+        getParent().filterBlocks(filter, block, region, full);
     }
 
     @Override

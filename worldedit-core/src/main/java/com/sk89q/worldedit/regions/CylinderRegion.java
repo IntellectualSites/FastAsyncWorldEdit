@@ -406,15 +406,15 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
-        final IChunkGet get, final IChunkSet set) {
+        final IChunkGet get, final IChunkSet set, boolean full) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;
         int tcz = bcz + 15;
         if (contains(bcx, bcz) && contains(tcx, tcz)) {
-            filter(chunk, filter, block, get, set, minY, maxY);
+            filter(chunk, filter, block, get, set, minY, maxY, full);
             return;
         }
-        super.filter(chunk, filter, block, get, set);
+        super.filter(chunk, filter, block, get, set, full);
     }
 }

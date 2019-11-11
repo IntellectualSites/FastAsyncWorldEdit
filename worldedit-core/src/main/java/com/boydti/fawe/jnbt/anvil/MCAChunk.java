@@ -562,14 +562,14 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         try {
             if (region != null) {
-                region.filter(this, filter, block, this, this);
+                region.filter(this, filter, block, this, this, full);
             } else {
                 block = block.init(chunkX, chunkZ, this);
                 for (int layer = 0; layer < 16; layer++) {
-                    if (!this.hasSection(layer) || !filter.appliesLayer(this, layer)) {
+                    if ((!full && !this.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
                         continue;
                     }
                     block.init(this, this, layer);

@@ -39,6 +39,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         super("PlotSquared");
         Fawe.debug("Optimizing PlotSquared");
         if (com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_HOOK) {
+            Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             setupBlockQueue();
             setupSchematicHandler();
             setupChunkManager();

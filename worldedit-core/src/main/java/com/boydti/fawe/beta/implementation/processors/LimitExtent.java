@@ -449,11 +449,11 @@ public class LimitExtent extends PassthroughExtent {
     }
 
     @Override
-    public <T extends Filter> T apply(Region region, T filter) {
+    public <T extends Filter> T apply(Region region, T filter, boolean full) {
         limit.THROW_MAX_CHECKS(region.getArea());
         limit.THROW_MAX_CHANGES(region.getArea());
         try {
-            return getExtent().apply(region, filter);
+            return getExtent().apply(region, filter, full);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;

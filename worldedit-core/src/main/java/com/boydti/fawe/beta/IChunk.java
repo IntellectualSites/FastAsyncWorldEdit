@@ -58,7 +58,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      * @param block The filter block
      * @param region The region allowed to filter (may be null)
      */
-    void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
+    void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full);
 
 //    /**
 //     * Flood through all the blocks in the chunk

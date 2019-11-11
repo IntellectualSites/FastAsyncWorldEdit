@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.annotation.Selection;
@@ -55,7 +56,7 @@ public class Bindings {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
             key = Key.of(ret, annotation);
         } else {
-            System.out.println("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
+            Fawe.debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
             return false;
         }
 

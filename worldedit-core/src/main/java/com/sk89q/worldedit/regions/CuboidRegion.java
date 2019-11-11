@@ -671,14 +671,14 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+    public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
         block = block.init(chunkX, chunkZ, get);
 
 
         if ((minX + 15) >> 4 <= chunkX && (maxX - 15) >> 4 >= chunkX && (minZ + 15) >> 4 <= chunkZ && (maxZ - 15) >> 4 >= chunkZ) {
-            filter(chunk, filter, block, get, set, minY, maxY);
+            filter(chunk, filter, block, get, set, minY, maxY, full);
             return;
         }
         int localMinX = Math.max(minX, chunkX << 4) & 15;
@@ -692,19 +692,19 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         int minSection = minY >> 4;
         int maxSection = maxY >> 4;
         if (minSection == maxSection) {
-            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ, full);
             return;
         }
         if (yStart != 0) {
-            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, 15, localMaxZ);
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, 15, localMaxZ, full);
             minSection++;
         }
         if (yEnd != 15) {
-            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ);
+            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ, full);
             maxSection--;
         }
         for (int layer = minSection; layer <= maxSection; layer++) {
-            filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+            filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ, full);
         }
     }
 

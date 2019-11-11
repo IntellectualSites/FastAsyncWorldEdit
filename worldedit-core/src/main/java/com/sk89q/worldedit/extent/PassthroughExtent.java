@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.sk89q.jnbt.CompoundTag;
@@ -249,5 +250,15 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public boolean isWorld() {
         return getExtent().isWorld();
+    }
+
+    @Override
+    public <T extends Filter> T apply(Region region, T filter, boolean full) {
+        return getExtent().apply(region, filter, full);
+    }
+
+    @Override
+    public <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
+        return getExtent().apply(positions, filter);
     }
 }

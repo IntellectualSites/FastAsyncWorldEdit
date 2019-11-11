@@ -652,7 +652,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return this;
     }
 
-    default <T extends Filter> T apply(Region region, T filter) {
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
         return apply((Iterable<BlockVector3>) region, filter);
     }
 

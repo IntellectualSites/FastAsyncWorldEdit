@@ -51,7 +51,7 @@ public enum NullChunk implements IQueueChunk {
     }
 
     @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
 
     }
 

@@ -172,7 +172,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 //    }
 
     @Override
-    default <T extends Filter> T apply(Region region, T filter) {
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
         if (region.equals(getRegion())) {
             return apply(this, filter);
         } else {

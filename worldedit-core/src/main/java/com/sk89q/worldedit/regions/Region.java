@@ -203,53 +203,53 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         return getMaximumPoint().getY();
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
         int minSection = Math.max(0, getMinimumY() >> 4);
         int maxSection = Math.min(15, getMaximumY() >> 4);
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
             block = block.init(get, set, layer);
             block.filter(filter, this);
         }
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, final int minY, final int maxY) {
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, final int minY, final int maxY, boolean full) {
         int minSection = minY >> 4;
         int maxSection = maxY >> 4;
         int yStart = (minY & 15);
         int yEnd = (maxY & 15);
         if (minSection == maxSection) {
-            filter(chunk, filter, block, get, set, minSection, yStart, yEnd);
+            filter(chunk, filter, block, get, set, minSection, yStart, yEnd, full);
             return;
         }
         if (yStart != 0) {
-            filter(chunk, filter, block, get, set, minSection, yStart, 15);
+            filter(chunk, filter, block, get, set, minSection, yStart, 15, full);
             minSection++;
         }
         if (yEnd != 15) {
-            filter(chunk, filter, block, get, set, minSection, 0, yEnd);
+            filter(chunk, filter, block, get, set, minSection, 0, yEnd, full);
             maxSection--;
         }
         for (int layer = minSection; layer <= maxSection; layer++) {
-            filter(chunk, filter, block, get, set, layer);
+            filter(chunk, filter, block, get, set, layer, full);
         }
         return;
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer) {
-        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, boolean full) {
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
         block = block.init(get, set, layer);
         block.filter(filter);
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean full) {
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
         block = block.init(get, set, layer);
         block.filter(filter, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd) {
-        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd, boolean full) {
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
         block = block.init(get, set, layer);
         block.filter(filter, yStart, yEnd);
     }

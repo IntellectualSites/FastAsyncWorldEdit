@@ -144,7 +144,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      */
     boolean isEmpty();
 
-    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ) {
+    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ, boolean full) {
         if (!filter.appliesChunk(chunkX, chunkZ)) {
             return block;
         }
@@ -158,18 +158,18 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
             if (block == null) {
                 block = this.initFilterBlock();
             }
-            chunk.filterBlocks(filter, block, region);
+            chunk.filterBlocks(filter, block, region, full);
         }
         this.submit(chunk);
         return block;
     }
 
     @Override
-    default <T extends Filter> T apply(Region region, T filter) {
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
         final Set<BlockVector2> chunks = region.getChunks();
         ChunkFilterBlock block = null;
         for (BlockVector2 chunk : chunks) {
-            block = apply(block, filter, region, chunk.getX(), chunk.getZ());
+            block = apply(block, filter, region, chunk.getX(), chunk.getZ(), full);
         }
         flush();
         return filter;

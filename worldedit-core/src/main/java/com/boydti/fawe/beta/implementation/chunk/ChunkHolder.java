@@ -310,18 +310,19 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {
             if (region != null) {
-                region.filter(this, filter, block, get, set);
+                region.filter(this, filter, block, get, set, full);
             } else {
                 block = block.init(chunkX, chunkZ, get);
                 for (int layer = 0; layer < 16; layer++) {
-                    if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) {
+                    if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
                         continue;
                     }
+                    System.out.println("Apply layer " + full);
                     block.init(get, set, layer);
                     block.filter(filter);
                 }

@@ -91,7 +91,7 @@ public class ProvideBindings extends Bindings {
     }
 
     @Binding
-    public Extent getExtent(Actor actor, InjectedValueAccess access, InjectedValueStore store) {
+    public Extent getExtent(Actor actor, InjectedValueAccess access) {
         Optional<EditSession> editSessionOpt = access.injectedValue(Key.of(EditSession.class));
         if (editSessionOpt.isPresent()) {
             return editSessionOpt.get();
@@ -102,7 +102,10 @@ public class ProvideBindings extends Bindings {
         }
         Player plr = getPlayer(actor);
         EditSession editSession = editSession(getLocalSession(plr), plr);
-        store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));
+        if (access instanceof InjectedValueStore) {
+            InjectedValueStore store = (InjectedValueStore) access;
+            store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));
+        }
         return editSession;
     }
 }

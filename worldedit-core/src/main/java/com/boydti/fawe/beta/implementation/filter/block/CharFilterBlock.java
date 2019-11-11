@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation.filter.block;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
 import com.boydti.fawe.beta.Flood;
@@ -65,7 +66,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         FilterBlockMask mask) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
-        if (init(iget, iset, layer) != null) {
+        if (init(iget, iset, layer) != null) { // TODO replace with hasSection
             while ((index = flood.poll()) != -1) {
                 x = index & 15;
                 z = index >> 4 & 15;
@@ -89,10 +90,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
         if (!get.hasSection(layer)) {
-            return null;
+            getArr = FaweCache.IMP.EMPTY_CHAR_4096;
+        } else {
+            getArr = get.sections[layer].get(get, layer);
         }
         this.set = iset;
-        getArr = get.sections[layer].get(get, layer);
         if (set.hasSection(layer)) {
             setArr = set.load(layer);
             delegate = FULL;
