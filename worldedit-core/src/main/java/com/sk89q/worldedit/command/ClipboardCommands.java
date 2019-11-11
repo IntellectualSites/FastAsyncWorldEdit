@@ -191,9 +191,8 @@ public class ClipboardCommands {
         session.setClipboard(null);
         ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
 
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
-        clipboard.setOrigin(session.getPlacementPosition(actor));
-        session.setClipboard(new ClipboardHolder(clipboard));
+        lazyClipboard.setOrigin(session.getPlacementPosition(actor));
+        session.setClipboard(new ClipboardHolder(lazyClipboard));
         BBC.COMMAND_COPY.send(actor, region.getArea());
         if (!actor.hasPermission("fawe.tips")) {
             BBC.TIP_PASTE.or(BBC.TIP_LAZYCOPY, BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
@@ -226,9 +225,8 @@ public class ClipboardCommands {
 //        session.setClipboard(null);
 //
 //        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
-//        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
 //        clipboard.setOrigin(session.getPlacementPosition(actor));
-//        session.setClipboard(new ClipboardHolder(clipboard));
+//        session.setClipboard(new ClipboardHolder(lazyClipboard));
 //        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
 //    }
 
@@ -462,6 +460,7 @@ public class ClipboardCommands {
 
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
+
         Operation operation = holder
                 .createPaste(editSession)
                 .to(to)

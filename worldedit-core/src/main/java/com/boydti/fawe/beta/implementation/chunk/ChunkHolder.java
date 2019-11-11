@@ -322,7 +322,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
                     if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
                         continue;
                     }
-                    System.out.println("Apply layer " + full);
                     block.init(get, set, layer);
                     block.filter(filter);
                 }

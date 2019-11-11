@@ -23,22 +23,16 @@ public class WorldCutClipboard extends WorldCopyClipboard {
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        int xx = mx + x;
-        int yy = my + y;
-        int zz = mz + z;
         Extent extent = getExtent();
-        BaseBlock block = extent.getFullBlock(xx, yy, zz);
-        extent.setBlock(xx, yy, zz, BlockTypes.AIR.getDefaultState());
+        BaseBlock block = extent.getFullBlock(x, y, z);
+        extent.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
         return block;
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        int xx = mx + x;
-        int yy = my + y;
-        int zz = mz + z;
         Extent extent = getExtent();
-        BlockState block = extent.getBlock(xx, yy, zz);
+        BlockState block = extent.getBlock(x, y, z);
         extent.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
         return block;
     }

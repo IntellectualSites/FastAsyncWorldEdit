@@ -60,6 +60,7 @@ public class ProvideBindings extends Bindings {
     public EditSession editSession(LocalSession localSession, Player player) {
         EditSession editSession = localSession.createEditSession(player);
         editSession.enableStandardMode();
+        Request.request().setEditSession(editSession);
         return editSession;
     }
 

@@ -293,6 +293,7 @@ public final class PlatformCommandManager {
                             .map(actor -> {
                                 EditSession editSession = localSession.createEditSession(actor);
                                 editSession.enableStandardMode();
+                                Request.request().setEditSession(editSession);
                                 return editSession;
                             });
                 });

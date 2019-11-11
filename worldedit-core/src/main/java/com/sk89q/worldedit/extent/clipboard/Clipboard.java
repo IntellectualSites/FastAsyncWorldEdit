@@ -51,6 +51,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
@@ -69,7 +70,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Specifies an object that implements something suitable as a "clipboard."
  */
 public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
-    public static Clipboard create(Region region) {
+    static Clipboard create(Region region) {
         checkNotNull(region);
         checkNotNull(region.getWorld(),
                 "World cannot be null (use the other constructor for the region)");
@@ -78,7 +79,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return ReadOnlyClipboard.of(session, region);
     }
 
-    public static Clipboard create(BlockVector3 size, UUID uuid) {
+    static Clipboard create(BlockVector3 size, UUID uuid) {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             return new DiskOptimizedClipboard(size, uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
@@ -323,7 +324,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
-        Region region = this.getRegion().clone();
         final BlockVector3 origin = this.getOrigin();
 
         final boolean copyBiomes = this.hasBiomes();
@@ -332,33 +332,21 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         final int rely = to.getBlockY() - origin.getBlockY();
         final int relz = to.getBlockZ() - origin.getBlockZ();
 
-        Operation visitor = new RegionVisitor(region, new RegionFunction() {
-            //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
-            MutableBlockVector2 mpos2d = new MutableBlockVector2();
-
-            {
-                mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        MutableBlockVector2 mpos2d = new MutableBlockVector2();
+        mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        for (BlockVector3 pos : this) {
+            BaseBlock block = pos.getFullBlock(this);
+            int xx = pos.getX() + relx;
+            int zz = pos.getZ() + relz;
+            if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
+                mpos2d.setComponents(xx, zz);
+                extent.setBiome(mpos2d, Clipboard.this.getBiome(pos.toBlockVector2()));
             }
-
-            @Override
-            public boolean apply(BlockVector3 mutable) throws WorldEditException {
-                BlockState block = getBlock(mutable);
-                int xx = mutable.getBlockX() + relx;
-                int zz = mutable.getBlockZ() + relz;
-                if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
-                    mpos2d.setComponents(xx, zz);
-//                        extent.setBiome(mpos2d, clipboard.getBiome(mpos2d_2.setComponents(mutable.getBlockX(), mutable.getBlockZ())));
-                    extent.setBiome(mpos2d, Clipboard.this
-                            .getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
-                }
-                if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
-                    return false;
-                }
-                extent.setBlock(xx, mutable.getBlockY() + rely, zz, block);
-                return false;
+            if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
+                continue;
             }
-        });
-        Operations.completeBlindly(visitor);
+            extent.setBlock(xx, pos.getY() + rely, zz, block);
+        }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
         final int entityOffsetX = to.getBlockX() - origin.getBlockX();
         final int entityOffsetY = to.getBlockY() - origin.getBlockY();

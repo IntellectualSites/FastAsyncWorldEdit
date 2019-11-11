@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 
 public class WorldCopyClipboard extends ReadOnlyClipboard {
 
-    public final int mx, my, mz;
     private final boolean hasBiomes;
     private final boolean hasEntities;
     private Extent extent;
@@ -28,10 +27,6 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         super(region);
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
-        final BlockVector3 origin = region.getMinimumPoint();
-        this.mx = origin.getBlockX();
-        this.my = origin.getBlockY();
-        this.mz = origin.getBlockZ();
         this.supplier = supplier;
     }
 
@@ -46,17 +41,17 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return getExtent().getFullBlock(mx + x, my + y, mz + z);
+        return getExtent().getFullBlock(x, y, z);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return getExtent().getBlock(mx + x, my + y, mz + z);
+        return getExtent().getBlock(x, y, z);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return getExtent().getBiomeType(mx + x, mz + z);
+        return getExtent().getBiomeType(x, z);
     }
 
     @Override

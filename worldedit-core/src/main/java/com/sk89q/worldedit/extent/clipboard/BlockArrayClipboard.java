@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.object.clipboard.DelegateClipboard;
+import com.google.common.collect.Iterators;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -29,6 +29,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.OffsetBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -39,7 +41,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -68,16 +69,12 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
      */
     public BlockArrayClipboard(Region region, UUID clipboardId) {
         this(region, Clipboard.create(region.getDimensions(), clipboardId));
-        checkNotNull(region);
-        this.region = region.clone();
-        this.offset = region.getMinimumPoint();
     }
 
     public BlockArrayClipboard(Region region, Clipboard clipboard) {
         super(clipboard);
         checkNotNull(region);
-        this.region = region.clone();
-        this.offset = region.getMinimumPoint();
+        setRegion(region);
     }
 
     @Override
@@ -87,6 +84,7 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
 
     public void setRegion(Region region) {
         this.region = region;
+        this.offset = region.getMinimumPoint();
     }
 
     @Override
@@ -237,17 +235,21 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        return getParent().iterator();
+        OffsetBlockVector3 mutable = new OffsetBlockVector3(offset);
+        return Iterators.transform(getParent().iterator(), mutable::init);
     }
 
     @Override
     public Iterator<BlockVector2> iterator2d() {
-        return getParent().iterator2d();
+        MutableBlockVector2 mutable = new MutableBlockVector2();
+        return Iterators.transform(getParent().iterator2d(), input ->
+        mutable.setComponents(input.getX() + offset.getX(), input.getZ() + offset.getZ()));
     }
 
     @Override
     public Iterator<BlockVector3> iterator(Order order) {
-        return getParent().iterator(order);
+        OffsetBlockVector3 mutable = new OffsetBlockVector3(offset);
+        return Iterators.transform(getParent().iterator(order), mutable::init);
     }
 
     /**
