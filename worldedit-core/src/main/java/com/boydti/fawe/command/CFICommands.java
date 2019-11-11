@@ -75,7 +75,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -88,7 +87,7 @@ import org.jetbrains.annotations.NotNull;
 public class CFICommands {
 
     private final WorldEdit worldEdit;
-    private final @NonNull TextComponent doubleNewLine = TextComponent.of("\n\n");
+    private final TextComponent doubleNewLine = TextComponent.of("\n\n");
 
     /**
      * Create a new instance.
@@ -111,7 +110,7 @@ public class CFICommands {
             desc = "Start CFI with a height map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void heightmap(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "yscale", desc = "double", def = "1") double yscale) {
+    public void heightmap(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "double", def = "1") double yscale) {
         if (yscale != 0) {
             int[] raw = ((DataBufferInt) image.load().getRaster().getDataBuffer()).getData();
             int[] table = IntStream.range(0, 256).map(i -> Math.min(255, (int) (i * yscale)))

@@ -502,9 +502,12 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.scatter")
     public void scatterBrush(InjectedValueAccess context, Pattern fill,
-        @Arg(desc = "Expression", def = "5") Expression radius,
-        @Arg(desc = "double", def = "5") double points,
-        @Arg(desc = "double", def = "1") double distance,
+        @Arg(desc = "Expression", def = "5")
+            Expression radius,
+        @Arg(desc = "double", def = "5")
+            double points,
+        @Arg(desc = "double", def = "1")
+            double distance,
         @Switch(name = 'o', desc = "Overlay the block") boolean overlay) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush;
@@ -585,14 +588,18 @@ public class BrushCommands {
             desc = "Run commands at random points on a surface",
             descFooter =
                     "Run commands at random points on a surface\n" +
-                            " - The scatter radius is the min distance between each point\n" +
                             " - Your selection will be expanded to the specified size around each point\n" +
                             " - Placeholders: {x}, {y}, {z}, {world}, {size}"
     )
     @CommandPermissions("worldedit.brush.scattercommand")
     public void scatterCommandBrush(Player player, InjectedValueAccess context,
-        @Arg(desc = "Expression") Expression radius, double points,
-        double distance, List<String> commandStr) throws WorldEditException {
+        @Arg(desc = "The minimum distance between each point")
+            Expression radius,
+        @Arg(desc = "double", def = "1")
+            double points,
+        @Arg(desc = "double", def = "1")
+            double distance,
+        List<String> commandStr) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(context,
             new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " ")))

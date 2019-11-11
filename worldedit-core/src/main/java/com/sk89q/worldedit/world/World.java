@@ -295,14 +295,13 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     /**
-     * Refresh a specific chunk with a bitMask (0 = default, 65535 = all block sections)
+     * Refresh a specific chunk
      * Note: only 0 is guaranteed to send all tiles / entities
      * Note: Only 65535 is guaranteed to send all blocks
      * @param chunkX
      * @param chunkZ
-     * @param bitMask
      */
-    void refreshChunk(final int X, final int Z);
+    void refreshChunk(final int chunkX, final int chunkZ);
 
     @Override
     IChunkGet get(int x, int z);

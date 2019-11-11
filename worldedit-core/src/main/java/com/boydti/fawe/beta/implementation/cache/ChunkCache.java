@@ -22,8 +22,6 @@ public class ChunkCache<T extends Trimable> implements IChunkCache<T> {
     /**
      * Get or create the IGetBlocks
      *
-     * @param index    chunk index {@link com.boydti.fawe.util.MathMan#pairInt(int, int)}
-     * @param provider used to create if it isn't already cached
      * @return cached IGetBlocks
      */
     @Override

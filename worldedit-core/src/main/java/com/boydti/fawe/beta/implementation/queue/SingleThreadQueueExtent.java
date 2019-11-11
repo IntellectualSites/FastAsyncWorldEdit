@@ -29,7 +29,7 @@ import java.util.concurrent.Future;
  * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
  * chunks (that has to implemented by the platform e.g., Bukkit)
  * <p>
- * This queue is reusable {@link #init(IChunkCache)}
+ * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)} }
  */
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
@@ -103,7 +103,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     /**
      * Initialize the queue
      *
-     * @param cache
      */
     @Override
     public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
@@ -146,7 +145,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * Submit without first checking that it has been removed from the chunk map
      *
      * @param chunk
-     * @param <T>
      * @return
      */
     private <V extends Future<V>> V submitUnchecked(IQueueChunk chunk) {

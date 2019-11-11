@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 
 /**
- * Records changes made through the {@link #set(int, int, int, int)} method<br/>
+ * Records changes made through the {@link #set(int, int, int, char)} method<br/>
  * Changes are not recorded if you edit the raw data
  */
 public final class DifferentialBlockBuffer implements DifferentialCollection<char[][][][][]> {
