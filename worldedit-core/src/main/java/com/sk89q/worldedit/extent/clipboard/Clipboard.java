@@ -41,6 +41,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -153,6 +154,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     default int getVolume() {
         return getWidth() * getHeight() * getLength();
+    }
+
+    default Iterator<BlockVector3> iterator(Order order) {
+        return order.create(getRegion());
     }
 
     default Iterator<BlockVector3> iterator() {

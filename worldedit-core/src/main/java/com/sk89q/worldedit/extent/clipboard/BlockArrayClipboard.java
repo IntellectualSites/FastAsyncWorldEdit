@@ -19,12 +19,14 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.object.clipboard.DelegateClipboard;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -38,6 +40,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -230,6 +233,21 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
         x -= offset.getX();
         z -= offset.getZ();
         return getParent().getBiomeType(x, z);
+    }
+
+    @Override
+    public Iterator<BlockVector3> iterator() {
+        return getParent().iterator();
+    }
+
+    @Override
+    public Iterator<BlockVector2> iterator2d() {
+        return getParent().iterator2d();
+    }
+
+    @Override
+    public Iterator<BlockVector3> iterator(Order order) {
+        return getParent().iterator(order);
     }
 
     /**

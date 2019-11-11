@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.FaweOutputStream;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,7 +35,9 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -55,6 +58,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -144,8 +148,18 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             Arrays.fill(palette, Character.MAX_VALUE);
             int paletteMax = 0;
             int numTiles = 0;
-            for (BlockVector3 pos : clipboard) {
-                BaseBlock block = pos.getFullBlock(clipboard);
+            Clipboard finalClipboard;
+            if (clipboard instanceof BlockArrayClipboard) {
+                finalClipboard = ((BlockArrayClipboard) clipboard).getParent();
+            } else {
+                finalClipboard = clipboard;
+            }
+            System.out.println(finalClipboard.getClass());
+            System.out.println(finalClipboard.getRegion());
+            Iterator<BlockVector3> iterator = finalClipboard.iterator(Order.YZX);
+            while (iterator.hasNext()) {
+                BlockVector3 pos = iterator.next();
+                BaseBlock block = pos.getFullBlock(finalClipboard);
                 CompoundTag nbt = block.getNbtData();
                 if (nbt != null) {
                     Map<String, Tag> values = nbt.getValue();
@@ -208,12 +222,12 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 out.writeNamedEmptyList("TileEntities");
             }
 
-            if (clipboard.hasBiomes()) {
-                writeBiomes(clipboard, out);
+            if (finalClipboard.hasBiomes()) {
+                writeBiomes(finalClipboard, out);
             }
 
             List<Tag> entities = new ArrayList<>();
-            for (Entity entity : clipboard.getEntities()) {
+            for (Entity entity : finalClipboard.getEntities()) {
                 BaseEntity state = entity.getState();
 
                 if (state != null) {
@@ -267,7 +281,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 }
             }
         };
-        System.out.println("TODO Optimize biome write");
         BlockVector3 min = clipboard.getMinimumPoint();
         int width = clipboard.getRegion().getWidth();
         int length = clipboard.getRegion().getLength();
