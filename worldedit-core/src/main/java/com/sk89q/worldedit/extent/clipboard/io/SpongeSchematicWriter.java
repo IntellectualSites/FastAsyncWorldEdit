@@ -154,8 +154,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             } else {
                 finalClipboard = clipboard;
             }
-            System.out.println(finalClipboard.getClass());
-            System.out.println(finalClipboard.getRegion());
             Iterator<BlockVector3> iterator = finalClipboard.iterator(Order.YZX);
             while (iterator.hasNext()) {
                 BlockVector3 pos = iterator.next();
