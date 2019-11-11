@@ -95,7 +95,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette, biomePalette;
-    private BlockVector3 min;
+    private BlockVector3 min = BlockVector3.ZERO;
 
 
     /**

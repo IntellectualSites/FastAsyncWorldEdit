@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
+import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -133,7 +134,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             });
 
             ByteArrayOutputStream blocksCompressed = new ByteArrayOutputStream();
-            DataOutputStream blocksOut = new DataOutputStream(new LZ4BlockOutputStream(blocksCompressed));
+            FaweOutputStream blocksOut = new FaweOutputStream(new DataOutputStream(new LZ4BlockOutputStream(blocksCompressed)));
 
             ByteArrayOutputStream tilesCompressed = new ByteArrayOutputStream();
             NBTOutputStream tilesOut = new NBTOutputStream(new LZ4BlockOutputStream(tilesCompressed));
@@ -141,7 +142,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             List<Integer> paletteList = new ArrayList<>();
             char[] palette = new char[BlockTypesCache.states.length];
             Arrays.fill(palette, Character.MAX_VALUE);
-            int[] paletteMax = {0};
+            int paletteMax = 0;
             int numTiles = 0;
             for (BlockVector3 pos : clipboard) {
                 BaseBlock block = pos.getFullBlock(clipboard);
@@ -166,12 +167,21 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                     numTiles++;
                     tilesOut.writeTagPayload(block.getNbtData());
                 }
+
+                int ordinal = block.getOrdinal();
+                char value = palette[ordinal];
+                if (value == Character.MAX_VALUE) {
+                    int size = paletteMax++;
+                    palette[ordinal] = value = (char) size;
+                    paletteList.add(ordinal);
+                }
+                blocksOut.writeVarInt(value);
             }
             // close
             tilesOut.close();
             blocksOut.close();
 
-            out.writeNamedTag("PaletteMax", paletteMax[0]);
+            out.writeNamedTag("PaletteMax", paletteMax);
 
             out.writeLazyCompoundTag("Palette", out12 -> {
                 for (int i = 0; i < paletteList.size(); i++) {
