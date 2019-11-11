@@ -23,7 +23,7 @@ import java.util.Map;
 public class DefaultTransformParser extends FaweParser<ResettableExtent> {
 
     public DefaultTransformParser(WorldEdit worldEdit) {
-        super(worldEdit);
+        super(worldEdit, "transforms");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        transform = parse(cmdArgs, actor);
+                        transform = parse(command + cmdArgs, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {

@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 
 public class DefaultMaskParser extends FaweParser<Mask> {
     public DefaultMaskParser(WorldEdit worldEdit) {
-        super(worldEdit);
+        super(worldEdit, "masks");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        mask = parse(cmdArgs, actor);
+                        mask = parse(command + cmdArgs, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {

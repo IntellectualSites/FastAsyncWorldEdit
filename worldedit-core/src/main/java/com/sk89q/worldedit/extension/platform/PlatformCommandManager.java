@@ -609,10 +609,17 @@ public final class PlatformCommandManager {
     }
 
     public <T> T parse(String args, Actor actor) {
-        return parse(args, actor);
+        InjectedValueAccess context;
+        if (actor == null) {
+            context = globalInjectedValues;
+        } else {
+            context = initializeInjectedValues(args::toString, actor);
+        }
+        return parse(args, context);
     }
 
     public <T> T parse(String args, InjectedValueAccess access) {
+        if (args.isEmpty()) return null;
         String[] split = parseArgs(args)
                 .map(Substring::getSubstring)
                 .toArray(String[]::new);

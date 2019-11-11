@@ -30,6 +30,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.expression.Expression;
@@ -44,7 +45,7 @@ import java.util.stream.Stream;
 public class DefaultPatternParser extends FaweParser<Pattern> {
 
     public DefaultPatternParser(WorldEdit worldEdit) {
-        super(worldEdit);
+        super(worldEdit, "patterns");
     }
 
     @Override
@@ -72,7 +73,7 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        pattern = parse(cmdArgs, actor);
+                        pattern = parse(command + cmdArgs, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
