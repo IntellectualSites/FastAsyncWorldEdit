@@ -327,17 +327,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         final int rely = to.getBlockY() - origin.getBlockY();
         final int relz = to.getBlockZ() - origin.getBlockZ();
 
-//        this.apply(this, new Filter() {
-//            @Override
-//            public void applyBlock(FilterBlock block) {
-//
-//            }
-//        });
-
-        System.out.println("Rel " + relx + "," + rely + "," + relz + " | " + to + " | " + origin);
-
-        System.out.println("TODO optimize paste using above apply");
-
         Operation visitor = new RegionVisitor(region, new RegionFunction() {
             //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
             MutableBlockVector2 mpos2d = new MutableBlockVector2();
@@ -349,7 +338,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             @Override
             public boolean apply(BlockVector3 mutable) throws WorldEditException {
                 BlockState block = getBlock(mutable);
-                System.out.println("Pos " + mutable);
                 int xx = mutable.getBlockX() + relx;
                 int zz = mutable.getBlockZ() + relz;
                 if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {

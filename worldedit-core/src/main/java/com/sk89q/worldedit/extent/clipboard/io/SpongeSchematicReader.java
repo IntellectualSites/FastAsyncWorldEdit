@@ -95,7 +95,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette, biomePalette;
-    private BlockVector3 min;
+    private BlockVector3 min = BlockVector3.ZERO;
 
 
     /**
@@ -220,7 +220,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
         BlockVector3 origin = min;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
-            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
+//            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
+            origin = BlockVector3.at(offsetX, offsetY, offsetZ);
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
@@ -339,7 +340,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-
         clipboard.setOrigin(origin);
         return clipboard;
     }
