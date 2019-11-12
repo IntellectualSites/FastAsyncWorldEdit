@@ -1,5 +1,6 @@
 package com.boydti.fawe.regions.general.integrations.plotquared;
 
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
@@ -20,6 +21,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -106,12 +108,18 @@ public class FaweSchematicHandler extends SchematicHandler {
             com.github.intellectualsites.plotsquared.plot.util.TaskManager.runTask(whenDone);
             return;
         }
+        CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
+        if (weTag instanceof CompressedSchematicTag) {
+            Clipboard clipboard = ((CompressedSchematicTag) weTag).getSource();
+            URL url = FaweAPI.upload(clipboard, BuiltInClipboardFormat.SPONGE_SCHEMATIC);
+            whenDone.run(url);
+            return;
+        }
         MainUtil.upload(uuid, file, "schematic", new RunnableVal<OutputStream>() {
             @Override
             public void run(OutputStream output) {
                 try {
                     try (PGZIPOutputStream gzip = new PGZIPOutputStream(output)) {
-                        CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
                             Map<String, Tag> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));
