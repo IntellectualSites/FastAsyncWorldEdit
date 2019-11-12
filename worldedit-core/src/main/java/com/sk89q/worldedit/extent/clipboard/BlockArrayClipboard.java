@@ -60,6 +60,13 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
         this(region, UUID.randomUUID());
     }
 
+    public BlockArrayClipboard(Clipboard clipboard, BlockVector3 offset) {
+        super(clipboard);
+        Region shifted = clipboard.getRegion();
+        shifted.shift(offset);
+        setRegion(shifted);
+    }
+
     /**
      * Create a new instance.
      *
