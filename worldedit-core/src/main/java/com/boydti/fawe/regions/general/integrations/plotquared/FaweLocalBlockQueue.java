@@ -19,7 +19,6 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     public final IQueueExtent IMP;
-    private final LegacyMapper legacyMapper;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
 
@@ -27,7 +26,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
         super(worldName);
         this.world = FaweAPI.getWorld(worldName);
         IMP = Fawe.get().getQueueHandler().getQueue(world);
-        legacyMapper = LegacyMapper.getInstance();
+        Fawe.get().getQueueHandler().uncache();
     }
 
     @Override
