@@ -56,6 +56,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
+import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -202,7 +203,8 @@ public class UtilityCommands {
                         Expression radiusExp,
                     @Range(min=1) @Arg(desc = "The depth to fill", def = "1")
                         int depth,
-                    @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException, EvaluationException {
+                    @Arg(desc = "The direction to move", def = "down")
+                        @Direction BlockVector3 direction) throws WorldEditException, EvaluationException {
         double radius = radiusExp.evaluate();
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
