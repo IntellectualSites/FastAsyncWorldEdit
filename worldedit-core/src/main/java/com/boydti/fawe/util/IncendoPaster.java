@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sk89q.worldedit.util.paste.Paster;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -11,6 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * Single class paster for the Incendo paste service
@@ -18,7 +20,7 @@ import java.util.*;
  * @author Sauilitired
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public final class IncendoPaster {
+public final class IncendoPaster implements Paster {
 
     /**
      * Upload service URL
@@ -48,6 +50,22 @@ public final class IncendoPaster {
                 String.format("Unknown application name: %s", pasteApplication));
         }
         this.pasteApplication = pasteApplication;
+    }
+
+    @Override
+    public Callable<URL> paste(String content) {
+        return new PasteTask(content);
+    }
+
+    private final class PasteTask implements Callable<URL> {
+
+        private PasteTask(String content) {}
+
+        @Override
+        public URL call() throws Exception {
+            return new URL(debugPaste());
+        }
+
     }
 
     /**
