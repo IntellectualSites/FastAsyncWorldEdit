@@ -226,7 +226,7 @@ public final class IncendoPaster {
         incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
         incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
         incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
-        incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
+//        incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
 
         final String rawResponse;
         try {
