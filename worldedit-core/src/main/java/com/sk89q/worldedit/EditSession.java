@@ -1118,7 +1118,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 new BoundedHeightMask(
                         Math.max(origin.getBlockY() - depth + 1, getMinimumPoint().getBlockY()),
-                        Math.min(getMaximumPoint().getBlockY(), origin.getBlockY())),
+                        Math.min(getMaxY(), origin.getBlockY())),
                 Masks.negate(new ExistingBlockMask(this)));
 
         // Want to replace blocks

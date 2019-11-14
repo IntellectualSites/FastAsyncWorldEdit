@@ -180,12 +180,22 @@ public class BlockMask extends ABlockMask {
     public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
+            boolean modified = false;
+            boolean hasAny = false;
             for (int i = 0; i < ordinals.length; i++) {
                 if (ordinals[i]) {
-                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                    boolean result = other.test(BlockState.getFromOrdinal(i));
+                    hasAny |= result;
+                    modified |= !result;
+                    ordinals[i] = result;
                 }
             }
-            return this;
+            if (modified) {
+                if (!hasAny) {
+                    return Masks.alwaysFalse();
+                }
+                return this;
+            }
         }
         return null;
     }
@@ -194,12 +204,17 @@ public class BlockMask extends ABlockMask {
     public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
+            boolean modified = false;
             for (int i = 0; i < ordinals.length; i++) {
                 if (!ordinals[i]) {
-                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                    boolean result = other.test(BlockState.getFromOrdinal(i));
+                    modified |= result;
+                    ordinals[i] = result;
                 }
             }
-            return this;
+            if (modified) {
+                return this;
+            }
         }
         return null;
     }

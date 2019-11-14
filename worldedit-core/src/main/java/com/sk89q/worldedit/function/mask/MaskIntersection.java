@@ -144,10 +144,10 @@ public class MaskIntersection extends AbstractMask {
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
         boolean changed = false;
-        while (changed |= combineMasks(pairingFunction(), failedCombines));
+        while (combineMasks(pairingFunction(), failedCombines)) changed = true;
         // Optimize / combine
         do changed |= optimizeMasks(optimized);
-        while (changed |= combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
+        while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
             getLogger(MaskIntersection.class).debug("Failed optimize MaskIntersection");
@@ -169,6 +169,7 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
+                    if (mask == other) continue;
                     AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
                     if (failedCombines.contains(pair)) continue;
                     Mask combined = pairing.apply(pair);
