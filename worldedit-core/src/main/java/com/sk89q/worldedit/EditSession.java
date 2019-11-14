@@ -1595,13 +1595,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkArgument(radius >= 0, "radius >= 0 required");
 
         // Our origins can only be liquids
-        Mask liquidMask = new BlockTypeMask(this, fluid);
+        Mask liquidMask = new SingleBlockTypeMask(this, fluid);
 
         // But we will also visit air blocks
         MaskIntersection blockMask = new MaskUnion(liquidMask, Masks.negate(new ExistingBlockMask(this)));
 
         // There are boundaries that the routine needs to stay in
-        MaskIntersection mask = new MaskIntersection(
+        Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
