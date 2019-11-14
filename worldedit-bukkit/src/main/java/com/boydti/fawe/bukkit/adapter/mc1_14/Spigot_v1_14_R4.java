@@ -676,7 +676,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
                 synchronized (packet) {
                     PacketPlayOutMapChunk nmsPacket = (PacketPlayOutMapChunk) packet.getNativePacket();
                     if (nmsPacket == null) {
-                        nmsPacket = MapChunkUtil_1_14.create(this, packet);
+                        nmsPacket = MapChunkUtil_1_14.create(nmsWorld, this, packet);
                         packet.setNativePacket(nmsPacket);
                     }
                     try {

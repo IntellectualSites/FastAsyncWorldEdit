@@ -38,6 +38,10 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     BiomeType[] getBiomes();
 
+    default boolean hasBiomes() {
+        return getBiomes() != null;
+    }
+
     @Override
     BiomeType getBiomeType(int x, int z);
 

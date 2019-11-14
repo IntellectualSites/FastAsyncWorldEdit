@@ -219,7 +219,7 @@ public final class BiomeTypes {
         ERODED_BADLANDS.setLegacyId(165);
         MODIFIED_WOODED_BADLANDS_PLATEAU.setLegacyId(166);
         MODIFIED_BADLANDS_PLATEAU.setLegacyId(167);
-//        BAMBOO_JUNGLE.setLegacyId(168);
-//        BAMBOO_JUNGLE_HILLS.setLegacyId(169);
+        BAMBOO_JUNGLE.setLegacyId(168);
+        BAMBOO_JUNGLE_HILLS.setLegacyId(169);
     }
 }

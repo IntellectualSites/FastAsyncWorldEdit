@@ -170,6 +170,11 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
         return getParent().getBiomes();
     }
 
+    @Override
+    default boolean hasBiomes() {
+        return getParent().hasBiomes();
+    }
+
     default <T extends IChunk> T findParent(Class<T> clazz) {
         IChunk root = getParent();
         if (clazz.isAssignableFrom(root.getClass())) {

@@ -57,6 +57,9 @@ public interface IBlocks extends Trimable {
         BlockRegistry registry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray);
+
+        System.out.println("Bitmask " + getBitMask());
+
         try {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (!this.hasSection(layer)) continue;
@@ -136,9 +139,15 @@ public interface IBlocks extends Trimable {
 //            }
 //        }
             if (writeBiomes) {
-                for (int i = 0; i < 256; i++) {
-                    // TODO biomes
-                    sectionWriter.writeInt(0);
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        BiomeType biome = getBiomeType(x, z);
+                        if (biome != null) {
+                            sectionWriter.writeInt(biome.getLegacyId());
+                        } else {
+                            sectionWriter.writeInt(0);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {

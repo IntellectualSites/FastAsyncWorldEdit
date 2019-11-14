@@ -26,7 +26,7 @@ public class ChunkSendProcessor implements IBatchProcessor {
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
-        boolean replaceAll = set.getBiomeType(0, 0) != null;
+        boolean replaceAll = set.hasBiomes();
         ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, () -> set, replaceAll);
         Stream<Player> stream = this.players.get();
         if (stream == null) {
