@@ -578,7 +578,7 @@ public class RegionCommands {
                          boolean skipEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
-                     @ArgFlag(name = 'm', desc = "Source mask")
+                     @ArgFlag(name = 'm', desc = "Source mask", def="")
                          Mask sourceMask,
                     InjectedValueAccess context) throws WorldEditException {
         actor.checkConfirmationStack(() -> {
