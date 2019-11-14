@@ -155,18 +155,6 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public boolean isOnlineMode() {
-        return Bukkit.getOnlineMode();
-    }
-
-    @Override
-    public String getPlatformVersion() {
-        String bukkitVersion = Bukkit.getVersion();
-        int index = bukkitVersion.indexOf("MC: ");
-        return index == -1 ? bukkitVersion : bukkitVersion.substring(index + 4, bukkitVersion.length() - 1);
-    }
-
-    @Override
     public void debug(final String message) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
         console.sendMessage(message);
@@ -177,19 +165,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin.getDataFolder();
     }
 
-    @Override
-    public void setupCommand(final String label, final FaweCommand cmd) {
-        if (plugin instanceof JavaPlugin) {
-            TaskManager.IMP.task(() -> {
-                PluginCommand registered = ((JavaPlugin) plugin).getCommand(label);
-                if (registered == null) {
-                    debug("Command not registered in plugin.yml: " + label);
-                    return;
-                }
-                registered.setExecutor(new BukkitCommand(cmd));
-            });
-        }
-    }
 
     @Override
     public com.sk89q.worldedit.entity.Player wrap(final Object obj) {

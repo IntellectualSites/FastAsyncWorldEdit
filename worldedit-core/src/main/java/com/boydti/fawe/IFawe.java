@@ -18,8 +18,6 @@ public interface IFawe {
 
     File getDirectory();
 
-    void setupCommand(final String label, final FaweCommand cmd);
-
     Player wrap(final Object obj);
 
     void setupVault();
@@ -37,10 +35,6 @@ public interface IFawe {
     }
 
     public default void registerPacketListener() {}
-
-    String getPlatformVersion();
-
-    boolean isOnlineMode();
 
     String getPlatform();
 
