@@ -107,6 +107,7 @@ import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
+import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -704,7 +705,6 @@ public final class PlatformCommandManager {
                     exceptionConverter.convert(next);
                     next = next.getCause();
                 } while (next != null);
-
                 throw t;
             }
         } catch (ConditionFailedException e) {
@@ -734,6 +734,8 @@ public final class PlatformCommandManager {
                     .color(TextColor.RED)
                     .append(e.getRichMessage())
                     .build());
+            List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
+            printUsage(actor, argList);
         } catch (Throwable t) {
             handleUnknownException(actor, t);
         } finally {
@@ -773,6 +775,11 @@ public final class PlatformCommandManager {
         }
 
         event.setCancelled(true);
+    }
+
+    private void printUsage(Actor actor, List<String> arguments) {
+        PrintCommandHelp.help(arguments, 0, false,
+                getCommandManager(), actor, "//help");
     }
 
     private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor tmp) {
