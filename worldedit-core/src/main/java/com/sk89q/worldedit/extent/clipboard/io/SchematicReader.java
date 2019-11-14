@@ -35,6 +35,7 @@ import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.EntityNBTCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.FlowerPotCompatibilityHandler;
@@ -247,9 +248,9 @@ public class SchematicReader implements ClipboardReader {
         biomes = null;
 
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
-        BlockVector3 origin = BlockVector3.at(originX, originY, originZ);
+        BlockVector3 origin = BlockVector3.ZERO;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
-            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
+            origin = BlockVector3.at(-offsetX, -offsetY, -offsetZ);
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
@@ -365,6 +366,11 @@ public class SchematicReader implements ClipboardReader {
         }
         fixStates(clipboard);
         clipboard.setOrigin(origin);
+
+        BlockVector3 min = BlockVector3.at(originX, originY, originZ);
+        if (!min.equals(BlockVector3.ZERO)) {
+            new BlockArrayClipboard(clipboard, min);
+        }
         return clipboard;
     }
 
