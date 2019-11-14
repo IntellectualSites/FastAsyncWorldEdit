@@ -253,11 +253,11 @@ public class HistoryCommands {
             for (; i < finalTimes; ++i) {
                 undone = undoSession.undo(undoSession.getBlockBag(player), player);
                 if (undone == null) break;
+                worldEdit.flushBlockBag(player, undone);
             }
             if (undone == null) i--;
             if (i > 0) {
                 BBC.COMMAND_UNDO_SUCCESS.send(player, i == 1 ? "" : " x" + i);
-                worldEdit.flushBlockBag(player, undone);
             }
             if (undone == null) {
                 player.printError(BBC.COMMAND_UNDO_ERROR.s());
