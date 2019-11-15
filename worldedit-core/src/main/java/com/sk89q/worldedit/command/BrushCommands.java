@@ -787,7 +787,7 @@ public class BrushCommands {
     }
 
     private void terrainBrush(LocalSession session,
-        @Arg(desc = "Expression") Expression radius, String image, int rotation,
+        Expression radius, String image, int rotation,
         double yscale, boolean flat, boolean randomRotate, boolean layers, boolean smooth,
         Shape shape, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -998,7 +998,7 @@ public class BrushCommands {
             desc = "Save your current brush"
     )
     @CommandPermissions("worldedit.brush.save")
-    public void saveBrush(Player player, LocalSession session, String name,
+    public void saveBrush(Player player, LocalSession session, @Arg(desc = "String name") String name,
                           @Switch(name = 'g', desc = "Save the brush globally") boolean root) throws WorldEditException, IOException {
         BrushTool tool = session.getBrushTool(player);
         if (tool != null) {
@@ -1035,7 +1035,7 @@ public class BrushCommands {
             desc = "Load a brush"
     )
     @CommandPermissions("worldedit.brush.load")
-    public void loadBrush(Player player, LocalSession session, String name)
+    public void loadBrush(Player player, LocalSession session, @Arg(desc = "String name") String name)
             throws WorldEditException, IOException {
         name = FileSystems.getDefault().getPath(name).getFileName().toString();
         File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");

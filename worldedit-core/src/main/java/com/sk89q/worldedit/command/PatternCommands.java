@@ -110,7 +110,7 @@ public class PatternCommands {
             name = "#color",
             desc = "Use the block closest to a specific color"
 )
-    public Pattern color(TextureUtil textureUtil, String color) {
+    public Pattern color(TextureUtil textureUtil, @Arg(desc = "String color") String color) {
         Color colorObj = ColorUtil.parseColor(color);
         return textureUtil.getNearestBlock(colorObj.getRGB()).getDefaultState();
     }

@@ -72,7 +72,7 @@ public class MaskCommands {
             name = "#simplex",
             desc = "Use simplex noise as the mask"
     )
-    public Mask simplex(double scale, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
+    public Mask simplex(@Arg(desc = "double scale") double scale, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
         scale = 1d / Math.max(1, scale);
         minInt = (minInt - 50) / 50;
         maxInt = (maxInt - 50) / 50;
@@ -365,7 +365,7 @@ public class MaskCommands {
             aliases = {"#|", "#side"},
             desc = "sides with a specific number of other blocks"
 )
-    public Mask wall(Mask mask, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) throws ExpressionException {
+    public Mask wall(@Arg(desc = "Mask") Mask mask, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) throws ExpressionException {
         return new WallMask(mask, (int) minInt, (int) maxInt);
     }
 
@@ -374,7 +374,7 @@ public class MaskCommands {
             aliases = {"#~", "#adjacent"},
             desc = "Adjacent to a specific number of other blocks"
 )
-    public Mask adjacent(Mask mask, @Arg(name = "min", desc = "double", def = "-1") double min, @Arg(name = "max", desc = "double", def = "-1") double max) throws ExpressionException {
+    public Mask adjacent(@Arg(desc = "Mask") Mask mask, @Arg(name = "min", desc = "double", def = "-1") double min, @Arg(name = "max", desc = "double", def = "-1") double max) throws ExpressionException {
         if (min == -1 && max == -1) {
             min = 1;
             max = 8;
@@ -390,7 +390,7 @@ public class MaskCommands {
             aliases = {"#<", "#below"},
             desc = "below a specific block"
 )
-    public Mask below(Mask mask) throws ExpressionException {
+    public Mask below(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
         OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, 1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
@@ -400,7 +400,7 @@ public class MaskCommands {
             aliases = {"#>", "#above"},
             desc = "above a specific block"
 )
-    public Mask above(Mask mask) throws ExpressionException {
+    public Mask above(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
         OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, -1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
@@ -411,7 +411,7 @@ public class MaskCommands {
             desc = "in a specific biome",
             descFooter = "in a specific biome. For a list of biomes use //biomelist"
 )
-    public Mask biome(Extent extent, BiomeType biome) throws ExpressionException {
+    public Mask biome(Extent extent, @Arg(desc = "BiomeType") BiomeType biome) throws ExpressionException {
         return new BiomeMask(extent, biome);
     }
 
@@ -420,7 +420,7 @@ public class MaskCommands {
             aliases = {"#%", "#percent"},
             desc = "percentage chance"
 )
-    public Mask random(double chance) throws ExpressionException {
+    public Mask random(@Arg(desc = "double chance") double chance) throws ExpressionException {
         chance = chance / 100;
         return new RandomMask(chance);
     }
@@ -430,7 +430,7 @@ public class MaskCommands {
             aliases = {"#=", "#expression"},
             desc = "expression mask"
 )
-    public Mask expression(Extent extent, String input) throws ExpressionException {
+    public Mask expression(Extent extent, @Arg(desc = "String expression") String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
         ExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);
@@ -442,7 +442,7 @@ public class MaskCommands {
             aliases = {"#not", "#negate", "#!"},
             desc = "Negate another mask"
 )
-    public Mask expression(Mask mask) throws ExpressionException {
+    public Mask negate(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
         return Masks.negate(mask);
     }
 }
