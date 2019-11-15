@@ -239,7 +239,7 @@ public class BrushCommands {
             desc = "Create lines"
     )
     @CommandPermissions("worldedit.brush.line")
-    public void lineBrush(InjectedValueAccess context, Pattern fill,
+    public void lineBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
             Expression radius,
         @Switch(name = 'h', desc = "Create only a shell")
@@ -296,7 +296,7 @@ public class BrushCommands {
             desc = "Create a hanging line between two points"
     )
     @CommandPermissions("worldedit.brush.spline")
-    public void catenaryBrush(InjectedValueAccess context, Pattern fill,
+    public void catenaryBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(def = "1.2", desc = "Length of wire compared to distance between points") @Range(min = 1) double lengthFactor,
         @Arg(desc = "The radius to sample for blending", def = "0")
             Expression radius,
@@ -322,7 +322,7 @@ public class BrushCommands {
                    "Video: https://www.youtube.com/watch?v=zSN-2jJxXlM"
     )
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
-    public void surfaceSpline(Player player, InjectedValueAccess context, Pattern fill,
+    public void surfaceSpline(Player player, InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
             Expression radius,
         @Arg(desc = "double", def = "0") double tension,
@@ -343,7 +343,8 @@ public class BrushCommands {
             desc = "Creates a distorted sphere"
     )
     @CommandPermissions("worldedit.brush.rock")
-    public void blobBrush(InjectedValueAccess context, Pattern fill,
+    public void blobBrush(InjectedValueAccess context,
+          @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "Vector3", def = "10")
             Vector3 radius,
         @Arg(desc = "double", def = "100")
@@ -424,7 +425,7 @@ public class BrushCommands {
             descFooter = "Use a height map to paint any surface.\n"
 )
     @CommandPermissions("worldedit.brush.stencil")
-    public void stencilBrush(LocalSession session, InjectedValueAccess context, Pattern fill,
+    public void stencilBrush(LocalSession session, InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "Expression", def = "5") Expression radius,
         @Arg(desc = "String", def = "") String image,
         @Arg(def = "0", desc = "rotation") @Range(min = 0, max = 360) int rotation,
@@ -487,7 +488,7 @@ public class BrushCommands {
                    "The -r flag will apply random rotation"
     )
     @CommandPermissions("worldedit.brush.surface")
-    public void surfaceBrush(InjectedValueAccess context, Pattern fill,
+    public void surfaceBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "Expression", def = "5")
             Expression radius) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -501,7 +502,7 @@ public class BrushCommands {
                    "Video: https://youtu.be/RPZIaTbqoZw?t=34s"
     )
     @CommandPermissions("worldedit.brush.scatter")
-    public void scatterBrush(InjectedValueAccess context, Pattern fill,
+    public void scatterBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "Expression", def = "5")
             Expression radius,
         @Arg(desc = "double", def = "5")
@@ -573,7 +574,7 @@ public class BrushCommands {
                    "Note: The seeds define how many splotches there are, recursion defines how large, solid defines whether the pattern is applied per seed, else per block."
     )
     @CommandPermissions("worldedit.brush.splatter")
-    public void splatterBrush(InjectedValueAccess context, Pattern fill,
+    public void splatterBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "Expression", def = "5") Expression radius,
         @Arg(desc = "double", def = "1") double points,
         @Arg(desc = "double", def = "5") double recursion,
