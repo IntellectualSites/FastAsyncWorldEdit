@@ -140,7 +140,7 @@ public class MaskCommands {
             name = "#offset",
             desc = "Offset a mask"
     )
-    public Mask offset(double x, double y, double z, Mask mask) {
+    public Mask offset(@Arg(desc = "double x") double x, @Arg(desc = "double y") double y, @Arg(desc = "double z") double z, @Arg(desc = "Mask") Mask mask) {
         return new OffsetMask(mask, BlockVector3.at(x, y, z));
     }
 

@@ -526,7 +526,7 @@ public class BrushCommands {
             desc = "Scatter a schematic on a surface"
     )
     @CommandPermissions("worldedit.brush.populateschematic")
-    public void scatterSchemBrush(Player player, InjectedValueAccess context, Mask mask,
+    public void scatterSchemBrush(Player player, InjectedValueAccess context, @Arg(desc = "Mask") Mask mask,
         @Arg(name = "clipboard", desc = "Clipboard uri") String clipboardStr,
         @Arg(desc = "Expression", def = "30") Expression radius,
         @Arg(desc = "double", def = "50") double density,

@@ -55,7 +55,7 @@ public class TransformCommands {
             name = "#pattern",
             desc = "Always use a specific pattern"
     )
-    public ResettableExtent pattern(Actor actor, LocalSession session, Pattern pattern, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent pattern(Actor actor, LocalSession session, @Arg(desc = "Pattern") Pattern pattern, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new PatternTransform(other, pattern);
     }
 
