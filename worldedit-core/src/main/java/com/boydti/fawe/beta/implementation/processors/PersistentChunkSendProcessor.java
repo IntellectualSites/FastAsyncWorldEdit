@@ -19,13 +19,15 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class PersistentChunkSendProcessor extends ChunkSendProcessor {
-    private Long2ObjectLinkedOpenHashMap<Character> current;
+    private final Long2ObjectLinkedOpenHashMap<Character> current;
+    private final IQueueExtent queue;
     private Long2ObjectLinkedOpenHashMap<Character> previous;
 
-    public PersistentChunkSendProcessor(World world, IQueueExtent queue, PersistentChunkSendProcessor previous, Supplier<Stream<Player>> players) {
+    public PersistentChunkSendProcessor(IQueueExtent queue, World world, PersistentChunkSendProcessor previous, Supplier<Stream<Player>> players) {
         super(world, players);
         this.current = new Long2ObjectLinkedOpenHashMap<>();
         this.previous = previous.current;
+        this.queue = queue;
     }
 
     @Override
@@ -39,15 +41,25 @@ public class PersistentChunkSendProcessor extends ChunkSendProcessor {
         return new CombinedBlocks(get, set, lastValue == null ? 0 : lastValue);
     }
 
-    public void flush(IQueueExtent extent) {
-        if (!previous.isEmpty()) {
+    public void flush() {
+        clear(previous);
+        previous = null;
+    }
+
+    public void clear() {
+        clear(current);
+        current.clear();
+    }
+
+    public void clear(Long2ObjectLinkedOpenHashMap<Character> current) {
+        if (current != null && !current.isEmpty()) {
             Stream<Player> players = getPlayers().get();
-            for (Long2ObjectMap.Entry<Character> entry : previous.long2ObjectEntrySet()) {
+            for (Long2ObjectMap.Entry<Character> entry : current.long2ObjectEntrySet()) {
                 long pair = entry.getLongKey();
                 int chunkX = MathMan.unpairIntX(pair);
                 int chunkZ = MathMan.unpairIntY(pair);
                 BlockVector2 pos = BlockVector2.at(chunkX, chunkZ);
-                Supplier<IBlocks> chunk = () -> extent.getOrCreateChunk(pos.getX(), pos.getZ());
+                Supplier<IBlocks> chunk = () -> queue.getOrCreateChunk(pos.getX(), pos.getZ());
                 ChunkPacket packet = new ChunkPacket(pos.getX(), pos.getZ(), chunk, true);
                 char bitMask = entry.getValue();
                 if (players == null) {

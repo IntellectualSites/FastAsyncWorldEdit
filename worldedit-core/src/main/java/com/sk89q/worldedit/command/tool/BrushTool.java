@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal;
@@ -67,6 +68,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -76,6 +78,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 /**
@@ -104,7 +108,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     private transient BrushSettings secondary = new BrushSettings();
     private transient BrushSettings context = primary;
 
-    private transient VisualExtent visualExtent;
+    private transient PersistentChunkSendProcessor visualExtent;
     private transient Lock lock = new ReentrantLock();
 
     private transient BaseItem holder;
@@ -649,11 +653,17 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .combineStages(true);
         EditSession editSession = builder.build();
 
-//        processor = new PersistentChunkSendProcessor()
-        VisualExtent newVisualExtent = new VisualExtent(editSession, player);
+        PersistentChunkSendProcessor previous = null;
+        World world = editSession.getWorld();
+        Supplier<Stream<Player>> players = () -> Stream.of(player);
+
+        PersistentChunkSendProcessor newVisualExtent = new PersistentChunkSendProcessor(world, previous, players);
+
+        editSession.addProcessor(newVisualExtent);
+        editSession.addProcessor(NullProcessor.INSTANCE);
+
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
-            editSession.setExtent(newVisualExtent);
             switch (mode) {
                 case POINT:
                     editSession.setBlock(position, VisualExtent.VISUALIZE_BLOCK_DEFAULT);
@@ -667,10 +677,10 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }
         if (visualExtent != null) {
             // clear old data
-            visualExtent.clear();
+            visualExtent.flush();
         }
         visualExtent = newVisualExtent;
-        newVisualExtent.commit();
+        newVisualExtent.flush();
     }
 
     public void clear(Player player) {
