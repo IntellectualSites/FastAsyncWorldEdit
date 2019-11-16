@@ -101,6 +101,8 @@ public interface IBatchProcessor {
         return MultiBatchProcessor.of(this, other);
     }
 
+    default void flush() {}
+
     /**
      * Return a new processor after removing all are instances of a specified class
      * @param clazz

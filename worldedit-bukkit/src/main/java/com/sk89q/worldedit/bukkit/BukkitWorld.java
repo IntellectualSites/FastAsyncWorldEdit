@@ -22,7 +22,10 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
@@ -55,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import io.papermc.lib.PaperLib;

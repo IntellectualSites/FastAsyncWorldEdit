@@ -128,6 +128,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1008,7 +1010,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
                 ((FaweChangeSet) getChangeSet()).closeAsync();
             } else {
-                ((FaweChangeSet) getChangeSet()).close();
+                try {
+                    ((FaweChangeSet) getChangeSet()).close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }

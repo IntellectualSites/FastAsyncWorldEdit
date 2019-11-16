@@ -107,6 +107,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
+    public void flush() {
+        for (IBatchProcessor processor : this.processors) processor.flush();
+    }
+
+    @Override
     public String toString() {
         return super.toString() + "{" + StringMan.join(processors, ",") + "}";
     }

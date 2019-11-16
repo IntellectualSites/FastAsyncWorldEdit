@@ -399,7 +399,12 @@ public class LocalSession implements TextureHolder {
     private FaweChangeSet getChangeSet(Object o) {
         if (o instanceof FaweChangeSet) {
             FaweChangeSet cs = (FaweChangeSet) o;
-            cs.close();
+            try {
+                cs.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
             return cs;
         }
         if (o instanceof Integer) {

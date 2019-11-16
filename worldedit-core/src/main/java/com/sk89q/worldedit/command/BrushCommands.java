@@ -207,7 +207,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.sphere")
     public void circleBrush(Player player, InjectedValueAccess context,
-        Pattern fill,
+        @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "5")
             Expression radius) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -223,7 +223,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.recursive")
     public void recursiveBrush(InjectedValueAccess context, EditSession editSession,
-        Pattern fill,
+        @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "5")
             Expression radius,
         @Switch(name = 'd', desc = "Apply in depth first order")
@@ -264,7 +264,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.spline")
     public void splineBrush(Player player, InjectedValueAccess context,
-        Pattern fill,
+        @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "25")
             Expression radius) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -407,7 +407,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.shatter")
     public void shatterBrush(EditSession editSession, InjectedValueAccess context,
-        Pattern fill,
+        @Arg(desc = "Pattern") Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "10")
             Expression radius,
         @Arg(desc = "Lines", def = "10") int count) throws WorldEditException {

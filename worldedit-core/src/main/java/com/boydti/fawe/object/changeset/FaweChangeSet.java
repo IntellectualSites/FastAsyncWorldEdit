@@ -33,6 +33,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
+public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Closeable {
 
     private World world;
     private final String worldName;
@@ -77,24 +79,23 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
         return world;
     }
 
-    @Deprecated
-    public boolean flushAsync() {
-        return closeAsync();
-    }
-
-    public boolean closeAsync() {
+    public void closeAsync() {
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
             waitingAsync.decrementAndGet();
             synchronized (waitingAsync) {
                 waitingAsync.notifyAll();
             }
-            close();
+            try {
+                close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
-        return true;
     }
 
-    public boolean flush() {
+    @Override
+    public void flush() {
         try {
             if (!Fawe.isMainThread()) {
                 while (waitingAsync.get() > 0) {
@@ -111,11 +112,11 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
-    public boolean close() {
-        return flush();
+    @Override
+    public void close() throws IOException {
+        flush();
     }
 
     public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);

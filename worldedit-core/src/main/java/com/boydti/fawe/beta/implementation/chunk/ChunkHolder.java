@@ -1,6 +1,8 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.CombinedBlocks;
+import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;

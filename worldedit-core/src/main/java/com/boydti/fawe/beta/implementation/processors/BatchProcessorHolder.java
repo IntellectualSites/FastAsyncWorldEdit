@@ -20,6 +20,11 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
     }
 
     @Override
+    public void flush() {
+        getProcessor().flush();
+    }
+
+    @Override
     public void setProcessor(IBatchProcessor set) {
         this.processor = set;
     }

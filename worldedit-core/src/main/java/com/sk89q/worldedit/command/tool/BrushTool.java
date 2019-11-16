@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.BrushSettings;
@@ -644,8 +645,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .autoQueue(false)
                 .blockBag(null)
                 .changeSetNull()
-                .combineStages(false);
+                .fastmode(true)
+                .combineStages(true);
         EditSession editSession = builder.build();
+
+//        processor = new PersistentChunkSendProcessor()
         VisualExtent newVisualExtent = new VisualExtent(editSession, player);
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {

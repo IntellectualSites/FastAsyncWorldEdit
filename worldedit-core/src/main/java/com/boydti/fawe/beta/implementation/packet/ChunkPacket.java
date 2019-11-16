@@ -62,7 +62,8 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
         if (tmp == null) {
             synchronized (this) {
                 if (sectionBytes == null) {
-                    sectionBytes = getChunk().toByteArray(FaweCache.IMP.BYTE_BUFFER_8192.get(), this.full);
+                    IBlocks tmpChunk = getChunk();
+                    sectionBytes = tmpChunk.toByteArray(FaweCache.IMP.BYTE_BUFFER_8192.get(), tmpChunk.getBitMask());
                 }
                 tmp = sectionBytes;
             }

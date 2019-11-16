@@ -1,6 +1,8 @@
 package com.boydti.fawe.beta.implementation.processors;
 
+import com.boydti.fawe.beta.CombinedBlocks;
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -16,18 +18,41 @@ import java.util.stream.Stream;
 public class ChunkSendProcessor implements IBatchProcessor {
     private final Supplier<Stream<Player>> players;
     private final World world;
+    private final boolean full;
 
     public ChunkSendProcessor(World world, Supplier<Stream<Player>> players) {
+        this(world, players, false);
+    }
+
+    public ChunkSendProcessor(World world, Supplier<Stream<Player>> players, boolean full) {
         this.players = players;
         this.world = world;
+        this.full = full;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public Supplier<Stream<Player>> getPlayers() {
+        return players;
     }
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
-        boolean replaceAll = set.hasBiomes();
-        ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, () -> set, replaceAll);
+        IBlocks blocks;
+        boolean full = this.full;
+        if (full) {
+            blocks = set;
+        } else {
+            blocks = combine(chunk, get, set);
+            if (set.hasBiomes()) {
+                full = true;
+            }
+        }
+        ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, () -> blocks, full);
         Stream<Player> stream = this.players.get();
         if (stream == null) {
             world.sendFakeChunk(null, packet);
@@ -38,8 +63,12 @@ public class ChunkSendProcessor implements IBatchProcessor {
         return set;
     }
 
+    public IBlocks combine(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return new CombinedBlocks(get, set, 0);
+    }
+
     @Override
     public Extent construct(Extent child) {
-        return null;
+        throw new UnsupportedOperationException("Processing only");
     }
 }

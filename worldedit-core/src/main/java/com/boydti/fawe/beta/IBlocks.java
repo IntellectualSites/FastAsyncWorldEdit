@@ -45,11 +45,11 @@ public interface IBlocks extends Trimable {
 
     IBlocks reset();
 
-    default byte[] toByteArray(boolean writeBiomes) {
-        return toByteArray(null, writeBiomes);
+    default byte[] toByteArray(int bitMask) {
+        return toByteArray(null, bitMask);
     }
 
-    default byte[] toByteArray(byte[] buffer, boolean writeBiomes) {
+    default byte[] toByteArray(byte[] buffer, int bitMask) {
         if (buffer == null) {
             buffer = new byte[1024];
         }
@@ -138,7 +138,7 @@ public interface IBlocks extends Trimable {
 //                }
 //            }
 //        }
-            if (writeBiomes) {
+            if (bitMask == Character.MAX_VALUE) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BiomeType biome = getBiomeType(x, z);
