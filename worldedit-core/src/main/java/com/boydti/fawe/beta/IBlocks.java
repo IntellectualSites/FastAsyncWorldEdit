@@ -64,8 +64,6 @@ public interface IBlocks extends Trimable {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) continue;
 
-                System.out.println("Write section " + layer);
-
                 char[] ids = this.load(layer);
 
                 int nonEmpty = 0; // TODO optimize into same loop as toPalette

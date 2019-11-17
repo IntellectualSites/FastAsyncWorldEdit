@@ -20,6 +20,9 @@ public abstract class CharBlocks implements IBlocks {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null);
+                if (arr == null) {
+                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                }
             } else {
                 blocks.blocks[layer] = blocks.update(layer, arr);
             }

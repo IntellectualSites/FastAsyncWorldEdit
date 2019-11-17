@@ -227,7 +227,7 @@ public final class BukkitAdapter_1_14 {
         for (; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
-                case 0:
+                case BlockID.__RESERVED__:
                     break outer;
                 case BlockID.AIR:
                 case BlockID.CAVE_AIR:
@@ -247,14 +247,17 @@ public final class BukkitAdapter_1_14 {
             for (; i < 4096; i++) {
                 char ordinal = set[i];
                 switch (ordinal) {
-                    case 0:
+                    case BlockID.__RESERVED__:
                         ordinal = getArr[i];
-                        set[i] = ordinal;
                         switch (ordinal) {
+                            case BlockID.__RESERVED__:
+                                ordinal = BlockID.AIR;
                             case BlockID.AIR:
                             case BlockID.CAVE_AIR:
                             case BlockID.VOID_AIR:
                                 air++;
+                            default:
+                                set[i] = ordinal;
                         }
                         break;
                     case BlockID.AIR:

@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.BiomeBase;
+import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkSection;
@@ -564,17 +565,20 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     return data;
                 }
 
-                char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
                 try {
-                    final int size = num_palette;
-                    if (size != 1) {
-                        for (int i = 0; i < size; i++) {
+                    if (num_palette != 1) {
+                        for (int i = 0; i < num_palette; i++) {
                             char ordinal = ordinal(palette.a(i), adapter);
-                            paletteToBlockChars[i] = ordinal;
+                            paletteToOrdinal[i] = ordinal;
                         }
                         for (int i = 0; i < 4096; i++) {
                             char paletteVal = data[i];
-                            char val = paletteToBlockChars[paletteVal];
+                            char val = paletteToOrdinal[paletteVal];
+                            if (val == Character.MAX_VALUE) {
+                                val = ordinal(palette.a(i), adapter);
+                                paletteToOrdinal[i] = val;
+                            }
                             data[i] = val;
                         }
                     } else {
@@ -583,14 +587,14 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     }
                 } finally {
                     for (int i = 0; i < num_palette; i++) {
-                        paletteToBlockChars[i] = Character.MAX_VALUE;
+                        paletteToOrdinal[i] = Character.MAX_VALUE;
                     }
                 }
+                return data;
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-            return data;
         }
     }
 
