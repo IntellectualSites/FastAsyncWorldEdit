@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
 import com.boydti.fawe.config.BBC;
@@ -40,6 +42,7 @@ import com.boydti.fawe.object.mask.MaskedTargetBlock;
 import com.boydti.fawe.object.pattern.PatternTraverser;
 import com.boydti.fawe.util.BrushCache;
 import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
@@ -58,6 +61,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
@@ -74,6 +78,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -653,11 +659,20 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .combineStages(true);
         EditSession editSession = builder.build();
 
-        PersistentChunkSendProcessor previous = null;
         World world = editSession.getWorld();
-        Supplier<Stream<Player>> players = () -> Stream.of(player);
+        Supplier<Collection<Player>> players = () -> Collections.singleton(player);
 
-        PersistentChunkSendProcessor newVisualExtent = new PersistentChunkSendProcessor(world, previous, players);
+        PersistentChunkSendProcessor newVisualExtent = new PersistentChunkSendProcessor(world, this.visualExtent, players);
+        ExtentTraverser<IChunkExtent> traverser = new ExtentTraverser<>(editSession).find(IChunkExtent.class);
+        if (traverser == null) {
+            throw new IllegalStateException("No queue found");
+        }
+
+        IChunkExtent chunkExtent = traverser.get();
+        if (this.visualExtent != null) {
+            this.visualExtent.init(chunkExtent);
+        }
+        newVisualExtent.init(chunkExtent);
 
         editSession.addProcessor(newVisualExtent);
         editSession.addProcessor(NullProcessor.INSTANCE);
@@ -675,6 +690,8 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 }
             }
         }
+        editSession.flushQueue();
+
         if (visualExtent != null) {
             // clear old data
             visualExtent.flush();

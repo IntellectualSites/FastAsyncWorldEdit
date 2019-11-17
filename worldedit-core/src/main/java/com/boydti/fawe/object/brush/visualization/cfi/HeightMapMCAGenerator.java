@@ -1187,8 +1187,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             char combined = block.getDefaultState().getOrdinalChar();
                             mainArr[index] = combined;
                             floorArr[index] = combined;
-                        } else {
-                            System.out.println("Block is null: " + color);
                         }
                     }
                 }

@@ -10,21 +10,20 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeType;
 
+import java.util.Collection;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class ChunkSendProcessor implements IBatchProcessor {
-    private final Supplier<Stream<Player>> players;
+    private final Supplier<Collection<Player>> players;
     private final World world;
     private final boolean full;
 
-    public ChunkSendProcessor(World world, Supplier<Stream<Player>> players) {
+    public ChunkSendProcessor(World world, Supplier<Collection<Player>> players) {
         this(world, players, false);
     }
 
-    public ChunkSendProcessor(World world, Supplier<Stream<Player>> players, boolean full) {
+    public ChunkSendProcessor(World world, Supplier<Collection<Player>> players, boolean full) {
         this.players = players;
         this.world = world;
         this.full = full;
@@ -34,7 +33,7 @@ public class ChunkSendProcessor implements IBatchProcessor {
         return world;
     }
 
-    public Supplier<Stream<Player>> getPlayers() {
+    public Supplier<Collection<Player>> getPlayers() {
         return players;
     }
 
@@ -53,12 +52,15 @@ public class ChunkSendProcessor implements IBatchProcessor {
             }
         }
         ChunkPacket packet = new ChunkPacket(chunkX, chunkZ, () -> blocks, full);
-        Stream<Player> stream = this.players.get();
+        Collection<Player> stream = this.players.get();
         if (stream == null) {
             world.sendFakeChunk(null, packet);
         } else {
-            stream.filter(player -> player.getWorld().equals(world))
-                .forEach(player -> world.sendFakeChunk(player, packet));
+            for (Player player : stream) {
+                if (player.getWorld().equals(world)) {
+                    world.sendFakeChunk(player, packet);
+                }
+            }
         }
         return set;
     }

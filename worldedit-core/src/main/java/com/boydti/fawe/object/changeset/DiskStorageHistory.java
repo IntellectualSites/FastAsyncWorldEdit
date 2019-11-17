@@ -193,7 +193,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public void close() throws IOException {
         super.close();
         synchronized (this) {
-            boolean flushed = osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null || osENTCT != null;
             try {
                 if (osBD != null) {
                     osBD.close();
@@ -221,9 +220,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            if (!flushed) {
-                throw new IOException("Empty");
             }
         }
     }

@@ -457,6 +457,7 @@ public final class PlatformCommandManager {
                     c -> {
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
                         c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
+                        c.accept(ToolUtilCommandsRegistration.builder(), new ToolUtilCommands(worldEdit));
                     },
                     manager -> {
                         PaintBrushCommands.register(commandManagerService, manager, registration);

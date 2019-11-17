@@ -28,7 +28,7 @@ public class CombinedBlocks implements IBlocks {
     public CombinedBlocks(IBlocks secondary, IBlocks primary, int addMask) {
         this.secondary = secondary;
         this.primary = primary;
-        this.addMask = addMask;
+        this.addMask = addMask == 0 ? 0 : addMask & secondary.getBitMask();
     }
 
     @Override

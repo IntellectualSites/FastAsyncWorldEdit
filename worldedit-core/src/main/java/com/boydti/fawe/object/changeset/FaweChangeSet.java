@@ -48,6 +48,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
     private final String worldName;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
+    private boolean closed;
 
     public static FaweChangeSet getDefaultChangeSet(World world, UUID uuid) {
         if (Settings.IMP.HISTORY.USE_DISK) {
@@ -80,6 +81,8 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
     }
 
     public void closeAsync() {
+        if (closed) return;
+        closed = true;
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
             waitingAsync.decrementAndGet();
@@ -116,7 +119,10 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
 
     @Override
     public void close() throws IOException {
-        flush();
+        if (!closed) {
+            closed = true;
+            flush();
+        }
     }
 
     public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);

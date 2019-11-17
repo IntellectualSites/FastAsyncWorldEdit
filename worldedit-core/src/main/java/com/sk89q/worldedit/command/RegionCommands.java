@@ -77,6 +77,7 @@ import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -151,7 +152,7 @@ public class RegionCommands {
     @Logging(REGION)
     public void test(Player player, EditSession editSession, @Selection Region region, @Arg(desc = "hello there") BiomeType biome) throws WorldEditException {
         System.out.println("Test start");
-        editSession.addProcessor(new ChunkSendProcessor(editSession.getWorld(), () -> Stream.of(player)));
+        editSession.addProcessor(new ChunkSendProcessor(editSession.getWorld(), () -> Collections.singleton(player)));
         editSession.addProcessor(NullProcessor.INSTANCE);
         FlatRegionFunction replace = new BiomeReplace(editSession, biome);
         FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);

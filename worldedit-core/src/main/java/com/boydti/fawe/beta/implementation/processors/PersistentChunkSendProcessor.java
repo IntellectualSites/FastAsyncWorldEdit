@@ -7,6 +7,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.entity.Player;
@@ -14,19 +15,25 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class PersistentChunkSendProcessor extends ChunkSendProcessor {
     private final Long2ObjectLinkedOpenHashMap<Character> current;
-    private final IQueueExtent queue;
+    @Nullable
     private Long2ObjectLinkedOpenHashMap<Character> previous;
+    private IChunkExtent queue;
 
-    public PersistentChunkSendProcessor(IQueueExtent queue, World world, PersistentChunkSendProcessor previous, Supplier<Stream<Player>> players) {
+    public PersistentChunkSendProcessor(World world, PersistentChunkSendProcessor previous, Supplier<Collection<Player>> players) {
         super(world, players);
         this.current = new Long2ObjectLinkedOpenHashMap<>();
-        this.previous = previous.current;
+        this.previous = previous != null ? previous.current : null;
+    }
+
+    public void init(IChunkExtent queue) {
         this.queue = queue;
     }
 
@@ -35,10 +42,15 @@ public class PersistentChunkSendProcessor extends ChunkSendProcessor {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
         long pair = MathMan.pairInt(chunkX, chunkZ);
-        Character bitMask = (char) (set.hasBiomes() ? Character.MAX_VALUE : set.getBitMask());
-        current.put(pair, bitMask);
-        Character lastValue = previous.remove(pair);
-        return new CombinedBlocks(get, set, lastValue == null ? 0 : lastValue);
+        char bitMask = (char) (set.hasBiomes() ? Character.MAX_VALUE : set.getBitMask());
+        synchronized (this) {
+            current.put(pair, (Character) bitMask);
+            if (previous != null) {
+                Character lastValue = previous.remove(pair);
+                if (lastValue != null) bitMask |= lastValue;
+            }
+        }
+        return new CombinedBlocks(get, set, bitMask);
     }
 
     public void flush() {
@@ -47,13 +59,15 @@ public class PersistentChunkSendProcessor extends ChunkSendProcessor {
     }
 
     public void clear() {
+        if (queue == null) throw new IllegalStateException("Queue is not provided");
         clear(current);
         current.clear();
+        queue = null;
     }
 
     public void clear(Long2ObjectLinkedOpenHashMap<Character> current) {
         if (current != null && !current.isEmpty()) {
-            Stream<Player> players = getPlayers().get();
+            Collection<Player> players = getPlayers().get();
             for (Long2ObjectMap.Entry<Character> entry : current.long2ObjectEntrySet()) {
                 long pair = entry.getLongKey();
                 int chunkX = MathMan.unpairIntX(pair);

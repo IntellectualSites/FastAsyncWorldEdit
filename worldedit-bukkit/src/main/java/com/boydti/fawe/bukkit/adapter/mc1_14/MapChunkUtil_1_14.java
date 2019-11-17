@@ -80,7 +80,7 @@ public class MapChunkUtil_1_14 {
         try {
             PacketPlayOutMapChunk nmsPacket;
             int bitMask = packet.getChunk().getBitMask();
-            if (bitMask == 0) {
+            if (bitMask == 0) { // TODO remove once sending tiles/entities is fixed
                 nmsPacket = Fawe.get().getQueueHandler().sync((Callable<PacketPlayOutMapChunk>) () -> {
                     Chunk nmsChunk = world.getChunkAt(packet.getChunkX(), packet.getChunkZ());
                     PacketPlayOutMapChunk nmsPacket1 = new PacketPlayOutMapChunk(nmsChunk, 65535);

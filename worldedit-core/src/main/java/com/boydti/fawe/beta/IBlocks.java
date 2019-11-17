@@ -8,8 +8,10 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
 import java.io.IOException;
@@ -45,11 +47,11 @@ public interface IBlocks extends Trimable {
 
     IBlocks reset();
 
-    default byte[] toByteArray(int bitMask) {
-        return toByteArray(null, bitMask);
+    default byte[] toByteArray(boolean full) {
+        return toByteArray(null, getBitMask(), full);
     }
 
-    default byte[] toByteArray(byte[] buffer, int bitMask) {
+    default byte[] toByteArray(byte[] buffer, int bitMask, boolean full) {
         if (buffer == null) {
             buffer = new byte[1024];
         }
@@ -58,11 +60,11 @@ public interface IBlocks extends Trimable {
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray);
 
-        System.out.println("Bitmask " + getBitMask());
-
         try {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
-                if (!this.hasSection(layer)) continue;
+                if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) continue;
+
+                System.out.println("Write section " + layer);
 
                 char[] ids = this.load(layer);
 
@@ -83,7 +85,7 @@ public interface IBlocks extends Trimable {
 
                 sectionWriter.writeShort(nonEmpty); // non empty
 
-//                if (false) {
+//                if (false) { // short palette
 //                    sectionWriter.writeByte(14); // globalPaletteBitsPerBlock
 //                    BitArray4096 bits = new BitArray4096(14); // globalPaletteBitsPerBlock
 //                    bits.setAt(0, 0);
@@ -123,22 +125,7 @@ public interface IBlocks extends Trimable {
                     }
 //                }
             }
-
-//        if (writeBiomes) {
-//            for (int x = 0; x < 16; x++) {
-//                for (int z = 0; z < 16; z++) {
-//                    BiomeType biome = this.getBiomeType(x, z);
-//                    if (biome == null) {
-//                        if (writeBiomes) {
-//                            break;
-//                        } else {
-//                            biome = BiomeTypes.FOREST;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-            if (bitMask == Character.MAX_VALUE) {
+            if (full) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
                         BiomeType biome = getBiomeType(x, z);
