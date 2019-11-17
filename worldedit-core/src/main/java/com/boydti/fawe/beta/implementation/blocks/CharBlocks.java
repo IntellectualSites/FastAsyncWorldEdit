@@ -16,7 +16,6 @@ public abstract class CharBlocks implements IBlocks {
     public static final Section EMPTY = new Section() {
         @Override
         public final char[] get(CharBlocks blocks, int layer) {
-            blocks.sections[layer] = FULL;
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null);
@@ -25,17 +24,20 @@ public abstract class CharBlocks implements IBlocks {
                 }
             } else {
                 blocks.blocks[layer] = blocks.update(layer, arr);
+                if (blocks.blocks[layer] == null) {
+                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                }
+            }
+            synchronized (this) {
+                if (blocks.blocks[layer] != null) {
+                    blocks.sections[layer] = FULL;
+                }
             }
             return arr;
         }
     };
     public final char[][] blocks;
     public final Section[] sections;
-
-    public CharBlocks(CharBlocks other) {
-        this.blocks = other.blocks;
-        this.sections = other.sections;
-    }
 
     public CharBlocks() {
         blocks = new char[16][];
@@ -49,8 +51,12 @@ public abstract class CharBlocks implements IBlocks {
     public boolean trim(boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
-            if (sections[i] == EMPTY) {
-                blocks[i] = null;
+            if (sections[i] == EMPTY && blocks[i] != null) {
+                synchronized (this) {
+                    if (sections[i] == EMPTY && blocks[i] != null) {
+                        blocks[i] = null;
+                    }
+                }
             } else {
                 result = false;
             }
