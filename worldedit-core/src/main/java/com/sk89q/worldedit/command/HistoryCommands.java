@@ -83,7 +83,7 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void faweRollback(Player player, LocalSession session, String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
+    public void faweRollback(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return;
@@ -214,7 +214,7 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void restore(Player player, LocalSession session, String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
+    public void restore(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
         faweRollback(player, session, user, radius, time, true);
     }
 

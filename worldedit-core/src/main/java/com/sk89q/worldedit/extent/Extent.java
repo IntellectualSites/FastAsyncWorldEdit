@@ -21,12 +21,15 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.NullExtent;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -453,6 +456,18 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default boolean cancel() {
+        ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
+
+        NullExtent nullExtent = new NullExtent(this, FaweCache.MANUAL);
+
+        ExtentTraverser<Extent> next = traverser.next();
+        if (next != null) {
+            Extent child = next.get();
+            if (child instanceof NullExtent) return true;
+            traverser.setNext(nullExtent);
+            child.cancel();
+        }
+        addProcessor(nullExtent);
         return true;
     }
 

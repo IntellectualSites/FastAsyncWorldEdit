@@ -325,21 +325,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return player;
     }
 
-    public boolean cancel() {
-        ExtentTraverser traverser = new ExtentTraverser<>(getExtent());
-        NullExtent nullExtent = new NullExtent(world, FaweCache.MANUAL);
-        while (traverser != null) {
-            Extent get = traverser.get();
-            ExtentTraverser next = traverser.next();
-            if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
-                traverser.setNext(nullExtent);
-            }
-            get.addProcessor(nullExtent);
-            traverser = next;
-        }
-        return super.cancel();
-    }
-
     // pkg private for TracedEditSession only, may later become public API
     boolean commitRequired() {
         return false;

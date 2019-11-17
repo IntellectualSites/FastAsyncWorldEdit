@@ -21,11 +21,9 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
     @Override
     public boolean trim(boolean aggressive) {
-        synchronized (this) {
-            for (int i = 0; i < 16; i++) {
-                sections[i] = EMPTY;
-                blocks[i] = null;
-            }
+        for (int i = 0; i < 16; i++) {
+            sections[i] = EMPTY;
+            blocks[i] = null;
         }
         return true;
     }

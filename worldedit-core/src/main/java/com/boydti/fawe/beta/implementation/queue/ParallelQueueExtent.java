@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation.queue;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueWrapper;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
@@ -10,6 +11,7 @@ import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.boydti.fawe.object.extent.NullExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
@@ -54,6 +56,15 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public IQueueExtent getExtent() {
         return (IQueueExtent) super.getExtent();
+    }
+
+    @Override
+    public boolean cancel() {
+        if (super.cancel()) {
+            processor.setProcessor(new NullExtent(this, FaweCache.MANUAL));
+            return true;
+        }
+        return false;
     }
 
     private IQueueExtent getNewQueue() {

@@ -81,6 +81,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
+    public boolean isUnderutilized() {
+        return blockingExecutor.getActiveCount() < blockingExecutor.getMaximumPoolSize();
+    }
+
     private long getAllocate() {
         long now = System.currentTimeMillis();
         targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);

@@ -211,7 +211,6 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     }
 
     private void updateGet(BukkitGetBlocks_1_14 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
-        checkNotNull(arr);
         synchronized (get) {
             if (this.nmsChunk != nmsChunk) {
                 this.nmsChunk = nmsChunk;

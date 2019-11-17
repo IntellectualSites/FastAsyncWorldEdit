@@ -221,17 +221,20 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
         final int size = chunks.size();
         final boolean lowMem = MemUtil.isMemoryLimited();
-        if (enabledQueue && (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE)) {
+        // If queueing is enabled AND either of the following
+        //  - memory is low & queue size > num threads + 8
+        //  - queue size > target size and primary queue has less than num threads submissions
+        if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized()))) {
             chunk = chunks.removeFirst();
             final Future future = submitUnchecked(chunk);
             if (future != null && !future.isDone()) {
                 final int targetSize;
                 if (lowMem) {
-                    targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS;
+                    targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS + 8;
                 } else {
                     targetSize = Settings.IMP.QUEUE.TARGET_SIZE;
                 }
-                pollSubmissions(targetSize, true);
+                pollSubmissions(targetSize, lowMem);
                 submissions.add(future);
             }
         }

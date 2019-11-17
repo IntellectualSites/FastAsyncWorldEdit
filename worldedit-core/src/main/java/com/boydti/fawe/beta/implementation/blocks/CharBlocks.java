@@ -28,10 +28,8 @@ public abstract class CharBlocks implements IBlocks {
                     throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
                 }
             }
-            synchronized (this) {
-                if (blocks.blocks[layer] != null) {
-                    blocks.sections[layer] = FULL;
-                }
+            if (blocks.blocks[layer] != null) {
+                blocks.sections[layer] = FULL;
             }
             return arr;
         }
@@ -52,11 +50,7 @@ public abstract class CharBlocks implements IBlocks {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
             if (sections[i] == EMPTY && blocks[i] != null) {
-                synchronized (this) {
-                    if (sections[i] == EMPTY && blocks[i] != null) {
-                        blocks[i] = null;
-                    }
-                }
+                blocks[i] = null;
             } else {
                 result = false;
             }

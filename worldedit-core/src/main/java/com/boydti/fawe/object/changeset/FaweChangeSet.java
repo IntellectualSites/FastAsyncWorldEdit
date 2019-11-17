@@ -31,6 +31,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.io.Closeable;
@@ -196,6 +197,9 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
                         int combinedFrom = blocksGet[index];
+                        if (combinedFrom == 0) {
+                            combinedFrom = BlockID.AIR;
+                        }
                         int combinedTo = blocksSet[index];
                         if (combinedTo != 0) {
                             add(xx, yy, zz, combinedFrom, combinedTo);
