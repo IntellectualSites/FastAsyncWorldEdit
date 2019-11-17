@@ -453,7 +453,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 //                }
 
                 Runnable callback;
-                if (bitMask == 0) {
+                if (bitMask == 0 && biomes == null) {
                     callback = null;
                 } else {
                     int finalMask = bitMask;

@@ -482,12 +482,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         Mask mask = traceMask == null ? new SolidBlockMask(editSession) : traceMask;
         new MaskTraverser(mask).reset(editSession);
         MaskedTargetBlock tb = new MaskedTargetBlock(mask, player, range, 0.2);
-        return TaskManager.IMP.sync(new RunnableVal<Vector3>() {
-            @Override
-            public void run(Vector3 value) {
-                this.value = tb.getMaskedTargetBlock(useLastBlock);
-            }
-        });
+        return tb.getMaskedTargetBlock(useLastBlock);
     }
 
     public boolean act(BrushAction action, Player player, LocalSession session) {

@@ -275,7 +275,7 @@ public class Settings extends Config {
                 " - A value too small may break some operations (deform?)"
 
         })
-        public int TARGET_SIZE = 64;
+        public int TARGET_SIZE = 8192;
         @Comment({
                 "Force FAWE to start placing chunks regardless of whether an edit is finished processing",
                 " - A larger value will use slightly less CPU time",
