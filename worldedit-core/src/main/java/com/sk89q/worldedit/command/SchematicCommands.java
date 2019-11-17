@@ -211,11 +211,11 @@ public class SchematicCommands {
     public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "sponge")
+                     @Arg(desc = "Format name.", def = "")
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
+        ClipboardFormat format = formatName != null ? ClipboardFormats.findByAlias(formatName) : null;
         InputStream in = null;
         try {
             URI uri;

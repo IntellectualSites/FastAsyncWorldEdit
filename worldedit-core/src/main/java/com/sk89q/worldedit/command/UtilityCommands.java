@@ -805,7 +805,7 @@ public class UtilityCommands {
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
             for (int i = 0; i < len; i++) {
-                String arg = "";
+                String arg = args.get(i);
                 switch (arg.toLowerCase()) {
                     case "me":
                     case "mine":
@@ -890,7 +890,8 @@ public class UtilityCommands {
                                 UUID.fromString(f.getName());
                                 return;
                             }
-                        } catch (IllegalArgumentException ignored) {}
+                        } catch (IllegalArgumentException ignored) {
+                        }
                         super.accept(f);
                     }
                 };
