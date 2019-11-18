@@ -473,7 +473,9 @@ public class LocalSession implements TextureHolder {
             return;
         }
         // Don't store anything if no changes were made
-        if (editSession.size() == 0) return;
+        if (editSession.size() == 0) {
+            return;
+        }
 
         FaweChangeSet changeSet = (FaweChangeSet) editSession.getChangeSet();
         if (changeSet.isEmpty()) {

@@ -90,7 +90,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                         int index = value.getIndex();
                         long age = System.currentTimeMillis() - value.getBDFile().lastModified();
                         String ageFormatted = MainUtil.secToTime(age / 1000);
-                        BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromInternalId(from).getAsString(), BlockState.getFromInternalId(to).getAsString(), ageFormatted);
+                        BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromOrdinal(from).getAsString(), BlockState.getFromOrdinal(to).getAsString(), ageFormatted);
                         count.incrementAndGet();
                         return;
                     }

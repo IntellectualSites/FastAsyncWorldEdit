@@ -145,6 +145,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
 
     @Override
     public synchronized IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        System.out.println("Add chunk " + chunk.getX() + "," + chunk.getZ() + " | " + set.getBitMask());
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
 

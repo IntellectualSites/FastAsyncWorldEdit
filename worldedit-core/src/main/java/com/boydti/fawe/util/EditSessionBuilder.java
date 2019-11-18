@@ -328,7 +328,6 @@ public class EditSessionBuilder {
                     queue = parallel.getExtent();
                     extent = parallel;
                 } else {
-                    System.out.println("FAWE is in single threaded mode (performance reduced)");
                     extent = queue = Fawe.get().getQueueHandler().getQueue(world);
                 }
             } else {

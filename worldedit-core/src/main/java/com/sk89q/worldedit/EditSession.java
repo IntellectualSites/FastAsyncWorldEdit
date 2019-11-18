@@ -26,6 +26,7 @@ import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -204,7 +205,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
-    private int changes = 0;
+    private int changes = -1;
     private final BlockBag blockBag;
 
     private final int maxY;
