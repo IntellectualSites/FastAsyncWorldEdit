@@ -70,7 +70,6 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         final int y = target.getBlockY();
         final int z = target.getBlockZ();
         World world = player.getWorld();
-        EditSessionBuilder editSession = new EditSessionBuilder(world).player(player);
         RollbackDatabase db = DBHandler.IMP.getDatabase(world);
         final AtomicInteger count = new AtomicInteger();
         db.getPotentialEdits(null, 0, target, target, new RunnableVal<DiskStorageHistory>() {

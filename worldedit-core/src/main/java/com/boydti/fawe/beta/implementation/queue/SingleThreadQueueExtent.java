@@ -138,7 +138,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
         chunks.remove(index, chunk);
-        return submitUnchecked(chunk);
+        V future = submitUnchecked(chunk);
+        submissions.add(future);
+        return future;
     }
 
     /**
