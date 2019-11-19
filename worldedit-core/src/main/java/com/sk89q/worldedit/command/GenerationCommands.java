@@ -187,7 +187,7 @@ public class GenerationCommands {
     public void hcyl(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The pattern of blocks to generate")
                             Pattern pattern,
-        BlockVector2 radius,
+                     @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
                     @Arg(desc = "The height of the cylinder", def = "1")
                                 int height,
                     @Range(min = 1) @Arg(desc = "double", def = "1") double thickness, InjectedValueAccess context) throws WorldEditException {
@@ -209,7 +209,7 @@ public class GenerationCommands {
     public void cyl(Actor actor, LocalSession session, EditSession editSession,
                    @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-        BlockVector2 radius,
+                    @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
                    @Arg(desc = "The height of the cylinder", def = "1")
                                int height,
                    @Switch(name = 'h', desc = "Make a hollow cylinder")
