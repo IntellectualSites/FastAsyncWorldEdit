@@ -19,8 +19,9 @@
 
 package com.sk89q.worldedit.util.paste;
 
-import com.boydti.fawe.util.IncendoPaster;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
+
+import com.boydti.fawe.util.IncendoPaster;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.task.Supervisor;
 

@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.forge;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.forge.ForgeAdapter.adaptPlayer;
-
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.LocalSession;
@@ -34,6 +31,7 @@ import com.sk89q.worldedit.forge.net.packet.LeftClickAirEventMessage;
 import com.sk89q.worldedit.forge.proxy.ClientProxy;
 import com.sk89q.worldedit.forge.proxy.CommonProxy;
 import com.sk89q.worldedit.forge.proxy.ServerProxy;
+import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
@@ -41,14 +39,13 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -61,12 +58,10 @@ import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
@@ -77,6 +72,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.forge.ForgeAdapter.adaptPlayer;
 
 /**
  * The Forge implementation of WorldEdit.
@@ -105,7 +104,6 @@ public class ForgeWorldEdit {
 
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::init);
-        modBus.addListener(this::load);
 
         MinecraftForge.EVENT_BUS.register(ThreadSafeCache.getInstance());
         MinecraftForge.EVENT_BUS.register(this);
@@ -131,24 +129,6 @@ public class ForgeWorldEdit {
         LOGGER.info("WorldEdit for Forge (version " + getInternalVersion() + ") is loaded");
     }
 
-    private void load(FMLLoadCompleteEvent event) {
-        if (FMLLoader.getDist() == Dist.CLIENT) {
-            // we want to setup platform before we hit the main menu
-            // but this event is async -- so we must delay until the first game loop:
-            Minecraft.getInstance().addScheduledTask(this::setupPlatform);
-        }
-    }
-
-    @SubscribeEvent
-    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
-        if (this.platform != null) {
-            LOGGER.warn("FMLServerStartingEvent occurred when FMLServerStoppingEvent hasn't");
-            WorldEdit.getInstance().getPlatformManager().unregister(platform);
-        }
-
-        setupPlatform();
-    }
-
     private void setupPlatform() {
         this.platform = new ForgePlatform(this);
 
@@ -159,11 +139,6 @@ public class ForgeWorldEdit {
 //        } else {
         this.provider = new ForgePermissionsProvider.VanillaPermissionsProvider(platform);
 //        }
-
-        setupRegistries();
-
-        config = new ForgeConfiguration(this);
-        config.load();
     }
 
     private void setupRegistries() {
@@ -206,12 +181,25 @@ public class ForgeWorldEdit {
     }
 
     @SubscribeEvent
+    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
+        final Path delChunks = workingDir.resolve(DELCHUNKS_FILE_NAME);
+        if (Files.exists(delChunks)) {
+            ChunkDeleter.runFromFile(delChunks, true);
+        }
+    }
+
+    @SubscribeEvent
     public void serverStopping(FMLServerStoppingEvent event) {
         WorldEdit.getInstance().getPlatformManager().unregister(platform);
     }
 
     @SubscribeEvent
     public void serverStarted(FMLServerStartedEvent event) {
+        setupPlatform();
+        setupRegistries();
+
+        config = new ForgeConfiguration(this);
+        config.load();
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
     }
 
@@ -226,10 +214,10 @@ public class ForgeWorldEdit {
 
         if (event.getWorld().isRemote && event instanceof LeftClickEmpty) {
             // catch LCE, pass it to server
-            InternalPacketHandler.HANDLER.sendToServer(new LeftClickAirEventMessage());
+            InternalPacketHandler.getHandler().sendToServer(new LeftClickAirEventMessage());
             return;
         }
-        
+
         boolean isLeftDeny = event instanceof PlayerInteractEvent.LeftClickBlock
                 && ((PlayerInteractEvent.LeftClickBlock) event)
                         .getUseItem() == Event.Result.DENY;
@@ -237,19 +225,16 @@ public class ForgeWorldEdit {
                 event instanceof PlayerInteractEvent.RightClickBlock
                         && ((PlayerInteractEvent.RightClickBlock) event)
                                 .getUseItem() == Event.Result.DENY;
-        if (isLeftDeny || isRightDeny || event.getEntity().world.isRemote) {
+        if (isLeftDeny || isRightDeny || event.getEntity().world.isRemote || event.getHand() == Hand.OFF_HAND) {
             return;
         }
 
         WorldEdit we = WorldEdit.getInstance();
-        ForgePlayer player = adaptPlayer((EntityPlayerMP) event.getEntityPlayer());
-        ForgeWorld world = getWorld(event.getEntityPlayer().world);
+        ForgePlayer player = adaptPlayer((ServerPlayerEntity) event.getPlayer());
+        ForgeWorld world = getWorld(event.getPlayer().world);
 
         if (event instanceof PlayerInteractEvent.LeftClickEmpty) {
-            if (we.handleArmSwing(player)) {
-                // this event cannot be canceled
-                // event.setCanceled(true);
-            }
+            we.handleArmSwing(player); // this event cannot be canceled
         } else if (event instanceof PlayerInteractEvent.LeftClickBlock) {
             Location pos = new Location(world, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
 
@@ -280,10 +265,10 @@ public class ForgeWorldEdit {
     @SubscribeEvent
     public void onCommandEvent(CommandEvent event) throws CommandSyntaxException {
         ParseResults<CommandSource> parseResults = event.getParseResults();
-        if (!(parseResults.getContext().getSource().getEntity() instanceof EntityPlayerMP)) {
+        if (!(parseResults.getContext().getSource().getEntity() instanceof ServerPlayerEntity)) {
             return;
         }
-        EntityPlayerMP player = parseResults.getContext().getSource().asPlayer();
+        ServerPlayerEntity player = parseResults.getContext().getSource().asPlayer();
         if (player.world.isRemote()) {
             return;
         }
@@ -312,7 +297,7 @@ public class ForgeWorldEdit {
      * @param player the player
      * @return the session
      */
-    public LocalSession getSession(EntityPlayerMP player) {
+    public LocalSession getSession(ServerPlayerEntity player) {
         checkNotNull(player);
         return WorldEdit.getInstance().getSessionManager().get(adaptPlayer(player));
     }

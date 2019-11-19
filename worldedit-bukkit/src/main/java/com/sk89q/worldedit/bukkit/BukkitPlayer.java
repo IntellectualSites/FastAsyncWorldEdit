@@ -44,6 +44,8 @@ import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Locale;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
@@ -59,7 +61,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -215,12 +216,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public GameMode getGameMode() {
-        return GameModes.get(getPlayer().getGameMode().name().toLowerCase(Locale.ROOT));
+        return GameModes.get(player.getGameMode().name().toLowerCase(Locale.ROOT));
     }
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        getPlayer().setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
+        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
     }
 
     @Override
@@ -237,6 +238,16 @@ public class BukkitPlayer extends AbstractPlayerActor {
             getPlayer().addAttachment(plugin).setPermission(permission, true);
             return true;
         }
+    }
+
+    @Override
+    public boolean isAllowedToFly() {
+        return player.getAllowFlight();
+    }
+
+    @Override
+    public void setFlying(boolean flying) {
+        player.setFlying(flying);
     }
 
     @Override
@@ -279,16 +290,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
         }
         return player;
-    }
-
-    @Override
-    public boolean isAllowedToFly() {
-        return getPlayer().getAllowFlight();
-    }
-
-    @Override
-    public void setFlying(boolean flying) {
-        getPlayer().setFlying(flying);
     }
 
     @Override

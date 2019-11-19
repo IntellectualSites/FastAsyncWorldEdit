@@ -572,7 +572,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     default  <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return replaceBlocks(region, filter, new BlockPattern(replacement));
+        return replaceBlocks(region, filter, (Pattern) replacement);
     }
 
     /**

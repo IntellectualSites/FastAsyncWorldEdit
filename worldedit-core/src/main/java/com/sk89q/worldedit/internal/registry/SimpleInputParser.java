@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  */
 public abstract class SimpleInputParser<E> extends InputParser<E> {
 
-    public SimpleInputParser(WorldEdit worldEdit) {
+    protected SimpleInputParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 

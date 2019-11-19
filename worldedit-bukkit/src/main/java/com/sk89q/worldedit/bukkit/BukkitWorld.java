@@ -34,6 +34,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -328,19 +330,27 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-        int X = pt.getBlockX() >> 4;
-        int Z = pt.getBlockZ() >> 4;
-        if (Fawe.isMainThread()) {
-            world.getChunkAt(X, Z);
-        } else if (!world.isChunkLoaded(X, Z)) {
-            if (PaperLib.isPaper()) {
-                world.getChunkAtAsync(X, Z, true);
-            } else {
-                Fawe.get().getQueueHandler().sync(() -> {
-                    world.getChunkAt(X, Z);
-                });
-            }
+
+        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
+
+        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
+            world.loadChunk(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
         }
+        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
+			int X = pt.getBlockX() >> 4;
+	        int Z = pt.getBlockZ() >> 4;
+	        if (Fawe.isMainThread()) {
+	            world.getChunkAt(X, Z);
+	        } else if (!world.isChunkLoaded(X, Z)) {
+	            if (PaperLib.isPaper()) {
+	                world.getChunkAtAsync(X, Z, true);
+	            } else {
+	                Fawe.get().getQueueHandler().sync(() -> {
+	                    world.getChunkAt(X, Z);
+	                });
+	            }
+	        }
+		}
     }
 
     @Override
@@ -551,5 +561,15 @@ public class BukkitWorld extends AbstractWorld {
     public void sendFakeChunk(Player player, ChunkPacket packet) {
         org.bukkit.entity.Player bukkitPlayer = BukkitAdapter.adapt(player);
         WorldEditPlugin.getInstance().getBukkitImplAdapter().sendFakeChunk(getWorld(), bukkitPlayer, packet);
+    }
+
+    @Override
+    public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.simulateItemUse(getWorld(), position, item, face);
+        }
+
+        return false;
     }
 }

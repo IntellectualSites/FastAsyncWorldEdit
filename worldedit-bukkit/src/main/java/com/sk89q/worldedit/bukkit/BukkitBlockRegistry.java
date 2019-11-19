@@ -75,6 +75,13 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         return super.getMaterial(state);
     }
 
+    @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
+        }
+        return OptionalInt.empty();
+    }
     @Nullable
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
@@ -136,10 +143,5 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             }
         }
         return blocks;
-    }
-
-    @Override
-    public OptionalInt getInternalBlockStateId(BlockState state) {
-        return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
     }
 }

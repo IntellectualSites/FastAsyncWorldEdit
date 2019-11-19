@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
@@ -56,6 +54,8 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Commands to undo, redo, and clear history.
@@ -223,6 +223,16 @@ public class HistoryCommands {
         aliases = { "/un", "/ud", "undo" },
         desc = "Undoes the last action (from history)"
     )
+        } else {
+            undoSession = session;
+        }
+        int finalTimes = times;
+        player.checkConfirmation(() -> {
+            EditSession undone = null;
+            int i = 0;
+            for (; i < finalTimes; ++i) {
+                undone = undoSession.undo(undoSession.getBlockBag(player), player);
+                if (undone == null) break;
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
     public void undo(Player player, LocalSession session,
         @Range(min = 1) @Arg(desc = "Number of undoes to perform", def = "1")
@@ -243,16 +253,6 @@ public class HistoryCommands {
                 BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
                 return;
             }
-        } else {
-            undoSession = session;
-        }
-        int finalTimes = times;
-        player.checkConfirmation(() -> {
-            EditSession undone = null;
-            int i = 0;
-            for (; i < finalTimes; ++i) {
-                undone = undoSession.undo(undoSession.getBlockBag(player), player);
-                if (undone == null) break;
                 worldEdit.flushBlockBag(player, undone);
             }
             if (undone == null) i--;
@@ -311,7 +311,7 @@ public class HistoryCommands {
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        actor.print(BBC.COMMAND_HISTORY_CLEAR.s());
+        actor.print("History cleared.");
     }
 
 }

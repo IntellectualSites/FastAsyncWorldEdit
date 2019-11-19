@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.internal.command.exception;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.DisallowedItemException;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -29,6 +27,7 @@ import com.sk89q.worldedit.InvalidItemException;
 import com.sk89q.worldedit.MaxBrushRadiusException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.MaxRadiusException;
+import com.sk89q.worldedit.MissingWorldException;
 import com.sk89q.worldedit.UnknownDirectionException;
 import com.sk89q.worldedit.UnknownItemException;
 import com.sk89q.worldedit.WorldEdit;
@@ -46,6 +45,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.UsageException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * converts WorldEdit exceptions and converts them into {@link CommandException}s.

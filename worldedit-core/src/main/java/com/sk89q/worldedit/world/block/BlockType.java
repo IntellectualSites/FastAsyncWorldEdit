@@ -19,9 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.sk89q.worldedit.WorldEdit;
+import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
@@ -35,6 +34,7 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
@@ -100,6 +102,14 @@ public class BlockType implements FawePattern, Keyed {
         } else {
             return name;
         }
+    }
+
+    private BlockState computeDefaultState() {
+        BlockState defaultState = Iterables.getFirst(getBlockStatesMap().values(), null);
+        if (values != null) {
+            defaultState = values.apply(defaultState);
+        }
+        return defaultState;
     }
 
     @Deprecated

@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import static com.boydti.fawe.util.ReflectionUtils.as;
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
@@ -41,6 +40,7 @@ import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -60,6 +60,7 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.component.CodeFormat;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
@@ -70,6 +71,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -843,6 +846,24 @@ public class SchematicCommands {
         return fileList;
     }
 
+    @Command(
+        name = "delete",
+        aliases = {"d"},
+        desc = "Delete a saved schematic"
+    )
+    @CommandPermissions("worldedit.schematic.delete")
+    public void delete(Actor actor,
+                       @Arg(desc = "File name.")
+                           String filename) throws WorldEditException {
+        LocalConfiguration config = worldEdit.getConfiguration();
+        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+
+        File f = worldEdit.getSafeOpenFile(actor instanceof Player ? ((Player) actor) : null,
+                dir, filename, "schematic", ClipboardFormats.getFileExtensionArray());
+
+        if (!f.exists()) {
+            actor.printError("Schematic " + filename + " does not exist!");
+            return;
     private boolean delete(File file) {
         if (file.delete()) {
             new File(file.getParentFile(), "." + file.getName() + ".cached").delete();

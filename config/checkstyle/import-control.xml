@@ -44,10 +44,19 @@
     <allow pkg="com.google.auto"/>
     <allow pkg="it.unimi.dsi.fastutil"/>
 
+    <subpackage name="internal.expression">
+      <allow pkg="org.antlr.v4"/>
+    </subpackage>
+
     <subpackage name="bukkit">
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
       <allow pkg="io.papermc.lib"/>
+    </subpackage>
+
+    <subpackage name="cli">
+      <allow pkg="org.apache.logging.log4j"/>
+      <allow pkg="org.apache.commons.cli" />
     </subpackage>
 
     <subpackage name="forge">
@@ -59,6 +68,18 @@
       <allow pkg="org.lwjgl"/>
       <allow pkg="io.netty.buffer"/>
       <allow pkg="org.spongepowered.api" />
+      <allow pkg="com.mojang.brigadier" />
+      <allow pkg="com.mojang.datafixers" />
+    </subpackage>
+
+    <subpackage name="fabric">
+      <allow pkg="net.minecraft"/>
+      <allow pkg="net.fabricmc"/>
+      <allow pkg="com.mojang.authlib"/>
+      <allow pkg="org.apache.logging.log4j"/>
+      <allow pkg="org.lwjgl"/>
+      <allow pkg="io.netty.buffer"/>
+      <allow pkg="org.spongepowered" />
       <allow pkg="com.mojang.brigadier" />
       <allow pkg="com.mojang.datafixers" />
     </subpackage>

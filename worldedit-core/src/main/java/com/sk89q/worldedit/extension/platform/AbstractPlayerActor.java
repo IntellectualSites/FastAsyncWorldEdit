@@ -19,13 +19,14 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.EditSession;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -45,6 +46,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
+
+import javax.annotation.Nullable;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
@@ -70,7 +73,6 @@ import java.text.NumberFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nullable;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.jetbrains.annotations.NotNull;
 
@@ -249,7 +251,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 if (!lastState) {
                     lastState = BlockTypeUtil.centralBottomLimit(state) != 1;
                     continue;
-                }
+                    }
                 if (freeStart == -1) {
                     freeStart = level + BlockTypeUtil.centralTopLimit(state);
                 } else {
@@ -257,13 +259,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     double space = level + bottomLimit - freeStart;
                     if (space >= height) {
                         setPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
-                        return true;
-                    }
+                    return true;
+                }
                     // Not enough room, reset the free position
                     if (bottomLimit != 1) {
                         freeStart = -1;
-                    }
-                }
+            }
+        }
             } else {
                 freeStart = -1;
                 lastState = true;
@@ -414,7 +416,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     session.setBlock(spot, BlockTypes.GLASS.getDefaultState());
                 } catch (MaxChangedBlocksException ignored) {
             }
-            }
+        }
         } else {
             setFlying(true);
         }
@@ -475,6 +477,23 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     @Override
     public Location getBlockTrace(int range) {
         return getBlockTrace(range, false);
+    }
+
+    /**
+     * Advances the block target block until the current block is a free
+     * @return true if a free spot is found
+     */
+    private boolean advanceToFree(TargetBlock hitBlox) {
+        Location curBlock;
+        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
+            if (canPassThroughBlock(curBlock)) {
+                return true;
+            }
+
+            hitBlox.getNextBlock();
+        }
+
+        return false;
     }
 
     @Override
@@ -541,33 +560,17 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         return false;
     }
-    /**
-     * Advances the block target block until the current block is a free
-     * @return true if a free spot is found
-     */
-    private boolean advanceToFree(TargetBlock hitBlox) {
-        Location curBlock;
-        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
-            if (canPassThroughBlock(curBlock)) {
-                return true;
-            }
-
-            hitBlox.getNextBlock();
-        }
-
-        return false;
-    }
 
     @Override
     public boolean passThroughForwardWall(int range) {
         TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
 
         if (!advanceToWall(hitBlox)) {
-                return false;
-            }
+            return false;
+                }
 
         if (!advanceToFree(hitBlox)) {
-            return false;
+                return false;
             }
 
         Location foundBlock = hitBlox.getCurrentBlock();
@@ -575,7 +578,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             setOnGround(foundBlock);
                 return true;
             }
-
 
         return false;
     }

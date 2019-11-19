@@ -19,31 +19,39 @@
 
 package com.sk89q.worldedit.forge;
 
+import com.sk89q.worldedit.command.util.PermissionCondition;
+
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
-import com.sk89q.worldedit.util.command.CommandMapping;
-import com.sk89q.worldedit.util.command.Dispatcher;
+import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.util.SharedConstants;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
+import org.enginehub.piston.Command;
+import org.enginehub.piston.CommandManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
 
@@ -81,19 +89,31 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
+    public int getDataVersion() {
+        return SharedConstants.getVersion().getWorldVersion();
+    }
+
+    @Override
+    public DataFixer getDataFixer() {
+        return dataFixer;
+    }
+
+    @Override
     public int schedule(long delay, long period, Runnable task) {
         return -1;
     }
 
     @Override
-    public List<? extends com.sk89q.worldedit.world.World> getWorlds() {
-        Iterable<WorldServer> worlds = server.getWorlds();
-        List<com.sk89q.worldedit.world.World> ret = new ArrayList<>();
-        for (WorldServer world : worlds) {
     @Nullable
     public ForgeWatchdog getWatchdog() {
         return watchdog;
     }
+
+    @Override
+    public List<? extends World> getWorlds() {
+        Iterable<ServerWorld> worlds = server.getWorlds();
+        List<World> ret = new ArrayList<>();
+        for (ServerWorld world : worlds) {
 
     @Override
     public List<? extends World> getWorlds() {
@@ -111,7 +131,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
         if (player instanceof ForgePlayer) {
             return player;
         } else {
-            EntityPlayerMP entity = server.getPlayerList().getPlayerByUsername(player.getName());
+            ServerPlayerEntity entity = server.getPlayerList().getPlayerByUsername(player.getName());
             return entity != null ? new ForgePlayer(entity) : null;
         }
     }
@@ -122,7 +142,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
         if (world instanceof ForgeWorld) {
             return world;
         } else {
-            for (WorldServer ws : server.getWorlds()) {
+            for (ServerWorld ws : server.getWorlds()) {
                 if (ws.getWorldInfo().getWorldName().equals(world.getName())) {
                     return new ForgeWorld(ws);
                 }
@@ -133,16 +153,17 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
-    public void registerCommands(Dispatcher dispatcher) {
+    public void registerCommands(CommandManager manager) {
         if (server == null) return;
         Commands mcMan = server.getCommandManager();
 
-        for (final CommandMapping command : dispatcher.getCommands()) {
+        for (Command command : manager.getAllCommands().collect(toList())) {
             CommandWrapper.register(mcMan.getDispatcher(), command);
-            if (command.getDescription().getPermissions().size() > 0) {
-                for (int i = 1; i < command.getDescription().getPermissions().size(); i++) {
-                    ForgeWorldEdit.inst.getPermissionsProvider().registerPermission(command.getDescription().getPermissions().get(i));
-                }
+            Set<String> perms = command.getCondition().as(PermissionCondition.class)
+                .map(PermissionCondition::getPermissions)
+                .orElseGet(Collections::emptySet);
+            if (!perms.isEmpty()) {
+                perms.forEach(ForgeWorldEdit.inst.getPermissionsProvider()::registerPermission);
             }
         }
     }
@@ -189,7 +210,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     public Collection<Actor> getConnectedUsers() {
         List<Actor> users = new ArrayList<>();
         PlayerList scm = server.getPlayerList();
-        for (EntityPlayerMP entity : scm.getPlayers()) {
+        for (ServerPlayerEntity entity : scm.getPlayers()) {
             if (entity != null) {
                 users.add(new ForgePlayer(entity));
             }

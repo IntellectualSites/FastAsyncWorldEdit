@@ -70,7 +70,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -437,7 +436,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         return act(BrushAction.PRIMARY, player, session);
-    }
+        }
 
     public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();

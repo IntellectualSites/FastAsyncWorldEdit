@@ -35,7 +35,7 @@ public abstract class InputParser<E> {
 
     protected final WorldEdit worldEdit;
 
-    public InputParser(WorldEdit worldEdit) {
+    protected InputParser(WorldEdit worldEdit) {
         this.worldEdit = worldEdit;
     }
 

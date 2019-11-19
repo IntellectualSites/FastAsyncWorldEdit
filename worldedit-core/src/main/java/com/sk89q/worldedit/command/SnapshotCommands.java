@@ -76,7 +76,7 @@ public class SnapshotCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
@@ -86,7 +86,7 @@ public class SnapshotCommands {
             if (!snapshots.isEmpty()) {
                 actor.print(new SnapshotListBox(world.getName(), snapshots).create(page));
             } else {
-                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
+                actor.printError("No snapshots are available. See console for details.");
 
                 // Okay, let's toss some debugging information!
                 File dir = config.snapshotRepo.getDirectory();
@@ -101,7 +101,7 @@ public class SnapshotCommands {
                 }
             }
         } catch (MissingWorldException ex) {
-            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+            actor.printError("No snapshots were found for this world.");
         }
     }
 
@@ -117,7 +117,7 @@ public class SnapshotCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
@@ -128,19 +128,19 @@ public class SnapshotCommands {
 
                 if (snapshot != null) {
                     session.setSnapshot(null);
-                    actor.print(BBC.SNAPSHOT_NEWEST.s());
+                    actor.print("Now using newest snapshot.");
                 } else {
-                    actor.printError(BBC.SNAPSHOT_NOT_FOUND.s());
+                    actor.printError("No snapshots were found.");
                 }
             } catch (MissingWorldException ex) {
-                actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+                actor.printError("No snapshots were found for this world.");
             }
         } else {
             try {
                 session.setSnapshot(config.snapshotRepo.getSnapshot(name));
-                BBC.SNAPSHOT_SET.send(actor, name);
+                actor.print("Snapshot set to: " + name);
             } catch (InvalidSnapshotException e) {
-                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
+                actor.printError("That snapshot does not exist or is not available.");
             }
         }
     }
@@ -156,12 +156,12 @@ public class SnapshotCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
         if (index < 1) {
-            actor.printError(BBC.SNAPSHOT_INVALID_INDEX.s());
+            actor.printError("Invalid index, must be equal or higher then 1.");
             return;
         }
 
@@ -173,13 +173,13 @@ public class SnapshotCommands {
             }
             Snapshot snapshot = snapshots.get(index - 1);
             if (snapshot == null) {
-                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
+                actor.printError("That snapshot does not exist or is not available.");
                 return;
             }
             session.setSnapshot(snapshot);
-            BBC.SNAPSHOT_SET.send(actor, snapshot.getName());
+            actor.print("Snapshot set to: " + snapshot.getName());
         } catch (MissingWorldException e) {
-            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+            actor.printError("No snapshots were found for this world.");
         }
     }
 
@@ -195,7 +195,7 @@ public class SnapshotCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
@@ -207,10 +207,10 @@ public class SnapshotCommands {
                     + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
             } else {
                 session.setSnapshot(snapshot);
-                BBC.SNAPSHOT_SET.send(actor, snapshot.getName());
+                actor.print("Snapshot set to: " + snapshot.getName());
             }
         } catch (MissingWorldException ex) {
-            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+            actor.printError("No snapshots were found for this world.");
         }
     }
 
@@ -226,7 +226,7 @@ public class SnapshotCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
@@ -240,7 +240,7 @@ public class SnapshotCommands {
                 actor.print("Snapshot set to: " + snapshot.getName());
             }
         } catch (MissingWorldException ex) {
-            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+            actor.printError("No snapshots were found for this world.");
         }
     }
 

@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -44,6 +42,8 @@ import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+
+import java.util.ArrayList;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -52,7 +52,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,6 +62,8 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * General WorldEdit commands.
@@ -132,8 +133,8 @@ public class GeneralCommands {
     }
 
     @Command(
-            name = "/fast",
-            desc = "Toggle fast mode"
+        name = "/fast",
+        desc = "Toggle fast mode"
     )
     @CommandPermissions("worldedit.fast")
     public void fast(Actor actor, LocalSession session,
@@ -144,12 +145,13 @@ public class GeneralCommands {
             actor.printError("Fast mode already " + (fastMode ? "enabled" : "disabled") + ".");
             return;
         }
+
         if (hasFastMode) {
             session.setFastMode(false);
-            actor.print(BBC.FAST_DISABLED.s());
+            actor.print("Fast mode disabled.");
         } else {
             session.setFastMode(true);
-            actor.print(BBC.FAST_ENABLED.s());
+            actor.print("Fast mode enabled. Lighting in the affected chunks may be wrong and/or you may need to rejoin to see changes.");
         }
     }
 
@@ -196,20 +198,20 @@ public class GeneralCommands {
         }
     }
 
-//    @Command(
-//        name = "/world",
-//        desc = "Sets the world override"
-//    )
-//    @CommandPermissions("worldedit.world")
-//    public void worldOverride(Actor actor, LocalSession session,
-//        @Arg(desc = "The world override", def = "") World world) {
-//        session.setWorldOverride(world);
-//        if (world == null) {
-//            actor.print("Removed world override.");
-//        } else {
-//            actor.print("Set the world override to " + world.getId() + ". (Use //world to go back to default)");
-//        }
-//    }
+    @Command(
+        name = "/world",
+        desc = "Sets the world override"
+    )
+    @CommandPermissions("worldedit.world")
+    public void world(Actor actor, LocalSession session,
+            @Arg(desc = "The world override", def = "") World world) {
+        session.setWorldOverride(world);
+        if (world == null) {
+            actor.print("Removed world override.");
+        } else {
+            actor.print("Set the world override to " + world.getId() + ". (Use //world to go back to default)");
+        }
+    }
 
     @Command(
         name = "/watchdog",
@@ -237,16 +239,18 @@ public class GeneralCommands {
     @Command(
         name = "gmask",
         aliases = {"/gmask"},
-        descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
         desc = "Set the global mask"
     )
-    @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gmask(Actor actor, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
-        session.setMask(mask);
+    @CommandPermissions("worldedit.global-mask")
+    public void gmask(Actor actor, LocalSession session,
+                      @Arg(desc = "The mask to set", def = "")
+                          Mask mask) {
         if (mask == null) {
-            actor.print(BBC.MASK_DISABLED.s());
+            session.setMask(null);
+            actor.print("Global mask disabled.");
         } else {
-            actor.print(BBC.MASK.s());
+            session.setMask(mask);
+            actor.print("Global mask set.");
         }
     }
 
@@ -291,7 +295,7 @@ public class GeneralCommands {
         actor.print(new ItemSearcher(search, blocksOnly, itemsOnly, page).call());
     }
 
-    public static class ItemSearcher implements Callable<Component> {
+    private static class ItemSearcher implements Callable<Component> {
         private final boolean blocksOnly;
         private final boolean itemsOnly;
         private final String search;

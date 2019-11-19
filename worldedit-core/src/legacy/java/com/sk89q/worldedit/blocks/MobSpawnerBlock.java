@@ -121,7 +121,6 @@ public class MobSpawnerBlock extends BaseBlock {
     @Override
     public CompoundTag getNbtData() {
         Map<String, Tag> values = new HashMap<>();
-        values.put("EntityId", new StringTag(mobType));
         values.put("Delay", new ShortTag(delay));
         values.put("SpawnCount", new ShortTag(spawnCount));
         values.put("SpawnRange", new ShortTag(spawnRange));
@@ -179,7 +178,6 @@ public class MobSpawnerBlock extends BaseBlock {
         } catch (InvalidFormatException ignored) {
             this.delay = -1;
         }
-
 
         ShortTag spawnCountTag = null;
         ShortTag spawnRangeTag = null;

@@ -20,13 +20,16 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
+
+import com.google.common.collect.Maps;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.util.IOUtil;
-import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.StringTag;
@@ -61,7 +64,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import com.sk89q.worldedit.math.Vector3;
 import java.util.Objects;
+import com.sk89q.worldedit.util.Location;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -332,6 +337,90 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             return;
         }
         schematic.writeNamedTag("Entities", new ListTag(CompoundTag.class, entities));
+    }
+
+    private void writeBiomes(Clipboard clipboard, Map<String, Tag> schematic) {
+        BlockVector3 min = clipboard.getMinimumPoint();
+        int width = clipboard.getRegion().getWidth();
+        int length = clipboard.getRegion().getLength();
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * length);
+
+        int paletteMax = 0;
+        Map<String, Integer> palette = new HashMap<>();
+
+        for (int z = 0; z < length; z++) {
+            int z0 = min.getBlockZ() + z;
+            for (int x = 0; x < width; x++) {
+                int x0 = min.getBlockX() + x;
+                BlockVector2 pt = BlockVector2.at(x0, z0);
+                BiomeType biome = clipboard.getBiome(pt);
+
+                String biomeKey = biome.getId();
+                int biomeId;
+                if (palette.containsKey(biomeKey)) {
+                    biomeId = palette.get(biomeKey);
+                } else {
+                    biomeId = paletteMax;
+                    palette.put(biomeKey, biomeId);
+                    paletteMax++;
+                }
+
+                while ((biomeId & -128) != 0) {
+                    buffer.write(biomeId & 127 | 128);
+                    biomeId >>>= 7;
+                }
+                buffer.write(biomeId);
+            }
+        }
+
+        schematic.put("BiomePaletteMax", new IntTag(paletteMax));
+
+        Map<String, Tag> paletteTag = new HashMap<>();
+        palette.forEach((key, value) -> paletteTag.put(key, new IntTag(value)));
+
+        schematic.put("BiomePalette", new CompoundTag(paletteTag));
+        schematic.put("BiomeData", new ByteArrayTag(buffer.toByteArray()));
+    }
+
+    private void writeEntities(Clipboard clipboard, Map<String, Tag> schematic) {
+        List<CompoundTag> entities = clipboard.getEntities().stream().map(e -> {
+            BaseEntity state = e.getState();
+            if (state == null) {
+                return null;
+            }
+            Map<String, Tag> values = Maps.newHashMap();
+            CompoundTag rawData = state.getNbtData();
+            if (rawData != null) {
+                values.putAll(rawData.getValue());
+            }
+            values.remove("id");
+            values.put("Id", new StringTag(state.getType().getId()));
+            final Location location = e.getLocation();
+            values.put("Pos", writeVector(location.toVector()));
+            values.put("Rotation", writeRotation(location));
+
+            return new CompoundTag(values);
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        if (entities.isEmpty()) {
+            return;
+        }
+        schematic.put("Entities", new ListTag(CompoundTag.class, entities));
+    }
+
+    private Tag writeVector(Vector3 vector) {
+        List<DoubleTag> list = new ArrayList<>();
+        list.add(new DoubleTag(vector.getX()));
+        list.add(new DoubleTag(vector.getY()));
+        list.add(new DoubleTag(vector.getZ()));
+        return new ListTag(DoubleTag.class, list);
+    }
+
+    private Tag writeRotation(Location location) {
+        List<FloatTag> list = new ArrayList<>();
+        list.add(new FloatTag(location.getYaw()));
+        list.add(new FloatTag(location.getPitch()));
+        return new ListTag(FloatTag.class, list);
     }
 
     @Override

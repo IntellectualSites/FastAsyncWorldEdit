@@ -33,13 +33,13 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-
 import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.block.BlockType;
+
+import java.nio.file.Path;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.PriorityQueue;
 
 /**

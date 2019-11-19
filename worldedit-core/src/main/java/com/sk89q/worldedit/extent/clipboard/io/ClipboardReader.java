@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -42,6 +43,15 @@ public interface ClipboardReader extends Closeable {
      */
     default Clipboard read() throws IOException {
         return read(UUID.randomUUID());
+    }
+
+    /**
+     * Get the DataVersion from a file (if possible).
+     *
+     * @return The data version, or empty
+     */
+    default OptionalInt getDataVersion() {
+        return OptionalInt.empty();
     }
 
     default Clipboard read(UUID uuid) throws IOException {

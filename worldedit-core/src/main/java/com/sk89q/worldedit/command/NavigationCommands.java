@@ -18,8 +18,6 @@
  */
 
 package com.sk89q.worldedit.command;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 
 import com.boydti.fawe.config.BBC;
@@ -35,6 +33,8 @@ import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Commands for moving the player around.
@@ -62,7 +62,7 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {
         player.findFreePosition();
-        player.print(BBC.UNSTUCK.s());
+        player.print("There you go!");
     }
 
     @Command(
@@ -84,11 +84,7 @@ public class NavigationCommands {
         if (ascentLevels == 0) {
             player.printError(BBC.ASCEND_FAIL.s());
         } else {
-            if (ascentLevels == 1) {
-                player.print(BBC.ASCENDED_SINGULAR.s());
-            } else {
-                BBC.ASCENDED_PLURAL.send(player, ascentLevels);
-            }
+            player.print((ascentLevels != 1) ? "Ascended " + ascentLevels + " levels." : "Ascended a level.");
         }
     }
 
@@ -113,7 +109,7 @@ public class NavigationCommands {
         } else if (descentLevels == 1) {
             player.print(BBC.DESCEND_SINGULAR.s());
         } else {
-            BBC.DESCEND_PLURAL.send(player, descentLevels);
+            player.print((descentLevels != 1) ? "Descended " + descentLevels + " levels." : "Descended a level.");
         }
     }
 

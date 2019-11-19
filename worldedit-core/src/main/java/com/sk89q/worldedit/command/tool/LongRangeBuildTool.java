@@ -27,6 +27,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -56,39 +57,56 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
         if (pos == null) return false;
-        try (EditSession eS = session.createEditSession(player)) {
+        BlockBag bag = session.getBlockBag(player);
+
+        try (EditSession editSession = session.createEditSession(player)) {
+            try {
+                editSession.disableBuffering();
             BlockVector3 blockPoint = pos.toVector().toBlockPoint();
             BaseBlock applied = secondary.apply(blockPoint);
             if (applied.getBlockType().getMaterial().isAir()) {
-                eS.setBlock(blockPoint, secondary);
+                    editSession.setBlock(blockPoint, secondary);
             } else {
-                eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), secondary);
+                    editSession.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), secondary);
+                }
+            } catch (MaxChangedBlocksException ignored) {
+            } finally {
+                session.remember(editSession);
             }
-            return true;
-        } catch (MaxChangedBlocksException ignored) {
-            // one block? eat it
+        } finally {
+            if (bag != null) {
+                bag.flushChanges();
         }
-        return false;
-
+    }
+        return true;
     }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
         if (pos == null) return false;
-        try (EditSession eS = session.createEditSession(player)) {
+        BlockBag bag = session.getBlockBag(player);
+
+        try (EditSession editSession = session.createEditSession(player)) {
+            try {
+                editSession.disableBuffering();
             BlockVector3 blockPoint = pos.toVector().toBlockPoint();
             BaseBlock applied = primary.apply(blockPoint);
             if (applied.getBlockType().getMaterial().isAir()) {
-                eS.setBlock(blockPoint, primary);
+                    editSession.setBlock(blockPoint, primary);
             } else {
-                eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), primary);
+                    editSession.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), primary);
+                }
+            } catch (MaxChangedBlocksException ignored) {
+            } finally {
+                session.remember(editSession);
             }
-            return true;
-        } catch (MaxChangedBlocksException ignored) {
-            // one block? eat it
+        } finally {
+            if (bag != null) {
+                bag.flushChanges();
         }
-        return false;
+    }
+        return true;
     }
 
     private Location getTargetFace(Player player) {
@@ -99,6 +117,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         } else {
             target = player.getBlockTrace(MAX_RANGE, false, mask);
         }
+
         if (target == null) {
             player.printError(BBC.NO_BLOCK.s());
             return null;

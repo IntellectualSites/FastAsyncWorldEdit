@@ -221,4 +221,9 @@ public class PlayerProxy extends AbstractPlayerActor {
     public Player getBasePlayer() {
         return basePlayer;
     }
+
+    @Override
+    public void floatAt(int x, int y, int z, boolean alwaysGlass) {
+        basePlayer.floatAt(x, y, z, alwaysGlass);
+    }
 }

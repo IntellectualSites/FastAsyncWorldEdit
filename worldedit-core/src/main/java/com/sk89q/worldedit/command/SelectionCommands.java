@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
+import com.google.common.base.Strings;
+
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
@@ -44,6 +46,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.annotation.Direction;
@@ -77,12 +80,19 @@ import com.sk89q.worldedit.world.storage.ChunkStore;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import java.util.Optional;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import java.util.stream.Stream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
+import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.exception.StopExecutionException;
 
 /**
  * Selection commands.
@@ -98,7 +108,6 @@ public class SelectionCommands {
 
     @Command(
         name = "/pos1",
-        aliases = "/1",
         desc = "Set position 1"
     )
     @Logging(POSITION)
@@ -116,18 +125,17 @@ public class SelectionCommands {
             return;
         }
 
-        if (!session.getRegionSelector(world).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
+        if (!session.getRegionSelector(world).selectPrimary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
+            actor.printError("Position already set.");
             return;
         }
 
         session.getRegionSelector(world)
-               .explainPrimarySelection(actor, session, pos.toBlockPoint());
+                .explainPrimarySelection(actor, session, pos.toVector().toBlockPoint());
     }
 
     @Command(
         name = "/pos2",
-            aliases = "/2",
         desc = "Set position 2"
     )
     @Logging(POSITION)
@@ -145,13 +153,13 @@ public class SelectionCommands {
             return;
         }
 
-        if (!session.getRegionSelector(world).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.printError(BBC.SELECTOR_ALREADY_SET.s());
+        if (!session.getRegionSelector(world).selectSecondary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
+            actor.printError("Position already set.");
             return;
         }
 
         session.getRegionSelector(world)
-                .explainSecondarySelection(actor, session, pos.toBlockPoint());
+                .explainSecondarySelection(actor, session, pos.toVector().toBlockPoint());
     }
 
     @Command(
@@ -204,7 +212,7 @@ public class SelectionCommands {
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.chunk")
-    public void chunk(Player player, LocalSession session,
+    public void chunk(Actor actor, World world, LocalSession session,
                       @Arg(desc = "The chunk to select", def = "")
                           BlockVector2 coordinates,
                       @Switch(name = 's', desc = "Expand your selection to encompass all chunks that are part of it")
@@ -213,7 +221,6 @@ public class SelectionCommands {
                           boolean useChunkCoordinates) throws WorldEditException {
         final BlockVector3 min;
         final BlockVector3 max;
-        final World world = player.getWorld();
         if (expandSelection) {
             Region region = session.getSelection(world);
 
@@ -223,7 +230,9 @@ public class SelectionCommands {
             min = BlockVector3.at(min2D.getBlockX() * 16, 0, min2D.getBlockZ() * 16);
             max = BlockVector3.at(max2D.getBlockX() * 16 + 15, world.getMaxY(), max2D.getBlockZ() * 16 + 15);
 
-            BBC.SELECTION_CHUNKS.send(player, min2D.getBlockX() + ", " + min2D.getBlockZ(), max2D.getBlockX() + ", " + max2D.getBlockZ());
+            actor.print("Chunks selected: ("
+                    + min2D.getBlockX() + ", " + min2D.getBlockZ() + ") - ("
+                    + max2D.getBlockX() + ", " + max2D.getBlockZ() + ")");
         } else {
             final BlockVector2 min2D;
             if (coordinates != null) {
@@ -233,13 +242,18 @@ public class SelectionCommands {
                     : ChunkStore.toChunk(coordinates.toBlockVector3());
             } else {
                 // use player loc
-                min2D = ChunkStore.toChunk(player.getBlockLocation().toBlockPoint());
+                if (actor instanceof Locatable) {
+                    min2D = ChunkStore.toChunk(((Locatable) actor).getBlockLocation().toVector().toBlockPoint());
+                } else {
+                    throw new StopExecutionException(TextComponent.of("A player or coordinates are required."));
+                }
             }
 
             min = BlockVector3.at(min2D.getBlockX() * 16, 0, min2D.getBlockZ() * 16);
             max = min.add(15, world.getMaxY(), 15);
 
-            BBC.SELECTION_CHUNK.send(player, min2D.getBlockX() + ", " + min2D.getBlockZ());
+            actor.print("Chunk selected: "
+                    + min2D.getBlockX() + ", " + min2D.getBlockZ());
         }
 
         final CuboidRegionSelector selector;
@@ -248,11 +262,11 @@ public class SelectionCommands {
         } else {
             selector = new CuboidRegionSelector(world);
         }
-        selector.selectPrimary(min, ActorSelectorLimits.forActor(player));
-        selector.selectSecondary(max, ActorSelectorLimits.forActor(player));
+        selector.selectPrimary(min, ActorSelectorLimits.forActor(actor));
+        selector.selectSecondary(max, ActorSelectorLimits.forActor(actor));
         session.setRegionSelector(world, selector);
 
-        session.dispatchCUISelection(player);
+        session.dispatchCUISelection(actor);
 
     }
 
@@ -333,8 +347,7 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-
-            BBC.SELECTION_CONTRACT.send(actor, (oldSize - newSize));
+            actor.print("Region contracted " + (oldSize - newSize) + " blocks.");
         } catch (RegionOperationException e) {
             actor.printError(e.getMessage());
         }
@@ -363,7 +376,7 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-            actor.print(BBC.SELECTION_SHIFT.s());
+            actor.print("Region shifted.");
         } catch (RegionOperationException e) {
             actor.printError(e.getMessage());
         }
@@ -386,7 +399,7 @@ public class SelectionCommands {
         region.expand(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
-        actor.print(BBC.SELECTION_OUTSET.s());
+        actor.print("Region outset.");
     }
 
     @Command(
@@ -496,11 +509,11 @@ public class SelectionCommands {
         desc = "Counts the number of blocks matching a mask"
     )
     @CommandPermissions("worldedit.analysis.count")
-    public void count(Player player, LocalSession session, EditSession editSession,
+    public void count(Actor actor, World world, LocalSession session, EditSession editSession,
                       @Arg(desc = "The mask of blocks to match")
                           Mask mask) throws WorldEditException {
-        int count = editSession.countBlocks(session.getSelection(player.getWorld()), mask);
-        BBC.SELECTION_COUNT.send(player, count);
+        int count = editSession.countBlocks(session.getSelection(world), mask);
+        actor.print("Counted: " + count);
     }
 
     @Command(
@@ -531,7 +544,7 @@ public class SelectionCommands {
 
 
         if (distribution.isEmpty()) {  // *Should* always be false
-            player.printError("No blocks counted.");
+            actor.printError("No blocks counted.");
             return;
         }
 
@@ -546,6 +559,65 @@ public class SelectionCommands {
                     c.getAmount() / (double) size * 100,
                     name);
             player.print(str);
+        }
+    }
+
+    private static class BlockDistributionResult extends PaginationBox {
+
+        private final List<Countable<BlockState>> distribution;
+        private final int totalBlocks;
+        private final boolean separateStates;
+
+        BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates) {
+            super("Block Distribution", "//distr -p %page%" + (separateStates ? " -d" : ""));
+            this.distribution = distribution;
+            // note: doing things like region.getArea is inaccurate for non-cuboids.
+            this.totalBlocks = distribution.stream().mapToInt(Countable::getAmount).sum();
+            this.separateStates = separateStates;
+            setComponentsPerPage(7);
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            Countable<BlockState> c = distribution.get(number);
+            TextComponent.Builder line = TextComponent.builder();
+
+            final int count = c.getAmount();
+
+            final double perc = count / (double) totalBlocks * 100;
+            final int maxDigits = (int) (Math.log10(totalBlocks) + 1);
+            final int curDigits = (int) (Math.log10(count) + 1);
+            line.append(String.format("%s%.3f%%  ", perc < 10 ? "  " : "", perc), TextColor.GOLD);
+            final int space = maxDigits - curDigits;
+            String pad = Strings.repeat(" ", space == 0 ? 2 : 2 * space + 1);
+            line.append(String.format("%s%s", count, pad), TextColor.YELLOW);
+
+            final BlockState state = c.getID();
+            final BlockType blockType = state.getBlockType();
+            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.LIGHT_PURPLE);
+            TextComponent toolTip;
+            if (separateStates && state != blockType.getDefaultState()) {
+                toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);
+                blockName = blockName.append(TextComponent.of("*", TextColor.LIGHT_PURPLE));
+            } else {
+                toolTip = TextComponent.of(blockType.getId(), TextColor.GRAY);
+            }
+            blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
+            line.append(blockName);
+
+            return line.build();
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return distribution.size();
+        }
+
+        @Override
+        public Component create(int page) throws InvalidComponentException {
+            super.getContents().append(TextComponent.of("Total Block Count: " + totalBlocks, TextColor.GRAY))
+                    .append(TextComponent.newline());
+            return super.create(page);
         }
     }
 

@@ -20,12 +20,12 @@
 package com.sk89q.worldedit.command.util;
 
 import com.boydti.fawe.util.TaskManager;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.function.EntityFunction;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.regex.Pattern;
 
 /**

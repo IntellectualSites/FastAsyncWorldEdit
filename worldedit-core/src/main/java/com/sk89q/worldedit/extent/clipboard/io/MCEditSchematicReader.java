@@ -19,8 +19,9 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -59,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.
@@ -176,7 +179,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         }
 
         // Need to pull out tile entities
-        List<Tag> tileEntities = requireTag(schematic, "TileEntities", ListTag.class).getValue();
+        final ListTag tileEntityTag = getTag(schematic, "TileEntities", ListTag.class);
+        List<Tag> tileEntities = tileEntityTag == null ? new ArrayList<>() : tileEntityTag.getValue();
         Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
         Map<BlockVector3, BlockState> blockStates = new HashMap<>();
 
@@ -206,6 +210,11 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             if (values.isEmpty()) {
                 t = null;
             }
+            if (values.isEmpty()) {
+                t = null;
+            } else {
+                t = new CompoundTag(values);
+            }
 
             if (fixer != null && t != null) {
                 t = fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, t, -1);
@@ -221,9 +230,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         clipboard.setOrigin(origin);
 
-        // Don't log a torrent of errors
-        int failedBlockSets = 0;
 
+        Set<Integer> unknownBlocks = new HashSet<>();
         for (int x = 0; x < width; ++x) {
             for (int y = 0; y < height; ++y) {
                 for (int z = 0; z < length; ++z) {
@@ -242,18 +250,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                             log.warn("Unknown block when pasting schematic: "
                                              + blocks[index] + ":" + blockData[index] + ". Please report this issue.");
                         }
-                    } catch (WorldEditException e) {
-                        switch (failedBlockSets) {
-                            case 0:
-                                log.warn("Failed to set block on a Clipboard", e);
-                                break;
-                            case 1:
-                                log.warn("Failed to set block on a Clipboard (again) -- no more messages will be logged", e);
-                                break;
-                            default:
-                        }
-
-                        failedBlockSets++;
+                    } catch (WorldEditException ignored) { // BlockArrayClipboard won't throw this
                     }
                 }
             }

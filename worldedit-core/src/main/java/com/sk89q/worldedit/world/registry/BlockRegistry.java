@@ -23,9 +23,8 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import java.util.OptionalInt;
-
 import javax.annotation.Nullable;
+import java.util.OptionalInt;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;

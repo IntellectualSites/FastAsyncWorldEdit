@@ -56,6 +56,8 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extension.platform.Capability;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.slf4j.Logger;
@@ -63,7 +65,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.worldedit.world.storage.NBTConversions;
+import java.util.OptionalInt;
 
 /**
  * Reads schematic files using the Sponge Schematic Specification.
@@ -96,6 +99,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private int offsetX, offsetY, offsetZ;
     private char[] palette, biomePalette;
     private BlockVector3 min = BlockVector3.ZERO;
+    private int schematicVersion = -1;
 
 
     /**
@@ -210,7 +214,58 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     }
 
     @Override
-    public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
+    public Clipboard read() throws IOException {
+        CompoundTag schematicTag = getBaseTag();
+        Map<String, Tag> schematic = schematicTag.getValue();
+
+        final Platform platform = WorldEdit.getInstance().getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING);
+        int liveDataVersion = platform.getDataVersion();
+
+        if (schematicVersion == 1) {
+            dataVersion = 1631; // this is a relatively safe assumption unless someone imports a schematic from 1.12, e.g. sponge 7.1-
+            fixer = platform.getDataFixer();
+            return readVersion1(schematicTag);
+        } else if (schematicVersion == 2) {
+            dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
+            if (dataVersion > liveDataVersion) {
+                log.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
+                        dataVersion, liveDataVersion);
+            } else if (dataVersion < liveDataVersion) {
+                fixer = platform.getDataFixer();
+                if (fixer != null) {
+                    log.debug("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
+                            dataVersion, liveDataVersion);
+                } else {
+                    log.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
+                            dataVersion, liveDataVersion);
+                }
+            }
+
+            BlockArrayClipboard clip = readVersion1(schematicTag);
+            return readVersion2(clip, schematicTag);
+        }
+        throw new IOException("This schematic version is currently not supported");
+    }
+
+    @Override
+    public OptionalInt getDataVersion() {
+        try {
+            CompoundTag schematicTag = getBaseTag();
+            Map<String, Tag> schematic = schematicTag.getValue();
+            if (schematicVersion == 1) {
+                return OptionalInt.of(1631);
+            } else if (schematicVersion == 2) {
+                return OptionalInt.of(requireTag(schematic, "DataVersion", IntTag.class).getValue());
+            }
+            return OptionalInt.empty();
+        } catch (IOException e) {
+            return OptionalInt.empty();
+        }
+    }
+
+    @Override
+    public Clipboard getBaseTag(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
         inputStream.readNamedTagLazy(root);
         if (blocks != null) blocks.close();
@@ -347,6 +402,106 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
 
         return clipboard;
+    }
+
+    private Clipboard readVersion2(BlockArrayClipboard version1, CompoundTag schematicTag) throws IOException {
+        Map<String, Tag> schematic = schematicTag.getValue();
+        if (schematic.containsKey("BiomeData")) {
+            readBiomes(version1, schematic);
+        }
+        if (schematic.containsKey("Entities")) {
+            readEntities(version1, schematic);
+        }
+        return version1;
+    }
+
+    private void readBiomes(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
+        ByteArrayTag dataTag = requireTag(schematic, "BiomeData", ByteArrayTag.class);
+        IntTag maxTag = requireTag(schematic, "BiomePaletteMax", IntTag.class);
+        CompoundTag paletteTag = requireTag(schematic, "BiomePalette", CompoundTag.class);
+
+        Map<Integer, BiomeType> palette = new HashMap<>();
+        if (maxTag.getValue() != paletteTag.getValue().size()) {
+            throw new IOException("Biome palette size does not match expected size.");
+        }
+
+        for (Entry<String, Tag> palettePart : paletteTag.getValue().entrySet()) {
+            String key = palettePart.getKey();
+            if (fixer != null) {
+                key = fixer.fixUp(DataFixer.FixTypes.BIOME, key, dataVersion);
+            }
+            BiomeType biome = BiomeTypes.get(key);
+            if (biome == null) {
+                log.warn("Unknown biome type :" + key +
+                        " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+            }
+            Tag idTag = palettePart.getValue();
+            if (!(idTag instanceof IntTag)) {
+                throw new IOException("Biome mapped to non-Int tag.");
+            }
+            palette.put(((IntTag) idTag).getValue(), biome);
+        }
+
+        int width = clipboard.getDimensions().getX();
+
+        byte[] biomes = dataTag.getValue();
+        int biomeIndex = 0;
+        int biomeJ = 0;
+        int bVal;
+        int varIntLength;
+        BlockVector2 min = clipboard.getMinimumPoint().toBlockVector2();
+        while (biomeJ < biomes.length) {
+            bVal = 0;
+            varIntLength = 0;
+
+            while (true) {
+                bVal |= (biomes[biomeJ] & 127) << (varIntLength++ * 7);
+                if (varIntLength > 5) {
+                    throw new IOException("VarInt too big (probably corrupted data)");
+                }
+                if (((biomes[biomeJ] & 128) != 128)) {
+                    biomeJ++;
+                    break;
+                }
+                biomeJ++;
+            }
+            int z = biomeIndex / width;
+            int x = biomeIndex % width;
+            BiomeType type = palette.get(bVal);
+            clipboard.setBiome(min.add(x, z), type);
+            biomeIndex++;
+        }
+    }
+
+    private void readEntities(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
+        List<Tag> entList = requireTag(schematic, "Entities", ListTag.class).getValue();
+        if (entList.isEmpty()) {
+            return;
+        }
+        for (Tag et : entList) {
+            if (!(et instanceof CompoundTag)) {
+                continue;
+            }
+            CompoundTag entityTag = (CompoundTag) et;
+            Map<String, Tag> tags = entityTag.getValue();
+            String id = requireTag(tags, "Id", StringTag.class).getValue();
+            entityTag = entityTag.createBuilder().putString("id", id).remove("Id").build();
+
+            if (fixer != null) {
+                entityTag = fixer.fixUp(DataFixer.FixTypes.ENTITY, entityTag, dataVersion);
+            }
+
+            EntityType entityType = EntityTypes.get(id);
+            if (entityType != null) {
+                Location location = NBTConversions.toLocation(clipboard,
+                        requireTag(tags, "Pos", ListTag.class),
+                        requireTag(tags, "Rotation", ListTag.class));
+                BaseEntity state = new BaseEntity(entityType, entityTag);
+                clipboard.createEntity(location, state);
+            } else {
+                log.warn("Unknown entity when pasting schematic: " + id);
+            }
+        }
     }
 
     @Override

@@ -78,7 +78,6 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.File;
@@ -148,6 +147,7 @@ public class LocalSession implements TextureHolder {
     private transient ResettableExtent transform = null;
     private transient ZoneId timezone = ZoneId.systemDefault();
     private transient World currentWorld;
+    private transient boolean tickingWatchdog = false;
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
@@ -156,8 +156,6 @@ public class LocalSession implements TextureHolder {
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
-
-    private transient boolean loadDefaults = true;
 
     // Saved properties
     private String lastScript;
@@ -1104,6 +1102,14 @@ public class LocalSession implements TextureHolder {
         }
     }
 
+    public void setPlaceAtPos1(boolean placeAtPos1) {
+        this.placeAtPos1 = placeAtPos1;
+    }
+
+    public boolean isPlaceAtPos1() {
+        return placeAtPos1;
+    }
+
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
         ItemType type = item.getType();
         if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
@@ -1602,5 +1608,14 @@ public class LocalSession implements TextureHolder {
                 }
             }
         }
+    }
+
+    private void prepareEditingExtents(EditSession editSession, Actor actor) {
+        editSession.setFastMode(fastMode);
+        editSession.setReorderMode(reorderMode);
+        if (editSession.getSurvivalExtent() != null) {
+            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
+        }
+        editSession.setTickingWatchdog(tickingWatchdog);
     }
 }

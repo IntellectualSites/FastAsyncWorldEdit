@@ -28,12 +28,24 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BundledItemRegistry;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.RegistryManager;
 
 public class ForgeItemRegistry extends BundledItemRegistry {
 
     @Nullable
     @Override
     public String getName(ItemType itemType) {
-        return super.getName(itemType); // TODO
+        if (FMLLoader.getDist().isClient()) {
+            final Item item = RegistryManager.ACTIVE.getRegistry(Item.class)
+                    .getValue(ResourceLocation.tryCreate(itemType.getId()));
+            if (item != null) {
+                return I18n.format(item.getTranslationKey());
+            }
+        }
+        return super.getName(itemType);
     }
 }

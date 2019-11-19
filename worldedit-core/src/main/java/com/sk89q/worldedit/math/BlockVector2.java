@@ -599,5 +599,4 @@ public class BlockVector2 {
     public String toString() {
         return "(" + x + ", " + z + ")";
     }
-
 }

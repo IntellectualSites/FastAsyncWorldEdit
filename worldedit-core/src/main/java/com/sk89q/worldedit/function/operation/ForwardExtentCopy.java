@@ -36,16 +36,21 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
+import com.sk89q.worldedit.function.FlatRegionFunction;
+import com.sk89q.worldedit.function.FlatRegionMaskingFilter;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
+import com.sk89q.worldedit.function.biome.ExtentBiomeCopy;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -78,7 +83,7 @@ public class ForwardExtentCopy implements Operation {
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
-    private int affected;
+    private int affectedBlocks;
     private RegionFunction filterFunction;
 
     /**
@@ -94,6 +99,10 @@ public class ForwardExtentCopy implements Operation {
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
         this(source, region, region.getMinimumPoint(), destination, to);
     }
+    private FlatRegionVisitor lastBiomeVisitor;
+    private EntityVisitor lastEntityVisitor;
+    private int affectedBiomeCols;
+    private int affectedEntities;
 
     /**
      * Create a new copy.
@@ -267,13 +276,21 @@ public class ForwardExtentCopy implements Operation {
      * @return the number of affected
      */
     public int getAffected() {
-        return affected;
+        return affectedBlocks + affectedBiomeCols + affectedEntities;
     }
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         if (currentTransform == null) {
             currentTransform = transform;
+        }
+        if (lastBiomeVisitor != null) {
+            affectedBiomeCols += lastBiomeVisitor.getAffected();
+            lastBiomeVisitor = null;
+        }
+        if (lastEntityVisitor != null) {
+            affectedEntities += lastEntityVisitor.getAffected();
+            lastEntityVisitor = null;
         }
 
         Extent finalDest = destination;
@@ -405,7 +422,21 @@ public class ForwardExtentCopy implements Operation {
     @Override
     public void addStatusMessages(List<String> messages) {
         StringBuilder msg = new StringBuilder();
-        msg.append(affected).append(" objects(s)");
+        msg.append(affectedBlocks).append(" block(s)");
+        if (affectedBiomeCols > 0) {
+            if (affectedEntities > 0) {
+                msg.append(", ");
+            } else {
+                msg.append(" and ");
+            }
+            msg.append(affectedBiomeCols).append(" biome(s)");
+        }
+        if (affectedEntities > 0) {
+            if (affectedBiomeCols > 0) {
+                msg.append(",");
+            }
+            msg.append(" and ").append(affectedEntities).append(" entities(s)");
+        }
         msg.append(" affected.");
         messages.add(msg.toString());
     }

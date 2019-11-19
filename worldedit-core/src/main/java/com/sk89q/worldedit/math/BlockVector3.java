@@ -18,8 +18,6 @@
  */
 
 package com.sk89q.worldedit.math;
-
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.sk89q.worldedit.math.BitMath.mask;
 import static com.sk89q.worldedit.math.BitMath.unpackX;
 import static com.sk89q.worldedit.math.BitMath.unpackY;
@@ -28,6 +26,8 @@ import static com.sk89q.worldedit.math.BitMath.unpackZ;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -122,6 +122,11 @@ public abstract class BlockVector3 {
         return new MutableBlockVector3(x, y, z);
     }
 
+    public long toLongPackedForm() {
+        checkLongPackable(this);
+        return (x & BITS_26) | ((z & BITS_26) << 26) | (((y & (long) BITS_12) << (26 + 26)));
+    }
+
     public MutableBlockVector3 mutX(double x) {
         return new MutableBlockVector3((int) x, getY(), getZ());
     }
@@ -148,11 +153,6 @@ public abstract class BlockVector3 {
 
     public BlockVector3 toImmutable() {
         return BlockVector3.at(getX(), getY(), getZ());
-    }
-
-    public long toLongPackedForm() {
-        checkLongPackable(this);
-        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
     }
 
     /**

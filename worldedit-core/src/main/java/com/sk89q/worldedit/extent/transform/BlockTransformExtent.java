@@ -18,8 +18,6 @@
  */
 
 package com.sk89q.worldedit.extent.transform;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.Direction.ASCENDING_EAST;
 import static com.sk89q.worldedit.util.Direction.ASCENDING_NORTH;
 import static com.sk89q.worldedit.util.Direction.ASCENDING_SOUTH;
@@ -69,7 +67,10 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transforms blocks themselves (but not their position) according to a

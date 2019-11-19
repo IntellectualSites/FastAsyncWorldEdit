@@ -19,8 +19,9 @@
 
 package com.sk89q.worldedit.util.eventbus;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.HashMultimap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import org.slf4j.Logger;

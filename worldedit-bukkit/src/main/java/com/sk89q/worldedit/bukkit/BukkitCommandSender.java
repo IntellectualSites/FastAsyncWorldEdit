@@ -106,10 +106,6 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
         return true;
     }
 
-    @Override public boolean togglePermission(String permission) {
-        return false;
-    }
-
     @Override public void setPermission(String permission, boolean value) {
     }
 

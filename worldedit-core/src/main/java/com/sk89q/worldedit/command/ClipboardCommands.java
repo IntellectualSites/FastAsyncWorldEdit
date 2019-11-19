@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
+import com.google.common.collect.Lists;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
@@ -37,12 +39,10 @@ import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
@@ -53,6 +53,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
@@ -91,10 +93,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+
+import java.util.List;
 
 
 /**
@@ -102,18 +103,6 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ClipboardCommands {
-
-    private WorldEdit worldEdit;
-
-    /**
-     * Create a new instance.
-     *
-     * @param worldEdit reference to WorldEdit
-     */
-    public ClipboardCommands(WorldEdit worldEdit) {
-        checkNotNull(worldEdit);
-        this.worldEdit = worldEdit;
-    }
 
 
     @Command(
@@ -442,6 +431,8 @@ public class ClipboardCommands {
                           boolean atOrigin,
                       @Switch(name = 's', desc = "Select the region after pasting")
                           boolean selectPasted,
+                      @Switch(name = 'n', desc = "No paste, select only. (Implies -s)")
+                          boolean onlySelect,
                       @Switch(name = 'e', desc = "Paste entities if available")
                           boolean pasteEntities,
                       @Switch(name = 'b', desc = "Paste biomes if available")
@@ -457,6 +448,7 @@ public class ClipboardCommands {
         }
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
+        List<String> messages = Lists.newArrayList();
 
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
@@ -471,7 +463,7 @@ public class ClipboardCommands {
                 .build();
         Operations.completeLegacy(operation);
 
-        if (selectPasted) {
+        if (selectPasted || onlySelect) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
             Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
@@ -578,7 +570,7 @@ public class ClipboardCommands {
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
         holder.setTransform(holder.getTransform().combine(transform));
-        actor.print(BBC.COMMAND_FLIPPED.s());
+        actor.print("The clipboard copy has been flipped.");
     }
 
     @Command(
@@ -588,6 +580,6 @@ public class ClipboardCommands {
     @CommandPermissions("worldedit.clipboard.clear")
     public void clearClipboard(Actor actor, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
-        actor.print(BBC.CLIPBOARD_CLEARED.s());
+        actor.print("Clipboard cleared.");
     }
 }

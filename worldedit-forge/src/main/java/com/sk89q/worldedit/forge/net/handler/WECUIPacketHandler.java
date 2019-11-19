@@ -20,15 +20,10 @@
 package com.sk89q.worldedit.forge.net.handler;
 
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.forge.ForgePlayer;
 import com.sk89q.worldedit.forge.ForgeWorldEdit;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.ThreadQuickExitException;
-import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
-import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
-import net.minecraftforge.fml.network.NetworkRegistry.ChannelBuilder;
 import net.minecraftforge.fml.network.event.EventNetworkChannel;
 
 import java.nio.charset.Charset;
@@ -40,21 +35,17 @@ public final class WECUIPacketHandler {
     }
 
     public static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
-    private static final String PROTOCOL_VERSION = Integer.toString(1);
-    public static EventNetworkChannel HANDLER = ChannelBuilder
-            .named(new ResourceLocation(ForgeWorldEdit.MOD_ID, ForgeWorldEdit.CUI_PLUGIN_CHANNEL))
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+    private static final int PROTOCOL_VERSION = 1;
+    private static EventNetworkChannel HANDLER = PacketHandlerUtil
+            .buildLenientHandler(ForgeWorldEdit.CUI_PLUGIN_CHANNEL, PROTOCOL_VERSION)
             .eventNetworkChannel();
-    
+
     public static void init() {
         HANDLER.addListener(WECUIPacketHandler::onPacketData);
-        HANDLER.addListener(WECUIPacketHandler::callProcessPacket);
     }
 
-    public static void onPacketData(ServerCustomPayloadEvent event) {
-        EntityPlayerMP player = event.getSource().get().getSender();
+    public static void onPacketData(ClientCustomPayloadEvent event) {
+        ServerPlayerEntity player = event.getSource().get().getSender();
         LocalSession session = ForgeWorldEdit.inst.getSession(player);
 
         if (session.hasCUISupport()) {
@@ -62,17 +53,9 @@ public final class WECUIPacketHandler {
         }
 
         String text = event.getPayload().toString(UTF_8_CHARSET);
-        session.handleCUIInitializationMessage(text);
-        session.describeCUI(adaptPlayer(player));
+        final ForgePlayer actor = adaptPlayer(player);
+        session.handleCUIInitializationMessage(text, actor);
+        session.describeCUI(actor);
     }
-    
-    public static void callProcessPacket(ClientCustomPayloadEvent event) {
-        try {
-            new SPacketCustomPayload(
-                    new ResourceLocation(ForgeWorldEdit.MOD_ID, ForgeWorldEdit.CUI_PLUGIN_CHANNEL),
-                    event.getPayload()
-            ).processPacket(Minecraft.getInstance().player.connection);
-        } catch (ThreadQuickExitException ignored) {
-        }
-    }
+
 }

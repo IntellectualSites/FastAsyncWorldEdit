@@ -23,7 +23,6 @@ import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -38,11 +37,6 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
 
     public DistanceWand() {
         super("worldedit.selection.pos");
-    }
-
-    @Override
-    public boolean canUse(Actor player) {
-        return player.hasPermission("worldedit.wand");
     }
 
     @Override
@@ -74,8 +68,7 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
     private Location getTarget(Player player) {
         Location target;
         Mask mask = getTraceMask();
-        int range = getRange();
-        if (range < MAX_RANGE) {
+        if (this.range > -1) {
             target = player.getBlockTrace(getRange(), true, mask);
         } else {
             target = player.getBlockTrace(MAX_RANGE, false, mask);

@@ -19,19 +19,20 @@
 
 package com.sk89q.worldedit.command.argument;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.sk89q.worldedit.util.formatting.text.TextComponent.space;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import java.util.List;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.converter.SuccessfulConversion;
 import org.enginehub.piston.inject.InjectedValueAccess;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.util.formatting.text.TextComponent.space;
 
 public class CommaSeparatedValuesConverter<T> implements ArgumentConverter<T> {
 

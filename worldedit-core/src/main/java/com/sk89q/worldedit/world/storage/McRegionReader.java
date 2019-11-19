@@ -123,10 +123,6 @@ public class McRegionReader {
         int x = position.getBlockX() & 31;
         int z = position.getBlockZ() & 31;
 
-        if (x < 0 || x >= 32 || z < 0 || z >= 32) {
-            throw new DataException("MCRegion file does not contain " + x + "," + z);
-        }
-
         int offset = getOffset(x, z);
 
         // The chunk hasn't been generated

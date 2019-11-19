@@ -57,8 +57,10 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.lang.ref.WeakReference;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -114,6 +116,17 @@ public abstract class SpongeWorld extends AbstractWorld {
     @Override
     public String getName() {
         return getWorld().getName();
+    }
+
+    @Override
+    public String getId() {
+        return getName().replace(" ", "_").toLowerCase(Locale.ROOT) +
+                getWorld().getDimension().getType().getName().toLowerCase(Locale.ROOT);
+    }
+
+    @Override
+    public Path getStoragePath() {
+        return getWorld().getDirectory();
     }
 
     @SuppressWarnings("WeakerAccess")

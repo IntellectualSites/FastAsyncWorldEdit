@@ -31,12 +31,12 @@ import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.regions.AbstractFlatRegion;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Iterator;
@@ -84,7 +84,6 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
      */
     public ForgetfulExtentBuffer(Extent delegate, Mask mask) {
         super(delegate);
-        checkNotNull(delegate);
         checkNotNull(mask);
         this.mask = mask;
         Mask2D bmask = mask.toMask2D();
@@ -189,7 +188,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
      * @return a region
      */
     public Region asRegion() {
-        return new AbstractRegion(null) {
+        return new AbstractFlatRegion(null) {
             @Override
             public BlockVector3 getMinimumPoint() {
                 return min != null ? min : BlockVector3.ZERO;
@@ -220,6 +219,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
                 return buffer.keySet().iterator();
             }
 
+            @Override
             public Iterable<BlockVector2> asFlatRegion() {
                 return biomeBuffer.keySet();
             }

@@ -19,23 +19,24 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.Iterables;
 import static com.sk89q.worldedit.internal.command.CommandUtil.getSubCommands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.NoInputCommandParameters;
 import org.enginehub.piston.config.ColorConfig;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.part.CommandPart;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 import org.enginehub.piston.util.HelpGenerator;
 
 /**

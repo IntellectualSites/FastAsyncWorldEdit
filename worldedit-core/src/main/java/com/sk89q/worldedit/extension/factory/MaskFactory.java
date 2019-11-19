@@ -32,6 +32,7 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A registry of known {@link Mask}s. Provides methods to instantiate
@@ -48,19 +49,36 @@ public final class MaskFactory extends AbstractFactory<Mask> {
      * @param worldEdit the WorldEdit instance
      */
     public MaskFactory(WorldEdit worldEdit) {
-        super(worldEdit, new DefaultMaskParser(worldEdit));
+		super(worldEdit, new DefaultMaskParser(worldEdit));
+		/*
+        super(worldEdit, new BlocksMaskParser(worldEdit));
 
-//        register(new ExistingMaskParser(worldEdit));
-//        register(new SolidMaskParser(worldEdit));
-//        register(new LazyRegionMaskParser(worldEdit));
-//        register(new RegionMaskParser(worldEdit));
-//        register(new OffsetMaskParser(worldEdit));
-//        register(new NoiseMaskParser(worldEdit));
-//        register(new BlockStateMaskParser(worldEdit));
-//        register(new NegateMaskParser(worldEdit));
-//        register(new ExpressionMaskParser(worldEdit));
-        register(new BlockCategoryMaskParser(worldEdit)); // TODO implement in DefaultMaskParser
-//        register(new BiomeMaskParser(worldEdit));
+        register(new ExistingMaskParser(worldEdit));
+        register(new SolidMaskParser(worldEdit));
+        register(new LazyRegionMaskParser(worldEdit));
+        register(new RegionMaskParser(worldEdit));
+        register(new OffsetMaskParser(worldEdit));
+        register(new NoiseMaskParser(worldEdit));
+        register(new BlockStateMaskParser(worldEdit));
+        register(new NegateMaskParser(worldEdit));
+        register(new ExpressionMaskParser(worldEdit));
+		*/
+        register(new BlockCategoryMaskParser(worldEdit));
+		/*
+        register(new BiomeMaskParser(worldEdit));
+		*/
+
+
+    }
+
+    @Override
+    public List<String> getSuggestions(String input) {
+        final String[] split = input.split(" ");
+        if (split.length > 1) {
+            String prev = input.substring(0, input.lastIndexOf(" ")) + " ";
+            return super.getSuggestions(split[split.length -1]).stream().map(s -> prev + s).collect(Collectors.toList());
+        }
+        return super.getSuggestions(input);
     }
 
     @Override

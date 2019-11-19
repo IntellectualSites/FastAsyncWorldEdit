@@ -29,7 +29,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.Map;
 import java.util.Optional;
@@ -72,26 +71,6 @@ public class ExtentBuffer extends AbstractBufferingExtent {
             return Optional.of(buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos))));
         }
         return Optional.empty();
-    }
-
-    @Override
-    public BlockState getBlock(BlockVector3 position) {
-        if (mask.test(position)) {
-            return getOrDefault(position).toImmutableState();
-        }
-        return super.getBlock(position);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        if (mask.test(position)) {
-            return getOrDefault(position);
-        }
-        return super.getFullBlock(position);
-    }
-
-    private BaseBlock getOrDefault(BlockVector3 position) {
-        return buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos)));
     }
 
     @Override

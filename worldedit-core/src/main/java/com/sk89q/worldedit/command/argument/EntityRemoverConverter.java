@@ -28,11 +28,12 @@ import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.converter.FailedConversion;
 import org.enginehub.piston.converter.SuccessfulConversion;
-import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
 import java.util.List;
+
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
 public class EntityRemoverConverter implements ArgumentConverter<EntityRemover> {
 

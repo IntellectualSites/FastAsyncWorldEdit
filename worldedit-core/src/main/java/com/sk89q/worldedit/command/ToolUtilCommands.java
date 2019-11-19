@@ -82,16 +82,16 @@ public class ToolUtilCommands {
             return;
         }
         if (maskOpt == null) {
-            player.print(BBC.BRUSH_MASK_DISABLED.s());
+            player.print("Brush mask disabled.");
             tool.setMask(null);
             return;
-        }
+    }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
         settings.setMask(maskOpt);
         tool.update();
-        player.print(BBC.BRUSH_MASK.s());
+        player.print("Brush mask set.");
     }
 
     @Command(
@@ -110,7 +110,7 @@ public class ToolUtilCommands {
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.s());
             return;
-        }
+    }
         if (pattern == null) {
             player.print(BBC.BRUSH_MATERIAL.s());
             tool.setFill(null);
@@ -125,61 +125,29 @@ public class ToolUtilCommands {
     }
 
     @Command(
-            name = "range",
-            desc = "Set the brush range"
-    )
+        name = "range",
+        desc = "Set the brush range"
+        )
     @CommandPermissions("worldedit.brush.options.range")
     public void range(Player player, LocalSession session,
                       @Arg(desc = "The range of the brush")
-                              int range) throws WorldEditException {
-        range = Math.max(0, Math.min(256, range));
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
-            return;
-        }
-        tool.setRange(range);
-        player.print(BBC.BRUSH_RANGE.s());
+                          int range) throws WorldEditException {
+        session.getBrushTool(player, false).setRange(range);
+        player.print("Brush range set.");
     }
 
     @Command(
-            name = "size",
-            desc = "Set the brush size"
+        name = "size",
+        desc = "Set the brush size"
     )
     @CommandPermissions("worldedit.brush.options.size")
     public void size(Player player, LocalSession session,
-                     @Arg(desc = "The size of the brush", def = "5")
-                             int size,
-                     @Switch(name = 'h', desc = "TODO")
-                             boolean offHand) throws WorldEditException {
+                     @Arg(desc = "The size of the brush")
+                         int size) throws WorldEditException {
         we.checkMaxBrushRadius(size);
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
-            return;
-        }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        settings.setSize(size);
-        tool.update();
-        player.print(BBC.BRUSH_SIZE.s());
-    }
 
-    @Command(
-        name = "tracemask",
-        aliases = {"tarmask", "tm", "targetmask"},
-        desc = "Set the mask used to stop tool traces"
-    )
-    @CommandPermissions("worldedit.brush.options.tracemask")
-    public void traceMask(Player player, LocalSession session,
-                          @Arg(desc = "The trace mask to set", def = "")
-                             Mask maskOpt) throws WorldEditException {
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
-            return;
-        }
-        tool.setTraceMask(maskOpt);
-        BBC.BRUSH_TARGET_MASK_SET.send(player, maskOpt.toString());
+        session.getBrushTool(player, false).setSize(size);
+        player.print("Brush size set.");
     }
 
     //todo none should be moved to the same class where it is in upstream
@@ -194,28 +162,42 @@ public class ToolUtilCommands {
     }
 
     @Command(
-            name = "/superpickaxe",
-            aliases = {",", "/sp", "/pickaxe"},
-            desc = "Toggle the super pickaxe function"
+        name = "tracemask",
+        aliases = {"tarmask", "tm", "targetmask"},
+        desc = "Set the mask used to stop tool traces"
+    )
+    @CommandPermissions("worldedit.brush.options.tracemask")
+    public void traceMask(Player player, LocalSession session,
+                          @Arg(desc = "The trace mask to set", def = "")
+                             Mask maskOpt) throws WorldEditException {
+        session.getBrushTool(player, false).setTraceMask(maskOpt);
+        if (maskOpt == null) {
+            player.print("Trace mask disabled.");
+        } else {
+            player.print("Trace mask set.");
+        }
+    }
+
+    @Command(
+        name = "/",
+        aliases = { "," },
+        desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
     public void togglePickaxe(Player player, LocalSession session,
-                              @Arg(desc = "state", def = "on") String state) throws WorldEditException {
-        if (session.hasSuperPickAxe()) {
-            if ("on".equals(state)) {
-                player.print(BBC.SUPERPICKAXE_ENABLED.s());
+                              @Arg(desc = "The new super pickaxe state", def = "")
+                                  Boolean superPickaxe) {
+        boolean hasSuperPickAxe = session.hasSuperPickAxe();
+        if (superPickaxe != null && superPickaxe == hasSuperPickAxe) {
+            player.printError("Super pickaxe already " + (superPickaxe ? "enabled" : "disabled") + ".");
                 return;
             }
-
+        if (hasSuperPickAxe) {
             session.disableSuperPickAxe();
-            player.print(BBC.SUPERPICKAXE_DISABLED.s());
+            player.print("Super pickaxe disabled.");
         } else {
-            if ("off".equals(state)) {
-                player.print(BBC.SUPERPICKAXE_DISABLED.s());
-                return;
-            }
             session.enableSuperPickAxe();
-            player.print(BBC.SUPERPICKAXE_ENABLED.s());
+            player.print("Super pickaxe enabled.");
         }
     }
 

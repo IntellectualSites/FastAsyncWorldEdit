@@ -59,23 +59,23 @@ public class ForestGenerator implements RegionFunction {
             case BlockID.DIRT:
             case BlockID.PODZOL:
             case BlockID.COARSE_DIRT:
-                return treeType.generate(editSession, position.add(0, 1, 0));
+            return treeType.generate(editSession, position.add(0, 1, 0));
             default:
-                if (t.getMaterial().isReplacedDuringPlacement()) {
-                    // since the implementation's tree generators generally don't generate in non-air spots,
-                    // we trick editsession history here in the first call
-                    editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
-                    // and then trick the generator here by directly setting into the world
-                    editSession.getWorld().setBlock(position, BlockTypes.AIR.getDefaultState());
-                    // so that now the generator can generate the tree
-                    boolean success = treeType.generate(editSession, position);
-                    if (!success) {
-                        editSession.setBlock(position, block); // restore on failure
-                    }
-                    return success;
-                } else { // Trees won't grow on this!
-                    return false;
+            if (t.getMaterial().isReplacedDuringPlacement()) {
+                // since the implementation's tree generators generally don't generate in non-air spots,
+                // we trick editsession history here in the first call
+                editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
+                // and then trick the generator here by directly setting into the world
+                editSession.getWorld().setBlock(position, BlockTypes.AIR.getDefaultState());
+                // so that now the generator can generate the tree
+                boolean success = treeType.generate(editSession, position);
+                if (!success) {
+                    editSession.setBlock(position, block); // restore on failure
                 }
+                return success;
+            } else { // Trees won't grow on this!
+                return false;
+            }
         }
     }
 }

@@ -27,6 +27,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
@@ -81,6 +82,7 @@ public class BiomeCommands {
     public void biomeList(Actor actor,
                           @ArgFlag(name = 'p', desc = "Page number.", def = "1")
                               int page) {
+        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
 
@@ -97,7 +99,8 @@ public class BiomeCommands {
                                 }
                             })
                             .collect(Collectors.toList()));
-             actor.print(paginationBox.create(page));
+             return paginationBox.create(page);
+        }, null);
     }
 
     @Command(
@@ -180,7 +183,8 @@ public class BiomeCommands {
         Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
-            region = new CuboidRegion(player.getLocation().toVector().toBlockPoint(), player.getLocation().toVector().toBlockPoint());
+            final BlockVector3 pos = player.getLocation().toVector().toBlockPoint();
+            region = new CuboidRegion(pos, pos);
         } else {
             region = session.getSelection(world);
         }

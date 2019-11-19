@@ -56,11 +56,9 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class WorldEditCommands {
-
-    private static final DateTimeFormatter dateFormat = DateTimeFormatter
-        .ofPattern("yyyy-MM-dd HH:mm:ss z");
+    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
     private final WorldEdit we;
 
@@ -174,11 +172,10 @@ public class WorldEditCommands {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
-            BBC.TIMEZONE_SET.send(actor, tz.getDisplayName(
-                TextStyle.FULL, Locale.ENGLISH
+            actor.print("Timezone set for this session to: " + tz.getDisplayName(
+                    TextStyle.FULL, Locale.ENGLISH
             ));
-            BBC.TIMEZONE_DISPLAY
-                .send(actor, dateFormat.format(ZonedDateTime.now(tz)));
+            actor.print("The current time in that timezone is: " + dateFormat.format(ZonedDateTime.now(tz)));
         } catch (ZoneRulesException e) {
             actor.printError("Invalid timezone");
         }
@@ -186,7 +183,7 @@ public class WorldEditCommands {
 
     @Command(
         name = "help",
-        desc = "Displays help for FAWE commands"
+        desc = "Displays help for WorldEdit commands"
     )
     @SkipQueue
     @CommandPermissions("worldedit.help")
@@ -196,8 +193,8 @@ public class WorldEditCommands {
                      @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> commandStr) throws WorldEditException {
-        PrintCommandHelp.help(commandStr, page, listSubCommands,
-            we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help");
+                         List<String> command) throws WorldEditException {
+        PrintCommandHelp.help(command, page, listSubCommands,
+                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help");
     }
 }

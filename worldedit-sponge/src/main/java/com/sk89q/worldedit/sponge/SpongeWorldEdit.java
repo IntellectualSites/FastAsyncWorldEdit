@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.sponge;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
 import com.google.inject.Inject;
 import com.sk89q.worldedit.LocalSession;
@@ -29,6 +30,7 @@ import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.sponge.adapter.AdapterLoadException;
 import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
 import com.sk89q.worldedit.sponge.adapter.SpongeImplLoader;
@@ -51,6 +53,7 @@ import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
@@ -61,6 +64,8 @@ import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -133,6 +138,11 @@ public class SpongeWorldEdit {
             WorldEdit.getInstance().getPlatformManager().unregister(platform);
         }
 
+        final Path delChunks = workingDir.toPath().resolve(DELCHUNKS_FILE_NAME);
+        if (Files.exists(delChunks)) {
+            ChunkDeleter.runFromFile(delChunks, true);
+        }
+
         this.platform = new SpongePlatform(this);
         this.provider = new SpongePermissionsProvider();
 
@@ -203,6 +213,22 @@ public class SpongeWorldEdit {
     }
 
     @Listener
+    public void onPlayerItemInteract(InteractItemEvent.Secondary event, @Root Player spongePlayer) {
+        if (platform == null) {
+            return;
+        }
+
+        if (!platform.isHookingEvents()) return; // We have to be told to catch these events
+
+        WorldEdit we = WorldEdit.getInstance();
+
+        SpongePlayer player = wrapPlayer(spongePlayer);
+        if (we.handleRightClick(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Listener
     public void onPlayerInteract(InteractBlockEvent event, @Root Player spongePlayer) {
         if (platform == null) {
             return;
@@ -242,26 +268,20 @@ public class SpongeWorldEdit {
                 }
             }
         } else if (event instanceof InteractBlockEvent.Secondary) {
-        if (interactedType != BlockTypes.AIR) {
-                if (!optLoc.isPresent()) {
-                    return;
-                }
+            if (!optLoc.isPresent()) {
+                return;
+            }
 
-                Location<World> loc = optLoc.get();
-                com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
-                        world, loc.getX(), loc.getY(), loc.getZ());
+            Location<World> loc = optLoc.get();
+            com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
+                    world, loc.getX(), loc.getY(), loc.getZ());
 
-                if (we.handleBlockRightClick(player, pos)) {
-                    event.setCancelled(true);
-                }
+            if (we.handleBlockRightClick(player, pos)) {
+                event.setCancelled(true);
+            }
 
-                if (we.handleRightClick(player)) {
-                    event.setCancelled(true);
-                }
-            } else {
-                if (we.handleRightClick(player)) {
-                    event.setCancelled(true);
-                }
+            if (we.handleRightClick(player)) {
+                event.setCancelled(true);
             }
         }
     }

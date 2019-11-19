@@ -19,26 +19,28 @@
 
 package com.sk89q.worldedit.internal.expression;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.SetMultimap;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.internal.expression.lexer.Lexer;
-import com.sk89q.worldedit.internal.expression.lexer.tokens.Token;
-import com.sk89q.worldedit.internal.expression.parser.Parser;
-import com.sk89q.worldedit.internal.expression.runtime.Constant;
-import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
-import com.sk89q.worldedit.internal.expression.runtime.ExpressionEnvironment;
-import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutException;
-import com.sk89q.worldedit.internal.expression.runtime.Functions;
-import com.sk89q.worldedit.internal.expression.runtime.RValue;
-import com.sk89q.worldedit.internal.expression.runtime.ReturnException;
-import com.sk89q.worldedit.internal.expression.runtime.Variable;
+import com.sk89q.worldedit.antlr.ExpressionLexer;
+import com.sk89q.worldedit.antlr.ExpressionParser;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import com.sk89q.worldedit.session.request.Request;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
+
+import java.lang.invoke.MethodHandle;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -68,59 +70,62 @@ import java.util.concurrent.TimeoutException;
  * If you wish to run the equation multiple times, you can then optimize it,
  * by calling {@link #optimize()}. You can then run the equation as many times
  * as you want by calling {@link #evaluate(double...)}. You do not need to
- * pass values for all variables specified while compiling.
- * To query variables after evaluation, you can use
- * {@link #getVariable(String, boolean)}. To get a value out of these, use
- * {@link Variable#getValue()}.</p>
- *
- * <p>Variables are also supported and can be set either by passing values
- * to {@link #evaluate(double...)}.</p>
+ * pass values for all slots specified while compiling.
+ * To query slots after evaluation, you can use the {@linkplain #getSlots() slot table}.
  */
 public class Expression {
 
     private static final ThreadLocal<ArrayDeque<Expression>> instance = ThreadLocal.withInitial(ArrayDeque::new);
-    private static final ExecutorService evalThread = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder()
-                    .setDaemon(true)
-                    .setNameFormat("worldedit-expression-eval-%d")
-                    .build());
+    private static final ExecutorService evalThread = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors(),
+        new ThreadFactoryBuilder()
+            .setDaemon(true)
+            .setNameFormat("worldedit-expression-eval-%d")
+            .build());
 
-    private final Map<String, RValue> variables = new HashMap<>();
+    private final SlotTable slots = new SlotTable();
+    private final List<String> providedSlots;
     private Variable[] variableArray;
-    private RValue root;
-    private final Functions functions = new Functions();
+    private ExpressionParser.AllStatementsContext root;
+    private final SetMultimap<String, MethodHandle> functions = Functions.getFunctionMap();
     private ExpressionEnvironment environment;
 
     public static Expression compile(String expression, String... variableNames) throws ExpressionException {
         return new Expression(expression, variableNames);
     }
 
+    private Expression(String expression, String... variableNames) throws ExpressionException {
+        slots.putSlot("e", new LocalSlot.Constant(Math.E));
+        slots.putSlot("pi", new LocalSlot.Constant(Math.PI));
+        slots.putSlot("true", new LocalSlot.Constant(1));
+        slots.putSlot("false", new LocalSlot.Constant(0));
+
+        for (String variableName : variableNames) {
+            slots.initVariable(variableName)
+                .orElseThrow(() -> new ExpressionException(-1,
+                    "Tried to overwrite identifier '" + variableName + "'"));
+        }
+        this.providedSlots = ImmutableList.copyOf(variableNames);
+
+        CharStream cs = CharStreams.fromString(expression, "<input>");
+        ExpressionLexer lexer = new ExpressionLexer(cs);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(new LexerErrorListener());
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        ExpressionParser parser = new ExpressionParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ParserErrorListener());
+        try {
+            root = parser.allStatements();
+            Objects.requireNonNull(root, "Unable to parse root, but no exceptions?");
+        } catch (ParseCancellationException e) {
+            throw new ParserException(parser.getState(), e);
+        }
+        ParseTreeWalker.DEFAULT.walk(new ExpressionValidator(slots.keySet(), functions), root);
+    }
+
     public Expression(double constant) {
         root = new Constant(0, constant);
-    }
-
-    private Expression(String expression, String... variableNames) throws ExpressionException {
-        this(Lexer.tokenize(expression), variableNames);
-    }
-
-    private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
-
-        variables.put("e", new Constant(-1, Math.E));
-        variables.put("pi", new Constant(-1, Math.PI));
-        variables.put("true", new Constant(-1, 1));
-        variables.put("false", new Constant(-1, 0));
-
-        variableArray = new Variable[variableNames.length];
-        for (int i = 0; i < variableNames.length; i++) {
-            if (variables.containsKey(variableNames[i])) {
-                throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableNames[i] + "'");
-            }
-            Variable var = new Variable(0);
-            variables.put(variableNames[i], var);
-            variableArray[i] = var;
-        }
-
-        root = Parser.parse(tokens, this);
     }
 
     public double evaluate(double x, double y, double z) throws EvaluationException {
@@ -157,10 +162,19 @@ public class Expression {
             return root.getValue();
         }
         for (int i = 0; i < values.length; ++i) {
-            Variable var = variableArray[i];
-            var.value = values[i];
+            String slotName = providedSlots.get(i);
+            LocalSlot.Variable slot = slots.getVariable(slotName)
+                .orElseThrow(() -> new EvaluationException(-1,
+                    "Tried to assign to non-variable " + slotName + "."));
+
+            slot.setValue(values[i]);
         }
-        return evaluateFinal(timeout);
+
+        // evaluation exceptions are thrown out of this method
+        if (timeout < 0) {
+            return evaluateRoot();
+        }
+        return evaluateRootTimed(timeout);
     }
 
     private double evaluateFinal(int timeout) throws EvaluationException {
@@ -175,6 +189,7 @@ public class Expression {
     }
 
     private double evaluateRootTimed(int timeout) throws EvaluationException {
+        CountDownLatch startLatch = new CountDownLatch(1);
         Request request = Request.request();
         Future<Double> result = evalThread.submit(() -> {
             Request local = Request.request();
@@ -182,12 +197,14 @@ public class Expression {
             local.setWorld(request.getWorld());
             local.setEditSession(request.getEditSession());
             try {
+                startLatch.countDown();
                 return Expression.this.evaluateRoot();
             } finally {
                 Request.reset();
             }
         });
         try {
+            startLatch.await();
             return result.get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -197,12 +214,8 @@ public class Expression {
             throw new ExpressionTimeoutException("Calculations exceeded time limit.");
         } catch (ExecutionException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof EvaluationException) {
-                throw (EvaluationException) cause;
-            }
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
+            Throwables.throwIfInstanceOf(cause, EvaluationException.class);
+            Throwables.throwIfUnchecked(cause);
             throw new RuntimeException(cause);
         }
     }
@@ -210,14 +223,18 @@ public class Expression {
     private Double evaluateRoot() throws EvaluationException {
         pushInstance();
         try {
-            return root.getValue();
+            return root.accept(new EvaluatingVisitor(slots, functions));
         } finally {
             popInstance();
         }
     }
 
-    public void optimize() throws EvaluationException {
-        root = root.optimize();
+    public void optimize() {
+        // TODO optimizing
+    }
+
+    public SlotTable getSlots() {
+        return slots;
     }
 
     public RValue getRoot() {
@@ -227,15 +244,6 @@ public class Expression {
     @Override
     public String toString() {
         return root.toString();
-    }
-
-    public RValue getVariable(String name, boolean create) {
-        RValue variable = variables.get(name);
-        if (variable == null && create) {
-            variables.put(name, variable = new Variable(0));
-        }
-
-        return variable;
     }
 
     public static Expression getInstance() {
@@ -251,10 +259,6 @@ public class Expression {
         ArrayDeque<Expression> foo = instance.get();
 
         foo.pop();
-    }
-
-    public Functions getFunctions() {
-        return functions;
     }
 
     public ExpressionEnvironment getEnvironment() {

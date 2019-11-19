@@ -50,11 +50,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.HashMap;
 
 public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
     private static LegacyMapper INSTANCE = new LegacyMapper();
+
+    private Map<String, String> blockEntries = new HashMap<>();
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
@@ -95,20 +98,31 @@ public final class LegacyMapper {
         parserContext.setTryLegacy(false); // This is legacy. Don't match itself.
 
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
+            String id = blockEntry.getKey();
+			Integer combinedId = getCombinedId(blockEntry.getKey());
+            final String value = blockEntry.getValue();
+            blockEntries.put(id, value);
+			BlockState blockState;
             try {
-                BlockState blockState = BlockState.get(null, blockEntry.getValue());
+                blockState = BlockState.get(null, blockEntry.getValue());
                 BlockType type = blockState.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
                 }
-                Integer combinedId = getCombinedId(blockEntry.getKey());
-                blockArr[combinedId] = blockState.getInternalId();
-
-                blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
-                blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
             } catch (InputParseException e) {
-                log.warn("Unknown block: " + blockEntry.getValue());
+                if (fixer != null) {
+                    String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
+                    try {
+                        blockState = WorldEdit.getInstance().getBlockFactory().parseFromInput(newEntry, parserContext).toImmutableState();
+                    } catch (InputParseException ignored) {
+						log.warn("Unknown block: " + value);
+						continue;
+                    }
+                }
             }
+			blockArr[combinedId] = blockState.getInternalId();
+            blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
+            blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
         }
         for (int id = 0; id < 256; id++) {
             int combinedId = id << 4;
@@ -123,8 +137,6 @@ public final class LegacyMapper {
         for (Map.Entry<String, String> itemEntry : dataFile.items.entrySet()) {
             try {
                 itemMap.put(getCombinedId(itemEntry.getKey()), ItemTypes.get(itemEntry.getValue()));
-            } catch (Exception e) {
-                log.warn("Unknown item: " + itemEntry.getValue());
             }
         }
     }

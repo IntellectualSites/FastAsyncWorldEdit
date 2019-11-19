@@ -304,14 +304,6 @@ public interface Player extends Entity, Actor {
     void setPosition(Vector3 pos, float pitch, float yaw);
 
     /**
-     * Move the player.
-     *
-     * @param pos where to move them
-     */
-    @Override
-    void setPosition(Vector3 pos);
-
-    /**
      * Sends a fake block to the client.
      *
      * <p>

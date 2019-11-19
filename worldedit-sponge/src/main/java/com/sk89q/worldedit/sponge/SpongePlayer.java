@@ -31,12 +31,15 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.adapter.spongeapi.TextAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemTypes;
-
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
@@ -149,6 +152,11 @@ public class SpongePlayer extends AbstractPlayerActor {
         sendColorized(msg, TextColors.RED);
     }
 
+    @Override
+    public void print(Component component) {
+        TextAdapter.sendComponent(player, WorldEditText.format(component));
+    }
+
     private void sendColorized(String msg, TextColor formatting) {
         for (String part : msg.split("\n")) {
             this.player.sendMessage(Text.of(formatting, TextSerializers.FORMATTING_CODE.deserialize(part)));
@@ -194,6 +202,16 @@ public class SpongePlayer extends AbstractPlayerActor {
     public void setGameMode(GameMode gameMode) {
         player.getGameModeData().type().set(Sponge.getRegistry().getType(org.spongepowered.api.entity.living.player.gamemode.GameMode.class,
                 gameMode.getId()).get());
+    }
+
+    @Override
+    public boolean isAllowedToFly() {
+        return player.get(Keys.CAN_FLY).orElse(super.isAllowedToFly());
+    }
+
+    @Override
+    public void setFlying(boolean flying) {
+        player.offer(Keys.IS_FLYING, flying);
     }
 
     @Override

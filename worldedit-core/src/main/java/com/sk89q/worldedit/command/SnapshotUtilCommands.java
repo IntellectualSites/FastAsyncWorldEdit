@@ -68,7 +68,7 @@ public class SnapshotUtilCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
+            actor.printError("Snapshot/backup restore is not configured.");
             return;
         }
 
@@ -79,7 +79,7 @@ public class SnapshotUtilCommands {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(snapshotName);
             } catch (InvalidSnapshotException e) {
-                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
+                actor.printError("That snapshot does not exist or is not available.");
                 return;
             }
         } else {
@@ -92,7 +92,7 @@ public class SnapshotUtilCommands {
                 snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot == null) {
-                    actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
+                    actor.printError("No snapshots were found. See console for details.");
 
                     // Okay, let's toss some debugging information!
                     File dir = config.snapshotRepo.getDirectory();
@@ -109,15 +109,21 @@ public class SnapshotUtilCommands {
                     return;
                 }
             } catch (MissingWorldException ex) {
-                actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
+                actor.printError("No snapshots were found for this world.");
                 return;
             }
         }
 
+        ChunkStore chunkStore;
 
         // Load chunk store
-        try (ChunkStore chunkStore = snapshot.getChunkStore()) {
-            BBC.SNAPSHOT_LOADED.send(actor, snapshot.getName());
+        try {
+            chunkStore = snapshot.getChunkStore();
+            actor.print("Snapshot '" + snapshot.getName() + "' loaded; now restoring...");
+        } catch (DataException | IOException e) {
+            actor.printError("Failed to load snapshot: " + e.getMessage());
+            return;
+        }
 
             // Restore snapshot
             SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
@@ -128,12 +134,12 @@ public class SnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (!restore.getMissingChunks().isEmpty()) {
-                    actor.printError(BBC.SNAPSHOT_ERROR_RESTORE.s());
+                    actor.printError("Chunks were not present in snapshot.");
                 } else if (error != null) {
                     actor.printError("Errors prevented any blocks from being restored.");
                     actor.printError("Last error: " + error);
                 } else {
-                    actor.printError(BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.s());
+                    actor.printError("No chunks could be loaded. (Bad archive?)");
                 }
             } else {
                 actor.print(String.format("Restored; %d "
@@ -143,6 +149,6 @@ public class SnapshotUtilCommands {
             }
         } catch (DataException | IOException e) {
             actor.printError("Failed to load snapshot: " + e.getMessage());
+            }
         }
-    }
 }
