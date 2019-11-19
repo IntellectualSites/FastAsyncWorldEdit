@@ -347,7 +347,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + commandLabel;
+        split[0] = commandLabel;
 
         String arguments = Joiner.on(" ").join(split);
         CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
@@ -484,22 +484,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         return true;
     }
-
-/*
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        // Add the command to the array because the underlying command handling
-        // code of WorldEdit expects it
-        String[] split = new String[args.length + 1];
-        System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + commandLabel;
-
-        String arguments = Joiner.on(" ").join(split);
-        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
-        getWorldEdit().getEventBus().post(event);
-        return CommandUtil.fixSuggestions(arguments, event.getSuggestions());
-    }
-*/
 
     /**
      * Gets the session for the player.

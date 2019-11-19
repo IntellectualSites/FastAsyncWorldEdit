@@ -330,12 +330,6 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-
-        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
-
-        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
-            world.loadChunk(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
-        }
         if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
 			int X = pt.getBlockX() >> 4;
 	        int Z = pt.getBlockZ() >> 4;

@@ -104,6 +104,7 @@ fun Project.applyShadowConfiguration() {
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")
+        exclude("META-INF/maven/**")
         minimize()
     }
 }

@@ -145,7 +145,7 @@ public class ToolCommands {
     public void selwand(Player player, LocalSession session) throws WorldEditException {
 
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
-        session.setTool(itemType, new SelectionWand());
+        session.setTool(itemType, SelectionWand.INSTANCE);
         player.print("Selection wand bound to " + itemType.getName() + ".");
     }
 
