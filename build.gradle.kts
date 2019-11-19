@@ -85,9 +85,9 @@ if (!project.hasProperty("gitCommitHash")) {
     }
 }
 
-buildScan {
-    setTermsOfServiceUrl("https://gradle.com/terms-of-service")
-    setTermsOfServiceAgree("yes")
-
-    publishAlways()
-}
+//buildScan {
+//    setTermsOfServiceUrl("https://gradle.com/terms-of-service")
+//    setTermsOfServiceAgree("yes")
+//
+//    publishAlways()
+//}

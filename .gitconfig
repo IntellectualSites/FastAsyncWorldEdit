@@ -1,0 +1,3 @@
+[merge "import-driver"]
+	name = Java merge driver used to resolve conflicts
+	driver = merge-imports.sh %O %A %B %L %P

@@ -1,1 +1,2 @@
 *.java   diff=java
+#*.java merge=import-driver #TODO not implemented, I'm just using a merge tool instead
