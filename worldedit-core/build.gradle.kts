@@ -34,8 +34,8 @@ dependencies {
     val antlrVersion = "4.7.2"
     "antlr"("org.antlr:antlr4:$antlrVersion")
     "implementation"("org.antlr:antlr4-runtime:$antlrVersion")
-    
-    "compile"("com.googlecode.json-simple:json-simple:1.3.9") { isTransitive = false }
+
+    "compile"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     "compileOnly"(project(":worldedit-libs:core:ap"))
     "annotationProcessor"(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP

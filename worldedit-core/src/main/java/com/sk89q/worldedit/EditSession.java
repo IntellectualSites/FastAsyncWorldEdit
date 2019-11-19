@@ -68,6 +68,7 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -94,9 +95,9 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
-import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
@@ -1169,18 +1170,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Count the number of blocks of a list of types in a region.
-     *
-     * @param region the region
-     * @param searchBlocks the list of blocks to search
-     * @return the number of blocks that matched the block
-     */
-    public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
-        BlockMask mask = new BlockMask(this, searchBlocks);
-        return countBlocks(region, mask);
-    }
-
-    /**
      * Remove a cuboid above the given position with a given apothem and a given height.
      *
      * @param position base position
@@ -1220,26 +1209,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 position.add(-apothem + 1, 0, -apothem + 1),
                 position.add(apothem - 1, -height + 1, apothem - 1));
         return setBlocks(region, BlockTypes.AIR.getDefaultState());
-    }
-
-    /**
-     * Remove blocks of a certain type nearby a given position.
-     *
-     * @param position center position of cuboid
-     * @param mask the mask to match
-     * @param apothem an apothem of the cuboid, where the minimum is 1
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int removeNear(BlockVector3 position, Mask mask, int apothem) throws MaxChangedBlocksException {
-        checkNotNull(position);
-        checkArgument(apothem >= 1, "apothem >= 1");
-
-        final BlockVector3 adjustment = BlockVector3.at(1, 1, 1).multiply(apothem - 1);
-        final Region region = new CuboidRegion(this.getWorld(), // Causes clamping of Y range
-                position.add(adjustment.multiply(-1)), position.add(adjustment));
-        final Pattern pattern = BlockTypes.AIR.getDefaultState();
-        return this.replaceBlocks(region, mask, pattern);
     }
 
     /**
@@ -1495,6 +1464,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return this.changes = copy.getAffected();
     }
 
+    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir,
+                          boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
+        Mask mask = null;
+        if (!copyAir) {
+            mask = new ExistingBlockMask(this);
+        }
+        return moveRegion(region, dir, distance, moveEntities, copyBiomes, mask, replacement);
+    }
+
     /**
      * Move the blocks in a region a certain direction.
      *
@@ -1509,8 +1487,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      * @throws IllegalArgumentException thrown if the region is not a flat region, but copyBiomes is true
      */
-    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir,
-                          boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
+    public int moveRegion(Region region, BlockVector3 dir, int distance,
+                          boolean moveEntities, boolean copyBiomes, Mask mask, Pattern replacement) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(dir);
         checkArgument(distance >= 1, "distance >= 1 required");
@@ -1538,14 +1516,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         copy.setRemovingEntities(moveEntities);
         copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(1);
-        Mask sourceMask = getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(this);
-            copy.setSourceMask(sourceMask);
-            setSourceMask(null);
-        }
-        if (!copyAir) {
-            copy.setSourceMask(new ExistingBlockMask(this));
+        if (mask != null) {
+            new MaskTraverser(mask).reset(this);
+            copy.setSourceMask(mask);
+            if (this.getSourceMask() == mask) {
+                setSourceMask(null);
+            }
         }
 
         Operations.completeBlindly(copy);
@@ -1697,21 +1673,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public int makeHollowCylinder(BlockVector3 pos, final Pattern block, double radiusX, double radiusZ, int height, double thickness) throws MaxChangedBlocksException {
         return makeCylinder(pos, block, radiusX, radiusZ, height, thickness, false);
-    }
-
-    /**
-     * Stack a cuboid region. For compatibility, entities are copied by biomes are not.
-     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, Mask)} to fine tune.
-     *
-     * @param region the region to stack
-     * @param dir the direction to stack
-     * @param count the number of times to stack
-     * @param copyAir true to also copy air blocks
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int stackCuboidRegion(Region region, BlockVector3 dir, int count, boolean copyAir) throws MaxChangedBlocksException {
-        return stackCuboidRegion(region, dir, count, true, false, copyAir ? null : new ExistingBlockMask(this));
     }
 
     private int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, double thickness, boolean filled) throws MaxChangedBlocksException {
