@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SimpleBukkitAdapter extends CachedBukkitAdapter {
     private BlockData[][] blockDataCache;
 
-    public boolean init() {
+    private boolean init() {
         if (blockDataCache != null) return false;
         this.blockDataCache = new BlockData[BlockTypes.size()][];
         blockDataCache[0] = new BlockData[] {Material.AIR.createBlockData()};

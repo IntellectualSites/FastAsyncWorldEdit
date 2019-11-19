@@ -2,15 +2,13 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
@@ -24,7 +22,6 @@ import net.minecraft.server.v1_14_R1.DataPaletteBlock;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
@@ -35,16 +32,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-public final class BukkitAdapter_1_14 {
-
+public final class BukkitAdapter_1_14 extends NMSAdapter {
     /*
-        NMS fields
-        */
+    NMS fields
+    */
     public final static Field fieldBits;
     public final static Field fieldPalette;
     public final static Field fieldSize;
@@ -152,10 +146,6 @@ public final class BukkitAdapter_1_14 {
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
                 return chunk.getHandle();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -178,34 +168,25 @@ public final class BukkitAdapter_1_14 {
         if (playerChunk == null) {
             return;
         }
-//        ChunkSection[] sections = nmsChunk.getSections();
-//        for (int layer = 0; layer < 16; layer++) {
-//            if (sections[layer] == null && (mask & (1 << layer)) != 0) {
-//                sections[layer] = new ChunkSection(layer << 4);
-//            }
-//        }
         if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(new Supplier<Object>() {
-                @Override
-                public Object get() {
-                    try {
-                        int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                        if (dirtyBits == 0) {
-                            nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                        }
-                        if (mask == 0) {
-                            dirtyBits = 65535;
-                        } else {
-                            dirtyBits |= mask;
-                        }
-
-                        fieldDirtyBits.set(playerChunk, dirtyBits);
-                        fieldDirtyCount.set(playerChunk, 64);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+            TaskManager.IMP.sync(() -> {
+                try {
+                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                    if (dirtyBits == 0) {
+                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                     }
-                    return null;
+                    if (mask == 0) {
+                        dirtyBits = 65535;
+                    } else {
+                        dirtyBits |= mask;
+                    }
+
+                    fieldDirtyBits.set(playerChunk, dirtyBits);
+                    fieldDirtyCount.set(playerChunk, 64);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
+                return null;
             });
             return;
         }
@@ -217,90 +198,6 @@ public final class BukkitAdapter_1_14 {
      */
     public static ChunkSection newChunkSection(final int layer, final char[] blocks) {
         return newChunkSection(layer, null, blocks);
-    }
-
-    private static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set) {
-        int air = 0;
-        int num_palette = 0;
-        int i = 0;
-        outer:
-        for (; i < 4096; i++) {
-            char ordinal = set[i];
-            switch (ordinal) {
-                case BlockID.__RESERVED__:
-                    break outer;
-                case BlockID.AIR:
-                case BlockID.CAVE_AIR:
-                case BlockID.VOID_AIR:
-                    air++;
-            }
-            int palette = blockToPalette[ordinal];
-            if (palette == Integer.MAX_VALUE) {
-                blockToPalette[ordinal] = palette = num_palette;
-                paletteToBlock[num_palette] = ordinal;
-                num_palette++;
-            }
-            blocksCopy[i] = palette;
-        }
-        if (i != 4096) {
-            char[] getArr = get.apply(layer);
-            for (; i < 4096; i++) {
-                char ordinal = set[i];
-                switch (ordinal) {
-                    case BlockID.__RESERVED__:
-                        ordinal = getArr[i];
-                        switch (ordinal) {
-                            case BlockID.__RESERVED__:
-                                ordinal = BlockID.AIR;
-                            case BlockID.AIR:
-                            case BlockID.CAVE_AIR:
-                            case BlockID.VOID_AIR:
-                                air++;
-                            default:
-                                set[i] = ordinal;
-                        }
-                        break;
-                    case BlockID.AIR:
-                    case BlockID.CAVE_AIR:
-                    case BlockID.VOID_AIR:
-                        air++;
-                }
-                int palette = blockToPalette[ordinal];
-                if (palette == Integer.MAX_VALUE) {
-                    blockToPalette[ordinal] = palette = num_palette;
-                    paletteToBlock[num_palette] = ordinal;
-                    num_palette++;
-                }
-                blocksCopy[i] = palette;
-            }
-        }
-
-        num_palette_buffer[0] = num_palette;
-        return air;
-    }
-    private static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, char[] set) {
-        int air = 0;
-        int num_palette = 0;
-        for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
-            switch (ordinal) {
-                case 0:
-                    ordinal = BlockID.AIR;
-                case BlockID.AIR:
-                case BlockID.CAVE_AIR:
-                case BlockID.VOID_AIR:
-                    air++;
-            }
-            int palette = blockToPalette[ordinal];
-            if (palette == Integer.MAX_VALUE) {
-                blockToPalette[ordinal] = palette = num_palette;
-                paletteToBlock[num_palette] = ordinal;
-                num_palette++;
-            }
-            blocksCopy[i] = palette;
-        }
-        num_palette_buffer[0] = num_palette;
-        return air;
     }
 
     public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set) {

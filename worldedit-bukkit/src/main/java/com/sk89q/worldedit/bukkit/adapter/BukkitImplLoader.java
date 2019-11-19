@@ -155,6 +155,7 @@ public class BukkitImplLoader {
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
         for (String className : adapterCandidates) {
+            System.out.println("Try load " + className);
             try {
                 Class<?> cls = Class.forName(className);
                 if (cls.isSynthetic()) continue;
@@ -168,6 +169,7 @@ public class BukkitImplLoader {
                 log.warn("Failed to load the Bukkit adapter class '" + className +
                         "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
+                e.printStackTrace();
                 if (className.equals(customCandidate)) {
                     log.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
                 }

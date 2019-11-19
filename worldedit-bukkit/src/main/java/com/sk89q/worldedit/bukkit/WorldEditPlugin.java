@@ -22,10 +22,9 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
-import com.bekvon.bukkit.residence.commands.message;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
+import com.boydti.fawe.bukkit.adapter.mc1_14.FAWE_Spigot_v1_14_R4;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -50,7 +49,6 @@ import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
 import java.io.File;
@@ -84,7 +82,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -251,9 +248,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
             BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
         }
-        // Block & Item
+        /*// Block & Item
         for (Material material : Material.values()) {
-/*
             if (material.isBlock() && !material.isLegacy()) {
                 BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
                     // TODO Use something way less hacky than this.
@@ -277,11 +273,11 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                     }
                 }));
             }
-*/
             if (material.isItem() && !material.isLegacy()) {
                 ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
             }
         }
+        */
         // Entity
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
@@ -371,7 +367,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
-            adapterLoader.addClass(Spigot_v1_14_R4.class);
+            adapterLoader.addClass(FAWE_Spigot_v1_14_R4.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

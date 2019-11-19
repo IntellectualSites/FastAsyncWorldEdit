@@ -192,7 +192,7 @@ public class AsyncBlock implements Block {
     @Override
     public void setType(@NotNull Material type) {
         try {
-            world.setBlock(x, y, z, BukkitAdapter.adapt(type).getDefaultState());
+            world.setBlock(x, y, z, BukkitAdapter.asBlockType(type).getDefaultState());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }

@@ -39,7 +39,6 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.BiomeBase;
-import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkSection;
@@ -521,7 +520,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                Spigot_v1_14_R4 adapter = ((Spigot_v1_14_R4) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                FAWE_Spigot_v1_14_R4 adapter = ((FAWE_Spigot_v1_14_R4) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitAdapter_1_14.fieldBits.get(blocks);
@@ -599,7 +598,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, Spigot_v1_14_R4 adapter) {
+    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_14_R4 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {

@@ -144,6 +144,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 BlockState state = null;
                 try {
                     String palettePart = fix(entry.getKey());
+                    System.out.println("Read " + palettePart);
                     state = BlockState.get(palettePart);
                 } catch (InputParseException e) {
                     e.printStackTrace();

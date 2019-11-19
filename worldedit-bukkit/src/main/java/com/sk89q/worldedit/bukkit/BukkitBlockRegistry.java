@@ -127,7 +127,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     }
 
     @Override
-    public Collection<String> registerBlocks() {
+    public Collection<String> values() {
         ArrayList<String> blocks = new ArrayList<>();
         for (Material m : Material.values()) {
             if (!m.isLegacy() && m.isBlock()) {

@@ -26,6 +26,8 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import java.util.Locale;
+
+import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -208,7 +210,9 @@ public interface IBukkitAdapter {
      * @param material The material
      * @return The itemtype
      */
-    ItemType asItemType(Material material);
+    default ItemType asItemType(Material material) {
+        return ItemTypes.get(material.getKey().toString());
+    }
 
     /**
      * Create a WorldEdit BlockStateHolder from a Bukkit BlockData
@@ -216,9 +220,10 @@ public interface IBukkitAdapter {
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
-    BlockState adapt(BlockData blockData);
-
-    BlockType adapt(Material material);
+    default BlockState adapt(BlockData blockData) {
+        String id = blockData.getAsString();
+        return BlockState.get(id);
+    }
 
     /**
      * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
@@ -226,7 +231,9 @@ public interface IBukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    BlockData adapt(BlockStateHolder block);
+    default BlockData adapt(BlockStateHolder block) {
+        return Bukkit.createBlockData(block.getAsString());
+    }
 
     /**
      * Create a WorldEdit BaseItemStack from a Bukkit ItemStack

@@ -741,6 +741,7 @@ public final class BlockTypes {
     private static Field[] fieldsTmp;
     private static JoinedCharSequence joined;
     private static int initIndex = 0;
+
     public static BlockType init() {
         if (fieldsTmp == null) {
             fieldsTmp = BlockTypes.class.getDeclaredFields();

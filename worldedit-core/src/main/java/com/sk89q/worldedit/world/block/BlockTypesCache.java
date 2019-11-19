@@ -176,7 +176,7 @@ public class BlockTypesCache {
             Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS);
             Registries registries = platform.getRegistries();
             BlockRegistry blockReg = registries.getBlockRegistry();
-            Collection<String> blocks = blockReg.registerBlocks();
+            Collection<String> blocks = blockReg.values();
             Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
 
             int size = blockMap.size();

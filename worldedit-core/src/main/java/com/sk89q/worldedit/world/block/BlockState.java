@@ -179,7 +179,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                             // Suggest property
                             String input = charSequence.toString();
                             BlockType finalType = type;
-                            throw new SuggestInputParseException("Invalid property " + charSequence + ":" + input + " for type " + type, input, () ->
+                            throw new SuggestInputParseException("Invalid property " + key + ":" + input + " for type " + type, input, () ->
                                 finalType.getProperties().stream()
                                 .map(Property::getName)
                                 .filter(p -> StringMan.blockStateMatches(input, p))
@@ -196,6 +196,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                 case '=': {
                     charSequence.setSubstring(last, i);
                     property = (AbstractProperty) type.getPropertyMap().get(charSequence);
+                    if (property == null) System.out.println("No prop " + charSequence + " | " + type.getPropertyMap());
                     last = i + 1;
                     break;
                 }

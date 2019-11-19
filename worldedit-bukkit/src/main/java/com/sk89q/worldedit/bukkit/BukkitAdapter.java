@@ -353,10 +353,6 @@ public enum BukkitAdapter {
     public static BlockState adapt(@NotNull BlockData blockData) {
         return getAdapter().adapt(blockData);
     }
-
-    public static BlockType adapt(Material material) {
-        return getAdapter().adapt(material);
-    }
     /*
     private static Map<String, BlockData> blockDataCache = new HashMap<>();
     */

@@ -26,6 +26,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -36,16 +37,23 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import java.util.Map;
-import java.util.OptionalInt;
-import javax.annotation.Nullable;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.OptionalInt;
+
+import javax.annotation.Nullable;
+
+import java.util.Map;
+import java.util.OptionalInt;
+
+import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -68,6 +76,19 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     DataFixer getDataFixer();
 
     /**
+     * @return {@code true} if {@link #tickWatchdog()} is implemented
+     */
+    default boolean supportsWatchdog() {
+        return false;
+    }
+
+    /**
+     * Tick the server watchdog, if possible.
+     */
+    default void tickWatchdog() {
+    }
+
+    /**
      * Get the block at the given location.
      *
      * @param location the location
@@ -83,11 +104,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param notifyAndLight notify and light if set
      * @return true if a block was likely changed
      */
-    default boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
-        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
-    }
-
-    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder<?> state, boolean update);
+    boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight);
 
     /**
      * Notifies the simulation that the block at the given location has
@@ -143,13 +160,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     void sendFakeOP(Player player);
 
     /**
-     * Send a fake chunk packet to a player
-     * @param player
-     * @param packet
-     */
-    void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet);
-
-    /**
      * Simulates a player using an item.
      *
      * @param world the world
@@ -178,10 +188,24 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     BaseItemStack adapt(ItemStack itemStack);
 
-    boolean isChunkInUse(Chunk chunk);
+    default OptionalInt getInternalBlockStateId(BlockData data) {
+        return getInternalBlockStateId(BukkitAdapter.adapt(data));
+    }
 
+    /**
+     * Retrieve the internal ID for a given state, if possible.
+     *
+     * @param state The block state
+     * @return the internal ID of the state
+     */
+    default OptionalInt getInternalBlockStateId(BlockState state) {
+        return OptionalInt.empty();
+    }
+
+
+    // FAWE ADDITIONS
     default BlockMaterial getMaterial(BlockType blockType) {
-        return null;
+        return getMaterial(blockType.getDefaultState());
     }
 
     default BlockMaterial getMaterial(BlockState blockState) {
@@ -201,12 +225,11 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     }
 
     /**
-     * Retrieve the internal ID for a given state, if possible.
-     *
-     * @param state The block state
-     * @return the internal ID of the state
+     * Send a fake chunk packet to a player
+     * @param player
+     * @param packet
      */
-    default OptionalInt getInternalBlockStateId(BlockState state) {
-        return OptionalInt.empty();
+    default void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
+        throw new UnsupportedOperationException("Cannot send fake chunks");
     }
 }

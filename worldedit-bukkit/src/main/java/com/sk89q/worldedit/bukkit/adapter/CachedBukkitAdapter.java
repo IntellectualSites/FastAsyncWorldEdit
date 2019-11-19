@@ -57,11 +57,11 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     }
 
     @Override
-    public BlockType adapt(Material material) {
+    public BlockType asBlockType(Material material) {
         try {
             return BlockTypesCache.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
-            if (init()) return adapt(material);
+            if (init()) return asBlockType(material);
             throw e;
         }
     }
