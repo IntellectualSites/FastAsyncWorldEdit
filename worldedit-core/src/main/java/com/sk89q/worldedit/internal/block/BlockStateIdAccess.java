@@ -31,7 +31,7 @@ import java.util.OptionalInt;
 import static com.google.common.base.Preconditions.checkState;
 
 public final class BlockStateIdAccess {
-
+    /*
     private static final BiMap<BlockState, Integer> ASSIGNED_IDS = HashBiMap.create(2 << 13);
 
     public static OptionalInt getBlockStateId(BlockState holder) {
@@ -49,7 +49,7 @@ public final class BlockStateIdAccess {
      * {@link OptionalInt#empty()}. In those cases, we will use our own ID system,
      * since it's useful for other entries as well.
      * @return an unused ID in WorldEdit's ID tracker
-     */
+     /
     private static int provideUnusedWorldEditId() {
         return usedIds.nextClearBit(0);
     }
@@ -73,5 +73,12 @@ public final class BlockStateIdAccess {
 
     private BlockStateIdAccess() {
     }
+    */
+    public static OptionalInt getBlockStateId(BlockState holder) {
+        return OptionalInt.of(holder.getOrdinal());
+    }
 
+    public static @Nullable BlockState getBlockStateById(int id) {
+        return BlockState.getFromOrdinal(id);
+    }
 }

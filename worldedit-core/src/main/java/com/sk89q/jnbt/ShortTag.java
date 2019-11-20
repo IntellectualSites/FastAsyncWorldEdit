@@ -23,6 +23,14 @@ package com.sk89q.jnbt;
  * The {@code TAG_Short} tag.
  */
 public final class ShortTag extends NumberTag {
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_SHORT;
+    }
+    @Override
+    public String getTypeName() {
+        return "TAG_Short";
+    }
 
     private final short value;
 

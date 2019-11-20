@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.adapter.mc1_14.nbt;
 
+import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
@@ -14,43 +15,52 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class LazyCompoundTag_1_14 extends CompoundTag {
-    private final NBTTagCompound nmsTag;
+    private final Supplier<NBTTagCompound> nmsTag;
 
-    public LazyCompoundTag_1_14(NBTTagCompound tag) {
+    public LazyCompoundTag_1_14(Supplier<NBTTagCompound> tag) {
         super(null);
         this.nmsTag = tag;
+    }
+
+    public LazyCompoundTag_1_14(NBTTagCompound tag) {
+        this(() -> tag);
+    }
+
+    public NBTTagCompound get() {
+        return nmsTag.get();
     }
 
     @Override
     public Map<String, Tag> getValue() {
         Map<String, Tag> value = super.getValue();
         if (value == null) {
-            Tag tag = WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(nmsTag);
+            Tag tag = WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(nmsTag.get());
             setValue(((CompoundTag) tag).getValue());
         }
         return super.getValue();
     }
 
     public boolean containsKey(String key) {
-        return nmsTag.hasKey(key);
+        return nmsTag.get().hasKey(key);
     }
 
     public byte[] getByteArray(String key) {
-        return nmsTag.getByteArray(key);
+        return nmsTag.get().getByteArray(key);
     }
 
     public byte getByte(String key) {
-        return nmsTag.getByte(key);
+        return nmsTag.get().getByte(key);
     }
 
     public double getDouble(String key) {
-        return nmsTag.getDouble(key);
+        return nmsTag.get().getDouble(key);
     }
 
     public double asDouble(String key) {
-        NBTBase value = nmsTag.get(key);
+        NBTBase value = nmsTag.get().get(key);
         if (value instanceof NBTNumber) {
             return ((NBTNumber) value).asDouble();
         }
@@ -58,19 +68,19 @@ public class LazyCompoundTag_1_14 extends CompoundTag {
     }
 
     public float getFloat(String key) {
-        return nmsTag.getFloat(key);
+        return nmsTag.get().getFloat(key);
     }
 
     public int[] getIntArray(String key) {
-        return nmsTag.getIntArray(key);
+        return nmsTag.get().getIntArray(key);
     }
 
     public int getInt(String key) {
-        return nmsTag.getInt(key);
+        return nmsTag.get().getInt(key);
     }
 
     public int asInt(String key) {
-        NBTBase value = nmsTag.get(key);
+        NBTBase value = nmsTag.get().get(key);
         if (value instanceof NBTNumber) {
             return ((NBTNumber) value).asInt();
         }
@@ -78,7 +88,7 @@ public class LazyCompoundTag_1_14 extends CompoundTag {
     }
 
     public List<Tag> getList(String key) {
-        NBTBase tag = nmsTag.get(key);
+        NBTBase tag = nmsTag.get().get(key);
         if (tag instanceof NBTTagList) {
             ArrayList<Tag> list = new ArrayList<>();
             NBTTagList nbtList = (NBTTagList) tag;
@@ -95,7 +105,7 @@ public class LazyCompoundTag_1_14 extends CompoundTag {
     }
 
     public ListTag getListTag(String key) {
-        NBTBase tag = nmsTag.get(key);
+        NBTBase tag = nmsTag.get().get(key);
         if (tag instanceof NBTTagList) {
             return (ListTag) WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(tag);
         }
@@ -113,15 +123,15 @@ public class LazyCompoundTag_1_14 extends CompoundTag {
     }
 
     public long[] getLongArray(String key) {
-        return nmsTag.getLongArray(key);
+        return nmsTag.get().getLongArray(key);
     }
 
     public long getLong(String key) {
-        return nmsTag.getLong(key);
+        return nmsTag.get().getLong(key);
     }
 
     public long asLong(String key) {
-        NBTBase value = nmsTag.get(key);
+        NBTBase value = nmsTag.get().get(key);
         if (value instanceof NBTNumber) {
             return ((NBTNumber) value).asLong();
         }
@@ -129,10 +139,15 @@ public class LazyCompoundTag_1_14 extends CompoundTag {
     }
 
     public short getShort(String key) {
-        return nmsTag.getShort(key);
+        return nmsTag.get().getShort(key);
     }
 
     public String getString(String key) {
-        return nmsTag.getString(key);
+        return nmsTag.get().getString(key);
+    }
+
+    @Override
+    public String toString() {
+        return nmsTag.get().toString();
     }
 }

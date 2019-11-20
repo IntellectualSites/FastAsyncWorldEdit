@@ -934,7 +934,6 @@ public final class ItemTypes {
             }
             String name = fieldsTmp[initIndex++].getName().toLowerCase(Locale.ROOT);
             CharSequence fullName = joined.init(ItemType.REGISTRY.getDefaultNamespace(), ':', name);
-            System.out.println("Name " + fullName + " | " + ItemType.REGISTRY.getMap().get(fullName));
             return ItemType.REGISTRY.getMap().get(fullName);
         } catch (Throwable e) {
             e.printStackTrace();

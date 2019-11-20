@@ -25,6 +25,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The {@code TAG_String} tag.
  */
 public final class StringTag extends Tag {
+    @Override
+    public String getTypeName() {
+        return "TAG_String";
+    }
+
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_STRING;
+    }
 
     private final String value;
 

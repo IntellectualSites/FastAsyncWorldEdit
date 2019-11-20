@@ -90,7 +90,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         checkNotNull(name);
         checkNotNull(tag);
 
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         writeNamedTagName(name, type);
 
         if (type == NBTConstants.TYPE_END) {
@@ -189,7 +189,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     public void writeTag(Tag tag) throws IOException {
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         os.writeByte(type);
         writeTagPayload(tag);
     }
@@ -207,7 +207,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      *             if an I/O error occurs.
      */
     public void writeTagPayload(Tag tag) throws IOException {
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         switch (type) {
             case NBTConstants.TYPE_END:
                 writeEndTagPayload((EndTag) tag);
@@ -311,7 +311,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         int size = tags.size();
         if (!tags.isEmpty()) {
             Tag tag0 = tags.get(0);
-            os.writeByte(NBTUtils.getTypeCode(tag0.getClass()));
+            os.writeByte(tag0.getTypeCode());
         } else {
             os.writeByte(NBTUtils.getTypeCode(clazz));
         }

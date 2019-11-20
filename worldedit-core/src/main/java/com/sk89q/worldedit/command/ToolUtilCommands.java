@@ -179,9 +179,9 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "/",
-        aliases = { "," },
-        desc = "Toggle the super pickaxe function"
+            name = "/superpickaxe",
+            aliases = {",", "/sp", "/pickaxe"},
+            desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
     public void togglePickaxe(Player player, LocalSession session,

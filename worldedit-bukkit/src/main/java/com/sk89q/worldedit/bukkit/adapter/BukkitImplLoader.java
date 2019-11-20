@@ -155,7 +155,6 @@ public class BukkitImplLoader {
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
         for (String className : adapterCandidates) {
-            System.out.println("Try load " + className);
             try {
                 Class<?> cls = Class.forName(className);
                 if (cls.isSynthetic()) continue;

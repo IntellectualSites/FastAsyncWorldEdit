@@ -79,6 +79,7 @@ public enum Capability {
      * The capability of a platform to perform modifications to a world.
      */
     WORLD_EDITING {
+        /*
         @Override
         void initialize(PlatformManager platformManager, Platform platform) {
             BlockRegistry blockRegistry = platform.getRegistries().getBlockRegistry();
@@ -93,6 +94,7 @@ public enum Capability {
         void unload(PlatformManager platformManager, Platform platform) {
             BlockStateIdAccess.clear();
         }
+        */
     };
 
     void initialize(PlatformManager platformManager, Platform platform) {

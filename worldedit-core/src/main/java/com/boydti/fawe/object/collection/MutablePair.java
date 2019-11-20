@@ -7,12 +7,12 @@ public class MutablePair<K, V> implements Map.Entry<K, V> {
     private V value;
     @Override
     public K getKey() {
-        return null;
+        return key;
     }
 
     @Override
     public V getValue() {
-        return null;
+        return value;
     }
 
     @Override

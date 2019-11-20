@@ -9,9 +9,11 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
+import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
@@ -21,6 +23,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -101,9 +104,8 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 
     @Override
     public CompoundTag getTag(int x, int y, int z) {
-        TileEntity tile = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
-        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        return (CompoundTag) adapter.toNative(tile);
+        TileEntity tileEntity = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
+        return new LazyCompoundTag_1_14(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
     private static final Function<BlockPosition, BlockVector3> posNms2We = new Function<BlockPosition, BlockVector3>() {
@@ -116,8 +118,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     private final static Function<TileEntity, CompoundTag> nmsTile2We = new Function<TileEntity, CompoundTag>() {
         @Override
         public CompoundTag apply(TileEntity tileEntity) {
-            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-            return (CompoundTag) adapter.toNative(tileEntity.b());
+            return new LazyCompoundTag_1_14(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
         }
     };
 
@@ -419,10 +420,11 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                             for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
                                 final CompoundTag nativeTag = entry.getValue();
                                 final BlockVector3 blockHash = entry.getKey();
-                                final int x = blockHash.getX()+ bx;
+                                final int x = blockHash.getX() + bx;
                                 final int y = blockHash.getY();
                                 final int z = blockHash.getZ() + bz;
                                 final BlockPosition pos = new BlockPosition(x, y, z);
+
                                 synchronized (nmsWorld) {
                                     TileEntity tileEntity = nmsWorld.getTileEntity(pos);
                                     if (tileEntity == null || tileEntity.isRemoved()) {
@@ -473,18 +475,23 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     Callable<Future> chain = new Callable<Future>() {
                         @Override
                         public Future call() {
-                            // Run the sync tasks
-                            for (int i = 1; i < finalSyncTasks.length; i++) {
-                                Runnable task = finalSyncTasks[i];
-                                if (task != null) {
-                                    task.run();
+                            try {
+                                // Run the sync tasks
+                                for (int i = 0; i < finalSyncTasks.length; i++) {
+                                    Runnable task = finalSyncTasks[i];
+                                    if (task != null) {
+                                        task.run();
+                                    }
                                 }
-                            }
-                            if (callback == null) {
-                                if (finalizer != null) finalizer.run();
-                                return null;
-                            } else {
-                                return queueHandler.async(callback, null);
+                                if (callback == null) {
+                                    if (finalizer != null) finalizer.run();
+                                    return null;
+                                } else {
+                                    return queueHandler.async(callback, null);
+                                }
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                                throw e;
                             }
                         }
                     };

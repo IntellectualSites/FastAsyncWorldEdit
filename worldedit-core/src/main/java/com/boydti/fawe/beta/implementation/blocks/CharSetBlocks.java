@@ -101,7 +101,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) {
         if (tiles == null) {
-            tiles = new BlockVector3ChunkMap<CompoundTag>();
+            tiles = new BlockVector3ChunkMap<>();
         }
         tiles.put(x, y, z, tile);
         return true;

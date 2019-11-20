@@ -110,28 +110,26 @@ public class RegionCommands {
     }
 
     @Command(
-        name = "/set",
-        desc = "Sets all the blocks in the region"
+            name = "/set",
+            aliases = {"/"},
+            desc = "Sets all the blocks in the region"
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     public int set(Actor actor, EditSession editSession,
                    @Selection Region region,
                    @Arg(desc = "The pattern of blocks to set")
-                       Pattern pattern) {
-        RegionFunction set = new BlockReplace(editSession, pattern);
-        RegionVisitor visitor = new RegionVisitor(region, set);
-
-        Operations.completeBlindly(visitor);
-        List<String> messages = Lists.newArrayList();
-        visitor.addStatusMessages(messages);
-        if (messages.isEmpty()) {
-            actor.print("Operation completed.");
-        } else {
-            actor.print("Operation completed (" + Joiner.on(", ").join(messages) + ").");
-        }
-
-        return visitor.getAffected();
+                           Pattern pattern,
+                   InjectedValueAccess context) {
+        actor.checkConfirmationRegion(() -> {
+            int affected = editSession.setBlocks(region, pattern);
+            if (affected != 0) {
+                BBC.OPERATION.send(actor, affected);
+                if (!actor.hasPermission("fawe.tips"))
+                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(actor);
+            }
+        }, getArguments(context), region, context);
+        return 0;
     }
 
     @Command(
@@ -148,40 +146,17 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/set",
-            aliases = {"/"},
-            desc = "Sets all the blocks in the region"
-    )
-    @CommandPermissions("worldedit.region.set")
-    @Logging(REGION)
-    public void set(Actor actor, EditSession editSession,
-                    @Selection Region region,
-                    @Arg(desc = "The pattern of blocks to set")
-                            Pattern pattern, InjectedValueAccess context) throws WorldEditException {
-        actor.checkConfirmationRegion(() -> {
-            int affected = editSession.setBlocks(region, pattern);
-            if (affected != 0) {
-                BBC.OPERATION.send(actor, affected);
-                if (!actor.hasPermission("fawe.tips"))
-                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(actor);
-            }
-        }, getArguments(context), region, context);
-    }
-
-    @Command(
             name = "/test",
             desc = "test region"
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
     public void test(Player player, EditSession editSession, @Selection Region region, @Arg(desc = "hello there") BiomeType biome) throws WorldEditException {
-        System.out.println("Test start");
         editSession.addProcessor(new ChunkSendProcessor(editSession.getWorld(), () -> Collections.singleton(player)));
         editSession.addProcessor(NullProcessor.INSTANCE);
         FlatRegionFunction replace = new BiomeReplace(editSession, biome);
         FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);
         Operations.completeLegacy(visitor);
-        System.out.println("Test end");
     }
 
     @Command(

@@ -23,6 +23,15 @@ package com.sk89q.jnbt;
  * The {@code TAG_End} tag.
  */
 public final class EndTag extends Tag {
+    @Override
+    public String getTypeName() {
+        return "TAG_End";
+    }
+
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_END;
+    }
 
     @Override
     public Object getValue() {

@@ -24,7 +24,7 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.mc1_14.FAWE_Spigot_v1_14_R4;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;

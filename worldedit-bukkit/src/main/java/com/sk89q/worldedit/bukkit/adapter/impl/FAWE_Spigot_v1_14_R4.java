@@ -17,11 +17,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.boydti.fawe.bukkit.adapter.mc1_14;
+package com.sk89q.worldedit.bukkit.adapter.impl;
 
+import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitAdapter_1_14;
+import com.boydti.fawe.bukkit.adapter.mc1_14.MapChunkUtil_1_14;
+import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -74,6 +80,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -82,7 +89,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
-    private final BukkitImplAdapter<NBTBase> parent;
+    private final Spigot_v1_14_R4 parent;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -242,9 +249,6 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
         BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
-        if (material.isAir()) {
-            return OptionalInt.empty();
-        }
         IBlockData mcState = material.getCraftBlockData().getState();
         return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
     }
@@ -324,9 +328,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
-        Map<String, ? extends Property<?>> result = getParent().getProperties(blockType);
-        System.out.println("Result " + result);
-        return result;
+        return getParent().getProperties(blockType);
     }
 
     @Override
@@ -342,5 +344,18 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
         weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
         return weStack;
+    }
+
+    @Override
+    public Tag toNative(NBTBase foreign) {
+        return parent.toNative(foreign);
+    }
+
+    @Override
+    public NBTBase fromNative(Tag foreign) {
+        if (foreign instanceof LazyCompoundTag_1_14) {
+            return ((LazyCompoundTag_1_14) foreign).get();
+        }
+        return parent.fromNative(foreign);
     }
 }

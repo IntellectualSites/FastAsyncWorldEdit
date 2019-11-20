@@ -23,6 +23,14 @@ package com.sk89q.jnbt;
  * The {@code TAG_Int} tag.
  */
 public final class IntTag extends NumberTag {
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_INT;
+    }
+    @Override
+    public String getTypeName() {
+        return "TAG_Int";
+    }
 
     private final int value;
 

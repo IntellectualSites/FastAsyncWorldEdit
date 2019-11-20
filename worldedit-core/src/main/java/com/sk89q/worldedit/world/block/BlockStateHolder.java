@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
@@ -200,6 +202,10 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
      * @param nbtData NBT data, or null if no data
      */
     default void setNbtData(@Nullable CompoundTag nbtData) {
+        throw new UnsupportedOperationException("State is immutable");
+    }
+
+    default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         throw new UnsupportedOperationException("State is immutable");
     }
 

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
@@ -160,11 +161,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     @Override
     public CompoundTag getNbtData() {
         return this.nbtData;
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("This class is immutable.");
     }
 
     /**

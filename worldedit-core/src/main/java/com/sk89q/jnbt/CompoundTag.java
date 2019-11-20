@@ -32,6 +32,15 @@ import java.util.UUID;
  * The {@code TAG_Compound} tag.
  */
 public class CompoundTag extends Tag {
+    @Override
+    public String getTypeName() {
+        return "TAG_Compound";
+    }
+
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_COMPOUND;
+    }
 
     private Map<String, Tag> value;
 

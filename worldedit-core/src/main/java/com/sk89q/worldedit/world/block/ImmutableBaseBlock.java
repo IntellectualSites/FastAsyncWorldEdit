@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;

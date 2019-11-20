@@ -35,4 +35,8 @@ public abstract class Tag {
         return getValue();
     }
 
+    public abstract int getTypeCode();
+
+    public abstract String getTypeName();
+
 }

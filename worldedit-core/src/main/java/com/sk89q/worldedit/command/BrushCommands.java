@@ -155,15 +155,6 @@ public class BrushCommands {
     }
 
     @Command(
-        name = "none",
-        aliases = "unbind",
-        desc = "Unbind a bound brush from your current item"
-    )
-    void none(Player player, LocalSession session) throws WorldEditException {
-        ToolCommands.setToolNone(player, session, "Brush");
-    }
-
-    @Command(
             name = "blendball",
             aliases = {"bb", "blend"},
             desc = "Smooths and blends terrain",
@@ -960,52 +951,6 @@ public class BrushCommands {
     }
 
     @Command(
-        name = "forest",
-        desc = "Forest brush, creates a forest in the area"
-    )
-    @CommandPermissions("worldedit.brush.forest")
-    public void forest(Player player, LocalSession localSession,
-                       @Arg(desc = "The shape of the region")
-                           RegionFactory shape,
-                       @Arg(desc = "The size of the brush", def = "5")
-                           Expression radius,
-                       @Arg(desc = "The density of the brush", def = "20")
-                           double density,
-                       @Arg(desc = "The type of tree to use")
-                           TreeGenerator.TreeType type) throws WorldEditException, EvaluationException {
-        setOperationBasedBrush(player, localSession, radius,
-            new Paint(new TreeGeneratorFactory(type), density / 100), shape, "worldedit.brush.forest");
-    }
-
-    @Command(
-        name = "raise",
-        desc = "Raise brush, raise all blocks by one"
-    )
-    @CommandPermissions("worldedit.brush.raise")
-    public void raise(Player player, LocalSession localSession,
-                      @Arg(desc = "The shape of the region")
-                          RegionFactory shape,
-                      @Arg(desc = "The size of the brush", def = "5")
-                          Expression radius) throws WorldEditException, EvaluationException {
-        setOperationBasedBrush(player, localSession, radius,
-            new Deform("y-=1"), shape, "worldedit.brush.raise");
-    }
-
-    @Command(
-        name = "lower",
-        desc = "Lower brush, lower all blocks by one"
-    )
-    @CommandPermissions("worldedit.brush.lower")
-    public void lower(Player player, LocalSession localSession,
-                      @Arg(desc = "The shape of the region")
-                          RegionFactory shape,
-                      @Arg(desc = "The size of the brush", def = "5")
-                          Expression radius) throws WorldEditException, EvaluationException {
-        setOperationBasedBrush(player, localSession, radius,
-            new Deform("y+=1"), shape, "worldedit.brush.lower");
-    }
-
-    @Command(
             name = "savebrush",
             aliases = {"save"},
             desc = "Save your current brush"
@@ -1139,7 +1084,7 @@ public class BrushCommands {
                     @Arg(desc = "The shape of the region")
                         RegionFactory shape,
                     @Arg(desc = "The size of the brush", def = "5")
-                        double radius,
+                        Expression radius,
                     @Arg(desc = "The pattern of blocks to set")
                         Pattern pattern) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
@@ -1155,7 +1100,7 @@ public class BrushCommands {
                        @Arg(desc = "The shape of the region")
                            RegionFactory shape,
                        @Arg(desc = "The size of the brush", def = "5")
-                           double radius,
+                           Expression radius,
                        @Arg(desc = "The density of the brush", def = "20")
                            double density,
                        @Arg(desc = "The type of tree to use")
@@ -1173,7 +1118,7 @@ public class BrushCommands {
                       @Arg(desc = "The shape of the region")
                           RegionFactory shape,
                       @Arg(desc = "The size of the brush", def = "5")
-                          double radius) throws WorldEditException {
+                          Expression radius) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
             new Deform("y-=1"), shape, "worldedit.brush.raise");
     }
@@ -1187,7 +1132,7 @@ public class BrushCommands {
                       @Arg(desc = "The shape of the region")
                           RegionFactory shape,
                       @Arg(desc = "The size of the brush", def = "5")
-                          double radius) throws WorldEditException {
+                                  Expression radius) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
             new Deform("y+=1"), shape, "worldedit.brush.lower");
     }

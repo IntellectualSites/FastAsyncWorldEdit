@@ -24,6 +24,14 @@ package com.sk89q.jnbt;
  * 
  */
 public final class LongTag extends NumberTag {
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG;
+    }
+    @Override
+    public String getTypeName() {
+        return "TAG_Long";
+    }
 
     private final long value;
 

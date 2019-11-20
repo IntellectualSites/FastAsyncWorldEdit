@@ -15,7 +15,7 @@ import java.util.concurrent.Future;
 /**
  * An interface for getting blocks.
  */
-public interface IChunkGet extends IBlocks, Trimable, InputExtent {
+public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     @Override
     BaseBlock getFullBlock(int x, int y, int z);
@@ -26,6 +26,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent {
     @Override
     BlockState getBlock(int x, int y, int z);
 
+    @Override
     CompoundTag getTag(int x, int y, int z);
 
     @Override

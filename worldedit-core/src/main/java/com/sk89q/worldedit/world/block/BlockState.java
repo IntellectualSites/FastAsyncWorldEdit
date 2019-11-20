@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.ITileInput;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -53,7 +54,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     private final char ordinalChar;
     private final BlockType blockType;
     private BlockMaterial material;
-    private BaseBlock emptyBaseBlock;
+    private final BaseBlock emptyBaseBlock;
+    private CompoundInput compoundInput = CompoundInput.NULL;
 
     protected BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
@@ -196,7 +198,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                 case '=': {
                     charSequence.setSubstring(last, i);
                     property = (AbstractProperty) type.getPropertyMap().get(charSequence);
-                    if (property == null) System.out.println("No prop " + charSequence + " | " + type.getPropertyMap());
                     last = i + 1;
                     break;
                 }
@@ -356,6 +357,9 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                 return this.material = blockType.getMaterial();
             }
             this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
+            if (this.material.hasContainer()) {
+                this.compoundInput = CompoundInput.CONTAINER;
+            }
         }
         return material;
     }
@@ -387,5 +391,18 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     @Override
     public int hashCode() {
         return getOrdinal();
+    }
+
+    public boolean isAir() {
+        try {
+            return material.isAir();
+        } catch (NullPointerException ignore) {
+            return getMaterial().isAir();
+        }
+    }
+
+    @Override
+    public BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
+        return compoundInput.get(this, input, x, y, z);
     }
 }

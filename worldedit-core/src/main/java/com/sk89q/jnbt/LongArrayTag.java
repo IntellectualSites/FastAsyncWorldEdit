@@ -29,6 +29,15 @@ import java.util.Locale;
  * The {@code TAG_Long_Array} tag.
  */
 public class LongArrayTag extends Tag {
+    @Override
+    public String getTypeName() {
+        return "TAG_Long_Array";
+    }
+
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG_ARRAY;
+    }
 
     private final long[] value;
 
