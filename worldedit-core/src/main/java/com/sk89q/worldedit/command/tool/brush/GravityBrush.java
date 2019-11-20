@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.util.collection.LocatedBlockList;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class GravityBrush implements Brush {
@@ -53,15 +54,11 @@ public class GravityBrush implements Brush {
                         if (y != freeSpot) {
                             editSession.setBlock((int)x, (int)y, (int)z, BlockTypes.AIR.getDefaultState());
                             editSession.setBlock((int)x, (int)freeSpot, (int)z, block);
-                    }
+                        }
                         freeSpot = y + 1;
-                }
                     }
                 }
-
-                column.clear();
-                removedBlocks.clear();
             }
         }
-
+    }
 }

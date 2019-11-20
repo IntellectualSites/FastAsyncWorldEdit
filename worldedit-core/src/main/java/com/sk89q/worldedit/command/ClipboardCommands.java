@@ -39,10 +39,12 @@ import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
@@ -314,8 +316,8 @@ public class ClipboardCommands {
                 }
             }
 
-            final LocalConfiguration config = this.worldEdit.getConfiguration();
-            final File working = this.worldEdit.getWorkingDirectoryFile(config.saveDir).getAbsoluteFile();
+            final LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
+            final File working = WorldEdit.getInstance().getWorkingDirectoryFile(config.saveDir).getAbsoluteFile();
 
             url = MainUtil.upload(null, null, "zip", new RunnableVal<OutputStream>() {
                 @Override
@@ -484,7 +486,7 @@ public class ClipboardCommands {
             uri = ((URIClipboardHolder) holder).getURI(clipboard);
         }
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
-        worldEdit.getEventBus().post(event);
+        WorldEdit.getInstance().getEventBus().post(event);
         if (event.isCancelled()) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
         }

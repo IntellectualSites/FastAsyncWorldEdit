@@ -411,6 +411,7 @@ public class ForwardExtentCopy implements Operation {
             }
 
         }
+        int affected;
         affected = region.getArea();
         return null;
     }

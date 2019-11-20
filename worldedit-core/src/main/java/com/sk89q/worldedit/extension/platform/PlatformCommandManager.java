@@ -498,7 +498,7 @@ public final class PlatformCommandManager {
             this.registration.register(
                 commandManager,
                 ClipboardCommandsRegistration.builder(),
-                new ClipboardCommands(worldEdit)
+                new ClipboardCommands()
             );
             this.registration.register(
                 commandManager,
@@ -523,7 +523,7 @@ public final class PlatformCommandManager {
             this.registration.register(
                 commandManager,
                 RegionCommandsRegistration.builder(),
-                new RegionCommands(worldEdit)
+                new RegionCommands()
             );
             this.registration.register(
                 commandManager,

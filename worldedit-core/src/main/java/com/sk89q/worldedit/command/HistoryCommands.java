@@ -40,7 +40,6 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -54,6 +53,7 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.Range;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -83,7 +83,7 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void faweRollback(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
+    public void faweRollback(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(from = 0, to=Integer.MAX_VALUE) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return;
@@ -214,32 +214,22 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void restore(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
+    public void restore(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
         faweRollback(player, session, user, radius, time, true);
     }
 
     @Command(
-        name = "/undo",
-        aliases = { "/un", "/ud", "undo" },
-        desc = "Undoes the last action (from history)"
+            name = "/undo",
+            aliases = { "/un", "/ud", "undo" },
+            desc = "Undoes the last action (from history)"
     )
-        } else {
-            undoSession = session;
-        }
-        int finalTimes = times;
-        player.checkConfirmation(() -> {
-            EditSession undone = null;
-            int i = 0;
-            for (; i < finalTimes; ++i) {
-                undone = undoSession.undo(undoSession.getBlockBag(player), player);
-                if (undone == null) break;
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
     public void undo(Player player, LocalSession session,
-        @Range(min = 1) @Arg(desc = "Number of undoes to perform", def = "1")
-            int times,
-        @Arg(name = "player", desc = "Undo this player's operations", def = "")
-            String playerName,
-        InjectedValueAccess context) throws WorldEditException {
+                     @Arg(desc = "Number of undoes to perform", def = "1")
+                             int times,
+                     @Arg(name = "player", desc = "Undo this player's operations", def = "")
+                             String playerName,
+                     InjectedValueAccess context) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession;
         if (session.hasFastMode()) {
@@ -253,6 +243,16 @@ public class HistoryCommands {
                 BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
                 return;
             }
+        } else {
+            undoSession = session;
+        }
+        int finalTimes = times;
+        player.checkConfirmation(() -> {
+            EditSession undone = null;
+            int i = 0;
+            for (; i < finalTimes; ++i) {
+                undone = undoSession.undo(undoSession.getBlockBag(player), player);
+                if (undone == null) break;
                 worldEdit.flushBlockBag(player, undone);
             }
             if (undone == null) i--;
@@ -272,7 +272,7 @@ public class HistoryCommands {
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
     public void redo(Player player, LocalSession session,
-                     @Range(min = 1) @Arg(desc = "Number of redoes to perform", def = "1")
+                     @Arg(desc = "Number of redoes to perform", def = "1")
                          int times,
                      @Arg(name = "player", desc = "Redo this player's operations", def = "")
                          String playerName) throws WorldEditException {

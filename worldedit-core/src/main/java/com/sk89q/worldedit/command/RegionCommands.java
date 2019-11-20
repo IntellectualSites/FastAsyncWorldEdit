@@ -54,7 +54,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.LayerVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -83,6 +82,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -254,7 +254,7 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(min = 0, max = 15) int value) {
+    public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(from = 0, to = 15) int value) {
         // TODO NOT IMPLEMENTED
     }
 
@@ -263,7 +263,7 @@ public class RegionCommands {
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setskylighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
+    public void setskylighting(Player player, @Selection Region region, @Range(from = 0, to= 15) int value) {
         // TODO NOT IMPLEMENTED
     }
 
@@ -314,7 +314,7 @@ public class RegionCommands {
                          boolean shell, InjectedValueAccess context) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
             actor.printError("//curve only works with convex polyhedral selections");
-            return 0;
+            return;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
@@ -523,22 +523,24 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     public void move(Actor actor, World world, EditSession editSession, LocalSession session,
-                     @Selection Region region,
+                    @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
-                        int count,
+                            int count,
                     @Arg(desc = "The direction to move", def = Direction.AIM)
                     @Direction(includeDiagonals = true)
-                        BlockVector3 direction,
+                            BlockVector3 direction,
                     @Arg(desc = "The pattern of blocks to leave", def = "air")
-                        Pattern replace,
+                            Pattern replace,
                     @Switch(name = 's', desc = "Shift the selection to the target location")
-                        boolean moveSelection,
+                            boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
-                        boolean ignoreAirBlocks,
-                    @Switch(name = 'e', desc = "Ignore entities")
-                        boolean skipEntities,
+                            boolean ignoreAirBlocks,
+                    @Switch(name = 'e', desc = "Skip copy entities")
+                            boolean skipEntities,
                     @Switch(name = 'b', desc = "Also copy biomes")
-                        boolean copyBiomes,
+                            boolean copyBiomes,
+                    @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
+                            Mask mask,
                     InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
 		
@@ -554,7 +556,7 @@ public class RegionCommands {
         }
 		
         actor.checkConfirmationRegion(() -> {
-            int affected = editSession.moveRegion(region, direction, count, !ignoreAirBlocks, !skipEntities, copyBiomes, combinedMask, replace);
+            int affected = editSession.moveRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask, replace);
 
             if (moveSelection) {
                 try {
@@ -612,7 +614,7 @@ public class RegionCommands {
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Source mask", def="")
-                         Mask sourceMask,
+                         Mask mask,
                     InjectedValueAccess context) throws WorldEditException {
         
 		Mask combinedMask;
@@ -627,9 +629,6 @@ public class RegionCommands {
         }
 					
         actor.checkConfirmationStack(() -> {
-            if (sourceMask != null) {
-                editSession.addSourceMask(sourceMask);
-            }
             int affected = editSession.stackCuboidRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask);
 
             if (moveSelection) {
@@ -751,7 +750,7 @@ public class RegionCommands {
     @Logging(REGION)
     public void hollow(Actor actor, EditSession editSession,
                       @Selection Region region,
-                       @Range(min = 0) @Arg(desc = "Thickness of the shell to leave", def = "0")
+                       @Range(from=0, to=Integer.MAX_VALUE) @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
@@ -799,6 +798,7 @@ public class RegionCommands {
             visitor.setMask(new NoiseFilter2D(new RandomNoise(), density / 100));
             Operations.completeLegacy(visitor);
 
+            int affected = ground.getAffected();
             actor.print(affected + " flora created.");
         }, "/flora", region, context);
     }

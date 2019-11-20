@@ -230,16 +230,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
             || plugin.getPermissionsResolver().hasPermission(player.getWorld().getName(), player, perm);
     }
 
-    @Override public boolean togglePermission(String permission) {
-        if (this.hasPermission(permission)) {
-            player.addAttachment(plugin).setPermission(permission, false);
-            return false;
-        } else {
-            player.addAttachment(plugin).setPermission(permission, true);
-            return true;
-        }
-    }
-
     @Override
     public boolean isAllowedToFly() {
         return player.getAllowFlight();
@@ -257,13 +247,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *   - The `/wea` command will give/remove the required bypass permission
          */
         if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
-            player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+            player.addAttachment(plugin).setPermission(permission, value);
         } else if (value) {
             if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
-                player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+                player.addAttachment(plugin).setPermission(permission, value);
             }
         } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
-            player.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(permission, value);
+            player.addAttachment(plugin).setPermission(permission, value);
         }
     }
 

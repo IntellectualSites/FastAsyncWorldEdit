@@ -21,6 +21,7 @@ repositories {
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
     maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
     maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
+    flatDir {dir(File("lib"))}
 }
 
 configurations.all {
@@ -34,6 +35,7 @@ dependencies {
     "api"(project(":worldedit-core"))
     "api"(project(":worldedit-libs:core"))
     "api"(project(":worldedit-libs:bukkit"))
+    "compile"(":worldedit-adapters:")
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT") {
         exclude("junit", "junit")

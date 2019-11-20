@@ -47,8 +47,8 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Radii;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -69,6 +69,7 @@ import org.enginehub.piston.annotation.param.Switch;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.Range;
 
 /**
  * Commands for the generation of shapes and other objects.
@@ -173,7 +174,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
+    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY, InjectedValueAccess context) throws WorldEditException {
         actor.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
             BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
@@ -186,15 +187,14 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    public int hcyl(Actor actor, LocalSession session, EditSession editSession,
+    public void hcyl(Actor actor, LocalSession session, EditSession editSession, InjectedValueAccess context,
                     @Arg(desc = "The pattern of blocks to generate")
                         Pattern pattern,
                     @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
-                    @Radii(2)
-                        List<Double> radii,
+                        BlockVector2 radii,
                     @Arg(desc = "The height of the cylinder", def = "1")
                         int height) throws WorldEditException {
-        return cyl(actor, session, editSession, pattern, radii, height, true);
+        cyl(actor, session, editSession, pattern, radii, height, true, context);
     }
 
     @Command(
@@ -206,7 +206,7 @@ public class GenerationCommands {
     public void cyl(Actor actor, LocalSession session, EditSession editSession,
                    @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                    @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
+                   @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
                    @Arg(desc = "The height of the cylinder", def = "1")
                                int height,
                    @Switch(name = 'h', desc = "Make a hollow cylinder")
@@ -293,9 +293,12 @@ public class GenerationCommands {
     @Logging(POSITION)
     public int pumpkins(Actor actor, LocalSession session, EditSession editSession,
                         @Arg(desc = "The size of the patch", def = "10")
-                            int size) throws WorldEditException {
+                            int size,
+                        @Arg(desc = "//TODO ", def = "0.02")
+                                    double density) throws WorldEditException {
+        checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
-        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size);
+        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
         actor.print(affected + " pumpkin patches created.");
         return affected;
     }

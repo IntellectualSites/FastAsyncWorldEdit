@@ -124,7 +124,7 @@ public abstract class BlockVector3 {
 
     public long toLongPackedForm() {
         checkLongPackable(this);
-        return (x & BITS_26) | ((z & BITS_26) << 26) | (((y & (long) BITS_12) << (26 + 26)));
+        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
     }
 
     public MutableBlockVector3 mutX(double x) {

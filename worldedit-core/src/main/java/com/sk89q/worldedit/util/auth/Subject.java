@@ -54,7 +54,15 @@ public interface Subject {
      * @param permission the permission
      * @return false if the permission was removed, true if this subject has permission
      */
-    boolean togglePermission(String permission);
+    default boolean togglePermission(String permission) {
+        if (this.hasPermission(permission)) {
+            setPermission(permission, false);
+            return false;
+        } else {
+            setPermission(permission, true);
+            return true;
+        }
+    }
 
     void setPermission(String permission, boolean value);
 }

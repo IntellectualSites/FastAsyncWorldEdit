@@ -16,10 +16,9 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
-import com.sk89q.worldedit.internal.expression.runtime.Constant;
-import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,6 +38,8 @@ public class BrushSettings {
         SCROLL_ACTION,
     }
 
+    private static final Expression DEFAULT_SIZE = Expression.compile("1");
+
     private final Map<SettingType, Object> constructor = new ConcurrentHashMap<>();
 
     private Brush brush;
@@ -46,7 +47,7 @@ public class BrushSettings {
     private Mask sourceMask;
     private ResettableExtent transform;
     private Pattern material;
-    private Expression size = new Expression(1);
+    private Expression size = DEFAULT_SIZE;
     private Set<String> permissions;
     private Scroll scrollAction;
     private String lastWorld;
@@ -135,7 +136,7 @@ public class BrushSettings {
         transform = null;
         material = null;
         scrollAction = null;
-        size = new Expression(1);
+        size = DEFAULT_SIZE;
         permissions.clear();
         constructor.clear();
         return this;
@@ -182,7 +183,7 @@ public class BrushSettings {
     public BrushSettings setSize(Expression size) {
         checkNotNull(size);
         this.size = size;
-        if (size.getRoot() instanceof Constant && ((Constant) size.getRoot()).getValue() == -1) {
+        if (size == DEFAULT_SIZE) {
             constructor.remove(SettingType.SIZE);
         } else {
             constructor.put(SettingType.SIZE, size.toString());
@@ -191,7 +192,7 @@ public class BrushSettings {
     }
 
     public BrushSettings setSize(double size) {
-        return setSize(new Expression(size));
+        return setSize(Expression.compile(Double.toString(size)));
     }
 
     public BrushSettings setScrollAction(Scroll scrollAction) {

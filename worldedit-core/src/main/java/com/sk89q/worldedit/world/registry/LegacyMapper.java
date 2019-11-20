@@ -102,7 +102,7 @@ public final class LegacyMapper {
 			Integer combinedId = getCombinedId(blockEntry.getKey());
             final String value = blockEntry.getValue();
             blockEntries.put(id, value);
-			BlockState blockState;
+			BlockState blockState = null;
             try {
                 blockState = BlockState.get(null, blockEntry.getValue());
                 BlockType type = blockState.getBlockType();
@@ -114,10 +114,10 @@ public final class LegacyMapper {
                     String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
                     try {
                         blockState = WorldEdit.getInstance().getBlockFactory().parseFromInput(newEntry, parserContext).toImmutableState();
-                    } catch (InputParseException ignored) {
-						log.warn("Unknown block: " + value);
-						continue;
-                    }
+                    } catch (InputParseException ignored) {}
+                }
+                if (blockState == null) {
+                    log.warn("Unknown block: " + value);
                 }
             }
 			blockArr[combinedId] = blockState.getInternalId();
@@ -135,9 +135,21 @@ public final class LegacyMapper {
         }
 
         for (Map.Entry<String, String> itemEntry : dataFile.items.entrySet()) {
-            try {
-                itemMap.put(getCombinedId(itemEntry.getKey()), ItemTypes.get(itemEntry.getValue()));
+            String id = itemEntry.getKey();
+            String value = itemEntry.getValue();
+            ItemType type = ItemTypes.get(value);
+            if (type == null && fixer != null) {
+                value = fixer.fixUp(DataFixer.FixTypes.ITEM_TYPE, value, 1631);
+                type = ItemTypes.get(value);
             }
+            if (type != null) {
+                try {
+                    itemMap.put(getCombinedId(id), type);
+                    continue;
+                } catch (Exception e) {
+                }
+            }
+            log.warn("Unknown item: " + value);
         }
     }
 

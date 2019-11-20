@@ -62,9 +62,12 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -367,7 +370,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
         }
         // this should be impossible but IntelliJ isn't that smart
-        if (blockType == null) {
+        if (state == null) {
             throw new NoMatchException("Does not match a valid block type: '" + input + "'");
         }
 
@@ -398,23 +401,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             // Allow setting mob spawn type
             if (blockAndExtraData.length > 1) {
                 String mobName = blockAndExtraData[1];
-                for (MobType mobType : MobType.values()) {
-                    if (mobType.getName().toLowerCase().equals(mobName.toLowerCase(Locale.ROOT))) {
-                        mobName = mobType.getName();
-                        break;
-                    }
-                }
-                mobName = ent.getId();
-                if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
-                    String finalMobName = mobName.toLowerCase(Locale.ROOT);
-                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
-                            .map(m -> m.getName().toLowerCase(Locale.ROOT))
-                            .filter(s -> s.startsWith(finalMobName))
-                            .collect(Collectors.toList()));
-                }
+                EntityType mobType = EntityTypes.parse(mobName);
                 return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
-                return validate(context, new MobSpawnerBlock(state, MobType.PIG.getName()));
+                return validate(context, new MobSpawnerBlock(state, EntityTypes.PIG.getId()));
             }
         } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
             // allow setting type/player/rotation

@@ -135,6 +135,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -1427,8 +1428,22 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Stack a cuboid region. For compatibility, entities are copied but biomes are not.
-     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, boolean)} to fine tune.
+     * Stack a cuboid region. For compatibility, entities are copied by biomes are not.
+     * Use {@link #stackCuboidRegion(Region, BlockVector3, int, boolean, boolean, Mask)} to fine tune.
+     *
+     * @param region the region to stack
+     * @param dir the direction to stack
+     * @param count the number of times to stack
+     * @param copyAir true to also copy air blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int stackCuboidRegion(Region region, BlockVector3 dir, int count, boolean copyAir) throws MaxChangedBlocksException {
+        return stackCuboidRegion(region, dir, count, true, false, copyAir ? null : new ExistingBlockMask(this));
+    }
+
+    /**
+     * Stack a cuboid region.
      *
      * @param region the region to stack
      * @param dir the direction to stack
@@ -1439,7 +1454,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int stackCuboidRegion(Region region, BlockVector3 dir, int count, boolean copyAir, boolean copyEntities, boolean copyBiomes) throws MaxChangedBlocksException {
+    public int stackCuboidRegion(Region region, BlockVector3 dir, int count,
+                                 boolean copyEntities, boolean copyBiomes, Mask mask) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(dir);
         checkArgument(count >= 1, "count >= 1 required");
@@ -1451,14 +1467,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(count);
         copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
-        Mask sourceMask = getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(EditSession.this);
-            copy.setSourceMask(sourceMask);
+        mask = MaskIntersection.of(getSourceMask(), mask).optimize();
+        if (mask != Masks.alwaysTrue()) {
             setSourceMask(null);
-        }
-        if (!copyAir) {
-            copy.setSourceMask(new ExistingBlockMask(this));
+            copy.setSourceMask(mask);
         }
         Operations.completeBlindly(copy);
         return this.changes = copy.getAffected();
@@ -2327,15 +2339,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException
      */
     public int makeShape(final Region region, final Vector3 zero, final Vector3 unit,
-                        final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
+                         final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
             throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z", "type", "data");
         expression.optimize();
 
         final Variable typeVariable = expression.getSlots().getVariable("type")
-            .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalStateException::new);
         final Variable dataVariable = expression.getSlots().getVariable("data")
-            .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalStateException::new);
 
         final WorldEditExpressionEnvironment environment = new WorldEditExpressionEnvironment(this, unit, zero);
         expression.setEnvironment(environment);
@@ -2349,12 +2361,26 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 final Vector3 scaled = current.subtract(zero).divide(unit);
 
                 try {
-                    if (expression.evaluateTimeout(timeout, scaled.getX(), scaled.getY(), scaled.getZ(), defaultMaterial.getBlockType().getInternalId(), defaultMaterial.getInternalPropertiesId()) <= 0) {
-                        // TODO data
+                    int[] legacy = LegacyMapper.getInstance().getLegacyFromBlock(defaultMaterial.toImmutableState());
+                    int typeVar = 0;
+                    int dataVar = 0;
+                    if (legacy != null) {
+                        typeVar = legacy[0];
+                        if (legacy.length > 1) {
+                            dataVar = legacy[1];
+                        }
+                    }
+                    if (expression.evaluate(new double[]{scaled.getX(), scaled.getY(), scaled.getZ(), typeVar, dataVar}, timeout) <= 0) {
                         return null;
                     }
-
-                    return BlockTypes.get((int) typeVariable.getValue()).withPropertyId((int) dataVariable.getValue()).toBaseBlock();
+                    int newType = (int) typeVariable.getValue();
+                    int newData = (int) dataVariable.getValue();
+                    if (newType != typeVar || newData != dataVar) {
+                        BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(newType, newData);
+                        return state == null ? defaultMaterial : state.toBaseBlock();
+                    } else {
+                        return defaultMaterial;
+                    }
                 } catch (ExpressionTimeoutException e) {
                     timedOut[0] = timedOut[0] + 1;
                     return null;
@@ -2404,7 +2430,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     final Vector3 scaled = position.toVector3().subtract(zero).divide(unit);
 
                     // transform
-                    expression.evaluateTimeout(timeout, scaled.getX(), scaled.getY(), scaled.getZ());
+                    expression.evaluate(new double[]{scaled.getX(), scaled.getY(), scaled.getZ()}, timeout);
                     int xv = (int) (x.getValue() * unit.getX() + zero2.getX());
                     int yv = (int) (y.getValue() * unit.getY() + zero2.getY());
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());

@@ -22,25 +22,23 @@ package com.sk89q.worldedit.internal.expression;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
-
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.antlr.ExpressionLexer;
 import com.sk89q.worldedit.antlr.ExpressionParser;
+import com.sk89q.worldedit.session.request.Request;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import com.sk89q.worldedit.session.request.Request;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-import java.util.ArrayDeque;
 
 import java.lang.invoke.MethodHandle;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -75,17 +73,16 @@ import java.util.concurrent.TimeoutException;
  */
 public class Expression {
 
-    private static final ThreadLocal<ArrayDeque<Expression>> instance = ThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Stack<Expression>> instance = new ThreadLocal<>();
     private static final ExecutorService evalThread = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors(),
-        new ThreadFactoryBuilder()
-            .setDaemon(true)
-            .setNameFormat("worldedit-expression-eval-%d")
-            .build());
+            Runtime.getRuntime().availableProcessors(),
+            new ThreadFactoryBuilder()
+                    .setDaemon(true)
+                    .setNameFormat("worldedit-expression-eval-%d")
+                    .build());
 
     private final SlotTable slots = new SlotTable();
     private final List<String> providedSlots;
-    private Variable[] variableArray;
     private ExpressionParser.AllStatementsContext root;
     private final SetMultimap<String, MethodHandle> functions = Functions.getFunctionMap();
     private ExpressionEnvironment environment;
@@ -102,8 +99,8 @@ public class Expression {
 
         for (String variableName : variableNames) {
             slots.initVariable(variableName)
-                .orElseThrow(() -> new ExpressionException(-1,
-                    "Tried to overwrite identifier '" + variableName + "'"));
+                    .orElseThrow(() -> new ExpressionException(-1,
+                            "Tried to overwrite identifier '" + variableName + "'"));
         }
         this.providedSlots = ImmutableList.copyOf(variableNames);
 
@@ -124,48 +121,16 @@ public class Expression {
         ParseTreeWalker.DEFAULT.walk(new ExpressionValidator(slots.keySet(), functions), root);
     }
 
-    public Expression(double constant) {
-        root = new Constant(0, constant);
-    }
-
-    public double evaluate(double x, double y, double z) throws EvaluationException {
-        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, x, y, z);
-    }
-
-    public double evaluate() throws EvaluationException {
-        return evaluateFinal(WorldEdit.getInstance().getConfiguration().calculationTimeout);
-    }
-
     public double evaluate(double... values) throws EvaluationException {
-        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, values);
-    }
-
-    private double evaluateTimeout(int timeout, double x, double y, double z) throws EvaluationException {
-        if (root instanceof Constant) return root.getValue();
-        variableArray[0].value = x;
-        variableArray[1].value = y;
-        variableArray[2].value = z;
-        return evaluateFinal(timeout);
-    }
-
-    public double evaluateTimeout(int timeout, double... values) throws EvaluationException {
-        if (root instanceof Constant) return root.getValue();
-        for (int i = 0; i < values.length; ++i) {
-            final Variable var = variableArray[i];
-            var.value = values[i];
-        }
-        return evaluateFinal(timeout);
+        return evaluate(values, WorldEdit.getInstance().getConfiguration().calculationTimeout);
     }
 
     public double evaluate(double[] values, int timeout) throws EvaluationException {
-        if (root instanceof Constant) {
-            return root.getValue();
-        }
         for (int i = 0; i < values.length; ++i) {
             String slotName = providedSlots.get(i);
             LocalSlot.Variable slot = slots.getVariable(slotName)
-                .orElseThrow(() -> new EvaluationException(-1,
-                    "Tried to assign to non-variable " + slotName + "."));
+                    .orElseThrow(() -> new EvaluationException(-1,
+                            "Tried to assign to non-variable " + slotName + "."));
 
             slot.setValue(values[i]);
         }
@@ -175,17 +140,6 @@ public class Expression {
             return evaluateRoot();
         }
         return evaluateRootTimed(timeout);
-    }
-
-    private double evaluateFinal(int timeout) throws EvaluationException {
-        try {
-            if (timeout < 0) {
-                return evaluateRoot();
-            }
-            return evaluateRootTimed(timeout);
-        } catch (ReturnException e) {
-            return e.getValue();
-        } // other evaluation exceptions are thrown out of this method
     }
 
     private double evaluateRootTimed(int timeout) throws EvaluationException {
@@ -233,17 +187,13 @@ public class Expression {
         // TODO optimizing
     }
 
-    public SlotTable getSlots() {
-        return slots;
-    }
-
-    public RValue getRoot() {
-        return root;
-    }
-
     @Override
     public String toString() {
         return root.toString();
+    }
+
+    public SlotTable getSlots() {
+        return slots;
     }
 
     public static Expression getInstance() {
@@ -251,14 +201,22 @@ public class Expression {
     }
 
     private void pushInstance() {
-        ArrayDeque<Expression> foo = instance.get();
-        foo.push(this);
+        Stack<Expression> threadLocalExprStack = instance.get();
+        if (threadLocalExprStack == null) {
+            instance.set(threadLocalExprStack = new Stack<>());
+        }
+
+        threadLocalExprStack.push(this);
     }
 
     private void popInstance() {
-        ArrayDeque<Expression> foo = instance.get();
+        Stack<Expression> threadLocalExprStack = instance.get();
 
-        foo.pop();
+        threadLocalExprStack.pop();
+
+        if (threadLocalExprStack.isEmpty()) {
+            instance.set(null);
+        }
     }
 
     public ExpressionEnvironment getEnvironment() {

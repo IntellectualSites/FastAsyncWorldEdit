@@ -10,10 +10,9 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.annotation.Range;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
-import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
@@ -38,19 +37,15 @@ public class PrimitiveBindings extends Bindings {
     @Binding
     public Expression getExpression(String argument) throws ExpressionException {
         try {
-            return new Expression(Double.parseDouble(argument));
-        } catch (NumberFormatException e1) {
-            try {
-                Expression expression = Expression.compile(argument);
-                expression.optimize();
-                return expression;
-            } catch (EvaluationException e) {
-                throw new InputParseException(String.format(
-                        "Expected '%s' to be a valid number (or a valid mathematical expression)", argument));
-            } catch (ExpressionException e) {
-                throw new InputParseException(String.format(
-                        "Expected '%s' to be a number or valid math expression (error: %s)", argument, e.getMessage()));
-            }
+            Expression expression = Expression.compile(argument);
+            expression.optimize();
+            return expression;
+        } catch (EvaluationException e) {
+            throw new InputParseException(String.format(
+                    "Expected '%s' to be a valid number (or a valid mathematical expression)", argument));
+        } catch (ExpressionException e) {
+            throw new InputParseException(String.format(
+                    "Expected '%s' to be a number or valid math expression (error: %s)", argument, e.getMessage()));
         }
     }
 

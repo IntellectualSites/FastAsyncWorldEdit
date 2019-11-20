@@ -429,49 +429,6 @@ public class SchematicCommands {
         }
     }
 
-    @Command(
-        name = "delete",
-        aliases = {"d"},
-        desc = "Delete a saved schematic"
-    )
-    @CommandPermissions({"worldedit.schematic.delete", "worldedit.schematic.delete.other"})
-    public void delete(Actor actor, LocalSession session,
-                       @Arg(desc = "File name.")
-                           String filename) throws WorldEditException, IOException {
-        LocalConfiguration config = worldEdit.getConfiguration();
-        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
-        List<File> files = new ArrayList<>();
-
-        if (filename.equalsIgnoreCase("*")) {
-            files.addAll(getFiles(session.getClipboard()));
-        } else {
-            File f = MainUtil.resolveRelative(new File(dir, filename));
-            files.add(f);
-        }
-
-        if (files.isEmpty()) {
-            actor.printError(BBC.SCHEMATIC_NONE.s());
-            return;
-        }
-        for (File f : files) {
-            if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
-                actor.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + !MainUtil.isInSubDirectory(working, f)
-                    + ")");
-                continue;
-            }
-            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
-                BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
-                continue;
-            }
-            if (!delete(f)) {
-                actor.printError("Deletion of " + filename + " failed! Maybe it is read-only.");
-                continue;
-            }
-            BBC.FILE_DELETED.send(actor, filename);
-        }
-    }
-
     private List<File> getFiles(ClipboardHolder clipboard) {
         Collection<URI> uris = Collections.emptyList();
         if (clipboard instanceof URIClipboardHolder) {
@@ -853,17 +810,43 @@ public class SchematicCommands {
     )
     @CommandPermissions("worldedit.schematic.delete")
     public void delete(Actor actor,
+                       LocalSession session,
                        @Arg(desc = "File name.")
-                           String filename) throws WorldEditException {
+                           String filename) throws WorldEditException, IOException {
         LocalConfiguration config = worldEdit.getConfiguration();
-        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
+        List<File> files = new ArrayList<>();
 
-        File f = worldEdit.getSafeOpenFile(actor instanceof Player ? ((Player) actor) : null,
-                dir, filename, "schematic", ClipboardFormats.getFileExtensionArray());
+        if (filename.equalsIgnoreCase("*")) {
+            files.addAll(getFiles(session.getClipboard()));
+        } else {
+            File f = MainUtil.resolveRelative(new File(dir, filename));
+            files.add(f);
+        }
 
-        if (!f.exists()) {
-            actor.printError("Schematic " + filename + " does not exist!");
+        if (files.isEmpty()) {
+            actor.printError(BBC.SCHEMATIC_NONE.s());
             return;
+        }
+        for (File f : files) {
+            if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
+                actor.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + !MainUtil.isInSubDirectory(working, f)
+                        + ")");
+                continue;
+            }
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
+                BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
+                continue;
+            }
+            if (!delete(f)) {
+                actor.printError("Deletion of " + filename + " failed! Maybe it is read-only.");
+                continue;
+            }
+            BBC.FILE_DELETED.send(actor, filename);
+        }
+    }
+
     private boolean delete(File file) {
         if (file.delete()) {
             new File(file.getParentFile(), "." + file.getName() + ".cached").delete();

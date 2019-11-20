@@ -40,7 +40,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.util.io.file.InvalidFilenameException;
-import com.sk89q.worldedit.world.storage.MissingWorldException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.enginehub.piston.exception.CommandException;

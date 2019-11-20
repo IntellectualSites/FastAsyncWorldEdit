@@ -25,11 +25,8 @@ import com.boydti.fawe.object.schematic.PNGWriter;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 
 import com.google.common.collect.ImmutableSet;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.Tag;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,7 +35,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -95,7 +91,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             }
             BufferedInputStream buffered = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            return new SpongeSchematicReader(nbtStream);
+            return new FastSchematicReader(nbtStream);
         }
 
         @Override
@@ -108,7 +104,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 gzip = new PGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new SpongeSchematicWriter(nbtStream);
+            return new FastSchematicWriter(nbtStream);
         }
 
         @Override

@@ -45,6 +45,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -57,7 +58,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
-import com.sk89q.worldedit.internal.annotation.Range;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 
@@ -95,15 +96,13 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.jetbrains.annotations.Range;
 
 /**
  * Utility commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class UtilityCommands {
-//        CommandQueuedConditionGenerator.Registration.class,
-        CommandPermissionsConditionGenerator.Registration.class // TODO NOT IMPLEMENTED - Piston doesn't seem to work with multiple conditions???
-})
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -201,9 +200,9 @@ public class UtilityCommands {
     public int fill(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
-                    @Range(min=1) @Arg(desc = "The radius to fill in")
+                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The radius to fill in")
                         Expression radiusExp,
-                    @Range(min=1) @Arg(desc = "The depth to fill", def = "1")
+                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The depth to fill", def = "1")
                         int depth,
                     @Arg(desc = "The direction to move", def = "down")
                         @Direction BlockVector3 direction) throws WorldEditException, EvaluationException {
@@ -745,7 +744,7 @@ public class UtilityCommands {
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new RuntimeException(new CommandException("Invalid path"));
+                        throw new RuntimeException(new StopExecutionException(TextComponent.of("Invalid path")));
                     }
                 } catch (IOException ignore) {
                 }

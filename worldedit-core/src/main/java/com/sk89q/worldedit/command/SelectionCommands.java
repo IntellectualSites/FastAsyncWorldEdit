@@ -74,6 +74,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
@@ -108,6 +109,7 @@ public class SelectionCommands {
 
     @Command(
         name = "/pos1",
+        aliases = "/1",
         desc = "Set position 1"
     )
     @Logging(POSITION)
@@ -136,6 +138,7 @@ public class SelectionCommands {
 
     @Command(
         name = "/pos2",
+            aliases = "/2",
         desc = "Set position 2"
     )
     @Logging(POSITION)
@@ -544,7 +547,7 @@ public class SelectionCommands {
 
 
         if (distribution.isEmpty()) {  // *Should* always be false
-            actor.printError("No blocks counted.");
+            player.printError("No blocks counted.");
             return;
         }
 

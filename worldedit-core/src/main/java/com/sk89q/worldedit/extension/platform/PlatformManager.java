@@ -415,7 +415,6 @@ public class PlatformManager {
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session));
                             event.setCancelled(true);
-                        }
                             return;
                         }
 
@@ -429,7 +428,6 @@ public class PlatformManager {
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session), false, true);
                             event.setCancelled(true);
-                        }
                             return;
                         }
 

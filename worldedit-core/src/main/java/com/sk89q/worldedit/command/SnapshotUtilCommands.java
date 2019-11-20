@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -39,11 +36,14 @@ import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.snapshot.SnapshotRestore;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
-import java.io.File;
-import java.io.IOException;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+
+import java.io.File;
+import java.io.IOException;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class SnapshotUtilCommands {
@@ -55,15 +55,15 @@ public class SnapshotUtilCommands {
     }
 
     @Command(
-        name = "restore",
-        aliases = { "/restore" },
-        desc = "Restore the selection from a snapshot"
+            name = "restore",
+            aliases = { "/restore" },
+            desc = "Restore the selection from a snapshot"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.snapshots.restore")
     public void restore(Actor actor, World world, LocalSession session, EditSession editSession,
                         @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
-                            String snapshotName) throws WorldEditException {
+                                String snapshotName) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -98,10 +98,10 @@ public class SnapshotUtilCommands {
                     File dir = config.snapshotRepo.getDirectory();
 
                     try {
-                        WorldEdit.logger.info("FAWE found no snapshots: looked in: "
+                        WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                                 + dir.getCanonicalPath());
                     } catch (IOException e) {
-                        WorldEdit.logger.info("FAWE found no snapshots: looked in "
+                        WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                                 + "(NON-RESOLVABLE PATH - does it exist?): "
                                 + dir.getPath());
                     }
@@ -125,6 +125,7 @@ public class SnapshotUtilCommands {
             return;
         }
 
+        try {
             // Restore snapshot
             SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
             //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
@@ -143,12 +144,15 @@ public class SnapshotUtilCommands {
                 }
             } else {
                 actor.print(String.format("Restored; %d "
-                        + "missing chunks and %d other errors.",
+                                + "missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }
-        } catch (DataException | IOException e) {
-            actor.printError("Failed to load snapshot: " + e.getMessage());
+        } finally {
+            try {
+                chunkStore.close();
+            } catch (IOException ignored) {
             }
         }
+    }
 }

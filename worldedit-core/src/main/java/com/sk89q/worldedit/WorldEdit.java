@@ -43,8 +43,6 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.internal.expression.runtime.Constant;
-import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
@@ -397,8 +395,8 @@ public final class WorldEdit {
 
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         if (getConfiguration().maxBrushRadius > 0) {
-            RValue r = radius.getRoot();
-            if (r instanceof Constant && ((Constant) r).getValue() > getConfiguration().maxBrushRadius) {
+            double val = radius.evaluate();
+            if (val > getConfiguration().maxBrushRadius) {
                 throw new MaxBrushRadiusException();
             }
         }

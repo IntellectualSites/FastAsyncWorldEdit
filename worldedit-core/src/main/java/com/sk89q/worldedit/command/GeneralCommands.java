@@ -342,7 +342,7 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(Player player, World world, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
+    public void gtexture(Player player, World worldArg, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
         // gtexture <randomize> <min=0> <max=100>
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
@@ -375,7 +375,7 @@ public class GeneralCommands {
                 } else {
                     ParserContext parserContext = new ParserContext();
                     parserContext.setActor(player);
-                    parserContext.setWorld(world);
+                    parserContext.setWorld(worldArg);
                     parserContext.setSession(session);
                     parserContext.setExtent(editSession);
                     Mask mask = worldEdit.getMaskFactory().parseFromInput(arg, parserContext);

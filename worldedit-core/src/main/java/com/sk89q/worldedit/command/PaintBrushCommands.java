@@ -104,7 +104,7 @@ public class PaintBrushCommands {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         double density = requireNonNull(DENSITY.value(parameters).asSingle(double.class)) / 100;
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
-        BrushCommands.setOperationBasedBrush(player, localSession, new Expression(radius),
+        BrushCommands.setOperationBasedBrush(player, localSession, Expression.compile(Double.toString(radius)),
             new Paint(generatorFactory, density), regionFactory, "worldedit.brush.paint");
     }
 

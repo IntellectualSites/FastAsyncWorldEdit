@@ -42,13 +42,13 @@ import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.util.HandSide;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 
@@ -253,7 +253,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.visualize")
     public void visual(Player player, LocalSession session,
-        @Arg(name = "mode", desc = "int", def = "0") @Range(min = 0, max = 2)
+        @Arg(name = "mode", desc = "int", def = "0") @Range(from = 0, to = 2)
             int mode)
             throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);

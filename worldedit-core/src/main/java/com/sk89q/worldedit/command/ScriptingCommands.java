@@ -59,15 +59,6 @@ public class ScriptingCommands {
     }
 
     @Command(
-        name = "setupdispatcher",
-        desc = ""
-    )
-    @CommandPermissions("fawe.setupdispatcher")
-    public void setupdispatcher(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
-        PlatformCommandManager.getInstance().registerAllCommands();
-    }
-
-    @Command(
         name = "cs",
         desc = "Execute a CraftScript"
     )

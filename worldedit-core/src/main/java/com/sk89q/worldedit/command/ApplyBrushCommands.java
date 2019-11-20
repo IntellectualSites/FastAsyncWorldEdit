@@ -97,7 +97,7 @@ public class ApplyBrushCommands {
                                Contextual<? extends RegionFunction> generatorFactory) throws WorldEditException {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
-        BrushCommands.setOperationBasedBrush(player, localSession, new Expression(radius),
+        BrushCommands.setOperationBasedBrush(player, localSession, Expression.compile(Double.toString(radius)),
             new Apply(generatorFactory), regionFactory, "worldedit.brush.apply");
     }
 

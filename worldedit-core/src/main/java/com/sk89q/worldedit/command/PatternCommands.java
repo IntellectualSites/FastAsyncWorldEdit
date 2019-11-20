@@ -46,7 +46,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.Vector3;
@@ -61,6 +60,7 @@ import java.util.Set;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.jetbrains.annotations.Range;
 
 //@Command(aliases = {"patterns"},
 //        desc = "Help for the various patterns. [More Info](https://git.io/vSPmA)",
@@ -226,7 +226,7 @@ public class PatternCommands {
             descFooter = "Use the pattern's id and the existing blocks data with the provided mask\n" +
                     " - Use to replace slabs or where the data values needs to be shifted instead of set"
 )
-    public Pattern iddatamask(Extent extent, @Range(min = 0, max = 15) @Arg(desc = "bit mask") int bitmask, @Arg(desc = "Pattern")Pattern pattern) {
+    public Pattern iddatamask(Extent extent, @Range(from = 0, to = 15) @Arg(desc = "bit mask") int bitmask, @Arg(desc = "Pattern")Pattern pattern) {
 
         return new IdDataMaskPattern(extent, pattern, bitmask);
     }

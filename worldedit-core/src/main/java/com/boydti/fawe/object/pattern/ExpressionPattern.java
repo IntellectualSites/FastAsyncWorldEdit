@@ -3,9 +3,9 @@ package com.boydti.fawe.object.pattern;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
-import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -49,7 +49,7 @@ public class ExpressionPattern extends AbstractPattern {
                 ((WorldEditExpressionEnvironment) expression.getEnvironment()).setCurrentBlock(vector.toVector3());
             }
             double combined = expression.evaluate(vector.getX(), vector.getY(), vector.getZ());
-            return BlockState.getFromInternalId((int) combined).toBaseBlock();
+            return BlockState.getFromOrdinal((int) combined).toBaseBlock();
         } catch (EvaluationException e) {
             e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();

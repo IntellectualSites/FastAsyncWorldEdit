@@ -103,15 +103,16 @@ public class BlockType implements FawePattern, Keyed {
             return name;
         }
     }
-
+    /*
     private BlockState computeDefaultState() {
+
         BlockState defaultState = Iterables.getFirst(getBlockStatesMap().values(), null);
         if (values != null) {
             defaultState = values.apply(defaultState);
         }
         return defaultState;
     }
-
+    */
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) return settings.defaultState;
