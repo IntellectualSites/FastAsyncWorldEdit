@@ -18,7 +18,6 @@ run
 /dependency-reduced-pom.xml
 *-private.sh
 logs/
-lib/
 *.bat
 worldedit-bukkit/src/main/java/ignore/*
 todo.txt
