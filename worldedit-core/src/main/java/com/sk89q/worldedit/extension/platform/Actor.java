@@ -23,13 +23,18 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.brush.visualization.VirtualWorld;
+import com.boydti.fawe.util.task.InterruptableCondition;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.MapMetadatable;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.SessionOwner;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.auth.Subject;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -37,7 +42,9 @@ import org.enginehub.piston.inject.InjectedValueAccess;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.concurrent.locks.Condition;
 
 /**
  * An object that can perform actions in WorldEdit.
@@ -134,100 +141,30 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
 
     boolean runAction(Runnable ifFree, boolean checkFree, boolean async);
 
-    default void checkConfirmationStack(@NotNull Runnable task, @NotNull String command,
-                                        Region region, int times, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (region != null) {
-                BlockVector3 min = region.getMinimumPoint();
-                BlockVector3 max = region.getMaximumPoint();
-                long area =
-                        (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
-                if (area > 2 << 18) {
-                    setConfirmTask(task, context, command);
-                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
-                    long volume = (long) base.getX() * base.getZ() * base.getY() * times;
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                            .format(min, max, command,
-                                    NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
+    /**
+     * Decline any pending actions
+     * @return true if an action was pending
+     */
+    default boolean decline() {
+        InterruptableCondition confirm = deleteMeta("cmdConfirm");
+        if (confirm != null) {
+            confirm.interrupt();
+            return true;
         }
-        task.run();
+        return false;
     }
 
-    default void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command,
-                                         Region region, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (region != null) {
-                BlockVector3 min = region.getMinimumPoint();
-                BlockVector3 max = region.getMaximumPoint();
-                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
-                if (area > 2 << 18) {
-                    setConfirmTask(task, context, command);
-                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
-                    long volume = (long) base.getX() * base.getZ() * base.getY();
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                            .format(min, max, command,
-                                    NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
-        }
-        task.run();
-    }
-
-    default void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context,
-                                @NotNull String command) {
-        CommandEvent event = new CommandEvent(this, command);
-        Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
-            task.run();
-            return null;
-        }, context, getSession(), event);
-        setMeta("cmdConfirm", newTask);
-    }
-
-    default void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times,
-                                   int limit, InjectedValueAccess context) throws RegionOperationException {
-        if (!getMeta("cmdConfirmRunning", false)) {
-            if (times > limit) {
-                setConfirmTask(task, context, command);
-                String volume = "<unspecified>";
-                throw new RegionOperationException(
-                        BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
-            }
-        }
-        task.run();
-    }
-
-    default void checkConfirmationRadius(@NotNull Runnable task, String command, int radius,
-                                         InjectedValueAccess context) throws RegionOperationException {
-        if (command != null && !getMeta("cmdConfirmRunning", false)) {
-            if (radius > 0) {
-                if (radius > 448) {
-                    setConfirmTask(task, context, command);
-                    long volume = (long) (Math.PI * ((double) radius * radius));
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
-                            .format(0, radius, command,
-                                    NumberFormat.getNumberInstance().format(volume)));
-                }
-            }
-        }
-        task.run();
-    }
-
+    /**
+     * Confirm any pending actions
+     * @return true if an action was pending
+     */
     default boolean confirm() {
-        Runnable confirm = deleteMeta("cmdConfirm");
-        if (confirm == null) {
-            return false;
+        InterruptableCondition confirm = deleteMeta("cmdConfirm");
+        if (confirm != null) {
+            confirm.signal();;
+            return true;
         }
-        queueAction(() -> {
-            setMeta("cmdConfirmRunning", true);
-            try {
-                confirm.run();
-            } finally {
-                setMeta("cmdConfirmRunning", false);
-            }
-        });
-        return true;
+        return false;
     }
 
     /**
@@ -256,5 +193,43 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
 
     default boolean runIfFree(Runnable r) {
         return runAction(r, true, false);
+    }
+
+    /**
+     * Attempt to cancel all pending and running actions
+     * @param close if Extents are closed
+     * @return number of cancelled actions
+     */
+    default int cancel(boolean close) {
+        int cancelled = decline() ? 1 : 0;
+
+        for (Request request : Request.getAll()) {
+            EditSession editSession = request.getEditSession();
+            if (editSession != null) {
+                Player player = editSession.getPlayer();
+                if (equals(player)) {
+                    editSession.cancel();
+                    cancelled++;
+                }
+            }
+        }
+        VirtualWorld world = getSession().getVirtualWorld();
+        if (world != null) {
+            if (close) {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return cancelled;
     }
 }

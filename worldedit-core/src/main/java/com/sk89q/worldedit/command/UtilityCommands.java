@@ -39,11 +39,12 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
-import com.sk89q.worldedit.command.util.SkipQueue;
+import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -102,7 +103,7 @@ import org.jetbrains.annotations.Range;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -700,6 +701,7 @@ public class UtilityCommands {
             name = "/confirm",
             desc = "Confirm a command"
     )
+    @SkipQueue
     @CommandPermissions("fawe.confirm")
     public void confirm(Player fp) throws WorldEditException {
         if (!fp.confirm()) {

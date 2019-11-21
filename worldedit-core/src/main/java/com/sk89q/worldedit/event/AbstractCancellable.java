@@ -23,7 +23,7 @@ package com.sk89q.worldedit.event;
  * An abstract implementation of {@link Cancellable} that has all
  * of {@link Cancellable}'s methods implemented.
  */
-public abstract class AbstractCancellable implements Cancellable {
+public abstract class AbstractCancellable extends Event implements Cancellable {
 
     private boolean cancelled;
 

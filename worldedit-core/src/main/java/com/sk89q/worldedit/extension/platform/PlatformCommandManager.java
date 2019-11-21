@@ -111,6 +111,7 @@ import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.extension.platform.binding.Bindings;
@@ -122,6 +123,8 @@ import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
+import com.sk89q.worldedit.internal.command.ConfirmHandler;
+import com.sk89q.worldedit.internal.command.MethodInjector;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.Substring;
@@ -130,6 +133,7 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -138,12 +142,12 @@ import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.config.TextConfig;
+import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ArgumentConverters;
+import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.CommandExecutionException;
 import org.enginehub.piston.exception.ConditionFailedException;
-import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.exception.UsageException;
 import org.enginehub.piston.gen.CommandRegistration;
 import org.enginehub.piston.impl.CommandManagerServiceImpl;
@@ -165,6 +169,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -221,7 +227,10 @@ public final class PlatformCommandManager {
         this.globalInjectedValues = MapBackedValueStore.create();
         this.registration = new CommandRegistrationHandler(
             ImmutableList.of(
-                new CommandLoggingHandler(worldEdit, COMMAND_LOG)
+                new CommandLoggingHandler(worldEdit, COMMAND_LOG),
+                new MethodInjector(),
+                new ConfirmHandler()
+
             ));
         // setup separate from main constructor
         // ensures that everything is definitely assigned
@@ -262,7 +271,7 @@ public final class PlatformCommandManager {
         WorldConverter.register(commandManager);
         ExpressionConverter.register(commandManager);
 
-        registerBindings(new ConsumeBindings(worldEdit));
+        registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));
         registerBindings(new ProvideBindings(worldEdit));
     }
@@ -611,17 +620,29 @@ public final class PlatformCommandManager {
         return CommandArgParser.forArgString(input).parseArgs();
     }
 
-    public <T> T parse(String args, Actor actor) {
+    public <T> T parseCommand(String args, Actor actor) {
         InjectedValueAccess context;
         if (actor == null) {
             context = globalInjectedValues;
         } else {
-            context = initializeInjectedValues(args::toString, actor);
+            context = initializeInjectedValues(args::toString, actor, null);
         }
-        return parse(args, context);
+        return parseCommand(args, context);
     }
 
-    public <T> T parse(String args, InjectedValueAccess access) {
+    public <T> T parseConverter(String args, InjectedValueAccess access, Class<T> clazz) {
+        ArgumentConverter<T> converter = commandManager.getConverter(Key.of(clazz)).orElse(null);
+        if (converter != null) {
+            ConversionResult<T> result = converter.convert(args, access);
+            Collection<T> values = result.orElse(Collections.emptyList());
+            if (!values.isEmpty()) {
+                return values.iterator().next();
+            }
+        }
+        return null;
+    }
+
+    public <T> T parseCommand(String args, InjectedValueAccess access) {
         if (args.isEmpty()) return null;
         String[] split = parseArgs(args)
                 .map(Substring::getSubstring)
@@ -639,8 +660,6 @@ public final class PlatformCommandManager {
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
             Optional<Command> optional = commandManager.getCommand(arg0);
             if (!optional.isPresent()) {
-                System.out.println("No command for '" + arg0 + "' " + StringMan.getString(commandManager.getAllCommands().map(
-                    Command::getName).collect(Collectors.toList())));
                 return;
             }
             Command cmd = optional.get();
@@ -648,6 +667,8 @@ public final class PlatformCommandManager {
             if (queued != null && !queued.isQueued()) {
                 handleCommandOnCurrentThread(event);
                 return;
+            } else {
+                actor.decline();
             }
             LocalSession session = worldEdit.getSessionManager().get(actor);
             synchronized (session) {
@@ -679,7 +700,7 @@ public final class PlatformCommandManager {
             }
         }
 
-        MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
+        MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor, event);
 
         ThrowableSupplier<Throwable> task = () -> commandManager.execute(context, ImmutableList.copyOf(split));
 
@@ -717,10 +738,6 @@ public final class PlatformCommandManager {
         } catch (FaweException e) {
             actor.printError("Edit cancelled: " + e.getMessage());
         } catch (UsageException e) {
-            actor.print(TextComponent.builder("")
-                .color(TextColor.RED)
-                .append(e.getRichMessage())
-                .build());
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
                 actor.print(TextComponent.builder("Usage: ")
@@ -728,22 +745,27 @@ public final class PlatformCommandManager {
                     .append(HelpGenerator.create(e.getCommandParseResult()).getUsage())
                     .build());
             }
-        } catch (CommandExecutionException e) {
-            handleUnknownException(actor, e.getCause());
-        } catch (CommandException e) {
             actor.print(TextComponent.builder("")
                     .color(TextColor.RED)
                     .append(e.getRichMessage())
                     .build());
-            List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
-            printUsage(actor, argList);
+        } catch (CommandExecutionException e) {
+            handleUnknownException(actor, e.getCause());
+        } catch (CommandException e) {
+            Component msg = e.getRichMessage();
+            if (msg != TextComponent.empty()) {
+                actor.print(TextComponent.builder("")
+                        .color(TextColor.RED)
+                        .append(msg)
+                        .build());
+                List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
+                printUsage(actor, argList);
+            }
         } catch (Throwable t) {
             handleUnknownException(actor, t);
         } finally {
             if (context instanceof MemoizingValueAccess) {
                 context = ((MemoizingValueAccess) context).snapshotMemory();
-            } else {
-                System.out.println("Invalid context " + context);
             }
             Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
 
@@ -783,7 +805,7 @@ public final class PlatformCommandManager {
                 getCommandManager(), actor, "//help");
     }
 
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor tmp) {
+    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor tmp, Event event) {
         InjectedValueStore store = MapBackedValueStore.create();
         Actor actor = wrapActor(tmp, store);
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
@@ -801,9 +823,10 @@ public final class PlatformCommandManager {
                 localSession.tellVersion(actor);
                 return Optional.of(localSession);
             });
-
+        store.injectValue(Key.of(InjectedValueStore.class), ValueProvider.constant(store));
+        store.injectValue(Key.of(Event.class), ValueProvider.constant(event));
         return MemoizingValueAccess.wrap(
-            MergedValueAccess.of(store, globalInjectedValues)
+                MergedValueAccess.of(store, globalInjectedValues)
         );
     }
 
@@ -821,7 +844,7 @@ public final class PlatformCommandManager {
             List<String> argStrings = split.stream()
                 .map(Substring::getSubstring)
                 .collect(Collectors.toList());
-            MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor());
+            MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor(), event);
             ImmutableSet<Suggestion> suggestions;
             try {
                 suggestions = commandManager.getSuggestions(access, argStrings);
@@ -832,7 +855,6 @@ public final class PlatformCommandManager {
                 }
                 throw t;
             }
-
             event.setSuggestions(suggestions.stream()
                 .map(suggestion -> {
                     int noSlashLength = arguments.length() - 1;

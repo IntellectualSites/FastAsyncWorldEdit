@@ -30,7 +30,6 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.clipboard.WorldCutClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.ImgurUtility;
@@ -44,10 +43,10 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -74,7 +73,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -92,7 +90,6 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
@@ -113,6 +110,7 @@ public class ClipboardCommands {
         desc = "Copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.copy")
+    @Confirm(Confirm.Processor.REGION)
     public void copy(Actor actor, LocalSession session, EditSession editSession,
                      @Selection Region region,
                      @Switch(name = 'e', desc = "Skip copy entities")
@@ -120,7 +118,7 @@ public class ClipboardCommands {
                      @Switch(name = 'b', desc = "Also copy biomes")
                              boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                        Mask mask, InjectedValueAccess context) throws WorldEditException {
+                        Mask mask) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -130,33 +128,31 @@ public class ClipboardCommands {
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
         }
-        actor.checkConfirmationRegion(() -> {
-            session.setClipboard(null);
+        session.setClipboard(null);
 
-            Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
+        Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
 
-            session.setClipboard(new ClipboardHolder(clipboard));
+        session.setClipboard(new ClipboardHolder(clipboard));
 
-            clipboard.setOrigin(session.getPlacementPosition(actor));
-            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-            copy.setCopyingEntities(!skipEntities);
-            copy.setCopyingBiomes(copyBiomes);
+        clipboard.setOrigin(session.getPlacementPosition(actor));
+        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+        copy.setCopyingEntities(!skipEntities);
+        copy.setCopyingBiomes(copyBiomes);
 
-            Mask sourceMask = editSession.getSourceMask();
-            if (sourceMask != null) {
-                new MaskTraverser(sourceMask).reset(editSession);
-                copy.setSourceMask(sourceMask);
-                editSession.setSourceMask(null);
-            }
-            if (mask != null && mask != Masks.alwaysTrue()) {
-                copy.setSourceMask(mask);
-            }
-            Operations.completeLegacy(copy);
-            BBC.COMMAND_COPY.send(actor, region.getArea());
-            if (!actor.hasPermission("fawe.tips")) {
-                BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
-            }
-        }, "/copy", region, context);
+        Mask sourceMask = editSession.getSourceMask();
+        if (sourceMask != null) {
+            new MaskTraverser(sourceMask).reset(editSession);
+            copy.setSourceMask(sourceMask);
+            editSession.setSourceMask(null);
+        }
+        if (mask != null && mask != Masks.alwaysTrue()) {
+            copy.setSourceMask(mask);
+        }
+        Operations.completeLegacy(copy);
+        BBC.COMMAND_COPY.send(actor, region.getArea());
+        if (!actor.hasPermission("fawe.tips")) {
+            BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
+        }
     }
 
     @Command(
@@ -229,6 +225,7 @@ public class ClipboardCommands {
     )
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
     public void cut(Actor actor, LocalSession session, EditSession editSession,
                     @Selection Region region,
                     @Arg(desc = "Pattern to leave in place of the selection", def = "air")
@@ -238,8 +235,7 @@ public class ClipboardCommands {
                     @Switch(name = 'b', desc = "Also copy biomes, source biomes are unaffected")
                         boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                        Mask mask,
-                    InjectedValueAccess context) throws WorldEditException {
+                        Mask mask) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -251,35 +247,32 @@ public class ClipboardCommands {
         if (volume >= limit.MAX_CHANGES) {
             throw FaweCache.MAX_CHANGES;
         }
-        actor.checkConfirmationRegion(() -> {
-            session.setClipboard(null);
+        session.setClipboard(null);
 
-            BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
-            clipboard.setOrigin(session.getPlacementPosition(actor));
+        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
+        clipboard.setOrigin(session.getPlacementPosition(actor));
 
-            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-            copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
-            copy.setCopyingEntities(!skipEntities);
-            copy.setRemovingEntities(true);
-            copy.setCopyingBiomes(copyBiomes);
-            Mask sourceMask = editSession.getSourceMask();
-            if (sourceMask != null) {
-                new MaskTraverser(sourceMask).reset(editSession);
-                copy.setSourceMask(sourceMask);
-                editSession.setSourceMask(null);
-            }
-            if (mask != null) {
-                copy.setSourceMask(mask);
-            }
-            Operations.completeLegacy(copy);
-            session.setClipboard(new ClipboardHolder(clipboard));
+        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+        copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
+        copy.setCopyingEntities(!skipEntities);
+        copy.setRemovingEntities(true);
+        copy.setCopyingBiomes(copyBiomes);
+        Mask sourceMask = editSession.getSourceMask();
+        if (sourceMask != null) {
+            new MaskTraverser(sourceMask).reset(editSession);
+            copy.setSourceMask(sourceMask);
+            editSession.setSourceMask(null);
+        }
+        if (mask != null) {
+            copy.setSourceMask(mask);
+        }
+        Operations.completeLegacy(copy);
+        session.setClipboard(new ClipboardHolder(clipboard));
 
-            BBC.COMMAND_CUT_SLOW.send(actor, region.getArea());
-            if (!actor.hasPermission("fawe.tips")) {
-                BBC.TIP_LAZYCUT.send(actor);
-            }
-        }, "cut", region, context);
-
+        BBC.COMMAND_CUT_SLOW.send(actor, region.getArea());
+        if (!actor.hasPermission("fawe.tips")) {
+            BBC.TIP_LAZYCUT.send(actor);
+        }
     }
 
     @Command(

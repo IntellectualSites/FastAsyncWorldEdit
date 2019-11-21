@@ -29,7 +29,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.SkipQueue;
+import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.entity.Player;

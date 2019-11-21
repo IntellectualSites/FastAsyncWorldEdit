@@ -2,20 +2,24 @@ package com.sk89q.worldedit.extension.platform.binding;
 
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.sk89q.worldedit.UnknownDirectionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.annotation.Direction;
+import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -26,14 +30,73 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.inject.InjectedValueStore;
+import org.enginehub.piston.converter.ConversionResult;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
 import java.util.Collection;
 
 public class ConsumeBindings extends Bindings {
-    public ConsumeBindings(WorldEdit worldEdit) {
+    private final PlatformCommandManager manager;
+
+    public ConsumeBindings(WorldEdit worldEdit, PlatformCommandManager manager) {
         super(worldEdit);
+        this.manager = manager;
+    }
+
+    @Binding
+    @Confirm
+    @Selection
+    public int regionMultiple(Actor actor, InjectedValueAccess context, @Selection Region region, String argument) {
+        int times = (int) Expression.compile(argument).evaluate();
+        return Confirm.Processor.REGION.check(actor, context, times);
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.RADIUS)
+    public Integer radiusInteger(Actor actor, InjectedValueAccess context, String argument) {
+        int times = (int) Expression.compile(argument).evaluate();
+        return Confirm.Processor.RADIUS.check(actor, context, times);
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.LIMIT)
+    public Integer limitInteger(Actor actor, InjectedValueAccess context, String argument) {
+        int times = (int) Expression.compile(argument).evaluate();
+        return Confirm.Processor.LIMIT.check(actor, context, times);
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.RADIUS)
+    public Double radiusDouble(Actor actor, InjectedValueAccess context, String argument) {
+        double times = Expression.compile(argument).evaluate();
+        return Confirm.Processor.RADIUS.check(actor, context, times);
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.LIMIT)
+    public Double limitDouble(Actor actor, InjectedValueAccess context, String argument) {
+        double times = Expression.compile(argument).evaluate();
+        return Confirm.Processor.LIMIT.check(actor, context, times);
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.RADIUS)
+    public BlockVector2 radiusVec2(Actor actor, InjectedValueAccess context, String argument) {
+        BlockVector2 radius = manager.parseConverter(argument, context, BlockVector2.class);
+        double length = radius.length();
+        Confirm.Processor.RADIUS.check(actor, context, length);
+        return radius;
+    }
+
+    @Binding
+    @Confirm(Confirm.Processor.RADIUS)
+    public BlockVector3 radiusVec3(Actor actor, InjectedValueAccess context, String argument) {
+        BlockVector3 radius = manager.parseConverter(argument, context, BlockVector3.class);
+        double length = radius.length();
+        Confirm.Processor.RADIUS.check(actor, context, length);
+        return radius;
     }
 
     @Binding

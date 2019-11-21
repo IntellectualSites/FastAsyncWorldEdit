@@ -1,5 +1,6 @@
-package com.sk89q.worldedit.command.util;
+package com.sk89q.worldedit.command.util.annotation;
 
+import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import org.enginehub.piston.annotation.CommandCondition;
 
 import java.lang.annotation.Retention;

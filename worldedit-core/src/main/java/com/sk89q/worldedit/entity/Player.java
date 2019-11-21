@@ -375,39 +375,6 @@ public interface Player extends Entity, Actor {
         }
     }
 
-    default int cancel(boolean close) {
-        int cancelled = 0;
-
-        for (Request request : Request.getAll()) {
-            EditSession editSession = request.getEditSession();
-            if (editSession != null) {
-                Player player = editSession.getPlayer();
-                if (equals(player)) {
-                    editSession.cancel();
-                    cancelled++;
-                }
-            }
-        }
-        VirtualWorld world = getSession().getVirtualWorld();
-        if (world != null) {
-            if (close) {
-                try {
-                    world.close(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    world.close(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return cancelled;
-    }
-
     void sendTitle(String title, String sub);
 
     /**

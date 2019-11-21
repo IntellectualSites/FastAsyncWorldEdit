@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.command.util;
 
+import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.gen.CommandConditionGenerator;
 import org.enginehub.piston.util.NonnullByDefault;

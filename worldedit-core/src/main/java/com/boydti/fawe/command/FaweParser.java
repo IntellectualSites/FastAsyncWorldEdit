@@ -4,9 +4,7 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
@@ -29,9 +27,9 @@ public abstract class FaweParser<T> extends InputParser<T> {
         input = prefix + " " + input;
         InjectedValueAccess injected = context.getInjected();
         if (injected != null) {
-            return getPlatform().parse(input, injected);
+            return getPlatform().parseCommand(input, injected);
         } else {
-            return getPlatform().parse(input, context.getActor());
+            return getPlatform().parseCommand(input, context.getActor());
         }
     }
 

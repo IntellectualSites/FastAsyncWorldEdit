@@ -37,6 +37,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.generator.CavesGen;
@@ -46,9 +47,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.internal.annotation.Radii;
 import com.sk89q.worldedit.internal.annotation.Selection;
-import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -95,6 +94,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
+    @Confirm(Confirm.Processor.REGION)
     public void caves(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
                       @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
                       @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
@@ -105,12 +105,10 @@ public class GenerationCommands {
                       @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
                       @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
                       @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
-                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt, InjectedValueAccess context) throws WorldEditException {
-        actor.checkConfirmationRegion(() -> {
-            CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
-            editSession.generate(region, gen);
-            BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
-        }, "/caves", region, context);
+                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
+        CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
+        editSession.generate(region, gen);
+        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
     }
 
 
@@ -120,11 +118,10 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, InjectedValueAccess context) throws WorldEditException {
-        actor.checkConfirmationRegion(() -> {
-            editSession.addOres(region, mask);
-            BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
-        }, "/ores", region, context);
+    @Confirm(Confirm.Processor.REGION)
+    public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
+        editSession.addOres(region, mask);
+        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
     }
 
     @Command(
@@ -174,11 +171,10 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY, InjectedValueAccess context) throws WorldEditException {
-        actor.checkConfirmationRegion(() -> {
-            editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-            BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
-        }, "/ore", region, context);
+    @Confirm(Confirm.Processor.REGION)
+    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY) throws WorldEditException {
+        editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
+        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
     }
 
     @Command(
@@ -187,14 +183,14 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    public void hcyl(Actor actor, LocalSession session, EditSession editSession, InjectedValueAccess context,
+    public void hcyl(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The pattern of blocks to generate")
                         Pattern pattern,
-                    @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+                     @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
                         BlockVector2 radii,
                     @Arg(desc = "The height of the cylinder", def = "1")
                         int height) throws WorldEditException {
-        cyl(actor, session, editSession, pattern, radii, height, true, context);
+        cyl(actor, session, editSession, pattern, radii, height, true);
     }
 
     @Command(
@@ -206,18 +202,16 @@ public class GenerationCommands {
     public void cyl(Actor actor, LocalSession session, EditSession editSession,
                    @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                   @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
+                   @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the cylinder. Order is N/S, E/W") BlockVector2 radius,
                    @Arg(desc = "The height of the cylinder", def = "1")
                                int height,
                    @Switch(name = 'h', desc = "Make a hollow cylinder")
-                               boolean hollow, InjectedValueAccess context) throws WorldEditException {
+                               boolean hollow) throws WorldEditException {
         double max = Math.max(radius.getBlockX(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
-        actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
-            BBC.VISITOR_BLOCK.send(actor, affected);
-        }, "/cyl", (int) max, context);
+        int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
+        BBC.VISITOR_BLOCK.send(actor, affected);
     }
 
     @Command(
@@ -229,11 +223,10 @@ public class GenerationCommands {
     public void hsphere(Actor actor, LocalSession session, EditSession editSession,
                        @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W") BlockVector3 radii,
+                       @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W") BlockVector3 radii,
                        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
-                           boolean raised,
-                        InjectedValueAccess context) throws WorldEditException {
-       sphere(actor, session, editSession, pattern, radii, raised, true, context);
+                           boolean raised) throws WorldEditException {
+       sphere(actor, session, editSession, pattern, radii, raised, true);
     }
 
     @Command(
@@ -245,23 +238,21 @@ public class GenerationCommands {
     public void sphere(Actor actor, LocalSession session, EditSession editSession,
         @Arg(desc = "The pattern of blocks to generate")
             Pattern pattern,
-        @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+        @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
             BlockVector3 radii,
         @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
             boolean raised,
         @Switch(name = 'h', desc = "Make a hollow sphere")
-            boolean hollow, InjectedValueAccess context) throws WorldEditException {
+            boolean hollow) throws WorldEditException {
         double max = MathMan.max(radii.getBlockX(), radii.getBlockY(), radii.getBlockZ());
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
         BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
-        actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
-            if (actor instanceof Player) {
-                ((Player) actor).findFreePosition();
-            }
-            BBC.VISITOR_BLOCK.send(actor, affected);
-        }, "sphere", (int) max, context);
+        int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
+        if (actor instanceof Player) {
+            ((Player) actor).findFreePosition();
+        }
+        BBC.VISITOR_BLOCK.send(actor, affected);
     }
 
     @Command(
@@ -312,9 +303,9 @@ public class GenerationCommands {
     public void hollowPyramid(Actor actor, LocalSession session, EditSession editSession,
                              @Arg(desc = "The pattern of blocks to set")
                                  Pattern pattern,
-                             @Arg(desc = "The size of the pyramid")
-                                 int size, InjectedValueAccess context) throws WorldEditException {
-        pyramid(actor, session, editSession, pattern, size, true, context);
+                             @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
+                                 int size) throws WorldEditException {
+        pyramid(actor, session, editSession, pattern, size, true);
     }
 
     @Command(
@@ -326,20 +317,17 @@ public class GenerationCommands {
     public void pyramid(Actor actor, LocalSession session, EditSession editSession,
                        @Arg(desc = "The pattern of blocks to set")
                            Pattern pattern,
-                       @Arg(desc = "The size of the pyramid")
+                        @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
                            int size,
                        @Switch(name = 'h', desc = "Make a hollow pyramid")
-                           boolean hollow,
-                        InjectedValueAccess context) throws WorldEditException {
+                           boolean hollow) throws WorldEditException {
         BlockVector3 pos = session.getPlacementPosition(actor);
         worldEdit.checkMaxRadius(size);
-        actor.checkConfirmationRadius(() -> {
-            int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-            if (actor instanceof Player) {
-                ((Player) actor).findFreePosition();
-            }
-            BBC.VISITOR_BLOCK.send(actor, affected);
-        }, getArguments(context), size, context);
+        int affected = editSession.makePyramid(pos, pattern, size, !hollow);
+        if (actor instanceof Player) {
+            ((Player) actor).findFreePosition();
+        }
+        BBC.VISITOR_BLOCK.send(actor, affected);
     }
 
     @Command(
@@ -350,6 +338,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
+    @Confirm(Confirm.Processor.REGION)
     public void generate(Actor actor, LocalSession session, EditSession editSession,
                         @Selection Region region,
                         @Arg(desc = "The pattern of blocks to set")
@@ -363,8 +352,7 @@ public class GenerationCommands {
                         @Switch(name = 'o', desc = "Use the placement's coordinate origin")
                             boolean offset,
                         @Switch(name = 'c', desc = "Use the selection's center as origin")
-                            boolean offsetCenter,
-                         InjectedValueAccess context) throws WorldEditException {
+                            boolean offsetCenter) throws WorldEditException {
 
         final Vector3 zero;
         Vector3 unit;
@@ -395,17 +383,15 @@ public class GenerationCommands {
 
         final Vector3 unit1 = unit;
 
-        actor.checkConfirmationRegion(() -> {
-            try {
-                final int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
-                if (actor instanceof Player) {
-                    ((Player) actor).findFreePosition();
-                }
-                BBC.VISITOR_BLOCK.send(actor, affected);
-            } catch (ExpressionException e) {
-                actor.printError(e.getMessage());
+        try {
+            final int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
+            if (actor instanceof Player) {
+                ((Player) actor).findFreePosition();
             }
-        }, "/generate", region, context);
+            BBC.VISITOR_BLOCK.send(actor, affected);
+        } catch (ExpressionException e) {
+            actor.printError(e.getMessage());
+        }
     }
 
     @Command(
@@ -418,6 +404,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
+    @Confirm(Confirm.Processor.REGION)
     public void generateBiome(Actor actor, LocalSession session, EditSession editSession,
                              @Selection Region region,
                              @Arg(desc = "The biome type to set")
@@ -431,8 +418,7 @@ public class GenerationCommands {
                              @Switch(name = 'o', desc = "Use the placement's coordinate origin")
                                  boolean offset,
                              @Switch(name = 'c', desc = "Use the selection's center as origin")
-                                 boolean offsetCenter,
-                             InjectedValueAccess context) throws WorldEditException {
+                                 boolean offsetCenter) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 
@@ -461,14 +447,12 @@ public class GenerationCommands {
         }
 
         final Vector3 unit1 = unit;
-        actor.checkConfirmationRegion(() -> {
-            try {
-                final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
-                BBC.VISITOR_FLAT.send(actor, affected);
-            } catch (ExpressionException e) {
-                actor.printError(e.getMessage());
-            }
-        }, "/generatebiome", region, context);
+        try {
+            final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
+            BBC.VISITOR_FLAT.send(actor, affected);
+        } catch (ExpressionException e) {
+            actor.printError(e.getMessage());
+        }
     }
 
 }
