@@ -34,9 +34,12 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Locale;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
@@ -141,22 +144,22 @@ public class PlayerProxy extends AbstractPlayerActor {
 
     @Override
     public void printRaw(String msg) {
-        basePlayer.printRaw(msg);
+        basePlayer.print(TextComponent.of(msg));
     }
 
     @Override
     public void printDebug(String msg) {
-        basePlayer.printDebug(msg);
+        basePlayer.printDebug(TextComponent.of(msg));
     }
 
     @Override
     public void print(String msg) {
-        basePlayer.print(msg);
+        basePlayer.printInfo(TextComponent.of(msg));
     }
 
     @Override
     public void printError(String msg) {
-        basePlayer.printError(msg);
+        basePlayer.printError(TextComponent.of(msg));
     }
 
     @Override
@@ -225,5 +228,10 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
         basePlayer.floatAt(x, y, z, alwaysGlass);
+    }
+
+    @Override
+    public Locale getLocale() {
+        return basePlayer.getLocale();
     }
 }

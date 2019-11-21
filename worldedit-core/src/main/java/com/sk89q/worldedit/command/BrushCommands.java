@@ -124,6 +124,8 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.function.factory.Apply;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -1147,6 +1149,6 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.print("Set brush to " + factory);
+        player.printInfo(TranslatableComponent.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
     }
 }

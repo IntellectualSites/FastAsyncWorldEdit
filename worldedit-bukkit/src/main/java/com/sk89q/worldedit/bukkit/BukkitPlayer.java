@@ -188,7 +188,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(player, WorldEditText.format(component));
+        TextAdapter.sendComponent(player, WorldEditText.format(component, getLocale()));
     }
 
     @Override
@@ -290,6 +290,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public boolean setLocation(com.sk89q.worldedit.util.Location location) {
         return player.teleport(BukkitAdapter.adapt(location));
+    }
+
+    @Override
+    public Locale getLocale() {
+        return Locale.forLanguageTag(player.getLocale().replace('_', '-'));
     }
 
     @Nullable

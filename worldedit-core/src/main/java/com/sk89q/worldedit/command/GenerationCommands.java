@@ -53,10 +53,12 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -211,7 +213,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.cyl.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -252,7 +254,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.sphere.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -272,7 +274,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size);
         density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
-        actor.print(affected + " trees created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.forestgen.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -290,7 +292,7 @@ public class GenerationCommands {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
-        actor.print(affected + " pumpkin patches created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.pumpkins.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -327,7 +329,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.pyramid.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -388,9 +390,9 @@ public class GenerationCommands {
             if (actor instanceof Player) {
                 ((Player) actor).findFreePosition();
             }
-            BBC.VISITOR_BLOCK.send(actor, affected);
+            actor.printInfo(TranslatableComponent.of("worldedit.generate.created", TextComponent.of(affected)));
         } catch (ExpressionException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -449,9 +451,9 @@ public class GenerationCommands {
         final Vector3 unit1 = unit;
         try {
             final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
-            BBC.VISITOR_FLAT.send(actor, affected);
+            actor.printInfo(TranslatableComponent.of("worldedit.generatebiome.changed", TextComponent.of(affected)));
         } catch (ExpressionException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 

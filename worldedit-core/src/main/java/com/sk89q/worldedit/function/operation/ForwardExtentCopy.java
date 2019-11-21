@@ -58,7 +58,13 @@ import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import java.util.Collections;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import java.util.List;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -421,25 +427,16 @@ public class ForwardExtentCopy implements Operation {
     }
 
     @Override
-    public void addStatusMessages(List<String> messages) {
-        StringBuilder msg = new StringBuilder();
-        msg.append(affectedBlocks).append(" block(s)");
-        if (affectedBiomeCols > 0) {
-            if (affectedEntities > 0) {
-                msg.append(", ");
-            } else {
-                msg.append(" and ");
-            }
-            msg.append(affectedBiomeCols).append(" biome(s)");
-        }
-        if (affectedEntities > 0) {
-            if (affectedBiomeCols > 0) {
-                msg.append(",");
-            }
-            msg.append(" and ").append(affectedEntities).append(" entities(s)");
-        }
-        msg.append(" affected.");
-        messages.add(msg.toString());
+    public Iterable<Component> getStatusMessages() {
+        List<Component> messages = new ArrayList<>();
+        messages.add(TranslatableComponent.of("worldedit.operation.affected.block",
+                TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE));
+        messages.add(TranslatableComponent.of("worldedit.operation.affected.biome",
+                TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE));
+        messages.add(TranslatableComponent.of("worldedit.operation.affected.entity",
+                TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE));
+
+        return messages;
     }
 
 }

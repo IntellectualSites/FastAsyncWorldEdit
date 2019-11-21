@@ -31,6 +31,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 /**
  * Plants a tree.
@@ -64,10 +65,10 @@ public class TreePlanter implements BlockTool {
                 }
 
                 if (!successful) {
-                    player.printError(BBC.TOOL_TREE_ERROR_BLOCK.s());
+                    player.printError(TranslatableComponent.of("worldedit.tool.tree.obstructed"));
                 }
             } catch (MaxChangedBlocksException e) {
-                player.printError(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.s());
+                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
             }

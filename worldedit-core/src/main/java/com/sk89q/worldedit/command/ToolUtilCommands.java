@@ -44,6 +44,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -82,7 +83,7 @@ public class ToolUtilCommands {
             return;
         }
         if (maskOpt == null) {
-            player.print("Brush mask disabled.");
+            player.print(TranslatableComponent.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
             return;
     }
@@ -91,7 +92,7 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
         settings.setMask(maskOpt);
         tool.update();
-        player.print("Brush mask set.");
+        player.print(TranslatableComponent.of("worldedit.tool.mask.set"));
     }
 
     @Command(
@@ -112,16 +113,15 @@ public class ToolUtilCommands {
             return;
     }
         if (pattern == null) {
-            player.print(BBC.BRUSH_MATERIAL.s());
             tool.setFill(null);
-            return;
-        }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        settings.setFill(pattern);
-        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-        settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
-        tool.update();
-        player.print(BBC.BRUSH_MATERIAL.s());
+        } else {
+	        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+	        settings.setFill(pattern);
+	        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
+	        settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
+	        tool.update();
+		}
+		player.print(TranslatableComponent.of("worldedit.tool.material.set"));
     }
 
     @Command(
@@ -133,7 +133,7 @@ public class ToolUtilCommands {
                       @Arg(desc = "The range of the brush")
                           int range) throws WorldEditException {
         session.getBrushTool(player, false).setRange(range);
-        player.print("Brush range set.");
+        player.printInfo(TranslatableComponent.of("worldedit.tool.range.set"));
     }
 
     @Command(
@@ -147,7 +147,7 @@ public class ToolUtilCommands {
         we.checkMaxBrushRadius(size);
 
         session.getBrushTool(player, false).setSize(size);
-        player.print("Brush size set.");
+        player.printInfo(TranslatableComponent.of("worldedit.tool.size.set"));
     }
 
     //todo none should be moved to the same class where it is in upstream
@@ -172,9 +172,9 @@ public class ToolUtilCommands {
                              Mask maskOpt) throws WorldEditException {
         session.getBrushTool(player, false).setTraceMask(maskOpt);
         if (maskOpt == null) {
-            player.print("Trace mask disabled.");
+            player.printInfo(TranslatableComponent.of("worldedit.tool.tracemask.disabled"));
         } else {
-            player.print("Trace mask set.");
+            player.printInfo(TranslatableComponent.of("worldedit.tool.tracemask.set"));
         }
     }
 
@@ -189,15 +189,15 @@ public class ToolUtilCommands {
                                   Boolean superPickaxe) {
         boolean hasSuperPickAxe = session.hasSuperPickAxe();
         if (superPickaxe != null && superPickaxe == hasSuperPickAxe) {
-            player.printError("Super pickaxe already " + (superPickaxe ? "enabled" : "disabled") + ".");
+            player.printError(TranslatableComponent.of(superPickaxe ? "worldedit.tool.superpickaxe.enabled.already" : "worldedit.tool.superpickaxe.disabled.already"));
                 return;
             }
         if (hasSuperPickAxe) {
             session.disableSuperPickAxe();
-            player.print("Super pickaxe disabled.");
+            player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.disabled"));
         } else {
             session.enableSuperPickAxe();
-            player.print("Super pickaxe enabled.");
+            player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.enabled"));
         }
     }
 

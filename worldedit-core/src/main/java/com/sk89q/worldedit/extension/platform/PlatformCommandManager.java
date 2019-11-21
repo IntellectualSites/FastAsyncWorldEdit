@@ -813,7 +813,7 @@ public final class PlatformCommandManager {
             store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));
         } else {
             store.injectValue(Key.of(Player.class), context -> {
-                throw new CommandException(TextComponent.of("This command must be used with a player."), ImmutableList.of());
+                throw new CommandException(TranslatableComponent.of("worldedit.command.player-only"), ImmutableList.of());
             });
         }
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
@@ -831,8 +831,8 @@ public final class PlatformCommandManager {
     }
 
     private void handleUnknownException(Actor actor, Throwable t) {
-        actor.printError("Please report this error: [See console]");
-        actor.printRaw(t.getClass().getName() + ": " + t.getMessage());
+        actor.printError(TranslatableComponent.of("worldedit.command.error.report"));
+        actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
         log.error("An unexpected error while handling a WorldEdit command", t);
     }
 

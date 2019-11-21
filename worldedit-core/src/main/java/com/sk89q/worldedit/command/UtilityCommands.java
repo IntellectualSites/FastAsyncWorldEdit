@@ -72,6 +72,7 @@ import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.awt.RenderingHints;
@@ -214,7 +215,7 @@ public class UtilityCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.fillDirection(pos, pattern, radius, depth, direction);
-        actor.print(affected + " block(s) have been created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.fill.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -312,7 +313,7 @@ public class UtilityCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.fillXZ(pos, pattern, radius, depth, true);
-        actor.print(affected + " block(s) have been created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.fillr.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -330,9 +331,8 @@ public class UtilityCommands {
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
-        int affected = editSession.drainArea(
-            session.getPlacementPosition(actor), radius, waterlogged);
-        actor.print(affected + " block(s) have been changed.");
+        int affected = editSession.drainArea(session.getPlacementPosition(actor), radius, waterlogged);
+        actor.printInfo(TranslatableComponent.of("worldedit.drain.drained", TextComponent.of(affected)));
         return affected;
     }
 
@@ -349,7 +349,7 @@ public class UtilityCommands {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(actor), radius, BlockTypes.LAVA);
-        actor.print(affected + " block(s) have been changed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.fixlava.fixed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -366,7 +366,7 @@ public class UtilityCommands {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(actor), radius, BlockTypes.WATER);
-        actor.print(affected + " block(s) have been changed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.fixwater.fixed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -387,7 +387,7 @@ public class UtilityCommands {
         height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
 
         int affected = editSession.removeAbove(session.getPlacementPosition(actor), size, height);
-        actor.print(affected + " block(s) have been removed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.removeabove.removed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -408,7 +408,7 @@ public class UtilityCommands {
         height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
 
         int affected = editSession.removeBelow(session.getPlacementPosition(actor), size, height);
-        actor.print(affected + " block(s) have been removed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.removebelow.removed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -428,7 +428,7 @@ public class UtilityCommands {
         we.checkMaxRadius(radius);
 
         int affected = editSession.removeNear(session.getPlacementPosition(actor), mask, radius);
-        actor.print(affected + " block(s) have been removed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.removenear.removed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -459,7 +459,7 @@ public class UtilityCommands {
         }
 
         int affected = editSession.replaceBlocks(region, from, to);
-        actor.print(affected + " block(s) have been replaced.");
+        actor.printInfo(TranslatableComponent.of("worldedit.replacenear.replaced", TextComponent.of(affected)));
         return affected;
     }
 
@@ -477,7 +477,7 @@ public class UtilityCommands {
         we.checkMaxRadius(size);
 
         int affected = editSession.simulateSnow(session.getPlacementPosition(actor), size);
-        actor.print(affected + " surface(s) covered. Let it snow~");
+        actor.printInfo(TranslatableComponent.of("worldedit.snow.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -495,7 +495,7 @@ public class UtilityCommands {
         we.checkMaxRadius(size);
 
         int affected = editSession.thaw(session.getPlacementPosition(actor), size);
-        actor.print(affected + " surface(s) thawed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.thaw.removed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -516,7 +516,7 @@ public class UtilityCommands {
         final boolean onlyNormalDirt = !convertCoarse;
 
         final int affected = editSession.green(session.getPlacementPosition(actor), size, onlyNormalDirt);
-        actor.print(affected + " surface(s) greened.");
+        actor.printInfo(TranslatableComponent.of("worldedit.green.changed", TextComponent.of(affected)));
         return affected;
     }
 
@@ -554,7 +554,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("worldedit.extinguish")
     @Logging(PLACEMENT)
-    public void extinguish(Actor actor, LocalSession session, EditSession editSession,
+    public int extinguish(Actor actor, LocalSession session, EditSession editSession,
                            @Arg(desc = "The radius of the square to remove in", def = "")
                                Integer radius) throws WorldEditException {
 
@@ -566,7 +566,8 @@ public class UtilityCommands {
 
         Mask mask = new BlockTypeMask(editSession, BlockTypes.FIRE);
         int affected = editSession.removeNear(session.getPlacementPosition(actor), mask, size);
-        actor.print(affected + " block(s) have been removed.");
+        actor.printInfo(TranslatableComponent.of("worldedit.extinguish.removed", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -599,7 +600,7 @@ public class UtilityCommands {
         if (radius == null) {
             radius = config.butcherDefaultRadius;
         } else if (radius < -1) {
-            actor.printError("Use -1 to remove all mobs in loaded chunks");
+            actor.printError(TranslatableComponent.of("worldedit.butcher.explain-all"));
             return 0;
         } else if (radius == -1) {
             if (config.butcherMaxRadius != -1) {
@@ -622,7 +623,11 @@ public class UtilityCommands {
 
         int killed = killMatchingEntities(radius, actor, flags::createFunction);
 
-        actor.print("Killed " + killed + (killed != 1 ? " mobs" : " mob") + (radius < 0 ? "" : " in a radius of " + radius) + ".");
+        actor.printInfo(TranslatableComponent.of(
+                "worldedit.butcher.killed",
+                TextComponent.of(killed),
+                TextComponent.of(radius)
+        ));
 
         return killed;
     }
@@ -656,20 +661,19 @@ public class UtilityCommands {
                       @Arg(desc = "The radius of the cuboid to remove from")
                           int radius) throws WorldEditException {
         if (radius < -1) {
-            actor.printError("Use -1 to remove all entities in loaded chunks");
+            actor.printError(TranslatableComponent.of("worldedit.remove.explain-all"));
             return 0;
         }
 
         int removed = killMatchingEntities(radius, actor, remover::createFunction);
-
-        actor.print("Marked " + removed + (removed != 1 ? " entities" : " entity") + " for removal.");
+        actor.printInfo(TranslatableComponent.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;
     }
 
-    // get the formatter with the system locale. in the future, if we can get a local from a player, we can use that
-    private static final DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
-    static {
-        formatter.applyPattern("#,##0.#####"); // pattern is locale-insensitive. this can translate to "1.234,56789"
+    private DecimalFormat formatForLocale(Locale locale) {
+        DecimalFormat format = (DecimalFormat) NumberFormat.getInstance(locale);
+        format.applyPattern("#,##0.#####");
+        return format;
     }
 
     @Command(
@@ -685,16 +689,15 @@ public class UtilityCommands {
         try {
             expression = Expression.compile(String.join(" ", input));
         } catch (ExpressionException e) {
-            actor.printError(String.format(
-                "'%s' could not be parsed as a valid expression", input));
+            actor.printError(TranslatableComponent.of("worldedit.calc.invalid", TextComponent.of(String.join(" ", input))));
             return;
         }
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
             double result = expression.evaluate(
                     new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
-            String formatted = Double.isNaN(result) ? "NaN" : formatter.format(result);
+            String formatted = Double.isNaN(result) ? "NaN" : formatForLocale(actor.getLocale()).format(result);
             return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
-        }, null);
+        }, (Component) null);
     }
 
     @Command(

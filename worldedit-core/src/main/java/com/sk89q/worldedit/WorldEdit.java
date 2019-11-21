@@ -52,12 +52,16 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.util.io.file.InvalidFilenameException;
 import com.sk89q.worldedit.util.task.SimpleSupervisor;
 import com.sk89q.worldedit.util.task.Supervisor;
+import com.sk89q.worldedit.util.translation.TranslationManager;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
@@ -109,6 +113,7 @@ public final class WorldEdit {
     private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
             EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
+    private final TranslationManager translationManager = new TranslationManager(this);
 
     private final BlockFactory blockFactory = new BlockFactory(this);
     private final ItemFactory itemFactory = new ItemFactory(this);
@@ -222,6 +227,15 @@ public final class WorldEdit {
      */
     public SessionManager getSessionManager() {
         return sessions;
+    }
+
+    /**
+     * Return the translation manager.
+     *
+     * @return the translation manager
+     */
+    public TranslationManager getTranslationManager() {
+        return translationManager;
     }
 
     /**
@@ -631,7 +645,7 @@ public final class WorldEdit {
      * @param player the player
      * @param f the script file to execute
      * @param args arguments for the script
-     * @throws WorldEditException
+     * @throws WorldEditException if something goes wrong
      */
     public void runScript(Player player, File f, String[] args) throws WorldEditException {
         String filename = f.getPath();
@@ -639,7 +653,7 @@ public final class WorldEdit {
         String ext = filename.substring(index + 1);
 
         if (!ext.equalsIgnoreCase("js")) {
-            player.printError("Only .js scripts are currently supported");
+            player.printError(TranslatableComponent.of("worldedit.script.unsupported"));
             return;
         }
 
@@ -652,7 +666,7 @@ public final class WorldEdit {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    player.printError("Script does not exist: " + filename);
+                    player.printError(TranslatableComponent.of("worldedit.script.file-not-found", TextComponent.of(filename)));
                     return;
                 }
             } else {
@@ -665,7 +679,7 @@ public final class WorldEdit {
             in.close();
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            player.printError("Script read error: " + e.getMessage());
+            player.printError(TranslatableComponent.of("worldedit.script.read-error", TextComponent.of(e.getMessage())));
             return;
         }
 
@@ -678,8 +692,7 @@ public final class WorldEdit {
         try {
             engine = new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError ignored) {
-            player.printError("Failed to find an installed script engine.");
-            player.printError("Please see https://worldedit.enginehub.org/en/latest/usage/other/craftscripts/");
+            player.printError(TranslatableComponent.of("worldedit.script.no-script-engine"));
             return;
         }
 
@@ -693,14 +706,13 @@ public final class WorldEdit {
         try {
             engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
-            player.printError("Failed to execute:");
-            player.printRaw(e.getMessage());
+            player.printError(TranslatableComponent.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
             logger.warn("Failed to execute script", e);
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            player.printError("Failed to execute (see console):");
-            player.printRaw(e.getClass().getCanonicalName());
+            player.printError(TranslatableComponent.of("worldedit.script.failed-console", TextComponent.of(e.getClass().getCanonicalName(),
+                    TextColor.WHITE)));
             logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {

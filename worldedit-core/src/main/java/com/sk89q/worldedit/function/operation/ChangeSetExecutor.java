@@ -93,10 +93,6 @@ public class ChangeSetExecutor implements Operation {
     public void cancel() {
     }
 
-    @Override
-    public void addStatusMessages(List<String> messages) {
-    }
-
     public static ChangeSetExecutor create(ChangeSet changeSet, UndoContext context, Type type, BlockBag blockBag, int inventory) {
         return new ChangeSetExecutor(changeSet, type, context, blockBag, inventory);
     }

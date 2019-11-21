@@ -42,7 +42,6 @@ import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;

@@ -41,6 +41,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -240,7 +242,7 @@ public class HistoryCommands {
             player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {
-                player.printError("Unable to find session for " + playerName);
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
@@ -255,9 +257,9 @@ public class HistoryCommands {
             }
         }
         if (timesUndone > 0) {
-            player.print("Undid " + timesUndone + " available edits.");
+            player.printInfo(TranslatableComponent.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
         } else {
-            player.printError("Nothing left to undo.");
+            player.printError(TranslatableComponent.of("worldedit.undo.none"));
         }
     }
 
@@ -278,7 +280,7 @@ public class HistoryCommands {
             player.checkPermission("worldedit.history.redo.other");
             redoSession = worldEdit.getSessionManager().findByName(playerName);
             if (redoSession == null) {
-                BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
@@ -293,9 +295,9 @@ public class HistoryCommands {
             }
         }
         if (timesRedone > 0) {
-            BBC.COMMAND_REDO_SUCCESS.send(player, timesRedone == 1 ? "" : " x" + timesRedone);
+            player.printInfo(TranslatableComponent.of("worldedit.redo.redid", TextComponent.of(timesRedone)));
         } else {
-            player.printError(BBC.COMMAND_REDO_ERROR.s());
+            player.printError(TranslatableComponent.of("worldedit.redo.none"));
         }
     }
 
@@ -307,7 +309,7 @@ public class HistoryCommands {
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        actor.print("History cleared.");
+        actor.printInfo(TranslatableComponent.of("worldedit.clearhistory.cleared"));
     }
 
 }

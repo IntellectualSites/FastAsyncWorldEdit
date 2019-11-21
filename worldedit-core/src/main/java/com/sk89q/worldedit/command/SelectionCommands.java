@@ -71,6 +71,7 @@ import com.sk89q.worldedit.util.formatting.component.CommandListBox;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -123,12 +124,12 @@ public class SelectionCommands {
         } else if (actor instanceof Locatable) {
             pos = ((Locatable) actor).getBlockLocation();
         } else {
-            actor.printError("You must provide coordinates as console.");
+            actor.printError(TranslatableComponent.of("worldedit.pos.console-require-coords"));
             return;
         }
 
         if (!session.getRegionSelector(world).selectPrimary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.printError("Position already set.");
+            actor.printError(TranslatableComponent.of("worldedit.pos.already-set"));
             return;
         }
 
@@ -152,12 +153,12 @@ public class SelectionCommands {
         } else if (actor instanceof Locatable) {
             pos = ((Locatable) actor).getBlockLocation();
         } else {
-            actor.printError("You must provide coordinates as console.");
+            actor.printError(TranslatableComponent.of("worldedit.pos.console-require-coords"));
             return;
         }
 
         if (!session.getRegionSelector(world).selectSecondary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
-            actor.printError("Position already set.");
+            actor.printError(TranslatableComponent.of("worldedit.pos.already-set"));
             return;
         }
 
@@ -175,15 +176,15 @@ public class SelectionCommands {
         Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.printError(BBC.SELECTOR_ALREADY_SET.s());
+            if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+                player.printError(TranslatableComponent.of("worldedit.hpos.already-set"));
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainPrimarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.printError(BBC.NO_BLOCK.s());
+            player.printError(TranslatableComponent.of("worldedit.hpos.no-block"));
         }
     }
 
@@ -197,15 +198,15 @@ public class SelectionCommands {
         Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toBlockPoint(), ActorSelectorLimits.forActor(player))) {
-                player.printError(BBC.SELECTOR_ALREADY_SET.s());
+            if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+                player.printError(TranslatableComponent.of("worldedit.hpos.already-set"));
                 return;
             }
 
             session.getRegionSelector(player.getWorld())
                     .explainSecondarySelection(player, session, pos.toBlockPoint());
         } else {
-            player.printError(BBC.NO_BLOCK.s());
+            player.printError(TranslatableComponent.of("worldedit.hpos.no-block"));
         }
     }
 
@@ -233,9 +234,13 @@ public class SelectionCommands {
             min = BlockVector3.at(min2D.getBlockX() * 16, 0, min2D.getBlockZ() * 16);
             max = BlockVector3.at(max2D.getBlockX() * 16 + 15, world.getMaxY(), max2D.getBlockZ() * 16 + 15);
 
-            actor.print("Chunks selected: ("
-                    + min2D.getBlockX() + ", " + min2D.getBlockZ() + ") - ("
-                    + max2D.getBlockX() + ", " + max2D.getBlockZ() + ")");
+            actor.printInfo(TranslatableComponent.of(
+                    "worldedit.chunk.selected-multiple",
+                    TextComponent.of(min2D.getBlockX()),
+                    TextComponent.of(min2D.getBlockZ()),
+                    TextComponent.of(max2D.getBlockX()),
+                    TextComponent.of(max2D.getBlockZ())
+            ));
         } else {
             final BlockVector2 min2D;
             if (coordinates != null) {
@@ -255,8 +260,8 @@ public class SelectionCommands {
             min = BlockVector3.at(min2D.getBlockX() * 16, 0, min2D.getBlockZ() * 16);
             max = min.add(15, world.getMaxY(), 15);
 
-            actor.print("Chunk selected: "
-                    + min2D.getBlockX() + ", " + min2D.getBlockZ());
+            actor.printInfo(TranslatableComponent.of("worldedit.chunk.selected", TextComponent.of(min2D.getBlockX()),
+                    TextComponent.of(min2D.getBlockZ())));
         }
 
         final CuboidRegionSelector selector;
@@ -287,16 +292,16 @@ public class SelectionCommands {
         }
         ItemType itemType = ItemTypes.parse(wandId);
         if (itemType == null) {
-            player.printError("Wand item is mis-configured or disabled.");
+            player.printError(TranslatableComponent.of("worldedit.wand.invalid"));
             return;
         }
         player.giveItem(new BaseItemStack(itemType, 1));
         if (navWand) {
             session.setTool(itemType, NavigationWand.INSTANCE);
-            player.print("Left click: jump to location; Right click: pass through walls");
+            player.printInfo(TranslatableComponent.of("worldedit.wand.navwand.info"));
         } else {
-            session.setTool(itemType, SelectionWand.INSTANCE);
-            player.print(BBC.SELECTION_WAND.s());
+            session.setTool(itemType, new SelectionWand());
+            player.printInfo(TranslatableComponent.of("worldedit.wand.selwand.info"));
         }
         if (!player.hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
@@ -350,9 +355,9 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-            actor.print("Region contracted " + (oldSize - newSize) + " blocks.");
+            actor.printInfo(TranslatableComponent.of("worldedit.contract.contracted", TextComponent.of(oldSize - newSize)));
         } catch (RegionOperationException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -379,9 +384,9 @@ public class SelectionCommands {
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
-            actor.print("Region shifted.");
+            actor.print(TranslatableComponent.of("worldedit.shift.shifted"));
         } catch (RegionOperationException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -402,7 +407,7 @@ public class SelectionCommands {
         region.expand(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
-        actor.print("Region outset.");
+        actor.print(TranslatableComponent.of("worldedit.outset.outset"));
     }
 
     @Command(
@@ -422,7 +427,7 @@ public class SelectionCommands {
         region.contract(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
-        actor.print("Region inset.");
+        actor.print(TranslatableComponent.of("worldedit.inset.inset"));
     }
 
     private BlockVector3[] getChangesForEachDir(int amount, boolean onlyHorizontal, boolean onlyVertical) {
@@ -480,20 +485,15 @@ public class SelectionCommands {
 
                 long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
 
-                String msg = String.format("%1$s: %2$s @ %3$s (%4$d blocks)", name, sizeStr, originStr, numBlocks);
-                player.print(msg);
-
-                index++;
-            }
-            return;
+            BlockVector3 origin = clipboard.getOrigin();
+            actor.printInfo(TranslatableComponent.of("worldedit.size.offset", TextComponent.of(origin.toString())));
         } else {
+			region = session.getSelection(world);
+			
+            actor.printInfo(TranslatableComponent.of("worldedit.size.type", TextComponent.of(session.getRegionSelector(world).getTypeName())));
 
-            region = session.getSelection(player.getWorld());
-
-            player.print("Type: " + session.getRegionSelector(player.getWorld()).getTypeName());
-
-            for (String line : session.getRegionSelector(player.getWorld()).getInformationLines()) {
-                player.print(line);
+            for (Component line : session.getRegionSelector(world).getSelectionInfoLines()) {
+                actor.print(line);
             }
 
         }
@@ -501,22 +501,22 @@ public class SelectionCommands {
                 .subtract(region.getMinimumPoint())
                 .add(1, 1, 1);
 
-        player.print("Size: " + size);
-        player.print("Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
-        player.print("# of blocks: " + region.getArea());
+        actor.printInfo(TranslatableComponent.of("worldedit.size.size", TextComponent.of(size.toString())));
+        actor.printInfo(TranslatableComponent.of("worldedit.size.distance", TextComponent.of(region.getMaximumPoint().distance(region.getMinimumPoint()))));
+        actor.printInfo(TranslatableComponent.of("worldedit.size.blocks", TextComponent.of(region.getArea())));
     }
-
 
     @Command(
         name = "/count",
         desc = "Counts the number of blocks matching a mask"
     )
     @CommandPermissions("worldedit.analysis.count")
-    public void count(Actor actor, World world, LocalSession session, EditSession editSession,
+    public int count(Actor actor, World world, LocalSession session, EditSession editSession,
                       @Arg(desc = "The mask of blocks to match")
                           Mask mask) throws WorldEditException {
         int count = editSession.countBlocks(session.getSelection(world), mask);
-        actor.print("Counted: " + count);
+        actor.printInfo(TranslatableComponent.of("worldedit.count.counted", TextComponent.of(count)));
+        return count;
     }
 
     @Command(
@@ -547,22 +547,13 @@ public class SelectionCommands {
 
 
         if (distribution.isEmpty()) {  // *Should* always be false
-            player.printError("No blocks counted.");
+            actor.printError(TranslatableComponent.of("worldedit.distr.no-blocks"));
             return;
         }
 
-        // note: doing things like region.getArea is inaccurate for non-cuboids.
-        int size = session.getSelection(player.getWorld()).getArea();
-        BBC.SELECTION_DISTR.send(player, size);
-
-        for (Countable c : distribution) {
-            String name = c.getID().toString();
-            String str = String.format("%-7s (%.3f%%) %s",
-                    String.valueOf(c.getAmount()),
-                    c.getAmount() / (double) size * 100,
-                    name);
-            player.print(str);
-        }
+        BlockDistributionResult res = new BlockDistributionResult(distribution, separateStates);
+        if (!actor.isPlayer()) res.formatForConsole();
+        return res.create(finalPage);
     }
 
     private static class BlockDistributionResult extends PaginationBox {
@@ -618,7 +609,7 @@ public class SelectionCommands {
 
         @Override
         public Component create(int page) throws InvalidComponentException {
-            super.getContents().append(TextComponent.of("Total Block Count: " + totalBlocks, TextColor.GRAY))
+            super.getContents().append(TranslatableComponent.of("worldedit.distr.total", TextColor.GRAY, TextComponent.of(totalBlocks)))
                     .append(TextComponent.newline());
             return super.create(page);
         }
@@ -638,7 +629,7 @@ public class SelectionCommands {
         if (selector == null) {
             session.getRegionSelector(world).clear();
             session.dispatchCUISelection(actor);
-            actor.print(BBC.SELECTION_CLEARED.s());
+            actor.printInfo(TranslatableComponent.of("worldedit.select.cleared"));
             return;
         }
 
@@ -648,38 +639,38 @@ public class SelectionCommands {
         switch (selector) {
             case CUBOID:
                 newSelector = new CuboidRegionSelector(oldSelector);
-                actor.print(BBC.SEL_CUBOID.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.cuboid.message"));
                 break;
             case EXTEND:
                 newSelector = new ExtendingCuboidRegionSelector(oldSelector);
-                actor.print(BBC.SEL_CUBOID_EXTEND.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.extend.message"));
                 break;
             case POLY: {
                 newSelector = new Polygonal2DRegionSelector(oldSelector);
-                actor.print(BBC.SEL_2D_POLYGON.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.poly.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolygonVertexLimit();
-                limit.ifPresent(integer -> actor.print(BBC.SEL_MAX.format(integer)));
+                limit.ifPresent(integer -> actor.printInfo(TranslatableComponent.of("worldedit.select.poly.limit-message", TextComponent.of(integer))));
                 break;
             }
             case ELLIPSOID:
                 newSelector = new EllipsoidRegionSelector(oldSelector);
-                actor.print(BBC.SAL_ELLIPSOID.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.ellipsoid.message"));
                 break;
             case SPHERE:
                 newSelector = new SphereRegionSelector(oldSelector);
-                actor.print(BBC.SEL_SPHERE.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.sphere.message"));
                 break;
             case CYL:
                 newSelector = new CylinderRegionSelector(oldSelector);
-                actor.print(BBC.SEL_CYLINDRICAL.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.cyl.message"));
                 break;
             case CONVEX:
             case HULL:
             case POLYHEDRON: {
                 newSelector = new ConvexPolyhedralRegionSelector(oldSelector);
-                actor.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.convex.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> actor.print(BBC.SEL_MAX.format(integer)));
+                limit.ifPresent(integer -> actor.printInfo(TranslatableComponent.of("worldedit.select.convex.limit-message", TextComponent.of(integer))));
                 break;
             }
             case POLYHEDRAL:
@@ -706,14 +697,14 @@ public class SelectionCommands {
                 TextComponentProducer contents = box.getContents();
                 contents.append(SubtleFormat.wrap("Select one of the modes below:")).newline();
 
-                box.appendCommand("cuboid", "Select two corners of a cuboid", "//sel cuboid");
-                box.appendCommand("extend", "Fast cuboid selection mode", "//sel extend");
-                box.appendCommand("poly", "Select a 2D polygon with height", "//sel poly");
-                box.appendCommand("ellipsoid", "Select an ellipsoid", "//sel ellipsoid");
-                box.appendCommand("sphere", "Select a sphere", "//sel sphere");
-                box.appendCommand("cyl", "Select a cylinder", "//sel cyl");
-                box.appendCommand("convex", "Select a convex polyhedral", "//sel convex");
-                box.appendCommand("polyhedral", "Select a hollow polyhedral", "//sel polyhedral");
+                box.appendCommand("cuboid", TranslatableComponent.of("worldedit.select.cuboid.description"), "//sel cuboid");
+                box.appendCommand("extend", TranslatableComponent.of("worldedit.select.extend.description"), "//sel extend");
+                box.appendCommand("poly", TranslatableComponent.of("worldedit.select.poly.description"), "//sel poly");
+                box.appendCommand("ellipsoid", TranslatableComponent.of("worldedit.select.ellipsoid.description"), "//sel ellipsoid");
+                box.appendCommand("sphere", TranslatableComponent.of("worldedit.select.sphere.description"), "//sel sphere");
+                box.appendCommand("cyl", TranslatableComponent.of("worldedit.select.cyl.description"), "//sel cyl");
+                box.appendCommand("convex", TranslatableComponent.of("worldedit.select.convex.description"), "//sel convex");
+				box.appendCommand("polyhedral", "Select a hollow polyhedral", "//sel polyhedral");
                 box.appendCommand("fuzzy[=<mask>]", "Select all connected blocks (magic wand)", "//sel fuzzy[=<mask>]");
 
                 actor.print(box.create(1));
@@ -731,7 +722,7 @@ public class SelectionCommands {
 
             if (found != null) {
                 session.setDefaultRegionSelector(found);
-                BBC.SELECTOR_SET_DEFAULT.send(actor, found.name());
+                actor.printInfo(TranslatableComponent.of("worldedit.select.default-set", TextComponent.of(found.name())));
             } else {
                 throw new RuntimeException("Something unexpected happened. Please report this.");
             }

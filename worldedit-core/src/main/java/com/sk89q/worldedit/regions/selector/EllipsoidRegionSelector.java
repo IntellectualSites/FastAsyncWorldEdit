@@ -35,7 +35,10 @@ import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -145,14 +148,36 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_CENTER.send(player, region.getCenter(), region.getArea());
+        if (isDefined()) {
+            player.printInfo(TranslatableComponent.of(
+                    "worldedit.selection.ellipsoid.explain.primary-area",
+                    TextComponent.of(region.getCenter().toString()),
+                    TextComponent.of(region.getArea())
+            ));
+        } else {
+            player.printInfo(TranslatableComponent.of(
+                    "worldedit.selection.ellipsoid.explain.primary",
+                    TextComponent.of(region.getCenter().toString())
+            ));
+        }
 
         session.describeCUI(player);
     }
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_RADIUS.send(player, region.getRadius(), region.getArea());
+        if (isDefined()) {
+            player.printInfo(TranslatableComponent.of(
+                    "worldedit.selection.ellipsoid.explain.secondary-area",
+                    TextComponent.of(region.getRadius().toString()),
+                    TextComponent.of(region.getArea())
+            ));
+        } else {
+            player.printInfo(TranslatableComponent.of(
+                    "worldedit.selection.ellipsoid.explain.secondary",
+                    TextComponent.of(region.getRadius().toString())
+            ));
+        }
 
         session.describeCUI(player);
     }
@@ -197,17 +222,17 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<String> getInformationLines() {
-        final List<String> lines = new ArrayList<>();
+    public List<Component> getSelectionInfoLines() {
+        final List<Component> lines = new ArrayList<>();
 
         final Vector3 center = region.getCenter();
         if (center.lengthSq() > 0) {
-            lines.add("Center: " + center);
+            lines.add(TranslatableComponent.of("worldedit.selection.ellipsoid.info.center", TextComponent.of(center.toString())));
         }
 
         final Vector3 radius = region.getRadius();
         if (radius.lengthSq() > 0) {
-            lines.add("X/Y/Z radius: " + radius);
+            lines.add(TranslatableComponent.of("worldedit.selection.ellipsoid.info.radius", TextComponent.of(radius.toString())));
         }
 
         return lines;

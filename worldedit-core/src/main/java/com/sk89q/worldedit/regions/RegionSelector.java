@@ -19,15 +19,20 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.google.common.collect.Lists;
+
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -152,10 +157,24 @@ public interface RegionSelector {
 
     /**
      * Get lines of information about the selection.
-     *
+     * 
      * @return a list of lines describing the region
      */
-    List<String> getInformationLines();
+    @Deprecated
+    default List<String> getInformationLines() {
+        return Lists.newArrayList();
+    };
+
+    /**
+     * Get lines of information about the selection.
+     *
+     * @return a list of lines describing the region.
+     */
+    default List<Component> getSelectionInfoLines() {
+        return getInformationLines().stream()
+                .map(TextComponent::of)
+                .collect(Collectors.toList());
+    }
 
     /**
      * Get the vertices

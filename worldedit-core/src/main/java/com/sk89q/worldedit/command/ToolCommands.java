@@ -27,7 +27,6 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.command.tool.BlockReplacer;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
@@ -125,10 +124,10 @@ public class ToolCommands {
         return "/tool " + name;
     }
 
-    static void setToolNone(Player player, LocalSession session, String type)
+    static void setToolNone(Player player, LocalSession session, boolean isBrush)
         throws InvalidToolBindException {
         session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
-        player.print(type + " unbound from your current item.");
+        player.printInfo(TranslatableComponent.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
     private final WorldEdit we;
 
@@ -146,7 +145,7 @@ public class ToolCommands {
 
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
         session.setTool(itemType, SelectionWand.INSTANCE);
-        player.print("Selection wand bound to " + itemType.getName() + ".");
+        player.printInfo(TranslatableComponent.of("worldedit.tool.selwand.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -159,7 +158,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, NavigationWand.INSTANCE);
-        player.print("Navigation wand bound to " + itemStack.getType().getName() + ".");
+        player.printInfo(TranslatableComponent.of("worldedit.tool.navWand.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -171,7 +170,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new QueryTool());
-        BBC.TOOL_INFO.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.info.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -196,7 +195,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new TreePlanter(type));
-        BBC.TOOL_TREE.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.tree.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -210,7 +209,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new BlockReplacer(pattern));
-        BBC.TOOL_REPL.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.repl.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -222,7 +221,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new BlockDataCyler());
-        BBC.TOOL_CYCLER.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.data-cycler.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -240,13 +239,13 @@ public class ToolCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (range > config.maxSuperPickaxeSize) {
-            BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);
+            player.printError(TranslatableComponent.of("worldedit.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
             return;
         }
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new FloodFillTool(range, pattern));
-        BBC.TOOL_FLOOD_FILL.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.floodfill.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -258,7 +257,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new FloatingTreeRemover());
-        BBC.TOOL_DELTREE.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.deltree.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -270,7 +269,7 @@ public class ToolCommands {
 
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new DistanceWand());
-        BBC.TOOL_FARWAND.send(player, itemStack.getType().getName());
+        player.printInfo(TranslatableComponent.of("worldedit.tool.farwand.equip", TextComponent.of(itemType.getName())));
     }
 
     @Command(
@@ -284,10 +283,10 @@ public class ToolCommands {
                                        Pattern primary,
                                    @Arg(desc = "Pattern to set on right-click")
                                        Pattern secondary) throws WorldEditException {
-        BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
 
-        session.setTool(itemStack.getType(), new LongRangeBuildTool(primary, secondary));
-        player.print("Long-range building tool bound to " + itemStack.getType().getName() + ".");
+        final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
+        session.setTool(itemType, new LongRangeBuildTool(primary, secondary));
+        player.printInfo(TranslatableComponent.of("worldedit.tool.lrbuild.equip", TextComponent.of(itemType.getName())));
         String primaryName = "pattern";
         String secondaryName = "pattern";
         if (primary instanceof BlockStateHolder) {
@@ -296,7 +295,6 @@ public class ToolCommands {
         if (secondary instanceof BlockStateHolder) {
             secondaryName = ((BlockStateHolder<?>) secondary).getBlockType().getName();
         }
-        player.print("Left-click set to " + primaryName + "; right-click set to "
-                + secondaryName + ".");
+        player.printInfo(TranslatableComponent.of("worldedit.tool.lrbuild.set", TextComponent.of(primaryName), TextComponent.of(secondaryName)));
     }
 }

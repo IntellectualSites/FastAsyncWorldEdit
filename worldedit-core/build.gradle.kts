@@ -1,11 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import com.mendhak.gradlecrowdin.DownloadTranslationsTask
+import com.mendhak.gradlecrowdin.UploadSourceFileTask
 
 plugins {
     id("java-library")
     id("net.ltgt.apt-eclipse")
     id("net.ltgt.apt-idea")
     id("antlr")
+    id("com.mendhak.gradlecrowdin")
 }
 
 repositories {
@@ -99,5 +102,30 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
 
+    }
+}
+
+val crowdinApiKey = "crowdin_apikey"
+
+if (project.hasProperty(crowdinApiKey)) {
+    tasks.named<UploadSourceFileTask>("crowdinUpload") {
+        apiKey = "${project.property(crowdinApiKey)}"
+        projectId = "worldedit-core"
+        files = arrayOf(
+            object {
+                var name = "strings.json"
+                var source = "${file("src/main/resources/lang/strings.json")}"
+            }
+        )
+    }
+
+    tasks.named<DownloadTranslationsTask>("crowdinDownload") {
+        apiKey = "${project.property(crowdinApiKey)}"
+        destination = "${file("build/resources/main/lang")}"
+        projectId = "worldedit-core"
+    }
+
+    tasks.named("classes").configure {
+        dependsOn("crowdinDownload")
     }
 }

@@ -40,6 +40,7 @@ import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -85,9 +86,9 @@ public class ChunkCommands {
         int chunkZ = (int) Math.floor(pos.getBlockZ() / 16.0);
 
         final BlockVector2 chunkPos = BlockVector2.at(chunkX, chunkZ);
-        player.print("Chunk: " + chunkX + ", " + chunkZ);
-        player.print("Old format: " + LegacyChunkStore.getFilename(chunkPos));
-        player.print("McRegion: region/" + McRegionChunkStore.getFilename(chunkPos));
+        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.chunk", TextComponent.of(chunkX), TextComponent.of(chunkZ)));
+        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.old-filename", TextComponent.of(LegacyChunkStore.getFilename(chunkPos))));
+        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.mcregion-filename", TextComponent.of(McRegionChunkStore.getFilename(chunkPos))));
     }
 
     @Command(
@@ -99,7 +100,7 @@ public class ChunkCommands {
                             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
         final Region region = session.getSelection(world);
 
-        actor.print("Listing chunks for " + actor.getName());
+        actor.print(TranslatableComponent.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
         actor.print(new ChunkListPaginationBox(region).create(page));
     }
 

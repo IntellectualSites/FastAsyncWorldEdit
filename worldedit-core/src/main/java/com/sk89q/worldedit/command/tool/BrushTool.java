@@ -86,6 +86,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import javax.annotation.Nullable;
 
 /**
