@@ -6,6 +6,8 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -44,7 +46,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
      *
      * @param extent the extent
      */
-    public NullExtent(Extent extent, BBC failReason) {
+    public NullExtent(Extent extent, Component failReason) {
         this(extent, new FaweException(failReason));
     }
 

@@ -217,7 +217,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
-    public void sendTitle(String title, String sub) {
+    public void sendTitle(Component title, Component sub) {
         basePlayer.sendTitle(title, sub);
     }
 

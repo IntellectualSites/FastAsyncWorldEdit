@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import com.sk89q.worldedit.EditSession;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -111,7 +112,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             } else {
                 FaweException fe = FaweException.get(throwable);
                 if (fe != null) {
-                    printError(fe.getMessage());
+                    printError(fe.getComponent());
                 } else {
                     throwable.printStackTrace();
                 }

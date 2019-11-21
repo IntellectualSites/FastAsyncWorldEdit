@@ -28,6 +28,7 @@ import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.MovableTool;
@@ -500,7 +501,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (brush == null) return false;
 
         if (current.setWorld(player.getWorld().getName()) && !current.canUse(player)) {
-            BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
+            player.print(TranslatableComponent.of("fawe.error.no.perm" , StringMan.join(current.getPermissions(), ",")));
             return false;
         }
         try (EditSession editSession = session.createEditSession(player)) {

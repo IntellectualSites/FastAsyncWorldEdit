@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -170,7 +171,7 @@ public class ClipboardFormats {
         LocalConfiguration config = worldEdit.getConfiguration();
         if (input.startsWith("url:")) {
             if (!player.hasPermission("worldedit.schematic.load.web")) {
-                if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.web");
+                if (message) player.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.web"));
                 return null;
             }
             URL base = new URL(Settings.IMP.WEB.URL);
@@ -178,19 +179,19 @@ public class ClipboardFormats {
         }
         if (input.startsWith("http")) {
             if (!player.hasPermission("worldedit.schematic.load.asset")) {
-                if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.asset");
+                if (message) player.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.asset"));
                 return null;
             }
             URL url = new URL(input);
             URL webInterface = new URL(Settings.IMP.WEB.ASSETS);
             if (!url.getHost().equalsIgnoreCase(webInterface.getHost())) {
-                if (message) BBC.WEB_UNAUTHORIZED.send(player, url);
+                if (message) player.print(TranslatableComponent.of("fawe.error.web.unauthorized", url));
                 return null;
             }
             return loadAllFromUrl(url);
         } else {
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
-                BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
+                player.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.other"));
                 return null;
             }
             File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
@@ -210,7 +211,7 @@ public class ClipboardFormats {
                 }
             } else {
                 if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
-                    if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
+                    if (message) player.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.other"));
                     return null;
                 }
                 if (format == null && input.matches(".*\\.[\\w].*")) {
@@ -232,12 +233,12 @@ public class ClipboardFormats {
             if (format == null && f.isFile()) {
                 format = findByFile(f);
                 if (format == null) {
-                    BBC.CLIPBOARD_INVALID_FORMAT.send(player, f.getName());
+                    player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.invalid.format" , f.getName()));
                     return null;
                 }
             }
             if (!f.exists()) {
-                if (message) BBC.SCHEMATIC_NOT_FOUND.send(player, input);
+                if (message) player.print(TranslatableComponent.of("fawe.error.schematic.not.found" , input));
                 return null;
             }
             if (!f.isDirectory()) {
@@ -247,7 +248,7 @@ public class ClipboardFormats {
             }
             URIClipboardHolder[] clipboards = loadAllFromDirectory(f);
             if (clipboards.length < 1) {
-                if (message) BBC.SCHEMATIC_NOT_FOUND.send(player, input);
+                if (message) player.print(TranslatableComponent.of("fawe.error.schematic.not.found" , input));
                 return null;
             }
             return new MultiClipboardHolder(f.toURI(), clipboards);

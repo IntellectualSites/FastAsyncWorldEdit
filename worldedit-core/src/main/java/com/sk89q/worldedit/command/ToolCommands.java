@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.google.common.collect.Collections2;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.InspectBrush;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;

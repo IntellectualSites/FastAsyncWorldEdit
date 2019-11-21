@@ -430,11 +430,11 @@ public class ForwardExtentCopy implements Operation {
     public Iterable<Component> getStatusMessages() {
         List<Component> messages = new ArrayList<>();
         messages.add(TranslatableComponent.of("worldedit.operation.affected.block",
-                TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE));
+                TextComponent.of(affectedBlocks)).color(TextColor.GRAY));
         messages.add(TranslatableComponent.of("worldedit.operation.affected.biome",
-                TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE));
+                TextComponent.of(affectedBiomeCols)).color(TextColor.GRAY));
         messages.add(TranslatableComponent.of("worldedit.operation.affected.entity",
-                TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE));
+                TextComponent.of(affectedEntities)).color(TextColor.GRAY));
 
         return messages;
     }

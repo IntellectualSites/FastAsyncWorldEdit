@@ -26,6 +26,7 @@ import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgum
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
@@ -110,7 +111,7 @@ public class GenerationCommands {
                       @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
         CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
         editSession.generate(region, gen);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
 
@@ -123,7 +124,7 @@ public class GenerationCommands {
     @Confirm(Confirm.Processor.REGION)
     public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
         editSession.addOres(region, mask);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -164,7 +165,7 @@ public class GenerationCommands {
             return false;
         });
         Operations.completeBlindly(visitor);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -176,7 +177,7 @@ public class GenerationCommands {
     @Confirm(Confirm.Processor.REGION)
     public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY) throws WorldEditException {
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(

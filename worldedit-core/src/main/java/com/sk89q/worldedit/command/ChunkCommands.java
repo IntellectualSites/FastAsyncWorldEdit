@@ -167,7 +167,7 @@ public class ChunkCommands {
             actor.printDebug(String.format("%d chunks total marked for deletion. (May have overlaps).",
                     currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum()));
         }
-        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.LIGHT_PURPLE)
+        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.GRAY)
                 .append(TextComponent.of("/stop", TextColor.AQUA)
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/stop"))));
     }

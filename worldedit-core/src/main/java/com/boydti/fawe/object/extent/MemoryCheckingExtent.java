@@ -9,6 +9,7 @@ import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class MemoryCheckingExtent extends PassthroughExtent {
     private final Player player;
@@ -22,9 +23,9 @@ public class MemoryCheckingExtent extends PassthroughExtent {
     public Extent getExtent() {
         if (MemUtil.isMemoryLimited()) {
             if (this.player != null) {
-                player.print(BBC.WORLDEDIT_CANCEL_REASON.format(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY.s()));
+                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", (TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.low.memory"))));
                 if (Permission.hasPermission(this.player, "worldedit.fast")) {
-                    BBC.WORLDEDIT_OOM_ADMIN.send(this.player);
+                    this.player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
                 }
             }
             WEManager.IMP.cancelEdit(this, FaweCache.LOW_MEMORY);

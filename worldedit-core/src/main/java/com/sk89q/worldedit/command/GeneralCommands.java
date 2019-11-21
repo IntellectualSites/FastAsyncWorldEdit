@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
@@ -357,7 +358,7 @@ public class GeneralCommands {
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
             session.setTextureUtil(null);
-            player.print(BBC.TEXTURE_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.general.texture.disabled"));
         } else {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
@@ -400,7 +401,7 @@ public class GeneralCommands {
             }
             if (!(util instanceof CachedTextureUtil)) util = new CachedTextureUtil(util);
             session.setTextureUtil(util);
-            BBC.TEXTURE_SET.send(player, StringMan.join(arguments, " "));
+            player.print(TranslatableComponent.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
         }
     }
 
@@ -414,9 +415,9 @@ public class GeneralCommands {
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
-            player.print(BBC.SOURCE_MASK_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.general.source.mask.disabled"));
         } else {
-            player.print(BBC.SOURCE_MASK.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.general.source.mask"));
         }
     }
 
@@ -430,9 +431,9 @@ public class GeneralCommands {
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
-            player.print(BBC.TRANSFORM_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.general.transform.disabled"));
         } else {
-            player.print(BBC.TRANSFORM.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.general.transform"));
         }
     }
 
@@ -444,9 +445,9 @@ public class GeneralCommands {
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         if (player.togglePermission("fawe.tips")) {
-            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_ON.s());
+            player.print(TranslatableComponent.of("fawe.info.worldedit.toggle.tips.on"));
         } else {
-            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_OFF.s());
+            player.print(TranslatableComponent.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
 }

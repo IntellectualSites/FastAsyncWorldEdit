@@ -196,7 +196,7 @@ public class Deform implements Contextual<Operation> {
         @Override
         public Iterable<Component> getStatusMessages() {
             return Lists.newArrayList(TranslatableComponent.of("worldedit.operation.deform.expression",
-                    TextComponent.of(expression).color(TextColor.LIGHT_PURPLE)));
+                    TextComponent.of(expression).color(TextColor.GRAY)));
         }
 
     }

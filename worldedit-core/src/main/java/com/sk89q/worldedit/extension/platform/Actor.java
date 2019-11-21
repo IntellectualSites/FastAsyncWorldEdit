@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -120,7 +121,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printInfo(Component component) {
-        print(component.color(TextColor.LIGHT_PURPLE));
+        print(component.color(TextColor.GRAY));
     }
 
     /**

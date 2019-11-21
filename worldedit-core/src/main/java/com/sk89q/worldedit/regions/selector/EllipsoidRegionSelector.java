@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.regions.selector;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

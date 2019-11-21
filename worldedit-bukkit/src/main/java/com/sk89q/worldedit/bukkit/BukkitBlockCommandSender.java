@@ -77,7 +77,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
+            print(TextComponent.of(part, TextColor.GRAY));
         }
     }
 

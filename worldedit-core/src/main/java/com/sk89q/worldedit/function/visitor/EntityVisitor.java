@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -88,7 +89,7 @@ public class EntityVisitor implements Operation {
         return Lists.newArrayList(TranslatableComponent.of(
                 "worldedit.operation.affected.entity",
                 TextComponent.of(getAffected())
-        ).color(TextColor.LIGHT_PURPLE));
+        ).color(TextColor.GRAY));
     }
 
 }

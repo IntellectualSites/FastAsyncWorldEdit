@@ -2,6 +2,7 @@ package com.sk89q.worldedit.command.util.annotation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.task.InterruptableCondition;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
@@ -47,7 +48,7 @@ public @interface Confirm {
                 BlockVector3 max = region.getMaximumPoint();
                 long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1) * (int) value;
                 if (area > 2 << 18) {
-                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM_REGION.send(actor, min, max, getArgs(context));
+                    actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , min, max, getArgs(context)));
                     return confirm(actor, context);
                 }
                 return true;
@@ -58,7 +59,7 @@ public @interface Confirm {
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
                 int max = WorldEdit.getInstance().getConfiguration().maxRadius;
                 if (value > max) {
-                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM_REGION.send(actor, value, max, getArgs(context));
+                    actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , value, max, getArgs(context)));
                     return Processor.confirm(actor, context);
                 }
                 return true;
@@ -69,7 +70,7 @@ public @interface Confirm {
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
                 int max = 50;// TODO configurable, get Key.of(Method.class) @Limit
                 if (value > max) {
-                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM_REGION.send(actor, value, max, getArgs(context));
+                    actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , value, max, getArgs(context)));
                     return Processor.confirm(actor, context);
                 }
                 return true;
@@ -78,7 +79,7 @@ public @interface Confirm {
         ALWAYS {
             @Override
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
-                BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.send(actor);
+                actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm"));
                 return confirm(actor, context);
             }
         }

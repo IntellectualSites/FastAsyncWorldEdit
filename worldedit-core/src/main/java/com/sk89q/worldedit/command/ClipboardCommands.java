@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RunnableVal;
@@ -153,7 +154,8 @@ public class ClipboardCommands {
         }
         Operations.completeLegacy(copy);
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.paste").or(TranslatableComponent.of("fawe.tips.tip.download"), TranslatableComponent.of("fawe.tips.tip.rotate"), TranslatableComponent.of("fawe.tips.tip.copypaste"), TranslatableComponent.of("fawe.tips.tip.replace.marker"), TranslatableComponent.of("fawe.tips.tip.copy.pattern")).send(actor);
         }
 		copy.getStatusMessages().forEach(actor::print);
     }
@@ -176,16 +178,17 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
         }
         session.setClipboard(null);
         ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
-        BBC.COMMAND_COPY.send(actor, region.getArea());
+        actor.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy" , region.getArea()));
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_PASTE.or(BBC.TIP_LAZYCOPY, BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.paste").or(TranslatableComponent.of("fawe.tips.tip.lazycopy"), TranslatableComponent.of("fawe.tips.tip.download"), TranslatableComponent.of("fawe.tips.tip.rotate"), TranslatableComponent.of("fawe.tips.tip.copypaste"), TranslatableComponent.of("fawe.tips.tip.replace.marker"), TranslatableComponent.of("fawe.tips.tip.copy.pattern")).send(actor);
         }
     }
 
@@ -217,7 +220,7 @@ public class ClipboardCommands {
 //        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
 //        clipboard.setOrigin(session.getPlacementPosition(actor));
 //        session.setClipboard(new ClipboardHolder(lazyClipboard));
-//        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
+//        actor.print(TranslatableComponent.of("fawe.worldedit.cut.command.cut.lazy" , region.getArea()));
 //    }
 
     @Command(
@@ -273,7 +276,7 @@ public class ClipboardCommands {
         session.setClipboard(new ClipboardHolder(clipboard));
 
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_LAZYCUT.send(actor);
+            actor.print(TranslatableComponent.of("fawe.tips.tip.lazycut"));
         }
 		copy.getStatusMessages().forEach(actor::print);
     }
@@ -287,11 +290,11 @@ public class ClipboardCommands {
     public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "schem") final String formatName) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            BBC.CLIPBOARD_INVALID_FORMAT.send(player, formatName);
+            player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
             return;
         }
 
-        BBC.GENERATING_LINK.send(player, formatName);
+        player.print(TranslatableComponent.of("fawe.web.generating.link" , formatName));
         ClipboardHolder holder = session.getClipboard();
 
         URL url;
@@ -360,14 +363,14 @@ public class ClipboardCommands {
                 }
             } else {
                 if (Settings.IMP.WEB.URL.isEmpty()) {
-                    BBC.SETTING_DISABLE.send(player, "web.url");
+                    player.print(TranslatableComponent.of("fawe.error.setting.disable", "web.url"));
                     return;
                 }
                 url = FaweAPI.upload(target, format);
             }
         }
         if (url == null) {
-            player.printError(BBC.GENERATING_LINK_FAILED.s());
+            player.printError(TranslatableComponent.of("fawe.web.generating.link.failed"));
         } else {
             String urlText = url.toString();
             if (Settings.IMP.WEB.SHORTEN_URLS) {
@@ -377,7 +380,7 @@ public class ClipboardCommands {
                     e.printStackTrace();
                 }
             }
-            BBC.DOWNLOAD_LINK.send(player, urlText);
+            player.print(TranslatableComponent.of("fawe.web.download.link" , urlText));
         }
     }
 
@@ -401,16 +404,16 @@ public class ClipboardCommands {
         } else {
             target = clipboard;
         }
-        BBC.GENERATING_LINK.send(player, format.getName());
+        player.print(TranslatableComponent.of("fawe.web.generating.link" , format.getName()));
         if (Settings.IMP.WEB.ASSETS.isEmpty()) {
-            BBC.SETTING_DISABLE.send(player, "web.assets");
+            player.print(TranslatableComponent.of("fawe.error.setting.disable", "web.assets"));
             return;
         }
         URL url = format.uploadPublic(target, category.replaceAll("[/|\\\\]", "."), player.getName());
         if (url == null) {
-            player.printError(BBC.GENERATING_LINK_FAILED.s());
+            player.printError(TranslatableComponent.of("fawe.web.generating.link.failed"));
         } else {
-            BBC.DOWNLOAD_LINK.send(player, Settings.IMP.WEB.ASSETS);
+            player.print(TranslatableComponent.of("fawe.web.download.link" , Settings.IMP.WEB.ASSETS));
         }
     }
 
@@ -474,7 +477,8 @@ public class ClipboardCommands {
             selector.explainRegionAdjust(actor, session);
         }
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_COPYPASTE.or(BBC.TIP_SOURCE_MASK, BBC.TIP_REPLACE_MARKER).send(actor, to);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.copypaste").or(TranslatableComponent.of("fawe.tips.tip.source.mask"), TranslatableComponent.of("fawe.tips.tip.replace.marker")).send(actor, to);
         }
 		if (onlySelect) {
             actor.printInfo(TranslatableComponent.of("worldedit.paste.selected"));
@@ -491,7 +495,7 @@ public class ClipboardCommands {
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         WorldEdit.getInstance().getEventBus().post(event);
         if (event.isCancelled()) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+            throw new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
         }
     }
 
@@ -527,10 +531,10 @@ public class ClipboardCommands {
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
-        BBC.COMMAND_PASTE.send(actor, to);
+        actor.print(TranslatableComponent.of("fawe.worldedit.paste.command.paste" , to));
 
         if (!actor.hasPermission("fawe.tips")) {
-            actor.print(BBC.TIP_COPYPASTE.s());
+            actor.print(TranslatableComponent.of("fawe.tips.tip.copypaste"));
         }
     }
 
@@ -558,7 +562,8 @@ public class ClipboardCommands {
         holder.setTransform(holder.getTransform().combine(transform));
         actor.printInfo(TranslatableComponent.of("worldedit.rotate.rotated"));
         if (!actor.hasPermission("fawe.tips")) {
-            BBC.TIP_FLIP.or(BBC.TIP_DEFORM, BBC.TIP_TRANSFORM).send(actor);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.flip").or(TranslatableComponent.of("fawe.tips.tip.deform"), TranslatableComponent.of("fawe.tips.tip.transform")).send(actor);
         }
     }
 

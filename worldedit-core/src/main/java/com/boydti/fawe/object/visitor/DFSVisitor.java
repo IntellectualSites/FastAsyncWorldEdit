@@ -1,12 +1,18 @@
 package com.boydti.fawe.object.visitor;
 
 import com.boydti.fawe.config.BBC;
+import com.google.common.collect.Lists;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.IntegerTrio;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -139,9 +145,11 @@ public abstract class DFSVisitor implements Operation {
 
     }
 
-    @Override
-    public void addStatusMessages(List<String> messages) {
-        messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
+    public Iterable<Component> getStatusMessages() {
+        return Lists.newArrayList(TranslatableComponent.of(
+                "fawe.worldedit.visitor.visitor.block",
+                TextComponent.of(getAffected())
+        ).color(TextColor.GRAY));
     }
 
     public int getAffected() {

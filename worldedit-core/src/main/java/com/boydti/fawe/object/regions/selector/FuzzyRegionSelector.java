@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.regions.selector;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.regions.FuzzyRegion;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
@@ -88,13 +89,13 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     @Override
     public void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position) {
         int size = this.region.getArea();
-        BBC.SELECTOR_FUZZY_POS1.send(player, position, "(" + region.getArea() + ")");
+        player.print(TranslatableComponent.of("fawe.worldedit.selector.selector.fuzzy.pos1", position, "(" + region.getArea() + ")"));
     }
 
     @Override
     public void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position) {
         int size = this.region.getArea();
-        BBC.SELECTOR_FUZZY_POS2.send(player, position, "(" + region.getArea() + ")");
+        player.print(TranslatableComponent.of("fawe.worldedit.selector.selector.fuzzy.pos2", position, "(" + region.getArea() + ")"));
     }
 
     @Override

@@ -1,7 +1,14 @@
 package com.boydti.fawe.object.exception;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.extent.Extent;
+
+import java.util.Locale;
 
 public class FaweException extends RuntimeException {
     // DEBUG
@@ -18,18 +25,22 @@ public class FaweException extends RuntimeException {
         }
     }
 
-    private final String message;
+    private final Component message;
 
     public FaweException(String reason) {
-        this.message = reason;
+        this(TextComponent.of(reason));
     }
 
-    public FaweException(BBC reason) {
-        this(reason.format());
+    public FaweException(Component reason) {
+        this.message = reason;
     }
 
     @Override
     public String getMessage() {
+        return WorldEditText.reduceToText(message, Locale.ROOT);
+    }
+
+    public Component getComponent() {
         return message;
     }
 

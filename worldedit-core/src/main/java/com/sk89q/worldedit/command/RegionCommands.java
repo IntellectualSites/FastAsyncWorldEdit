@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -62,6 +63,7 @@ import com.sk89q.worldedit.regions.Regions;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -119,7 +121,8 @@ public class RegionCommands {
         if (affected != 0) {
             actor.printInfo(TranslatableComponent.of("worldedit.set.done"));
             if (!actor.hasPermission("fawe.tips"))
-                BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(actor);
+                System.out.println("TODO FIXME TIPS");
+//                TranslatableComponent.of("fawe.tips.tip.fast").or(TranslatableComponent.of("fawe.tips.tip.cancel"), TranslatableComponent.of("fawe.tips.tip.mask"), TranslatableComponent.of("fawe.tips.tip.mask.angle"), TranslatableComponent.of("fawe.tips.tip.set.linear"), TranslatableComponent.of("fawe.tips.tip.surface.spread"), TranslatableComponent.of("fawe.tips.tip.set.hand")).send(actor);
         }
         return 0;
     }
@@ -142,7 +145,6 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
     public void test(Player player, EditSession editSession, @Arg(desc = "test") @Confirm(RADIUS) BlockVector3 radius) throws WorldEditException {
-        player.print("Run test " + radius);
 //        editSession.addProcessor(new ChunkSendProcessor(editSession.getWorld(), () -> Collections.singleton(player)));
 //        editSession.addProcessor(NullProcessor.INSTANCE);
 //        FlatRegionFunction replace = new BiomeReplace(editSession, biome);
@@ -164,7 +166,7 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-        BBC.LIGHTING_PROPAGATE_SELECTION.send(player, count);
+        player.print(TranslatableComponent.of("fawe.info.lighting.propagate.selection" , count));
     }
 
     @Command(
@@ -192,7 +194,7 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
-        BBC.UPDATED_LIGHTING_SELECTION.send(player, count);
+        player.print(TranslatableComponent.of("fawe.info.updated.lighting.selection" , count));
     }
 
     @Command(
@@ -204,14 +206,14 @@ public class RegionCommands {
     public void nbtinfo(Player player, EditSession editSession) {
         Location pos = player.getBlockTrace(128);
         if (pos == null) {
-            player.printError(BBC.NO_BLOCK.s());
+            player.printError(TranslatableComponent.of("fawe.navigation.no.block"));
             return;
         }
         CompoundTag nbt = editSession.getFullBlock(pos.toBlockPoint()).getNbtData();
         if (nbt != null) {
             player.print(nbt.getValue().toString());
         } else {
-            player.printError(BBC.NO_BLOCK.s());
+            player.printError(TranslatableComponent.of("fawe.navigation.no.block"));
         }
     }
 
@@ -349,7 +351,7 @@ public class RegionCommands {
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
-        BBC.VISITOR_BLOCK.send(player, affected);
+        player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , affected));
     }
 
     @Command(
@@ -448,9 +450,9 @@ public class RegionCommands {
     @CommandPermissions("fawe.admin")
     public void wea(Actor actor) throws WorldEditException {
         if (actor.togglePermission("fawe.bypass")) {
-            actor.print(BBC.WORLDEDIT_BYPASSED.s());
+            actor.print(TranslatableComponent.of("fawe.info.worldedit.bypassed"));
         } else {
-            actor.print(BBC.WORLDEDIT_RESTRICTED.s());
+            actor.print(TranslatableComponent.of("fawe.info.worldedit.restricted"));
         }
     }
 
@@ -464,10 +466,10 @@ public class RegionCommands {
     public void wer(Player player) throws WorldEditException {
         final Region region = player.getLargestRegion();
         if (region == null) {
-            player.print(BBC.NO_REGION.s());
+            player.print(TranslatableComponent.of("fawe.error.no.region"));
         } else {
             player.setSelection(region);
-            player.print(BBC.SET_REGION.s());
+            player.print(TranslatableComponent.of("fawe.info.set.region"));
         }
     }
 
@@ -480,7 +482,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void move(Actor actor, World world, EditSession editSession, LocalSession session,
+    public int move(Actor actor, World world, EditSession editSession, LocalSession session,
                     @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
                             int count,
@@ -543,7 +545,7 @@ public class RegionCommands {
                      @Arg(desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
                      @Switch(name = 'm', desc = "TODO") boolean notFullHeight) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
-        BBC.VISITOR_BLOCK.send(player, affected);
+        player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , affected));
     }
 
     @Command(
@@ -552,7 +554,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Logging(ORIENTATION_REGION)
-    public void stack(Actor actor, World world, EditSession editSession, LocalSession session,
+    public int stack(Actor actor, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(desc = "# of copies to stack", def = "1")
                           @Confirm(Confirm.Processor.REGION) int count,
@@ -663,7 +665,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void regenerateChunk(Player player, LocalSession session, EditSession editSession, @Selection Region region,
+    public void regenerateChunk(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
                                 @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
                                 @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
         Mask mask = session.getMask();

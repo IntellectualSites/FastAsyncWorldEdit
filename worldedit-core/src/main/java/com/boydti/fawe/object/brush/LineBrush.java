@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -25,13 +26,13 @@ public class LineBrush implements Brush, ResettableTool {
         if (pos1 == null) {
             if (!visual) {
                 pos1 = position;
-                BBC.BRUSH_LINE_PRIMARY.send(editSession.getPlayer(), position);
+                editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.primary", position));
             }
             return;
         }
         editSession.drawLine(pattern, pos1, position, size, !shell, flat);
         if (!visual) {
-            BBC.BRUSH_LINE_SECONDARY.send(editSession.getPlayer());
+            editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.secondary"));
             if (!select) {
                 pos1 = null;
             } else {

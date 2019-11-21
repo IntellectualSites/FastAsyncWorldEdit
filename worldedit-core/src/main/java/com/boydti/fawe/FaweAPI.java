@@ -2,6 +2,8 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -232,7 +234,7 @@ public class FaweAPI {
      * @param reason
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
-    public static void cancelEdit(Extent extent, BBC reason) {
+    public static void cancelEdit(Extent extent, Component reason) {
         try {
             WEManager.IMP.cancelEdit(extent, new FaweException(reason));
         } catch (WorldEditException ignore) {

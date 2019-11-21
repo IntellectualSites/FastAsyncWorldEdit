@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
 import com.boydti.fawe.object.brush.scroll.Scroll;
@@ -79,7 +80,7 @@ public class ToolUtilCommands {
             throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (maskOpt == null) {
@@ -109,7 +110,7 @@ public class ToolUtilCommands {
                          Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
     }
         if (pattern == null) {
@@ -158,7 +159,7 @@ public class ToolUtilCommands {
     )
     public void none(Player player, LocalSession session) throws WorldEditException {
         session.setTool(player, null);
-        player.print(BBC.TOOL_NONE.s());
+        player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.none"));
     }
 
     @Command(
@@ -258,13 +259,13 @@ public class ToolUtilCommands {
             throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         VisualMode[] modes = VisualMode.values();
         VisualMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
         tool.setVisualMode(player, newMode);
-        BBC.BRUSH_VISUAL_MODE_SET.send(player, newMode);
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.visual.mode.set" , newMode));
     }
 
     @Command(
@@ -277,13 +278,13 @@ public class ToolUtilCommands {
                        @Arg(name = "mode", desc = "int", def = "0") int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         TargetMode[] modes = TargetMode.values();
         TargetMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
         tool.setTargetMode(newMode);
-        BBC.BRUSH_TARGET_MODE_SET.send(player, newMode);
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.target.mode.set" , newMode));
     }
 
     @Command(
@@ -296,11 +297,11 @@ public class ToolUtilCommands {
                              int offset) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         tool.setTargetOffset(offset);
-        BBC.BRUSH_TARGET_OFFSET_SET.send(player, offset);
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.target.offset.set" , offset));
     }
 
     @Command(
@@ -317,7 +318,7 @@ public class ToolUtilCommands {
                                List<String> commandStr) throws WorldEditException {
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
 
@@ -325,11 +326,11 @@ public class ToolUtilCommands {
         Scroll action = Scroll.fromArguments(bt, player, session, mode, commandStr, true);
         settings.setScrollAction(action);
         if (mode == Scroll.Action.NONE) {
-            BBC.BRUSH_SCROLL_ACTION_UNSET.send(player);
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.scroll.action.unset"));
         } else if (action != null) {
             String full = (mode.name().toLowerCase() + " " + StringMan.join(commandStr, " ")).trim();
             settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, full);
-            BBC.BRUSH_SCROLL_ACTION_SET.send(player, mode);
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.scroll.action.set" , mode));
         }
         bt.update();
     }
@@ -351,11 +352,11 @@ public class ToolUtilCommands {
                       Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (maskArg == null) {
-            player.print(BBC.BRUSH_SOURCE_MASK_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.source.mask.disabled"));
             tool.setSourceMask(null);
             return;
         }
@@ -364,7 +365,7 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
         settings.setSourceMask(maskArg);
         tool.update();
-        player.print(BBC.BRUSH_SOURCE_MASK.s());
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.source.mask"));
     }
 
     @Command(
@@ -379,11 +380,11 @@ public class ToolUtilCommands {
                           Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (transform == null) {
-            player.print(BBC.BRUSH_TRANSFORM_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform.disabled"));
             tool.setTransform(null);
             return;
         }
@@ -392,6 +393,6 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
         settings.setTransform(transform);
         tool.update();
-        player.print(BBC.BRUSH_TRANSFORM.s());
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform"));
     }
 }

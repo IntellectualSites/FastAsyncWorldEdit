@@ -1,6 +1,9 @@
 package com.boydti.fawe.object.progress;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
@@ -101,7 +104,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     }
 
     public void doneTask() {
-        sendTile("", BBC.PROGRESS_FINISHED.s());
+        sendTile(TextComponent.empty(), TranslatableComponent.of("fawe.progress.progress.finished"));
     }
 
     public void sendTask() {
@@ -112,10 +115,10 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
         String speedStr = StringMan.padRight("" + speed, 3);
         String percent = StringMan.padRight("" + (amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
         int remaining = speed != 0 ? amountQueue / speed : -1;
-        sendTile("", BBC.PROGRESS_MESSAGE.format(queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
+        sendTile(TextComponent.empty(), TranslatableComponent.of("fawe.progress.progress.message", queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
     }
 
-    public void sendTile(String title, String sub) {
+    public void sendTile(Component title, Component sub) {
         player.sendTitle(title, sub);
     }
 }

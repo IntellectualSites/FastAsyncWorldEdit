@@ -1,6 +1,7 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.extension.platform.Actor;
 
@@ -30,7 +31,7 @@ public abstract class FaweCommand<T> {
                 TaskManager.IMP.async(() -> execute(player, args));
             } else {
                 if (!player.runAction(() -> execute(player, args), true, true)) {
-                    player.printError(BBC.WORLDEDIT_COMMAND_LIMIT.s());
+                    player.printError(TranslatableComponent.of("fawe.info.worldedit.command.limit"));
                     return true;
                 }
             }

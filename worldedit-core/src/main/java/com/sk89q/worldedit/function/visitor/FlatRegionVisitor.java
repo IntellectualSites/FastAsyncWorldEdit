@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
@@ -87,7 +88,7 @@ public class FlatRegionVisitor implements Operation {
         return Lists.newArrayList(TranslatableComponent.of(
                 "worldedit.operation.affected.column",
                 TextComponent.of(getAffected())
-        ).color(TextColor.LIGHT_PURPLE));
+        ).color(TextColor.GRAY));
     }
 
 }

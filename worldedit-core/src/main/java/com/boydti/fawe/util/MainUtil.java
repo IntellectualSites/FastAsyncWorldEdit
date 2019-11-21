@@ -5,6 +5,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -61,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
@@ -831,7 +836,8 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                if (printDebug) BBC.FILE_DELETED.send((Player)null, file);
+                Component msg = WorldEditText.format(TranslatableComponent.of("fawe.info.file.deleted"), Locale.ROOT);
+                if (printDebug) Fawe.debug(msg);
             }
         });
         pool.shutdown();

@@ -25,6 +25,7 @@ import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
@@ -736,7 +737,7 @@ public final class PlatformCommandManager {
                 actor.print(e.getRichMessage());
             }
         } catch (FaweException e) {
-            actor.printError("Edit cancelled: " + e.getMessage());
+            actor.printError(TextComponent.builder().append("Edit cancelled: ").append(e.getComponent()).build());
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {

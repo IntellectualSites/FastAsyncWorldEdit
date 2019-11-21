@@ -8,6 +8,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -949,7 +950,7 @@ public class CFICommands {
         JsonObject data1 = obj.get("data").getAsJsonObject();
         String link = data1.get("link").getAsString();
         URL url = new URL(link);
-        BBC.DOWNLOAD_LINK.send(player, url);
+        player.print(TranslatableComponent.of("fawe.web.download.link" , url));
     }
 
     @Command(

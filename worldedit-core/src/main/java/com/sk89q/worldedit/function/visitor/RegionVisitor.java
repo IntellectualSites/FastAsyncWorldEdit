@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.visitor;
 import com.google.common.collect.Lists;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -99,7 +100,7 @@ public class RegionVisitor implements Operation {
         return Lists.newArrayList(TranslatableComponent.of(
                 "worldedit.operation.affected.block",
                 TextComponent.of(getAffected())
-        ).color(TextColor.LIGHT_PURPLE));
+        ).color(TextColor.GRAY));
     }
 
 }

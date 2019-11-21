@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;
@@ -283,7 +284,7 @@ public abstract class BreadthFirstSearch implements Operation {
         return Lists.newArrayList(TranslatableComponent.of(
                 "worldedit.operation.affected.block",
                 TextComponent.of(getAffected())
-        ).color(TextColor.LIGHT_PURPLE));
+        ).color(TextColor.GRAY));
     }
 
 }

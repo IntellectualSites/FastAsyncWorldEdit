@@ -2,6 +2,7 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
@@ -20,6 +21,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.io.IOException;
@@ -58,11 +60,11 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
-            player.print(BBC.NO_PERM.format("worldedit.tool.inspect"));
+            player.print(TranslatableComponent.of("", "worldedit.tool.inspect"));
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(BBC.SETTING_DISABLE.format("history.use-database (Import with /frb #import )"));
+            player.print(TranslatableComponent.of("fawe.error.setting.disable", ("history.use-database (Import with /frb #import )")));
             return false;
         }
         BlockVector3 target = getTarget(player, rightClick).toBlockPoint();
@@ -89,7 +91,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                         int index = value.getIndex();
                         long age = System.currentTimeMillis() - value.getBDFile().lastModified();
                         String ageFormatted = MainUtil.secToTime(age / 1000);
-                        BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromOrdinal(from).getAsString(), BlockState.getFromOrdinal(to).getAsString(), ageFormatted);
+                        player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info" , name, BlockState.getFromOrdinal(from).getAsString(), BlockState.getFromOrdinal(to).getAsString(), ageFormatted));
                         count.incrementAndGet();
                         return;
                     }
@@ -100,7 +102,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         }, new Runnable() {
             @Override
             public void run() {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count);
+                player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
             }
         }, false, false);
         return true;

@@ -45,6 +45,7 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -375,7 +376,7 @@ public interface Player extends Entity, Actor {
         }
     }
 
-    void sendTitle(String title, String sub);
+    void sendTitle(Component title, Component sub);
 
     /**
      * Loads any history items from disk: - Should already be called if history on disk is enabled

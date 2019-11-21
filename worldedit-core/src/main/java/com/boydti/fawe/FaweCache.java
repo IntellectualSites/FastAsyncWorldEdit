@@ -5,6 +5,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
@@ -199,15 +200,15 @@ public enum FaweCache implements Trimable {
      */
     public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
-    public static final FaweException MANUAL = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
-    public static final FaweException NO_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
-    public static final FaweException OUTSIDE_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-    public static final FaweException MAX_CHECKS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-    public static final FaweException MAX_CHANGES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
-    public static final FaweException LOW_MEMORY = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
-    public static final FaweException MAX_ENTITIES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ENTITIES);
-    public static final FaweException MAX_TILES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
-    public static final FaweException MAX_ITERATIONS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ITERATIONS);
+    public static final FaweException MANUAL = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
+    public static final FaweException NO_REGION = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.no.region"));
+    public static final FaweException OUTSIDE_REGION = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
+    public static final FaweException MAX_CHECKS = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
+    public static final FaweException MAX_CHANGES = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.changes"));
+    public static final FaweException LOW_MEMORY = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.low.memory"));
+    public static final FaweException MAX_ENTITIES = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.entities"));
+    public static final FaweException MAX_TILES = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.tiles"));
+    public static final FaweException MAX_ITERATIONS = new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.iterations"));
 
     /*
     thread cache

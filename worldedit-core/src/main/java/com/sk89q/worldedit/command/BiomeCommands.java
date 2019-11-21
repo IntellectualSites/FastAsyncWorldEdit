@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -205,7 +206,8 @@ public class BiomeCommands {
                 TextComponent.of(visitor.getAffected())
         ));
         if (!player.hasPermission("fawe.tips")) {
-            BBC.TIP_BIOME_PATTERN.or(BBC.TIP_BIOME_MASK).send(player);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.biome.pattern").or(TranslatableComponent.of("fawe.tips.tip.biome.mask")).send(player);
         }
     }
 

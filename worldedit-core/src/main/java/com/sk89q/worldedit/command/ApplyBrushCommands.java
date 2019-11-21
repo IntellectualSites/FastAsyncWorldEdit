@@ -61,12 +61,12 @@ import org.enginehub.piston.part.SubCommandPart;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ApplyBrushCommands {
 
-    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape"), TranslatableComponent.of("worldedit.brush.apply.shape"))
+    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape") , TranslatableComponent.of("worldedit.brush.apply.shape"))
         .defaultsTo(ImmutableList.of())
         .ofTypes(ImmutableList.of(Key.of(RegionFactory.class)))
         .build();
 
-    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius"), TranslatableComponent.of("worldedit.brush.apply.radius"))
+    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius") , TranslatableComponent.of("worldedit.brush.apply.radius"))
         .defaultsTo(ImmutableList.of("5"))
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
@@ -85,7 +85,7 @@ public class ApplyBrushCommands {
 
             builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.apply")));
             builder.addParts(REGION_FACTORY, RADIUS);
-            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type"), TranslatableComponent.of("worldedit.brush.apply.type"))
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type") , TranslatableComponent.of("worldedit.brush.apply.type"))
                     .withCommands(manager.getAllCommands().collect(Collectors.toList()))
                     .required()
                     .build());

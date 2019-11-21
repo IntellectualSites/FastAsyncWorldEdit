@@ -23,6 +23,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
 import com.boydti.fawe.object.function.QuadFunction;
@@ -189,7 +190,7 @@ public class UtilityCommands {
     @SkipQueue
     public void cancel(Player player) {
         int cancelled = player.cancel(false);
-        BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
+        player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.count" , cancelled));
     }
 
     @Command(
@@ -696,7 +697,7 @@ public class UtilityCommands {
             double result = expression.evaluate(
                     new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
             String formatted = Double.isNaN(result) ? "NaN" : formatForLocale(actor.getLocale()).format(result);
-            return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
+            return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.GRAY));
         }, (Component) null);
     }
 
@@ -708,7 +709,7 @@ public class UtilityCommands {
     @CommandPermissions("fawe.confirm")
     public void confirm(Player fp) throws WorldEditException {
         if (!fp.confirm()) {
-            BBC.NOTHING_CONFIRMED.send(fp);
+            fp.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
 
@@ -768,7 +769,7 @@ public class UtilityCommands {
         getFiles(dir, actor, args, formatName, playerFolder, fileList::add);
 
         if (fileList.isEmpty()) {
-            BBC.SCHEMATIC_NONE.send(actor);
+            actor.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"));
             return Collections.emptyList();
         }
 

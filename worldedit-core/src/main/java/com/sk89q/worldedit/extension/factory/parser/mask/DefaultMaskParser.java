@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 import com.boydti.fawe.command.FaweParser;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -149,7 +150,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                     input = input.substring(input.indexOf(char0) + 1);
                                     mask = parseFromInput(char0 + "[" + input + "]", context);
                                     if (actor != null) {
-                                        BBC.COMMAND_CLARIFYING_BRACKET.send(actor, char0 + "[" + input + "]");
+                                        actor.print(TranslatableComponent.of("fawe.worldedit.help.command.clarifying.bracket" , char0 + "[" + input + "]"));
                                     }
                                     return mask;
                             }

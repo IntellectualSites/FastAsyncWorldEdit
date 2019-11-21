@@ -5,6 +5,7 @@
 //import com.boydti.fawe.beta.IChunk;
 //import com.boydti.fawe.beta.IQueueExtent;
 //import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 //import com.boydti.fawe.object.*;
 //import com.boydti.fawe.object.brush.visualization.ImmutableVirtualWorld;
 //import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
@@ -129,7 +130,7 @@
 //                            URI uri = file.toURI();
 //                            ClipboardFormat format = ClipboardFormats.findByFile(file);
 //                            format.hold(player, uri, new FileInputStream(file));
-//                            BBC.SCHEMATIC_LOADED.send(player, filename);
+//                            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , filename));
 //                            session.setVirtualWorld(null);
 //                            return;
 //                        }
@@ -157,7 +158,7 @@
 //                                        session.setClipboard(null);
 //                                    }
 //                                    select.put(clicked, false);
-//                                    BBC.CLIPBOARD_CLEARED.send(player);
+//                                    player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.cleared"))
 //                                }
 //                            } else {
 //                                // Add it
@@ -165,7 +166,7 @@
 //                                MultiClipboardHolder multi = new MultiClipboardHolder(URI.create(""), new LazyClipboardHolder(uri, source, format, null));
 //                                session.addClipboard(multi);
 //                                select.put(clicked, true);
-//                                BBC.SCHEMATIC_LOADED.send(player, file.getName());
+//                                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , file.getName()));
 //                            }
 //                        }
 //                        // Resend relevant chunks

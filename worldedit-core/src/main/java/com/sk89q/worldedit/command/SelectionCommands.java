@@ -25,6 +25,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
@@ -303,7 +304,8 @@ public class SelectionCommands {
             player.printInfo(TranslatableComponent.of("worldedit.wand.selwand.info"));
         }
         if (!player.hasPermission("fawe.tips"))
-            BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.sel.list").or(TranslatableComponent.of("fawe.tips.tip.select.connected"), TranslatableComponent.of("fawe.tips.tip.set.pos1"), TranslatableComponent.of("fawe.tips.tip.farwand"), TranslatableComponent.of("fawe.tips.tip.discord")).send(player);
     }
 
     @Command(
@@ -590,11 +592,11 @@ public class SelectionCommands {
 
             final BlockState state = c.getID();
             final BlockType blockType = state.getBlockType();
-            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.LIGHT_PURPLE);
+            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.GRAY);
             TextComponent toolTip;
             if (separateStates && state != blockType.getDefaultState()) {
                 toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);
-                blockName = blockName.append(TextComponent.of("*", TextColor.LIGHT_PURPLE));
+                blockName = blockName.append(TextComponent.of("*", TextColor.GRAY));
             } else {
                 toolTip = TextComponent.of(blockType.getId(), TextColor.GRAY);
             }
@@ -677,10 +679,10 @@ public class SelectionCommands {
             }
             case POLYHEDRAL:
                 newSelector = new PolyhedralRegionSelector(world);
-                actor.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
+                actor.print(TranslatableComponent.of("fawe.selection.sel.convex.polyhedral"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> actor.print(BBC.SEL_MAX.format(integer)));
-                actor.print(BBC.SEL_LIST.s());
+                limit.ifPresent(integer -> actor.print(TranslatableComponent.of("fawe.selection.sel.max", (integer))));
+                actor.print(TranslatableComponent.of("fawe.selection.sel.list"));
                 break;
             case FUZZY:
             case MAGIC:
@@ -689,8 +691,8 @@ public class SelectionCommands {
                 }
                 //TODO Make FuzzyRegionSelector accept actors
                 newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);
-                actor.print(BBC.SEL_FUZZY.s());
-                actor.print(BBC.SEL_LIST.s());
+                actor.print(TranslatableComponent.of("fawe.selection.sel.fuzzy"));
+                actor.print(TranslatableComponent.of("fawe.selection.sel.list"));
                 break;
             case LIST:
             default:

@@ -62,17 +62,17 @@ import static org.enginehub.piston.part.CommandParts.arg;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class PaintBrushCommands {
 
-    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape"), TranslatableComponent.of("worldedit.brush.paint.shape"))
+    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape") , TranslatableComponent.of("worldedit.brush.paint.shape"))
         .defaultsTo(ImmutableList.of())
         .ofTypes(ImmutableList.of(Key.of(RegionFactory.class)))
         .build();
 
-    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius"), TranslatableComponent.of("worldedit.brush.paint.size"))
+    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius") , TranslatableComponent.of("worldedit.brush.paint.size"))
         .defaultsTo(ImmutableList.of("5"))
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
 
-    private static final CommandArgument DENSITY = arg(TranslatableComponent.of("density"), TranslatableComponent.of("worldedit.brush.paint.density"))
+    private static final CommandArgument DENSITY = arg(TranslatableComponent.of("density") , TranslatableComponent.of("worldedit.brush.paint.density"))
         .defaultsTo(ImmutableList.of("20"))
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
@@ -92,7 +92,7 @@ public class PaintBrushCommands {
             builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.paint")));
 
             builder.addParts(REGION_FACTORY, RADIUS, DENSITY);
-            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type"), TranslatableComponent.of("worldedit.brush.paint.type"))
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type") , TranslatableComponent.of("worldedit.brush.paint.type"))
                 .withCommands(manager.getAllCommands().collect(Collectors.toList()))
                 .required()
                 .build());
