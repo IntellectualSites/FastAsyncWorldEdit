@@ -3,6 +3,7 @@ package com.boydti.fawe.config;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.ArrayList;
@@ -36,14 +37,21 @@ public class Caption {
         }
         List<Component> children = parent.children();
         if (!children.isEmpty()) {
+            TextColor lastColor = parent.color();
             for (int i = 0; i < children.size(); i++) {
                 Component child = children.get(i);
                 Component coloredChild = color(child);
+                if (coloredChild.color() == null && lastColor != null) {
+                    coloredChild = coloredChild.color(lastColor);
+                }
                 if (coloredChild != child) {
                     if (!(children instanceof ArrayList)) {
                         children = new ArrayList<>(children);
                     }
                     children.set(i, coloredChild);
+                }
+                if (coloredChild.color() != null) {
+                    lastColor = coloredChild.color();
                 }
             }
             if (children instanceof ArrayList) {
