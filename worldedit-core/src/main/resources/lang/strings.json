@@ -7,7 +7,7 @@
 	"piston.style.text.modifier": "TODO modifier: {0}, {1}, {2}",
 	"piston.style.main.text": "{0}",
 	"piston.style.part.wrapping": "&8{0}&e{1}&8{2}",
-	"piston.text.command.prefix": "TODO prefix",
+	"piston.text.command.prefix": "/",
 	
 	"fawe.info.prefix": "&4&lFAWE&7: ",
 	"fawe.info.file.deleted": "{0} has been deleted.",
