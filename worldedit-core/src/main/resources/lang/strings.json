@@ -9,7 +9,6 @@
 	"piston.style.part.wrapping": "&8{0}&e{1}&8{2}",
 	"piston.text.command.prefix": "/",
 	
-	"fawe.info.prefix": "&4&lFAWE&7: ",
 	"fawe.info.file.deleted": "{0} has been deleted.",
 	"fawe.info.schematic.pasting": "&7The schematic is pasting. This cannot be undone.",
 	"fawe.info.lighting.propagate.selection": "Lighting has been propogated in {0} chunks. (Note: To remove light use //removelight)",
