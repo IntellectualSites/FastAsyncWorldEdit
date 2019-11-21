@@ -143,7 +143,6 @@ public class WorldEditCommands {
     public void report(Actor actor) throws WorldEditException, IOException {
 		String dest = IncendoPaster.debugPaste();
 		actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
-        BBC.DOWNLOAD_LINK.send(actor, );
     }
 
     @Command(

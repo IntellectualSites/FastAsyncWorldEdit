@@ -46,7 +46,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.annotation.Direction;
@@ -300,7 +299,7 @@ public class SelectionCommands {
             session.setTool(itemType, NavigationWand.INSTANCE);
             player.printInfo(TranslatableComponent.of("worldedit.wand.navwand.info"));
         } else {
-            session.setTool(itemType, new SelectionWand());
+            session.setTool(itemType, SelectionWand.INSTANCE);
             player.printInfo(TranslatableComponent.of("worldedit.wand.selwand.info"));
         }
         if (!player.hasPermission("fawe.tips"))
@@ -453,7 +452,7 @@ public class SelectionCommands {
         desc = "Get information about the selection"
     )
     @CommandPermissions("worldedit.selection.size")
-    public void size(Player player, LocalSession session,
+    public void size(Actor actor, World world, LocalSession session,
                      @Switch(name = 'c', desc = "Get clipboard info instead")
                          boolean clipboardInfo) throws WorldEditException {
         Region region;
@@ -477,16 +476,17 @@ public class SelectionCommands {
                 region = clipboard.getRegion();
                 BlockVector3 size = region.getMaximumPoint()
                         .subtract(region.getMinimumPoint()).
-                        add(1, 1, 1);
+                                add(1, 1, 1);
                 BlockVector3 origin = clipboard.getOrigin();
 
                 String sizeStr = size.getBlockX() + "*" + size.getBlockY() + "*" + size.getBlockZ();
                 String originStr = origin.getBlockX() + "," + origin.getBlockY() + "," + origin.getBlockZ();
 
                 long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
-
-            BlockVector3 origin = clipboard.getOrigin();
-            actor.printInfo(TranslatableComponent.of("worldedit.size.offset", TextComponent.of(origin.toString())));
+                actor.printInfo(TranslatableComponent.of("worldedit.size.offset", TextComponent.of(name), TextComponent.of(sizeStr), TextComponent.of(originStr), TextComponent.of(numBlocks)));
+                index++;
+            }
+            return;
         } else {
 			region = session.getSelection(world);
 			
@@ -524,11 +524,13 @@ public class SelectionCommands {
         desc = "Get the distribution of blocks in the selection"
     )
     @CommandPermissions("worldedit.analysis.distr")
-    public void distr(Player player, LocalSession session, EditSession editSession,
+    public void distr(Actor actor, World world, LocalSession session, EditSession editSession,
                       @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
-                          boolean clipboardDistr,
+                              boolean clipboardDistr,
                       @Switch(name = 'd', desc = "Separate blocks by state")
-                          boolean separateStates) throws WorldEditException {
+                              boolean separateStates,
+                      @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.", def = "")
+                              Integer page) throws WorldEditException {
         List<Countable> distribution;
 
         Region region;
@@ -538,7 +540,7 @@ public class SelectionCommands {
             region = clipboard.getRegion();
             new ExtentTraverser<AbstractDelegateExtent>(editSession).setNext(new AbstractDelegateExtent(clipboard));
         } else {
-            region = session.getSelection(player.getWorld());
+            region = session.getSelection(world);
         }
         if (separateStates)
             distribution = (List) editSession.getBlockDistributionWithData(region);
@@ -553,16 +555,16 @@ public class SelectionCommands {
 
         BlockDistributionResult res = new BlockDistributionResult(distribution, separateStates);
         if (!actor.isPlayer()) res.formatForConsole();
-        return res.create(finalPage);
+        actor.print(res.create(page));
     }
 
     private static class BlockDistributionResult extends PaginationBox {
 
-        private final List<Countable<BlockState>> distribution;
+        private final List<Countable> distribution;
         private final int totalBlocks;
         private final boolean separateStates;
 
-        BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates) {
+        BlockDistributionResult(List<Countable> distribution, boolean separateStates) {
             super("Block Distribution", "//distr -p %page%" + (separateStates ? " -d" : ""));
             this.distribution = distribution;
             // note: doing things like region.getArea is inaccurate for non-cuboids.

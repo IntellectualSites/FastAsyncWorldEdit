@@ -115,7 +115,7 @@
     "worldedit.shift.shifted": "Region shifted.",
     "worldedit.outset.outset": "Region outset.",
     "worldedit.inset.inset": "Region inset.",
-    "worldedit.size.offset": "Offset: {0}",
+    "worldedit.size.offset": "{0}: {1} @ {2} ({3} blocks)",
     "worldedit.size.type": "Type: {0}",
     "worldedit.size.size": "Size: {0}",
     "worldedit.size.distance": "Cuboid distance: {0}",
