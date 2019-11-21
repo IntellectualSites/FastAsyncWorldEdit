@@ -35,28 +35,32 @@ public class Caption {
                 }
             }
         }
+        TextColor lastColor = parent.color();
         List<Component> children = parent.children();
         if (!children.isEmpty()) {
-            TextColor lastColor = parent.color();
             for (int i = 0; i < children.size(); i++) {
-                Component child = children.get(i);
-                Component coloredChild = color(child);
-                if (coloredChild.color() == null && lastColor != null) {
-                    coloredChild = coloredChild.color(lastColor);
+                Component original = children.get(i);
+                Component child = original;
+                if (child.color() == null && lastColor != null) {
+                    child = child.color(lastColor);
                 }
-                if (coloredChild != child) {
+                child = color(child);
+                if (original != child) {
                     if (!(children instanceof ArrayList)) {
                         children = new ArrayList<>(children);
                     }
-                    children.set(i, coloredChild);
+                    children.set(i, child);
                 }
-                if (coloredChild.color() != null) {
-                    lastColor = coloredChild.color();
+                if (child.color() != null) {
+                    lastColor = child.color();
                 }
             }
             if (children instanceof ArrayList) {
                 parent = parent.children(children);
             }
+        }
+        if (parent.color() == null && lastColor != null) {
+            parent = parent.color(lastColor);
         }
         return parent;
     }
