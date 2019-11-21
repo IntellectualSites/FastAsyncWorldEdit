@@ -21,14 +21,12 @@ package com.sk89q.worldedit.command;
 
 import com.google.common.collect.Collections2;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.InspectBrush;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.command.tool.BlockReplacer;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
@@ -53,7 +51,6 @@ import com.sk89q.worldedit.internal.command.CommandUtil;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;

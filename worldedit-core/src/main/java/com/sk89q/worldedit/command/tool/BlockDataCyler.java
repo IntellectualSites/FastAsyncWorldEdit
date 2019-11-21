@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
@@ -33,7 +32,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 

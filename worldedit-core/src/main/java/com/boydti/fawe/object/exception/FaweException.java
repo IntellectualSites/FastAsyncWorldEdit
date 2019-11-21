@@ -1,11 +1,8 @@
 package com.boydti.fawe.object.exception;
 
-import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.extent.Extent;
 
 import java.util.Locale;

@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -29,15 +28,13 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
+
 import java.io.File;
 import java.util.List;
 import java.util.stream.Stream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.inject.InjectedValueAccess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

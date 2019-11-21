@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
@@ -51,12 +50,11 @@ import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import org.jetbrains.annotations.Range;
 
 import static com.google.common.base.Preconditions.checkNotNull;

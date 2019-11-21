@@ -1,8 +1,7 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
-import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;
@@ -32,6 +31,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
@@ -284,16 +284,17 @@ public class Fawe {
     }
 
     public void setupConfigs() {
-        MainUtil.copyFile(MainUtil.getJarFile(), "de/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "ru/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "ru/commands.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "tr/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "es/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "es/commands.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "nl/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "fr/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "cn/message.yml", null);
-        MainUtil.copyFile(MainUtil.getJarFile(), "it/message.yml", null);
+        MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "de/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/commands.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "tr/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "es/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "es/commands.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "nl/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "fr/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "cn/message.yml", null);
+//        MainUtil.copyFile(MainUtil.getJarFile(), "it/message.yml", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
@@ -312,7 +313,9 @@ public class Fawe {
             Settings.IMP.reload(file);
             // Setting up message.yml
             String lang = Objects.toString(Settings.IMP.LANGUAGE);
-            BBC.load(new File(this.IMP.getDirectory(), (lang.isEmpty() ? "" : lang + File.separator) + "message.yml"));
+            if (!lang.isEmpty()) {
+                getWorldEdit().getTranslationManager().setDefaultLocale(Locale.forLanguageTag(lang));
+            }
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");

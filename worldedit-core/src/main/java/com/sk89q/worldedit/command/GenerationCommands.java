@@ -18,14 +18,12 @@
  */
 
 package com.sk89q.worldedit.command;
-import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -59,7 +57,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -70,7 +68,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import org.enginehub.piston.inject.InjectedValueAccess;
+
 import org.jetbrains.annotations.Range;
 
 /**

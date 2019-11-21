@@ -139,7 +139,7 @@ public class TranslationManager {
         return false;
     }
 
-    private Map<String, String> getTranslationMap(Locale locale) {
+    public Map<String, String> getTranslationMap(Locale locale) {
         Map<String, String> translations = translationMap.get(locale);
         if (translations == null) {
             if (tryLoadTranslations(locale)) {

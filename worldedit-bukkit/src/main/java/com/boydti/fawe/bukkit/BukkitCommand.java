@@ -1,12 +1,11 @@
 package com.boydti.fawe.bukkit;
 
-import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.FaweCommand;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitBlockCommandSender;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
 import org.bukkit.command.BlockCommandSender;
@@ -28,7 +27,7 @@ public class BukkitCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, Command cmd, String label, String[] args) {
         final Actor plr = wrapCommandSender(sender);
         if (!sender.hasPermission(this.cmd.getPerm()) && !sender.isOp()) {
-            BBC.NO_PERM.send(plr, this.cmd.getPerm());
+            plr.printError(TranslatableComponent.of("fawe.error.no.perm", TextComponent.of(this.cmd.getPerm())));
             return true;
         }
         this.cmd.executeSafe(plr, args);

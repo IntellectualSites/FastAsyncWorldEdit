@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.jnbt.CompoundTag;
@@ -63,21 +62,16 @@ import com.sk89q.worldedit.regions.Regions;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
-import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.util.formatting.component.TextUtils;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import org.jetbrains.annotations.Range;
 
 import java.util.ArrayList;
@@ -86,7 +80,6 @@ import java.util.List;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.command.util.annotation.Confirm.Processor.ALWAYS;
 import static com.sk89q.worldedit.command.util.annotation.Confirm.Processor.RADIUS;
 import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;

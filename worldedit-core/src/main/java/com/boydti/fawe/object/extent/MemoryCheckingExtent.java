@@ -1,8 +1,6 @@
 package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.Permission;
 import com.boydti.fawe.util.WEManager;

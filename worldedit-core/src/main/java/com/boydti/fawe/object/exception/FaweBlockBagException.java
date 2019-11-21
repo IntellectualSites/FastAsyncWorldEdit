@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.exception;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class FaweBlockBagException extends FaweException {

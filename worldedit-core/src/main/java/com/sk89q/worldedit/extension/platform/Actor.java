@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -29,24 +29,15 @@ import com.boydti.fawe.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.MapMetadatable;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.auth.Subject;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.concurrent.locks.Condition;
 import java.util.Locale;
 
 /**
@@ -86,7 +77,9 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printDebug)
      */
     @Deprecated
-    void printDebug(String msg);
+    default void printDebug(String msg) {
+        printDebug(TextComponent.of(msg));
+    }
 
     /**
      * Print a WorldEdit message.
@@ -95,7 +88,9 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printInfo)
      */
     @Deprecated
-    void print(String msg);
+    default void print(String msg) {
+        printInfo(TextComponent.of(msg));
+    }
 
     /**
      * Print a WorldEdit error.
@@ -104,7 +99,10 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printError)
      */
     @Deprecated
-    void printError(String msg);
+    default void printError(String msg) {
+        printError(TextComponent.of(msg));
+    }
+
 
     /**
      * Print a WorldEdit error.
@@ -112,7 +110,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printError(Component component) {
-        print(component.color(TextColor.RED));
+        print(TranslatableComponent.of("error", component));
     }
 
     /**
@@ -121,7 +119,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printInfo(Component component) {
-        print(component.color(TextColor.GRAY));
+        print(TranslatableComponent.of("info", component));
     }
 
     /**
@@ -144,7 +142,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printDebug(Component component) {
-        print(component.color(TextColor.GRAY));
+        print(TranslatableComponent.of("debug", component));
     }
 
     /**

@@ -1,6 +1,8 @@
 {
 	"fawe.prefix": "&8(&4&lFAWE&8)&7 ",
-	
+	"error": "&c",
+	"info": "&7",
+	"debug": "&3",
 	"piston.style.help.text": "Help: {0}",
 	"piston.style.text.modifier": "TODO modifier: {0}, {1}, {2}",
 	"piston.style.main.text": "{0}",

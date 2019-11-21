@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,7 +34,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 
 import java.util.Iterator;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 /**

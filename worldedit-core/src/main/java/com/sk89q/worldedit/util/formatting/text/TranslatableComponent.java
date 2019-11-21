@@ -131,7 +131,7 @@ public interface TranslatableComponent extends BuildableComponent<TranslatableCo
 
     // FAWE added
     @Nonnull
-    static TranslatableComponent of(@Nonnull final String key, final Object... args) {
+    public static TranslatableComponent of(@Nonnull final String key, final Object... args) {
         List<Component> components = Arrays.stream(args)
                 .map(arg -> arg instanceof Component ? (Component) arg : TextComponent.of(Objects.toString(arg)))
                 .collect(Collectors.toList());

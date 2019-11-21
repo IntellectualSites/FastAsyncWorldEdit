@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.visitor;
 
-import com.boydti.fawe.config.BBC;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;

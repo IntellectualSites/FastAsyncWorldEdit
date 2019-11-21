@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.LazyClipboardHolder;

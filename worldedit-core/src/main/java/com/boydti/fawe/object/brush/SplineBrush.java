@@ -1,14 +1,11 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;

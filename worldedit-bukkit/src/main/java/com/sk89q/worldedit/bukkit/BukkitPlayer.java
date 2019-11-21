@@ -21,7 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
@@ -43,22 +43,16 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
-import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
-import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -174,25 +168,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void print(String msg) {
-        print(LegacyComponentSerializer.legacy().deserialize("&7" + msg, '&'));
-    }
-
-    @Override
-    public void printDebug(String msg) {
-        print(LegacyComponentSerializer.legacy().deserialize("&3" + msg, '&'));
-    }
-
-    @Override
-    public void printError(String msg) {
-        print(LegacyComponentSerializer.legacy().deserialize("&c" + msg, '&'));
-    }
-
-    @Override
     public void print(Component component) {
         Component prefix = TranslatableComponent.of("fawe.prefix");
         component = TextComponent.builder().append(prefix).append(component).build();
-        component = BBC.color(component, getLocale());
+        component = Caption.color(component, getLocale());
         TextAdapter.sendComponent(player, component);
     }
 

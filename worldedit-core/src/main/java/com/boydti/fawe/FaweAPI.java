@@ -1,9 +1,8 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -40,6 +39,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -456,11 +457,10 @@ public class FaweAPI {
     }
 
     /**
-     * @return
-     * @see BBC
+     * @return Map of translation ket to value
      */
-    public static BBC[] getTranslations() {
-        return BBC.values();
+    public static Map<String, String> getTranslations(Locale locale) {
+        return WorldEdit.getInstance().getTranslationManager().getTranslationMap(locale);
     }
 
 }

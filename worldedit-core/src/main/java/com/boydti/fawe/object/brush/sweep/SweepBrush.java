@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.sweep;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
