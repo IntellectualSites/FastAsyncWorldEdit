@@ -1,9 +1,10 @@
 package com.boydti.fawe.object.exception;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class FaweBlockBagException extends FaweException {
     public FaweBlockBagException() {
-        super(BBC.WORLDEDIT_SOME_FAILS_BLOCKBAG);
+        super(TranslatableComponent.of("fawe.error.worldedit.some.fails.blockbag"));
     }
 }

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -28,6 +29,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import java.io.File;
 import java.util.List;
@@ -70,7 +72,7 @@ public class ScriptingCommands {
                         @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
                             List<String> args) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
-            player.printError("You don't have permission to use that script.");
+            player.printError(TranslatableComponent.of("worldedit.execute.script-permissions"));
             return;
         }
 
@@ -96,12 +98,12 @@ public class ScriptingCommands {
         String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
-            player.printError(BBC.SCRIPTING_NO_PERM.s());
+            player.printError(TranslatableComponent.of("worldedit.execute.script-permissions"));
             return;
         }
 
         if (lastScript == null) {
-            player.printError(BBC.SCRIPTING_CS.s());
+            player.printError(TranslatableComponent.of("worldedit.executelast.no-script"));
             return;
         }
 

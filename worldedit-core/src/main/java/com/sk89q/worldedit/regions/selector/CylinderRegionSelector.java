@@ -22,6 +22,7 @@ package com.sk89q.worldedit.regions.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -37,6 +38,9 @@ import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.text.NumberFormat;
@@ -172,7 +176,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_CENTER.send(player, pos, 0);
+        player.printInfo(TranslatableComponent.of("worldedit.selection.cylinder.explain.primary", TextComponent.of(pos.toString())));
+
         session.describeCUI(player);
     }
 
@@ -181,9 +186,14 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         Vector3 center = region.getCenter();
 
         if (!center.equals(Vector3.ZERO)) {
-            BBC.SELECTOR_RADIUS.send(player, NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()), region.getArea());
+            player.printInfo(TranslatableComponent.of(
+                    "worldedit.selection.cylinder.explain.secondary",
+                    TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getX())),
+                    TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getZ())),
+                    TextComponent.of(region.getArea())
+            ));
         } else {
-            player.printError("You must select the center point before setting the radius.");
+            player.printError(TranslatableComponent.of("worldedit.selection.cylinder.explain.secondary-missing"));
             return;
         }
 
@@ -238,14 +248,14 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<String> getInformationLines() {
-        final List<String> lines = new ArrayList<>();
+    public List<Component> getSelectionInfoLines() {
+        final List<Component> lines = new ArrayList<>();
 
         if (!region.getCenter().equals(Vector3.ZERO)) {
-            lines.add("Center: " + region.getCenter());
+            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.center", TextComponent.of(region.getCenter().toString())));
         }
         if (!region.getRadius().equals(Vector2.ZERO)) {
-            lines.add("Radius: " + region.getRadius());
+            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.radius", TextComponent.of(region.getRadius().toString())));
         }
 
         return lines;

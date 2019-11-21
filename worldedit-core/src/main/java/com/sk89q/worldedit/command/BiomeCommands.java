@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -49,6 +50,11 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.component.TextUtils;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -58,6 +64,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
+import java.util.List;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
@@ -101,7 +108,7 @@ public class BiomeCommands {
                             })
                             .collect(Collectors.toList()));
              return paginationBox.create(page);
-        }, null);
+        }, (Component) null);
     }
 
     @Command(
@@ -118,24 +125,24 @@ public class BiomeCommands {
         BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
         Set<BiomeType> biomes = new HashSet<>();
-        String qualifier;
+        String messageKey;
 
         if (useLineOfSight) {
             Location blockPosition = player.getBlockTrace(300);
             if (blockPosition == null) {
-                player.printError(BBC.NO_BLOCK.s());
+                player.printError(TranslatableComponent.of("worldedit.raytrace.noblock"));
                 return;
             }
 
             BiomeType biome = player.getWorld().getBiome(blockPosition.toVector().toBlockPoint().toBlockVector2());
             biomes.add(biome);
 
-            qualifier = "at line of sight point";
+            messageKey = "worldedit.biomeinfo.lineofsight";
         } else if (usePosition) {
             BiomeType biome = player.getWorld().getBiome(player.getLocation().toVector().toBlockPoint().toBlockVector2());
             biomes.add(biome);
 
-            qualifier = "at your position";
+            messageKey = "worldedit.biomeinfo.position";
         } else {
             World world = player.getWorld();
             Region region = session.getSelection(world);
@@ -150,19 +157,18 @@ public class BiomeCommands {
                 }
             }
 
-            qualifier = "in your selection";
+            messageKey = "worldedit.biomeinfo.selection";
         }
 
-        BBC.BIOME_LIST_HEADER.send(player, 1, 1);
-        player.print(biomes.size() != 1 ? "Biomes " + qualifier + ":" : "Biome " + qualifier + ":");
-        for (BiomeType biome : biomes) {
+        List<Component> components = biomes.stream().map(biome -> {
             BiomeData data = biomeRegistry.getData(biome);
             if (data != null) {
-                player.print(" " + data.getName());
+                return TextComponent.of(data.getName()).hoverEvent(HoverEvent.showText(TextComponent.of(biome.getId())));
             } else {
-                player.print(" <unknown #" + biome.getId() + ">");
+                return TextComponent.of(biome.getId());
             }
-        }
+        }).collect(Collectors.toList());
+        player.printInfo(TranslatableComponent.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
     }
 
     @Command(
@@ -195,9 +201,13 @@ public class BiomeCommands {
         FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);
         Operations.completeLegacy(visitor);
 
-        BBC.BIOME_CHANGED.send(player, visitor.getAffected());
+        player.printInfo(TranslatableComponent.of(
+                "worldedit.setbiome.changed",
+                TextComponent.of(visitor.getAffected())
+        ));
         if (!player.hasPermission("fawe.tips")) {
-            BBC.TIP_BIOME_PATTERN.or(BBC.TIP_BIOME_MASK).send(player);
+            System.out.println("TODO FIXME tips");
+//            TranslatableComponent.of("fawe.tips.tip.biome.pattern").or(TranslatableComponent.of("fawe.tips.tip.biome.mask")).send(player);
         }
     }
 

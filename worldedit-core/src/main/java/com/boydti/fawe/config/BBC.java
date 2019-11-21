@@ -4,12 +4,21 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,6 +29,7 @@ public enum BBC {
      * Things to note about this class:
      * Can use multiple arguments %s, %s1, %s2, %s3 etc
      */
+    PREFIX("&4&lFAWE&7: ", "Info"),
     FILE_DELETED("%s0 has been deleted.", "Info"),
     SCHEMATIC_PASTING("&7The schematic is pasting. This cannot be undone.", "Info"),
     LIGHTING_PROPAGATE_SELECTION("Lighting has been propogated in %s0 chunks. (Note: To remove light use //removelight)", "Info"),
@@ -135,7 +145,6 @@ public enum BBC {
     BRUSH_TRANSFORM_DISABLED("Brush transform disabled", "WorldEdit.Brush"),
     BRUSH_TRANSFORM("Brush transform set", "WorldEdit.Brush"),
     BRUSH_MATERIAL("Brush material set", "WorldEdit.Brush"),
-
 
     ROLLBACK_ELEMENT("Undoing %s0", "WorldEdit.Rollback"),
 
@@ -309,6 +318,8 @@ public enum BBC {
     SCRIPTING_CS("Use /cs with a script name first.", "WorldEdit.Scripting"),
     SCRIPTING_ERROR("An error occured while executing a craft script", "WorldEdit.Scripting"),
 
+
+
     TIP_SEL_LIST("Tip: See the different selection modes with //sel list", "Tips"),
     TIP_SELECT_CONNECTED("Tip: Select all connected blocks with //sel fuzzy", "Tips"),
     TIP_SET_POS1("Tip: Use pos1 as a pattern with //set pos1", "Tips"),
@@ -377,7 +388,7 @@ public enum BBC {
      */
     BBC(String defaultMessage, String category) {
         this.defaultMessage = defaultMessage;
-        this.translatedMessage = defaultMessage;
+        setTranslated(defaultMessage);
         this.category = category.toLowerCase(Locale.ROOT);
     }
 
@@ -428,7 +439,7 @@ public enum BBC {
                         yml.set(caption.category + "." + caption.name().toLowerCase(Locale.ROOT), value);
                     }
                     captions.add(caption);
-                    caption.translatedMessage = (String) value;
+                    caption.setTranslated((String) value);
                 } else {
                     toRemove.add(key);
                 }
@@ -449,6 +460,10 @@ public enum BBC {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setTranslated(String msg) {
+        this.translatedMessage = msg;
     }
 
     @Override
@@ -507,6 +522,49 @@ public enum BBC {
         } else {
             player.print(this.format(args));
         }
+    }
+
+    /**
+     * Colorize a component with legacy color codes
+     * @param parent
+     * @param locale
+     * @return Component
+     */
+    public static Component color(Component component, Locale locale) {
+        return color(WorldEditText.format(component, locale));
+    }
+
+    public static Component color(Component parent) {
+        if (parent instanceof TextComponent) {
+            TextComponent text = (TextComponent) parent;
+            String content = text.content();
+            if (content.indexOf('&') != -1) {
+                Component legacy = LegacyComponentSerializer.legacy().deserialize(content, '&');
+                legacy = legacy.style(parent.style());
+                if (!parent.children().isEmpty()) {
+                    parent = TextComponent.builder().append(legacy).append(parent.children()).build();
+                } else {
+                    parent = legacy;
+                }
+            }
+        }
+        List<Component> children = parent.children();
+        if (!children.isEmpty()) {
+            for (int i = 0; i < children.size(); i++) {
+                Component child = children.get(i);
+                Component coloredChild = color(child);
+                if (coloredChild != child) {
+                    if (!(children instanceof ArrayList)) {
+                        children = new ArrayList<>(children);
+                    }
+                    children.set(i, coloredChild);
+                }
+            }
+            if (children instanceof ArrayList) {
+                parent = parent.children(children);
+            }
+        }
+        return parent;
     }
 
 }

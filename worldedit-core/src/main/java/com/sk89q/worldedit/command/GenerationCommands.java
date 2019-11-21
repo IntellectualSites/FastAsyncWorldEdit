@@ -26,6 +26,7 @@ import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgum
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
@@ -53,10 +54,12 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -108,7 +111,7 @@ public class GenerationCommands {
                       @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
         CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
         editSession.generate(region, gen);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
 
@@ -121,7 +124,7 @@ public class GenerationCommands {
     @Confirm(Confirm.Processor.REGION)
     public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
         editSession.addOres(region, mask);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -162,7 +165,7 @@ public class GenerationCommands {
             return false;
         });
         Operations.completeBlindly(visitor);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -174,7 +177,7 @@ public class GenerationCommands {
     @Confirm(Confirm.Processor.REGION)
     public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY) throws WorldEditException {
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-        BBC.VISITOR_BLOCK.send(actor, editSession.getBlockChangeCount());
+        actor.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -211,7 +214,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.cyl.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -252,7 +255,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.sphere.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -272,7 +275,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size);
         density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
-        actor.print(affected + " trees created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.forestgen.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -290,7 +293,7 @@ public class GenerationCommands {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
-        actor.print(affected + " pumpkin patches created.");
+        actor.printInfo(TranslatableComponent.of("worldedit.pumpkins.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -327,7 +330,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        BBC.VISITOR_BLOCK.send(actor, affected);
+        actor.printInfo(TranslatableComponent.of("worldedit.pyramid.created", TextComponent.of(affected)));
     }
 
     @Command(
@@ -388,9 +391,9 @@ public class GenerationCommands {
             if (actor instanceof Player) {
                 ((Player) actor).findFreePosition();
             }
-            BBC.VISITOR_BLOCK.send(actor, affected);
+            actor.printInfo(TranslatableComponent.of("worldedit.generate.created", TextComponent.of(affected)));
         } catch (ExpressionException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -449,9 +452,9 @@ public class GenerationCommands {
         final Vector3 unit1 = unit;
         try {
             final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
-            BBC.VISITOR_FLAT.send(actor, affected);
+            actor.printInfo(TranslatableComponent.of("worldedit.generatebiome.changed", TextComponent.of(affected)));
         } catch (ExpressionException e) {
-            actor.printError(e.getMessage());
+            actor.printError(TextComponent.of(e.getMessage()));
         }
     }
 

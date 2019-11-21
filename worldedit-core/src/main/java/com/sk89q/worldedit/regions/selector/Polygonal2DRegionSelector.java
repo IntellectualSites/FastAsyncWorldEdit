@@ -22,6 +22,7 @@ package com.sk89q.worldedit.regions.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -35,6 +36,9 @@ import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.util.Collections;
@@ -169,7 +173,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
+        player.printInfo(TranslatableComponent.of("worldedit.selection.polygon2d.explain.primary", TextComponent.of(pos.toString())));
 
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getArea()));
@@ -178,7 +182,11 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_POS.send(player, region.size(), pos, region.getArea());
+        player.printInfo(TranslatableComponent.of(
+                "worldedit.selection.polygon2d.explain.secondary",
+                TextComponent.of(region.size()),
+                TextComponent.of(pos.toString())
+        ));
 
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(region.size() - 1, pos, getArea()));
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));
@@ -236,8 +244,8 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<String> getInformationLines() {
-        return Collections.singletonList("# points: " + region.size());
+    public List<Component> getSelectionInfoLines() {
+        return Collections.singletonList(TranslatableComponent.of("worldedit.selection.polygon2d.info", TextComponent.of(region.size())));
     }
 
     @Override

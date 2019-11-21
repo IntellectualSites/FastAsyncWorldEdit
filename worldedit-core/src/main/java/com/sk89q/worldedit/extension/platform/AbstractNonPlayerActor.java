@@ -75,7 +75,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
         } else {
             FaweException fe = FaweException.get(throwable);
             if (fe != null) {
-                printError(fe.getMessage());
+                printError(fe.getComponent());
             } else {
                 throwable.printStackTrace();
             }

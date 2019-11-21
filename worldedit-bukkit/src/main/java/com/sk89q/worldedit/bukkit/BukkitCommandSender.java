@@ -22,6 +22,8 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.WorldEdit;
+
 import com.sk89q.worldedit.extension.platform.AbstractNonPlayerActor;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -29,6 +31,8 @@ import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import java.util.UUID;
+
+import java.util.Locale;
 import javax.annotation.Nullable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -93,7 +97,7 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(sender, WorldEditText.format(component));
+        TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));
     }
 
     @Override
@@ -111,6 +115,11 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
     @Override
     public void checkPermission(String permission) throws AuthorizationException {
+    }
+
+    @Override
+    public Locale getLocale() {
+        return WorldEdit.getInstance().getConfiguration().defaultLocale;
     }
 
     @Override

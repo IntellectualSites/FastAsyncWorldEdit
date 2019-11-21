@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -29,6 +30,8 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -62,7 +65,7 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {
         player.findFreePosition();
-        player.print("There you go!");
+        player.printInfo(TranslatableComponent.of("worldedit.unstuck.moved"));
     }
 
     @Command(
@@ -82,9 +85,9 @@ public class NavigationCommands {
             }
         }
         if (ascentLevels == 0) {
-            player.printError(BBC.ASCEND_FAIL.s());
+            player.printError(TranslatableComponent.of("worldedit.ascend.obstructed"));
         } else {
-            player.print((ascentLevels != 1) ? "Ascended " + ascentLevels + " levels." : "Ascended a level.");
+            player.printInfo(TranslatableComponent.of("worldedit.ascend.moved", TextComponent.of(ascentLevels)));
         }
     }
 
@@ -105,11 +108,9 @@ public class NavigationCommands {
             }
         }
         if (descentLevels == 0) {
-            player.printError(BBC.DESCEND_FAIL.s());
-        } else if (descentLevels == 1) {
-            player.print(BBC.DESCEND_SINGULAR.s());
+            player.printError(TranslatableComponent.of("worldedit.descend.obstructed"));
         } else {
-            player.print((descentLevels != 1) ? "Descended " + descentLevels + " levels." : "Descended a level.");
+            player.printInfo(TranslatableComponent.of("worldedit.descend.moved", TextComponent.of(descentLevels)));
         }
     }
 
@@ -130,9 +131,9 @@ public class NavigationCommands {
 
         boolean alwaysGlass = getAlwaysGlass(forceFlight, forceGlass);
         if (player.ascendToCeiling(clearance, alwaysGlass)) {
-            player.print(BBC.WHOOSH.s());
+            player.printInfo(TranslatableComponent.of("worldedit.ceil.moved"));
         } else {
-            player.printError(BBC.ASCEND_FAIL.s());
+            player.printError(TranslatableComponent.of("worldedit.ceil.obstructed"));
         }
     }
 
@@ -143,9 +144,9 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.thru.command")
     public void thru(Player player) throws WorldEditException {
         if (player.passThroughForwardWall(6)) {
-            player.print(BBC.WHOOSH.s());
+            player.printInfo(TranslatableComponent.of("worldedit.thru.moved"));
         } else {
-            player.printError(BBC.THRU_FAIL.s());
+            player.printError(TranslatableComponent.of("worldedit.thru.obstructed"));
         }
     }
 
@@ -165,14 +166,10 @@ public class NavigationCommands {
             pos = player.getSolidBlockTrace(300);
         }
         if (pos != null) {
-            if (force) {
-                player.setPosition(pos);
-            } else {
-                player.findFreePosition(pos);
-            }
-            player.print(BBC.POOF.s());
+            player.findFreePosition(pos);
+            player.printInfo(TranslatableComponent.of("worldedit.jumpto.moved"));
         } else {
-            player.printError(BBC.NO_BLOCK.s());
+            player.printError(TranslatableComponent.of("worldedit.jumpto.none"));
         }
     }
 
@@ -191,9 +188,9 @@ public class NavigationCommands {
                        boolean forceGlass) throws WorldEditException {
         boolean alwaysGlass = getAlwaysGlass(forceFlight, forceGlass);
         if (player.ascendUpwards(distance, alwaysGlass)) {
-            player.print(BBC.WHOOSH.s());
+            player.printInfo(TranslatableComponent.of("worldedit.up.moved"));
         } else {
-            player.printError(BBC.UP_FAIL.s());
+            player.printError(TranslatableComponent.of("worldedit.up.obstructed"));
         }
     }
 

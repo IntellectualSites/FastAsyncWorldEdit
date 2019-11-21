@@ -21,6 +21,8 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
@@ -40,11 +42,17 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
+import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
@@ -167,28 +175,25 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(String msg) {
-        for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7d" + part);
-        }
+        print(LegacyComponentSerializer.legacy().deserialize("&7" + msg, '&'));
     }
 
     @Override
     public void printDebug(String msg) {
-        for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A77" + part);
-        }
+        print(LegacyComponentSerializer.legacy().deserialize("&3" + msg, '&'));
     }
 
     @Override
     public void printError(String msg) {
-        for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
-        }
+        print(LegacyComponentSerializer.legacy().deserialize("&c" + msg, '&'));
     }
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(player, WorldEditText.format(component));
+        Component prefix = TranslatableComponent.of("fawe.prefix");
+        component = TextComponent.builder().append(prefix).append(component).build();
+        component = BBC.color(component, getLocale());
+        TextAdapter.sendComponent(player, component);
     }
 
     @Override
@@ -292,6 +297,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
         return player.teleport(BukkitAdapter.adapt(location));
     }
 
+    @Override
+    public Locale getLocale() {
+        return Locale.forLanguageTag(player.getLocale().replace('_', '-'));
+    }
+
     @Nullable
     @Override
     public <T> T getFacet(Class<? extends T> cls) {
@@ -361,10 +371,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void sendTitle(String title, String sub) {
-        player.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
-        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
-        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
+    public void sendTitle(Component title, Component sub) {
+        String titleStr = WorldEditText.reduceToText(title, getLocale());
+        String subStr = WorldEditText.reduceToText(sub, getLocale());
+        player.sendTitle(titleStr, subStr, 0, 70, 20);
     }
 
     @Override

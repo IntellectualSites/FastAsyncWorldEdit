@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.util.MathMan;
@@ -39,7 +40,7 @@ public class SurfaceSpline implements Brush {
             if (max == -1) return;
 //            pos.mutY(max);
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
+            editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.primary.2"));
             if (!vis) return;
         }
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
@@ -93,6 +94,6 @@ public class SurfaceSpline implements Brush {
             editSession.setBlocks(newSet, pattern);
             if (!vis) path.clear();
         }
-        editSession.getPlayer().print(BBC.BRUSH_SPLINE_SECONDARY.s());
+        editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary"));
     }
 }

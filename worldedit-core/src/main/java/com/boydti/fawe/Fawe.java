@@ -2,6 +2,7 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;

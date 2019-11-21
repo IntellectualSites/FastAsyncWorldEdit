@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
@@ -41,6 +42,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -49,6 +51,7 @@ import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -86,13 +89,13 @@ public class HistoryCommands {
     @CommandPermissions("worldedit.history.rollback")
     public void faweRollback(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(from = 0, to=Integer.MAX_VALUE) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
+            player.print(TranslatableComponent.of("fawe.error.setting.disable" , "history.use-database (Import with /frb #import )"));
             return;
         }
         if (user.charAt(0) == '#') {
             if (user.equals("#import")) {
                 if (!player.hasPermission("fawe.rollback.import")) {
-                    BBC.NO_PERM.send(player, "fawe.rollback.import");
+                    player.print(TranslatableComponent.of("fawe.error.no.perm", "fawe.rollback.import"));
                     return;
                 }
                 File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY);
@@ -145,7 +148,7 @@ public class HistoryCommands {
             }
             String toParse = user.substring(1);
             if (!MathMan.isInteger(toParse)) {
-                BBC.COMMAND_SYNTAX.send(player, "/frb #<index>");
+                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb #<index>"));
                 return;
             }
             int index = Integer.parseInt(toParse);
@@ -155,24 +158,24 @@ public class HistoryCommands {
             if (file.getBDFile().exists()) {
                 if (restore) file.redo(player);
                 else file.undo(player);
-                BBC.ROLLBACK_ELEMENT.send(player, world.getName() + "/" + user + "-" + index);
+                player.print(TranslatableComponent.of("fawe.worldedit.rollback.rollback.element" , world.getName() + "/" + user + "-" + index));
             } else {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, 0);
+                player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , 0));
             }
             return;
         }
         UUID other = Fawe.imp().getUUID(user);
         if (other == null) {
-            BBC.PLAYER_NOT_FOUND.send(player, user);
+            player.print(TranslatableComponent.of("fawe.error.player.not.found" , user));
             return;
         }
         if (radius == 0) {
-            BBC.COMMAND_SYNTAX.send(player, "/frb " + user + " <radius> <time>");
+            player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb " + user + " <radius> <time>"));
             return;
         }
         long timeDiff = MainUtil.timeToSec(time) * 1000;
         if (timeDiff == 0) {
-            BBC.COMMAND_SYNTAX.send(player, "/frb " + user + " " + radius + " <time>");
+            player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb " + user + " " + radius + " <time>"));
             return;
         }
         radius = Math.max(Math.min(500, radius), 0);
@@ -187,7 +190,7 @@ public class HistoryCommands {
 
         Region[] allowedRegions = player.getCurrentRegions(FaweMaskManager.MaskType.OWNER);
         if (allowedRegions == null) {
-            player.printError(BBC.NO_REGION.s());
+            player.printError(TranslatableComponent.of("fawe.error.no.region"));
             return;
         }
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
@@ -201,10 +204,10 @@ public class HistoryCommands {
             @Override
             public void run(DiskStorageHistory edit) {
                 edit.undo(player, allowedRegions);
-                BBC.ROLLBACK_ELEMENT.send(player, edit.getWorld().getName() + "/" + user + "-" + edit.getIndex());
+                player.print(TranslatableComponent.of("fawe.worldedit.rollback.rollback.element" , edit.getWorld().getName() + "/" + user + "-" + edit.getIndex()));
                 count.incrementAndGet();
             }
-        }, () -> BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count), true, restore);
+        }, () -> player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count)), true, restore);
     }
 
     @Command(
@@ -233,14 +236,14 @@ public class HistoryCommands {
         times = Math.max(1, times);
         LocalSession undoSession = session;
         if (session.hasFastMode()) {
-            player.print(BBC.COMMAND_UNDO_DISABLED.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
         if (playerName != null) {
             player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {
-                player.printError("Unable to find session for " + playerName);
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
@@ -255,9 +258,9 @@ public class HistoryCommands {
             }
         }
         if (timesUndone > 0) {
-            player.print("Undid " + timesUndone + " available edits.");
+            player.printInfo(TranslatableComponent.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
         } else {
-            player.printError("Nothing left to undo.");
+            player.printError(TranslatableComponent.of("worldedit.undo.none"));
         }
     }
 
@@ -278,7 +281,7 @@ public class HistoryCommands {
             player.checkPermission("worldedit.history.redo.other");
             redoSession = worldEdit.getSessionManager().findByName(playerName);
             if (redoSession == null) {
-                BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
@@ -293,9 +296,9 @@ public class HistoryCommands {
             }
         }
         if (timesRedone > 0) {
-            BBC.COMMAND_REDO_SUCCESS.send(player, timesRedone == 1 ? "" : " x" + timesRedone);
+            player.printInfo(TranslatableComponent.of("worldedit.redo.redid", TextComponent.of(timesRedone)));
         } else {
-            player.printError(BBC.COMMAND_REDO_ERROR.s());
+            player.printError(TranslatableComponent.of("worldedit.redo.none"));
         }
     }
 
@@ -307,7 +310,7 @@ public class HistoryCommands {
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        actor.print("History cleared.");
+        actor.printInfo(TranslatableComponent.of("worldedit.clearhistory.cleared"));
     }
 
 }

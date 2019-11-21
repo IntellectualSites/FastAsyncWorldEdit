@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
@@ -424,7 +425,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(BBC.BLOCK_NOT_ALLOWED + " '" + holder + "'");
+                throw new DisallowedUsageException(TranslatableComponent.of("fawe.error.block.not.allowed") + " '" + holder + "'");
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {

@@ -21,6 +21,7 @@ package com.sk89q.worldedit;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RegionWrapper;
@@ -700,7 +701,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     }
                 }
 
-                BBC.WORLDEDIT_SOME_FAILS_BLOCKBAG.send(player, str.toString());
+                player.print(TranslatableComponent.of("fawe.error.worldedit.some.fails.blockbag", str.toString()));
             }
         }
         return Collections.emptyMap();
@@ -1020,11 +1021,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         FaweLimit used = getLimitUsed();
         if (used.MAX_FAILS > 0) {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
-                BBC.WORLDEDIT_SOME_FAILS.send(player, used.MAX_FAILS);
+                player.print(TranslatableComponent.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null){
-                player.printError(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION.s());
+                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
             } else {
-                player.printError(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_LEVEL.s());
+                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
             }
         }
         // Reset limit

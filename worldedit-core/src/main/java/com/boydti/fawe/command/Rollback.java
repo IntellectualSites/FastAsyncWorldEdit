@@ -3,6 +3,7 @@ package com.boydti.fawe.command;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.RegionWrapper;
@@ -34,11 +35,11 @@ public class Rollback extends FaweCommand {
         }
         Player player = (Player) actor;
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
+            player.print(TranslatableComponent.of("fawe.error.setting.disable" , "history.use-database (Import with /frb #import )"));
             return false;
         }
         if (args.length != 3) {
-            BBC.COMMAND_SYNTAX.send(player, "/frb u:<uuid> r:<radius> t:<time>");
+            player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb u:<uuid> r:<radius> t:<time>"));
             return false;
         }
         switch (args[0]) {
@@ -46,13 +47,13 @@ public class Rollback extends FaweCommand {
             case "info":
             case "undo":
             case "revert":
-                BBC.COMMAND_SYNTAX.send(player, "/frb u:<uuid> r:<radius> t:<time>");
+                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb u:<uuid> r:<radius> t:<time>"));
                 return false;
         }
 
 
         if (args.length < 1) {
-            BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
+            player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb <info|undo> u:<uuid> r:<radius> t:<time>"));
             return false;
         }
         World world = player.getWorld();
@@ -60,7 +61,7 @@ public class Rollback extends FaweCommand {
             case "i":
             case "info":
                 if (args.length < 2) {
-                    BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
+                    player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb <info|undo> u:<uuid> r:<radius> t:<time>"));
                     return false;
                 }
                 player.deleteMeta(Player.METADATA_KEYS.ROLLBACK);
@@ -101,13 +102,13 @@ public class Rollback extends FaweCommand {
             case "undo":
             case "revert":
                 if (!player.hasPermission("fawe.rollback.perform")) {
-                    BBC.NO_PERM.send(player, "fawe.rollback.perform");
+                    player.print(TranslatableComponent.of("fawe.error.no.perm", "fawe.rollback.perform"));
                     return false;
                 }
                 final List<DiskStorageHistory> edits = player.getMeta(Player.METADATA_KEYS.ROLLBACK);
                 player.deleteMeta(Player.METADATA_KEYS.ROLLBACK);
                 if (edits == null) {
-                    BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
+                    player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb info u:<uuid> r:<radius> t:<time>"));
                     return false;
                 }
                 for (DiskStorageHistory edit : edits) {
@@ -119,7 +120,7 @@ public class Rollback extends FaweCommand {
                 }
                 player.print("Rollback complete!");
             default:
-                BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
+                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb info u:<uuid> r:<radius> t:<time>"));
                 return false;
         }
         return true;
@@ -132,7 +133,7 @@ public class Rollback extends FaweCommand {
         for (String arg : args) {
             String[] split = arg.split(":");
             if (split.length != 2) {
-                BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
+                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb <info|undo> u:<uuid> r:<radius> t:<time>"));
                 return;
             }
             switch (split[0].toLowerCase()) {
@@ -165,7 +166,7 @@ public class Rollback extends FaweCommand {
                     time = MainUtil.timeToSec(split[1]) * 1000;
                     break;
                 default:
-                    BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
+                    player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/frb <info|undo> u:<uuid> r:<radius> t:<time>"));
                     return;
             }
         }

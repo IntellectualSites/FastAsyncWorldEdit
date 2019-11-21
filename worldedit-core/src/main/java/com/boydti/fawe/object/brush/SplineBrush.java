@@ -2,6 +2,7 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.mask.IdMask;
@@ -94,13 +95,13 @@ public class SplineBrush implements Brush, ResettableTool {
                 points.add(position);
             }
             this.positionSets.add(points);
-            player.print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.primary.2"));
             if (!visualization) {
                 return;
             }
         }
         if (positionSets.size() < 2) {
-            player.print(BBC.BRUSH_SPLINE_SECONDARY_ERROR.s());
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary.error"));
             return;
         }
         List<Vector3> centroids = new ArrayList<>();
@@ -132,7 +133,7 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
         }
-        player.print(BBC.BRUSH_SPLINE_SECONDARY.s());
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary"));
         if (visualization) {
             numSplines = originalSize;
             positionSets.remove(positionSets.size() - 1);

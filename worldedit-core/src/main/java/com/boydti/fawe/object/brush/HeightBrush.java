@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
@@ -46,7 +47,7 @@ public class HeightBrush implements Brush {
             try {
                 heightMap = ScalableHeightMap.fromPNG(stream);
             } catch (IOException e) {
-                throw new FaweException(BBC.BRUSH_HEIGHT_INVALID);
+                throw new FaweException(TranslatableComponent.of("fawe.worldedit.brush.brush.height.invalid"));
             }
         } else if (clipboard != null) {
             heightMap = ScalableHeightMap.fromClipboard(clipboard);

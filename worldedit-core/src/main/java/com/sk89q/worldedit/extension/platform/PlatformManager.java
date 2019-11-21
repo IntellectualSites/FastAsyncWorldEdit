@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
@@ -385,7 +386,7 @@ public class PlatformManager {
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
+            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason" , faweException.getComponent()));
         } else {
             actor.printError("Please report this error: [See console]");
             actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
@@ -437,7 +438,7 @@ public class PlatformManager {
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                BBC.WORLDEDIT_CANCEL_REASON.send(player, faweException.getMessage());
+                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason" , faweException.getComponent()));
             } else {
                 player.printError("Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());

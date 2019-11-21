@@ -52,7 +52,7 @@ public class AnvilCommands {
 //        boolean copy = false;
 //        if (FaweAPI.getWorld(folder) != null) {
 //            if (!force) {
-//                BBC.WORLD_IS_LOADED.send(player);
+//                player.print(TranslatableComponent.of("fawe.worldedit.anvil.world.is.loaded"))
 //                return null;
 //            }
 //            copy = true;
@@ -80,7 +80,7 @@ public class AnvilCommands {
 //    @Deprecated
 //    public static <G, T extends MCAFilter<G>> T runWithSelection(Player player, EditSession editSession, Region selection, T filter) {
 //        if (!(selection instanceof CuboidRegion)) {
-//            BBC.NO_REGION.send(player);
+//            player.print(TranslatableComponent.of("fawe.error.no.region"))
 //            return null;
 //        }
 //        CuboidRegion cuboid = (CuboidRegion) selection;
@@ -131,7 +131,7 @@ public class AnvilCommands {
 //        final FaweBlockMatcher matchTo = FaweBlockMatcher.setBlocks(worldEdit.getBlocks(player, to, true));
 //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
 //        ReplaceSimpleFilter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//        if (result != null) player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
     }
 
     @Command(
@@ -148,7 +148,7 @@ public class AnvilCommands {
 //        RemapFilter filter = new RemapFilter(from, to);
 //        RemapFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -167,7 +167,7 @@ public class AnvilCommands {
 //        DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
 //        DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -190,7 +190,7 @@ public class AnvilCommands {
 //        }
 //        DeleteUnclaimedFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -212,7 +212,7 @@ public class AnvilCommands {
 //        }
 //        DeleteUnclaimedFilter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -229,7 +229,7 @@ public class AnvilCommands {
 //        DeleteOldFilter filter = new DeleteOldFilter(duration);
 //        DeleteOldFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -249,7 +249,7 @@ public class AnvilCommands {
 //        MCAQueue queue = new MCAQueue(defaultQueue);
 //        PlotTrimFilter result = queue.filterWorld(filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -262,7 +262,7 @@ public class AnvilCommands {
 //        DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);  TODO NOT IMPLEMENTED
 //        DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -275,7 +275,7 @@ public class AnvilCommands {
 //        TrimAirFilter filter = new TrimAirFilter();  TODO NOT IMPLEMENTED
 //        TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -289,7 +289,7 @@ public class AnvilCommands {
 //        DebugFixP2Roads filter = new DebugFixP2Roads();  TODO NOT IMPLEMENTED
 //        DebugFixP2Roads result = runWithWorld(player, folder, filter, true, true);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -319,7 +319,7 @@ public class AnvilCommands {
 //            filter = new ReplacePatternFilter(matchFrom, to);
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//        if (result != null) player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
     }
 
     //
@@ -341,7 +341,7 @@ public class AnvilCommands {
 //            filter = counter;
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.SELECTION_COUNT.format(result.getTotal()));
+//        if (result != null) player.print(TranslatableComponent.of("fawe.worldedit.selection.selection.count", (result.getTotal())));
     }
 
     @Command(
@@ -393,7 +393,7 @@ public class AnvilCommands {
 //        };
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -415,7 +415,7 @@ public class AnvilCommands {
 //            filter = counter;
 //        }
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
-//        if (result != null) player.print(BBC.SELECTION_COUNT.format(result.getTotal()));
+//        if (result != null) player.print(TranslatableComponent.of("fawe.worldedit.selection.selection.count", (result.getTotal())));
     }
 
     //
@@ -514,7 +514,7 @@ public class AnvilCommands {
 //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -546,7 +546,7 @@ public class AnvilCommands {
 //        }
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -560,7 +560,7 @@ public class AnvilCommands {
 //        MCAFilterCounter filter = new SetPatternFilter(to);  TODO NOT IMPLEMENTED
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -578,7 +578,7 @@ public class AnvilCommands {
 //        RemoveLayerFilter filter = new RemoveLayerFilter(minY, maxY, id);
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block", (result.getTotal())));
 //        }
     }
 
@@ -590,7 +590,7 @@ public class AnvilCommands {
     @CommandPermissions("worldedit.anvil.copychunks")
     public void copy(Player player, LocalSession session, EditSession editSession, @Selection Region selection) throws WorldEditException {
 //        if (!(selection instanceof CuboidRegion)) {  TODO NOT IMPLEMENTED
-//            BBC.NO_REGION.send(player);
+//            player.print(TranslatableComponent.of("fawe.error.no.region"))
 //            return;
 //        }
 //        CuboidRegion cuboid = (CuboidRegion) selection;
@@ -601,7 +601,7 @@ public class AnvilCommands {
 //        MCAClipboard clipboard = new MCAClipboard(queue, cuboid, origin);
 //        FawePlayer fp = FawePlayer.wrap(player);
 //        fp.setMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD, clipboard);
-//        BBC.COMMAND_COPY.send(player, selection.getArea());
+//        player.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy" , selection.getArea()));
     }
 
     @Command(
@@ -638,6 +638,6 @@ public class AnvilCommands {
 //                pasteQueue.pasteRegion(copyQueue, copyRegion, offset, iAnvilHistory);
 //            } catch (IOException e) { throw new RuntimeException(e); }
 //        });
-//        BBC.COMMAND_PASTE.send(player, player.getPosition().toBlockVector());
+//        player.print(TranslatableComponent.of("fawe.worldedit.paste.command.paste" , player.getPosition().toBlockVector()));
     }
 }

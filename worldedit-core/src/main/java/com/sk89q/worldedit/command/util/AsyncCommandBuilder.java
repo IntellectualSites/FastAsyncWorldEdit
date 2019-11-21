@@ -55,7 +55,7 @@ public final class AsyncCommandBuilder<T> {
     @Nullable
     private String description;
     @Nullable
-    private String delayMessage;
+    private Component delayMessage;
 
     @Nullable
     private Component successMessage;
@@ -84,7 +84,12 @@ public final class AsyncCommandBuilder<T> {
         return this;
     }
 
+    @Deprecated
     public AsyncCommandBuilder<T> sendMessageAfterDelay(String message) {
+        return sendMessageAfterDelay(TextComponent.of(checkNotNull(message)));
+    }
+
+    public AsyncCommandBuilder<T> sendMessageAfterDelay(Component message) {
         this.delayMessage = checkNotNull(message);
         return this;
     }
@@ -98,7 +103,7 @@ public final class AsyncCommandBuilder<T> {
 
     public AsyncCommandBuilder<T> onSuccess(@Nullable String message, @Nullable Consumer<T> consumer) {
         checkArgument(message != null || consumer != null, "Can't have null message AND consumer");
-        this.successMessage = message == null ? null : TextComponent.of(message, TextColor.LIGHT_PURPLE);
+        this.successMessage = message == null ? null : TextComponent.of(message, TextColor.GRAY);
         this.consumer = consumer;
         return this;
     }

@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import com.sk89q.worldedit.EditSession;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -56,6 +57,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -110,7 +112,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             } else {
                 FaweException fe = FaweException.get(throwable);
                 if (fe != null) {
-                    printError(fe.getMessage());
+                    printError(fe.getComponent());
                 } else {
                     throwable.printStackTrace();
                 }
@@ -358,10 +360,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 if (platformY < initialY) { // if ==, they already have the given clearance, if <, clearance is too large
-                    printError("Not enough space above you!");
                     return false;
                 } else if (platformY == initialY) {
-                    printError("You're already at the ceiling.");
                     return false;
                 }
                 floatAt(x, platformY + 1, z, alwaysGlass);
@@ -590,13 +590,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public File openFileOpenDialog(String[] extensions) {
-        printError("File dialogs are not supported in your environment.");
+        printError(TranslatableComponent.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 
     @Override
     public File openFileSaveDialog(String[] extensions) {
-        printError("File dialogs are not supported in your environment.");
+        printError(TranslatableComponent.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 
@@ -645,7 +645,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     }
 
-    @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("Not supported");

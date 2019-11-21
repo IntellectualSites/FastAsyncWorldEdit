@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
@@ -36,9 +37,13 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.NoCapablePlatformException;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,8 +52,8 @@ import java.time.format.TextStyle;
 import java.time.zone.ZoneRulesException;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -76,37 +81,45 @@ public class WorldEditCommands {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
         actor.print("FastAsyncWorldEdit" + fVerStr + " created by Empire92");
-
+		
         if (fVer != null) {
-            actor.printDebug("----------- Platforms -----------");
             FaweVersion version = Fawe.get().getVersion();
             Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
                 .getTime();
-            actor.printDebug(" - DATE: " + date.toLocaleString());
-            actor.printDebug(" - COMMIT: " + Integer.toHexString(version.hash));
-            actor.printDebug(" - BUILD: " + version.build);
-            actor.printDebug(" - PLATFORM: " + Settings.IMP.PLATFORM);
-            actor.printDebug("------------------------------------");
+						
+			TextComponent dateArg = TextComponent.of(date.toLocaleString());
+			TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
+			TextComponent buildArg = TextComponent.of(version.build);
+			TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);	
+			
+			actor.printInfo(TranslatableComponent.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
         }
+		
+		actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki"));
+		
         PlatformManager pm = we.getPlatformManager();
 
-        actor.printDebug("----------- Platforms -----------");
+        TextComponentProducer producer = new TextComponentProducer();
         for (Platform platform : pm.getPlatforms()) {
-            actor.printDebug(String.format("* %s (%s)", platform.getPlatformName(), platform.getPlatformVersion()));
+            producer.append(
+                    TextComponent.of("* ", TextColor.GRAY)
+                    .append(TextComponent.of(platform.getPlatformName()))
+                    .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
+            ).newline();
         }
-
-        actor.printDebug("----------- Capabilities -----------");
-        for (Capability capability : Capability.values()) {
-            try {
-                Platform platform = pm.queryCapability(capability);
-                actor.printDebug(String.format("%s: %s", capability.name(),
-                    platform != null ? platform.getPlatformName() : "NONE"));
-            } catch (NoCapablePlatformException e) {
-                actor.printDebug(String.format("%s: %s", capability.name(), "NONE"));
-            }
+		actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
+		
+		producer.reset();
+		for (Capability capability : Capability.values()) {
+            Platform platform = pm.queryCapability(capability);
+            producer.append(
+                    TextComponent.of(capability.name(), TextColor.GRAY)
+                    .append(TextComponent.of(": ")
+                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "NONE")))
+            ).newline();
         }
-        actor.printDebug("");
-        actor.printDebug("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki");
+        actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
+     
     }
 
     @Command(
@@ -118,7 +131,7 @@ public class WorldEditCommands {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
-        actor.print("Configuration and translations reloaded!");
+        actor.printInfo(TranslatableComponent.of("worldedit.reload.config"));
     }
 
     @Command(
@@ -129,7 +142,8 @@ public class WorldEditCommands {
     @SkipQueue
     @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
     public void report(Actor actor) throws WorldEditException, IOException {
-        BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
+		String dest = IncendoPaster.debugPaste();
+		actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
     }
 
     @Command(
@@ -172,12 +186,13 @@ public class WorldEditCommands {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
-            actor.print("Timezone set for this session to: " + tz.getDisplayName(
-                    TextStyle.FULL, Locale.ENGLISH
-            ));
-            actor.print("The current time in that timezone is: " + dateFormat.format(ZonedDateTime.now(tz)));
+            actor.printInfo(TranslatableComponent.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
+                    TextStyle.FULL, actor.getLocale()
+            ))));
+            actor.print(TranslatableComponent.of("worldedit.timezone.current",
+                    TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))));
         } catch (ZoneRulesException e) {
-            actor.printError("Invalid timezone");
+            actor.printError(TranslatableComponent.of("worldedit.timezone.invalid"));
         }
     }
 

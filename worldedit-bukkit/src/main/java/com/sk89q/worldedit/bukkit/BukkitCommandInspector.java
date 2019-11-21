@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 import com.sk89q.bukkit.util.CommandInspector;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import java.util.Optional;
 import org.bukkit.command.Command;
@@ -32,6 +33,8 @@ import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MapBackedValueStore;
 import org.slf4j.Logger;
+
+import java.util.Locale;
 import org.slf4j.LoggerFactory;
 
 class BukkitCommandInspector implements CommandInspector {
@@ -51,7 +54,7 @@ class BukkitCommandInspector implements CommandInspector {
     public String getShortText(Command command) {
         Optional<org.enginehub.piston.Command> mapping = dispatcher.getCommand(command.getName());
         if (mapping.isPresent()) {
-            return reduceToText(mapping.get().getDescription());
+            return reduceToText(mapping.get().getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale);
         } else {
             logger.warn("BukkitCommandInspector doesn't know how about the command '" + command + "'");
             return "Help text not available";
@@ -62,7 +65,7 @@ class BukkitCommandInspector implements CommandInspector {
     public String getFullText(Command command) {
         Optional<org.enginehub.piston.Command> mapping = dispatcher.getCommand(command.getName());
         if (mapping.isPresent()) {
-            return reduceToText(mapping.get().getFullHelp());
+            return reduceToText(mapping.get().getFullHelp(), WorldEdit.getInstance().getConfiguration().defaultLocale);
         } else {
             logger.warn("BukkitCommandInspector doesn't know how about the command '" + command + "'");
             return "Help text not available";

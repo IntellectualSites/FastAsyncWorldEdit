@@ -27,6 +27,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -79,7 +80,7 @@ public class AreaPickaxe implements BlockTool {
                 }
                 editSession.flushQueue();
             } catch (MaxChangedBlocksException e) {
-                player.printError("Max blocks change limit reached.");
+                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
             }

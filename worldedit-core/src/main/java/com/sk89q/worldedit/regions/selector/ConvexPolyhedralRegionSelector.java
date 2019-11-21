@@ -22,6 +22,7 @@ package com.sk89q.worldedit.regions.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -35,6 +36,9 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.polyhedron.Triangle;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;
@@ -188,15 +192,14 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public List<String> getInformationLines() {
-        List<String> ret = new ArrayList<>();
+    public List<Component> getSelectionInfoLines() {
+        List<Component> ret = new ArrayList<>();
 
-        ret.add("Vertices: "+region.getVertices().size());
-        ret.add("Triangles: "+region.getTriangles().size());
+        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.vertices", TextComponent.of(region.getVertices().size())));
+        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.triangles", TextComponent.of(region.getTriangles().size())));
 
         return ret;
     }
-
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
@@ -206,7 +209,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
+        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
     }
 
     @Override
@@ -217,7 +220,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        BBC.SELECTOR_POS.send(player, region.getVertices().size(), pos, region.getArea());
+        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.secondary", TextComponent.of(pos.toString())));
     }
 
     @Override

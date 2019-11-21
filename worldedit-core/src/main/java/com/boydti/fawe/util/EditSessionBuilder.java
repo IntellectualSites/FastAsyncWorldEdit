@@ -10,6 +10,7 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.LoggingChangeSet;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
@@ -306,7 +307,7 @@ public class EditSessionBuilder {
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
-                    player.print(BBC.WORLDEDIT_OOM_ADMIN.s());
+                    player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
                 }
                 throw FaweCache.LOW_MEMORY;
             }

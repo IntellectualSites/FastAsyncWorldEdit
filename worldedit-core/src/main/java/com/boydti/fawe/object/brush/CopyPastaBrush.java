@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -42,7 +43,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     @Override
     public boolean reset() {
         session.setClipboard(null);
-        player.print(BBC.BRUSH_RESET.s());
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.reset"));
         return true;
     }
 
@@ -87,7 +88,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
             int blocks = builder.size();
-            BBC.COMMAND_COPY.send(player, blocks);
+            player.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy" , blocks));
         } else {
             AffineTransform transform = null;
             if (randomRotate) {
