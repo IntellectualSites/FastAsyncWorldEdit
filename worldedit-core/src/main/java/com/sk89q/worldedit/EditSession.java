@@ -205,6 +205,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             return this.displayName;
         }
     }
+
     private final World world;
     private final String worldName;
     private boolean wrapped;
@@ -438,7 +439,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
     public void setBlockChangeLimit(int limit) {
-        // Nothing
+        this.limit.MAX_CHANGES = limit;
     }
 
     /**
@@ -907,7 +908,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Sets the block at the given coordiantes, subject to both history and block re-ordering.
+     * Sets the block at a position, subject to both history and block re-ordering.
      *
      * @param x the x coordinate
      * @param y the y coordinate
@@ -1095,7 +1096,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (direction.equals(BlockVector3.at(0, -1, 0))) {
             return fillXZ(origin, pattern, radius, depth, false);
         }
-        final MaskIntersection mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this)));
+        final Mask mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this)));
 
         // Want to replace blocks
         final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
@@ -1640,7 +1641,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
-        // Around the origin in a 3×3 block
+        // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
             if (liquidMask.test(position)) {
                 visitor.visit(position);
@@ -2213,6 +2214,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+    public int makePumpkinPatches(BlockVector3 position, int apothem) throws MaxChangedBlocksException {
+        return makePumpkinPatches(position, apothem, 0.02);
+    }
+
     public int makePumpkinPatches(BlockVector3 position, int apothem, double density) throws MaxChangedBlocksException {
         // We want to generate pumpkins
         GardenPatchGenerator generator = new GardenPatchGenerator(this);
@@ -2242,33 +2247,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeForest(BlockVector3 basePosition, int size, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
-            for (int x = basePosition.getBlockX() - size; x <= (basePosition.getBlockX() + size); ++x) {
-                for (int z = basePosition.getBlockZ() - size; z <= (basePosition.getBlockZ() + size); ++z) {
-                    // Don't want to be in the ground
-                    if (!this.getBlockType(x, basePosition.getBlockY(), z).getMaterial().isAir()) {
-                        continue;
-                    }
-                    // The gods don't want a tree here
-                    if (ThreadLocalRandom.current().nextInt(65536) >= (density * 65536)) {
-                        continue;
-                    } // def 0.05
-                    this.changes++;
-                    for (int y = basePosition.getBlockY(); y >= (basePosition.getBlockY() - 10); --y) {
-                        BlockType type = getBlockType(x, y, z);
-                        switch (type.getInternalId()) {
-                            case BlockID.GRASS:
-                            case BlockID.DIRT:
-                                treeType.generate(this, BlockVector3.at(x, y + 1, z));
-                                this.changes++;
-                                break;
-                            case BlockID.SNOW:
-                                setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
-                                break;
-                        }
-                    }
-                }
-            }
-        return this.changes;
+        return makeForest(CuboidRegion.fromCenter(basePosition, size), density, treeType);
     }
 
     /**

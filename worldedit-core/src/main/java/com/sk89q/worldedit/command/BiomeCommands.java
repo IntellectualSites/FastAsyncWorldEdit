@@ -127,12 +127,12 @@ public class BiomeCommands {
                 return;
             }
 
-            BiomeType biome = player.getWorld().getBiome(blockPosition.toBlockPoint().toBlockVector2());
+            BiomeType biome = player.getWorld().getBiome(blockPosition.toVector().toBlockPoint().toBlockVector2());
             biomes.add(biome);
 
             qualifier = "at line of sight point";
         } else if (usePosition) {
-            BiomeType biome = player.getWorld().getBiome(player.getLocation().toBlockPoint().toBlockVector2());
+            BiomeType biome = player.getWorld().getBiome(player.getLocation().toVector().toBlockPoint().toBlockVector2());
             biomes.add(biome);
 
             qualifier = "at your position";
@@ -145,11 +145,9 @@ public class BiomeCommands {
                     biomes.add(world.getBiome(pt));
                 }
             } else {
-                RegionVisitor visitor = new RegionVisitor(region, pt -> {
+                for (BlockVector3 pt : region) {
                     biomes.add(world.getBiome(pt.toBlockVector2()));
-                    return true;
-                });
-                Operations.completeBlindly(visitor);
+                }
             }
 
             qualifier = "in your selection";

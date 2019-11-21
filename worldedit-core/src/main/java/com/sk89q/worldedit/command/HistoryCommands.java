@@ -231,35 +231,33 @@ public class HistoryCommands {
                      @Arg(name = "player", desc = "Undo this player's operations", def = "")
                              String playerName) throws WorldEditException {
         times = Math.max(1, times);
-        LocalSession undoSession;
+        LocalSession undoSession = session;
         if (session.hasFastMode()) {
             player.print(BBC.COMMAND_UNDO_DISABLED.s());
             return;
         }
-        if (playerName != null && !playerName.isEmpty()) {
+        if (playerName != null) {
             player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {
-                BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
+                player.printError("Unable to find session for " + playerName);
                 return;
             }
+        }
+        int timesUndone = 0;
+        for (int i = 0; i < times; ++i) {
+            EditSession undone = undoSession.undo(undoSession.getBlockBag(player), player);
+            if (undone != null) {
+                timesUndone++;
+                worldEdit.flushBlockBag(player, undone);
+            } else {
+                break;
+            }
+        }
+        if (timesUndone > 0) {
+            player.print("Undid " + timesUndone + " available edits.");
         } else {
-            undoSession = session;
-        }
-        int finalTimes = times;
-        EditSession undone = null;
-        int i = 0;
-        for (; i < finalTimes; ++i) {
-            undone = undoSession.undo(undoSession.getBlockBag(player), player);
-            if (undone == null) break;
-            worldEdit.flushBlockBag(player, undone);
-        }
-        if (undone == null) i--;
-        if (i > 0) {
-            BBC.COMMAND_UNDO_SUCCESS.send(player, i == 1 ? "" : " x" + i);
-        }
-        if (undone == null) {
-            player.printError(BBC.COMMAND_UNDO_ERROR.s());
+            player.printError("Nothing left to undo.");
         }
     }
 

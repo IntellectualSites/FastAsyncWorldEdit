@@ -20,31 +20,17 @@
 package com.sk89q.worldedit.internal.expression;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 import java.time.Duration;
-import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 import static java.lang.Math.atan2;
 import static java.lang.Math.sin;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ExpressionTest extends BaseExpressionTest {
-
-    private Platform mockPlat = mock(Platform.class);
-
-    @AfterEach
-    public void tearDown() {
-        WorldEdit.getInstance().getPlatformManager().unregister(mockPlat);
-    }
-
     @Test
     public void testEvaluate() throws ExpressionException {
         // check

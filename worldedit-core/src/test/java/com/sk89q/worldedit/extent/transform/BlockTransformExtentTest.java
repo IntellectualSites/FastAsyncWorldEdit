@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extent.transform;
 
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,30 +38,32 @@ public class BlockTransformExtentTest {
     private static final Transform ROTATE_NEG_90 = new AffineTransform().rotateY(90);
     private final Set<BlockType> ignored = new HashSet<>();
 
+    /*
     @BeforeEach
     public void setUp() {
-        //BlockType.REGISTRY.register("worldedit:test", new BlockType("worldedit:test"));
+        BlockType.REGISTRY.register("worldedit:test", new BlockType("worldedit:test"));
     }
 
     @Test
     public void testTransform() {
-//        for (BlockType type : BlockType.REGISTRY.values()) {
-//            if (ignored.contains(type)) {
-//                continue;
-//            }
-//
-//            BlockState base = type.getDefaultState();
-//            BlockState rotated = base;
-//
-//            for (int i = 1; i < 4; i++) {
-//                rotated = BlockTransformExtent.transform(base, ROTATE_90);
-//            }
-//            assertEquals(base, rotated);
-//            rotated = base;
-//            for (int i = 1; i < 4; i++) {
-//                rotated = BlockTransformExtent.transform(base, ROTATE_NEG_90);
-//            }
-//            assertEquals(base, rotated);
-//        }
+        for (BlockType type : BlockType.REGISTRY.values()) {
+            if (ignored.contains(type)) {
+                continue;
+            }
+
+            BlockState base = type.getDefaultState();
+            BlockState rotated = base;
+
+            for (int i = 1; i < 4; i++) {
+                rotated = BlockTransformExtent.transform(base, ROTATE_90);
+            }
+            assertEquals(base, rotated);
+            rotated = base;
+            for (int i = 1; i < 4; i++) {
+                rotated = BlockTransformExtent.transform(base, ROTATE_NEG_90);
+            }
+            assertEquals(base, rotated);
+        }
     }
+    */
 }

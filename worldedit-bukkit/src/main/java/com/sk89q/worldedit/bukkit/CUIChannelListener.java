@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class CUIChannelListener implements PluginMessageListener {
 
-    public static final Charset UTF_8_CHARSET = StandardCharsets.UTF_8;
+    public static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
     private final WorldEditPlugin plugin;
 
     public CUIChannelListener(WorldEditPlugin plugin) {

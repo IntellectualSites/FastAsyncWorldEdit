@@ -50,7 +50,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             } catch (Throwable ignored) {
                 log.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
             }
-            if (Settings.PLATFORM.equalsIgnoreCase("bukkit")) {
+            if (Settings.PLATFORM.toLowerCase().startsWith("bukkit")) {
                 new FaweTrim();
             }
             if (MainCommand.getInstance().getCommand("generatebiome") == null) {

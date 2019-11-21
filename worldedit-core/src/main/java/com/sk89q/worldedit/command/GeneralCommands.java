@@ -194,7 +194,7 @@ public class GeneralCommands {
         } else {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32×32×32.");
+            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
         }
     }
 

@@ -182,7 +182,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("§c" + part);
+            player.sendMessage("\u00A7c" + part);
         }
     }
 
@@ -226,18 +226,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean hasPermission(String perm) {
-        return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
-            || plugin.getPermissionsResolver().hasPermission(player.getWorld().getName(), player, perm);
-    }
-
-    @Override
-    public boolean isAllowedToFly() {
-        return player.getAllowFlight();
-    }
-
-    @Override
-    public void setFlying(boolean flying) {
-        player.setFlying(flying);
+        return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp());
     }
 
     @Override
@@ -272,14 +261,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
         player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
     }
 
-    public Player getPlayer() {
-        if (!player.isValid()) {
-            Player tmp = Bukkit.getPlayer(getUniqueId());
-            if (tmp != null) {
-                player = tmp;
-            }
-        }
-        return player;
+    @Override
+    public boolean isAllowedToFly() {
+        return player.getAllowFlight();
+    }
+
+    @Override
+    public void setFlying(boolean flying) {
+        player.setFlying(flying);
     }
 
     @Override
@@ -311,7 +300,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public SessionKey getSessionKey() {
-        return new SessionKeyImpl(getUniqueId(), getName());
+        return new SessionKeyImpl(this.player.getUniqueId(), player.getName());
     }
 
     private static class SessionKeyImpl implements SessionKey {
@@ -381,5 +370,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+    }
+
+    public Player getPlayer() {
+        if (!player.isValid()) {
+            Player tmp = Bukkit.getPlayer(getUniqueId());
+            if (tmp != null) {
+                player = tmp;
+            }
+        }
+        return player;
     }
 }

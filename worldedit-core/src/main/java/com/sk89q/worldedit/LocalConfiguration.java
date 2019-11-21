@@ -27,6 +27,7 @@ import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
@@ -84,67 +85,69 @@ public abstract class LocalConfiguration {
 
     protected String[] getDefaultDisallowedBlocks() {
         List<BlockType> blockTypes = Lists.newArrayList(
-//                BlockTypes.OAK_SAPLING,
-//                BlockTypes.JUNGLE_SAPLING,
-//                BlockTypes.DARK_OAK_SAPLING,
-//                BlockTypes.SPRUCE_SAPLING,
-//                BlockTypes.BIRCH_SAPLING,
-//                BlockTypes.ACACIA_SAPLING,
-//                BlockTypes.BLACK_BED,
-//                BlockTypes.BLUE_BED,
-//                BlockTypes.BROWN_BED,
-//                BlockTypes.CYAN_BED,
-//                BlockTypes.GRAY_BED,
-//                BlockTypes.GREEN_BED,
-//                BlockTypes.LIGHT_BLUE_BED,
-//                BlockTypes.LIGHT_GRAY_BED,
-//                BlockTypes.LIME_BED,
-//                BlockTypes.MAGENTA_BED,
-//                BlockTypes.ORANGE_BED,
-//                BlockTypes.PINK_BED,
-//                BlockTypes.PURPLE_BED,
-//                BlockTypes.RED_BED,
-//                BlockTypes.WHITE_BED,
-//                BlockTypes.YELLOW_BED,
-//                BlockTypes.POWERED_RAIL,
-//                BlockTypes.DETECTOR_RAIL,
-//                BlockTypes.GRASS,
-//                BlockTypes.DEAD_BUSH,
-//                BlockTypes.MOVING_PISTON,
-//                BlockTypes.PISTON_HEAD,
-//                BlockTypes.SUNFLOWER,
-//                BlockTypes.ROSE_BUSH,
-//                BlockTypes.DANDELION,
-//                BlockTypes.POPPY,
-//                BlockTypes.BROWN_MUSHROOM,
-//                BlockTypes.RED_MUSHROOM,
-//                BlockTypes.TNT,
-//                BlockTypes.TORCH,
-//                BlockTypes.FIRE,
-//                BlockTypes.REDSTONE_WIRE,
-//                BlockTypes.WHEAT,
-//                BlockTypes.POTATOES,
-//                BlockTypes.CARROTS,
-//                BlockTypes.MELON_STEM,
-//                BlockTypes.PUMPKIN_STEM,
-//                BlockTypes.BEETROOTS,
-//                BlockTypes.RAIL,
-//                BlockTypes.LEVER,
-//                BlockTypes.REDSTONE_TORCH,
-//                BlockTypes.REDSTONE_WALL_TORCH,
-//                BlockTypes.REPEATER,
-//                BlockTypes.COMPARATOR,
-//                BlockTypes.STONE_BUTTON,
-//                BlockTypes.BIRCH_BUTTON,
-//                BlockTypes.ACACIA_BUTTON,
-//                BlockTypes.DARK_OAK_BUTTON,
-//                BlockTypes.JUNGLE_BUTTON,
-//                BlockTypes.OAK_BUTTON,
-//                BlockTypes.SPRUCE_BUTTON,
-//                BlockTypes.CACTUS,
-//                BlockTypes.SUGAR_CANE,
-//                // ores and stuff
-//                BlockTypes.BEDROCK
+                /*
+                BlockTypes.OAK_SAPLING,
+                BlockTypes.JUNGLE_SAPLING,
+                BlockTypes.DARK_OAK_SAPLING,
+                BlockTypes.SPRUCE_SAPLING,
+                BlockTypes.BIRCH_SAPLING,
+                BlockTypes.ACACIA_SAPLING,
+                BlockTypes.BLACK_BED,
+                BlockTypes.BLUE_BED,
+                BlockTypes.BROWN_BED,
+                BlockTypes.CYAN_BED,
+                BlockTypes.GRAY_BED,
+                BlockTypes.GREEN_BED,
+                BlockTypes.LIGHT_BLUE_BED,
+                BlockTypes.LIGHT_GRAY_BED,
+                BlockTypes.LIME_BED,
+                BlockTypes.MAGENTA_BED,
+                BlockTypes.ORANGE_BED,
+                BlockTypes.PINK_BED,
+                BlockTypes.PURPLE_BED,
+                BlockTypes.RED_BED,
+                BlockTypes.WHITE_BED,
+                BlockTypes.YELLOW_BED,
+                BlockTypes.POWERED_RAIL,
+                BlockTypes.DETECTOR_RAIL,
+                BlockTypes.GRASS,
+                BlockTypes.DEAD_BUSH,
+                BlockTypes.MOVING_PISTON,
+                BlockTypes.PISTON_HEAD,
+                BlockTypes.SUNFLOWER,
+                BlockTypes.ROSE_BUSH,
+                BlockTypes.DANDELION,
+                BlockTypes.POPPY,
+                BlockTypes.BROWN_MUSHROOM,
+                BlockTypes.RED_MUSHROOM,
+                BlockTypes.TNT,
+                BlockTypes.TORCH,
+                BlockTypes.FIRE,
+                BlockTypes.REDSTONE_WIRE,
+                BlockTypes.WHEAT,
+                BlockTypes.POTATOES,
+                BlockTypes.CARROTS,
+                BlockTypes.MELON_STEM,
+                BlockTypes.PUMPKIN_STEM,
+                BlockTypes.BEETROOTS,
+                BlockTypes.RAIL,
+                BlockTypes.LEVER,
+                BlockTypes.REDSTONE_TORCH,
+                BlockTypes.REDSTONE_WALL_TORCH,
+                BlockTypes.REPEATER,
+                BlockTypes.COMPARATOR,
+                BlockTypes.STONE_BUTTON,
+                BlockTypes.BIRCH_BUTTON,
+                BlockTypes.ACACIA_BUTTON,
+                BlockTypes.DARK_OAK_BUTTON,
+                BlockTypes.JUNGLE_BUTTON,
+                BlockTypes.OAK_BUTTON,
+                BlockTypes.SPRUCE_BUTTON,
+                BlockTypes.CACTUS,
+                BlockTypes.SUGAR_CANE,
+                // ores and stuff
+                BlockTypes.BEDROCK
+                */
         );
         return blockTypes.stream().filter(Objects::nonNull).map(BlockType::getId).toArray(String[]::new);
     }
@@ -154,7 +157,15 @@ public abstract class LocalConfiguration {
      */
     public abstract void load();
 
+    /**
+     *
+     * @param holder
+     * @return true if block is not permitted
+     */
     public boolean checkDisallowedBlocks(BlockStateHolder holder) {
+        if (disallowedBlocks.isEmpty()) {
+            return false;
+        }
         if (disallowedBlocksMask == null) {
             BlockMaskBuilder builder = new BlockMaskBuilder();
             for (String blockRegex : disallowedBlocks) {
@@ -191,7 +202,7 @@ public abstract class LocalConfiguration {
                 data = Byte.parseByte(splitter[1]);
             }
             item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
         }
 
         return item;

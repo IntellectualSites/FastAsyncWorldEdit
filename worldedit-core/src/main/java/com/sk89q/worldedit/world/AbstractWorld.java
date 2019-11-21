@@ -166,7 +166,7 @@ public abstract class AbstractWorld implements World {
 
         @SuppressWarnings("deprecation")
         public void play() {
-            playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4);
+            playEffect(position, 2001, blockType.getLegacyId());
         }
 
         @Override

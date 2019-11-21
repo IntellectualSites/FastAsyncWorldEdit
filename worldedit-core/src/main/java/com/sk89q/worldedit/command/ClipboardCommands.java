@@ -448,15 +448,17 @@ public class ClipboardCommands {
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
 
-        Operation operation = holder
-                .createPaste(editSession)
-                .to(to)
-                .ignoreAirBlocks(ignoreAirBlocks)
-                .copyBiomes(pasteBiomes)
-                .copyEntities(pasteEntities)
-                .maskSource(sourceMask)
-                .build();
-        Operations.completeLegacy(operation);
+        if (!onlySelect) {
+            Operation operation = holder
+                    .createPaste(editSession)
+                    .to(to)
+                    .ignoreAirBlocks(ignoreAirBlocks)
+                    .copyBiomes(pasteBiomes)
+                    .copyEntities(pasteEntities)
+                    .maskSource(sourceMask)
+                    .build();
+            Operations.completeLegacy(operation);
+        }
 
         if (selectPasted || onlySelect) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
