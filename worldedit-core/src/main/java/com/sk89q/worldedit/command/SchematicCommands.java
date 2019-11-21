@@ -827,28 +827,27 @@ public class SchematicCommands {
         }
 
         if (files.isEmpty()) {
-            actor.printError(BBC.SCHEMATIC_NONE.s());
+            actor.printError(TranslatableComponent.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
             return;
         }
         for (File f : files) {
             if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
-                actor.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + !MainUtil.isInSubDirectory(working, f)
-                        + ")");
+                actor.printError(TranslatableComponent.of("worldedit.schematic.delete.does-not-exist", TextComponent.of(filename)));
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
                 BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
                 continue;
             }
-            if (!delete(f)) {
-                actor.printError("Deletion of " + filename + " failed! Maybe it is read-only.");
+            if (!deleteFile(f)) {
+                actor.printError(TranslatableComponent.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
                 continue;
             }
             BBC.FILE_DELETED.send(actor, filename);
         }
     }
 
-    private boolean delete(File file) {
+    private boolean deleteFile(File file) {
         if (file.delete()) {
             new File(file.getParentFile(), "." + file.getName() + ".cached").delete();
             return true;

@@ -32,11 +32,11 @@ import java.util.List;
 
 public class BlockDistributionResult extends PaginationBox {
 
-    private final List<Countable<BlockState>> distribution;
+    private final List<Countable> distribution;
     private final int totalBlocks;
     private final boolean separateStates;
 
-    public BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates) {
+    public BlockDistributionResult(List<Countable> distribution, boolean separateStates) {
         super("Block Distribution", "//distr -p %page%" + (separateStates ? " -d" : ""));
         this.distribution = distribution;
         // note: doing things like region.getArea is inaccurate for non-cuboids.

@@ -774,9 +774,14 @@ public final class PlatformCommandManager {
                 editSession.flushQueue();
                 session.remember(editSession);
 
-                long time = System.currentTimeMillis() - start;
-                if (time > 1000) {
-                    BBC.ACTION_COMPLETE.send(actor, time / 1000D);
+                long timems = System.currentTimeMillis() - start;
+                if (timems > 1000) {
+                    actor.printDebug(TranslatableComponent.of(
+                            "worldedit.command.time-elapsed",
+                            TextComponent.of(timems + "m"),
+                            TextComponent.of(-1),
+                            TextComponent.of(Math.round(-1))
+                    ));
                 }
 
                 worldEdit.flushBlockBag(actor, editSession);

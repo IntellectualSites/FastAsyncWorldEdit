@@ -508,7 +508,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
             if (target == null) {
                 editSession.cancel();
-                player.print(BBC.NO_BLOCK.s());
+                player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
                 return true;
             }
             BlockBag bag = session.getBlockBag(player);
@@ -543,7 +543,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 WorldEdit.getInstance().checkMaxBrushRadius(size);
                 brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
-                player.printError("Max blocks change limit reached.");
+                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
                 if (bag != null) {

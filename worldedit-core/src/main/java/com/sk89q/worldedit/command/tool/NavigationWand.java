@@ -40,7 +40,7 @@ public enum NavigationWand implements DoubleActionTraceTool {
       if (pos != null) {
           player.findFreePosition(pos);
       } else {
-          player.printError("No block in sight (or too far)!");
+          player.printError(TranslatableComponent.of("worldedit.jumpto.none"));
       }
       return true;
   }
@@ -53,7 +53,7 @@ public enum NavigationWand implements DoubleActionTraceTool {
         }
 
         if (!player.passThroughForwardWall(Math.max(1, maxDist - 10))) {
-            player.printError("Nothing to pass through (or too far)!");
+            player.printError(TranslatableComponent.of("worldedit.thru.obstructed"));
         }
         return true;
     }
