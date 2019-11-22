@@ -210,7 +210,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public boolean hasPermission(String perm) {
-        return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp());
+        return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
+                || plugin.getPermissionsResolver().hasPermission(
+                player.getWorld().getName(), player, perm);
     }
 
     @Override

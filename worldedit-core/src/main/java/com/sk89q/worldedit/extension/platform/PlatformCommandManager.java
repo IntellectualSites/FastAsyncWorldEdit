@@ -24,6 +24,7 @@ import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -729,24 +730,18 @@ public final class PlatformCommandManager {
             }
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
-                actor.printError("You are not permitted to do that. Are you in the right mode?");
+                actor.printError(TranslatableComponent.of("fawe.error.no.perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
             } else {
                 actor.print(e.getRichMessage());
             }
         } catch (FaweException e) {
-            actor.printError(TextComponent.builder().append("Edit cancelled: ").append(e.getComponent()).build());
+            actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
-                actor.print(TextComponent.builder("Usage: ")
-                    .color(TextColor.RED)
-                    .append(HelpGenerator.create(e.getCommandParseResult()).getUsage())
-                    .build());
+                actor.printError(TranslatableComponent.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getUsage()));
             }
-            actor.print(TextComponent.builder("")
-                    .color(TextColor.RED)
-                    .append(e.getRichMessage())
-                    .build());
+            actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             handleUnknownException(actor, e.getCause());
         } catch (CommandException e) {

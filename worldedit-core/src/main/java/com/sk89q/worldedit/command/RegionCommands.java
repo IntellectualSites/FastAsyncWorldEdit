@@ -74,6 +74,7 @@ import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -137,12 +138,9 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
-    public void test(Player player, EditSession editSession, @Arg(desc = "test") @Confirm(RADIUS) BlockVector3 radius) throws WorldEditException {
-//        editSession.addProcessor(new ChunkSendProcessor(editSession.getWorld(), () -> Collections.singleton(player)));
-//        editSession.addProcessor(NullProcessor.INSTANCE);
-//        FlatRegionFunction replace = new BiomeReplace(editSession, biome);
-//        FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);
-//        Operations.completeLegacy(visitor);
+    public void test(Player player, EditSession editSession, @Arg(desc = "test") String world, BlockVector2 mcaFile) throws WorldEditException {
+        file = new File(world, "region" + File.separator)
+
     }
 
     @Command(
