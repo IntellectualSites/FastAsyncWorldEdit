@@ -337,44 +337,6 @@ public final class PlatformCommandManager {
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
     }
 
-    private Actor wrapActor(Actor actor, InjectedValueStore context) {
-        if (actor instanceof Player) {
-            final Set<String> failedPermissions = new LinkedHashSet<>();
-            Player player = (Player) actor;
-            Player unwrapped = PlayerProxy.unwrap(player);
-            actor = new LocationMaskedPlayerWrapper(unwrapped, unwrapped.getLocation(), true) {
-                @Override
-                public boolean hasPermission(String permission) {
-                    if (!super.hasPermission(permission)) {
-                        failedPermissions.add(permission);
-                        return false;
-                    }
-                    return true;
-                }
-                @Override
-                public void checkPermission(String permission) throws AuthorizationException {
-                    try {
-                        super.checkPermission(permission);
-                    } catch (AuthorizationException e) {
-                        failedPermissions.add(permission);
-                        throw e;
-                    }
-                }
-            };
-            context.injectValue(Key.of(CommandPermissions.class), i -> Optional.of(new CommandPermissions() {
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return CommandPermissions.class;
-                }
-                @Override
-                public String[] value() {
-                    return failedPermissions.toArray(new String[0]);
-                }
-            }));
-        }
-        return actor;
-    }
-
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
         CommandManager commandManager,
         Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance) {
@@ -815,9 +777,8 @@ public final class PlatformCommandManager {
                 getCommandManager(), actor, "//help");
     }
 
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor tmp, Event event) {
+    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event) {
         InjectedValueStore store = MapBackedValueStore.create();
-        Actor actor = wrapActor(tmp, store);
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
         if (actor instanceof Player) {
             store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));

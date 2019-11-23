@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -34,7 +33,6 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -44,7 +42,6 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class PlayerProxy extends AbstractPlayerActor {
 

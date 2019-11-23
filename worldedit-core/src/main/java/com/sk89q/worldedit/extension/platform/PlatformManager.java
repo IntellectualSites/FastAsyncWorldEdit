@@ -21,6 +21,8 @@ package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.wrappers.AsyncPlayer;
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
@@ -267,11 +269,17 @@ public class PlatformManager {
             if (cuiActor == null) {
                 cuiActor = player;
             }
-
-            return (T) new PlayerProxy(player, permActor, cuiActor, getWorldForEditing(player.getWorld()));
+            if (player == permActor && player == cuiActor) {
+                return (T) proxyFawe(player);
+            }
+            return (T) proxyFawe(new PlayerProxy(player, permActor, cuiActor, getWorldForEditing(player.getWorld())));
         } else {
             return base;
         }
+    }
+
+    private <T extends Player> T  proxyFawe(T player) {
+        return (T) new LocationMaskedPlayerWrapper(player, player.getLocation(), true);
     }
 
     /**

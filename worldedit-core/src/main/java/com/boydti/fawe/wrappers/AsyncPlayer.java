@@ -17,16 +17,16 @@ import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class PlayerWrapper extends PlayerProxy {
-    public PlayerWrapper(Player parent) {
+public class AsyncPlayer extends PlayerProxy {
+    public AsyncPlayer(Player parent) {
         super(parent);
     }
 
-    public static PlayerWrapper wrap(Player parent) {
-        if (parent instanceof PlayerWrapper) {
-            return (PlayerWrapper) parent;
+    public static AsyncPlayer wrap(Player parent) {
+        if (parent instanceof AsyncPlayer) {
+            return (AsyncPlayer) parent;
         }
-        return new PlayerWrapper(parent);
+        return new AsyncPlayer(parent);
     }
 
     @Override
@@ -162,15 +162,15 @@ public class PlayerWrapper extends PlayerProxy {
         } catch (RuntimeException e) {
             caught = e;
         }
-        TaskManager.IMP.sync(new RunnableVal<Object>() {
-            @Override
-            public void run(Object value) {
-                setPosition(Vector3.at(x + 0.5, y, z + 0.5));
-            }
-        });
+        setPosition(Vector3.at(x + 0.5, y, z + 0.5));
         if (caught != null) {
             throw caught;
         }
+    }
+
+    @Override
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
+        Fawe.get().getQueueHandler().sync(() -> super.setPosition(pos, pitch, yaw));
     }
 
     @Override
@@ -178,7 +178,7 @@ public class PlayerWrapper extends PlayerProxy {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
-                TargetBlock tb = new TargetBlock(PlayerWrapper.this, range, 0.2D);
+                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
                 this.value = useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
             }
         });
@@ -189,7 +189,7 @@ public class PlayerWrapper extends PlayerProxy {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
-                TargetBlock tb = new TargetBlock(PlayerWrapper.this, range, 0.2D);
+                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
                 this.value = useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
             }
         });
@@ -200,7 +200,7 @@ public class PlayerWrapper extends PlayerProxy {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
-                TargetBlock tb = new TargetBlock(PlayerWrapper.this, range, 0.2D);
+                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
                 this.value = tb.getSolidTargetBlock();
             }
         });
@@ -215,7 +215,7 @@ public class PlayerWrapper extends PlayerProxy {
     public boolean passThroughForwardWall(int range) {
         return TaskManager.IMP.sync(() -> {
             int searchDist = 0;
-            TargetBlock hitBlox = new TargetBlock(PlayerWrapper.this, range, 0.2);
+            TargetBlock hitBlox = new TargetBlock(AsyncPlayer.this, range, 0.2);
             Extent world = getLocation().getExtent();
             Location block;
             boolean firstBlock = true;
