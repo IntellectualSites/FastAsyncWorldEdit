@@ -59,8 +59,7 @@ public class ConsumeBindings extends Bindings {
     }
 
     @Binding
-    @Confirm
-    @Selection
+    @Confirm(Confirm.Processor.REGION)
     public int regionMultiple(Actor actor, InjectedValueAccess context, @Selection Region region, String argument) {
         int times = (int) Expression.compile(argument).evaluate();
         return Confirm.Processor.REGION.check(actor, context, times);

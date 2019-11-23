@@ -560,7 +560,7 @@ public class RegionCommands {
                          boolean skipEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
-                     @ArgFlag(name = 'm', desc = "Source mask", def="")
+                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                          Mask mask) throws WorldEditException {
         
 		Mask combinedMask;
