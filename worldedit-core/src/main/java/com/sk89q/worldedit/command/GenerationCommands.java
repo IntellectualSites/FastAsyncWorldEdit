@@ -127,6 +127,7 @@ public class GenerationCommands {
 
     @Command(
             name = "/img",
+            aliases = { "/image", "image" },
             desc = "Generate an image"
     )
     @CommandPermissions("worldedit.generation.image")
