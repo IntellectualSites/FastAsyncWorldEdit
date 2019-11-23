@@ -128,7 +128,7 @@ public class HistoryCommands {
             }
         }
         if (timesRedone > 0) {
-            player.printInfo(TranslatableComponent.of("worldedit.redo.redid", TextComponent.of(timesRedone)));
+            player.printInfo(TranslatableComponent.of("worldedit.redo.undone", TextComponent.of(timesRedone)));
         } else {
             player.printError(TranslatableComponent.of("worldedit.redo.none"));
         }

@@ -406,7 +406,6 @@
     "worldedit.undo.none": "Nothing left to undo.",
     "worldedit.redo.undone": "Redid {0} available edits.",
     "worldedit.redo.none": "Nothing left to redo.",
-	"worldedit.redo.redid": "Redid {0} available edits.",
     "worldedit.clearhistory.cleared": "History cleared.",
 
     "worldedit.raytrace.noblock": "No block in sight!",
