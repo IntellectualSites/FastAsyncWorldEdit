@@ -378,7 +378,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(com.sk89q.worldedit.world.World world, Region region, EditSession editSession) {
+    public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
         WorldServer originalWorld = ((CraftWorld) world).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {

@@ -235,7 +235,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("Cannot send fake chunks");
     }
 
-    default boolean regenerate(com.sk89q.worldedit.world.World world, Region region, EditSession editSession) {
+    default boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
         return editSession.regenerate(region);
     }
 }

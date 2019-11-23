@@ -223,7 +223,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public boolean regenerate(Region region, EditSession session) {
-        return session.regenerate(region);
+        return parent.regenerate(region, session);
     }
 
     @Override

@@ -330,7 +330,7 @@ public class HistorySubCommands {
                 RollbackOptimizedHistory edit = input.get();
                 UUID uuid = edit.getUUID();
                 int index = edit.getIndex();
-                if (!edit.getBDFile().exists()) {
+                if (!edit.isEmpty()) {
                     database.delete(uuid, index);
                     return TextComponent.empty();
                 }

@@ -656,13 +656,14 @@ public class RegionCommands {
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void regenerateChunk(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
+    public void regenerateChunk(Actor actor, World world, LocalSession session, EditSession editSession, @Selection Region region,
                                 @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
                                 @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
         Mask mask = session.getMask();
         session.setMask((Mask) null);
         session.setSourceMask((Mask) null);
-        editSession.regenerate(region, biome, seed);
+        world.regenerate(region, editSession);
+//        editSession.regenerate(region, biome, seed);
         session.setMask(mask);
         session.setSourceMask(mask);
 		actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
