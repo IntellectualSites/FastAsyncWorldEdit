@@ -492,7 +492,7 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "/history",
-                    ImmutableList.of(),
+                    ImmutableList.of("/frb"),
                     "Manage your history",
                     HistorySubCommandsRegistration.builder(),
                     new HistorySubCommands(history)
