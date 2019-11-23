@@ -227,11 +227,15 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         entity.valid = false;
     }
 
+    public Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
+        return BukkitAdapter_1_14.ensureLoaded(nmsWorld, X, Z);
+    }
+
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         try {
             WorldServer nmsWorld = world;
-            Chunk nmsChunk = BukkitAdapter_1_14.ensureLoaded(nmsWorld, X, Z);
+            Chunk nmsChunk = ensureLoaded(nmsWorld, X, Z);
 
             // Remove existing tiles
             {
@@ -628,7 +632,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             synchronized (this) {
                 tmp = nmsChunk;
                 if (tmp == null) {
-                    nmsChunk = tmp = BukkitAdapter_1_14.ensureLoaded(this.world, X, Z);
+                    nmsChunk = tmp = ensureLoaded(this.world, X, Z);
                 }
             }
         }

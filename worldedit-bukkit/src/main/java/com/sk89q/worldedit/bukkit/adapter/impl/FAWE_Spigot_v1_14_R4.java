@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl;
 
 import com.bekvon.bukkit.residence.commands.material;
 import com.bekvon.bukkit.residence.commands.server;
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
@@ -30,6 +31,7 @@ import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitAdapter_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.MapChunkUtil_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
+import com.boydti.fawe.util.TaskManager;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -92,6 +94,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +104,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -393,21 +398,44 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
             CraftServer server = originalWorld.getServer();
             WorldNBTStorage originalDataManager = originalWorld.getDataManager();
             WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server.getServer(), originalDataManager.getDataFixer());
+            ChunkGenerator originalGen = world.getGenerator();
+
             try (WorldServer freshWorld = new WorldServer(server.getServer(),
                     server.getServer().executorService, saveHandler,
                     originalWorld.worldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.getMethodProfiler(),
                     server.getServer().worldLoadListenerFactory.create(11),
-                    ((CraftWorld) world).getEnvironment(),
-                    server.getGenerator(world.getName()))) {
+                    world.getEnvironment(),
+                    originalGen)) {
 
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction
-                SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
-                extent.init(null, (x, z) -> new BukkitGetBlocks_1_14(freshWorld, x, z), null);
-                for (BlockVector3 vec : region) {
-                    editSession.setBlock(vec, extent.getFullBlock(vec));
+                Fawe.get().getQueueHandler().startSet(true);
+                try {
+                    SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
+                    extent.init(null, (x, z) -> new BukkitGetBlocks_1_14(freshWorld, x, z) {
+                        @Override
+                        public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
+                            Chunk cached = nmsWorld.getChunkIfLoaded(X, Z);
+                            if (cached != null) return cached;
+                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
+                            while (!future.isDone()) {
+                                // this feels so dirty
+                                freshWorld.getChunkProvider().runTasks();
+                            }
+                            try {
+                                return future.get();
+                            } catch (InterruptedException | ExecutionException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }, null);
+                    for (BlockVector3 vec : region) {
+                        editSession.setBlock(vec, extent.getFullBlock(vec));
+                    }
+                } finally {
+                    Fawe.get().getQueueHandler().endSet(true);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
