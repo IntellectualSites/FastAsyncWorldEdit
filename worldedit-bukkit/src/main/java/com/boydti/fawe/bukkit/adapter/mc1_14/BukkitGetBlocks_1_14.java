@@ -3,6 +3,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.bekvon.bukkit.residence.commands.set;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
@@ -67,26 +68,18 @@ import org.jetbrains.annotations.NotNull;
 public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public ChunkSection[] sections;
     public Chunk nmsChunk;
-    public CraftWorld world;
+    public WorldServer world;
     public int X, Z;
-//    private boolean forceLoad;
 
-    public BukkitGetBlocks_1_14(World world, int X, int Z, boolean forceLoad) {
-        this.world = (CraftWorld) world;
-        this.X = X;
-        this.Z = Z;
-//        if (forceLoad) {
-//            this.world.getHandle().setForceLoaded(X, Z, this.forceLoad = true);
-//        }
+    public BukkitGetBlocks_1_14(World world, int X, int Z) {
+        this(((CraftWorld) world).getHandle(), X, Z);
     }
 
-//    @Override
-//    protected void finalize() {
-//        if (forceLoad) {
-//            this.world.getHandle().setForceLoaded(X, Z, forceLoad = false);
-//        }
-//    }
-
+    public BukkitGetBlocks_1_14(WorldServer world, int X, int Z) {
+        this.world = world;
+        this.X = X;
+        this.Z = Z;
+    }
 
     public int getX() {
         return X;
@@ -133,14 +126,16 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 
     @Override
     public CompoundTag getEntity(UUID uuid) {
-        org.bukkit.entity.Entity bukkitEnt = world.getEntity(uuid);
-        if (bukkitEnt != null) {
+        Entity entity = world.getEntity(uuid);
+        if (entity != null) {
+            org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
             return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
         }
         for (List<Entity> entry : getChunk().getEntitySlices()) {
             if (entry != null) {
-                for (Entity entity : entry) {
-                    if (uuid.equals(entity.getUniqueID())) {
+                for (Entity ent : entry) {
+                    if (uuid.equals(ent.getUniqueID())) {
+                        org.bukkit.entity.Entity bukkitEnt = ent.getBukkitEntity();
                         return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
                     }
                 }
@@ -235,7 +230,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         try {
-            WorldServer nmsWorld = world.getHandle();
+            WorldServer nmsWorld = world;
             Chunk nmsChunk = BukkitAdapter_1_14.ensureLoaded(nmsWorld, X, Z);
 
             // Remove existing tiles
@@ -633,7 +628,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             synchronized (this) {
                 tmp = nmsChunk;
                 if (tmp == null) {
-                    nmsChunk = tmp = BukkitAdapter_1_14.ensureLoaded(this.world.getHandle(), X, Z);
+                    nmsChunk = tmp = BukkitAdapter_1_14.ensureLoaded(this.world, X, Z);
                 }
             }
         }

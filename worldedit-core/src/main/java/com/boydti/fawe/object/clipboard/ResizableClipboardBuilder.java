@@ -67,7 +67,7 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
                 Change change = iterator.next();
                 if (change instanceof MutableBlockChange) {
                     MutableBlockChange blockChange = (MutableBlockChange) change;
-                    BlockState block = BlockState.getFromInternalId(blockChange.combinedId);
+                    BlockState block = BlockState.getFromOrdinal(blockChange.ordinal);
                     clipboard.setBlock(blockChange.x, blockChange.y, blockChange.z, block);
                 } else if (change instanceof MutableTileChange) {
                     MutableTileChange tileChange = (MutableTileChange) change;

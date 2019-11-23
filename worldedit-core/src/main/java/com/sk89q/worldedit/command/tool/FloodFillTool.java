@@ -73,7 +73,7 @@ public class FloodFillTool implements BlockTool {
             return true;
         }
 
-        try (EditSession editSession = session.createEditSession(player)) {
+        try (EditSession editSession = session.createEditSession(player, "FloodFillTool")) {
             try {
                 Mask mask = initialType.toMask(editSession);
                 BlockReplace function = new BlockReplace(editSession, pattern);

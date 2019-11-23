@@ -24,11 +24,13 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataFixer;
@@ -231,5 +233,9 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     default void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
         throw new UnsupportedOperationException("Cannot send fake chunks");
+    }
+
+    default boolean regenerate(com.sk89q.worldedit.world.World world, Region region, EditSession editSession) {
+        return editSession.regenerate(region);
     }
 }

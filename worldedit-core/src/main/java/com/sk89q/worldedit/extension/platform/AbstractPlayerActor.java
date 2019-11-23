@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
+import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.sk89q.worldedit.EditSession;
 
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
@@ -94,7 +95,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
-    private SimpleAsyncNotifyQueue asyncNotifyQueue = new SimpleAsyncNotifyQueue(
+    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
         (thread, throwable) -> {
             while (throwable.getCause() != null) {
                 throwable = throwable.getCause();
@@ -618,7 +619,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     @Override
     public void checkPermission(String permission) throws AuthorizationException {
         if (!hasPermission(permission)) {
-            throw new AuthorizationException();
+            throw new AuthorizationException(Caption.toString(TranslatableComponent.of("fawe.error.no.perm", permission)));
         }
     }
 
@@ -675,7 +676,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             }
         };
         if (async) {
-            asyncNotifyQueue.queue(wrapped);
+            asyncNotifyQueue.run(wrapped);
         } else {
             TaskManager.IMP.taskNow(wrapped, false);
         }

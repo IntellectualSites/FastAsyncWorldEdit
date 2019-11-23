@@ -190,6 +190,10 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean regenerate(Region region, EditSession editSession) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.regenerate(this, region, editSession);
+        }
         /*
         BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
 
@@ -560,7 +564,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
+        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ);
     }
 
     @Override

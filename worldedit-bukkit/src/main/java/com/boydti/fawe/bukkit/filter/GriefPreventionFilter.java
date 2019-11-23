@@ -10,6 +10,7 @@ import org.bukkit.World;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -19,10 +20,10 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
 
     public GriefPreventionFilter(World world) {
         checkNotNull(world);
-        this.claims = TaskManager.IMP.sync(new RunnableVal<Collection<Claim>>() {
+        this.claims = TaskManager.IMP.sync(new Supplier<Collection<Claim>>() {
             @Override
-            public void run(Collection<Claim> claims) {
-                this.value = new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims());
+            public Collection<Claim> get() {
+                return new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims());
             }
         });
         this.world = world;

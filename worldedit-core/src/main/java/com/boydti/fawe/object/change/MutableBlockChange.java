@@ -10,14 +10,14 @@ public class MutableBlockChange implements Change {
     public int z;
     public int y;
     public int x;
-    public int combinedId;
+    public int ordinal;
 
 
-    public MutableBlockChange(int x, int y, int z, int combinedId) {
+    public MutableBlockChange(int x, int y, int z, int ordinal) {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.combinedId = combinedId;
+        this.ordinal = ordinal;
     }
 
     @Override
@@ -31,6 +31,6 @@ public class MutableBlockChange implements Change {
     }
 
     public void create(UndoContext context) {
-        context.getExtent().setBlock(x, y, z, BlockState.getFromOrdinal(combinedId));
+        context.getExtent().setBlock(x, y, z, BlockState.getFromOrdinal(ordinal));
     }
 }

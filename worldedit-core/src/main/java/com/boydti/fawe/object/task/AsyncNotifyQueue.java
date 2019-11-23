@@ -1,37 +1,72 @@
 package com.boydti.fawe.object.task;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TaskManager;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
-public abstract class AsyncNotifyQueue {
-    protected Object lock = new Object();
-    protected final Runnable task;
-    protected final AtomicBoolean running = new AtomicBoolean();
+public class AsyncNotifyQueue implements Closeable {
+    private final Lock lock = new ReentrantLock(true);
+    private final Thread.UncaughtExceptionHandler handler;
+    private boolean closed;
 
-    public AsyncNotifyQueue() {
-        this.task = new Runnable() {
-            @Override
-            public void run() {
-                operate();
-                synchronized (lock) {
-                    if (hasQueued()) TaskManager.IMP.async(this);
-                    else running.set(false);
+    public AsyncNotifyQueue(Thread.UncaughtExceptionHandler handler) {
+        this.handler = handler;
+    }
+
+    public Thread.UncaughtExceptionHandler getHandler() {
+        return handler;
+    }
+
+    public <T> Future<T> run(Runnable task) {
+        return call(() -> {
+            task.run();
+            return null;
+        });
+    }
+
+    public <T> Future<T> supply(Supplier<T> task) {
+        return call(task::get);
+    }
+
+    public <T> Future<T> call(Callable<T> task) {
+        Future[] self = new Future[1];
+        Callable<T> wrapped = () -> {
+            if (!closed) {
+                try {
+                    lock.lock();
+                    if (!closed) {
+                        try {
+                            return task.call();
+                        } catch (Throwable e) {
+                            handler.uncaughtException(Thread.currentThread(), e);
+                            if (self[0] != null) self[0].cancel(true);
+                        }
+                    }
+                } finally {
+                    lock.unlock();
                 }
             }
+            if (self[0] != null) self[0].cancel(true);
+            return null;
         };
+        self[0] = Fawe.get().getQueueHandler().async(wrapped);
+        return self[0];
     }
 
-    public abstract boolean hasQueued();
-
-    public void queue(Runnable queueTask) {
-        synchronized (lock) {
-            if (queueTask != null) queueTask.run();
-            if (!running.get()) {
-                running.set(true);
-                TaskManager.IMP.async(task);
-            }
-        }
+    @Override
+    public void close() {
+        closed = true;
     }
 
-    public abstract void operate();
+    public boolean isClosed() {
+        return closed;
+    }
 }

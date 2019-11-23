@@ -552,11 +552,6 @@ public class SchematicCommands {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
         String pageCommand = arguments.get();
-        if (pageCommand.contains("-p ")) {
-            pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
-        } else{
-            pageCommand = pageCommand + " -p %page%";
-        }
         LocalConfiguration config = worldEdit.getConfiguration();
         File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
 
@@ -840,7 +835,7 @@ public class SchematicCommands {
                 actor.printError(TranslatableComponent.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
                 continue;
             }
-            actor.print(TranslatableComponent.of("fawe.info.file.deleted" , filename));
+            actor.print(TranslatableComponent.of("worldedit.schematic.delete.deleted" , filename));
         }
     }
 

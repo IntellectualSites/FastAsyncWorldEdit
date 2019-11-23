@@ -3,6 +3,7 @@ package com.boydti.fawe.bukkit.filter;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
@@ -26,20 +27,17 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     }
     @Override
     public void calculateRegions() {
-        TaskManager.IMP.sync(new RunnableVal<Object>() {
-            @Override
-            public void run(Object value) {
-                WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(FaweAPI.getWorld(world.getName()));
-                for (ProtectedRegion region : manager.getRegions().values()) {
-                    BlockVector3 min = region.getMinimumPoint();
-                    BlockVector3 max = region.getMaximumPoint();
-                    if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
-                        getLogger(WorldGuardFilter.class).debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
-                        large = true;
-                        break;
-                    }
-                    add(min.toBlockVector2(), max.toBlockVector2());
+        Fawe.get().getQueueHandler().sync(() -> {
+            WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(FaweAPI.getWorld(world.getName()));
+            for (ProtectedRegion region : manager.getRegions().values()) {
+                BlockVector3 min = region.getMinimumPoint();
+                BlockVector3 max = region.getMaximumPoint();
+                if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
+                    getLogger(WorldGuardFilter.class).debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
+                    large = true;
+                    break;
                 }
+                add(min.toBlockVector2(), max.toBlockVector2());
             }
         });
     }

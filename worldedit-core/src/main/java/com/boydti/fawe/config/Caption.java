@@ -1,5 +1,6 @@
 package com.boydti.fawe.config;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -11,6 +12,14 @@ import java.util.List;
 import java.util.Locale;
 
 public class Caption {
+    public static String toString(Component component) {
+        return toString(component, WorldEdit.getInstance().getTranslationManager().getDefaultLocale());
+    }
+
+    public static String toString(Component component, Locale locale) {
+        return WorldEditText.reduceToText(color(component), locale);
+    }
+
     /**
      * Colorize a component with legacy color codes
      * @param parent

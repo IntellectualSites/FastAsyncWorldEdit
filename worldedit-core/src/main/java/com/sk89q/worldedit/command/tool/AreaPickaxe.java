@@ -62,7 +62,7 @@ public class AreaPickaxe implements BlockTool {
             return false;
         }
 
-        try (EditSession editSession = session.createEditSession(player)) {
+        try (EditSession editSession = session.createEditSession(player, "AreaPickaxe")) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
             try {

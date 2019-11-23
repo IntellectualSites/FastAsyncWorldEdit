@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
+import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -65,7 +65,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
 
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
-    private SimpleAsyncNotifyQueue asyncNotifyQueue = new SimpleAsyncNotifyQueue(
+    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
     (thread, throwable) -> {
         while (throwable.getCause() != null) {
             throwable = throwable.getCause();
@@ -106,7 +106,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
             }
         };
         if (async) {
-            asyncNotifyQueue.queue(wrapped);
+            asyncNotifyQueue.run(wrapped);
         } else {
             TaskManager.IMP.taskNow(wrapped, false);
         }

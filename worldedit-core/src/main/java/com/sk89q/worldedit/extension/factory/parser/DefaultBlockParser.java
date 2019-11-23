@@ -19,8 +19,10 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.Maps;
 
+import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
@@ -421,12 +423,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(TranslatableComponent.of("fawe.error.block.not.allowed") + " '" + holder + "'");
+                throw new DisallowedUsageException(Caption.toString(TranslatableComponent.of("fawe.error.block.not.allowed", holder)));
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
                 if (!actor.hasPermission("worldedit.anyblock")) {
-                    throw new DisallowedUsageException("You are not allowed to nbt'");
+                    throw new DisallowedUsageException("You are not allowed to use nbt'");
                 }
             }
         }

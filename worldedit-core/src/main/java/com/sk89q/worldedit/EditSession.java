@@ -210,8 +210,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     private final int maxY;
 
-    public static final UUID CONSOLE = UUID.fromString("1-1-3-3-7");
-
     @Deprecated
     public EditSession(@NotNull World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         this(null, world, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);

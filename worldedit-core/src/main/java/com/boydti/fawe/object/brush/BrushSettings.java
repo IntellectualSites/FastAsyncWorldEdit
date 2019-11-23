@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush;
 
+import static com.boydti.fawe.object.brush.BrushSettings.SettingType.BRUSH;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
@@ -273,4 +274,13 @@ public class BrushSettings {
         return perms.isEmpty();
     }
 
+    @Override
+    public String toString() {
+        String name = (String) getSettings().get(BRUSH);
+        if (name != null) {
+            return name;
+        }
+        name = brush.getClass().getName();
+        return name.substring(name.lastIndexOf('.') + 1);
+    }
 }

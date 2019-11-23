@@ -69,7 +69,6 @@ public class SuperPickaxeCommands {
             player.printError(TranslatableComponent.of("worldedit.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
             return;
         }
-
         session.setSuperPickaxe(new AreaPickaxe(range));
         session.enableSuperPickAxe();
         player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.mode.area"));

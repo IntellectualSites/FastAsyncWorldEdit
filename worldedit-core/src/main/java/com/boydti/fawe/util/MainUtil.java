@@ -80,6 +80,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
+
+import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
@@ -336,7 +338,7 @@ public class MainUtil {
 
     public static FaweInputStream getCompressedIS(InputStream is, int buffer) throws IOException {
         int mode = (byte) is.read();
-        is = new BufferedInputStream(is, buffer);
+        is = new FastBufferedInputStream(is, buffer);
         if (mode == 0) {
             return new FaweInputStream(is);
         }
@@ -353,7 +355,7 @@ public class MainUtil {
         int amountAbs = Math.abs(mode);
         if (amountAbs > 6) {
             if (mode > 0) {
-                is = new BufferedInputStream(new GZIPInputStream(is, buffer));
+                is = new FastBufferedInputStream(new GZIPInputStream(is, buffer));
             } else {
                 is = new ZstdInputStream(is);
             }
@@ -366,7 +368,7 @@ public class MainUtil {
                 is = new LZ4BlockInputStream(is);
             }
         }
-        return new FaweInputStream(is);
+        return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
     public static URL upload(UUID uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
@@ -833,7 +835,7 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                Component msg = WorldEditText.format(TranslatableComponent.of("fawe.info.file.deleted"), Locale.ROOT);
+                Component msg = WorldEditText.format(TranslatableComponent.of("worldedit.schematic.delete.deleted"), Locale.ROOT);
                 if (printDebug) Fawe.debug(msg);
             }
         });

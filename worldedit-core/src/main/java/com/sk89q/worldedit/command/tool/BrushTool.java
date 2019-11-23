@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import static com.boydti.fawe.object.brush.BrushSettings.SettingType.BRUSH;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -110,7 +111,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     private transient BrushSettings context = primary;
 
     private transient PersistentChunkSendProcessor visualExtent;
-    private transient Lock lock = new ReentrantLock();
 
     private transient BaseItem holder;
 
@@ -210,7 +210,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        lock = new ReentrantLock();
         boolean multi = stream.readBoolean();
         primary = (BrushSettings) stream.readObject();
         if (multi) {
@@ -497,7 +496,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             player.print(TranslatableComponent.of("fawe.error.no.perm" , StringMan.join(current.getPermissions(), ",")));
             return false;
         }
-        try (EditSession editSession = session.createEditSession(player)) {
+        try (EditSession editSession = session.createEditSession(player, current.toString())) {
             Location target = player.getBlockTrace(getRange(), true, traceMask);
 
             if (target == null) {
@@ -639,7 +638,9 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         BrushSettings current = getContext();
         Brush brush = current.getBrush();
         if (brush == null) return;
+
         EditSessionBuilder builder = new EditSessionBuilder(player.getWorld())
+                .command(current.toString())
                 .player(player)
                 .allowedRegionsEverywhere()
                 .autoQueue(false)

@@ -4,7 +4,9 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,6 +21,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     private int maxY;
     private int minZ;
     private int maxZ;
+    private String command;
 
     public RollbackOptimizedHistory(World world, UUID uuid, int index) {
         super(world, uuid, index);
@@ -40,32 +43,40 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.time = System.currentTimeMillis();
     }
 
+    public RollbackOptimizedHistory(World world, UUID uuid, int index, long time, long size, CuboidRegion region, String command) {
+        super(world, uuid, index);
+        this.time = time;
+        this.minX = region.getMinimumX();
+        this.minY = region.getMinimumY();
+        this.minZ = region.getMinimumZ();
+        this.maxX = region.getMaximumX();
+        this.maxY = region.getMaximumY();
+        this.maxZ = region.getMaximumZ();
+        this.blockSize = (int) size;
+        this.command = command;
+        this.closed = true;
+    }
+
     public long getTime() {
         return time;
     }
 
-    public int getMinX() {
-        return minX;
+    @Override
+    protected DiskStorageSummary summarizeShallow() {
+        DiskStorageSummary summary = super.summarizeShallow();
+        summary.minX = this.minX;
+        summary.minZ = this.minZ;
+        summary.maxX = this.maxX;
+        summary.maxZ = this.maxZ;
+        return summary;
     }
 
-    public int getMaxX() {
-        return maxX;
+    public void setCommand(String command) {
+        this.command = command;
     }
 
-    public int getMinY() {
-        return minY;
-    }
-
-    public int getMaxY() {
-        return maxY;
-    }
-
-    public int getMinZ() {
-        return minZ;
-    }
-
-    public int getMaxZ() {
-        return maxZ;
+    public String getCommand() {
+        return command;
     }
 
     public void setDimensions(BlockVector3 pos1, BlockVector3 pos2) {
@@ -120,5 +131,13 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         minZ = z;
         maxZ = z;
         super.writeHeader(os, x, y, z);
+    }
+
+    public BlockVector3 getMinimumPoint() {
+        return BlockVector3.at(minX, minY, minZ);
+    }
+
+    public BlockVector3 getMaximumPoint() {
+        return BlockVector3.at(maxX, maxY, maxZ);
     }
 }

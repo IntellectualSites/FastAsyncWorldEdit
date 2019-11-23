@@ -1432,6 +1432,10 @@ public class LocalSession implements TextureHolder {
      * @return an edit session
      */
     public EditSession createEditSession(Actor actor) {
+        return createEditSession(actor, null);
+    }
+
+    public EditSession createEditSession(Actor actor, String command) {
         checkNotNull(actor);
 
         World world = null;
@@ -1449,6 +1453,7 @@ public class LocalSession implements TextureHolder {
             builder.player((Player) actor);
             builder.blockBag(blockBag);
         }
+        builder.command(command);
         builder.fastmode(fastMode);
 
         editSession = builder.build();

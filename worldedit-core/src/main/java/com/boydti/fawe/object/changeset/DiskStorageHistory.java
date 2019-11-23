@@ -8,22 +8,28 @@ import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.IntegerPair;
 import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -166,6 +172,26 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     public File getBDFile() {
         return bdFile;
+    }
+
+    public File getNbtfFile() {
+        return nbtfFile;
+    }
+
+    public File getNbttFile() {
+        return nbttFile;
+    }
+
+    public File getEntfFile() {
+        return entfFile;
+    }
+
+    public File getEnttFile() {
+        return enttFile;
+    }
+
+    public File getBioFile() {
+        return bioFile;
     }
 
     public int getIndex() {
@@ -379,46 +405,35 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbtfFile)));
     }
 
-    public DiskStorageSummary summarize(RegionWrapper requiredRegion, boolean shallow) {
+    protected DiskStorageSummary summarizeShallow() {
+        return new DiskStorageSummary(getOriginX(), getOriginZ());
+    }
+
+    public DiskStorageSummary summarize(Region region, boolean shallow) {
         if (bdFile.exists()) {
             int ox = getOriginX();
             int oz = getOriginZ();
-            if ((ox != 0 || oz != 0) && !requiredRegion.isIn(ox, oz)) {
-                return new DiskStorageSummary(ox, oz);
-            }
-            try (FileInputStream fis = new FileInputStream(bdFile)) {
-                FaweInputStream gis = MainUtil.getCompressedIS(fis);
-                // skip mode
-                gis.skipFully(1);
-                // origin
-                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
-                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
-                setOrigin(ox, oz);
-                DiskStorageSummary summary = new DiskStorageSummary(ox, oz);
-                if (!requiredRegion.isIn(ox, oz)) {
-                    fis.close();
-                    gis.close();
-                    return summary;
-                }
-                byte[] buffer = new byte[4];
-                int i = 0;
-                int amount = (Settings.IMP.HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
-                while (!shallow && ++i < amount) {
-                    if (gis.read(buffer) == -1) {
-                        fis.close();
-                        gis.close();
-                        return summary;
-                    }
-                    int x = (buffer[0] & 0xFF) + (buffer[1] << 8) + ox;
-                    int z = (buffer[2] & 0xFF) + (buffer[3] << 8) + oz;
-                    int from = gis.readVarInt();
-                    int to = gis.readVarInt();
-                    summary.add(x, z, to);
-                }
+            DiskStorageSummary summary = summarizeShallow();
+            if (region != null && !region.contains(ox, oz)) {
                 return summary;
+            }
+            try (FaweInputStream fis = getBlockIS()) {
+                if (!shallow) {
+                    int amount = (Settings.IMP.HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
+                    MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
+                    for (int i = 0; i < amount; i++) {
+                        int x = posDel.readX(fis) + ox;
+                        int y = posDel.readY(fis);
+                        int z = posDel.readZ(fis) + ox;
+                        idDel.readCombined(fis, change);
+                        summary.add(x, z, change.to);
+                    }
+                }
+            } catch (EOFException ignored) {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return summary;
         }
         return null;
     }
@@ -463,7 +478,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
 
         public void add(int x, int z, int id) {
-            blocks[BlockState.getFromInternalId(id).getOrdinal()]++;
+            blocks[id]++;
             if (x < minX) {
                 minX = x;
             } else if (x > maxX) {
@@ -485,6 +500,14 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 }
             }
             return map;
+        }
+
+        public List<Countable<BlockState>> getBlockDistributionWithData() {
+            ArrayList<Countable<BlockState>> list = new ArrayList<>();
+            for (Map.Entry<BlockState, Integer> entry : getBlocks().entrySet()) {
+                list.add(new Countable<>(entry.getKey(), entry.getValue()));
+            }
+            return list;
         }
 
         public Map<BlockState, Double> getPercents() {

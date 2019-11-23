@@ -156,4 +156,8 @@ public class TranslationManager {
     public Component convertText(Component component, Locale locale) {
         return friendlyComponentRenderer.render(component, locale);
     }
+
+    public Locale getDefaultLocale() {
+        return defaultLocale;
+    }
 }

@@ -110,7 +110,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printError(Component component) {
-        print(TranslatableComponent.of("error", component));
+        print(TranslatableComponent.of("fawe.error", component));
     }
 
     /**
@@ -119,7 +119,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printInfo(Component component) {
-        print(TranslatableComponent.of("info", component));
+        print(TranslatableComponent.of("fawe.info", component));
     }
 
     /**
@@ -142,7 +142,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printDebug(Component component) {
-        print(TranslatableComponent.of("debug", component));
+        print(TranslatableComponent.of("fawe.debug", component));
     }
 
     /**

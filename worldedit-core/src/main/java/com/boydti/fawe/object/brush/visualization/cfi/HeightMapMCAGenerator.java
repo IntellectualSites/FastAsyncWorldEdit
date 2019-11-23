@@ -48,6 +48,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
@@ -847,7 +848,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             try {
                 update();
                 Player esPlayer = curES.getPlayer();
-                UUID uuid = esPlayer != null ? esPlayer.getUniqueId() : EditSession.CONSOLE;
+                UUID uuid = esPlayer != null ? esPlayer.getUniqueId() : Identifiable.CONSOLE;
                 try {
                     curES.setRawChangeSet(new CFIChangeSet(this, uuid));
                 } catch (IOException e) {

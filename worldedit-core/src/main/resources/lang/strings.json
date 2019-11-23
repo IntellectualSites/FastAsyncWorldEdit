@@ -1,19 +1,23 @@
 {
-	"fawe.prefix": "&8(&4&lFAWE&8)&7 ",
-	"error": "&c{0}",
-	"info": "&7{0}",
-	"debug": "&3{0}",
+	"fawe.prefix": "&8(&4&lHELLO&8)&7 ",
+	"fawe.error": "&c{0}",
+	"fawe.info": "&7{0}",
+	"fawe.debug": "&3{0}",
+	
 	"piston.style.help.text": "Help: {0}",
 	"piston.style.text.modifier": "TODO modifier: {0}, {1}, {2}",
 	"piston.style.main.text": "{0}",
 	"piston.style.part.wrapping": "&8{0}&e{1}&8{2}",
-	"piston.text.command.prefix": "/",
+	"piston.text.command.prefix": "TODO prefix",
 	
-	"fawe.info.file.deleted": "{0} has been deleted.",
-	"fawe.info.schematic.pasting": "&7The schematic is pasting. This cannot be undone.",
+	"fawe.worldedit.history.find.element": "&8 - &2{0}: {1} &7ago &3{2}m &6{3} &c/{4}",
+	"fawe.worldedit.history.find.hover": "{0} blocks changed, click for more info",
+	
+	
 	"fawe.info.lighting.propagate.selection": "Lighting has been propogated in {0} chunks. (Note: To remove light use //removelight)",
 	"fawe.info.updated.lighting.selection": "Lighting has been updated in {0} chunks. (It may take a second for the packets to send)",
 	"fawe.info.set.region": "Selection set to your current allowed region",
+	
 	"fawe.info.worldedit.command.limit": "Please wait until your current action completes",
 	"fawe.info.worldedit.delayed": "Please wait while we process your FAWE action...",
 	"fawe.info.worldedit.run": "Apologies for the delay. Now executing: {0}",
@@ -505,6 +509,7 @@
 
     "worldedit.paste.pasted": "The clipboard has been pasted at {0}",
     "worldedit.paste.selected": "Selected clipboard paste region.",
+	
     "worldedit.rotate.no-interpolation": "Note: Interpolation is not yet supported, so angles that are multiples of 90 is recommended.",
     "worldedit.rotate.rotated": "The clipboard copy has been rotated.",
     "worldedit.flip.flipped": "The clipboard copy has been flipped.",
@@ -568,7 +573,7 @@
     "worldedit.command.permissions": "You are not permitted to do that. Are you in the right mode?",
     "worldedit.command.player-only": "This command must be used with a player.",
     "worldedit.command.error.report": "Please report this error: [See console]",
-    "worldedit.pastebin.uploading": "(Please wait... sending output to pastebin...)",
+    "worldedit.pastebin.uploading": "(Please wait... uploading paste...)",
     "worldedit.session.cant-find-session": "Unable to find session for {0}",
     "worldedit.platform.no-file-dialog": "File dialogs are not supported in your environment.",
 

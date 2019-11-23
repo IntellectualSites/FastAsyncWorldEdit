@@ -1,19 +1,28 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
 import com.boydti.fawe.command.CFICommands;
+import com.boydti.fawe.config.Caption;
+import com.boydti.fawe.database.DBHandler;
+import com.boydti.fawe.database.RollbackDatabase;
+import com.boydti.fawe.logging.LoggingChangeSet;
+import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -57,8 +66,10 @@ public class ProvideBindings extends Bindings {
     }
 
     @Binding
-    public EditSession editSession(LocalSession localSession, Player player) {
-        EditSession editSession = localSession.createEditSession(player);
+    public EditSession editSession(LocalSession localSession, Player player, InjectedValueAccess context) {
+        Arguments arguments = context.injectedValue(Key.of(Arguments.class)).orElse(null);
+        String command = arguments == null ? null : arguments.get();
+        EditSession editSession = localSession.createEditSession(player, command);
         editSession.enableStandardMode();
         Request.request().setEditSession(editSession);
         return editSession;
@@ -68,6 +79,31 @@ public class ProvideBindings extends Bindings {
     @Binding
     public Region selection(LocalSession localSession, Player player) {
         return localSession.getSelection(player.getWorld());
+    }
+
+    @Binding
+    public RollbackDatabase database(World world) {
+        return DBHandler.IMP.getDatabase(world);
+    }
+
+    @AllowedRegion(FaweMaskManager.MaskType.OWNER)
+    @Binding
+    public Region[] regionsOwner(Player player) {
+        return regions(player, FaweMaskManager.MaskType.OWNER);
+    }
+
+    @AllowedRegion(FaweMaskManager.MaskType.MEMBER)
+    @Binding
+    public Region[] regionsMember(Player player) {
+        return regions(player, FaweMaskManager.MaskType.MEMBER);
+    }
+
+    public Region[] regions(Player player, FaweMaskManager.MaskType type) {
+        Region[] regions = player.getCurrentRegions(type);
+        if (regions == null) {
+            throw new IllegalArgumentException(Caption.toString(TranslatableComponent.of("fawe.error.no.region")));
+        }
+        return regions;
     }
 
     @Binding
@@ -102,7 +138,7 @@ public class ProvideBindings extends Bindings {
             return extent;
         }
         Player plr = getPlayer(actor);
-        EditSession editSession = editSession(getLocalSession(plr), plr);
+        EditSession editSession = editSession(getLocalSession(plr), plr, access);
         if (access instanceof InjectedValueStore) {
             InjectedValueStore store = (InjectedValueStore) access;
             store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));

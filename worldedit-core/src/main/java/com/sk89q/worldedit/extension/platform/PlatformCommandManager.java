@@ -25,6 +25,8 @@ import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.util.StringMan;
+import com.sk89q.worldedit.command.HistorySubCommands;
+import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -294,6 +296,7 @@ public final class PlatformCommandManager {
                                 }
                             });
                 });
+        /*
         globalInjectedValues.injectValue(Key.of(EditSession.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
@@ -306,6 +309,7 @@ public final class PlatformCommandManager {
                                 return editSession;
                             });
                 });
+        */
         globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
                 context -> context.injectedValue(Key.of(Actor.class))
                         .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
@@ -518,10 +522,18 @@ public final class PlatformCommandManager {
                     GenerationCommandsRegistration.builder(),
                     new GenerationCommands(worldEdit)
             );
+            HistoryCommands history = new HistoryCommands(worldEdit);
             this.registration.register(
-                commandManager,
-                HistoryCommandsRegistration.builder(),
-                new HistoryCommands(worldEdit)
+                    commandManager,
+                    HistoryCommandsRegistration.builder(),
+                    history
+            );
+            registerSubCommands(
+                    "/history",
+                    ImmutableList.of(),
+                    "Manage your history",
+                    HistorySubCommandsRegistration.builder(),
+                    new HistorySubCommands(history)
             );
             this.registration.register(
                 commandManager,
@@ -739,7 +751,7 @@ public final class PlatformCommandManager {
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
-                actor.printError(TranslatableComponent.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getUsage()));
+                actor.printError(TranslatableComponent.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {

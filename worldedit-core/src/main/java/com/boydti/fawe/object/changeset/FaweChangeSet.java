@@ -49,19 +49,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
     private final String worldName;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
-    private boolean closed;
-
-    public static FaweChangeSet getDefaultChangeSet(World world, UUID uuid) {
-        if (Settings.IMP.HISTORY.USE_DISK) {
-            if (Settings.IMP.HISTORY.USE_DATABASE) {
-                return new RollbackOptimizedHistory(world, uuid);
-            } else {
-                return new DiskStorageHistory(world, uuid);
-            }
-        } else {
-            return new MemoryOptimizedHistory(world);
-        }
-    }
+    protected boolean closed;
 
     public FaweChangeSet(String world) {
         this.worldName = world;

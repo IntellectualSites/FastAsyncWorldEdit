@@ -22,10 +22,6 @@ import java.util.concurrent.Future;
 public class AbstractDelegateChangeSet extends FaweChangeSet {
     public final FaweChangeSet parent;
 
-    public static FaweChangeSet getDefaultChangeSet(World world, UUID uuid) {
-        return FaweChangeSet.getDefaultChangeSet(world, uuid);
-    }
-
     public AbstractDelegateChangeSet(FaweChangeSet parent) {
         super(parent.getWorld());
         this.parent = parent;

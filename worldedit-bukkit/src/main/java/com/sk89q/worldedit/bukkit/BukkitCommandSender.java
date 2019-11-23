@@ -75,27 +75,6 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
     }
 
     @Override
-    public void print(String msg) {
-        for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7d" + part);
-        }
-    }
-
-    @Override
-    public void printDebug(String msg) {
-        for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A77" + part);
-        }
-    }
-
-    @Override
-    public void printError(String msg) {
-        for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7c" + part);
-        }
-    }
-
-    @Override
     public void print(Component component) {
         TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));
     }

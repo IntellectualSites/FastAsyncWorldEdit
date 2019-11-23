@@ -4,8 +4,10 @@ import com.boydti.fawe.util.MathMan;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
+/**
+ * Efficient blur / average color over an image
+ */
 public class SummedColorTable {
-    private static float inv256 = 1/256f;
     private final long[] reds, greens, blues, alpha;
     private final int[] hasAlpha;
     private final int length;
@@ -82,11 +84,6 @@ public class SummedColorTable {
                 }
             }
         }
-    }
-
-    private long getSum(int index, long[] summed) {
-        if (index < 0) return 0;
-        return summed[index];
     }
 
     public int averageRGB(int x1, int z1, int x2, int z2) {

@@ -558,14 +558,18 @@ public class SelectionCommands {
         actor.print(res.create(page));
     }
 
-    private static class BlockDistributionResult extends PaginationBox {
+    public static class BlockDistributionResult extends PaginationBox {
 
         private final List<Countable> distribution;
         private final int totalBlocks;
         private final boolean separateStates;
 
-        BlockDistributionResult(List<Countable> distribution, boolean separateStates) {
-            super("Block Distribution", "//distr -p %page%" + (separateStates ? " -d" : ""));
+        public BlockDistributionResult(List<Countable> distribution, boolean separateStates) {
+            this(distribution, separateStates, "//distr -p %page%" + (separateStates ? " -d" : ""));
+        }
+
+        public BlockDistributionResult(List<Countable> distribution, boolean separateStates, String pageCommand) {
+            super("Block Distribution", pageCommand);
             this.distribution = distribution;
             // note: doing things like region.getArea is inaccurate for non-cuboids.
             this.totalBlocks = distribution.stream().mapToInt(Countable::getAmount).sum();

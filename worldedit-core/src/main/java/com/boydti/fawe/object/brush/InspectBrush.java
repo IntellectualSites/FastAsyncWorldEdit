@@ -1,11 +1,12 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
@@ -19,12 +20,16 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
 
@@ -61,47 +66,49 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(TranslatableComponent.of("fawe.error.setting.disable", ("history.use-database (Import with /frb #import )")));
+            player.print(TranslatableComponent.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
             return false;
         }
-        BlockVector3 target = getTarget(player, rightClick).toBlockPoint();
-        final int x = target.getBlockX();
-        final int y = target.getBlockY();
-        final int z = target.getBlockZ();
-        World world = player.getWorld();
-        RollbackDatabase db = DBHandler.IMP.getDatabase(world);
-        final AtomicInteger count = new AtomicInteger();
-        db.getPotentialEdits(null, 0, target, target, new RunnableVal<DiskStorageHistory>() {
-            @Override
-            public void run(DiskStorageHistory value) {
-                try {
-                    Iterator<MutableFullBlockChange> iter = value.getFullBlockIterator(null, 0, false);
-                    while (iter.hasNext()) {
-                        MutableFullBlockChange change = iter.next();
-                        if (change.x != x || change.y != y || change.z != z) {
-                            continue;
-                        }
-                        int from = change.from;
-                        int to = change.to;
-                        UUID uuid = value.getUUID();
-                        String name = Fawe.imp().getName(uuid);
-                        int index = value.getIndex();
-                        long age = System.currentTimeMillis() - value.getBDFile().lastModified();
-                        String ageFormatted = MainUtil.secToTime(age / 1000);
-                        player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info" , name, BlockState.getFromOrdinal(from).getAsString(), BlockState.getFromOrdinal(to).getAsString(), ageFormatted));
-                        count.incrementAndGet();
-                        return;
+        try {
+            BlockVector3 target = getTarget(player, rightClick).toBlockPoint();
+            final int x = target.getBlockX();
+            final int y = target.getBlockY();
+            final int z = target.getBlockZ();
+            World world = player.getWorld();
+            RollbackDatabase db = DBHandler.IMP.getDatabase(world);
+            int count = 0;
+            for (Supplier<RollbackOptimizedHistory> supplier : db.getEdits(target, false)) {
+                count++;
+                RollbackOptimizedHistory edit = supplier.get();
+                Iterator<MutableFullBlockChange> iter = edit.getFullBlockIterator(null, 0, false);
+                while (iter.hasNext()) {
+                    MutableFullBlockChange change = iter.next();
+                    if (change.x != x || change.y != y || change.z != z) {
+                        continue;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    int from = change.from;
+                    int to = change.to;
+                    UUID uuid = edit.getUUID();
+                    String name = Fawe.imp().getName(uuid);
+                    int index = edit.getIndex();
+                    long age = System.currentTimeMillis() - edit.getBDFile().lastModified();
+                    String ageFormatted = MainUtil.secToTime(age / 1000);
+                    BlockState blockFrom = BlockState.getFromOrdinal(from);
+                    BlockState blockTo = BlockState.getFromOrdinal(to);
+                    TranslatableComponent msg = TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info", name, blockFrom, blockTo, ageFormatted);
+
+                    String cmd = edit.getCommand();
+                    TextComponent hover = TextComponent.of(cmd, TextColor.GOLD);
+                    String infoCmd = "//history summary " + uuid + " " + index;
+                    msg = msg.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
+                    msg = msg.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
+                    player.print(msg);
                 }
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
-            }
-        }, false, false);
+            player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return true;
     }
 

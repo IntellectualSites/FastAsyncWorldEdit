@@ -9,6 +9,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
+import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.LoggingChangeSet;
@@ -58,6 +59,7 @@ public class EditSessionBuilder {
     private BlockBag blockBag;
     private boolean threaded = true;
     private EditSessionEvent event;
+    private String command;
 
     /**
      * An EditSession builder<br>
@@ -128,6 +130,11 @@ public class EditSessionBuilder {
         this.world = world;
         this.worldName = world.getName();
         return setDirty();
+    }
+
+    public EditSessionBuilder command(String command) {
+        this.command = command;
+        return this;
     }
 
     /**
@@ -360,7 +367,7 @@ public class EditSessionBuilder {
             if (!this.fastmode || changeSet != null) {
                 if (changeSet == null) {
                     if (Settings.IMP.HISTORY.USE_DISK) {
-                        UUID uuid = player == null ? EditSession.CONSOLE : player.getUniqueId();
+                        UUID uuid = player == null ? Identifiable.CONSOLE : player.getUniqueId();
                         if (Settings.IMP.HISTORY.USE_DATABASE) {
                             changeSet = new RollbackOptimizedHistory(world, uuid);
                         } else {
@@ -377,6 +384,9 @@ public class EditSessionBuilder {
                 }
                 if (this.limit.SPEED_REDUCTION > 0) {
                     this.extent = this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
+                }
+                if (command != null && changeSet instanceof RollbackOptimizedHistory) {
+                    ((RollbackOptimizedHistory) changeSet).setCommand(this.command);
                 }
                 if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
                     changeSet = LoggingChangeSet.wrap(player, changeSet);

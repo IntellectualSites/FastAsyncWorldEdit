@@ -19,6 +19,10 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
+import com.boydti.fawe.object.collection.AdaptedSetCollection;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -27,9 +31,11 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class PaginationBox extends MessageBox {
 
@@ -75,7 +81,11 @@ public abstract class PaginationBox extends MessageBox {
         super(title, new TextComponentProducer());
 
         if (pageCommand != null && !pageCommand.contains("%page%")) {
-            throw new IllegalArgumentException("pageCommand must contain %page% if provided.");
+            if (pageCommand.contains("-p ")) {
+                pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
+            } else{
+                pageCommand = pageCommand + " -p %page%";
+            }
         }
         this.pageCommand = pageCommand;
     }
@@ -131,12 +141,16 @@ public abstract class PaginationBox extends MessageBox {
         throw new IllegalStateException("Pagination components must be created with a page");
     }
 
+    public static <T> PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<T> lines, Function<T, Component> adapt) {
+        return fromStrings(header, pageCommand, Collections2.transform(lines, adapt));
+    }
+
     public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection lines) {
         return new ListPaginationBox(header, pageCommand, lines);
     }
 
     public static PaginationBox fromStrings(String header, @Nullable String pageCommand, List<String> lines) {
-        return new ListPaginationBox(header, pageCommand, lines);
+        return fromStrings(header, pageCommand, (Collection) lines);
     }
 
     public static class ListPaginationBox extends PaginationBox {
@@ -167,6 +181,9 @@ public abstract class PaginationBox extends MessageBox {
                     obj = iterator.next();
                     iterIndex++;
                 } while (iterIndex < number);
+            }
+            if (obj instanceof Supplier) {
+                obj = ((Supplier) obj).get();
             }
             if (obj instanceof Component) {
                 return (Component) obj;

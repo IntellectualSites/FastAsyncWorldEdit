@@ -33,8 +33,8 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     private int mode;
     private final int compression;
 
-    private FaweStreamIdDelegate idDel;
-    private FaweStreamPositionDelegate posDel;
+    protected FaweStreamIdDelegate idDel;
+    protected FaweStreamPositionDelegate posDel;
 
     public FaweStreamChangeSet(World world) {
         this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
@@ -85,10 +85,10 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
 
         void readCombined(FaweInputStream in, MutableBlockChange change, boolean dir) throws IOException;
 
-        void readCombined(FaweInputStream in, MutableFullBlockChange change, boolean dir) throws IOException;
+        void readCombined(FaweInputStream in, MutableFullBlockChange change) throws IOException;
     }
 
-    private void setupStreamDelegates(int mode) {
+    protected void setupStreamDelegates(int mode) {
         this.mode = mode;
         if (mode == 3 || mode == 4) {
             idDel = new FaweStreamIdDelegate() {
@@ -102,15 +102,15 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 public void readCombined(FaweInputStream is, MutableBlockChange change, boolean dir) throws IOException {
                     if (dir) {
                         is.readVarInt();
-                        change.combinedId = is.readVarInt();
+                        change.ordinal = is.readVarInt();
                     } else {
-                        change.combinedId = is.readVarInt();
+                        change.ordinal = is.readVarInt();
                         is.readVarInt();
                     }
                 }
 
                 @Override
-                public void readCombined(FaweInputStream is, MutableFullBlockChange change, boolean dir) throws IOException {
+                public void readCombined(FaweInputStream is, MutableFullBlockChange change) throws IOException {
                     change.from = is.readVarInt();
                     change.to = is.readVarInt();
                 }
@@ -126,11 +126,11 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 public void readCombined(FaweInputStream in, MutableBlockChange change, boolean dir) throws IOException {
                     int from1 = in.read();
                     int from2 = in.read();
-                    change.combinedId = in.readVarInt();
+                    change.ordinal = in.readVarInt();
                 }
 
                 @Override
-                public void readCombined(FaweInputStream is, MutableFullBlockChange change, boolean dir) throws IOException {
+                public void readCombined(FaweInputStream is, MutableFullBlockChange change) throws IOException {
                     change.from = is.readVarInt();
                     change.to = BlockTypes.AIR.getInternalId();
                 }
@@ -290,7 +290,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
 
     public abstract NBTInputStream getTileRemoveIS() throws IOException;
 
-    private int blockSize;
+    protected int blockSize;
     public int entityCreateSize;
     public int entityRemoveSize;
     public int tileCreateSize;
@@ -530,7 +530,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                     change.x = posDel.readX(is) + originX;
                     change.y = posDel.readY(is);
                     change.z = posDel.readZ(is) + originZ;
-                    idDel.readCombined(is, change, dir);
+                    idDel.readCombined(is, change);
                     return change;
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
