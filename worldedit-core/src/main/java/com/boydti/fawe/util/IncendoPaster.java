@@ -243,8 +243,7 @@ public final class IncendoPaster implements Paster {
 
         incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
         incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
-        incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
-//        incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
+        incendoPaster.addFile(new PasteFile("strings.json", readFile(new File(Fawe.imp().getDirectory(), "lang/strings.json"))));
 
         final String rawResponse;
         try {
