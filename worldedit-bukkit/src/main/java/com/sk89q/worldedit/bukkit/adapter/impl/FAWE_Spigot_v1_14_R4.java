@@ -404,12 +404,6 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction
-                CuboidRegion expandedPreGen = new CuboidRegion(region.getMinimumPoint().subtract(16, 0, 16), region.getMaximumPoint().add(16, 0, 16));
-                for (BlockVector2 chunk : expandedPreGen.getChunks()) {
-                    freshWorld.getChunkAt(chunk.getBlockX(), chunk.getBlockZ());
-                }
-
-                // TODO optimize
                 SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
                 extent.init(null, (x, z) -> new BukkitGetBlocks_1_14(freshWorld, x, z), null);
                 for (BlockVector3 vec : region) {
