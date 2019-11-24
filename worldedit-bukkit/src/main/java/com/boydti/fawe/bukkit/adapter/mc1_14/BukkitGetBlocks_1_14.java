@@ -14,6 +14,7 @@ import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.util.TaskManager;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
@@ -41,11 +42,13 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.ChunkStatus;
 import net.minecraft.server.v1_14_R1.DataBits;
 import net.minecraft.server.v1_14_R1.DataPalette;
 import net.minecraft.server.v1_14_R1.DataPaletteBlock;
@@ -54,6 +57,8 @@ import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.LightEngine;
+import net.minecraft.server.v1_14_R1.LightEngineThreaded;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.NBTTagInt;
 import net.minecraft.server.v1_14_R1.TileEntity;
@@ -444,12 +449,11 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     };
                 }
 
-//                {//Lighting
-//                    for (int layer = 0; layer < 16; layer++) {
-//                        if (!set.hasSection(layer)) continue;
-//                        //TODO lighting
-//                    }
-//                }
+                {//Lighting
+                    // TODO optimize, cause this is really slow
+                    LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
+                    engine.a(nmsChunk, false);
+                }
 
                 Runnable callback;
                 if (bitMask == 0 && biomes == null) {

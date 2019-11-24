@@ -23,3 +23,4 @@ worldedit-bukkit/src/main/java/ignore/*
 todo.txt
 mvn/*
 docs/
+*.sh

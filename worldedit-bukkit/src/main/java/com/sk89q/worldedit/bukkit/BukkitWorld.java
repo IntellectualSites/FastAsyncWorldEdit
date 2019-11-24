@@ -192,7 +192,7 @@ public class BukkitWorld extends AbstractWorld {
     public boolean regenerate(Region region, EditSession editSession) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            return adapter.regenerate(getWorld(), region, editSession);
+            return adapter.regenerate(getWorld(), region, null, null, editSession);
         }
         /*
         BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
