@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.sk89q.worldedit.event.platform.Interaction.HIT;
 import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
 
@@ -408,8 +409,9 @@ public final class WorldEdit {
     }
 
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
+        double val = radius.evaluate();
+        checkArgument(val >= 0);
         if (getConfiguration().maxBrushRadius > 0) {
-            double val = radius.evaluate();
             if (val > getConfiguration().maxBrushRadius) {
                 throw new MaxBrushRadiusException();
             }
