@@ -31,8 +31,11 @@ public abstract class MapChunkUtil<T> {
             fieldX.setInt(nmsPacket, packet.getChunkX());
             fieldZ.setInt(nmsPacket, packet.getChunkZ());
             fieldBitMask.set(nmsPacket, packet.getChunk().getBitMask());
-            Object heightMap = adapter.fromNative(packet.getHeightMap());
-            fieldHeightMap.set(nmsPacket, heightMap);
+
+            if (fieldHeightMap != null) {
+                Object heightMap = adapter.fromNative(packet.getHeightMap());
+                fieldHeightMap.set(nmsPacket, heightMap);
+            }
 
             fieldChunkData.set(nmsPacket, packet.getSectionBytes());
 

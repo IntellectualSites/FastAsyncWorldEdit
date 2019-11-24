@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,6 +35,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataFixer;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -42,6 +44,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -237,5 +240,13 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
         return editSession.regenerate(region);
+    }
+
+    default IChunkGet get(World world, int chunkX, int chunkZ) {
+        throw new UnsupportedOperationException();
+    }
+
+    default int getInternalBiomeId(BiomeType biome) {
+        return Biome.BADLANDS.ordinal();
     }
 }

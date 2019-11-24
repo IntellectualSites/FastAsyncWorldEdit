@@ -21,6 +21,10 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Time;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -93,8 +97,7 @@ public class HistorySubCommands {
     @Command(
             name = "rollback",
             desc = "Undo a specific edit. " +
-                    " - The time uses s, m, h, d, y.\n" +
-                    " - Import from disk: /history import"
+                    " - The time uses s, m, h, d, y."
     )
     @CommandPermissions("worldedit.history.undo")
     @Confirm

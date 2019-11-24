@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.FaweCache;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;

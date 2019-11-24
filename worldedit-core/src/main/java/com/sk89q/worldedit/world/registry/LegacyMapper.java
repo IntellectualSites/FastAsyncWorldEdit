@@ -56,6 +56,13 @@ public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
     private static LegacyMapper INSTANCE = new LegacyMapper();
+    static {
+        try {
+            INSTANCE.loadFromResource();
+        } catch (Throwable e) {
+            log.warn("Failed to load the built-in legacy id registry", e);
+        }
+    }
 
     private Map<String, String> blockEntries = new HashMap<>();
 
@@ -68,11 +75,6 @@ public final class LegacyMapper {
      * Create a new instance.
      */
     private LegacyMapper() {
-        try {
-            loadFromResource();
-        } catch (Throwable e) {
-            log.warn("Failed to load the built-in legacy id registry", e);
-        }
     }
 
     /**
@@ -118,6 +120,7 @@ public final class LegacyMapper {
                 }
                 if (blockState == null) {
                     log.warn("Unknown block: " + value);
+                    continue;
                 }
             }
 			blockArr[combinedId] = blockState.getInternalId();

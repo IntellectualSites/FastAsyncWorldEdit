@@ -564,7 +564,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ);
+        return WorldEditPlugin.getInstance().getBukkitImplAdapter().get(getWorldChecked(), chunkX, chunkZ);
     }
 
     @Override
