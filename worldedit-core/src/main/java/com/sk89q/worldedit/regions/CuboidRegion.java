@@ -700,11 +700,11 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             minSection++;
         }
         if (yEnd != 15) {
-            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ, full);
+            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, yEnd, localMaxZ, full);
             maxSection--;
         }
         for (int layer = minSection; layer <= maxSection; layer++) {
-            filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ, full);
+            filter(chunk, filter, block, get, set, layer, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ, full);
         }
     }
 
