@@ -42,10 +42,11 @@ public @interface Confirm {
             @Override
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
                 Region region = context.injectedValue(Key.of(Region.class, Selection.class)).orElseThrow(IncompleteRegionException::new);
-                BlockVector3 min = region.getMinimumPoint();
-                BlockVector3 max = region.getMaximumPoint();
-                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1) * (int) value;
-                if (area > 2 << 18) {
+                BlockVector3 pos1 = region.getMinimumPoint();
+                BlockVector3 pos2 = region.getMaximumPoint();
+                long area = (pos2.getX() - pos1.getX()) * (pos2.getZ() - pos1.getZ() + 1) * (long) value;
+                long max = 2 << 18; // TODO configurable?
+                if (max != -1 && area > max) {
                     actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , min, max, getArgs(context)));
                     return confirm(actor, context);
                 }
@@ -56,7 +57,7 @@ public @interface Confirm {
             @Override
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
                 int max = WorldEdit.getInstance().getConfiguration().maxRadius;
-                if (value > max) {
+                if (max != -1 && value > max) {
                     actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , value, max, getArgs(context)));
                     return Processor.confirm(actor, context);
                 }
@@ -67,7 +68,7 @@ public @interface Confirm {
             @Override
             public boolean passes(Actor actor, InjectedValueAccess context, double value) {
                 int max = 50;// TODO configurable, get Key.of(Method.class) @Limit
-                if (value > max) {
+                if (max != -1 && value > max) {
                     actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , value, max, getArgs(context)));
                     return Processor.confirm(actor, context);
                 }
