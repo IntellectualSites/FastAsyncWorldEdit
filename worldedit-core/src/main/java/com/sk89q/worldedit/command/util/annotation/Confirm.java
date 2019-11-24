@@ -45,9 +45,9 @@ public @interface Confirm {
                 BlockVector3 pos1 = region.getMinimumPoint();
                 BlockVector3 pos2 = region.getMaximumPoint();
                 long area = (pos2.getX() - pos1.getX()) * (pos2.getZ() - pos1.getZ() + 1) * (long) value;
-                long max = 2 << 18; // TODO configurable?
+                long max = 2 << 18;
                 if (max != -1 && area > max) {
-                    actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , min, max, getArgs(context)));
+                    actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm.region" , pos1, pos2, getArgs(context)));
                     return confirm(actor, context);
                 }
                 return true;
