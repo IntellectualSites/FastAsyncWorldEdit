@@ -48,6 +48,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -92,6 +93,7 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -383,7 +385,7 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
+    public boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
         WorldServer originalWorld = ((CraftWorld) world).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {
@@ -398,18 +400,27 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
             CraftServer server = originalWorld.getServer();
             IDataManager originalDataManager = originalWorld.getDataManager();
             WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server.getServer(), originalDataManager.i());
-            ChunkGenerator originalGen = world.getGenerator();
 
+            ChunkGenerator generator = world.getGenerator();
+            org.bukkit.World.Environment environment = world.getEnvironment();
+            if (seed != null) {
+                if (biome == BiomeTypes.NETHER) {
+                    environment = org.bukkit.World.Environment.NETHER;
+                } else if (biome == BiomeTypes.THE_END) {
+                    environment = org.bukkit.World.Environment.THE_END;
+                } else {
+                    environment = org.bukkit.World.Environment.NORMAL;
+                }
+                generator = null;
+            }
             try (WorldServer freshWorld = new WorldServer(server.getServer(),
                     saveHandler,
                     originalWorld.worldMaps,
                     originalWorld.worldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.methodProfiler,
-                    world.getEnvironment(),
-                    originalGen
-            )
-            ) {
+                    environment,
+                    generator)) {
                 SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
                 extent.init(null, (x, z) -> new BukkitGetBlocks_1_13(freshWorld, x, z) {
                     @Override

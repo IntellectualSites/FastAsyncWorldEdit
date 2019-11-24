@@ -54,6 +54,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -387,7 +388,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
+    public boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
         WorldServer originalWorld = ((CraftWorld) world).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {
@@ -404,14 +405,26 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
             WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server.getServer(), originalDataManager.getDataFixer());
             ChunkGenerator originalGen = world.getGenerator();
 
+            ChunkGenerator generator = world.getGenerator();
+            org.bukkit.World.Environment environment = world.getEnvironment();
+            if (seed != null) {
+                if (biome == BiomeTypes.NETHER) {
+                    environment = org.bukkit.World.Environment.NETHER;
+                } else if (biome == BiomeTypes.THE_END) {
+                    environment = org.bukkit.World.Environment.THE_END;
+                } else {
+                    environment = org.bukkit.World.Environment.NORMAL;
+                }
+                generator = null;
+            }
             try (WorldServer freshWorld = new WorldServer(server.getServer(),
                     server.getServer().executorService, saveHandler,
                     originalWorld.worldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.getMethodProfiler(),
                     server.getServer().worldLoadListenerFactory.create(11),
-                    world.getEnvironment(),
-                    originalGen)) {
+                    environment,
+                    generator)) {
 
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction
