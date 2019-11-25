@@ -4,15 +4,11 @@ on:
   push:
     branches:
     - master
-    - breaking-114
-    - commanding
-    - commanding-pipeline
+    - merge
   pull_request:
     branches:
     - master
-    - breaking-114
-    - commanding
-    - commanding-pipeline
+    - merge
  
 jobs:
   test:
