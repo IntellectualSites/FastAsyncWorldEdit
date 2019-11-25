@@ -471,10 +471,12 @@ public class LocalSession implements TextureHolder {
         if (editSession.getChangeSet() == null || limitMb == 0 || historySize >> 20 > limitMb && !append) {
             return;
         }
+        /*
         // Don't store anything if no changes were made
         if (editSession.size() == 0) {
             return;
         }
+        */
 
         FaweChangeSet changeSet = (FaweChangeSet) editSession.getChangeSet();
         if (changeSet.isEmpty()) {
