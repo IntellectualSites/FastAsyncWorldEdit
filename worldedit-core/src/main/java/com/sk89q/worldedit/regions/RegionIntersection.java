@@ -23,13 +23,17 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -168,5 +172,53 @@ public class RegionIntersection extends AbstractRegion {
             }
         }
         return null;
+    }
+
+    public List<Region> getRegions() {
+        return regions;
+    }
+
+    @Override
+    public Set<BlockVector2> getChunks() {
+        Set<BlockVector2> set = null;
+        for (Region region : regions) {
+            if (set == null) {
+                set = region.getChunks();
+            } else {
+                set = Sets.union(set, region.getChunks());
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public Set<BlockVector3> getChunkCubes() {
+        Set<BlockVector3> set = null;
+        for (Region region : regions) {
+            if (set == null) {
+                set = region.getChunkCubes();
+            } else {
+                set = Sets.union(set, region.getChunkCubes());
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public boolean containsChunk(int chunkX, int chunkZ) {
+        for (Region region : regions) if (region.containsChunk(chunkX, chunkZ)) return true;
+        return false;
+    }
+
+    @Override
+    public boolean contains(int x, int z) {
+        for (Region region : regions) if (region.contains(x, z)) return true;
+        return false;
+    }
+
+    @Override
+    public boolean contains(int x, int y, int z) {
+        for (Region region : regions) if (region.contains(x, y, z)) return true;
+        return false;
     }
 }

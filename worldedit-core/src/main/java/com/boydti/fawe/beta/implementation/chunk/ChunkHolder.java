@@ -316,10 +316,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {
+            block = block.init(chunkX, chunkZ, get);
             if (region != null) {
                 region.filter(this, filter, block, get, set, full);
             } else {
-                block = block.init(chunkX, chunkZ, get);
                 for (int layer = 0; layer < 16; layer++) {
                     if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
                         continue;

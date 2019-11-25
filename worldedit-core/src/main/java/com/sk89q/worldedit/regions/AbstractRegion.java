@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -169,21 +170,14 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     public Set<BlockVector2> getChunks() {
         final Set<BlockVector2> chunks = new HashSet<>();
 
-        final BlockVector3 min = getMinimumPoint();
-        final BlockVector3 max = getMaximumPoint();
+        final BlockVector3 min = getMinimumPoint().divide(16);
+        final BlockVector3 max = getMaximumPoint().divide(16);
 
-        final int minY = min.getBlockY();
-
-        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
-            for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
-                if (!contains(BlockVector3.at(x, minY, z))) {
-                    continue;
+        for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
+            for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
+                if (containsChunk(X, Z)) {
+                    chunks.add(BlockVector2.at(X, Z));
                 }
-
-                chunks.add(BlockVector2.at(
-                    x >> ChunkStore.CHUNK_SHIFTS,
-                    z >> ChunkStore.CHUNK_SHIFTS
-                ));
             }
         }
 
