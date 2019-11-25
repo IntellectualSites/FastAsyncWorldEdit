@@ -1,10 +1,8 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.WEManager;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -12,7 +10,6 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -20,13 +17,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.List;
-
 public class ProcessedWEExtent extends AbstractDelegateExtent {
     private final FaweLimit limit;
     private final AbstractDelegateExtent extent;
 
-    public ProcessedWEExtent(final Extent parent, FaweLimit limit) {
+    public ProcessedWEExtent(Extent parent, FaweLimit limit) {
         super(parent);
         this.limit = limit;
         this.extent = (AbstractDelegateExtent) parent;
@@ -37,7 +32,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public Entity createEntity(final Location location, final BaseEntity entity) {
+    public Entity createEntity(Location location, BaseEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -46,21 +41,6 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
             return null;
         }
         return super.createEntity(location, entity);
-    }
-
-    @Override
-    public BiomeType getBiome(final BlockVector2 position) {
-        return super.getBiome(position);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return super.getEntities();
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(final Region region) {
-        return super.getEntities(region);
     }
 
     @Override
@@ -84,7 +64,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -95,7 +75,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {
                 WEManager.IMP.cancelEdit(this, FaweException.MAX_TILES);
@@ -117,7 +97,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (!limit.MAX_CHANGES()) {
             WEManager.IMP.cancelEditSafe(this, FaweException.MAX_CHANGES);
             return false;

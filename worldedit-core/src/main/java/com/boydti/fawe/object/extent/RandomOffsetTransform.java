@@ -11,17 +11,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.SplittableRandom;
 
-public class RandomOffsetTransform extends ResettableExtent {
+public class RandomOffsetTransform extends OffsetExtent {
     private transient SplittableRandom random;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
-    private final int dx, dy, dz;
-
     public RandomOffsetTransform(Extent parent, int dx, int dy, int dz) {
-        super(parent);
-        this.dx = dx + 1;
-        this.dy = dy + 1;
-        this.dz = dz + 1;
+        super(parent, dx + 1, dy + 1, dz + 1);
         this.random = new SplittableRandom();
     }
 
@@ -33,7 +28,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 pos, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block) throws WorldEditException {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
@@ -41,7 +36,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         x = x + random.nextInt(1 + (dx << 1)) - dx;
         y = y + random.nextInt(1 + (dy << 1)) - dy;
         z = z + random.nextInt(1 + (dz << 1)) - dz;

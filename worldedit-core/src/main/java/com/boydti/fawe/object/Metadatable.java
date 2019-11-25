@@ -11,7 +11,6 @@ public class Metadatable {
      *
      * @param key
      * @param value
-     * @return previous value
      */
     public void setMeta(String key, Object value) {
         this.meta.put(key, value);

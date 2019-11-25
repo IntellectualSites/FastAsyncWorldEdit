@@ -2,7 +2,7 @@ package com.sk89q.worldedit.math;
 
 public class MutableBlockVector2 extends BlockVector2 {
 
-    private static ThreadLocal<MutableBlockVector2> MUTABLE_CACHE = ThreadLocal.withInitial(() -> new MutableBlockVector2());
+    private static ThreadLocal<MutableBlockVector2> MUTABLE_CACHE = ThreadLocal.withInitial(MutableBlockVector2::new);
 
     public static MutableBlockVector2 get(int x, int z) {
         return MUTABLE_CACHE.get().setComponents(x, z);

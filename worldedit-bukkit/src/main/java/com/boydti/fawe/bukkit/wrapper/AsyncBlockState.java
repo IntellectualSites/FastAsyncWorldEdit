@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -17,33 +19,30 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public class AsyncBlockState implements BlockState {
 
-    private int combinedId;
+    private BaseBlock state;
     private BlockData blockData;
-    private CompoundTag nbt;
     private final AsyncBlock block;
 
     public AsyncBlockState(AsyncBlock block) {
-        this(block, block.queue.getCombinedId4Data(block.x, block.y, block.z, 0));
+        this(block, block.world.getFullBlock(block.x, block.y, block.z));
     }
 
-    public AsyncBlockState(AsyncBlock block, int combined) {
-        this.combinedId = combined;
+    public AsyncBlockState(AsyncBlock block, BaseBlock state) {
+        this.state = state;
         this.block = block;
-        this.blockData = BukkitAdapter.getBlockData(combined);
-        if (BlockTypes.getFromStateId(combined).getMaterial().hasContainer()) {
-            this.nbt = block.queue.getTileEntity(block.x, block.y, block.z);
-        }
+        this.blockData = BukkitAdapter.adapt(state);
     }
 
     public int getTypeId() {
-        return BlockTypes.getFromStateId(combinedId).getInternalId();
+        return state.getBlockType().getInternalId();
     }
 
     public int getPropertyId() {
-        return combinedId >> BlockTypes.BIT_OFFSET;
+        return state.getInternalId() >> BlockTypes.BIT_OFFSET;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class AsyncBlockState implements BlockState {
 
     @Override
     public byte getLightLevel() {
-        return (byte) BlockTypes.getFromStateId(combinedId).getMaterial().getLightValue();
+        return (byte) state.getMaterial().getLightValue();
     }
 
     @Override
@@ -101,6 +100,7 @@ public class AsyncBlockState implements BlockState {
         return block.getLocation(loc);
     }
 
+    @NotNull
     @Override
     public Chunk getChunk() {
         return block.getChunk();
@@ -114,7 +114,14 @@ public class AsyncBlockState implements BlockState {
     @Override
     public void setBlockData(BlockData blockData) {
         this.blockData = blockData;
-        this.combinedId = BukkitAdapter.adapt(blockData).getInternalId();
+        CompoundTag nbt = state.getNbtData();
+        BlockType oldType = state.getBlockType();
+        com.sk89q.worldedit.world.block.BlockState newState = BukkitAdapter.adapt(blockData);
+        if (nbt != null && newState.getBlockType() == oldType) {
+            state = newState.toBaseBlock(nbt);
+        } else {
+            state = newState.toBaseBlock();
+        }
     }
 
     @Override
@@ -135,33 +142,30 @@ public class AsyncBlockState implements BlockState {
     @Override
     public boolean update(boolean force, boolean applyPhysics) {
         try {
-            boolean result = block.queue.setBlock(block.x, block.y, block.z, BukkitAdapter.adapt(blockData));
-            if (nbt != null) {
-                block.queue.setTile(block.x, block.y, block.z, nbt);
-            }
-            return result;
+            return block.world.setBlock(block.x, block.y, block.z, state);
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
     }
 
     public CompoundTag getNbtData() {
-        return nbt;
+        return state.getNbtData();
     }
 
     public void setNbtData(CompoundTag nbt) {
-        this.nbt = nbt;
+        state = this.state.toBaseBlock(nbt);
     }
 
     @Override
     public byte getRawData() {
-        return (byte) (combinedId >> BlockTypes.BIT_OFFSET);
+        return (byte) (state.getInternalId() >> BlockTypes.BIT_OFFSET);
     }
 
     @Override
     public void setRawData(byte data) {
-        this.combinedId = getTypeId() + (data << BlockTypes.BIT_OFFSET);
-        this.blockData = BukkitAdapter.getBlockData(this.combinedId);
+        int combinedId = getTypeId() + (data << BlockTypes.BIT_OFFSET);
+        state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock(state.getNbtData());
+        this.blockData = BukkitAdapter.adapt(state);
     }
 
     @Override

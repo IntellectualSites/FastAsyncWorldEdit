@@ -19,15 +19,17 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A mask that checks whether blocks at the given positions are matched by
@@ -36,12 +38,9 @@ import java.util.Set;
  * <p>This mask checks for ONLY the block type. If state should also be checked,
  * use {@link BlockMask}.</p>
  */
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Deprecated
 public class BlockTypeMask extends AbstractExtentMask {
 
-    private final boolean[] types;
+    private final Set<BlockType> blocks;
 
     /**
      * Create a new block mask.
@@ -49,8 +48,9 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param extent the extent
      * @param blocks a list of blocks to match
      */
-    public BlockTypeMask(Extent extent, Collection<BlockType> blocks) {
-        this(extent, blocks.toArray(new BlockType[0]));
+    public BlockTypeMask(Extent extent, @NotNull Collection<BlockType> blocks) {
+        super(extent);
+        this.blocks = new HashSet<>(blocks);
     }
 
     /**
@@ -59,15 +59,8 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param extent the extent
      * @param block an array of blocks to match
      */
-    public BlockTypeMask(Extent extent, BlockType... block) {
-        super(extent);
-        this.types = new boolean[BlockTypes.size()];
-        for (BlockType type : block) this.types[type.getInternalId()] = true;
-    }
-
-    protected BlockTypeMask(Extent extent, boolean[] types) {
-        super(extent);
-        this.types = types;
+    public BlockTypeMask(Extent extent, @NotNull BlockType... block) {
+        this(extent, Arrays.asList(block));
     }
 
     /**
@@ -75,14 +68,8 @@ public class BlockTypeMask extends AbstractExtentMask {
      *
      * @param blocks a list of blocks
      */
-    public void add(Collection<BlockType> blocks) {
-        checkNotNull(blocks);
-        for (BlockType type : blocks) {
-            add(type);
-        }
-        for (BlockType type : blocks) {
-            this.types[type.getInternalId()] = true;
-        }
+    public void add(@NotNull Collection<BlockType> blocks) {
+        this.blocks.addAll(blocks);
     }
 
     /**
@@ -90,10 +77,8 @@ public class BlockTypeMask extends AbstractExtentMask {
      *
      * @param block an array of blocks
      */
-    public void add(BlockType... block) {
-        for (BlockType type : block) {
-            this.types[type.getInternalId()] = true;
-        }
+    public void add(@NotNull BlockType... block) {
+        add(Arrays.asList(block));
     }
 
     /**
@@ -102,20 +87,18 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @return a list of blocks
      */
     public Collection<BlockType> getBlocks() {
-        Set<BlockType> blocks = new HashSet<>();
-        for (int i = 0; i < types.length; i++) {
-            if (types[i]) blocks.add(BlockTypes.get(i));
-        }
         return blocks;
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(vector.getBlock(getExtent()).getBlockType());
+        return blocks.contains(getExtent().getBlock(vector).getBlockType());
     }
 
-    public boolean test(BlockType block) {
-        return types[block.getInternalId()];
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
     }
 
 }

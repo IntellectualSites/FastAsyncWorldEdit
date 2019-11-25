@@ -106,8 +106,8 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
 
     public <B extends BlockStateHolder<B>> void setBlock(int x, int y, int z, B block) {
         setBlock(x, y, z, block.getInternalId());
-        if (block instanceof BaseBlock && ((BaseBlock)block).hasNbtData()) {
-            setTile(x & 15, y, z & 15, ((BaseBlock)block).getNbtData());
+        if (block instanceof BaseBlock && block.hasNbtData()) {
+            setTile(x & 15, y, z & 15, block.getNbtData());
         }
     }
 
@@ -287,7 +287,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
 
     @Override
     public boolean equals(final Object obj) {
-        if ((obj == null) || obj.hashCode() != hashCode() || !(obj instanceof FaweChunk)) {
+        if (obj == null || obj.hashCode() != hashCode() || !(obj instanceof FaweChunk)) {
             return false;
         }
         return longHash() != ((FaweChunk) obj).longHash();
@@ -295,15 +295,9 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
 
     public abstract FaweChunk<T> copy(boolean shallow);
 
-    public void start() {
-    }
+    public void start() {}
 
-    ;
-
-    public void end() {
-    }
-
-    ;
+    public void end() {}
 
     @Override
     public abstract FaweChunk call();

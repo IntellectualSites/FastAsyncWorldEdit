@@ -19,14 +19,15 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.FilterBlock;
-import com.google.common.base.Function;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -54,14 +55,40 @@ public class MaskUnion extends MaskIntersection {
         super(mask);
     }
 
+    public static Mask of(Mask... masks) {
+        Set<Mask> set = new LinkedHashSet<>();
+        for (Mask mask : masks) {
+            if (mask == Masks.alwaysTrue()) {
+                return mask;
+            }
+            if (mask != null) {
+                if (mask.getClass() == MaskUnion.class) {
+                    set.addAll(((MaskUnion) mask).getMasks());
+                } else {
+                    set.add(mask);
+                }
+            }
+        }
+        switch (set.size()) {
+            case 0:
+                return Masks.alwaysTrue();
+            case 1:
+                return set.iterator().next();
+            default:
+                return new MaskUnion(masks).optimize();
+        }
+    }
+
     @Override
-    public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
-        return input -> input.getKey().or(input.getValue());
+    public Function<Entry<Mask, Mask>, Mask> pairingFunction() {
+        return input -> input.getKey().tryOr(input.getValue());
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        for (Mask mask : getMasksArray()) {
+        Mask[] masks = getMasksArray();
+
+        for (Mask mask : masks) {
             if (mask.test(vector)) {
                 return true;
             }

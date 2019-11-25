@@ -19,10 +19,12 @@
 
 package com.sk89q.worldedit.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.Vector3Impl;
 
 /**
  * Represents a location in a world with has a direction.
@@ -34,7 +36,7 @@ import com.sk89q.worldedit.math.Vector3;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
-public class Location extends Vector3 {
+public class Location extends Vector3Impl {
 
     private final Extent extent;
     private final float pitch;
@@ -47,7 +49,7 @@ public class Location extends Vector3 {
      * @param extent the extent
      */
     public Location(Extent extent) {
-        this(extent, Vector3.ZERO, Vector3.ZERO);
+        this(extent, Vector3.ZERO, 0f, 90f);
     }
 
     /**
@@ -60,7 +62,7 @@ public class Location extends Vector3 {
      * @param z the Z coordinate
      */
     public Location(Extent extent, double x, double y, double z) {
-        this(extent, Vector3.at(x, y, z), Vector3.ZERO);
+        this(extent, Vector3.at(x, y, z), 0f, 90f);
     }
 
     /**
@@ -71,7 +73,7 @@ public class Location extends Vector3 {
      * @param position the position vector
      */
     public Location(Extent extent, Vector3 position) {
-        this(extent, position, Vector3.ZERO);
+        this(extent, position, 0f, 90f);
     }
 
     /**
@@ -124,7 +126,6 @@ public class Location extends Vector3 {
      * @param yaw the yaw, in degrees
      * @param pitch the pitch, in degrees
      */
-
     public Location(Extent extent, Vector3 position, float yaw, float pitch) {
         super(position);
         checkNotNull(extent);
@@ -290,6 +291,18 @@ public class Location extends Vector3 {
      */
     public Location setPosition(Vector3 position) {
         return new Location(extent, position, yaw, pitch);
+    }
+
+    @Override public Location clampY(int min, int max) {
+        checkArgument(min <= max, "minimum cannot be greater than maximum");
+        if (getY() < min) {
+            return new Location(extent, getX(), min, getZ());
+        }
+        if (getY() > max) {
+            return new Location(extent, getX(), max, getZ());
+        }
+        return this;
+
     }
 
     @Override

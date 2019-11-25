@@ -9,7 +9,9 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class OffsetExtent extends ResettableExtent {
-    private final int dx, dy, dz;
+    protected final int dx;
+    protected final int dy;
+    protected final int dz;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public OffsetExtent(Extent parent, int dx, int dy, int dz) {
@@ -30,12 +32,12 @@ public class OffsetExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         return getExtent().setBlock(location.getBlockX() + dx, location.getBlockY() + dy, location.getBlockZ() + dz, block);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public  <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return getExtent().setBlock(x + dx, y + dy, z + dz, block);
     }
 

@@ -312,6 +312,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         return originZ;
     }
 
+    @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {
         blockSize++;
         try {
@@ -344,6 +345,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         }
     }
 
+    @Override
     public void addTileCreate(CompoundTag tag) {
         if (tag == null) {
             return;
@@ -357,6 +359,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         }
     }
 
+    @Override
     public void addTileRemove(CompoundTag tag) {
         if (tag == null) {
             return;
@@ -370,6 +373,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         }
     }
 
+    @Override
     public void addEntityRemove(CompoundTag tag) {
         if (tag == null) {
             return;
@@ -383,6 +387,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         }
     }
 
+    @Override
     public void addEntityCreate(CompoundTag tag) {
         if (tag == null) {
             return;
@@ -660,6 +665,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         }
     }
 
+    @Override
     public Iterator<Change> getIterator(final boolean dir) {
         close();
         try {

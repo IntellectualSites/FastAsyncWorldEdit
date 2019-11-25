@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard.ClipboardEntity;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
-import com.boydti.fawe.object.extent.LightingExtent;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -41,19 +40,18 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
  * other data as lists or maps.
  */
-public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable {
+public class BlockArrayClipboard implements Clipboard, Closeable {
 
     private Region region;
     private BlockVector3 origin;
@@ -218,15 +216,16 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tag) {
         x -= mx;
         y -= my;
         z -= mz;
-        return IMP.setTile(x, y, z, tag);
+        IMP.setTile(x, y, z, tag);
     }
 
-    public boolean setTile(BlockVector3 position, CompoundTag tag) {
-        return setTile(position.getX(), position.getY(), position.getZ(), tag);
+    public void setTile(BlockVector3 position, CompoundTag tag) {
+        setTile(position.getX(), position.getY(), position.getZ(), tag);
     }
 
     @Override
@@ -255,34 +254,14 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return IMP.setBiome(x, z, biome);
     }
 
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return IMP.setBiome(x, z, biome);
+    }
+
     @Nullable
     @Override
     public Operation commit() {
         return null;
-    }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        return getBlockLight(x, y, z);
-    }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        return 0;
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        return getBrightness(x, y, z);
-    }
-
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
 }

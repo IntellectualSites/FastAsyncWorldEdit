@@ -26,9 +26,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * Region selectors create {@link Region}s from a series of "selected points."
@@ -157,11 +158,11 @@ public interface RegionSelector {
     List<String> getInformationLines();
 
     /**
-     * Get the verticies
+     * Get the vertices
      * @return
      * @throws IncompleteRegionException
      */
-    default List<BlockVector3> getVerticies() throws IncompleteRegionException {
+    default List<BlockVector3> getVertices() throws IncompleteRegionException {
         return Collections.singletonList(getPrimaryPosition());
     }
 }

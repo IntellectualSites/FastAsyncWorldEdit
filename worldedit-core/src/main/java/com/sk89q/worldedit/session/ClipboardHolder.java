@@ -62,8 +62,8 @@ public class ClipboardHolder {
     }
 
     /**
-     * Get all currently held clipboards
-     * @return
+     * Gets all currently held clipboards.
+     * @return all clipboards being held.
      */
     public List<Clipboard> getClipboards() {
         return Collections.singletonList(getClipboard());
@@ -74,10 +74,10 @@ public class ClipboardHolder {
     }
 
     /**
-     * Get all end ClipboardHolders<br/>
+     * Gets all end ClipboardHolders<br/>
      *  - Usually this will return itself.<br/>
      *  - If this is a multi clipboard, it will return the children
-     * @return Set of end ClipboardHolders
+     * @return a List of end ClipboardHolders
      */
     public List<ClipboardHolder> getHolders() {
         return Collections.singletonList(this);

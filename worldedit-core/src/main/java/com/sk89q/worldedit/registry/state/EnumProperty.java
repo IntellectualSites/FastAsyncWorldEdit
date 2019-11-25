@@ -19,23 +19,20 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import com.sk89q.worldedit.util.Direction;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
 
-    private Map<String, Integer> offsets = new HashMap<>();
+    private Map<CharSequence, Integer> offsets = new HashMap<>();
 
     public EnumProperty(final String name, final List<String> values) {
         this(name, values, 0);
     }
 
-    public EnumProperty(final String name, final List<String> values, int bitOffset) {
+    private EnumProperty(final String name, final List<String> values, int bitOffset) {
         super(name, values, bitOffset);
         for (int i = 0; i < values.size(); i++) {
             String value = values.get(i).intern();

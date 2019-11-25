@@ -1,13 +1,11 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.concurrent.ForkJoinPool;
@@ -127,7 +125,7 @@ public final class HeightMapMCADrawer {
 
     private int getSlope(byte[] heights, int width, int index, int height) {
         return (
-                + getHeight(heights, index + 1, height)
+            + getHeight(heights, index + 1, height)
 //                + getHeight(heights, index + width, height)
                 + getHeight(heights, index + width + 1, height)
                 - getHeight(heights, index - 1, height)

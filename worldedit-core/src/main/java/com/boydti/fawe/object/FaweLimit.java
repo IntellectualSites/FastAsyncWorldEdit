@@ -1,13 +1,7 @@
 package com.boydti.fawe.object;
 
-import com.sk89q.worldedit.world.block.BlockState;
-
-import java.util.Collections;
 import java.util.Set;
 
-/**
- * Created by Jesse on 4/5/2016.
- */
 public class FaweLimit {
     public int MAX_ACTIONS = 0;
     public int MAX_CHANGES = 0;

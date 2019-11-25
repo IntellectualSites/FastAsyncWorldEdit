@@ -1,48 +1,35 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.NMSMappedFaweQueue;
-import com.boydti.fawe.example.NMSRelighter;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
-
-import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -79,44 +67,44 @@ public class FaweAPI {
         return TaskManager.IMP;
     }
 
-    /**
-     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
-     *
-     * @param methods The class with a bunch of mask methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.MaskCommands
-     */
-    public static boolean registerMasks(Object methods) {
-        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom material for use in e.g {@literal //material #id:<input>}
-     *
-     * @param methods The class with a bunch of pattern methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.PatternCommands
-     */
-    public static boolean registerPatterns(Object methods) {
-        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom transform for use in
-     *
-     * @param methods The class with a bunch of transform methods
-     * @return true if the transform was registered
-     * @see com.sk89q.worldedit.command.TransformCommands
-     */
-    public static boolean registerTransforms(Object methods) {
-        DefaultTransformParser parser = Fawe.get().getTransformParser();
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
+//    /**
+//     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
+//     *
+//     * @param methods The class with a bunch of mask methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.MaskCommands
+//     */
+//    public static boolean registerMasks(Object methods) {
+//        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom material for use in e.g {@literal //material #id:<input>}
+//     *
+//     * @param methods The class with a bunch of pattern methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.PatternCommands
+//     */
+//    public static boolean registerPatterns(Object methods) {
+//        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom transform for use in
+//     *
+//     * @param methods The class with a bunch of transform methods
+//     * @return true if the transform was registered
+//     * @see com.sk89q.worldedit.command.TransformCommands
+//     */
+//    public static boolean registerTransforms(Object methods) {
+//        DefaultTransformParser parser = Fawe.get().getTransformParser();
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
 
     public static <T> T getParser(Class<T> parserClass) {
         try {
@@ -148,41 +136,25 @@ public class FaweAPI {
      * @param aliases The aliases to give the command (or none)
      */
     public static void registerCommands(Object clazz, String... aliases) {
-        CommandManager.getInstance().registerCommands(clazz, aliases);
+//        PlatformCommandManager.getInstance().registerCommands(clazz, aliases); TODO NOT IMPLEMENTED
     }
 
     /**
-     * Wrap some object into a FawePlayer<br>
-     * - org.bukkit.entity.Player
-     * - org.spongepowered.api.entity.living.player
-     * - com.sk89q.worldedit.entity.Player
-     * - String (name)
-     * - UUID (player UUID)
-     *
-     * @param obj
-     * @return
-     */
-    public static FawePlayer wrapPlayer(Object obj) {
-        return FawePlayer.wrap(obj);
-    }
-
-    public static FaweQueue createQueue(String worldName, boolean autoqueue) {
-        return SetQueue.IMP.getNewQueue(worldName, true, autoqueue);
-    }
-
-    /**
-     * You can either use a FaweQueue or an EditSession to change blocks<br>
-     * - The FaweQueue skips a bit of overhead so it's faster<br>
+     * You can either use a IQueueExtent or an EditSession to change blocks<br>
+     * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
-     * Remember to enqueue it when you're done!<br>
+     * Remember to commit when you're done!<br>
      *
-     * @param world     The name of the world
-     * @param autoqueue If it should start dispatching before you enqueue it.
-     * @return
-     * @see FaweQueue#enqueue()
+     * @param world the name of the world
+     * @param autoQueue If it should start dispatching before you enqueue it.
+     * @return the queue that was created
      */
-    public static FaweQueue createQueue(World world, boolean autoqueue) {
-        return SetQueue.IMP.getNewQueue(world, true, autoqueue);
+    public static IQueueExtent createQueue(World world, boolean autoQueue) {
+        IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
+        if (!autoQueue) {
+            queue.disableQueue();
+        }
+        return queue;
     }
 
     public static World getWorld(String worldName) {
@@ -200,23 +172,11 @@ public class FaweAPI {
      * Upload the clipboard to the configured web interface
      *
      * @param clipboard The clipboard (may not be null)
-     * @param format    The format to use (some formats may not be supported)
+     * @param format The format to use (some formats may not be supported)
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
         return format.uploadAnonymous(clipboard);
-    }
-
-    /**
-     * Just forwards to ClipboardFormat.SCHEMATIC.load(file)
-     *
-     * @param file
-     * @return
-     * @see ClipboardFormat
-     * @see Schematic
-     */
-    public static Schematic load(File file) throws IOException {
-        return ClipboardFormats.findByFile(file).load(file);
     }
 
     /**
@@ -238,12 +198,12 @@ public class FaweAPI {
     }
 
     /**
-     * Get a player's allowed WorldEdit region
+     * Gets a player's allowed WorldEdit region
      *
-     * @param player
-     * @return
+     * @param player the player to check
+     * @return the regions the player can use WorldEdit in
      */
-    public static Region[] getRegions(FawePlayer player) {
+    public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
     }
 
@@ -252,8 +212,8 @@ public class FaweAPI {
      * - The extent must be the one being used by an EditSession, otherwise an error may be thrown <br>
      * - Insert an extent into the EditSession using the EditSessionEvent: http://wiki.sk89q.com/wiki/WorldEdit/API/Hooking_EditSession <br>
      *
-     * @param extent
-     * @param reason
+     * @param extent the extent being used by an {@link EditSession}
+     * @param reason the caption that explains why the edit was canceled
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
     public static void cancelEdit(Extent extent, BBC reason) {
@@ -268,10 +228,10 @@ public class FaweAPI {
     }
 
     /**
-     * Get the DiskStorageHistory object representing a File
+     * Get the {@link DiskStorageHistory} object representing a File
      *
-     * @param file
-     * @return
+     * @param file the file containing a {@link DiskStorageHistory} object
+     * @return the history from the file as an object
      */
     public static DiskStorageHistory getChangeSetFromFile(File file) {
         if (!file.exists() || file.isDirectory()) {
@@ -307,15 +267,15 @@ public class FaweAPI {
      * Used in the RollBack to generate a list of DiskStorageHistory objects<br>
      * - Note: An edit outside the radius may be included if it overlaps with an edit inside that depends on it.
      *
-     * @param origin   - The origin location
-     * @param user     - The uuid (may be null)
-     * @param radius   - The radius from the origin of the edit
-     * @param timediff - The max age of the file in milliseconds
-     * @param shallow  - If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
+     * @param origin The origin location
+     * @param user The uuid (may be null)
+     * @param radius The radius from the origin of the edit
+     * @param timeDiff the max age of the file in milliseconds
+     * @param shallow If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
      *                 Reading only part of the file will result in unreliable bounds info for large edits
-     * @return
+     * @return a list of DiskStorageHistory objects
      */
-    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
+    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timeDiff, boolean shallow) {
         Extent extent = origin.getExtent();
         if (!(extent instanceof World)) {
             throw new IllegalArgumentException("Origin is not a valid world");
@@ -343,7 +303,7 @@ public class FaweAPI {
             ArrayList<Integer> ids = new ArrayList<>();
             for (File file : userFile.listFiles()) {
                 if (file.getName().endsWith(".bd")) {
-                    if (timediff >= Integer.MAX_VALUE || now - file.lastModified() <= timediff) {
+                    if (timeDiff >= Integer.MAX_VALUE || now - file.lastModified() <= timeDiff) {
                         files.add(file);
                         if (files.size() > 2048) {
                             return null;
@@ -397,7 +357,7 @@ public class FaweAPI {
      * @param uuid
      * @param index
      * @return
-     * @see DiskStorageHistory#toEditSession(FawePlayer)
+     * @see DiskStorageHistory#toEditSession(Player)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
@@ -416,19 +376,10 @@ public class FaweAPI {
         return (version[0] > major) || ((version[0] == major) && (version[1] > minor)) || ((version[0] == major) && (version[1] == minor) && (version[2] >= minor2));
     }
 
-    @Deprecated
-    public static int fixLighting(String world, Region selection) {
-        return fixLighting(world, selection, FaweQueue.RelightMode.ALL);
-    }
 
     @Deprecated
-    public static int fixLighting(String world, Region selection, final FaweQueue.RelightMode mode) {
-        return fixLighting(world, selection, null, mode);
-    }
-
-    @Deprecated
-    public static int fixLighting(String world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
-        return fixLighting(getWorld(world), selection, queue, mode);
+    public static int fixLighting(World world, Region selection) {
+        return fixLighting(world, selection, null);
     }
 
     /**
@@ -441,7 +392,7 @@ public class FaweAPI {
      * @param selection (assumes cuboid)
      * @return
      */
-    public static int fixLighting(World world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
+    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
@@ -452,46 +403,26 @@ public class FaweAPI {
         final int maxZ = top.getBlockZ() >> 4;
 
         int count = 0;
-        if (queue == null) {
-            queue = SetQueue.IMP.getNewQueue(world, true, false);
-        }
+        if (queue == null) queue = createQueue(world, false);
         // Remove existing lighting first
-        if (queue instanceof NMSMappedFaweQueue) {
-            final NMSMappedFaweQueue nmsQueue = (NMSMappedFaweQueue) queue;
-            NMSRelighter relighter = new NMSRelighter(nmsQueue);
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.addChunk(x, z, null, 65535);
-                    count++;
-                }
-            }
-            if (mode != FaweQueue.RelightMode.NONE) {
-                boolean sky = nmsQueue.hasSky();
-                if (sky) {
-                    relighter.fixSkyLighting();
-                }
-                relighter.fixBlockLighting();
-            } else {
-                relighter.removeLighting();
-            }
-            relighter.sendChunks();
-        }
+//        if (queue instanceof LightingExtent) {
+//            LightingExtent relighter = (LightingExtent) queue;
+//            for (int x = minX; x <= maxX; x++) {
+//                for (int z = minZ; z <= maxZ; z++) {
+//                    relighter.relightChunk(x, z);
+//                    count++;
+//                }
+//            }
+//        } else {
+//            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
+//        }
         return count;
-    }
-
-    /**
-     * Set a task to run when the global queue (SetQueue class) is empty
-     *
-     * @param whenDone
-     */
-    public static void addTask(final Runnable whenDone) {
-        SetQueue.IMP.addEmptyTask(whenDone);
     }
 
     /**
      * Have a task run when the server is low on memory (configured threshold)
      *
-     * @param run
+     * @param run the task to run
      */
     public static void addMemoryLimitedTask(Runnable run) {
         MemUtil.addMemoryLimitedTask(run);
@@ -500,18 +431,10 @@ public class FaweAPI {
     /**
      * Have a task run when the server is no longer low on memory (configured threshold)
      *
-     * @param run
+     * @param run the task to run
      */
     public static void addMemoryPlentifulTask(Runnable run) {
         MemUtil.addMemoryPlentifulTask(run);
-    }
-
-    /**
-     * @return
-     * @see BBC
-     */
-    public static BBC[] getTranslations() {
-        return BBC.values();
     }
 
 }

@@ -2,7 +2,6 @@ package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import java.util.SplittableRandom;
 
 public class RandomMask extends AbstractMask implements ResettableMask {

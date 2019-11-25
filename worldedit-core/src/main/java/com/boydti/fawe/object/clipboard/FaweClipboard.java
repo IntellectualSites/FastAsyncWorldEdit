@@ -1,25 +1,25 @@
 package com.boydti.fawe.object.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.util.ReflectionUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 public abstract class FaweClipboard {
     public abstract BaseBlock getBlock(int x, int y, int z);
@@ -28,7 +28,17 @@ public abstract class FaweClipboard {
 
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block);
 
-    public abstract boolean hasBiomes();
+    /**
+     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
+     * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null}
+     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
+     * to ocean, instead of having biomes explicitly set.
+     *
+     * @return true if the clipboard has biome data set
+     */
+    public boolean hasBiomes() {
+        return false;
+    }
 
     public abstract boolean setBiome(int x, int z, BiomeType biome);
 
@@ -56,7 +66,7 @@ public abstract class FaweClipboard {
     public abstract BlockVector3 getDimensions();
 
     /**
-     * The locations provided are relative to the clipboard min
+     * The locations provided are relative to the clipboard min.
      *
      * @param task
      * @param air
@@ -67,11 +77,11 @@ public abstract class FaweClipboard {
         <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block);
     }
 
-    public abstract void streamBiomes(final NBTStreamer.ByteReader task);
+    public abstract void streamBiomes(NBTStreamer.ByteReader task);
 
-    public void streamCombinedIds(final NBTStreamer.ByteReader task) {
+    public void streamCombinedIds(NBTStreamer.ByteReader task) {
         forEach(new BlockReader() {
-            private int index = 0;
+            private int index;
 
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
@@ -86,8 +96,8 @@ public abstract class FaweClipboard {
 
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-            	if(!(block instanceof BaseBlock)) return;
-            	BaseBlock base = (BaseBlock)block;
+                if(!(block instanceof BaseBlock)) return;
+                BaseBlock base = (BaseBlock)block;
                 CompoundTag tag = base.getNbtData();
                 if (tag != null) {
                     Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
@@ -161,10 +171,10 @@ public abstract class FaweClipboard {
             return world;
         }
 
-		@Override
-		public boolean setLocation(Location location) {
-			//Should not be teleporting this entity
-			return false;
-		}
+        @Override
+        public boolean setLocation(Location location) {
+            //Should not be teleporting this entity
+            return false;
+        }
     }
 }

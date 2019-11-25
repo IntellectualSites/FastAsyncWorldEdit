@@ -57,7 +57,7 @@ public class PositionTransformExtent extends ResettableExtent {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	return super.getFullBlock(getPos(position));
+        return super.getFullBlock(getPos(position));
     }
 
     @Override

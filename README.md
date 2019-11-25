@@ -10,7 +10,7 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 
 * [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
 * [Discord](https://discord.gg/ngZCzbU)
-* [Wiki](https://github.com/boy0001/FastAsyncWorldedit/wiki)
+* [Wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues)
 
 ## Downloads

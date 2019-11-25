@@ -37,7 +37,7 @@ public class SingleBlockStateMask extends ABlockMask {
     }
 
     @Override
-    public Mask and(Mask mask) {
+    public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             if (other.test(BlockState.getFromOrdinal(ordinal))) {

@@ -1,13 +1,12 @@
 package com.boydti.fawe.object.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class URIClipboardHolder extends ClipboardHolder {
     private final URI uri;

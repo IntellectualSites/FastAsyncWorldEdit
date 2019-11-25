@@ -19,16 +19,14 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.boydti.fawe.object.changeset.FaweChangeSet;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,15 +66,15 @@ public class ChangeSetExecutor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        if (type == Type.UNDO) {
-            while (iterator.hasNext()) {
-                iterator.next().undo(context);
-            }
-        } else {
-            while (iterator.hasNext()) {
-                iterator.next().redo(context);
+        while (iterator.hasNext()) {
+            Change change = iterator.next();
+            if (type == Type.UNDO) {
+                change.undo(context);
+            } else {
+                change.redo(context);
             }
         }
+
         return null;
     }
 

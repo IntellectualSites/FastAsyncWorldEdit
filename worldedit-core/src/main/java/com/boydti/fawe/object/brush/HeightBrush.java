@@ -1,24 +1,22 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.brush.heightmap.RotatableHeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
+import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ThreadLocalRandom;
@@ -75,7 +73,7 @@ public class HeightBrush implements Brush {
         HeightMap map = getHeightMap();
         map.setSize(size);
 
-        FaweQueue queue = editSession.getQueue();
+        Extent queue = editSession.getExtent();
         // Optimized application of height map
         if (queue instanceof HeightMapMCAGenerator) {
             HeightMapMCAGenerator hmmg = (HeightMapMCAGenerator) queue;
@@ -84,8 +82,6 @@ public class HeightBrush implements Brush {
             if (metaHeight == null) {
                 hmmg.getMetaData().setMeta("PRECISION_HEIGHT", metaHeight = new byte[hmmg.getArea()]);
             }
-
-            Vector3 origin = hmmg.getOrigin();
 
             int bx = position.getBlockX();
             int bz = position.getBlockZ();
@@ -133,8 +129,8 @@ public class HeightBrush implements Brush {
             }
 
             if (smooth) {
-            	BlockVector2 min = BlockVector2.at(Math.max(0, bx - size), Math.max(0, bz - size));
-            	BlockVector2 max = BlockVector2.at(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
+                BlockVector2 min = BlockVector2.at(Math.max(0, bx - size), Math.max(0, bz - size));
+                BlockVector2 max = BlockVector2.at(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
                 hmmg.smooth(min, max, 8, 1);
 
                 if (size > 20) {

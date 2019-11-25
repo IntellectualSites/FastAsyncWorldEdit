@@ -1,15 +1,12 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-
-import java.io.IOException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class RelativePattern extends AbstractPattern implements ResettablePattern {
 
@@ -26,9 +23,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = pos;
         }
-        mutable.mutX((pos.getX() - origin.getX()));
-        mutable.mutY((pos.getY() - origin.getY()));
-        mutable.mutZ((pos.getZ() - origin.getZ()));
+        mutable.mutX(pos.getX() - origin.getX());
+        mutable.mutY(pos.getY() - origin.getY());
+        mutable.mutZ(pos.getZ() - origin.getZ());
         return pattern.apply(mutable);
     }
 
@@ -37,9 +34,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         if (origin == null) {
             origin = set;
         }
-        mutable.mutX((set.getX() - origin.getX()));
-        mutable.mutY((set.getY() - origin.getY()));
-        mutable.mutZ((set.getZ() - origin.getZ()));
+        mutable.mutX(set.getX() - origin.getX());
+        mutable.mutY(set.getY() - origin.getY());
+        mutable.mutZ(set.getZ() - origin.getZ());
         return pattern.apply(extent, get, mutable);
     }
 

@@ -52,9 +52,9 @@ public class BukkitImplLoader {
             "**\n" +
             "** When working with blocks or undoing, chests will be empty, signs\n" +
             "** will be blank, and so on. There will be no support for entity\n" +
-            "** and biome-related functions.\n" +
+            "** and block property-related functions.\n" +
             "**\n" +
-            "** Please see http://wiki.sk89q.com/wiki/WorldEdit/Bukkit_adapters\n" +
+            "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n" +
             "**********************************************\n";
 
     /**
@@ -160,9 +160,6 @@ public class BukkitImplLoader {
                 if (cls.isSynthetic()) continue;
                 if (BukkitImplAdapter.class.isAssignableFrom(cls)) {
                     return (BukkitImplAdapter) cls.newInstance();
-                } else {
-                    log.warn("Failed to load the Bukkit adapter class '" + className +
-                            "' because it does not implement " + BukkitImplAdapter.class.getCanonicalName());
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Failed to load the Bukkit adapter class '" + className +
@@ -171,7 +168,6 @@ public class BukkitImplLoader {
                 log.warn("Failed to load the Bukkit adapter class '" + className +
                         "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
-                e.printStackTrace();
                 if (className.equals(customCandidate)) {
                     log.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
                 }

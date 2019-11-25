@@ -24,17 +24,13 @@ import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
-
-import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * Represents a physical shape.
@@ -62,14 +58,23 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      *
      * @return center point
      */
-    Vector3 getCenter();
+    default Vector3 getCenter() {
+        return getMinimumPoint().add(getMaximumPoint()).toVector3().divide(2);
+    }
 
     /**
      * Get the number of blocks in the region.
      *
      * @return number of blocks
      */
-    int getArea();
+    default int getArea() {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+
+        return (max.getX() - min.getX() + 1) *
+                (max.getY() - min.getY() + 1) *
+                (max.getZ() - min.getZ() + 1);
+    }
 
     /**
      * Get X-size.
@@ -136,9 +141,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      * @param position the position
      * @return true if contained
      */
-    default boolean contains(BlockVector3 position) {
-        return contains(position.getX(), position.getY(), position.getZ());
-    }
+    boolean contains(BlockVector3 position);
 
     /**
      * Get a list of chunks.

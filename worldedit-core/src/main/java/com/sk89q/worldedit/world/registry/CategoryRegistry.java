@@ -20,13 +20,14 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.registry.Category;
+import com.sk89q.worldedit.registry.Keyed;
 
 import java.util.Set;
 
 /**
  * A registry of categories. Minecraft internally calls these 'Tags'.
  */
-public interface CategoryRegistry<T> {
+public interface CategoryRegistry<T extends Keyed> {
 
     /**
      * Gets a set of values with a given category.
@@ -36,5 +37,7 @@ public interface CategoryRegistry<T> {
      */
     Set<T> getCategorisedByName(String category);
 
-    Set<T> getAll(final Category<T> category);
+    default Set<T> getAll(final Category<T> category) {
+        return getCategorisedByName(category.getId());
+    }
 }

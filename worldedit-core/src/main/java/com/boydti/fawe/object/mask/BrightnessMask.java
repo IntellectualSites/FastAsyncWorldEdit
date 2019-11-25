@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.mask;
 
 import com.boydti.fawe.object.extent.LightingExtent;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.math.BlockVector3;

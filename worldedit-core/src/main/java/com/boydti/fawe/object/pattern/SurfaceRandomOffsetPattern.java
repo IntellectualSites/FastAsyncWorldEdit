@@ -1,15 +1,11 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.io.IOException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {
@@ -19,7 +15,6 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final MutableBlockVector3 cur;
     private final MutableBlockVector3[] buffer;
     private final MutableBlockVector3[] allowed;
-    private MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;
@@ -60,8 +55,8 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     private boolean allowed(BlockVector3 bv) {
-    	MutableBlockVector3 v = new MutableBlockVector3(bv);
-        BlockStateHolder block = pattern.apply(bv);
+        MutableBlockVector3 v = new MutableBlockVector3(bv);
+        BaseBlock block = pattern.apply(bv);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
         }
@@ -105,7 +100,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     private boolean canPassthrough(BlockVector3 v) {
-        BlockStateHolder block = pattern.apply(v);
+        BaseBlock block = pattern.apply(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }
 }

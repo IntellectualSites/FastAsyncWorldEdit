@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.sk89q.worldedit.world.block.BlockType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.FileNotFoundException;
@@ -21,9 +22,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
         int red1 = (c1 >> 16) & 0xFF;
         int green1 = (c1 >> 8) & 0xFF;
         int blue1 = (c1 >> 0) & 0xFF;
-        byte red2 = (byte) ((c2 >> 16));
-        byte green2 = (byte) ((c2 >> 8));
-        byte blue2 = (byte) ((c2 >> 0));
+        byte red2 = (byte) (c2 >> 16);
+        byte green2 = (byte) (c2 >> 8);
+        byte blue2 = (byte) (c2 >> 0);
         int red = MathMan.clamp(red1 + random(red2), 0, 255);
         int green = MathMan.clamp(green1 + random(green2), 0, 255);
         int blue = MathMan.clamp(blue1 + random(blue2), 0, 255);
@@ -32,7 +33,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     private int random(int i) {
         if (i < 0) {
-            int i1 = (-i);
+            int i1 = -i;
             return -ThreadLocalRandom.current().nextInt(i1);
         } else {
             return ThreadLocalRandom.current().nextInt(i);
@@ -80,7 +81,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     @Override
     public BlockType getNearestBlock(int color) {
-        int offsetColor = offsets.getOrDefault(color, 0);
+        int offsetColor = offsets.getOrDefault((Object) color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {

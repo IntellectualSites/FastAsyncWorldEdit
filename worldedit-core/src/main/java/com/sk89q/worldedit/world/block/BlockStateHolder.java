@@ -34,11 +34,6 @@ import java.util.stream.Collectors;
 
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern, TileEntityBlock {
 
-    @Override
-    default BaseBlock apply(BlockVector3 position) {
-        return this.toBaseBlock();
-    }
-
     /**
      * Get the block type
      *
@@ -68,13 +63,13 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
     char getOrdinalChar();
 
     BlockMaterial getMaterial();
+
     /**
      * Get type id (legacy uses)
      * @return
      */
     @Deprecated
     int getInternalBlockTypeId();
-
     /**
      * Get the block data (legacy uses)
      * @return
@@ -152,6 +147,11 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
      * @return The BaseBlock
      */
     BaseBlock toBaseBlock(CompoundTag compoundTag);
+
+    @Override
+    default BaseBlock apply(BlockVector3 position) {
+        return toBaseBlock();
+    }
 
     /**
      * Return the name of the title entity ID.

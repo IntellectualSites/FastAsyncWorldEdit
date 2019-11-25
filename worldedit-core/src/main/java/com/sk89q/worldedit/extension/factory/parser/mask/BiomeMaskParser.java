@@ -21,26 +21,45 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.google.common.base.Splitter;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.mask.BiomeMask2D;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.session.request.RequestExtent;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.Biomes;
-import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BiomeMaskParser extends InputParser<Mask> {
 
     public BiomeMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
+    }
+
+    @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("$");
+        }
+        if (input.charAt(0) == '$') {
+            input = input.substring(1);
+            final int lastTermIdx = input.lastIndexOf(',');
+            if (lastTermIdx <= 0) {
+                return SuggestionHelper.getNamespacedRegistrySuggestions(BiomeType.REGISTRY, input).map(s -> "$" + s);
+            }
+            String prev = input.substring(0, lastTermIdx) + ",";
+            Set<String> prevBiomes = Arrays.stream(prev.split(",", 0)).collect(Collectors.toSet());
+            String search = input.substring(lastTermIdx + 1);
+            return SuggestionHelper.getNamespacedRegistrySuggestions(BiomeType.REGISTRY, search)
+                    .filter(s -> !prevBiomes.contains(s)).map(s -> "$" + prev + s);
+        }
+        return Stream.empty();
     }
 
     @Override
@@ -50,16 +69,14 @@ public class BiomeMaskParser extends InputParser<Mask> {
         }
 
         Set<BiomeType> biomes = new HashSet<>();
-        BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-        Collection<BiomeType> knownBiomes = BiomeType.REGISTRY.values();
         for (String biomeName : Splitter.on(",").split(input.substring(1))) {
-            BiomeType biome = Biomes.findBiomeByName(knownBiomes, biomeName, biomeRegistry);
+            BiomeType biome = BiomeType.REGISTRY.get(biomeName);
             if (biome == null) {
                 throw new InputParseException("Unknown biome '" + biomeName + '\'');
             }
             biomes.add(biome);
         }
 
-        return Masks.asMask(new BiomeMask2D(new RequestExtent(), biomes));
+        return Masks.asMask(new BiomeMask2D(context.getExtent(), biomes));
     }
 }

@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.OreGen;
@@ -26,32 +28,47 @@ import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.boydti.fawe.object.exception.FaweException;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nullable;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -119,6 +136,53 @@ public interface Extent extends InputExtent, OutputExtent {
     default @Nullable Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    /**
+     * Create an entity at the given location.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @param uuid the unique identifier of the entity
+     * @return a reference to the created entity, or null if the entity could not be created
+     */
+    default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
+
+    /*
+    Queue based methods
+    TODO NOT IMPLEMENTED:
+     */
+    default boolean isQueueEnabled() {
+        return false;
+    }
+
+    default void enableQueue() {
+        if (!isQueueEnabled()) throw FaweException._enableQueue;
+    }
+
+    default void disableQueue() {
+        if (isQueueEnabled()) throw FaweException._disableQueue;
+    }
+
+    /*
+    World based methods
+    TODO NOT IMPLEMENTED:
+     */
+
+    default boolean isWorld() {
+        return false;
+    }
+
+    default boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
+        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED: " + isWorld());
+    }
+
+    /*
+    Shifting operations down the pipeline from EditSession -> Extent
+         - This allows certain extents (e.g. multithreaded extent) to override and optimize as needed
+         - The EditSession shouldn't need to worry about implementation details
+         - TODO: actually optimize these
+     */
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
         maxY = Math.min(maxY, Math.max(0, maxY));
@@ -233,7 +297,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        BlockStateHolder block = getBlock(x, y, z);
+        BlockState block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
@@ -296,7 +360,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean contains(BlockVector3 pt) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return (pt.containedWithin(min, max));
+        return pt.containedWithin(min, max);
     }
 
     default void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
@@ -328,7 +392,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int[] counter = new int[BlockTypes.size()];
 
         for (final BlockVector3 pt : region) {
-            BlockType type = getBlockType(pt);
+            BlockType type = getBlock(pt).getBlockType();
             counter[type.getInternalId()]++;
         }
         List<Countable<BlockType>> distribution = new ArrayList<>();
@@ -401,4 +465,167 @@ public interface Extent extends InputExtent, OutputExtent {
         weClipboard.setOrigin(region.getMinimumPoint());
         return weClipboard;
     }
+
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchBlocks the list of blocks to search
+     * @return the number of blocks that matched the block
+     */
+    default int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
+        BlockMask mask = new BlockMask(this, searchBlocks);
+        return countBlocks(region, mask);
+    }
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchMask mask to match
+     * @return the number of blocks that matched the mask
+     */
+    default int countBlocks(Region region, Mask searchMask) {
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        Operations.completeBlindly(visitor);
+        return visitor.getAffected();
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given block type.
+     *
+     * @param region the region
+     * @param block the block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(block);
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+
+        int changes = 0;
+        for (BlockVector3 pos : region) {
+            if (setBlock(pos, block)) {
+                changes++;
+            }
+        }
+        return changes;
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given pattern.
+     *
+     * @param region the region
+     * @param pattern the pattern that provides the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+        if (pattern instanceof BlockPattern) {
+            return setBlocks(region, ((BlockPattern) pattern).getBlock());
+        }
+        if (pattern instanceof BlockStateHolder) {
+            return setBlocks(region, (BlockStateHolder) pattern);
+        }
+        int count = 0;
+        for (BlockVector3 pos : region) {
+            if (pattern.apply(this, pos, pos)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param replacement the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+        return replaceBlocks(region, filter, new BlockPattern(replacement));
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
+        return replaceBlocks(region, mask, pattern);
+    }
+
+    /**
+     * Replaces all the blocks matching a given mask, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param mask the mask that blocks must match
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(mask);
+        checkNotNull(pattern);
+
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionVisitor visitor = new RegionVisitor(region, filter);
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
+    }
+
+
+    /**
+     * Sets the blocks at the center of the given region to the given pattern.
+     * If the center sits between two blocks on a certain axis, then two blocks
+     * will be placed to mark the center.
+     *
+     * @param region the region to find the center of
+     * @param pattern the replacement pattern
+     * @return the number of blocks placed
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+
+        Vector3 center = region.getCenter();
+        Region centerRegion = new CuboidRegion(
+                this instanceof World ? (World) this : null, // Causes clamping of Y range
+                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
+                        center.getY(), MathUtils.roundHalfUp(center.getZ())));
+        return setBlocks(centerRegion, pattern);
+    }
+
+    default int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
+        if (vset instanceof Region) {
+            return setBlocks((Region) vset, pattern);
+        }
+        int count = 0;
+        for (BlockVector3 pos : vset) {
+            if (pattern.apply(this, pos, pos)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }

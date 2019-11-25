@@ -1,15 +1,15 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.regions.Region;
-
 import javax.annotation.Nullable;
 
 public interface IDelegateFilter extends Filter {
+
     Filter getParent();
 
     @Override
-    default boolean appliesChunk(int cx, int cz) {
-        return getParent().appliesChunk(cx, cz);
+    default boolean appliesChunk(int chunkX, int chunkZ) {
+        return getParent().appliesChunk(chunkX, chunkZ);
     }
 
     @Override

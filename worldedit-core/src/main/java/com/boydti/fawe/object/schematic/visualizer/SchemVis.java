@@ -168,7 +168,7 @@
 //                            }
 //                        }
 //                        // Resend relevant chunks
-//                        FaweQueue packetQueue = SetQueue.IMP.getNewQueue(this.player.getWorld(), true, false);
+//                        IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(this.player.getWorld(), true, false);
 //                        if (packetQueue.supports(Capability.CHUNK_PACKETS)) {
 //                            ArrayDeque<Long> toSend = new ArrayDeque<>();
 //                            ObjectIterator<Long2ObjectMap.Entry<MCAChunk>> iter = chunks.long2ObjectEntrySet().fastIterator();
@@ -232,7 +232,7 @@
 //     * @param chunkX
 //     * @param chunkZ
 //     */
-//    private void send(FaweQueue packetQueue, int chunkX, int chunkZ) {
+//    private void send(IQueueExtent packetQueue, int chunkX, int chunkZ) {
 //        TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
 //            try {
 //                int OX = chunkOffset.getBlockX();
@@ -519,7 +519,7 @@
 //     */
 //    @Override
 //    public void update() {
-//        FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
+//        IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
 //
 //        if (!packetQueue.supports(Capability.CHUNK_PACKETS)) {
 //            return;
@@ -574,7 +574,7 @@
 //        files.clear();
 //        player.getPlayer().setPosition(origin, origin.getPitch(), origin.getYaw());
 //        if (update) {
-//            FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
+//            IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
 //
 //            int OX = chunkOffset.getBlockX();
 //            int OZ = chunkOffset.getBlockZ();

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.internal.util;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import org.enginehub.piston.annotation.Command;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.*;
 
@@ -79,10 +79,10 @@ public final class DocumentationPrinter {
             if (!f.getName().matches("^.*\\.java$")) {
                 continue;
             }
-            
+
             String className = "com.sk89q.worldedit.commands."
                 + f.getName().substring(0, f.getName().lastIndexOf("."));
-            
+
             Class<?> cls;
             try {
                 cls = Class.forName(className, true,
@@ -90,7 +90,7 @@ public final class DocumentationPrinter {
             } catch (ClassNotFoundException e) {
                 continue;
             }
-            
+
             classes.add(cls);
         }*/
 
@@ -142,12 +142,6 @@ public final class DocumentationPrinter {
                         stream.print(prefix + alias);
                         firstAlias = false;
                     }
-                }
-
-                stream.print(" || ");
-
-                if (cmd.flags() != null && !cmd.flags().isEmpty()) {
-                    stream.print(cmd.flags());
                 }
 
                 stream.print(" || ");

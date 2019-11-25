@@ -22,32 +22,41 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
-
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
 
 /**
  * Snapshot commands.
  */
-@Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class SnapshotCommands {
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
     private final WorldEdit we;
 
@@ -56,43 +65,35 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"list"},
-            usage = "[num]",
-            desc = "List snapshots",
-            min = 0,
-            max = 1
+        name = "list",
+        desc = "List snapshots"
     )
     @CommandPermissions("worldedit.snapshots.list")
-    public void list(Player player, CommandContext args) throws WorldEditException {
+    public void list(Actor actor, World world,
+                     @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
+                         int page) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
 
         try {
-            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, player.getWorld().getName());
+            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, world.getName());
 
             if (!snapshots.isEmpty()) {
-
-                int num = args.argsLength() > 0 ? Math.min(40, Math.max(5, args.getInteger(0))) : 5;
-
-                BBC.SNAPSHOT_LIST_HEADER.send(player, player.getWorld().getName());
-                for (byte i = 0; i < Math.min(num, snapshots.size()); i++) {
-                    player.print((i + 1) + ". " + snapshots.get(i).getName());
-                }
-
-                BBC.SNAPSHOT_LIST_FOOTER.send(player);
+                actor.print(new SnapshotListBox(world.getName(), snapshots).create(page));
             } else {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
 
                 // Okay, let's toss some debugging information!
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: " + dir.getCanonicalPath());
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
+                            + dir.getCanonicalPath());
                 } catch (IOException e) {
                     WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
@@ -100,175 +101,169 @@ public class SnapshotCommands {
                 }
             }
         } catch (MissingWorldException ex) {
-            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
         }
     }
 
     @Command(
-            aliases = { "use" },
-            usage = "<snapshot>",
-            desc = "Choose a snapshot to use",
-            min = 1,
-            max = 1
+        name = "use",
+        desc = "Choose a snapshot to use"
     )
     @CommandPermissions("worldedit.snapshots.restore")
-    public void use(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void use(Actor actor, World world, LocalSession session,
+                    @Arg(desc = "Snapshot to use")
+                        String name) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
-
-        String name = args.getString(0);
 
         // Want the latest snapshot?
         if (name.equalsIgnoreCase("latest")) {
             try {
-                Snapshot snapshot = config.snapshotRepo.getDefaultSnapshot(player.getWorld().getName());
+                Snapshot snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot != null) {
                     session.setSnapshot(null);
-                    BBC.SNAPSHOT_NEWEST.send(player);
+                    actor.print(BBC.SNAPSHOT_NEWEST.s());
                 } else {
-                    BBC.SNAPSHOT_NOT_FOUND.send(player);
+                    actor.printError(BBC.SNAPSHOT_NOT_FOUND.s());
                 }
             } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+                actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
             }
         } else {
             try {
                 session.setSnapshot(config.snapshotRepo.getSnapshot(name));
-                BBC.SNAPSHOT_SET.send(player, name);
+                actor.print("Snapshot set to: " + name);
             } catch (InvalidSnapshotException e) {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
             }
         }
     }
 
     @Command(
-            aliases = { "sel" },
-            usage = "<index>",
-            desc = "Choose the snapshot based on the list id",
-            min = 1,
-            max = 1
+        name = "sel",
+        desc = "Choose the snapshot based on the list id"
     )
     @CommandPermissions("worldedit.snapshots.restore")
-    public void sel(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void sel(Actor actor, World world, LocalSession session,
+                    @Arg(desc = "The list ID to select")
+                        int index) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
-            return;
-        }
-
-        int index = -1;
-        try {
-            index = Integer.parseInt(args.getString(0));
-        } catch (NumberFormatException e) {
-            player.printError("Invalid index, " + args.getString(0) + " is not a valid integer.");
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
 
         if (index < 1) {
-            BBC.SNAPSHOT_INVALID_INDEX.send(player);
+            actor.printError(BBC.SNAPSHOT_INVALID_INDEX.s());
             return;
         }
 
         try {
-            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, player.getWorld().getName());
+            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, world.getName());
             if (snapshots.size() < index) {
-                player.printError("Invalid index, must be between 1 and " + snapshots.size() + ".");
+                actor.printError("Invalid index, must be between 1 and " + snapshots.size() + ".");
                 return;
             }
             Snapshot snapshot = snapshots.get(index - 1);
             if (snapshot == null) {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                actor.printError(BBC.SNAPSHOT_NOT_AVAILABLE.s());
                 return;
             }
             session.setSnapshot(snapshot);
-            BBC.SNAPSHOT_SET.send(player, snapshot.getName());
+            actor.print("Snapshot set to: " + snapshot.getName());
         } catch (MissingWorldException e) {
-            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
         }
     }
 
     @Command(
-            aliases = { "before" },
-            usage = "<date>",
-            desc = "Choose the nearest snapshot before a date",
-            min = 1,
-            max = -1
+        name = "before",
+        desc = "Choose the nearest snapshot before a date"
     )
     @CommandPermissions("worldedit.snapshots.restore")
-    public void before(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void before(Actor actor, World world, LocalSession session,
+                       @Arg(desc = "The soonest date that may be used")
+                           ZonedDateTime date) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
 
-        Calendar date = session.detectDate(args.getJoinedStrings(0));
+        try {
+            Snapshot snapshot = config.snapshotRepo.getSnapshotBefore(date, world.getName());
 
-        if (date == null) {
-            BBC.SNAPSHOT_ERROR_DATE.send(player);
-        } else {
-            try {
-                Snapshot snapshot = config.snapshotRepo.getSnapshotBefore(date, player.getWorld().getName());
-
-                if (snapshot == null) {
-                    dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError("Couldn't find a snapshot before "
-                            + dateFormat.format(date.getTime()) + ".");
-                } else {
-                    session.setSnapshot(snapshot);
-                    BBC.SNAPSHOT_SET.send(player, snapshot.getName());
-                }
-            } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+            if (snapshot == null) {
+                actor.printError("Couldn't find a snapshot before "
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
+            } else {
+                session.setSnapshot(snapshot);
+                actor.print("Snapshot set to: " + snapshot.getName());
             }
+        } catch (MissingWorldException ex) {
+            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
         }
     }
 
     @Command(
-            aliases = { "after" },
-            usage = "<date>",
-            desc = "Choose the nearest snapshot after a date",
-            min = 1,
-            max = -1
+        name = "after",
+        desc = "Choose the nearest snapshot after a date"
     )
     @CommandPermissions("worldedit.snapshots.restore")
-    public void after(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void after(Actor actor, World world, LocalSession session,
+                      @Arg(desc = "The soonest date that may be used")
+                          ZonedDateTime date) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            actor.printError(BBC.SNAPSHOT_NOT_CONFIGURED.s());
             return;
         }
 
-        Calendar date = session.detectDate(args.getJoinedStrings(0));
-
-        if (date == null) {
-            BBC.SNAPSHOT_ERROR_DATE.send(player);
-        } else {
-            try {
-                Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
-                if (snapshot == null) {
-                    dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError("Couldn't find a snapshot after "
-                            + dateFormat.format(date.getTime()) + ".");
-                } else {
-                    session.setSnapshot(snapshot);
-                    BBC.SNAPSHOT_SET.send(player, snapshot.getName());
-                }
-            } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+        try {
+            Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, world.getName());
+            if (snapshot == null) {
+                actor.printError("Couldn't find a snapshot after "
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
+            } else {
+                session.setSnapshot(snapshot);
+                actor.print("Snapshot set to: " + snapshot.getName());
             }
+        } catch (MissingWorldException ex) {
+            actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
         }
     }
 
+    private static class SnapshotListBox extends PaginationBox {
+        private final List<Snapshot> snapshots;
+
+        SnapshotListBox(String world, List<Snapshot> snapshots) {
+            super("Snapshots for: " + world, "/snap list -p %page%");
+            this.snapshots = snapshots;
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            final Snapshot snapshot = snapshots.get(number);
+            return TextComponent.of(number + 1 + ". ", TextColor.GOLD)
+                    .append(TextComponent.of(snapshot.getName(), TextColor.LIGHT_PURPLE)
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to use")))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/snap use " + snapshot.getName())));
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return snapshots.size();
+        }
+    }
 }

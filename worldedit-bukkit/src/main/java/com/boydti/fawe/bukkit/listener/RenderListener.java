@@ -2,7 +2,6 @@ package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.TaskManager;
 import java.util.Iterator;
 import java.util.Map;
@@ -14,7 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -46,7 +47,6 @@ public class RenderListener implements Listener {
                     OFFSET = 8;
                     timeOut = 2;
                 } else {
-                    int tpsSqr = tps32 * tps32;
                     OFFSET = 1 + (tps32 / 102400);
                     timeOut = 162 - (tps32 / 2560);
                 }
@@ -75,7 +75,7 @@ public class RenderListener implements Listener {
         }, 1);
     }
 
-    public void setViewDistance(Player player, int value) {
+    private void setViewDistance(Player player, int value) {
         UUID uuid = player.getUniqueId();
         if (value == Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
             views.remove(uuid);
@@ -100,7 +100,7 @@ public class RenderListener implements Listener {
 //        player.setViewDistance(value);
     }
 
-    public int getViewDistance(Player player) {
+    private int getViewDistance(Player player) {
         int[] value = views.get(player.getUniqueId());
         return value == null ? Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
     }
@@ -122,14 +122,13 @@ public class RenderListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         setViewDistance(player, 1);
-        FawePlayer fp = FawePlayer.wrap(player);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerLeave(org.bukkit.event.player.PlayerQuitEvent event) {
+    public void onPlayerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID uid = player.getUniqueId();
         views.remove(uid);

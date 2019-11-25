@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -59,9 +60,9 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     public BlockState getBlock(int x, int y, int z) {
         return super.getBlock(x + dx, y + dy, z + dz);
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 pos) {
-    	return super.getFullBlock(pos.add(dx, dy, dz));
+        return super.getFullBlock(pos.add(dx, dy, dz));
     }
 }

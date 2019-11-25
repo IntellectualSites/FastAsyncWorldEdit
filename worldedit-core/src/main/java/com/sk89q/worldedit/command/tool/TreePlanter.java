@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.boydti.fawe.config.BBC;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -27,6 +28,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 
@@ -53,18 +55,19 @@ public class TreePlanter implements BlockTool {
             try {
                 boolean successful = false;
 
+                final BlockVector3 pos = clicked.toVector().add(0, 1, 0).toBlockPoint();
                 for (int i = 0; i < 10; i++) {
-                    if (treeType.generate(editSession, clicked.add(0, 1, 0).toBlockPoint())) {
+                    if (treeType.generate(editSession, pos)) {
                         successful = true;
                         break;
                     }
                 }
 
                 if (!successful) {
-                    BBC.TOOL_TREE_ERROR_BLOCK.send(player);
+                    player.printError(BBC.TOOL_TREE_ERROR_BLOCK.s());
                 }
             } catch (MaxChangedBlocksException e) {
-                BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.send(player);
+                player.printError(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.s());
             } finally {
                 session.remember(editSession);
             }

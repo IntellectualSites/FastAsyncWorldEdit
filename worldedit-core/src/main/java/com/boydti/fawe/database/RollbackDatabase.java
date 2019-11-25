@@ -10,7 +10,6 @@ import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         this(FaweAPI.getWorld(world));
     }
 
-    public RollbackDatabase(final World world) throws SQLException, ClassNotFoundException {
+    public RollbackDatabase(World world) throws SQLException, ClassNotFoundException {
         this.prefix = "";
         this.worldName = world.getName();
         this.world = world;
@@ -96,7 +95,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         }
     }
 
-    public void delete(final UUID uuid, final int id) {
+    public void delete(UUID uuid, int id) {
         addTask(new Runnable() {
             @Override
             public void run() {
@@ -127,12 +126,13 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         });
     }
 
-    public void getPotentialEdits(final UUID uuid, final long minTime, final BlockVector3 pos1, final BlockVector3 pos2, final RunnableVal<DiskStorageHistory> onEach, final Runnable whenDone, final boolean delete, final boolean ascending) {
+    public void getPotentialEdits(UUID uuid, long minTime, BlockVector3 pos1, BlockVector3 pos2, RunnableVal<DiskStorageHistory> onEach, Runnable whenDone, boolean delete, boolean ascending) {
         final World world = FaweAPI.getWorld(this.worldName);
         addTask(new Runnable() {
             @Override
             public void run() {
-                String stmtStr = ascending ? (uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC) : (uuid == null ? GET_EDITS : GET_EDITS_USER);
+                String stmtStr = ascending ? uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC :
+                    uuid == null ? GET_EDITS : GET_EDITS_USER;
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
                     stmt.setInt(1, pos1.getBlockX());
                     stmt.setInt(2, pos2.getBlockX());
@@ -243,7 +243,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
             }
             commit();
             return true;
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
@@ -258,7 +258,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 connection.commit();
                 connection.setAutoCommit(true);
             }
-        } catch (final SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -270,11 +270,11 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         if (!Fawe.imp().getDirectory().exists()) {
             Fawe.imp().getDirectory().mkdirs();
         }
-        if (!(dbLocation.exists())) {
+        if (!dbLocation.exists()) {
             try {
                 dbLocation.getParentFile().mkdirs();
                 dbLocation.createNewFile();
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 Fawe.debug("&cUnable to create database!");
             }
@@ -291,17 +291,15 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Gets the connection with the database
+     * Gets the connection with the database.
      *
-     * @return Connection with the database, null if none
+     * @return the connection with the database, {@code null} if none
      */
     public Connection getConnection() {
         if (connection == null) {
             try {
                 forceConnection();
-            } catch (final ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (final SQLException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -309,10 +307,10 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Closes the connection with the database
+     * Closes the connection with the database.
      *
      * @return true if successful
-     * @throws java.sql.SQLException if the connection cannot be closed
+     * @throws SQLException if the connection cannot be closed
      */
     public boolean closeConnection() throws SQLException {
         if (connection == null) {
@@ -329,15 +327,14 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     }
 
     /**
-     * Checks if a connection is open with the database
+     * Checks if a connection is open with the database.
      *
-     * @return true if the connection is open
-     * @throws java.sql.SQLException if the connection cannot be checked
+     * @return returns {@code true} if the connection is open, otherwise {@code false}
      */
     public boolean checkConnection() {
         try {
-            return (connection != null) && !connection.isClosed();
-        } catch (final SQLException e) {
+            return connection != null && !connection.isClosed();
+        } catch (SQLException e) {
             return false;
         }
     }

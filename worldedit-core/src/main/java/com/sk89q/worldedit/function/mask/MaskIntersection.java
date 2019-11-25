@@ -21,21 +21,21 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-
+import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-
+import java.util.function.Function;
+import javax.annotation.Nullable;
 
 /**
  * Combines several masks and requires that all masks return true
@@ -44,7 +44,7 @@ import java.util.Set;
  */
 public class MaskIntersection extends AbstractMask {
 
-    private final Set<Mask> masks = new LinkedHashSet<>();
+    private final Set<Mask> masks;
     private Mask[] masksArray;
 
     /**
@@ -54,8 +54,32 @@ public class MaskIntersection extends AbstractMask {
      */
     public MaskIntersection(Collection<Mask> masks) {
         checkNotNull(masks);
-        this.masks.addAll(masks);
+        this.masks = new LinkedHashSet<>(masks);
         formArray();
+    }
+
+    public static Mask of(Mask... masks) {
+        Set<Mask> set = new LinkedHashSet<>();
+        for (Mask mask : masks) {
+            if (mask == Masks.alwaysFalse()) {
+                return mask;
+            }
+            if (mask != null && mask != Masks.alwaysTrue()) {
+                if (mask.getClass() == MaskIntersection.class) {
+                    set.addAll(((MaskIntersection) mask).getMasks());
+                } else {
+                    set.add(mask);
+                }
+            }
+        }
+        switch (set.size()) {
+            case 0:
+                return Masks.alwaysTrue();
+            case 1:
+                return set.iterator().next();
+            default:
+                return new MaskIntersection(masks).optimize();
+        }
     }
 
     /**
@@ -75,48 +99,68 @@ public class MaskIntersection extends AbstractMask {
         }
     }
 
-    public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
-        return input -> input.getKey().and(input.getValue());
+    public Function<Entry<Mask, Mask>, Mask> pairingFunction() {
+        return input -> input.getKey().tryCombine(input.getValue());
     }
 
-    private void optimizeMasks(Set<Mask> ignore) {
-        LinkedHashSet<Mask> newMasks = null;
-        for (Mask mask : masks) {
+    private boolean optimizeMasks(Set<Mask> ignore) {
+        boolean changed = false;
+        // Optimize sub masks
+        for (int i = 0; i < masksArray.length; i++) {
+            Mask mask = masksArray[i];
             if (ignore.contains(mask)) continue;
-            Mask newMask = mask.optimize();
+            Mask newMask = mask.tryOptimize();
             if (newMask != null) {
-                if (newMask != mask) {
-                    if (newMasks == null) newMasks = new LinkedHashSet<>();
-                    newMasks.add(newMask);
-                }
+                changed = true;
+                masksArray[i] = newMask;
             } else {
                 ignore.add(mask);
             }
-            if (newMasks != null) {
-                masks.clear();
-                masks.addAll(newMasks);
+        }
+        if (changed) {
+            masks.clear();
+            Collections.addAll(masks, masksArray);
+        }
+        // Optimize this
+        boolean formArray = false;
+        for (Mask mask : masksArray) {
+            if (mask.getClass() == this.getClass()) {
+                this.masks.remove(mask);
+                this.masks.addAll(((MaskIntersection) mask).getMasks());
+                formArray = true;
+                changed = true;
             }
         }
+        if (formArray) formArray();
+        return changed;
     }
 
     @Override
-    public Mask optimize() {
+    public Mask tryOptimize() {
+        int maxIteration = 1000;
         Set<Mask> optimized = new HashSet<>();
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
-        while (combine(pairingFunction(), failedCombines)) {
-        }
+        boolean changed = false;
+        while (changed |= combineMasks(pairingFunction(), failedCombines));
         // Optimize / combine
-        do optimizeMasks(optimized);
-        while (combine(pairingFunction(), failedCombines));
+        do changed |= optimizeMasks(optimized);
+        while (changed |= combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
+
+        if (maxIteration == 0) {
+            Fawe.debug("Failed optimize MaskIntersection");
+            for (Mask mask : masks) {
+                System.out.println(mask.getClass() + " / " + mask);
+            }
+        }
         // Return result
         formArray();
-        if (masks.size() == 0) return Masks.alwaysTrue();
+        if (masks.isEmpty()) return Masks.alwaysTrue();
         if (masks.size() == 1) return masks.iterator().next();
-        return this;
+        return changed ? this : null;
     }
 
-    private boolean combine(Function<Map.Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
+    private boolean combineMasks(Function<Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
         boolean hasOptimized = false;
         while (true) {
             Mask[] result = null;
@@ -180,6 +224,10 @@ public class MaskIntersection extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
+        if (masksArray.length == 0) {
+            return false;
+        }
+
         for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;

@@ -1,9 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import javax.annotation.Nullable;
 
 /**
@@ -19,7 +17,7 @@ public class MutableMCABackedBaseBlock extends BaseBlock {
     private int z;
 
     public MutableMCABackedBaseBlock() {
-        super(0, null);
+        super();
     }
 
     public void setChunk(MCAChunk chunk) {

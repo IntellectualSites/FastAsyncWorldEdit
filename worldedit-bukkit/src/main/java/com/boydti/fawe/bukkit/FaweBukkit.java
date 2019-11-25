@@ -3,52 +3,50 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.bukkit.beta.BukkitQueue;
-import com.boydti.fawe.bukkit.beta.BukkitQueueHandler;
-import com.boydti.fawe.bukkit.chat.BukkitChatManager;
-import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
+import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
-import com.boydti.fawe.bukkit.listener.CFIPacketListener;
+import com.boydti.fawe.bukkit.listener.ChunkListener_8;
+import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.listener.SyncTabCompleteListener;
 import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
 import com.boydti.fawe.bukkit.regions.FactionsFeature;
-import com.boydti.fawe.bukkit.regions.FactionsOneFeature;
 import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
-import com.boydti.fawe.bukkit.regions.PreciousStonesFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.regions.WorldguardFlag;
+import com.boydti.fawe.bukkit.regions.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
-import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
-import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
-import com.boydti.fawe.bukkit.v0.ChunkListener_8;
-import com.boydti.fawe.bukkit.v0.ChunkListener_9;
-import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
-import org.bstats.bukkit.MetricsLite;
+import io.papermc.lib.PaperLib;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Supplier;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -56,27 +54,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
 
 public class FaweBukkit implements IFawe, Listener {
 
-//    private final WorldEditPlugin plugin;
     private final Plugin plugin;
     private VaultUtil vault;
-    private ItemUtil itemUtil;
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
@@ -99,20 +85,15 @@ public class FaweBukkit implements IFawe, Listener {
                 e.printStackTrace();
                 debug("===================================");
             }
-            if (Bukkit.getVersion().contains("git-Spigot")) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug("==============================");
-            }
-            if (Bukkit.getVersion().contains("git-Paper") && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
-            try {
-                Fawe.get().setChatManager(new BukkitChatManager());
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
+            if (Bukkit.getPluginManager().getPlugin("PlotSquared") != null) {
+                try {
+                    WEManager.IMP.managers.add(new PlotSquaredFeature());
+                } catch (Exception ignored) {
+                    //Not everyone uses or needs PlotSquared.
+                }
             }
         } catch (final Throwable e) {
             e.printStackTrace();
@@ -135,18 +116,6 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
 
-            try {
-                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            } catch (Throwable ignore) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
-                debug("==============================");
-                Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            }
         });
     }
 
@@ -164,7 +133,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public synchronized ImageViewer getImageViewer(FawePlayer fp) {
+    public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player fp) {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
@@ -185,7 +154,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            BukkitImageViewer viewer = new BukkitImageViewer((Player) fp.parent);
+            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(fp));
             if (imageListener == null) {
                 this.imageListener = new BukkitImageListener(plugin);
             }
@@ -214,7 +183,7 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public void debug(final String message) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(BBC.color(message));
+        console.sendMessage(message);
     }
 
     @Override
@@ -237,54 +206,34 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public FawePlayer<Player> wrap(final Object obj) {
+    public com.sk89q.worldedit.entity.Player wrap(final Object obj) {
         if (obj.getClass() == String.class) {
             String name = (String) obj;
-            FawePlayer existing = Fawe.get().getCachedPlayer(name);
+            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(name);
             if (existing != null) {
                 return existing;
             }
             Player player = Bukkit.getPlayer(name);
-            return player != null ? new BukkitPlayer(player) : null;
-        } else if (obj instanceof Player) {
-            Player player = (Player) obj;
-            FawePlayer existing = Fawe.get().getCachedPlayer(player.getName());
-            return existing != null ? existing : new BukkitPlayer(player);
-        } else if (obj.getClass().getName().contains("EntityPlayer")) {
-            try {
-                Method method = obj.getClass().getDeclaredMethod("getBukkitEntity");
-                return wrap(method.invoke(obj));
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return null;
-            }
-        } else {
-            return null;
+            return player != null ? BukkitAdapter.adapt(player) : null;
         }
+        if (obj.getClass() == UUID.class) {
+            UUID uuid = (UUID) obj;
+            com.sk89q.worldedit.entity.Player existing = Fawe.get().getCachedPlayer(uuid);
+            if (existing != null) {
+                return existing;
+            }
+            Player player = Bukkit.getPlayer(uuid);
+            return player != null ? BukkitAdapter.adapt(player) : null;
+        }
+        return null;
     }
 
     @Override public void startMetrics() {
-        new MetricsLite(plugin);
-    }
-
-    public ItemUtil getItemUtil() {
-        ItemUtil tmp = itemUtil;
-        if (tmp == null) {
-            try {
-                this.itemUtil = tmp = new ItemUtil();
-            } catch (Throwable e) {
-                Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                debug("===== PERSISTENT BRUSH FAILED =====");
-                e.printStackTrace();
-                debug("===================================");
-            }
-        }
-        return tmp;
+        new Metrics(plugin);
     }
 
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
-     * @return
      */
     @Override
     public void setupVault() {
@@ -298,10 +247,11 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        msg.append("server.version: " + Bukkit.getVersion() + "\n");
+        msg.append("server.version: ").append(Bukkit.getVersion()).append("\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-            msg.append(" - " + p.getName() + ": " + p.getDescription().getVersion() + "\n");
+            msg.append(" - ").append(p.getName()).append(": ")
+                .append(p.getDescription().getVersion()).append("\n");
         }
         return msg.toString();
     }
@@ -426,115 +376,98 @@ public class FaweBukkit implements IFawe, Listener {
     public Collection<FaweMaskManager> getMaskManagers() {
         final Plugin worldguardPlugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
         final ArrayList<FaweMaskManager> managers = new ArrayList<>();
-        if ((worldguardPlugin != null) && worldguardPlugin.isEnabled()) {
+        if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
-                managers.add(new Worldguard(worldguardPlugin, this));
-                managers.add(new WorldguardFlag(worldguardPlugin, this));
-                Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
+                managers.add(new Worldguard(worldguardPlugin));
+                managers.add(new WorldguardFlag(worldguardPlugin));
+                Fawe.debug("Attempting to use plugin 'WorldGuard'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
-        if ((townyPlugin != null) && townyPlugin.isEnabled()) {
+        if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
-                managers.add(new TownyFeature(townyPlugin, this));
-                Fawe.debug("Plugin 'Towny' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
+                managers.add(new TownyFeature(townyPlugin));
+                Fawe.debug("Attempting to use plugin 'Towny'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
-        if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
+        if (factionsPlugin != null && factionsPlugin.isEnabled()) {
             try {
                 managers.add(new FactionsFeature(factionsPlugin));
-                Fawe.debug("Plugin 'Factions' found. Using it now.");
-            } catch (final Throwable e) {
+                Fawe.debug("Attempting to use plugin 'Factions'");
+            } catch (Throwable e) {
                 try {
                     managers.add(new FactionsUUIDFeature(factionsPlugin, this));
-                    Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
-                } catch (Throwable e2) {
-                    try {
-                        managers.add(new FactionsOneFeature(factionsPlugin));
-                        Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
-                    } catch (Throwable e3) {
-                        e.printStackTrace();
-                    }
-
+                    Fawe.debug("Attempting to use plugin 'FactionsUUID'");
+                } catch (Throwable ignored) {
                 }
             }
         }
         final Plugin residencePlugin = Bukkit.getServer().getPluginManager().getPlugin("Residence");
-        if ((residencePlugin != null) && residencePlugin.isEnabled()) {
+        if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
-                Fawe.debug("Plugin 'Residence' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'Residence'");
+            } catch (Throwable ignored) {
             }
         }
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
-        if ((griefpreventionPlugin != null) && griefpreventionPlugin.isEnabled()) {
+        if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
-                Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin 'GriefPrevention'");
+            } catch (Throwable ignored) {
             }
         }
-        final Plugin preciousstonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
-        if ((preciousstonesPlugin != null) && preciousstonesPlugin.isEnabled()) {
-            try {
-                managers.add(new PreciousStonesFeature(preciousstonesPlugin, this));
-                Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
 
         final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
-        if ((aSkyBlock != null) && aSkyBlock.isEnabled()) {
+        if (aSkyBlock != null && aSkyBlock.isEnabled()) {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock));
-                Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
-            } catch (final Throwable e) {
+                Fawe.debug("Attempting to use plugin  'ASkyBlock' found. Using it now.");
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
             try {
                 managers.add(new FreeBuildRegion());
-                Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
-            } catch (final Throwable e) {
-                e.printStackTrace();
+                Fawe.debug("Attempting to use plugin '<internal.freebuild>'");
+            } catch (Throwable ignored) {
             }
         }
 
         return managers;
     }
-//
-//    @EventHandler
-//    public void onWorldLoad(WorldLoadEvent event) {
-//        org.bukkit.World world = event.getWorld();
-//        world.setKeepSpawnInMemory(false);
-//        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-//        ChunkProviderServer provider = nmsWorld.getChunkProviderServer();
-//        try {
-//            Field fieldChunkLoader = provider.getClass().getDeclaredField("chunkLoader");
-//            ReflectionUtils.setFailsafeFieldValue(fieldChunkLoader, provider, new FaweChunkLoader());
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+    private volatile boolean keepUnloaded;
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent event) {
+        if (keepUnloaded) {
+            org.bukkit.World world = event.getWorld();
+            world.setKeepSpawnInMemory(false);
+        }
+    }
+
+    public synchronized <T> T createWorldUnloaded(Supplier<T> task) {
+        keepUnloaded = true;
+        try {
+            return task.get();
+        } finally {
+            keepUnloaded = false;
+        }
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
-        FawePlayer fp = Fawe.get().getCachedPlayer(name);
-        if (fp != null) {
-            fp.unregister();
+        com.sk89q.worldedit.entity.Player wePlayer = Fawe.get().getCachedPlayer(name);
+        if (wePlayer != null) {
+            wePlayer.unregister();
             Fawe.get().unregister(name);
         }
     }
@@ -569,51 +502,11 @@ public class FaweBukkit implements IFawe, Listener {
         return null;
 //        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
     }
-
-    private Version version = null;
-
-    public Version getVersion() {
-        Version tmp = this.version;
-        if (tmp == null) {
-            tmp = Version.NONE;
-            for (Version v : Version.values()) {
-                try {
-                    BukkitQueue_0.checkVersion(v.name());
-                    this.version = tmp = v;
-                    break;
-                } catch (IllegalStateException ignored) {}
-            }
-        }
-        return tmp;
-    }
-
-    public enum Version {
-        v1_14_R1,
-        v1_13_R2,
-        NONE,
-    }
-
     private FaweQueue getQueue(World world) {
-        switch (getVersion()) {
-            case v1_13_R2:
-                return new BukkitQueue_1_13(world);
-            case v1_14_R1:
-                return new BukkitQueue_1_14(world);
-            default:
-            case NONE:
-                return new BukkitQueue_All(world);
-        }
+        return new BukkitQueue_1_14(world);
     }
 
     private FaweQueue getQueue(String world) {
-        switch (getVersion()) {
-            case v1_13_R2:
-                return new BukkitQueue_1_13(world);
-            case v1_14_R1:
-                return new BukkitQueue_1_14(world);
-            default:
-            case NONE:
-                return new BukkitQueue_All(world);
-        }
+        return new BukkitQueue_1_14(world);
     }
 }

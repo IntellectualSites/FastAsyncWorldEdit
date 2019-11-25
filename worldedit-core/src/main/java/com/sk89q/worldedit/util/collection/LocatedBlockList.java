@@ -19,70 +19,76 @@
 
 package com.sk89q.worldedit.util.collection;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.google.common.collect.Iterators;
+import com.sk89q.worldedit.WorldEdit;
+import com.google.common.collect.Iterators;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.LocatedBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wrapper around a list of blocks located in the world.
  */
 public class LocatedBlockList implements Iterable<LocatedBlock> {
 
-    private final List<LocatedBlock> list;
+    private final BlockMap blocks = BlockMap.create();
+    private final PositionList order = PositionList.create(
+        WorldEdit.getInstance().getConfiguration().extendedYLimit
+    );
 
     public LocatedBlockList() {
-        list = new ArrayList<>();
     }
 
     public LocatedBlockList(Collection<? extends LocatedBlock> collection) {
-        list = new ArrayList<>(collection);
+        for (LocatedBlock locatedBlock : collection) {
+            add(locatedBlock.getLocation(), locatedBlock.getBlock());
+        }
     }
 
     public void add(LocatedBlock setBlockCall) {
         checkNotNull(setBlockCall);
-        list.add(setBlockCall);
+        add(setBlockCall.getLocation(), setBlockCall.getBlock());
     }
 
     public <B extends BlockStateHolder<B>> void add(BlockVector3 location, B block) {
-        add(new LocatedBlock(location, block.toBaseBlock()));
+        blocks.put(location, block.toBaseBlock());
+        order.add(location);
+    }
+
+    public boolean containsLocation(BlockVector3 location) {
+        return blocks.containsKey(location);
+    }
+
+    public @Nullable BaseBlock get(BlockVector3 location) {
+        return blocks.get(location);
     }
 
     public int size() {
-        return list.size();
+        return order.size();
     }
 
     public void clear() {
-        list.clear();
+        blocks.clear();
+        order.clear();
     }
 
     @Override
     public Iterator<LocatedBlock> iterator() {
-        return list.iterator();
+        return Iterators.transform(order.iterator(), position ->
+            new LocatedBlock(position, blocks.get(position)));
     }
 
     public Iterator<LocatedBlock> reverseIterator() {
-        return new Iterator<LocatedBlock>() {
-
-            private final ListIterator<LocatedBlock> backingIterator = list.listIterator(list.size());
-
-            @Override
-            public boolean hasNext() {
-                return backingIterator.hasPrevious();
-            }
-
-            @Override
-            public LocatedBlock next() {
-                return backingIterator.previous();
-            }
-        };
+        return Iterators.transform(order.reverseIterator(), position ->
+            new LocatedBlock(position, blocks.get(position)));
     }
 
 }

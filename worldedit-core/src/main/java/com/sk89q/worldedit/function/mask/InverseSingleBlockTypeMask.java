@@ -1,37 +1,34 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class InverseSingleBlockTypeMask extends ABlockMask {
-    private final int internalId;
+    private final BlockType type;
 
     public InverseSingleBlockTypeMask(Extent extent, BlockType type) {
         super(extent);
-        this.internalId = type.getInternalId();
+        this.type = type;
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(vector.getBlock(getExtent()));
+        return test(getExtent().getBlock(vector));
     }
 
     @Override
     public final boolean test(BlockState state) {
-        return state.getBlockType().getInternalId() != internalId;
+        return state.getBlockType().equals(type);
     }
 
     @Override
     public Mask inverse() {
-        return new SingleBlockTypeMask(getExtent(), BlockTypes.values[internalId]);
+        return new SingleBlockTypeMask(getExtent(), type);
     }
 
     public BlockType getBlockType() {
-        return BlockTypes.get(internalId);
+        return this.type;
     }
 }

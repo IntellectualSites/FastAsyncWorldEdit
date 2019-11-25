@@ -19,22 +19,20 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -106,24 +104,24 @@ public interface ClipboardFormat {
     Set<String> getFileExtensions();
 
     /**
-     * Set the player's clipboard
-     * @param player
+     * Set the actor's clipboard
+     * @param actor
      * @param uri
-     * @param in
-     * @throws IOException
+     * @param inputStream the input stream
+     * @throws IOException thrown on I/O error
      */
-    default URIClipboardHolder hold(Player player, URI uri, InputStream in) throws IOException {
-        checkNotNull(player);
+    default URIClipboardHolder hold(Actor actor, URI uri, InputStream inputStream) throws IOException {
+        checkNotNull(actor);
         checkNotNull(uri);
-        checkNotNull(in);
+        checkNotNull(inputStream);
 
-        final ClipboardReader reader = getReader(in);
+        final ClipboardReader reader = getReader(inputStream);
 
         final Clipboard clipboard;
 
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
         session.setClipboard(null);
-        clipboard = reader.read(player.getUniqueId());
+        clipboard = reader.read(actor.getUniqueId());
         URIClipboardHolder holder = new URIClipboardHolder(uri, clipboard);
         session.setClipboard(holder);
         return holder;

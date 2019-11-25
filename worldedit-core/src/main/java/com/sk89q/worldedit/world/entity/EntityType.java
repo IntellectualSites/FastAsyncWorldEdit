@@ -19,10 +19,11 @@
 
 package com.sk89q.worldedit.world.entity;
 
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
-public class EntityType implements RegistryItem {
+public class EntityType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<EntityType> REGISTRY = new NamespacedRegistry<>("entity type");
 
@@ -36,6 +37,7 @@ public class EntityType implements RegistryItem {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }

@@ -49,7 +49,6 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         synchronized (NashornCraftScriptEngine.class) {
             if (FACTORY == null) FACTORY = new NashornScriptEngineFactory();
         }
-        ;
         ScriptEngine engine = FACTORY.getScriptEngine("--language=es6");
         SimpleBindings bindings = new SimpleBindings();
 
@@ -58,8 +57,7 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         }
 
        try {
-           Object result = engine.eval(script, bindings);
-           return result;
+           return engine.eval(script, bindings);
         } catch (Error e) {
             e.printStackTrace();
             throw new ScriptException(e.getMessage());
@@ -72,7 +70,6 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
                 throw e;
             }
             throw e;
-        } finally {
         }
     }
 

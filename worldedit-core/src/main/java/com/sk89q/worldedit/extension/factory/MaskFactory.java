@@ -22,12 +22,6 @@ package com.sk89q.worldedit.extension.factory;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -54,9 +48,19 @@ public final class MaskFactory extends AbstractFactory<Mask> {
      * @param worldEdit the WorldEdit instance
      */
     public MaskFactory(WorldEdit worldEdit) {
-        super(worldEdit);
-        register(new BlockCategoryMaskParser(worldEdit));
-        register(new DefaultMaskParser(worldEdit));
+        super(worldEdit, new DefaultMaskParser(worldEdit));
+
+//        register(new ExistingMaskParser(worldEdit));
+//        register(new SolidMaskParser(worldEdit));
+//        register(new LazyRegionMaskParser(worldEdit));
+//        register(new RegionMaskParser(worldEdit));
+//        register(new OffsetMaskParser(worldEdit));
+//        register(new NoiseMaskParser(worldEdit));
+//        register(new BlockStateMaskParser(worldEdit));
+//        register(new NegateMaskParser(worldEdit));
+//        register(new ExpressionMaskParser(worldEdit));
+        register(new BlockCategoryMaskParser(worldEdit)); // TODO implement in DefaultMaskParser
+//        register(new BiomeMaskParser(worldEdit));
     }
 
     @Override
@@ -81,7 +85,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
             case 0:
                 throw new NoMatchException("No match for '" + input + "'");
             case 1:
-                return masks.get(0);
+                return masks.get(0).optimize();
             default:
                 return new MaskIntersection(masks).optimize();
         }

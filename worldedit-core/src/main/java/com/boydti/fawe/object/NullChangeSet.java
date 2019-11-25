@@ -54,11 +54,6 @@ public class NullChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addChangeTask(FaweQueue queue) {
-
-    }
-
-    @Override
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);
     }
@@ -73,15 +68,15 @@ public class NullChangeSet extends FaweChangeSet {
         return 0;
     }
 
-	@Override
-	public boolean isRecordingChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isRecordingChanges() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void setRecordChanges(boolean recordChanges) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setRecordChanges(boolean recordChanges) {
+        // TODO Auto-generated method stub
+
+    }
 }

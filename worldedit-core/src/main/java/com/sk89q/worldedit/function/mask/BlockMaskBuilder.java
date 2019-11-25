@@ -4,6 +4,7 @@ import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
+
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -16,9 +17,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BlockMaskBuilder {
@@ -73,12 +72,15 @@ public class BlockMaskBuilder {
                 result = bitSets[type.getInternalId()] != null;
                 remove(type);
             }
-        } else if (value.length() == 0) {
-
-        } else if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
-            result = filterRegex(type, key, value.toString());
         } else {
-            result = filterOperator(type, key, operator, value);
+            if (value.length() == 0) {
+                return result;
+            }
+            if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
+                result = filterRegex(type, key, value.toString());
+            } else {
+                result = filterOperator(type, key, operator, value);
+            }
         }
         return result;
     }
@@ -147,14 +149,13 @@ public class BlockMaskBuilder {
                             Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
                             throw new SuggestInputParseException("No value for " + input, input, () -> {
                                 HashSet<String> values = new HashSet<>();
-                                types.forEach(t -> {
-                                    if (t.hasProperty(fKey)) {
-                                        Property p = t.getProperty(fKey);
-                                        for (int j = 0; j < p.getValues().size(); j++) {
-                                            if (has(t, p, j)) {
-                                                String o = p.getValues().get(j).toString();
-                                                if (o.startsWith(value)) values.add(o);
-                                            }
+                                types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
+                                    Property p = t.getProperty(fKey);
+                                    for (int j = 0; j < p.getValues().size(); j++) {
+                                        if (has(t, p, j)) {
+                                            String o = p.getValues().get(j).toString();
+                                            if (o.startsWith(value))
+                                                values.add(o);
                                         }
                                     }
                                 });
@@ -222,7 +223,6 @@ public class BlockMaskBuilder {
         AbstractProperty prop = (AbstractProperty) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return false;
-        List values = prop.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
         return (states == ALL || FastBitSet.get(states, localI));
     }
@@ -230,8 +230,8 @@ public class BlockMaskBuilder {
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
             Set<PropertyKey> keys = new HashSet<>();
-            finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
-            return keys.stream().map(p -> p.getId())
+            finalTypes.forEach(t -> t.getProperties().forEach(p -> keys.add(p.getKey())));
+            return keys.stream().map(PropertyKey::getId)
                     .filter(p -> StringMan.blockStateMatches(property, p))
                     .sorted(StringMan.blockStateComparator(property))
                     .collect(Collectors.toList());

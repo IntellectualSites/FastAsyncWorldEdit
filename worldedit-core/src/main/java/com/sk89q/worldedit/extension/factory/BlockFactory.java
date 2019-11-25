@@ -45,9 +45,7 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
      * @param worldEdit the WorldEdit instance.
      */
     public BlockFactory(WorldEdit worldEdit) {
-        super(worldEdit);
-
-        register(new DefaultBlockParser(worldEdit));
+        super(worldEdit, new DefaultBlockParser(worldEdit));
     }
 
     /**
@@ -61,7 +59,7 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
     public Set<BaseBlock> parseFromListInput(String input, ParserContext context) throws InputParseException {
         Set<BaseBlock> blocks = new HashSet<>();
         String[] splits = input.split(",");
-        for (String token : StringUtil.parseListInQuotes(splits, ',', '[', ']')) {
+        for (String token : StringUtil.parseListInQuotes(splits, ',', '[', ']', true)) {
             blocks.add(parseFromInput(token, context));
         }
         return blocks;

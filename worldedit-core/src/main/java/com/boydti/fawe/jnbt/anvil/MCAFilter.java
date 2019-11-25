@@ -2,7 +2,6 @@ package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.ForkJoinPool;
@@ -90,7 +89,6 @@ public class MCAFilter<T> extends IterableThreadLocal<T> {
      *
      * @param chunk
      * @param cache
-     * @return
      */
     public void finishChunk(MCAChunk chunk, T cache) {
     }
@@ -100,7 +98,6 @@ public class MCAFilter<T> extends IterableThreadLocal<T> {
      *
      * @param file
      * @param cache
-     * @return
      */
     public void finishFile(MCAFile file, T cache) {
     }

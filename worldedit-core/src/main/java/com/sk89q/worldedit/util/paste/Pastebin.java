@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util.paste;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldedit.util.net.HttpRequest;
 
 import java.io.IOException;
@@ -43,12 +42,12 @@ public class Pastebin implements Paster {
     }
 
     @Override
-    public ListenableFuture<URL> paste(String content) {
+    public Callable<URL> paste(String content) {
         if (mungingLinks) {
             content = content.replaceAll("http://", "http_//");
         }
 
-        return Pasters.getExecutor().submit(new PasteTask(content));
+        return new PasteTask(content);
     }
 
     private final class PasteTask implements Callable<URL> {
@@ -89,5 +88,5 @@ public class Pastebin implements Paster {
             }
         }
     }
-    
+
 }

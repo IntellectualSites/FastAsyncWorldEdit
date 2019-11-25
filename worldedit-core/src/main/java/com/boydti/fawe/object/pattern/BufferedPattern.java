@@ -1,20 +1,15 @@
 package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.FilterBlock;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.util.FaweTimer;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.io.IOException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.UUID;
 
 public class BufferedPattern extends AbstractPattern implements ResettablePattern {
@@ -25,10 +20,10 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
     protected final Pattern pattern;
     protected final UUID uuid;
 
-    public BufferedPattern(FawePlayer fp, Pattern parent) {
-        this.uuid = fp.getUUID();
-        long[] tmp = fp.getMeta("lastActionTime");
-        if (tmp == null) fp.setMeta("lastActionTime", tmp = new long[2]);
+    public BufferedPattern(Actor actor, Pattern parent) {
+        this.uuid = actor.getUniqueId();
+        long[] tmp = actor.getMeta("lastActionTime");
+        if (tmp == null) actor.setMeta("lastActionTime", tmp = new long[2]);
         actionTime = tmp;
         this.pattern = parent;
         this.timer = Fawe.get().getTimer();

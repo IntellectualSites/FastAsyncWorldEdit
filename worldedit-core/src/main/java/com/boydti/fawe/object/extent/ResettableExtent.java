@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -7,11 +9,9 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ResettableExtent extends AbstractDelegateExtent implements Serializable {
     public ResettableExtent(Extent parent) {
@@ -39,7 +39,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         return this;
     }
 
-    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+    private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
         Extent extent = getExtent();
         boolean next = extent instanceof ResettableExtent;

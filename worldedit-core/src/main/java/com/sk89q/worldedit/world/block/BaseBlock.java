@@ -20,20 +20,21 @@
 package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Represents a "snapshot" of a block with NBT Data.
@@ -44,9 +45,10 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock implements BlockStateHolder<BaseBlock> {
-    private final BlockState blockState;
-    private final CompoundTag nbtData;
+public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
+
+    private BlockState blockState;
+    @Nullable private CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
@@ -68,7 +70,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
      * @param blockState The blockstate
      */
     public BaseBlock(BlockState blockState) {
-    	this.blockState = blockState;
+        this.blockState = blockState;
         nbtData = null;
     }
 
@@ -103,23 +105,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         return blockState;
     }
 
-    protected BaseBlock(int internalId, CompoundTag nbtData) {
-        this(BlockState.getFromInternalId(internalId), nbtData);
-    }
-
     @Deprecated
     public static BaseBlock getFromInternalId(int internalId, CompoundTag nbtData) {
         return BlockState.getFromInternalId(internalId).toBaseBlock(nbtData);
-    }
-
-    /**
-     * Create a clone of another block.
-     *
-     * @param other the other block
-     */
-    @Deprecated
-    public BaseBlock(BaseBlock other) {
-        this(other.toImmutableState(), other.getNbtData());
     }
 
     /**
@@ -180,7 +168,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("Immutable");
+        throw new UnsupportedOperationException("This class is immutable.");
     }
 
     /**
@@ -237,8 +225,34 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
     }
 
     @Override
-    public final BaseBlock toBaseBlock() {
+    public BaseBlock toBaseBlock() {
         return this;
+    }
+
+    @Override
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        set.setFullBlock(extent, this);
+        return true;
+    }
+
+    @Override
+    public BaseBlock withPropertyId(int propertyId) {
+        return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtData());
+    }
+
+    @Override
+    public int getInternalBlockTypeId() {
+        return toImmutableState().getInternalBlockTypeId();
+    }
+
+    @Override
+    public int getInternalPropertiesId() {
+        return toImmutableState().getInternalPropertiesId();
+    }
+
+    @Override
+    public <V> BaseBlock with(PropertyKey property, V value) {
+        return toImmutableState().with(property, value).toBaseBlock(getNbtData());
     }
 
     @Override
@@ -252,8 +266,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         }
     }
 
-    public BlockState toBlockState() {
-        return blockState;
+    @Override
+    public <V> V getState(PropertyKey property) {
+        return toImmutableState().getState(property);
     }
 
     @Override
@@ -261,44 +276,16 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         return getOrdinal();
     }
 
-	@Override
-	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        set.setFullBlock(extent, this);
-        return true;
-	}
-
-	@Override
-	public BaseBlock withPropertyId(int propertyId) {
-		return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtData());
-	}
-
-	@Override
-	public int getInternalBlockTypeId() {
-		return toImmutableState().getInternalBlockTypeId();
-	}
-
-	@Override
-	public int getInternalPropertiesId() {
-		return toImmutableState().getInternalPropertiesId();
-	}
-
-	@Override
-	public <V> BaseBlock with(PropertyKey property, V value) {
-		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
-	}
-
-	@Override
-	public <V> V getState(PropertyKey property) {
-		return toImmutableState().getState(property);
-	}
-
     @Override
     public String toString() {
-        if (getNbtData() != null) {
-            return getAsString() + " {" + String.valueOf(getNbtData()) + "}";
-        } else {
-            return getAsString();
-        }
+//        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
+//            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
+//        } else {
+            return blockState.getAsString();
+//        }
     }
 
+    public BlockState toBlockState() {
+        return blockState;
+    }
 }

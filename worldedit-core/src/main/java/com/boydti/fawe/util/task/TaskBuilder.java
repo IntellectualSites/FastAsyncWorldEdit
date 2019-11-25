@@ -33,7 +33,7 @@ public class TaskBuilder extends Metadatable {
         return this;
     }
 
-    public TaskBuilder async(ReceiveTask task) {
+    public TaskBuilder async(ReceiveTask<Object> task) {
         tasks.add(RunnableTask.adapt(task, TaskType.ASYNC));
         return this;
     }
@@ -53,7 +53,7 @@ public class TaskBuilder extends Metadatable {
         return this;
     }
 
-    public TaskBuilder sync(ReceiveTask task) {
+    public TaskBuilder sync(ReceiveTask<Object> task) {
         tasks.add(RunnableTask.adapt(task, TaskType.SYNC));
         return this;
     }
@@ -95,7 +95,7 @@ public class TaskBuilder extends Metadatable {
         return this;
     }
 
-    public TaskBuilder syncParallel(ReceiveTask run) {
+    public TaskBuilder syncParallel(ReceiveTask<Object> run) {
         tasks.add(RunnableTask.adapt(run, TaskType.SYNC_PARALLEL));
         return this;
     }
@@ -106,10 +106,11 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Run some async tasks in parallel<br>
-     * - All async parallel tasks which occur directly after each other will be run at the same time
+     * Run some async tasks in parallel.
+     * <br>
+     * All async parallel tasks which occur directly after each other will be run at the same time.
      *
-     * @param run
+     * @param run the task to run
      * @return this
      */
     public TaskBuilder asyncParallel(Runnable run) {
@@ -122,7 +123,7 @@ public class TaskBuilder extends Metadatable {
         return this;
     }
 
-    public TaskBuilder asyncParallel(ReceiveTask run) {
+    public TaskBuilder asyncParallel(ReceiveTask<Object> run) {
         tasks.add(RunnableTask.adapt(run, TaskType.ASYNC_PARALLEL));
         return this;
     }
@@ -133,12 +134,12 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Run a split task when the server has free time<br>
+     * Run a split task when the server has free time.<br>
      * - i.e. To maintain high tps
      * - Use the split() method within task execution
      * - FAWE will be able to pause execution at these points
      *
-     * @param run
+     * @param run the split task to run
      * @return this
      */
     public TaskBuilder syncWhenFree(SplitTask run) {
@@ -151,7 +152,7 @@ public class TaskBuilder extends Metadatable {
         return this;
     }
 
-    public TaskBuilder syncWhenFree(ReceiveTask run) {
+    public TaskBuilder syncWhenFree(ReceiveTask<Object> run) {
         tasks.add(RunnableTask.adapt(run, TaskType.SYNC_WHEN_FREE));
         return this;
     }
@@ -199,8 +200,8 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Have all async tasks run on a new thread<br>
-     * - As opposed to trying to using the current thread
+     * Have all async tasks run on a new thread.<br>
+     * As opposed to trying to using the current thread.
      */
     public void buildAsync() {
         TaskManager.IMP.async(this::build);
@@ -363,7 +364,7 @@ public class TaskBuilder extends Metadatable {
             };
         }
 
-        public static RunnableTask adapt(final ReceiveTask task, TaskType type) {
+        public static RunnableTask adapt(final ReceiveTask<Object> task, TaskType type) {
             return new RunnableTask(type) {
                 @Override
                 public Object exec(Object previous) {

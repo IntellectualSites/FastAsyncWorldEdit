@@ -32,6 +32,8 @@ import com.sk89q.worldedit.internal.expression.runtime.Functions;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.internal.expression.runtime.ReturnException;
 import com.sk89q.worldedit.internal.expression.runtime.Variable;
+import com.sk89q.worldedit.session.request.Request;
+
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +86,6 @@ public class Expression {
                     .build());
 
     private final Map<String, RValue> variables = new HashMap<>();
-    private final String[] variableNames;
     private Variable[] variableArray;
     private RValue root;
     private final Functions functions = new Functions();
@@ -95,7 +96,6 @@ public class Expression {
     }
 
     public Expression(double constant) {
-        variableNames = null;
         root = new Constant(0, constant);
     }
 
@@ -104,7 +104,7 @@ public class Expression {
     }
 
     private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
-        this.variableNames = variableNames;
+
         variables.put("e", new Constant(-1, Math.E));
         variables.put("pi", new Constant(-1, Math.PI));
         variables.put("true", new Constant(-1, 1));
@@ -112,41 +112,58 @@ public class Expression {
 
         variableArray = new Variable[variableNames.length];
         for (int i = 0; i < variableNames.length; i++) {
-            String variableName = variableNames[i];
-            if (variables.containsKey(variableName)) {
-                throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableName + "'");
+            if (variables.containsKey(variableNames[i])) {
+                throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableNames[i] + "'");
             }
             Variable var = new Variable(0);
-            variables.put(variableName, var);
+            variables.put(variableNames[i], var);
             variableArray[i] = var;
         }
 
         root = Parser.parse(tokens, this);
     }
 
+    public double evaluate(double x, double y, double z) throws EvaluationException {
+        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, x, y, z);
+    }
+
+    public double evaluate() throws EvaluationException {
+        return evaluateFinal(WorldEdit.getInstance().getConfiguration().calculationTimeout);
+    }
+
     public double evaluate(double... values) throws EvaluationException {
-        if (root instanceof Constant) {
-            return root.getValue();
-        }
-        for (int i = 0; i < values.length; i++) {
-            Variable var = variableArray[i];
+        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, values);
+    }
+
+    private double evaluateTimeout(int timeout, double x, double y, double z) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        variableArray[0].value = x;
+        variableArray[1].value = y;
+        variableArray[2].value = z;
+        return evaluateFinal(timeout);
+    }
+
+    public double evaluateTimeout(int timeout, double... values) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        for (int i = 0; i < values.length; ++i) {
+            final Variable var = variableArray[i];
             var.value = values[i];
         }
-        pushInstance();
-        return evaluate(values, WorldEdit.getInstance().getConfiguration().calculationTimeout);
+        return evaluateFinal(timeout);
     }
 
     public double evaluate(double[] values, int timeout) throws EvaluationException {
-        for (int i = 0; i < values.length; ++i) {
-            final String variableName = variableNames[i];
-            final RValue invokable = variables.get(variableName);
-            if (!(invokable instanceof Variable)) {
-                throw new EvaluationException(invokable.getPosition(), "Tried to assign constant " + variableName + ".");
-            }
-
-            ((Variable) invokable).value = values[i];
+        if (root instanceof Constant) {
+            return root.getValue();
         }
+        for (int i = 0; i < values.length; ++i) {
+            Variable var = variableArray[i];
+            var.value = values[i];
+        }
+        return evaluateFinal(timeout);
+    }
 
+    private double evaluateFinal(int timeout) throws EvaluationException {
         try {
             if (timeout < 0) {
                 return evaluateRoot();
@@ -158,7 +175,18 @@ public class Expression {
     }
 
     private double evaluateRootTimed(int timeout) throws EvaluationException {
-        Future<Double> result = evalThread.submit(this::evaluateRoot);
+        Request request = Request.request();
+        Future<Double> result = evalThread.submit(() -> {
+            Request local = Request.request();
+            local.setSession(request.getSession());
+            local.setWorld(request.getWorld());
+            local.setEditSession(request.getEditSession());
+            try {
+                return Expression.this.evaluateRoot();
+            } finally {
+                Request.reset();
+            }
+        });
         try {
             return result.get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

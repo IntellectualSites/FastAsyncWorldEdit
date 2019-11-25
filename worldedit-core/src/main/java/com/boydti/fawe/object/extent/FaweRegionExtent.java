@@ -1,12 +1,9 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,9 +12,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Collection;
 import javax.annotation.Nullable;
 
@@ -41,14 +39,10 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public abstract Collection<Region> getRegions();
 
     public boolean isGlobal() {
-        for (Region region : getRegions()) {
-            if (region.isGlobal()) {
-                return true;
-            }
-        }
-        return false;
+        return getRegions().stream().anyMatch(Region::isGlobal);
     }
 
+    @Override
     public final boolean contains(BlockVector3 p) {
         return contains(p.getBlockX(), p.getBlockY(), p.getBlockZ());
     }

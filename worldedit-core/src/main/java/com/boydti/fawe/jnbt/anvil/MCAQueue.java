@@ -1,14 +1,12 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.example.NullFaweChunk;
 import com.boydti.fawe.jnbt.anvil.filters.DelegateMCAFilter;
 import com.boydti.fawe.jnbt.anvil.history.IAnvilHistory;
 import com.boydti.fawe.jnbt.anvil.history.NullAnvilHistory;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal2;
@@ -16,6 +14,7 @@ import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
@@ -25,11 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
@@ -818,9 +813,10 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     }
 
     @Override
-    public void sendBlockUpdate(FaweChunk chunk, FawePlayer... players) {
+    public void sendBlockUpdate(FaweChunk chunk, Player... players) {
         if (parent != null) {
             parentNMS.sendBlockUpdate(chunk, players);
         }
     }
+
 }

@@ -3,10 +3,10 @@ package com.boydti.fawe.object.pattern;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 
 public class DesaturatePattern extends AbstractPattern {
@@ -22,7 +22,7 @@ public class DesaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int color = getColor(util.getColor(block));
         return util.getNearestBlock(color).getDefaultState().toBaseBlock();
@@ -37,8 +37,7 @@ public class DesaturatePattern extends AbstractPattern {
         int red = (int) (r + value * (l - r));
         int green = (int) (g + value * (l - g));
         int blue = (int) (b + value * (l - b));
-        int newColor = (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
-        return newColor;
+        return (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
     }
 
     @Override

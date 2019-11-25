@@ -1,26 +1,29 @@
 package com.boydti.fawe.bukkit.wrapper.state;
 
-import com.boydti.fawe.bukkit.chat.FancyMessage;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlockState;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
+import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import java.util.Map;
 
-import net.minecraft.server.v1_14_R1.TileEntitySign;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
-    public AsyncSign(AsyncBlock block, int combined) {
-        super(block, combined);
+    public AsyncSign(AsyncBlock block, BaseBlock state) {
+        super(block, state);
     }
-    
+
     private boolean isEditable = false;
 
     @Override
@@ -37,18 +40,18 @@ public class AsyncSign extends AsyncBlockState implements Sign {
 
     private String fromJson(String jsonInput) {
         if (jsonInput == null || jsonInput.isEmpty()) return "";
-        return FancyMessage.deserialize(jsonInput).toOldMessageFormat();
+        return GsonComponentSerializer.INSTANCE.deserialize(jsonInput).toString();
     }
 
     private String toJson(String oldInput) {
         if (oldInput == null || oldInput.isEmpty()) return "";
-        return new FancyMessage("").color(oldInput).toJSONString();
+        return LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of(oldInput));
     }
 
     @Override
     public String getLine(int index) throws IndexOutOfBoundsException {
         CompoundTag nbt = getNbtData();
-        return nbt == null ? null : fromJson(nbt.getString("Text" + (index + 1)));
+        return nbt == null ? "" : fromJson(nbt.getString("Text" + (index + 1)));
     }
 
     @Override
@@ -60,15 +63,15 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         }
     }
 
-	@Override
-	public boolean isEditable() {
-		return this.isEditable;
-	}
+    @Override
+    public boolean isEditable() {
+        return this.isEditable;
+    }
 
-	@Override
-	public void setEditable(boolean arg0) {
-		this.isEditable = arg0;
-	}
+    @Override
+    public void setEditable(boolean arg0) {
+        this.isEditable = arg0;
+    }
 
     @Override
     public @NotNull PersistentDataContainer getPersistentDataContainer() {
@@ -80,7 +83,7 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         CompoundTag nbt = getNbtData();
         if (nbt != null) {
             String color = nbt.getString("Color").toUpperCase();
-            if (color != null) return DyeColor.valueOf(color);
+            if (!color.isEmpty()) return DyeColor.valueOf(color);
         }
         return DyeColor.BLACK;
     }

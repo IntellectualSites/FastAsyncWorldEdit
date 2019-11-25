@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class CommandContext {
-    
+
     protected final String command;
     protected final List<String> parsedArgs;
 
@@ -55,7 +55,7 @@ public class CommandContext {
         this(args.split(" ", -1), valueFlags);
     }
 
-    public CommandContext(String args, Set<Character> valueFlags, boolean allowHangingFlag) 
+    public CommandContext(String args, Set<Character> valueFlags, boolean allowHangingFlag)
             throws CommandException {
         this(args.split(" ", -1), valueFlags, allowHangingFlag, new CommandLocals());
     }
@@ -107,7 +107,7 @@ public class CommandContext {
         List<String> argList = new ArrayList<>(args.length);
         for (int i = 1; i < args.length; ++i) {
             isHanging = false;
-            
+
             String arg = args[i];
             if (arg.isEmpty()) {
                 isHanging = true;
@@ -216,7 +216,7 @@ public class CommandContext {
                 parsedArgs.add(arg);
             }
         }
-        
+
         this.suggestionContext = suggestionContext;
     }
 
@@ -248,7 +248,7 @@ public class CommandContext {
         }
         return buffer.toString();
     }
-    
+
     public String getRemainingString(int start) {
         return getString(start, parsedArgs.size() - 1);
     }

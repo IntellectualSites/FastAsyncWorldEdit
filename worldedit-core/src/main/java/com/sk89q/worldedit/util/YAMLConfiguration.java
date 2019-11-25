@@ -92,8 +92,6 @@ public class YAMLConfiguration extends LocalConfiguration {
         superPickaxeManyDrop = config.getBoolean(
                 "super-pickaxe.many-drop-items", superPickaxeManyDrop);
 
-        noDoubleSlash = config.getBoolean("no-double-slash", noDoubleSlash);
-
         useInventory = config.getBoolean("use-inventory.enable", useInventory);
         useInventoryOverride = config.getBoolean("use-inventory.allow-override",
                 useInventoryOverride);
@@ -127,6 +125,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         String type = config.getString("shell-save-type", "").trim();
         shellSaveType = type.isEmpty() ? null : type;
 
+        extendedYLimit = config.getBoolean("compat.extended-y-limit", false);
     }
 
     public void unload() {

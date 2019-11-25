@@ -2,23 +2,23 @@ package com.boydti.fawe.object.progress;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 
-/**
- * The default progress tracker uses titles
- */
-public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType, Integer> {
+import com.sk89q.worldedit.entity.Player;
+import java.util.function.BiConsumer;
 
-    private final FawePlayer player;
+/**
+ * The default progress tracker uses titles.
+ */
+public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker.ProgressType, Integer> {
+
+    private final Player player;
     private final long start;
     private int delay = Settings.IMP.QUEUE.PROGRESS.DELAY;
     private int interval = Settings.IMP.QUEUE.PROGRESS.INTERVAL;
 
-    public DefaultProgressTracker(FawePlayer player) {
+    public DefaultProgressTracker(Player player) {
         this.start = System.currentTimeMillis();
         this.player = player;
     }
@@ -39,7 +39,7 @@ public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType,
         return delay;
     }
 
-    public FawePlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -54,8 +54,14 @@ public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType,
     // If the task is finished
     private boolean done = false;
 
+    public enum ProgressType {
+        DISPATCH,
+        QUEUE,
+        DONE
+    }
+
     @Override
-    public void run(FaweQueue.ProgressType type, Integer amount) {
+    public void accept(ProgressType type, Integer amount) {
         switch (type) {
             case DISPATCH:
                 amountDispatch++;

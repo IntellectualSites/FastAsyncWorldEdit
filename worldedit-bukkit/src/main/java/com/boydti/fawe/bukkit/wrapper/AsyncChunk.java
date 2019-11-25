@@ -1,8 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
@@ -22,11 +20,9 @@ public class AsyncChunk implements Chunk {
     private final AsyncWorld world;
     private final int z;
     private final int x;
-    private final FaweQueue queue;
 
-    public AsyncChunk(World world, FaweQueue queue, int x, int z) {
+    public AsyncChunk(World world, int x, int z) {
         this.world = world instanceof AsyncWorld ? (AsyncWorld) world : new AsyncWorld(world, true);
-        this.queue = queue;
         this.x = x;
         this.z = z;
     }
@@ -62,7 +58,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public AsyncBlock getBlock(int x, int y, int z) {
-        return new AsyncBlock(world, queue, (this.x << 4) + x, y, (this.z << 4) + z);
+        return new AsyncBlock(world, (this.x << 4) + x, y, (this.z << 4) + z);
     }
 
     @Override
@@ -88,8 +84,7 @@ public class AsyncChunk implements Chunk {
             task.run();
             return task.value;
         }
-        if (queue instanceof BukkitQueue_0) {
-            BukkitQueue_0 bq = (BukkitQueue_0) queue;
+        if (world.isWorld()) {
             if (world.isChunkLoaded(x, z)) {
                 if (world.isChunkLoaded(x, z)) {
                     task.run();
@@ -173,15 +168,15 @@ public class AsyncChunk implements Chunk {
         return world.getChunkAt(x, z).isSlimeChunk();
     }
 
-	@Override
-	public boolean isForceLoaded() {
-		return world.isChunkForceLoaded(x, z);
-	}
+    @Override
+    public boolean isForceLoaded() {
+        return world.isChunkForceLoaded(x, z);
+    }
 
-	@Override
-	public void setForceLoaded(boolean arg0) {
-		world.getChunkAt(x, z).setForceLoaded(arg0);
-	}
+    @Override
+    public void setForceLoaded(boolean arg0) {
+        world.getChunkAt(x, z).setForceLoaded(arg0);
+    }
 
     @Override
     public boolean addPluginChunkTicket(final Plugin plugin) {
@@ -200,16 +195,17 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public long getInhabitedTime() {
-        return world.getChunkAt(x, z).getInhabitedTime();
+        return 0; //todo
     }
 
     @Override
-    public void setInhabitedTime(long l) {
-        world.getChunkAt(x, z).setInhabitedTime(l);
+    public void setInhabitedTime(long ticks) {
+        //todo
     }
 
     @Override
-    public boolean contains(@NotNull BlockData blockData) {
-        return world.getChunkAt(x, z).contains(blockData);
+    public boolean contains(@NotNull BlockData block) {
+        //todo
+        return false;
     }
 }

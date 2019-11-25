@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.pattern;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public abstract class AbstractExtentPattern extends AbstractPattern {
-    private transient final Extent extent;
+
+    private final transient Extent extent;
 
     public AbstractExtentPattern(Extent extent) {
         checkNotNull(extent);

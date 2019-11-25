@@ -27,18 +27,24 @@ import com.sk89q.worldedit.regions.iterator.RegionIterator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractRegion implements Region {
+public abstract class AbstractRegion extends AbstractSet<BlockVector3> implements Region {
 
     protected World world;
 
     public AbstractRegion(World world) {
         this.world = world;
+    }
+
+    @Override
+    public int size() {
+        return getArea();
     }
 
     @Override

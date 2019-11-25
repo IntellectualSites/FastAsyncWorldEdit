@@ -88,7 +88,6 @@ public class GroundFunction implements LayerFunction {
                 return true;
             }
         }
-
         return false;
     }
 

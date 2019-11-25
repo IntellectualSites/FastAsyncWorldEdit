@@ -1,10 +1,11 @@
 package com.boydti.fawe.util.image;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.command.FawePrimitiveBinding;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.util.command.parametric.ParameterException;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 
 import javax.annotation.Nullable;
 import java.awt.Graphics2D;
@@ -21,60 +22,59 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ImageUtil {
-    public static BufferedImage getScaledInstance(BufferedImage img,
-                                                  int targetWidth,
-                                                  int targetHeight,
-                                                  Object hint,
-                                                  boolean higherQuality)
-    {
-        if (img.getHeight() == targetHeight && img.getWidth() == targetWidth) {
-            return img;
+
+    public static BufferedImage getScaledInstance(BufferedImage image, int targetWidth,
+        int targetHeight, Object hint, boolean higherQuality) {
+        if (image.getHeight() == targetHeight && image.getWidth() == targetWidth) {
+            return image;
         }
-        int type = (img.getTransparency() == Transparency.OPAQUE) ?
-                BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = img;
-        int w, h;
+        int type = image.getTransparency() == Transparency.OPAQUE ?
+            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        BufferedImage scaledImage = image;
+        int width, height;
         if (higherQuality) {
             // Use multi-step technique: start with original size, then
             // scale down in multiple passes with drawImage()
             // until the target size is reached
-            w = ret.getWidth();
-            h = ret.getHeight();
+            width = scaledImage.getWidth();
+            height = scaledImage.getHeight();
         } else {
             // Use one-step technique: scale directly from original
             // size to target size with a single drawImage() call
-            w = targetWidth;
-            h = targetHeight;
+            width = targetWidth;
+            height = targetHeight;
         }
 
         do {
-            if (higherQuality && w > targetWidth) {
-                w /= 2;
-                if (w < targetWidth) {
-                    w = targetWidth;
-                }
-            } else if (w < targetWidth) w = targetWidth;
+            if (higherQuality && width > targetWidth) {
+                width /= 2;
+            }
+            if (width < targetWidth) {
+                width = targetWidth;
+            }
 
-            if (higherQuality && h > targetHeight) {
-                h /= 2;
-                if (h < targetHeight) {
-                    h = targetHeight;
-                }
-            } else if (h < targetHeight) h = targetHeight;
+            if (higherQuality && height > targetHeight) {
+                height /= 2;
+            }
+            if (height < targetHeight) {
+                height = targetHeight;
+            }
 
-            BufferedImage tmp = new BufferedImage(w, h, type);
+            BufferedImage tmp = new BufferedImage(width, height, type);
             Graphics2D g2 = tmp.createGraphics();
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
-            g2.drawImage(ret, 0, 0, w, h, null);
+            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                RenderingHints.VALUE_COLOR_RENDER_SPEED);
+            g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+                RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+            g2.drawImage(scaledImage, 0, 0, width, height, null);
             g2.dispose();
 
-            ret = tmp;
-        } while (w != targetWidth || h != targetHeight);
+            scaledImage = tmp;
+        } while (width != targetWidth || height != targetHeight);
 
-        return ret;
+        return scaledImage;
     }
 
     public static void fadeAlpha(BufferedImage image) {
@@ -103,12 +103,13 @@ public class ImageUtil {
             float dz2 = sqrZ[z];
             for (int x = 0; x < width; x++, index++) {
                 int color = raw[index];
-                int alpha = (color >> 24) & 0xFF;
+                int alpha = color >> 24 & 0xFF;
                 if (alpha != 0) {
                     float dx2 = sqrX[x];
                     float distSqr = dz2 + dx2;
-                    if (distSqr > 1) raw[index] = 0;
-                    else {
+                    if (distSqr > 1) {
+                        raw[index] = 0;
+                    } else {
                         alpha = (int) (alpha * (1 - distSqr));
                         raw[index] = (color & 0x00FFFFFF) + (alpha << 24);
                     }
@@ -119,10 +120,10 @@ public class ImageUtil {
 
     public static void scaleAlpha(BufferedImage image, double alphaScale) {
         int[] raw = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        int defined = (MathMan.clamp((int) (255 * alphaScale), 0, 255)) << 24;
+        int defined = MathMan.clamp((int) (255 * alphaScale), 0, 255) << 24;
         for (int i = 0; i < raw.length; i++) {
             int color = raw[i];
-            int alpha = ((color >> 24) & 0xFF);
+            int alpha = color >> 24 & 0xFF;
             switch (alpha) {
                 case 0:
                     continue;
@@ -147,10 +148,10 @@ public class ImageUtil {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int color = image.getRGB(x, y);
-                totalRed += (color >> 16) & 0xFF;
-                totalGreen += (color >> 8) & 0xFF;
-                totalBlue += (color >> 0) & 0xFF;
-                totalAlpha += (color >> 24) & 0xFF;
+                totalRed += color >> 16 & 0xFF;
+                totalGreen += color >> 8 & 0xFF;
+                totalBlue += color >> 0 & 0xFF;
+                totalAlpha += color >> 24 & 0xFF;
             }
         }
         int a = width * height;
@@ -161,19 +162,20 @@ public class ImageUtil {
         return (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
     }
 
-    public static BufferedImage load(@Nullable FawePrimitiveBinding.ImageUri uri) throws ParameterException {
+    public static BufferedImage load(@Nullable ProvideBindings.ImageUri uri)
+        throws InputParseException {
         return uri == null ? null : uri.load();
     }
 
-    public static BufferedImage load(URI uri) throws ParameterException {
+    public static BufferedImage load(URI uri) throws InputParseException {
         try {
             return MainUtil.readImage(getInputStream(uri));
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static InputStream getInputStream(URI uri) throws ParameterException {
+    public static InputStream getInputStream(URI uri) throws InputParseException {
         try {
             String uriStr = uri.toString();
             if (uriStr.startsWith("file:/")) {
@@ -182,11 +184,11 @@ public class ImageUtil {
             }
             return new URL(uriStr).openStream();
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static BufferedImage getImage(String arg) throws ParameterException {
+    public static BufferedImage getImage(String arg) throws InputParseException {
         try {
             if (arg.startsWith("http")) {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
@@ -198,40 +200,42 @@ public class ImageUtil {
                     throw new IOException("Failed to read " + url + ", please try again later");
                 }
                 return img;
-            } else if (arg.startsWith("file:/")) {
-                arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
-                return MainUtil.readImage(file);
-            } else {
-                throw new ParameterException("Invalid image " + arg);
             }
+            if (arg.startsWith("file:/")) {
+                arg = arg.replaceFirst("file:/+", "");
+                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
+                    Settings.IMP.PATHS.HEIGHTMAP), arg);
+                return MainUtil.readImage(file);
+            }
+            throw new InputParseException("Invalid image " + arg);
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static URI getImageURI(String arg) throws ParameterException {
+    public static URI getImageURI(String arg) throws InputParseException {
         try {
             if (arg.startsWith("http")) {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
                     arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
                 }
                 return new URL(arg).toURI();
-            } else if (arg.startsWith("file:/")) {
+            }
+            if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
+                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
+                    Settings.IMP.PATHS.HEIGHTMAP), arg);
                 if (!file.exists()) {
-                    throw new ParameterException("File not found " + file);
+                    throw new InputParseException("File not found " + file);
                 }
                 if (file.isDirectory()) {
-                    throw new ParameterException("File is a directory " + file);
+                    throw new InputParseException("File is a directory " + file);
                 }
                 return file.toURI();
-            } else {
-                throw new ParameterException("Invalid image " + arg);
             }
+            throw new InputParseException("Invalid image " + arg);
         } catch (IOException | URISyntaxException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 }

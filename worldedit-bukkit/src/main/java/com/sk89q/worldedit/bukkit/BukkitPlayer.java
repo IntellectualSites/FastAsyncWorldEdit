@@ -19,9 +19,11 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
-
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -29,20 +31,28 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -50,12 +60,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -69,6 +73,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        Fawe.get().register(this);
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            loadClipboardFromDisk();
+        }
     }
 
     @Override
@@ -162,16 +170,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
+    public void print(Component component) {
+        TextAdapter.sendComponent(player, WorldEditText.format(component));
+    }
+
+    @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-        if (pos instanceof com.sk89q.worldedit.util.Location) {
-            com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
-            Extent extent = loc.getExtent();
-            if (extent instanceof World) {
-                org.bukkit.World world = Bukkit.getWorld(((World) extent).getName());
-                player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
-            }
-        }
-        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
+        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(),
+                pos.getZ(), yaw, pitch));
     }
 
     @Override
@@ -191,7 +197,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase()));
+        player.setGameMode(org.bukkit.GameMode.valueOf(gameMode.getId().toUpperCase(Locale.ROOT)));
     }
 
     @Override
@@ -199,6 +205,33 @@ public class BukkitPlayer extends AbstractPlayerActor {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
                 || plugin.getPermissionsResolver().hasPermission(
                         player.getWorld().getName(), player, perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        if (this.hasPermission(permission)) {
+            player.addAttachment(plugin).setPermission(permission, false);
+            return false;
+        } else {
+            player.addAttachment(plugin).setPermission(permission, true);
+            return true;
+        }
+    }
+
+    @Override
+    public void setPermission(String permission, boolean value) {
+        /*
+         *  Permissions are used to managing WorldEdit region restrictions
+         *   - The `/wea` command will give/remove the required bypass permission
+         */
+        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
+            player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+        } else if (value) {
+            if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
+                player.addAttachment(Fawe.<FaweBukkit> imp().getPlugin()).setPermission(permission, value);
+            }
+        } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
+            player.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(permission, value);
+        }
     }
 
     @Override
@@ -221,14 +254,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void floatAt(int x, int y, int z, boolean alwaysGlass) {
-        if (alwaysGlass || !player.getAllowFlight()) {
-            super.floatAt(x, y, z, alwaysGlass);
-            return;
-        }
+    public boolean isAllowedToFly() {
+        return player.getAllowFlight();
+    }
 
-        setPosition(Vector3.at(x + 0.5, y, z + 0.5));
-        player.setFlying(true);
+    @Override
+    public void setFlying(boolean flying) {
+        player.setFlying(flying);
     }
 
     @Override
@@ -318,5 +350,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 }
             }
         }
+    }
+
+    @Override
+    public void sendTitle(String title, String sub) {
+        player.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
+        Bukkit.getServer().dispatchCommand(player, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");
     }
 }

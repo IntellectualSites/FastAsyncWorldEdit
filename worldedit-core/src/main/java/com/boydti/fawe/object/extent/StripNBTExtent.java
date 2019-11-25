@@ -1,11 +1,8 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -13,12 +10,11 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NbtValued;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 public class StripNBTExtent extends AbstractDelegateExtent {
     private final String[] strip;
@@ -50,8 +46,8 @@ public class StripNBTExtent extends AbstractDelegateExtent {
     }
 
     public <B extends BlockStateHolder<B>> B stripBlockNBT(B block) {
-    	if(!(block instanceof BaseBlock)) return block;
-    	BaseBlock localBlock = (BaseBlock)block;
+        if(!(block instanceof BaseBlock)) return block;
+        BaseBlock localBlock = (BaseBlock)block;
         if (!localBlock.hasNbtData()) return block;
         CompoundTag nbt = localBlock.getNbtData();
         Map<String, Tag> value = nbt.getValue();

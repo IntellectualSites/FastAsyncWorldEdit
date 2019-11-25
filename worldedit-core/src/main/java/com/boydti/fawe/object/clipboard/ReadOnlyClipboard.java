@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -11,7 +10,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.List;
 
 public abstract class ReadOnlyClipboard extends FaweClipboard {
@@ -65,7 +63,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
 
     @Override
     public void streamBiomes(NBTStreamer.ByteReader task) {
-    	BlockVector3 dim = getDimensions();
+        BlockVector3 dim = getDimensions();
         int index = 0;
         for (int z = 0; z <= dim.getBlockZ(); z++) {
             for (int x = 0; x <= dim.getBlockX(); x++, index++) {

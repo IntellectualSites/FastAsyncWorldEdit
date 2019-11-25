@@ -19,17 +19,18 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.internal.registry.SimpleInputParser;
-import com.sk89q.worldedit.session.request.RequestExtent;
 
 import java.util.List;
 
 public class SolidMaskParser extends SimpleInputParser<Mask> {
+
+    private final List<String> aliases = ImmutableList.of("#solid");
 
     public SolidMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -37,11 +38,11 @@ public class SolidMaskParser extends SimpleInputParser<Mask> {
 
     @Override
     public List<String> getMatchedAliases() {
-        return Lists.newArrayList("#solid");
+        return aliases;
     }
 
     @Override
     public Mask parseFromSimpleInput(String input, ParserContext context) {
-        return new SolidBlockMask(new RequestExtent());
+        return new SolidBlockMask(context.getExtent());
     }
 }

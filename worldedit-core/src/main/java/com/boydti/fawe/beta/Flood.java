@@ -2,13 +2,10 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Flood {
@@ -21,9 +18,9 @@ public class Flood {
 
     private int[][] queues;
     private long[][] visits;
-
-    private int X, Y, Z;
-
+    private int chunkX;
+    private int chunkYLayer;
+    private int chunkZ;
     private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
     private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
     private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
@@ -45,17 +42,17 @@ public class Flood {
         IQueueExtent fq = queueHandler.getQueue(world);
         while (!chunkQueues.isEmpty()) {
             long firstKey = chunkQueues.firstLongKey();
-            int X = MathMan.unpairIntX(firstKey);
-            int Z = MathMan.unpairIntY(firstKey);
+            int x = MathMan.unpairIntX(firstKey);
+            int z = MathMan.unpairIntY(firstKey);
             int[][] chunkQueue = chunkQueues.get(firstKey);
             // apply
         }
     }
 
-    private void init(int X, int Y, int Z) {
-        this.X = X;
-        this.Y = Y;
-        this.Z = Z;
+    private void init(int chunkX, int chunkYLayer, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkYLayer = chunkYLayer;
+        this.chunkZ = chunkZ;
     }
 
     public void start(int x, int y, int z) {
@@ -63,12 +60,12 @@ public class Flood {
     }
 
     private void push(int x, int y, int z, int depth) {
-        int X = x >> 4;
-        int Z = z >> 4;
-        long pair = MathMan.pairInt(X, Z);
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+        long pair = MathMan.pairInt(chunkX, chunkZ);
         int layer = y >> 4;
         int[] section = getOrCreateQueue(pair, layer);
-        int val = (x & 15) + ((z & 15) << 4)  + ((y & 15) << 8) + (depth << 12);
+        int val = (x & 15) + ((z & 15) << 4) + ((y & 15) << 8) + (depth << 12);
         push(section, val);
     }
 
@@ -154,8 +151,8 @@ public class Flood {
                 visit = visits[sectionIndex];
                 queue = queues[sectionIndex];
                 if (visit == null || queue == null) {
-                    long pair = MathMan.pairInt(X + nextX, Z + nextZ);
-                    int layer = Y + nextY;
+                    long pair = MathMan.pairInt(this.chunkX + nextX, this.chunkZ + nextZ);
+                    int layer = this.chunkYLayer + nextY;
                     if (layer < 0 || layer > 15) {
                         continue;
                     }
@@ -171,12 +168,12 @@ public class Flood {
     }
 
     public void set(long[] bits, int i) {
-        bits[i >> 6] |= (1L << (i & 0x3F));
+        bits[i >> 6] |= 1L << (i & 0x3F);
     }
 
     public final boolean getAndSet(long[] bits, int i) {
         int index = i >> 6;
-        long offset = (1L << (i & 0x3F));
+        long offset = 1L << (i & 0x3F);
         long val = bits[index];
         if ((val & offset) != 0) {
             return true;
@@ -186,7 +183,7 @@ public class Flood {
         }
     }
 
-    public boolean get(long[] bits, final int i) {
-        return (bits[i >> 6] & (1L << (i & 0x3F))) != 0;
+    public boolean get(long[] bits, int i) {
+        return (bits[i >> 6] & 1L << (i & 0x3F)) != 0;
     }
 }

@@ -25,16 +25,20 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,12 +50,16 @@ import java.util.Map;
  * <p>This buffer will not attempt to return results from the buffer when
  * accessor methods (such as {@link #getBlock(BlockVector3)}) are called.</p>
  */
-public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pattern {
+public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pattern, BiomePattern {
 
     private final Map<BlockVector3, BaseBlock> buffer = new LinkedHashMap<>();
+    private final Map<BlockVector2, BiomeType> biomeBuffer = new LinkedHashMap<>();
     private final Mask mask;
+    private final Mask2D biomeMask;
     private BlockVector3 min = null;
+    private BlockVector2 min2d = null;
     private BlockVector3 max = null;
+    private BlockVector2 max2d = null;
 
     /**
      * Create a new extent buffer that will buffer every change.
@@ -60,6 +68,11 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
      */
     public ForgetfulExtentBuffer(Extent delegate) {
         this(delegate, Masks.alwaysTrue());
+    }
+
+    @Override
+    public boolean isQueueEnabled() {
+        return true;
     }
 
     /**
@@ -74,6 +87,8 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         checkNotNull(delegate);
         checkNotNull(mask);
         this.mask = mask;
+        Mask2D bmask = mask.toMask2D();
+        this.biomeMask = bmask == null ? Masks.alwaysTrue2D() : bmask;
     }
 
     @Override
@@ -101,12 +116,70 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
     }
 
     @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        // Update minimum
+        if (min2d == null) {
+            min2d = position;
+        } else {
+            min2d = min2d.getMinimum(position);
+        }
+
+        // Update maximum
+        if (max2d == null) {
+            max2d = position;
+        } else {
+            max2d = max2d.getMaximum(position);
+        }
+
+        if (biomeMask.test(position)) {
+            biomeBuffer.put(position, biome);
+            return true;
+        } else {
+            return getExtent().setBiome(position, biome);
+        }
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        // Update minimum
+        if (min2d == null) {
+            min2d = BlockVector2.at(x, z);
+        } else {
+            min2d = min2d.getMinimum(BlockVector2.at(x,z));
+        }
+
+        // Update maximum
+        if (max2d == null) {
+            max2d = BlockVector2.at(x,z);
+        } else {
+            max2d = max2d.getMaximum(BlockVector2.at(x,z));
+        }
+
+        if (biomeMask.test(BlockVector2.at(x,z))) {
+            biomeBuffer.put(BlockVector2.at(x,z), biome);
+            return true;
+        } else {
+            return getExtent().setBiome(x, y, z, biome);
+        }    }
+
+
+    @Override
     public BaseBlock apply(BlockVector3 pos) {
         BaseBlock block = buffer.get(pos);
         if (block != null) {
             return block;
         } else {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
+    }
+
+    @Override
+    public BiomeType apply(BlockVector2 pos) {
+        BiomeType biome = biomeBuffer.get(pos);
+        if (biome != null) {
+            return biome;
+        } else {
+            return BiomeTypes.OCEAN;
         }
     }
 
@@ -145,6 +218,10 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             @Override
             public Iterator<BlockVector3> iterator() {
                 return buffer.keySet().iterator();
+            }
+
+            public Iterable<BlockVector2> asFlatRegion() {
+                return biomeBuffer.keySet();
             }
         };
     }

@@ -20,9 +20,9 @@ public class CFIChangeSet extends FaweChangeSet {
 
     public CFIChangeSet(HeightMapMCAGenerator hmmg, UUID uuid) throws IOException {
         super(hmmg);
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getWorldName());
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getId());
         int max = MainUtil.getMaxFileId(folder);
-        this.file = new File(folder, Integer.toString(max) + ".cfi");
+        this.file = new File(folder, max + ".cfi");
         File parent = this.file.getParentFile();
         if (!parent.exists()) this.file.getParentFile().mkdirs();
         if (!this.file.exists()) this.file.createNewFile();
@@ -79,15 +79,15 @@ public class CFIChangeSet extends FaweChangeSet {
         return 1;
     }
 
-	@Override
-	public boolean isRecordingChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isRecordingChanges() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void setRecordChanges(boolean recordChanges) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setRecordChanges(boolean recordChanges) {
+        // TODO Auto-generated method stub
+
+    }
 }

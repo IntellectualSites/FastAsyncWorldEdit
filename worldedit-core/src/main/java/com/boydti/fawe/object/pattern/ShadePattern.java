@@ -1,16 +1,14 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ShadePattern extends AbstractPattern {
     private final TextureUtil util;
@@ -26,7 +24,7 @@ public class ShadePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         return (darken ? util.getDarkerBlock(block) : util.getLighterBlock(block)).getDefaultState().toBaseBlock();
     }
 

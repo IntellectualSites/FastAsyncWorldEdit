@@ -19,12 +19,31 @@
 
 package com.sk89q.worldedit.entity;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.CFICommands;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.MaskedFaweQueue;
+import com.boydti.fawe.object.brush.visualization.VirtualWorld;
+import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
+import com.boydti.fawe.regions.FaweMaskManager;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.SetQueue;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -32,7 +51,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-
+import java.io.File;
 import javax.annotation.Nullable;
 
 /**
@@ -190,8 +209,12 @@ public interface Player extends Entity, Actor {
      * Get the point of the block that is being stood in.
      *
      * @return point
+     * @deprecated Use Locatable#getBlockLocation
      */
-    Location getBlockIn();
+    @Deprecated
+    default Location getBlockIn() {
+        return getBlockLocation();
+    }
 
     /**
      * Get the point of the block that is being stood upon.
@@ -211,6 +234,17 @@ public interface Player extends Entity, Actor {
     Location getBlockTrace(int range, boolean useLastBlock);
 
     /**
+     * Get the point of the block being looked at. May return null.
+     * Will return the farthest away block before matching the stop mask if useLastBlock is true and no other block is found.
+     *
+     * @param range how far to checks for blocks
+     * @param useLastBlock try to return the last valid block not matching the stop mask found
+     * @param stopMask the mask used to determine when to stop tracing
+     * @return point
+     */
+    Location getBlockTrace(int range, boolean useLastBlock, @Nullable Mask stopMask);
+
+    /**
      * Get the face that the player is looking at.
      *
      * @param range the range
@@ -218,6 +252,16 @@ public interface Player extends Entity, Actor {
      * @return a face
      */
     Location getBlockTraceFace(int range, boolean useLastBlock);
+
+    /**
+     * Get the face that the player is looking at.
+     *
+     * @param range the range
+     * @param useLastBlock try to return the last valid block not matching the stop mask found
+     * @param stopMask the mask used to determine when to stop tracing
+     * @return a face
+     */
+    Location getBlockTraceFace(int range, boolean useLastBlock, @Nullable Mask stopMask);
 
     /**
      * Get the point of the block being looked at. May return null.
@@ -264,6 +308,7 @@ public interface Player extends Entity, Actor {
      *
      * @param pos where to move them
      */
+    @Override
     void setPosition(Vector3 pos);
 
     /**
@@ -277,4 +322,154 @@ public interface Player extends Entity, Actor {
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
-}
+
+    public Region[] getCurrentRegions();
+
+    Region[] getCurrentRegions(FaweMaskManager.MaskType type);
+
+    Region getLargestRegion();
+
+    void setSelection(Region region);
+
+    /**
+     * Get the player's current selection (or null)
+     *
+     * @return
+     */
+    default Region getSelection() {
+        try {
+            return getSession().getSelection(getWorld());
+        } catch (IncompleteRegionException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Set the player's WorldEdit selection
+     *
+     * @param selector
+     */
+    default void setSelection(RegionSelector selector) {
+        getSession().setRegionSelector(getWorld(), selector);
+    }
+
+    /**
+     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g. If
+     * they are editing a CFI world.<br/>
+     *
+     * @return Editing world
+     */
+    default World getWorldForEditing() {
+        VirtualWorld virtual = getSession().getVirtualWorld();
+        if (virtual != null) {
+            return virtual;
+        }
+//        CFICommands.CFISettings cfi = getMeta("CFISettings");
+//        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
+//            return cfi.getGenerator();
+//        }
+        return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
+    }
+
+    default boolean runAsyncIfFree(Runnable r) {
+        return runAction(r, true, true);
+    }
+
+    default boolean runIfFree(Runnable r) {
+        return runAction(r, true, false);
+    }
+
+    /**
+     * Unregister this player (deletes all metadata etc) - Usually called on logout
+     */
+    default void unregister() {
+        cancel(true);
+        if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
+            getSession().setClipboard(null);
+            getSession().clearHistory();
+        }
+        Fawe.get().unregister(getName());
+    }
+
+    default int cancel(boolean close) {
+//        Collection<IQueueExtent> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
+//        int cancelled = 0;
+//        clearActions();
+//        for (IQueueExtent queue : queues) {
+//            Collection<EditSession> sessions = queue.getEditSessions();
+//            for (EditSession session : sessions) {
+//                FawePlayer currentPlayer = session.getPlayer();
+//                if (currentPlayer == this) {
+//                    if (session.cancel()) {
+//                        cancelled++;
+//                    }
+//                }
+//            }
+//        }
+//        VirtualWorld world = getSession().getVirtualWorld();
+//        if (world != null) {
+//            if (close) {
+//                try {
+//                    world.close(false);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            else world.clear();
+//        }
+        return 0;
+    }
+
+    void sendTitle(String title, String sub);
+
+    /**
+     * Loads any history items from disk: - Should already be called if history on disk is enabled
+     */
+    default void loadClipboardFromDisk() {
+        File file = MainUtil.getFile(Fawe.imp().getDirectory(),
+            Settings.IMP.PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd");
+        try {
+            if (file.exists() && file.length() > 5) {
+                DiskOptimizedClipboard doc = new DiskOptimizedClipboard(file);
+                LocalSession session = getSession();
+                try {
+                    if (session.getClipboard() != null) {
+                        return;
+                    }
+                } catch (EmptyClipboardException ignored) {
+                }
+                Clipboard clip = doc.toClipboard();
+                ClipboardHolder holder = new ClipboardHolder(clip);
+                getSession().setClipboard(holder);
+            }
+        } catch (Exception event) {
+            Fawe.debug("====== INVALID CLIPBOARD ======");
+            event.printStackTrace();
+            Fawe.debug("===============---=============");
+            Fawe.debug("This shouldn't result in any failure");
+            Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
+            Fawe.debug("===============---=============");
+        }
+    }
+
+    default FaweQueue getFaweQueue(boolean autoQueue) {
+        return getFaweQueue(true, autoQueue);
+    }
+
+    default FaweQueue getFaweQueue(boolean fast, boolean autoQueue) {
+        CFICommands.CFISettings settings = this.getMeta("CFISettings");
+        if (settings != null && settings.hasGenerator()) {
+            return settings.getGenerator();
+        } else {
+            return SetQueue.IMP.getNewQueue(getWorld(), true, autoQueue);
+        }
+    }
+
+    default FaweQueue getMaskedFaweQueue(boolean autoQueue) {
+        FaweQueue queue = getFaweQueue(autoQueue);
+        Region[] allowedRegions = getCurrentRegions();
+        if (allowedRegions.length == 1 && allowedRegions[0].isGlobal()) {
+            return queue;
+        }
+        return new MaskedFaweQueue(queue, allowedRegions);
+    }}

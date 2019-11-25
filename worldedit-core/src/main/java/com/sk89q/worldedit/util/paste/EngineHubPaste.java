@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.util.paste;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.util.net.HttpRequest;
-import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,9 +34,11 @@ public class EngineHubPaste implements Paster {
 
     private static final Pattern URL_PATTERN = Pattern.compile("https?://.+$");
 
+    private static final Gson GSON = new Gson();
+
     @Override
-    public ListenableFuture<URL> paste(String content) {
-        return Pasters.getExecutor().submit(new PasteTask(content));
+    public Callable<URL> paste(String content) {
+        return new PasteTask(content);
     }
 
     private static final class PasteTask implements Callable<URL> {
@@ -52,7 +54,7 @@ public class EngineHubPaste implements Paster {
             form.add("content", content);
             form.add("from", "enginehub");
 
-            URL url = HttpRequest.url("http://paste.enginehub.org/paste");
+            URL url = HttpRequest.url("https://paste.enginehub.org/paste");
             String result = HttpRequest.post(url)
                     .bodyForm(form)
                     .execute()
@@ -60,10 +62,10 @@ public class EngineHubPaste implements Paster {
                     .returnContent()
                     .asString("UTF-8").trim();
 
-            Object object = JSONValue.parse(result);
-            if (object instanceof Map) {
-                @SuppressWarnings("unchecked")
-                String urlString = String.valueOf(((Map<Object, Object>) object).get("url"));
+            Map<Object, Object> object = GSON.fromJson(result, new TypeToken<Map<Object, Object>>() {
+            }.getType());
+            if (object != null) {
+                String urlString = String.valueOf(object.get("url"));
                 Matcher m = URL_PATTERN.matcher(urlString);
 
                 if (m.matches()) {

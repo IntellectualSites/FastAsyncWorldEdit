@@ -1,10 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-
-import javax.annotation.Nullable;
 
 public abstract class ChunkFilterBlock extends SimpleFilterBlock {
     public ChunkFilterBlock(Extent extent) {

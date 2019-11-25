@@ -1,24 +1,17 @@
 package com.boydti.fawe.object.clipboard;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 public class EmptyClipboard implements Clipboard {
 
@@ -57,22 +50,6 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return Collections.emptyList();
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return null;
-    }
-
-    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
@@ -93,13 +70,23 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return false;
     }
 
-    @Nullable
     @Override
-    public Operation commit() {
-        return null;
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return false;
     }
+
 }

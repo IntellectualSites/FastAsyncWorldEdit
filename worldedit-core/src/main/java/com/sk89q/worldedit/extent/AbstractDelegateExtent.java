@@ -19,37 +19,31 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.jnbt.anvil.generator.GenBase;
-import com.boydti.fawe.jnbt.anvil.generator.Resource;
-import com.boydti.fawe.object.extent.LightingExtent;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.LightingExtent;
+import com.boydti.fawe.util.ExtentTraverser;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
 public class AbstractDelegateExtent implements Extent, LightingExtent {
-    private final Extent extent;
+
+    public Extent extent;
 
     /**
      * Create a new instance.
@@ -75,18 +69,50 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
      */
 
     @Override
-    public BlockVector3 getMinimumPoint() {
-        return extent.getMinimumPoint();
+    public BlockState getBlock(BlockVector3 position) {
+       return getBlock(position.getX(),position.getY(),position.getZ());
+    }
+
+    /*
+        Queue based methods
+        TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
+         */
+    public boolean isQueueEnabled() {
+        return getExtent().isQueueEnabled();
     }
 
     @Override
-    public BlockVector3 getMaximumPoint() {
-        return extent.getMaximumPoint();
+    public void disableQueue() {
+        try {
+            if (!(getExtent() instanceof ForgetfulExtentBuffer)) { // placeholder
+                getExtent().disableQueue();
+            }
+        } catch (FaweException ignored) {
+        }
+        if (getExtent() instanceof AbstractDelegateExtent) {
+            Extent next = ((AbstractDelegateExtent) getExtent()).getExtent();
+            new ExtentTraverser(this).setNext(next);
+        } else {
+            Fawe.debug("Cannot disable queue");
+        }
     }
 
+    @Override
+    public void enableQueue() {
+        try {
+            getExtent().enableQueue();
+        } catch (FaweException enableQueue) {
+            // TODO NOT IMPLEMENTED - THIS IS IMPORTANT (ForgetfulExtentBuffer is just a placeholder for now, it won't work)
+            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(getExtent()));
+        }
+    }
+
+    /*
+    Bounds
+    */
     @Override
     public int getMaxY() {
-        return extent.getMaxY();
+        return getExtent().getMaxY();
     }
 
     /*
@@ -95,27 +121,44 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return extent.getBlock(x, y, z);
+        return getExtent().getBlock(x, y, z);
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return extent.getFullBlock(x, y, z);
+        return getExtent().getFullBlock(x, y, z);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return extent.getBiomeType(x, z);
+        return getExtent().getBiomeType(x, z);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return extent.setBiome(x, y, z, biome);
+        return getExtent().setBiome(x, y, z, biome);
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return extent.setBlock(x, y, z, block);
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
+        return getExtent().setBlock(position.getX(), position.getY(), position.getZ(), block);
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return getExtent().setBlock(x, y, z, block);
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return getExtent().setBiome(position.getX(), 0, position.getZ(), biome);
     }
 
     @Override
@@ -128,37 +171,38 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
      */
 
     public int getSkyLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getSkyLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getSkyLight(x, y, z);
         }
         return 0;
     }
 
     public int getBlockLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBlockLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getBlockLight(x, y, z);
         }
         return getBrightness(x, y, z);
     }
 
     public int getOpacity(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getOpacity(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getOpacity(x, y, z);
         }
         return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
     }
 
     @Override
     public int getLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getLight(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getLight(x, y, z);
         }
         return 0;
     }
 
+    @Override
     public int getBrightness(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBrightness(x, y, z);
+        if (getExtent() instanceof LightingExtent) {
+            return ((LightingExtent) getExtent()).getBrightness(x, y, z);
         }
         return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
@@ -169,7 +213,17 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public String toString() {
-        return super.toString() + ":" + extent.toString();
+        return super.toString() + ":" + getExtent().toString();
+    }
+
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return getExtent().getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return getExtent().getMaximumPoint();
     }
 
     protected Operation commitBefore() {
@@ -180,7 +234,9 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public @Nullable Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
-        if (extent != this) other = extent.commit();
+        if (getExtent() != this) {
+            other = getExtent().commit();
+        }
         if (ours != null && other != null) {
             return new OperationQueue(ours, other);
         } else if (ours != null) {

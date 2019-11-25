@@ -1,18 +1,17 @@
 package com.boydti.fawe.object.queue;
 
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,8 +42,12 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public void setEntity(int x, int y, int z, CompoundTag tag) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return false;
+    }
 
+    @Override
+    public void setEntity(int x, int y, int z, CompoundTag tag) {
     }
 
     @Override
@@ -153,7 +156,7 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public void sendBlockUpdate(FaweChunk chunk, FawePlayer... players) {
+    public void sendBlockUpdate(FaweChunk chunk, Player... players) {
 
     }
 

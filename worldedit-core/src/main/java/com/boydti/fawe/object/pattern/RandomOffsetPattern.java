@@ -1,30 +1,20 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-
-import java.io.IOException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.SplittableRandom;
 
-public class RandomOffsetPattern extends AbstractPattern {
-    private final int dx, dy, dz;
-    private final Pattern pattern;
-
-    private transient int dx2, dy2, dz2;
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
-    private transient SplittableRandom r;
+public class RandomOffsetPattern extends OffsetPattern {
+    protected transient int dx2;
+    protected transient int dy2;
+    protected transient int dz2;
+    protected transient SplittableRandom r;
 
     public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
-        this.pattern = pattern;
-        this.dx = dx;
-        this.dy = dy;
-        this.dz = dz;
+        super(pattern, dx, dy, dz);
         this.dx2 = dx * 2 + 1;
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;

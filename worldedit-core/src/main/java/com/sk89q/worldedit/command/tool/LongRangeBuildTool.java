@@ -27,6 +27,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
@@ -64,7 +65,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
                 eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), secondary);
             }
             return true;
-        } catch (MaxChangedBlocksException e) {
+        } catch (MaxChangedBlocksException ignored) {
             // one block? eat it
         }
         return false;
@@ -84,17 +85,22 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
                 eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), primary);
             }
             return true;
-        } catch (MaxChangedBlocksException e) {
+        } catch (MaxChangedBlocksException ignored) {
             // one block? eat it
         }
-        return true;
+        return false;
     }
 
-    public Location getTargetFace(Player player) {
-        Location target = player.getBlockTraceFace(getRange(), true);
-
+    private Location getTargetFace(Player player) {
+        Location target;
+        Mask mask = getTraceMask();
+        if (this.range > -1) {
+            target = player.getBlockTrace(getRange(), true, mask);
+        } else {
+            target = player.getBlockTrace(MAX_RANGE, false, mask);
+        }
         if (target == null) {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
             return null;
         }
 

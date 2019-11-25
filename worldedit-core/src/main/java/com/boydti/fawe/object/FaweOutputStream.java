@@ -37,7 +37,7 @@ public class FaweOutputStream extends DataOutputStream {
     }
 
     public void writeVarInt(int i) throws IOException {
-        while((i & -128) != 0) {
+        while ((i & -128) != 0) {
             this.writeByte(i & 127 | 128);
             i >>>= 7;
         }

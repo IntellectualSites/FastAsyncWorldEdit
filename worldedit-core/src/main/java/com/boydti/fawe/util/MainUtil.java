@@ -1,18 +1,17 @@
 package com.boydti.fawe.util;
 
+import static java.lang.System.arraycopy;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal2;
-import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
-
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.CompoundTag;
@@ -27,20 +26,19 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import static java.lang.System.arraycopy;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
-
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -77,25 +75,22 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4InputStream;
+import net.jpountz.lz4.LZ4Utils;
 
 public class MainUtil {
-    /*
-     * Generic non plugin related utils
-     *  e.g. sending messages
-     */
-    public static void sendMessage(final FawePlayer<?> player, String message) {
-        message = BBC.color(message);
-        if (player == null) {
-            Fawe.debug(message);
-        } else {
-            player.sendMessage(message);
-        }
-    }
 
     public static void sendAdmin(final String s) {
-        for (final FawePlayer<?> player : Fawe.get().getCachedPlayers()) {
+        for (final Player player : Fawe.get().getCachedPlayers()) {
             if (player.hasPermission("fawe.admin")) {
-                player.sendMessage(s);
+                player.print(s);
             }
         }
         Fawe.debug(s);
@@ -228,8 +223,8 @@ public class MainUtil {
         if (changeSet instanceof FaweStreamChangeSet) {
             FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
             return fscs.getSizeOnDisk() + fscs.getSizeInMemory();
-        } else if (changeSet instanceof CPUOptimizedChangeSet) {
-            return changeSet.size() + 32;
+//        } else if (changeSet instanceof CPUOptimizedChangeSet) {
+//            return changeSet.size() + 32;
         } else if (changeSet != null) {
             return changeSet.size() * 128;
         } else {
@@ -403,17 +398,17 @@ public class MainUtil {
             con.setDoOutput(true);
             con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
             try (OutputStream output = con.getOutputStream(); PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true)) {
-                String CRLF = "\r\n";
-                writer.append("--" + boundary).append(CRLF);
-                writer.append("Content-Disposition: form-data; name=\"param\"").append(CRLF);
-                writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.displayName()).append(CRLF);
+                String crlf = "\r\n";
+                writer.append("--" + boundary).append(crlf);
+                writer.append("Content-Disposition: form-data; name=\"param\"").append(crlf);
+                writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.displayName()).append(crlf);
                 String param = "value";
-                writer.append(CRLF).append(param).append(CRLF).flush();
-                writer.append("--" + boundary).append(CRLF);
-                writer.append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"').append(CRLF);
-                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(filename)).append(CRLF);
-                writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-                writer.append(CRLF).flush();
+                writer.append(crlf).append(param).append(crlf).flush();
+                writer.append("--" + boundary).append(crlf);
+                writer.append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"').append(crlf);
+                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(filename)).append(crlf);
+                writer.append("Content-Transfer-Encoding: binary").append(crlf);
+                writer.append(crlf).flush();
                 OutputStream nonClosable = new AbstractDelegateOutputStream(new BufferedOutputStream(output)) {
                     @Override
                     public void close() {
@@ -422,8 +417,8 @@ public class MainUtil {
                 writeTask.value = nonClosable;
                 writeTask.run();
                 nonClosable.flush();
-                writer.append(CRLF).flush();
-                writer.append("--" + boundary + "--").append(CRLF).flush();
+                writer.append(crlf).flush();
+                writer.append("--" + boundary + "--").append(crlf).flush();
             }
             int responseCode = ((HttpURLConnection) con).getResponseCode();
             String content;
@@ -622,7 +617,6 @@ public class MainUtil {
         boolean reading = false;
         int index = 1;
         int numIndex = 1;
-        outer:
         for (int i = len; i >= 2; i--) {
             char c = fileName.charAt(i);
             if (!reading) {
@@ -635,7 +629,9 @@ public class MainUtil {
                     break;
                 case '.':
                     res[index--] = val;
-                    if (index == -1) return res;
+                    if (index == -1) {
+                        return res;
+                    }
                     val = 0;
                     numIndex = 1;
                     break;
@@ -852,34 +848,4 @@ public class MainUtil {
             e.printStackTrace();
         }
     }
-
-    public static void warnDeprecated(Class... alternatives) {
-        StackTraceElement[] stacktrace = new RuntimeException().getStackTrace();
-        if (stacktrace.length > 1) {
-            for (int i = 1; i < stacktrace.length; i++) {
-                StackTraceElement stack = stacktrace[i];
-                String s = stack.toString();
-                if (s.startsWith("com.sk89q")) {
-                    continue;
-                }
-                try {
-                    StackTraceElement creatorElement = stacktrace[1];
-                    String className = creatorElement.getClassName();
-                    Class clazz = Class.forName(className);
-                    String creator = clazz.getSimpleName();
-                    String packageName = clazz.getPackage().getName();
-
-                    StackTraceElement deprecatedElement = stack;
-                    String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
-                    Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
-                    Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                } finally {
-                    break;
-                }
-            }
-        }
-    }
-
 }

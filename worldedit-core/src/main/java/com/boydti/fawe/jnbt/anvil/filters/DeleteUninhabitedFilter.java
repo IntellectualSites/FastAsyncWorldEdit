@@ -6,7 +6,6 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFile;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.exception.FaweException;
 import java.io.File;

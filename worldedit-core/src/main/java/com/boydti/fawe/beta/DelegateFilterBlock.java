@@ -650,9 +650,8 @@ public class DelegateFilterBlock extends FilterBlock {
         return parent.getBlock(position);
     }
 
-    @Override
     public BlockType getBlockType(BlockVector3 position) {
-        return parent.getBlockType(position);
+        return parent.getBlock(position).getBlockType();
     }
 
     @Override

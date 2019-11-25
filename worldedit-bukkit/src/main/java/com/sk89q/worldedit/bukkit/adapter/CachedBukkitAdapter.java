@@ -1,22 +1,17 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.bekvon.bukkit.residence.commands.material;
-import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import org.bukkit.Bukkit;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
-
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     private int[] itemTypes;
@@ -53,7 +48,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public ItemType asItemType(Material material) {
         try {
-            return ItemTypes.get(itemTypes[material.ordinal()]);
+            return ItemTypes.get(material.getKey().getKey());
         } catch (NullPointerException e) {
             if (init()) return asItemType(material);
             return ItemTypes.get(itemTypes[material.ordinal()]);
@@ -63,7 +58,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public BlockType adapt(Material material) {
         try {
-        	return BlockTypes.values[blockTypes[material.ordinal()]];
+            return BlockTypes.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
             if (init()) return adapt(material);
             throw e;

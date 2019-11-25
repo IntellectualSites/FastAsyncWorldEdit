@@ -1,14 +1,17 @@
 package com.boydti.fawe.object.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MultiClipboardHolder extends URIClipboardHolder {
     private final List<URIClipboardHolder> holders;

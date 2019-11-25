@@ -4,6 +4,8 @@ import com.boydti.fawe.FaweCache;
 
 public class MutableVector3 extends Vector3 {
 
+    private double x, y, z;
+
     public static MutableVector3 get(int x, int y, int z) {
         return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
     }
@@ -15,22 +17,39 @@ public class MutableVector3 extends Vector3 {
     public MutableVector3() {}
 
     public MutableVector3(double x, double y, double z) {
-        super(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public MutableVector3(float x, float y, float z) {
-        super(x, y, z);
+        this((double) x, (double) y, (double) z);
     }
 
     public MutableVector3(Vector3 other) {
-        super(other);
+        this(other.getX(), other.getY(), other.getZ());
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public double getZ() {
+        return z;
     }
 
     @Override
     public MutableVector3 setComponents(Vector3 other) {
-        this.x = other.x;
-        this.y = other.y;
-        this.z = other.z;
+        this.x = other.getX();
+        this.y = other.getY();
+        this.z = other.getZ();
         return this;
     }
 
@@ -55,11 +74,13 @@ public class MutableVector3 extends Vector3 {
         this.x = x;
         return this;
     }
+
     @Override
     public MutableVector3 mutZ(int z) {
         this.z = z;
         return this;
     }
+
     @Override
     public MutableVector3 mutX(double x) {
         this.x = x;

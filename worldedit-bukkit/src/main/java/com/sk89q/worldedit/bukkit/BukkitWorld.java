@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,6 +40,15 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -49,15 +60,6 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
-
-import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BukkitWorld extends AbstractWorld {
 
@@ -157,6 +159,11 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public String getId() {
+        return getWorld().getName().replace(" ", "_").toLowerCase(Locale.ROOT);
+    }
+
+    @Override
     public Path getStoragePath() {
         return getWorld().getWorldFolder().toPath();
     }
@@ -242,9 +249,6 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
-        if (block == null) {
-            return false;
-        }
         BlockState state = block.getState();
         if (!(state instanceof InventoryHolder)) {
             return false;
@@ -311,19 +315,21 @@ public class BukkitWorld extends AbstractWorld {
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
 
-        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
-            world.loadChunk(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
-        }
+        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        final World ref = worldRef.get();
+        if (ref == null) {
+            return false;
+        } else if (other == null) {
             return false;
         } else if ((other instanceof BukkitWorld)) {
-            return ((BukkitWorld) other).getWorld().equals(getWorld());
+            World otherWorld = ((BukkitWorld) other).worldRef.get();
+            return ref.equals(otherWorld);
         } else if (other instanceof com.sk89q.worldedit.world.World) {
-            return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
+            return ((com.sk89q.worldedit.world.World) other).getName().equals(ref.getName());
         } else {
             return false;
         }
@@ -416,8 +422,21 @@ public class BukkitWorld extends AbstractWorld {
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
 
+    private static volatile boolean hasWarnedImplError = false;
+
     @Override
     public com.sk89q.worldedit.world.block.BlockState getBlock(BlockVector3 position) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            try {
+                return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position)).toImmutableState();
+            } catch (Exception e) {
+                if (!hasWarnedImplError) {
+                    hasWarnedImplError = true;
+                    logger.warn("Unable to retrieve block via impl adapter", e);
+                }
+            }
+        }
         Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
         return BukkitAdapter.adapt(bukkitBlock.getBlockData());
     }
@@ -472,8 +491,24 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return setBlock(BlockVector3.at(x,y,z), block);
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         getWorld().setBiome(position.getBlockX(), position.getBlockZ(), BukkitAdapter.adapt(biome));
         return true;
     }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return setBiome(BlockVector2.at(x,z), biome);
+    }
+
 }

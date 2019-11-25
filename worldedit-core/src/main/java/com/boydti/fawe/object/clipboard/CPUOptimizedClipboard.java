@@ -3,7 +3,6 @@ package com.boydti.fawe.object.clipboard;
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.ReflectionUtils;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -16,7 +15,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,13 +125,14 @@ public class CPUOptimizedClipboard extends FaweClipboard {
         return BlockVector3.at(width, height, length);
     }
 
-    private int ylast;
-    private int ylasti;
-    private int zlast;
-    private int zlasti;
+    private int yLast;
+    private int yLastI;
+    private int zLast;
+    private int zLastI;
 
     public int getIndex(int x, int y, int z) {
-        return x + ((ylast == y) ? ylasti : (ylasti = (ylast = y) * area)) + ((zlast == z) ? zlasti : (zlasti = (zlast = z) * width));
+        return x + ((yLast == y) ? yLastI : (yLastI = (yLast = y) * area)) + ((zLast == z) ? zLastI
+            : (zLastI = (zLast = z) * width));
     }
 
     @Override

@@ -1,6 +1,10 @@
 package com.boydti.fawe.object.io;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * A positionable file output stream.
@@ -8,49 +12,50 @@ import java.io.*;
  * Threading Design : [x] Single Threaded  [ ] Threadsafe  [ ] Immutable  [ ] Isolated
  */
 
-public class RandomFileOutputStream extends OutputStream
-{
+public class RandomFileOutputStream extends OutputStream {
 
 // *****************************************************************************
 // INSTANCE PROPERTIES
 // *****************************************************************************
 
-    protected RandomAccessFile              randomFile;                             // the random file to write to
-    protected boolean                       sync;                                   // whether to synchronize every write
-    protected boolean                       closeParent;
+    protected RandomAccessFile randomFile;                             // the random file to write to
+    protected boolean sync;                                   // whether to synchronize every write
+    protected boolean closeParent;
 
 // *****************************************************************************
-// INSTANCE CONSTRUCTION/INITIALIZATON/FINALIZATION, OPEN/CLOSE
+// INSTANCE CONSTRUCTION/INITIALIZATION/FINALIZATION, OPEN/CLOSE
 // *****************************************************************************
 
     public RandomFileOutputStream(String fnm) throws IOException {
-        this(fnm,false);
+        this(fnm, false);
     }
 
     public RandomFileOutputStream(String fnm, boolean syn) throws IOException {
-        this(new File(fnm),syn);
+        this(new File(fnm), syn);
     }
 
     public RandomFileOutputStream(File fil) throws IOException {
-        this(fil,false);
+        this(fil, false);
     }
 
     public RandomFileOutputStream(File fil, boolean syn) throws IOException {
         super();
 
-        File                                par;                                    // parent file
+        File par;                                    // parent file
 
-        fil=fil.getAbsoluteFile();
-        if((par=fil.getParentFile())!=null) { par.mkdirs(); }
-        randomFile=new RandomAccessFile(fil,"rw");
-        sync=syn;
+        fil = fil.getAbsoluteFile();
+        if ((par = fil.getParentFile()) != null) {
+            par.mkdirs();
+        }
+        randomFile = new RandomAccessFile(fil, "rw");
+        sync = syn;
         this.closeParent = true;
     }
 
     public RandomFileOutputStream(RandomAccessFile randomFile, boolean syn, boolean closeParent) {
         super();
         this.randomFile = randomFile;
-        sync=syn;
+        sync = syn;
         this.closeParent = closeParent;
     }
 
@@ -58,25 +63,38 @@ public class RandomFileOutputStream extends OutputStream
 // INSTANCE METHODS - OUTPUT STREAM IMPLEMENTATION
 // *****************************************************************************
 
+    @Override
     public void write(int val) throws IOException {
         randomFile.write(val);
-        if(sync) { randomFile.getFD().sync(); }
+        if (sync) {
+            randomFile.getFD().sync();
+        }
     }
 
+    @Override
     public void write(byte[] val) throws IOException {
         randomFile.write(val);
-        if(sync) { randomFile.getFD().sync(); }
+        if (sync) {
+            randomFile.getFD().sync();
+        }
     }
 
+    @Override
     public void write(byte[] val, int off, int len) throws IOException {
-        randomFile.write(val,off,len);
-        if(sync) { randomFile.getFD().sync(); }
+        randomFile.write(val, off, len);
+        if (sync) {
+            randomFile.getFD().sync();
+        }
     }
 
+    @Override
     public void flush() throws IOException {
-        if(sync) { randomFile.getFD().sync(); }
+        if (sync) {
+            randomFile.getFD().sync();
+        }
     }
 
+    @Override
     public void close() throws IOException {
         if (closeParent) {
             randomFile.close();

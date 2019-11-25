@@ -21,34 +21,39 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.registry.Keyed;
-import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
-	private final String id;
-    private final BlockTypes.Settings settings;
 
-    private boolean initItemType;
-    private ItemType itemType;
+    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+
+    private final String id;
+    private final LazyReference<FuzzyBlockState> emptyFuzzy
+        = LazyReference.from(() -> new FuzzyBlockState(this));
+    private final BlockTypes.Settings settings;
 
     protected BlockType(String id, int internalId, List<BlockState> states) {
         int i = id.indexOf("[");
@@ -58,7 +63,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Deprecated
     public int getMaxStateId() {
-    	return settings.permutations;
+        return settings.permutations;
     }
 
     /**
@@ -68,7 +73,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Override
     public String getId() {
-    	return this.id;
+        return this.id;
     }
 
     public String getNamespace() {
@@ -101,37 +106,19 @@ public class BlockType implements FawePattern, Keyed {
         if (settings.stateOrdinals == null) return settings.defaultState;
         return BlockTypes.states[settings.stateOrdinals[propertyId]];
     }
-    
+
     @Deprecated
     public BlockState withStateId(int internalStateId) { //
         return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
     }
 
     /**
-     * Properties string in the form property1=foo,prop2=bar
-     * @param properties
-     * @return
-     */
-    public BlockState withProperties(String properties) { //
-        int id = getInternalId();
-        for (String keyPair : properties.split(",")) {
-            String[] split = keyPair.split("=");
-            String name = split[0];
-            String value = split[1];
-            AbstractProperty btp = settings.propertiesMap.get(name);
-            id = btp.modify(id, btp.getValueFor(value));
-        }
-        return withStateId(id);
-    }
-
-    /**
-     * Gets the properties of this BlockType in a key->property mapping.
+     * Gets the properties of this BlockType in a {@code key->property} mapping.
      *
      * @return The properties map
      */
-    @Deprecated
     public Map<String, ? extends Property<?>> getPropertyMap() {
-        return this.settings.propertiesMap;
+        return this.settings.getPropertyMap();
     }
 
     /**
@@ -139,7 +126,6 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return the properties
      */
-    @Deprecated
     public List<? extends Property<?>> getProperties() {
         return this.settings.propertiesList;
     }
@@ -155,16 +141,15 @@ public class BlockType implements FawePattern, Keyed {
      * @param name The name
      * @return The property
      */
-    @Deprecated
     public <V> Property<V> getProperty(String name) {
-        return (Property<V>) this.settings.propertiesMap.get(name);
+        return (Property<V>) this.settings.getPropertyMap().get(name);  // stop changing this (performance)
     }
 
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.ordinal();
         return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
     }
-    
+
     public <V> Property<V> getProperty(PropertyKey key) {
         try {
             return (Property<V>) this.settings.propertiesMapArr[key.ordinal()];
@@ -178,17 +163,12 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public final BlockState getDefaultState() {
+    public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
-    /**
-     * @Deprecated use a Mask instead
-     * @return
-     */
-    @Deprecated
-    public FuzzyBlockState getFuzzyMatcher() { //
-        return new FuzzyBlockState(this);
+    public FuzzyBlockState getFuzzyMatcher() {
+        return emptyFuzzy.getValue();
     }
 
     /**
@@ -217,13 +197,12 @@ public class BlockType implements FawePattern, Keyed {
              * This is likely wrong. The only place this seems to currently (Dec 23 2018)
              * be invoked is via ForgeWorld, and value is a String when invoked there...
              */
-            AbstractProperty btp = this.settings.propertiesMap.get(prop.getName());
+            AbstractProperty btp = this.settings.getPropertyMap().get(prop.getName());
             checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
             id = btp.modify(id, btp.getValueFor((String)value));
         }
         return withStateId(id);
     }
-
 
     /**
      * Gets whether this block type has an item representation.
@@ -241,11 +220,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Nullable
     public ItemType getItemType() {
-        if(!initItemType) {
-            initItemType = true;
-            itemType = ItemTypes.get(this.id);
-        }
-        return itemType;
+        return ItemTypes.get(this.id);
     }
 
     /**
@@ -254,7 +229,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return The material
      */
     public BlockMaterial getMaterial() {
-    	return this.settings.blockMaterial;
+        return this.settings.blockMaterial;
     }
 
     /**
@@ -264,6 +239,7 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return legacy id or 0, if unknown
      */
+    @Deprecated
     public int getLegacyCombinedId() {
         Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
@@ -277,24 +253,24 @@ public class BlockType implements FawePattern, Keyed {
      * @return internal id
      */
     public int getInternalId() {
-    	return this.settings.internalId;
+        return this.settings.internalId;
     }
 
-    @Override
-    public int hashCode() {
-        return settings.internalId;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj == this;
-    }
-    
     @Override
     public String toString() {
         return getId();
     }
-    
+
+    @Override
+    public int hashCode() {
+        return settings.internalId; // stop changing this to WEs bad hashcode
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this; // stop changing this to a shitty string comparison
+    }
+
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
@@ -306,7 +282,7 @@ public class BlockType implements FawePattern, Keyed {
         return this.getDefaultState().toBaseBlock();
     }
 
-    public Mask toMask(Extent extent) {
+    public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
     }
 

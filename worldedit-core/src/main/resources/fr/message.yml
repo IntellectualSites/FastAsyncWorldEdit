@@ -1,71 +1,71 @@
 # Updated by NShoot
 info:
-  prefix: '&8(&4&lFAWE&8)&r&7'
+  prefix: '(FAWE)'
   file_deleted: '%s0 a été supprimé.'
-  schematic_pasting: '&7La schematic est en train d''être collée. Cette action ne
+  schematic_pasting: 'La schematic est en train d''être collée. Cette action ne
     peut pas être annulée.'
-  lighting_propogate_selection: '&7L''éclairage a été propagé dans %s0 chunks. (Info
+  lighting_propogate_selection: 'L''éclairage a été propagé dans %s0 chunks. (Info
     : Pour supprimer l''éclairage, faites //removelight)'
-  updated_lighting_selection: '&7L''éclairage a été mis à jour dans %s0 chunks. (Cela
+  updated_lighting_selection: 'L''éclairage a été mis à jour dans %s0 chunks. (Cela
     devraît prendre quelques secondes pour que ce soit à jour)'
-  set_region: '&7La sélection a été mise pour votre région actuellement autorisée'
-  worldedit_command_limit: '&7Veuillez patienter le temps que vos actions en cours
+  set_region: 'La sélection a été mise pour votre région actuellement autorisée'
+  worldedit_command_limit: 'Veuillez patienter le temps que vos actions en cours
     soient terminées'
-  worldedit_delayed: '&7Veuillez patienter pendant que votre action soit terminée.'
-  worldedit_run: '&7Désolé du délai. Exécution en cours: %s'
-  worldedit_complete: '&7Modification terminée.'
-  require_selection_in_mask: '&7%s de vos sélections ne sont pas dans votre masque.
+  worldedit_delayed: 'Veuillez patienter pendant que votre action soit terminée.'
+  worldedit_run: 'Désolé du délai. Exécution en cours: %s'
+  worldedit_complete: 'Modification terminée.'
+  require_selection_in_mask: '%s de vos sélections ne sont pas dans votre masque.
     Vous ne pouvez effectuer des modifications que dans vos régions autorisées.'
-  worldedit_volume: '&7Vous ne pouvez pas sélectionner un volume de %current% blocs.
+  worldedit_volume: 'Vous ne pouvez pas sélectionner un volume de %current% blocs.
     Le volume maximal que vous pouvez éditer est de %max% blocs.'
-  worldedit_iterations: '&7Vous ne pouvez pas faire %current% itérations. Votre nombre
+  worldedit_iterations: 'Vous ne pouvez pas faire %current% itérations. Votre nombre
     maximal d''itérations est de %max%.'
-  worldedit_unsafe: '&7L''accès à cette commande est restreint.'
-  worldedit_dangerous_worldedit: '&cModification non sécurisée complétée à %s0 par
+  worldedit_unsafe: 'L''accès à cette commande est restreint.'
+  worldedit_dangerous_worldedit: 'Modification non sécurisée complétée à %s0 par
     %s1'
-  worldedit_toggle_tips_on: '&7Conseils désactivés.'
-  worldedit_toggle_tips_off: '&7Conseils activés.'
-  worldedit_bypassed: '&7Bypass de la restriction du plugin.'
-  worldedit_unmasked: '&6Vos éditions ne sont désormais plus restreintes.'
-  worldedit_restricted: '&6Vos éditions sont désormais restreintes.'
+  worldedit_toggle_tips_on: 'Conseils désactivés.'
+  worldedit_toggle_tips_off: 'Conseils activés.'
+  worldedit_bypassed: 'Bypass de la restriction du plugin.'
+  worldedit_unmasked: 'Vos éditions ne sont désormais plus restreintes.'
+  worldedit_restricted: 'Vos éditions sont désormais restreintes.'
   worldedit_oom_admin: |-
-    &cOptions possibles:
-    &8 - &7//fast
-    &8 - &7Faites de petites modifications
-    &8 - &7Allouez plus de mémoire
-    &8 - &7Désactivez `max-memory-percent`
+    Options possibles:
+     - //fast
+     - Faites de petites modifications
+     - Allouez plus de mémoire
+     - Désactivez `max-memory-percent`
   compressed: Historique compressé. Sauvegardé ~ %s0b (%s1x plus petit)
   action_complete: Action complétée en %s0 secondes.
 error:
-  worldedit_extend: '&cVotre modification a peut-être été étendue en dehors de votre
+  worldedit_extend: 'Votre modification a peut-être été étendue en dehors de votre
     région autorisée.'
   web_unauthorized: 'Seuls les liens suivants sont autorisés : %s0'
-  command_syntax: '&cUtilisation : &7%s0'
-  no_perm: '&cIl vous manque la permission %s0'
-  setting_disable: '&cOption manquante : %s0'
-  brush_not_found: '&cBrosses disponibles : %s0'
-  brush_incompatible: '&cBrosse non compatible avec cette version'
-  schematic_not_found: '&cSchematic non trouvée : &7%s0'
-  no_region: '&cVous n''avez pas de région actuellement autorisée'
-  no_mask: '&cVous n''avez pas de masque actuel'
-  not_player: '&cVous devez être un joueur pour effectuer cette action !'
-  player_not_found: '&cJoueur non trouvé :&7 %s0'
+  command_syntax: 'Utilisation : %s0'
+  no_perm: 'Il vous manque la permission %s0'
+  setting_disable: 'Option manquante : %s0'
+  brush_not_found: 'Brosses disponibles : %s0'
+  brush_incompatible: 'Brosse non compatible avec cette version'
+  schematic_not_found: 'Schematic non trouvée : %s0'
+  no_region: 'Vous n''avez pas de région actuellement autorisée'
+  no_mask: 'Vous n''avez pas de masque actuel'
+  not_player: 'Vous devez être un joueur pour effectuer cette action !'
+  player_not_found: 'Joueur non trouvé : %s0'
   oom: |-
-    &8[&cAttention&8] &cMémoire faible détectée (< 1%). Nous allons :
-    &8 - &7Terminer le placement des blocs
-    &8 - &7Supprimer les historiques de blocs
-    &8 - &7Décharger les chunks non essentiels
-    &8 - &7Tuer les entités
-    &8 - &7Vider la mémoire
-    &cIgnorez ceci si vous essayez de faire crash le serveur.
-    &7Info : La mémoire faible est causé par WE (mais pas nécessairement)
-  worldedit_some_fails: '&c%s0 blocs ne peuvent pas être posés car ils sont en dehors
+    [Attention] Mémoire faible détectée (< 1%). Nous allons :
+     - Terminer le placement des blocs
+     - Supprimer les historiques de blocs
+     - Décharger les chunks non essentiels
+     - Tuer les entités
+     - Vider la mémoire
+    Ignorez ceci si vous essayez de faire crash le serveur.
+    Info : La mémoire faible est causé par WE (mais pas nécessairement)
+  worldedit_some_fails: '%s0 blocs ne peuvent pas être posés car ils sont en dehors
     de votre région autorisée.'
-  worldedit_some_fails_blockbag: '&cBlocs manquants : %s0'
+  worldedit_some_fails_blockbag: 'Blocs manquants : %s0'
   block_not_allowed: Vous n’avez pas la permission d’utiliser
 web:
   generating_link: Téléversement de %s, veuillez patienter...
-  generating_link_failed: '&cImpossible de générer le lien.'
+  generating_link_failed: 'Impossible de générer le lien.'
   download_link: '%s'
 worldedit:
   general:
@@ -129,7 +129,7 @@ worldedit:
     selection_shift: Région déplacée
     selection_cleared: Sélection effacée
   navigation:
-    navigation_wand_error: '&cIl n''y a rien à traverser.'
+    navigation_wand_error: 'Il n''y a rien à traverser.'
   anvil:
     world_is_loaded: Le monde ne devrait pas être utilisé lors de l'exécution. Décharger
       le monde, ou utilisez -f pour passer outre (sauvegarder d'abord)
@@ -144,8 +144,8 @@ worldedit:
     brush_target_offset_set: Définir le décalage de la cible à%s0
     brush_equipped: Brosse équipée de %s0
     brush_try_other: |-
-      &cIl existe d'autres brosses plus appropriées, par ex.
-      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+      Il existe d'autres brosses plus appropriées, par ex.
+       - //br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
     brush_copy: Clic gauche sur la base d'un objet à copier, clic droit pour coller.
       Augmentez le rayon de la brosse si nécessaire.
     brush_height_invalid: Hauteur de la carte invalide (%s0)
@@ -174,8 +174,8 @@ worldedit:
     rollback_element: Rollback de %s0
   tool:
     tool_inspect: Outil d'inspection lié à %s0.
-    tool_inspect_info: '&7%s0 a changé %s1 à %s2 il y a %s3'
-    tool_inspect_info_footer: '&6Total : &7%s0 modifications'
+    tool_inspect_info: '%s0 a changé %s1 à %s2 il y a %s3'
+    tool_inspect_info_footer: 'Total : %s0 modifications'
     tool_none: L'outil plus reliée à l'élément courant.
     tool_info: Outil d'information lié à  %s0.
     tool_tree: Outil d'arbres lié à %s0.
@@ -218,23 +218,23 @@ worldedit:
     nothing_confirmed: Vous n'avez aucune action en attente de confirmation.
     page_footer: Utilisez %s0 pour aller à la page suivante.
   schematic:
-    schematic_prompt_clear: '&7Vous voudriez peut-être utiliser &c%s0 &7pour effacer
+    schematic_prompt_clear: 'Vous voudriez peut-être utiliser %s0 pour effacer
       votre actuel presse-papier'
     schematic_show: |-
-      &7Affichage de &a%s0&7 schématiques depuis &a%s1&7:
-      &8 - &aClic gauche &7> une structure à mettre dans le presse-papier
-      &8 - &aClic droit &7> pour mettre une structure dans le presse-papier multiple
-      &8 - &7Utilisez &a%s2&7 pour revenir au monde
+      Affichage de %s0 schématiques depuis %s1:
+       - Clic gauche > une structure à mettre dans le presse-papier
+       - Clic droit > pour mettre une structure dans le presse-papier multiple
+       - Utilisez %s2 pour revenir au monde
     schematic_format: 'Formats disponibles (nom: Noms de recherche)'
-    schematic_move_exists: '&c%s0 existe déjà'
-    schematic_move_success: '&a%s0 -> %s1'
-    schematic_move_failed: '&a%s0 non déplacé : %s1'
+    schematic_move_exists: '%s0 existe déjà'
+    schematic_move_success: '%s0 -> %s1'
+    schematic_move_failed: '%s0 non déplacé : %s1'
     schematic_loaded: '%s0 chargé. Collez-le avec //paste'
     schematic_saved: '%s0 sauvegardé.'
     schematic_page: La page doit-être %s
     schematic_none: Aucun fichier trouvé.
     schematic_list: 'Fichiers disponibles (nom du fichier: Format) [%s0/%s1]:'
-    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+    schematic_list_elem: ' - %s0 - %s1'
   clipboard:
     clipboard_uri_not_found: Vous n'avez pas %s0 chargé.
     clipboard_cleared: Presse-papier effacé
@@ -260,31 +260,31 @@ worldedit:
     command_invalid_syntax: La commande n'a pas été utilisée correctement. (aucune
       aide disponible).
   help:
-    command_clarifying_bracket: '&7Ajout d''un crochet de clarification pour &c%s0'
-    help_suggest: '&7Impossible de trouver %s0. Essayez une des &c%s1 &7?'
+    command_clarifying_bracket: 'Ajout d''un crochet de clarification pour %s0'
+    help_suggest: 'Impossible de trouver %s0. Essayez une des %s1 ?'
     help_header_categories: Types de commandes
     help_header_subcommands: Sous commandes
-    help_header_command: '&cAide pour : &7%s0'
-    help_item_allowed: '&a%s0&8 - &7%s1'
-    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header_command: 'Aide pour : %s0'
+    help_item_allowed: '%s0 - %s1'
+    help_item_denied: '%s0 - %s1'
     help_header: 'Aide : page %s0/%s1'
-    help_footer: '&7Wiki anglais : https://git.io/vSKE5'
+    help_footer: 'Wiki anglais : https://git.io/vSKE5'
   cycler:
     block_cycler_cannot_cycle: Le data de ce bloc ne peut pas être cyclé!
     block_cycler_limit: Limite du nombre maximal de blocs changeable atteinte.
-    block_cycler_no_perm: '&cVous n’êtes pas autorisé à cycler la valeur du data de ce bloc.'
+    block_cycler_no_perm: 'Vous n’êtes pas autorisé à cycler la valeur du data de ce bloc.'
   scripting:
-    scripting_no_perm: '&cVous n’avez pas la permission d’exécuter ce script de fabrication'
+    scripting_no_perm: 'Vous n’avez pas la permission d’exécuter ce script de fabrication'
     scripting_cs: Utilisez /cs avec un nom de script avant.
     scripting_error: Une erreur s’est produite lors de l’exécution d’un script de fabrication.
 progress:
   progress_message: '%s1/%s0 (%s2%) @%s3bps %s4s restants'
   progress_finished: '[ Terminé ! ]'
 cancel:
-  worldedit_cancel_count: '&cModifications %s0 annulées.'
-  worldedit_cancel_reason_confirm: '&7Votre sélection est large (&c%s0 &7-> &c%s1&7,
-    contenant &c%s3&7 blocs). Faites &c//confirm &7pour exécuter &c%s2'
-  worldedit_cancel_reason: '&cVotre action a été annulée :&7 %s0&c.'
+  worldedit_cancel_count: 'Modifications %s0 annulées.'
+  worldedit_cancel_reason_confirm: 'Votre sélection est large (%s0 -> %s1,
+    contenant %s3 blocs). Faites //confirm pour exécuter %s2'
+  worldedit_cancel_reason: 'Votre action a été annulée : %s0.'
   worldedit_cancel_reason_manual: Annulation humaine
   worldedit_cancel_reason_low_memory: Mémoire trop faible
   worldedit_cancel_reason_max_changes: Trop de blocs modifiés
@@ -297,7 +297,7 @@ cancel:
     avec /wea, ou désactivez `region-restrictions` dans la configuration)
   worldedit_cancel_reason_no_region: Région non autorisée (bypass avec /wea, ou désactivez
     `region-restrictions` dans la configuration)
-  worldedit_failed_load_chunk: '&cChargement du chunk ignoré : &7%s0;%s1&c. Essayez
+  worldedit_failed_load_chunk: 'Chargement du chunk ignoré : %s0;%s1. Essayez
     d''augmenter chunk-wait.'
 navigation:
   ascend_fail: Aucune place libre au-dessus de vous n'a été trouvée
@@ -326,53 +326,52 @@ selection:
     clic droit. à ajouter. Pour sélectionner une cavité d''air, utilisez //pos1.'
   sel_convex_polyhedral: 'Sélecteur polyédrique convexe : Clic gauche=Premier sommet,
     droite, droite cliquez pour en ajouter d''autres.'
-  sel_list: Pour une liste de types de sélection, faites &c //sel list
+  sel_list: Pour une liste de types de sélection, faites  //sel list
   sel_modes: 'Sélectionnez un des modes en dessous :'
 tips:
-  tip_sel_list: 'Astuce : Voir les différents modes de sélection avec &c//sel list'
+  tip_sel_list: 'Astuce : Voir les différents modes de sélection avec //sel list'
   tip_select_connected: Astuce, Sélectionner tous les blocs connectés avec //sel fuzzy'
-  tip_set_pos1: Astuce, Utilisez pos1 comme motif avec &c//set pos1
-  tip_farwand: Astuce, Sélectionnez les points distants avec &c//farwand.'
+  tip_set_pos1: Astuce, Utilisez pos1 comme motif avec //set pos1
+  tip_farwand: Astuce, Sélectionnez les points distants avec //farwand.'
   tip_discord: 'Besoin d''aide ? Aide en anglais disponible : https://discord.gg/ngZCzbU'
-  tip_lazycut: '&7Conseil, Il est plus sûr d''utiliser &c//lazycut'
-  tip_fast: '&7Astuce, Définir rapidement et sans défaire en utilisant &c//fas'
-  tip_cancel: '&7Astuce, Vous pouvez &c//cancel &7et éditer en cours de traitement.'
-  tip_mask: '&7Astuce, Définir un masque de destination globale avec &c/gmask'
-  tip_mask_angle: '&7Astuce, Remplacer les pentes ascendantes de 3-20 blocs en faisant&c
+  tip_lazycut: 'Conseil, Il est plus sûr d''utiliser //lazycut'
+  tip_fast: 'Astuce, Définir rapidement et sans défaire en utilisant //fas'
+  tip_cancel: 'Astuce, Vous pouvez //cancel et éditer en cours de traitement.'
+  tip_mask: 'Astuce, Définir un masque de destination globale avec /gmask'
+  tip_mask_angle: 'Astuce, Remplacer les pentes ascendantes de 3-20 blocs en faisant
     //replace /[-20][-3] bedrock'
-  tip_set_linear: '&7Conseil, Définissez les blocs de manière linéaire avec&c //set
+  tip_set_linear: 'Conseil, Définissez les blocs de manière linéaire avec //set
     #l3d[wood,bedrock]'
-  tip_surface_spread: '&7Conseil, Étendez une surface plane à l''aide de&c //set #surfacespread[5][0][5][#existing]'
-  tip_set_hand: '&7Astuce, Utilisez votre main actuelle avec &c//set hand'
-  tip_replace_regex: '&7Tip, Remplacer à l''aide de regex :&c //replace .*_log <pattern>'
-  tip_replace_regex_2: '&7Tip, Remplacer à l''aide de regex :&c //replace .*stairs[facing=(north|south)]
+  tip_surface_spread: 'Conseil, Étendez une surface plane à l''aide de //set #surfacespread[5][0][5][#existing]'
+  tip_set_hand: 'Astuce, Utilisez votre main actuelle avec //set hand'
+  tip_replace_regex: 'Tip, Remplacer à l''aide de regex : //replace .*_log <pattern>'
+  tip_replace_regex_2: 'Tip, Remplacer à l''aide de regex : //replace .*stairs[facing=(north|south)]
     <pattern>'
-  tip_replace_regex_3: '&7Tip, Remplacer à l''aide des opérateurs :&c //replace water[level>2]
+  tip_replace_regex_3: 'Tip, Remplacer à l''aide des opérateurs : //replace water[level>2]
     sand'
-  tip_replace_regex_4: '&7Tip, Remplacer à l''aide des opérateurs :&c //replace true
+  tip_replace_regex_4: 'Tip, Remplacer à l''aide des opérateurs : //replace true
     *[waterlogged=false]'
-  tip_replace_regex_5: '&7Tip, Remplacer à l''aide des opérateurs :&c //replace true
+  tip_replace_regex_5: 'Tip, Remplacer à l''aide des opérateurs : //replace true
     *[level-=1]'
-  tip_replace_id: '&7Tip, Remplacez seulement l''ID du bloc :&c //replace woodenstair
+  tip_replace_id: 'Tip, Remplacez seulement l''ID du bloc : //replace woodenstair
     #id[cobblestair]'
-  tip_replace_light: 'Tip, Remplacez seulement les sources de lumière :&c //replace
+  tip_replace_light: 'Tip, Remplacez seulement les sources de lumière : //replace
     #brightness[1][15] 0'
   tip_tab_complete: Tip, La commande de remplacement prend en charge la complétion
     du tab.
-  tip_flip: Tip, Flip avec &c//flip
-  tip_deform: Tip, Remodeler avec &c//deform
-  tip_transform: Tip, Sélectionnez une transformation avec &c//gtransform
-  tip_copypaste: Tip, Collez en cliquant avec &c//br copypaste
-  tip_source_mask: Tip, Sélectionnez un masque source avec &c/gsmask <mask>&7
+  tip_flip: Tip, Flip avec //flip
+  tip_deform: Tip, Remodeler avec //deform
+  tip_transform: Tip, Sélectionnez une transformation avec //gtransform
+  tip_copypaste: Tip, Collez en cliquant avec //br copypaste
+  tip_source_mask: Tip, Sélectionnez un masque source avec /gsmask <mask>
   tip_replace_marker: 'Tip, Remplacez un bloc avec votre presse-papier entier avec
-    &c//replace wool #fullcopy'
-  tip_paste: Tip, Collez avec &c//paste
+    //replace wool #fullcopy'
+  tip_paste: Tip, Collez avec //paste
   tip_lazycopy: Tip, LazyCopy est plus rapide
-  tip_download: Tip, Essayez &c//download
-  tip_rotate: Tip, Orientez vos sélections avec &c//rotate
-  tip_copy_pattern: Tip, Utilisez un type de pattern avec &c#copy
+  tip_download: Tip, Essayez //download
+  tip_rotate: Tip, Orientez vos sélections avec //rotate
+  tip_copy_pattern: 'Tip, Utilisez un type de pattern avec #copy'
   tip_regen_0: Tip, Utilisez un biome avec /regen [biome]
   tip_regen_1: Tip, Utilisez un seed avec /regen [biome] [seed]
-  tip_biome_pattern: Tip, Le pattern &c#biome[forest]&7 peut être utilisé dans une
-    quelconque commande
+  tip_biome_pattern: Tip, Le pattern '#biome[forest] peut être utilisé dans une quelconque commande'
   tip_biome_mask: Tip, Mettez une restriction de biome en utilisant le masque `$jungle`

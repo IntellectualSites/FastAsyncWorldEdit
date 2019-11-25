@@ -20,16 +20,17 @@
 package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.math.BitMath.mask;
+import static com.sk89q.worldedit.math.BitMath.unpackX;
+import static com.sk89q.worldedit.math.BitMath.unpackY;
+import static com.sk89q.worldedit.math.BitMath.unpackZ;
 
-import com.google.common.collect.ComparisonChain;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
-import javax.annotation.Nullable;
 import java.util.Comparator;
 
 /**
@@ -51,14 +52,57 @@ public abstract class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
+        /* unnecessary
+        // switch for efficiency on typical cases
+        // in MC y is rarely 0/1 on selections
+        switch (y) {
+            case 0:
+                if (x == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
+        */
         return new BlockVector3Imp(x, y, z);
     }
 
-    static final Comparator<BlockVector3> YZX_ORDER = (a, b) -> ComparisonChain.start()
-            .compare(a.getY(), b.getY())
-            .compare(a.getZ(), b.getZ())
-            .compare(a.getX(), b.getX())
-            .result();
+    private static final int WORLD_XZ_MINMAX = 30_000_000;
+    private static final int WORLD_Y_MAX = 4095;
+
+    private static boolean isHorizontallyInBounds(int h) {
+        return -WORLD_XZ_MINMAX <= h && h <= WORLD_XZ_MINMAX;
+    }
+
+    public static boolean isLongPackable(BlockVector3 location) {
+        return isHorizontallyInBounds(location.getX()) &&
+            isHorizontallyInBounds(location.getZ()) &&
+            0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+    }
+
+    public static void checkLongPackable(BlockVector3 location) {
+        checkArgument(isLongPackable(location),
+            "Location exceeds long packing limits: %s", location);
+    }
+
+    private static final long BITS_26 = mask(26);
+    private static final long BITS_12 = mask(12);
+
+    public static BlockVector3 fromLongPackedForm(long packed) {
+        return at(unpackX(packed), unpackY(packed), unpackZ(packed));
+    }
+
+    // thread-safe initialization idiom
+    private static final class YzxOrderComparator {
+        private static final Comparator<BlockVector3> YZX_ORDER =
+            Comparator.comparingInt(BlockVector3::getY)
+                .thenComparingInt(BlockVector3::getZ)
+                .thenComparingInt(BlockVector3::getX);
+    }
 
     /**
      * Returns a comparator that sorts vectors first by Y, then Z, then X.
@@ -67,7 +111,7 @@ public abstract class BlockVector3 {
      * Useful for sorting by chunk block storage order.
      */
     public static Comparator<BlockVector3> sortByCoordsYzx() {
-        return YZX_ORDER;
+        return YzxOrderComparator.YZX_ORDER;
     }
 
     public MutableBlockVector3 setComponents(double x, double y, double z) {
@@ -106,37 +150,10 @@ public abstract class BlockVector3 {
         return BlockVector3.at(getX(), getY(), getZ());
     }
 
-//    /**
-//     * Get the BlockVector3 to the north<br>
-//     * Normal use you would use north(this),
-//     * To avoid constructing a new Vector, pass e.g. north(some MutableBlockVector3)
-//     * There is no gaurantee it will use this provided vector
-//     * @param orDefault the vector to use as the result<br>
-//     * @return BlockVector3
-//     */
-//    public BlockVector3 north(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY(), getZ() - 1);
-//    }
-//
-//    public BlockVector3 east(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX() + 1, getY(), getZ());
-//    }
-//
-//    public BlockVector3 south(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY(), getZ() + 1);
-//    }
-//
-//    public BlockVector3 west(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX() - 1, getY(), getZ());
-//    }
-//
-//    public BlockVector3 up(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY() + 1, getZ());
-//    }
-//
-//    public BlockVector3 down(BlockVector3 orDefault) {
-//        return orDefault.setComponents(getX(), getY() - 1, getZ());
-//    }
+    public long toLongPackedForm() {
+        checkLongPackable(this);
+        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
+    }
 
     /**
      * Get the X coordinate.
@@ -383,6 +400,50 @@ public abstract class BlockVector3 {
     }
 
     /**
+     * Shift all components right.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int x, int y, int z) {
+        return at(this.getX() >> x, this.getY() >> y, this.getZ() >> z);
+    }
+
+    /**
+     * Shift all components right by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int n) {
+        return shr(n, n, n);
+    }
+
+    /**
+     * Shift all components left.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int x, int y, int z) {
+        return at(this.getX() << x, this.getY() << y, this.getZ() << z);
+    }
+
+    /**
+     * Shift all components left by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int n) {
+        return shl(n, n, n);
+    }
+
+    /**
      * Get the length of the vector.
      *
      * @return length
@@ -469,7 +530,8 @@ public abstract class BlockVector3 {
      * @return true if the vector is contained
      */
     public boolean containedWithin(BlockVector3 min, BlockVector3 max) {
-        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max.getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max
+            .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
     }
 
     /**
@@ -554,7 +616,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(
             x2 + aboutX + translateX,
-                getY(),
+            getY(),
             z2 + aboutZ + translateZ
         );
     }
@@ -640,7 +702,7 @@ public abstract class BlockVector3 {
     }
 
     public boolean setFullBlock(Extent orDefault, BaseBlock block) {
-        return  orDefault.setBlock(this, block);
+        return orDefault.setBlock(this, block);
     }
 
     public boolean setBiome(Extent orDefault, BiomeType biome) {
@@ -679,11 +741,6 @@ public abstract class BlockVector3 {
         return orDefault.getBlock(getX(), getY() + y, getZ());
     }
 
-
-    /*
-    Adapt
-     */
-
     /**
      * Creates a 2D vector by dropping the Y component from this vector.
      *
@@ -698,16 +755,18 @@ public abstract class BlockVector3 {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof BlockVector3)) {
             return false;
         }
 
-        return equals((BlockVector3) obj);
+        BlockVector3 other = (BlockVector3) obj;
+        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 
     public final boolean equals(BlockVector3 other) {
-        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
+        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this
+            .getZ();
     }
 
     @Override

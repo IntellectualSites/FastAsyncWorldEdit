@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -32,14 +31,14 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.util.UUID;
-
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class PlayerProxy extends AbstractPlayerActor {
 
@@ -146,6 +145,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public void print(Component component) {
+        basePlayer.print(component);
+    }
+
+    @Override
     public String[] getGroups() {
         return permActor.getGroups();
     }
@@ -153,6 +157,14 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public boolean hasPermission(String perm) {
         return permActor.hasPermission(perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        return permActor.hasPermission(permission);
+    }
+
+    @Override public void setPermission(String permission, boolean value) {
+        permActor.setPermission(permission, value);
     }
 
     @Override
@@ -184,6 +196,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
         basePlayer.sendFakeBlock(pos, block);
+    }
+
+    @Override
+    public void sendTitle(String title, String sub) {
+        basePlayer.sendTitle(title, sub);
     }
 
     public Player getBasePlayer() {

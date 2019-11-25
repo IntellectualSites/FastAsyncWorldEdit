@@ -2,11 +2,10 @@ package com.boydti.fawe.object.brush.visualization;
 
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.example.NullQueueIntFaweChunk;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
-
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -63,7 +62,7 @@ public class VisualExtent extends AbstractDelegateExtent {
         return false;
     }
 
-    public void clear(VisualExtent other, FawePlayer... players) {
+    public void clear(VisualExtent other, Player... players) {
         for (Long2ObjectMap.Entry<VisualChunk> entry : chunks.long2ObjectEntrySet()) {
             long pair = entry.getLongKey();
             int cx = MathMan.unpairIntX(pair);
@@ -92,7 +91,7 @@ public class VisualExtent extends AbstractDelegateExtent {
         }
     }
 
-    public void visualize(FawePlayer players) {
+    public void visualize(Player players) {
         for (VisualChunk chunk : chunks.values()) {
             queue.sendBlockUpdate(chunk, players);
         }

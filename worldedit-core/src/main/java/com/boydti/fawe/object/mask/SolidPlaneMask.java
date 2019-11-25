@@ -1,16 +1,10 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
-import javax.annotation.Nullable;
-
-/**
- * Restricts the
- */
 public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
 
     private transient int mode = -1;
@@ -34,13 +28,13 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
                 originZ = vector.getBlockZ();
                 mode = 0;
                 Extent extent = getExtent();
-                if (!extent.getBlockType(mutable.setComponents(originX - 1, originY, originZ)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX + 1, originY, originZ)).getMaterial().isAir()) {
+                if (!extent.getBlock(mutable.setComponents(originX - 1, originY, originZ)).getMaterial().isAir() && !extent.getBlock(mutable.setComponents(originX + 1, originY, originZ)).getMaterial().isAir()) {
                     mode &= 1;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY, originZ - 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY, originZ + 1)).getMaterial().isAir()) {
+                if (!extent.getBlock(mutable.setComponents(originX, originY, originZ - 1)).getMaterial().isAir() && !extent.getBlock(mutable.setComponents(originX, originY, originZ + 1)).getMaterial().isAir()) {
                     mode &= 4;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY - 1, originZ + 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY + 1, originZ + 1)).getMaterial().isAir()) {
+                if (!extent.getBlock(mutable.setComponents(originX, originY - 1, originZ + 1)).getMaterial().isAir() && !extent.getBlock(mutable.setComponents(originX, originY + 1, originZ + 1)).getMaterial().isAir()) {
                     mode &= 2;
                 }
                 if (Integer.bitCount(mode) >= 3) {

@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.IChunkCache;
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -31,6 +34,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -40,11 +44,12 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.Locale;
 
 /**
  * Represents a world (dimension).
  */
-public interface World extends Extent {
+public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
 
     /**
      * Get the name of the world.
@@ -67,7 +72,6 @@ public interface World extends Extent {
      *
      * @return the maximum Y
      */
-    @Override
     int getMaxY();
 
     /**
@@ -127,7 +131,13 @@ public interface World extends Extent {
      * @param position the position
      * @return the light level (0-15)
      */
-    int getBlockLightLevel(BlockVector3 position);
+    default int getBlockLightLevel(BlockVector3 position) {
+        if (this instanceof LightingExtent) {
+            LightingExtent extent = (LightingExtent) this;
+            return extent.getBlockLight(position.getX(), position.getY(), position.getZ());
+        }
+        return getBlock(position).getMaterial().getLightValue();
+    }
 
     /**
      * Clear a chest's contents.
@@ -271,5 +281,15 @@ public interface World extends Extent {
 
     @Override
     int hashCode();
+
+    @Override
+    default boolean isWorld() {
+        return true;
+    }
+
+    @Override
+    default String getId() {
+        return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
+    }
 
 }

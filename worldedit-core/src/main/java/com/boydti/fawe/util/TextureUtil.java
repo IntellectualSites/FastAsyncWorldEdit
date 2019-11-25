@@ -17,8 +17,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,50 +39,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.imageio.ImageIO;
 
 // TODO FIXME
 public class TextureUtil implements TextureHolder {
 
-    public static TextureUtil fromClipboard(Clipboard clipboard) throws FileNotFoundException {
-        boolean[] ids = new boolean[BlockTypes.size()];
-        for (BlockVector3 pt : clipboard.getRegion()) {
-            ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
-        }
-        HashSet<BlockType> blocks = new HashSet<>();
-        for (int typeId = 0; typeId < ids.length; typeId++) {
-            if (ids[typeId]) {
-                blocks.add(BlockTypes.get(typeId));
-            }
-        }
-        return fromBlocks(blocks);
-    }
-
-    public static TextureUtil fromBlocks(Set<BlockType> blocks) throws FileNotFoundException {
-        return new FilteredTextureUtil(Fawe.get().getTextureUtil(), blocks);
-    }
-
-    public static TextureUtil fromMask(Mask mask) throws FileNotFoundException {
-        HashSet<BlockType> blocks = new HashSet<>();
-
-        SingleFilterBlock extent = new SingleFilterBlock();
-        new MaskTraverser(mask).reset(extent);
-
-        TextureUtil tu = Fawe.get().getTextureUtil();
-        for (int typeId : tu.getValidBlockIds()) {
-            BlockType block = BlockTypes.get(typeId);
-            extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
-            if (mask.test(extent)) {
-                blocks.add(block);
-            }
-        }
-        return fromBlocks(blocks);
-    }
-
-    @Override public TextureUtil getTextureUtil() {
-        return this;
-    }
-
-    private final File folder;
     private static final int[] FACTORS = new int[766];
 
     static {
@@ -93,29 +52,27 @@ public class TextureUtil implements TextureHolder {
         }
     }
 
+    private final File folder;
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
     protected long[] distances;
     protected int[] validColors;
     protected int[] validBlockIds;
-
     protected int[] validLayerColors;
     protected int[][] validLayerBlocks;
-
     protected int[] validMixBiomeColors;
     protected long[] validMixBiomeIds;
-
     /**
      * https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp
      */
     protected BiomeColor[] validBiomes;
-    private BiomeColor[] biomes = new BiomeColor[] {
+    private BiomeColor[] biomes = new BiomeColor[]{
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
-        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 7842607),
         // default values of temp and rain
-        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 7842607),
+        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 7842607),
         new BiomeColor(3, "mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(4, "forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(5, "taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
@@ -140,7 +97,7 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(22, "jungle_hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(23, "jungle_edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(24, "deep_ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 9616729, 0x77AB2F),
         new BiomeColor(26, "snowy_beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(27, "birch_forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
         new BiomeColor(28, "birch_forest_hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
@@ -373,6 +330,7 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),};
+    private BlockType[] layerBuffer = new BlockType[2];
 
     public TextureUtil() throws FileNotFoundException {
         this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
@@ -384,6 +342,61 @@ public class TextureUtil implements TextureHolder {
             throw new FileNotFoundException(
                 "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
         }
+    }
+
+    public static TextureUtil fromClipboard(Clipboard clipboard) throws FileNotFoundException {
+        boolean[] ids = new boolean[BlockTypes.size()];
+        for (BlockVector3 pt : clipboard.getRegion()) {
+            ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
+        }
+        HashSet<BlockType> blocks = new HashSet<>();
+        for (int typeId = 0; typeId < ids.length; typeId++) {
+            if (ids[typeId]) {
+                blocks.add(BlockTypes.get(typeId));
+            }
+        }
+        return fromBlocks(blocks);
+    }
+
+    public static TextureUtil fromBlocks(Set<BlockType> blocks) throws FileNotFoundException {
+        return new FilteredTextureUtil(Fawe.get().getTextureUtil(), blocks);
+    }
+
+    public static TextureUtil fromMask(Mask mask) throws FileNotFoundException {
+        HashSet<BlockType> blocks = new HashSet<>();
+
+        SingleFilterBlock extent = new SingleFilterBlock();
+        new MaskTraverser(mask).reset(extent);
+
+        TextureUtil tu = Fawe.get().getTextureUtil();
+        for (int typeId : tu.getValidBlockIds()) {
+            BlockType block = BlockTypes.get(typeId);
+            extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
+            if (mask.test(extent)) {
+                blocks.add(block);
+            }
+        }
+        return fromBlocks(blocks);
+    }
+
+    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2,
+        int blue2) {
+        int total1 = (red1 + green1 + blue1);
+        int total2 = (red2 + green2 + blue2);
+        if (total1 == 0 || total2 == 0) {
+            return 0;
+        }
+        int factor1 = FACTORS[total1];
+        int factor2 = FACTORS[total2];
+        long r = (512 * (red1 * factor1 - red2 * factor2)) >> 10;
+        long g = (green1 * factor1 - green2 * factor2);
+        long b = (767 * (blue1 * factor1 - blue2 * factor2)) >> 10;
+        return (int) ((r * r + g * g + b * b) >> 25);
+    }
+
+    @Override
+    public TextureUtil getTextureUtil() {
+        return this;
     }
 
     public BlockType getNearestBlock(int color) {
@@ -439,8 +452,6 @@ public class TextureUtil implements TextureHolder {
         }
         return BlockTypes.get(closest);
     }
-
-    private BlockType[] layerBuffer = new BlockType[2];
 
     /**
      * Returns the block combined ids as an array
@@ -887,7 +898,7 @@ public class TextureUtil implements TextureHolder {
                     if (!hasAlpha(colorOther)) {
                         int combinedOther = validBlockIds[j];
                         int combinedColor = combineTransparency(color, colorOther);
-                        colorLayerMap.put(combinedColor, new int[] {combined, combinedOther});
+                        colorLayerMap.put(combinedColor, new int[]{combined, combinedOther});
                     }
                 }
             }
@@ -975,21 +986,6 @@ public class TextureUtil implements TextureHolder {
             * hd);
     }
 
-    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2,
-        int blue2) {
-        int total1 = (red1 + green1 + blue1);
-        int total2 = (red2 + green2 + blue2);
-        if (total1 == 0 || total2 == 0) {
-            return 0;
-        }
-        int factor1 = FACTORS[total1];
-        int factor2 = FACTORS[total2];
-        long r = (512 * (red1 * factor1 - red2 * factor2)) >> 10;
-        long g = (green1 * factor1 - green2 * factor2);
-        long b = (767 * (blue1 * factor1 - blue2 * factor2)) >> 10;
-        return (int) ((r * r + g * g + b * b) >> 25);
-    }
-
     public long getDistance(BufferedImage image, int c1) {
         long totalDistSqr = 0;
         int width = image.getWidth();
@@ -1008,7 +1004,12 @@ public class TextureUtil implements TextureHolder {
         return totalDistSqr / area;
     }
 
+    public int[] getValidBlockIds() {
+        return validBlockIds.clone();
+    }
+
     public static class BiomeColor {
+
         public int id;
         public String name;
         public float temperature;
@@ -1027,9 +1028,5 @@ public class TextureUtil implements TextureHolder {
             this.grassCombined = grass;
             this.foliage = foliage;
         }
-    }
-
-    public int[] getValidBlockIds() {
-        return validBlockIds.clone();
     }
 }

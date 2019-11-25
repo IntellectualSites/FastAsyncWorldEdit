@@ -6,15 +6,14 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
+import com.sk89q.worldedit.world.block.BlockState;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 
-public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap.HeightMap {
+public class ScalableHeightMap implements HeightMap {
     public int size2;
     public int size;
 
@@ -79,7 +78,7 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
             MutableBlockVector3 bv = new MutableBlockVector3(pos);
             for (int y = minY; y <= maxY; y++) {
                 bv.mutY(y);
-                BlockStateHolder block = clipboard.getBlock(bv);
+                BlockState block = clipboard.getBlock(bv);
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }
@@ -103,10 +102,10 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < length; z++) {
                 int pixel = heightFile.getRGB(x, z);
-                int red = (pixel >> 16) & 0xFF;
-                int green = (pixel >> 8) & 0xFF;
-                int blue = (pixel >> 0) & 0xFF;
-                int alpha = (pixel >> 24) & 0xFF;
+                int red = pixel >> 16 & 0xFF;
+                int green = pixel >> 8 & 0xFF;
+                int blue = pixel >> 0 & 0xFF;
+                int alpha = pixel >> 24 & 0xFF;
                 int intensity = (int) (alpha * ((red + green + blue) * third) * alphaInverse);
                 array[x][z] = (byte) intensity;
             }

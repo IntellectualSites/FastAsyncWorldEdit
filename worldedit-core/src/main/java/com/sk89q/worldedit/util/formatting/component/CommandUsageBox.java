@@ -19,90 +19,70 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
-import com.boydti.fawe.config.BBC;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.worldedit.extension.platform.CommandManager;
-import com.sk89q.worldedit.util.command.CommandCallable;
-import com.sk89q.worldedit.util.command.CommandMapping;
-import com.sk89q.worldedit.util.command.Description;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.PrimaryAliasComparator;
-import com.sk89q.worldedit.util.formatting.StyledFragment;
+import static com.sk89q.worldedit.internal.command.CommandUtil.getSubCommands;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import com.google.common.collect.Iterables;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import java.util.List;
+import javax.annotation.Nullable;
+import org.enginehub.piston.Command;
+import org.enginehub.piston.CommandParameters;
+import org.enginehub.piston.config.ColorConfig;
+import org.enginehub.piston.util.HelpGenerator;
 
 /**
  * A box to describe usage of a command.
  */
-public class CommandUsageBox extends StyledFragment {
+public class CommandUsageBox extends TextComponentProducer {
 
     /**
      * Create a new usage box.
      *
-     * @param command the command to describe
-     * @param commandString the command that was used, such as "/we" or "/brush sphere"
+     * @param commands the commands to describe
+     * @param commandString the commands that were used, such as "/we" or "/brush sphere"
+     * @param helpRootCommand the command used to get subcommand help
      */
-    public CommandUsageBox(CommandCallable command, String commandString) {
-        this(command, commandString, null);
+    public CommandUsageBox(List<Command> commands, String commandString, String helpRootCommand) throws InvalidComponentException {
+        this(commands, commandString, helpRootCommand, null);
     }
 
     /**
      * Create a new usage box.
      *
-     * @param command the command to describe
-     * @param commandString the command that was used, such as "/we" or "/brush sphere"
-     * @param locals list of locals to use
+     * @param commands the commands to describe
+     * @param commandString the commands that were used, such as "/we" or "/brush sphere"
+     * @param helpRootCommand the command used to get subcommand help
+     * @param parameters list of parameters to use
      */
-    public CommandUsageBox(CommandCallable command, String commandString, @Nullable CommandLocals locals) {
-        checkNotNull(command);
+    public CommandUsageBox(List<Command> commands, String commandString, String helpRootCommand,
+                           @Nullable CommandParameters parameters) throws InvalidComponentException {
+        checkNotNull(commands);
         checkNotNull(commandString);
-        if (command instanceof Dispatcher) {
-            attachDispatcherUsage((Dispatcher) command, commandString, locals);
-        } else {
-            attachCommandUsage(command.getDescription(), commandString);
-        }
+        checkNotNull(helpRootCommand);
+        attachCommandUsage(commands, commandString, helpRootCommand);
     }
 
-    private void attachDispatcherUsage(Dispatcher dispatcher, String commandString, @Nullable CommandLocals locals) {
-        CommandListBox box = new CommandListBox(BBC.HELP_HEADER_SUBCOMMANDS.f());
-        String prefix = !commandString.isEmpty() ? commandString + " " : "";
-
-        List<CommandMapping> list = new ArrayList<>(dispatcher.getCommands());
-        list.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
-
-        for (CommandMapping mapping : list) {
-            boolean perm = locals == null || mapping.getCallable().testPermission(locals);
-            box.appendCommand(prefix + mapping.getPrimaryAlias(), mapping.getDescription().getDescription(), perm);
+    private void attachCommandUsage(List<Command> commands, String commandString, String helpRootCommand) {
+        TextComponentProducer boxContent = new TextComponentProducer()
+            .append(HelpGenerator.create(commands).getFullHelp());
+        if (getSubCommands(Iterables.getLast(commands)).size() > 0) {
+            boxContent.append(TextComponent.newline())
+                .append(ColorConfig.helpText().wrap(TextComponent.builder("> ")
+                    .append(ColorConfig.mainText().wrap(TextComponent.builder("List Subcommands")
+                        .decoration(TextDecoration.ITALIC, true)
+                        .clickEvent(ClickEvent.runCommand(helpRootCommand + " -s " + commandString))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("List all subcommands of this command")))
+                        .build()))
+                    .build()));
         }
+        MessageBox box = new MessageBox("Help for " + commandString,
+            boxContent);
 
-        append(box);
-    }
-
-    private void attachCommandUsage(Description description, String commandString) {
-        MessageBox box = new MessageBox(BBC.HELP_HEADER_COMMAND.f(commandString));
-        StyledFragment contents = box.getContents();
-
-        if (description.getUsage() != null) {
-            contents.append(new Label().append(BBC.COMMAND_SYNTAX.f(description.getUsage())));
-        } else {
-            contents.append(new Subtle().append("Usage information is not available."));
-        }
-
-        contents.newLine();
-
-        if (description.getHelp() != null) {
-            contents.append(description.getHelp());
-        } else if (description.getDescription() != null) {
-            contents.append(description.getDescription());
-        } else {
-            contents.append(new Subtle().append("No further help is available."));
-        }
-
-        append(box);
+        append(box.create());
     }
 
 }

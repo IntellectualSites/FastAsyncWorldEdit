@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.object.HasFaweQueue;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.function.RegionFunction;
@@ -45,11 +44,7 @@ public class RecursiveVisitor extends BreadthFirstSearch {
      * @param function the function
      */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth) {
-        this(mask, function, maxDepth, null);
-    }
-
-    public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
-        super(function, maxDepth, faweQueue);
+        super(function, maxDepth);
         checkNotNull(mask);
         this.mask = mask;
     }

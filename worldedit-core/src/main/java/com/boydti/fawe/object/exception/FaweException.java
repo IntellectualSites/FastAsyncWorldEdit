@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.exception;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.extent.Extent;
 
 public class FaweException extends RuntimeException {
     public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
@@ -14,15 +15,33 @@ public class FaweException extends RuntimeException {
     public static final FaweException MAX_ENTITIES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ENTITIES);
     public static final FaweException MAX_TILES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
 
-    private final BBC message;
+    // DEBUG
+    public static final FaweException _enableQueue;
+    public static final FaweException _disableQueue;
+
+    static {
+        try {
+            _enableQueue = new FaweException(Extent.class.getDeclaredMethod("enableQueue").toString());
+            _disableQueue = new FaweException(Extent.class.getDeclaredMethod("disableQueue").toString());
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final String message;
+
+    public FaweException(String reason) {
+        this.message = reason;
+    }
 
     public FaweException(BBC reason) {
-        this.message = reason;
+        this(reason.format());
     }
 
     @Override
     public String getMessage() {
-        return message == null ? null : message.format();
+        return message;
     }
 
     public static FaweException get(Throwable e) {

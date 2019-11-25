@@ -7,14 +7,14 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
+import com.sk89q.worldedit.world.block.BlockState;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 
 public class PNGWriter implements ClipboardWriter {
 
@@ -38,7 +38,6 @@ public class PNGWriter implements ClipboardWriter {
         double d = Math.min((double) imageSize / length, (double) imageSize / width) / 3;
         double d_2 = d / 2;
         double cx = (double) imageSize / 2;
-        double cy = (double) imageSize / 2;
 
         int[] poly1X = new int[4];
         int[] poly1Y = new int[4];
@@ -51,9 +50,6 @@ public class PNGWriter implements ClipboardWriter {
         double[] dpxi = new double[Math.max(256, width)];
         double[] dpyj = new double[length];
         double[] dpyi = new double[Math.max(256, width)];
-        double[] hd = new double[256];
-        for (int i = 0; i < hd.length; i++) {
-        }
         for (int j = 0; j < dpxj.length; j++) {
             dpxj[j] = cx + j * d;
             dpyj[j] = imageSize / 2 + d + j * d_2;
@@ -96,7 +92,7 @@ public class PNGWriter implements ClipboardWriter {
                 double cpy2 = cpy1 + dpyj[zz];
                 for (int y = y0; y < y0 + height; y++) {
                     mutable.mutY(y);
-                    BlockStateHolder block = clipboard.getBlock(mutable);
+                    BlockState block = clipboard.getBlock(mutable);
                     if (block.getBlockType().getMaterial().isAir()) {
                         continue;
                     }
@@ -109,50 +105,47 @@ public class PNGWriter implements ClipboardWriter {
                         continue;
                     }
                     double cpy = cpy2 - dpxi[y - y0];
-                    poly1X[0] = (int) (cpx);
-                    poly1Y[0] = (int) (cpy);
+                    poly1X[0] = (int) cpx;
+                    poly1Y[0] = (int) cpy;
                     poly1X[1] = (int) (cpx - d);
                     poly1Y[1] = (int) (cpy - d_2);
-                    poly1X[2] = (int) (cpx);
+                    poly1X[2] = (int) cpx;
                     poly1Y[2] = (int) (cpy - d);
                     poly1X[3] = (int) (cpx + d);
                     poly1Y[3] = (int) (cpy - d_2);
 
-                    poly2X[0] = (int) (cpx);
-                    poly2Y[0] = (int) (cpy);
+                    poly2X[0] = (int) cpx;
+                    poly2Y[0] = (int) cpy;
                     poly2X[1] = (int) (cpx + d);
                     poly2Y[1] = (int) (cpy - d_2);
                     poly2X[2] = (int) (cpx + d);
                     poly2Y[2] = (int) (cpy + d_2 + dpxi[0]);
-                    poly2X[3] = (int) (cpx);
+                    poly2X[3] = (int) cpx;
                     poly2Y[3] = (int) (cpy + dpxi[1]);
 
-                    poly3X[0] = (int) (cpx);
-                    poly3Y[0] = (int) (cpy);
+                    poly3X[0] = (int) cpx;
+                    poly3Y[0] = (int) cpy;
                     poly3X[1] = (int) (cpx - d);
                     poly3Y[1] = (int) (cpy - d_2);
                     poly3X[2] = (int) (cpx - d);
                     poly3Y[2] = (int) (cpy + d_2 + dpxi[0]);
-                    poly3X[3] = (int) (cpx);
+                    poly3X[3] = (int) cpx;
                     poly3Y[3] = (int) (cpy + dpxi[1]);
 
                     Color colorTop = new Color(tu.getColor(block.getBlockType()));
-                    Color colorRight = colorTop;
-                    Color colorLeft = colorTop;
 
+                    g2.setColor(colorTop);
                     if (fill) {
-                        g2.setColor(colorTop);
                         g2.fillPolygon(poly1X, poly1Y, 4);
-                        g2.setColor(colorRight);
+                        g2.setColor(colorTop);
                         g2.fillPolygon(poly2X, poly2Y, 4);
-                        g2.setColor(colorLeft);
+                        g2.setColor(colorTop);
                         g2.fillPolygon(poly3X, poly3Y, 4);
                     } else {
-                        g2.setColor(colorTop);
                         g2.drawPolygon(poly1X, poly1Y, 4);
-                        g2.setColor(colorRight);
+                        g2.setColor(colorTop);
                         g2.drawPolygon(poly2X, poly2Y, 4);
-                        g2.setColor(colorLeft);
+                        g2.setColor(colorTop);
                         g2.drawPolygon(poly3X, poly3Y, 4);
                     }
                 }

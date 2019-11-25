@@ -1,12 +1,9 @@
 package com.github.luben.zstd;
 
-import java.io.InputStream;
+import com.github.luben.zstd.util.Native;
 import java.io.FilterInputStream;
 import java.io.IOException;
-import java.lang.IndexOutOfBoundsException;
-
-import com.github.luben.zstd.util.Native;
-import com.github.luben.zstd.Zstd;
+import java.io.InputStream;
 
 /**
  * InputStream filter that decompresses the data provided
@@ -42,16 +39,13 @@ public class ZstdInputStream extends FilterInputStream {
     private native int  initDStream(long stream);
     private native int  decompressStream(long stream, byte[] dst, int dst_size, byte[] src, int src_size);
 
-    // The main constuctor / legacy version dispatcher
+    // The main constructor / legacy version dispatcher
     public ZstdInputStream(InputStream inStream) throws IOException {
         // FilterInputStream constructor
         super(inStream);
 
         // allocate input buffer with max frame header size
         src = new byte[srcBuffSize];
-        if (src == null) {
-            throw new IOException("Error allocating the input buffer of size " + srcBuffSize);
-        }
         stream = createDStream();
         int size = initDStream(stream);
         if (Zstd.isError(size)) {
@@ -80,9 +74,9 @@ public class ZstdInputStream extends FilterInputStream {
             throw new IOException("Stream closed");
         }
 
-        // guard agains buffer overflows
+        // guard against buffer overflows
         if (offset < 0 || len > dst.length - offset) {
-            throw new IndexOutOfBoundsException("Requested lenght " + len
+            throw new IndexOutOfBoundsException("Requested length " + len
                     + " from offset " + offset + " in buffer of size " + dst.length);
         }
         int dstSize = offset + len;

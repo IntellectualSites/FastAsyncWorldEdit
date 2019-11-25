@@ -50,7 +50,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      * @param zipFile the ZIP file
      * @param folder the folder to look into
      * @throws IOException
-     * @throws ZipException 
+     * @throws ZipException
      */
     public TrueZipMcRegionChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -101,6 +101,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
                     // Check for file
                     if (pattern.matcher(testEntry.getName()).matches()) {
                         folder = testEntry.getName().substring(0, testEntry.getName().lastIndexOf('/'));
+                        if (folder.endsWith("poi")) continue;
                         name = folder + "/" + name;
                         break;
                     }
@@ -115,7 +116,14 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
 
         ZipEntry entry = getEntry(name);
         if (entry == null) {
-            throw new MissingChunkException();
+            if (name.endsWith(".mca")) { // try old mcr format
+                entry = getEntry(name.replace(".mca", ".mcr"));
+                if (entry == null) {
+                    throw new MissingChunkException();
+                }
+            } else {
+                throw new MissingChunkException();
+            }
         }
         try {
             return zip.getInputStream(entry);
@@ -126,7 +134,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
 
     /**
      * Get an entry from the ZIP, trying both types of slashes.
-     * 
+     *
      * @param file the file
      * @return an entry
      */
@@ -150,7 +158,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
 
             ZipEntry testEntry = e.nextElement();
 
-            if (testEntry.getName().matches(".*\\.mcr$") || testEntry.getName().matches(".*\\.mca$")) { // TODO: does this need a separate class?
+            if (testEntry.getName().matches(".*\\.mcr$") || testEntry.getName().matches(".*\\.mca$")) {
                 return true;
             }
         }

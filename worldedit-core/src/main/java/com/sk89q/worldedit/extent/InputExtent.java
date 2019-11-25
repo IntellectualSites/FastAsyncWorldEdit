@@ -27,7 +27,6 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 
 /**
  * Provides the current state of blocks, entities, and so on.
@@ -54,10 +53,6 @@ public interface InputExtent {
 
     default BlockState getBlock(int x, int y, int z) {
         return getBlock(MutableBlockVector3.get(x, y, z));
-    }
-
-    default BlockType getBlockType(BlockVector3 position) {
-        return getBlock(position).getBlockType();
     }
 
     /**

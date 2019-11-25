@@ -1,17 +1,10 @@
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,12 +17,12 @@ public class ScanChunk {
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
 
     static {
-        DEFAULT_DIRECTIONS[0] = (BlockVector3.at(0, -1, 0));
-        DEFAULT_DIRECTIONS[1] = (BlockVector3.at(0, 1, 0));
-        DEFAULT_DIRECTIONS[2] = (BlockVector3.at(-1, 0, 0));
-        DEFAULT_DIRECTIONS[3] = (BlockVector3.at(1, 0, 0));
-        DEFAULT_DIRECTIONS[4] = (BlockVector3.at(0, 0, -1));
-        DEFAULT_DIRECTIONS[5] = (BlockVector3.at(0, 0, 1));
+        DEFAULT_DIRECTIONS[0] = BlockVector3.at(0, -1, 0);
+        DEFAULT_DIRECTIONS[1] = BlockVector3.at(0, 1, 0);
+        DEFAULT_DIRECTIONS[2] = BlockVector3.at(-1, 0, 0);
+        DEFAULT_DIRECTIONS[3] = BlockVector3.at(1, 0, 0);
+        DEFAULT_DIRECTIONS[4] = BlockVector3.at(0, 0, -1);
+        DEFAULT_DIRECTIONS[5] = BlockVector3.at(0, 0, 1);
         List<BlockVector3> list = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
@@ -43,13 +36,8 @@ public class ScanChunk {
                 }
             }
         }
-        Collections.sort(list, new Comparator<BlockVector3>() {
-            @Override
-            public int compare(BlockVector3 o1, BlockVector3 o2) {
-                return (int) Math.signum(o1.lengthSq() - o2.lengthSq());
-            }
-        });
-        DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[list.size()]);
+        list.sort((o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
+        DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[0]);
     }
 
     private final RegionFunction function;
@@ -57,7 +45,7 @@ public class ScanChunk {
     private final Long2ObjectOpenHashMap<long[][]> visits;
     private final Long2ObjectOpenHashMap<char[][]> queues;
 
-    public ScanChunk(final RegionFunction function) {
+    public ScanChunk(RegionFunction function) {
         this.function = function;
         this.directions = DEFAULT_DIRECTIONS;
 
@@ -65,8 +53,8 @@ public class ScanChunk {
         this.visits = new Long2ObjectOpenHashMap<>();
     }
 
-    public static final long pairInt(int x, int y) {
-        return (((long) x) << 32) | (y & 0xffffffffL);
+    public static long pairInt(int x, int y) {
+        return (long) x << 32 | y & 0xffffffffL;
     }
 
     public boolean isVisited(int x, int y, int z) {
@@ -180,7 +168,7 @@ public class ScanChunk {
 
             char triple = queue[index];
             int x = index & 15;
-            int z = (index >> 4) & 15;
+            int z = index >> 4 & 15;
             int y = index >> 8;
 
             int absX = xx + x;
@@ -249,7 +237,7 @@ public class ScanChunk {
 
                     char triple = queue[index];
                     int x = index & 15;
-                    int z = (index >> 4) & 15;
+                    int z = index >> 4 & 15;
                     int y = index >> 8;
                 }
                 queuePool.add(queue);
@@ -327,11 +315,11 @@ public class ScanChunk {
     }
 
     public void set(long[] bits, int i) {
-        bits[i >> 6] |= (1L << (i & 0x3F));
+        bits[i >> 6] |= 1L << (i & 0x3F);
     }
 
-    public boolean get(long[] bits, final int i) {
-        return (bits[i >> 6] & (1L << (i & 0x3F))) != 0;
+    public boolean get(long[] bits, int i) {
+        return (bits[i >> 6] & 1L << (i & 0x3F)) != 0;
     }
 
     public char getLocalIndex(int x, int y, int z) {

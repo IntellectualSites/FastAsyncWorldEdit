@@ -5,7 +5,6 @@ import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -19,7 +18,6 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
@@ -53,13 +51,11 @@ public class StencilBrush extends HeightBrush {
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final AdjacentAnyMask adjacent = new AdjacentAnyMask(Masks.negate(solid));
 
-
-        Player player = editSession.getPlayer().getPlayer();
         // BlockVector3 pos = player.getLocation();
 
 
 
-        Location loc = editSession.getPlayer().getPlayer().getLocation();
+        Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
@@ -93,13 +89,10 @@ public class StencilBrush extends HeightBrush {
                 }
                 return false;
             }
-        }, vector -> true, Integer.MAX_VALUE, editSession);
+        }, vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
     }
 
-    private void apply(double val) {
-
-    }
 }

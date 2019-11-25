@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.LayerFunction;
@@ -79,8 +80,16 @@ public class Naturalizer implements LayerFunction {
     }
 
     private boolean naturalize(BlockVector3 position, int depth) throws WorldEditException {
-        return editSession.setBlock(position, getTargetBlock(depth));
+        BlockState block = editSession.getBlock(position);
+        BlockState targetBlock = getTargetBlock(depth);
+
+        if (block.equalsFuzzy(targetBlock)) {
+            return false;
+        }
+
+        return editSession.setBlock(position, targetBlock);
     }
+
     @Override
     public boolean apply(BlockVector3 position, int depth) throws WorldEditException {
         if (mask.test(position)) {

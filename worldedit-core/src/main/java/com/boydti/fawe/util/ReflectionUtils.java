@@ -168,73 +168,73 @@ public class ReflectionUtils {
         }
     }
 
-    public static Object getHandle(final Object wrapper) {
+    public static Object getHandle(Object wrapper) {
         final Method getHandle = makeMethod(wrapper.getClass(), "getHandle");
         return callMethod(getHandle, wrapper);
     }
 
     //Utils
-    public static Method makeMethod(final Class<?> clazz, final String methodName, final Class<?>... parameters) {
+    public static Method makeMethod(Class<?> clazz, String methodName, Class<?>... parameters) {
         try {
             return clazz.getDeclaredMethod(methodName, parameters);
-        } catch (final NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             return null;
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T callMethod(final Method method, final Object instance, final Object... parameters) {
+    public static <T> T callMethod(Method method, Object instance, Object... parameters) {
         if (method == null) {
             throw new RuntimeException("No such method");
         }
         method.setAccessible(true);
         try {
             return (T) method.invoke(instance, parameters);
-        } catch (final InvocationTargetException ex) {
+        } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Constructor<T> makeConstructor(final Class<?> clazz, final Class<?>... parameterTypes) {
+    public static <T> Constructor<T> makeConstructor(Class<?> clazz, Class<?>... parameterTypes) {
         try {
             return (Constructor<T>) clazz.getConstructor(parameterTypes);
-        } catch (final NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             return null;
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static <T> T callConstructor(final Constructor<T> constructor, final Object... paramaters) {
+    public static <T> T callConstructor(Constructor<T> constructor, Object... paramaters) {
         if (constructor == null) {
             throw new RuntimeException("No such constructor");
         }
         constructor.setAccessible(true);
         try {
             return constructor.newInstance(paramaters);
-        } catch (final InvocationTargetException ex) {
+        } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static Field makeField(final Class<?> clazz, final String name) {
+    public static Field makeField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
-        } catch (final NoSuchFieldException ex) {
+        } catch (NoSuchFieldException ex) {
             return null;
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static Field findField(final Class<?> clazz, final Class<?> type, int hasMods, int noMods) {
+    public static Field findField(Class<?> clazz, Class<?> type, int hasMods, int noMods) {
         for (Field field : clazz.getDeclaredFields()) {
             if (type == null || type.isAssignableFrom(field.getType())) {
                 int mods = field.getModifiers();
@@ -246,7 +246,7 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static Field findField(final Class<?> clazz, final Class<?> type) {
+    public static Field findField(Class<?> clazz, Class<?> type) {
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getType() == type) {
                 return setAccessible(field);
@@ -255,11 +255,11 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static Method findMethod(final Class<?> clazz, final Class<?> returnType, Class... params) {
+    public static Method findMethod(Class<?> clazz, Class<?> returnType, Class... params) {
         return findMethod(clazz, 0, returnType, params);
     }
 
-    public static Method findMethod(final Class<?> clazz, int index, int hasMods, int noMods, final Class<?> returnType, Class... params) {
+    public static Method findMethod(Class<?> clazz, int index, int hasMods, int noMods, Class<?> returnType, Class... params) {
         outer:
         for (Method method : sortMethods(clazz.getDeclaredMethods())) {
             if (returnType == null || method.getReturnType() == returnType) {
@@ -296,49 +296,49 @@ public class ReflectionUtils {
         return fields;
     }
 
-    public static Method findMethod(final Class<?> clazz, int index, final Class<?> returnType, Class... params) {
+    public static Method findMethod(Class<?> clazz, int index, Class<?> returnType, Class... params) {
         return findMethod(clazz, index, 0, 0, returnType, params);
     }
 
-    public static <T extends AccessibleObject> T setAccessible(final T ao) {
+    public static <T extends AccessibleObject> T setAccessible(T ao) {
         ao.setAccessible(true);
         return ao;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(final Field field, final Object instance) {
+    public static <T> T getField(Field field, Object instance) {
         if (field == null) {
             throw new RuntimeException("No such field");
         }
         field.setAccessible(true);
         try {
             return (T) field.get(instance);
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static void setField(final Field field, final Object instance, final Object value) {
+    public static void setField(Field field, Object instance, Object value) {
         if (field == null) {
             throw new RuntimeException("No such field");
         }
         field.setAccessible(true);
         try {
             field.set(instance, value);
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static Class<?> getClass(final String name) {
+    public static Class<?> getClass(String name) {
         try {
             return Class.forName(name);
-        } catch (final ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             return null;
         }
     }
 
-    public static <T> Class<? extends T> getClass(final String name, final Class<T> superClass) {
+    public static <T> Class<? extends T> getClass(String name, Class<T> superClass) {
         try {
             return Class.forName(name).asSubclass(superClass);
         } catch (ClassCastException | ClassNotFoundException ex) {
@@ -353,7 +353,7 @@ public class ReflectionUtils {
      * @param clazz class
      * @return RefClass based on passed class
      */
-    public static RefClass getRefClass(final Class clazz) {
+    public static RefClass getRefClass(Class clazz) {
         return new RefClass(clazz);
     }
 
@@ -363,7 +363,7 @@ public class ReflectionUtils {
     public static class RefClass {
         private final Class<?> clazz;
 
-        private RefClass(final Class<?> clazz) {
+        private RefClass(Class<?> clazz) {
             this.clazz = clazz;
         }
 
@@ -382,7 +382,7 @@ public class ReflectionUtils {
          * @param object the object to check
          * @return true if object is an instance of this class
          */
-        public boolean isInstance(final Object object) {
+        public boolean isInstance(Object object) {
             return this.clazz.isInstance(object);
         }
 
@@ -394,11 +394,11 @@ public class ReflectionUtils {
          * @return RefMethod object
          * @throws RuntimeException if method not found
          */
-        public RefMethod getMethod(final String name, final Object... types) throws NoSuchMethodException {
+        public RefMethod getMethod(String name, Object... types) throws NoSuchMethodException {
             try {
                 final Class[] classes = new Class[types.length];
                 int i = 0;
-                for (final Object e : types) {
+                for (Object e : types) {
                     if (e instanceof Class) {
                         classes[i++] = (Class) e;
                     } else if (e instanceof RefClass) {
@@ -409,10 +409,10 @@ public class ReflectionUtils {
                 }
                 try {
                     return new RefMethod(this.clazz.getMethod(name, classes));
-                } catch (final NoSuchMethodException ignored) {
+                } catch (NoSuchMethodException ignored) {
                     return new RefMethod(this.clazz.getDeclaredMethod(name, classes));
                 }
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -424,11 +424,11 @@ public class ReflectionUtils {
          * @return RefMethod object
          * @throws RuntimeException if constructor not found
          */
-        public RefConstructor getConstructor(final Object... types) {
+        public RefConstructor getConstructor(Object... types) {
             try {
                 final Class[] classes = new Class[types.length];
                 int i = 0;
-                for (final Object e : types) {
+                for (Object e : types) {
                     if (e instanceof Class) {
                         classes[i++] = (Class) e;
                     } else if (e instanceof RefClass) {
@@ -439,10 +439,10 @@ public class ReflectionUtils {
                 }
                 try {
                     return new RefConstructor(this.clazz.getConstructor(classes));
-                } catch (final NoSuchMethodException ignored) {
+                } catch (NoSuchMethodException ignored) {
                     return new RefConstructor(this.clazz.getDeclaredConstructor(classes));
                 }
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -454,10 +454,10 @@ public class ReflectionUtils {
          * @return RefMethod object
          * @throws RuntimeException if method not found
          */
-        public RefMethod findMethod(final Object... types) {
+        public RefMethod findMethod(Object... types) {
             final Class[] classes = new Class[types.length];
             int t = 0;
-            for (final Object e : types) {
+            for (Object e : types) {
                 if (e instanceof Class) {
                     classes[t++] = (Class) e;
                 } else if (e instanceof RefClass) {
@@ -470,12 +470,12 @@ public class ReflectionUtils {
             Collections.addAll(methods, this.clazz.getMethods());
             Collections.addAll(methods, this.clazz.getDeclaredMethods());
             findMethod:
-            for (final Method m : methods) {
+            for (Method m : methods) {
                 final Class<?>[] methodTypes = m.getParameterTypes();
                 if (methodTypes.length != classes.length) {
                     continue;
                 }
-                for (final Class aClass : classes) {
+                for (Class aClass : classes) {
                     if (!Arrays.equals(classes, methodTypes)) {
                         continue findMethod;
                     }
@@ -492,12 +492,12 @@ public class ReflectionUtils {
          * @return RefMethod object
          * @throws RuntimeException if method not found
          */
-        public RefMethod findMethodByName(final String... names) {
+        public RefMethod findMethodByName(String... names) {
             final List<Method> methods = new ArrayList<>();
             Collections.addAll(methods, this.clazz.getMethods());
             Collections.addAll(methods, this.clazz.getDeclaredMethods());
-            for (final Method m : methods) {
-                for (final String name : names) {
+            for (Method m : methods) {
+                for (String name : names) {
                     if (m.getName().equals(name)) {
                         return new RefMethod(m);
                     }
@@ -513,7 +513,7 @@ public class ReflectionUtils {
          * @return RefMethod
          * @throws RuntimeException if method not found
          */
-        public RefMethod findMethodByReturnType(final RefClass type) {
+        public RefMethod findMethodByReturnType(RefClass type) {
             return this.findMethodByReturnType(type.clazz);
         }
 
@@ -531,7 +531,7 @@ public class ReflectionUtils {
             final List<Method> methods = new ArrayList<>();
             Collections.addAll(methods, this.clazz.getMethods());
             Collections.addAll(methods, this.clazz.getDeclaredMethods());
-            for (final Method m : methods) {
+            for (Method m : methods) {
                 if (type.equals(m.getReturnType())) {
                     return new RefMethod(m);
                 }
@@ -546,11 +546,11 @@ public class ReflectionUtils {
          * @return RefConstructor
          * @throws RuntimeException if constructor not found
          */
-        public RefConstructor findConstructor(final int number) {
+        public RefConstructor findConstructor(int number) {
             final List<Constructor> constructors = new ArrayList<>();
             Collections.addAll(constructors, this.clazz.getConstructors());
             Collections.addAll(constructors, this.clazz.getDeclaredConstructors());
-            for (final Constructor m : constructors) {
+            for (Constructor m : constructors) {
                 if (m.getParameterTypes().length == number) {
                     return new RefConstructor(m);
                 }
@@ -565,31 +565,31 @@ public class ReflectionUtils {
          * @return RefField
          * @throws RuntimeException if field not found
          */
-        public RefField getField(final String name) {
+        public RefField getField(String name) {
             try {
                 try {
                     return new RefField(this.clazz.getField(name));
-                } catch (final NoSuchFieldException ignored) {
+                } catch (NoSuchFieldException ignored) {
                     return new RefField(this.clazz.getDeclaredField(name));
                 }
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         /**
-         * find field by type
+         * Find the field by type.
          *
          * @param type field type
          * @return RefField
          * @throws RuntimeException if field not found
          */
-        public RefField findField(final RefClass type) {
+        public RefField findField(RefClass type) {
             return this.findField(type.clazz);
         }
 
         /**
-         * find field by type
+         * Find the field by type.
          *
          * @param type field type
          * @return RefField
@@ -602,7 +602,7 @@ public class ReflectionUtils {
             final List<Field> fields = new ArrayList<>();
             Collections.addAll(fields, this.clazz.getFields());
             Collections.addAll(fields, this.clazz.getDeclaredFields());
-            for (final Field f : fields) {
+            for (Field f : fields) {
                 if (type.equals(f.getType())) {
                     return new RefField(f);
                 }
@@ -612,12 +612,12 @@ public class ReflectionUtils {
     }
 
     /**
-     * Method wrapper
+     * Method wrapper.
      */
     public static class RefMethod {
         private final Method method;
 
-        private RefMethod(final Method method) {
+        private RefMethod(Method method) {
             this.method = method;
             method.setAccessible(true);
         }
@@ -644,25 +644,25 @@ public class ReflectionUtils {
         }
 
         /**
-         * apply method to object
+         * Apply method to object.
          *
          * @param e object to which the method is applied
          * @return RefExecutor with method call(...)
          */
-        public RefExecutor of(final Object e) {
+        public RefExecutor of(Object e) {
             return new RefExecutor(e);
         }
 
         /**
-         * call static method
+         * Calls static method.
          *
          * @param params sent parameters
          * @return return value
          */
-        public Object call(final Object... params) {
+        public Object call(Object... params) {
             try {
                 return this.method.invoke(null, params);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -670,7 +670,7 @@ public class ReflectionUtils {
         public class RefExecutor {
             final Object e;
 
-            public RefExecutor(final Object e) {
+            public RefExecutor(Object e) {
                 this.e = e;
             }
 
@@ -681,10 +681,10 @@ public class ReflectionUtils {
              * @return return value
              * @throws RuntimeException if something went wrong
              */
-            public Object call(final Object... params) {
+            public Object call(Object... params) {
                 try {
                     return RefMethod.this.method.invoke(this.e, params);
-                } catch (final Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -697,7 +697,7 @@ public class ReflectionUtils {
     public static class RefConstructor {
         private final Constructor constructor;
 
-        private RefConstructor(final Constructor constructor) {
+        private RefConstructor(Constructor constructor) {
             this.constructor = constructor;
             constructor.setAccessible(true);
         }
@@ -717,16 +717,16 @@ public class ReflectionUtils {
         }
 
         /**
-         * create new instance with constructor
+         * Creates a new instance with constructor
          *
          * @param params parameters for constructor
          * @return new object
          * @throws RuntimeException if something went wrong
          */
-        public Object create(final Object... params) {
+        public Object create(Object... params) {
             try {
                 return this.constructor.newInstance(params);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -735,7 +735,7 @@ public class ReflectionUtils {
     public static class RefField {
         private final Field field;
 
-        private RefField(final Field field) {
+        private RefField(Field field) {
             this.field = field;
             field.setAccessible(true);
         }
@@ -767,14 +767,14 @@ public class ReflectionUtils {
          * @param e applied object
          * @return RefExecutor with getter and setter
          */
-        public RefExecutor of(final Object e) {
+        public RefExecutor of(Object e) {
             return new RefExecutor(e);
         }
 
         public class RefExecutor {
             final Object e;
 
-            public RefExecutor(final Object e) {
+            public RefExecutor(Object e) {
                 this.e = e;
             }
 
@@ -783,10 +783,10 @@ public class ReflectionUtils {
              *
              * @param param value
              */
-            public void set(final Object param) {
+            public void set(Object param) {
                 try {
                     RefField.this.field.set(this.e, param);
-                } catch (final Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -799,7 +799,7 @@ public class ReflectionUtils {
             public Object get() {
                 try {
                     return RefField.this.field.get(this.e);
-                } catch (final Exception e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }

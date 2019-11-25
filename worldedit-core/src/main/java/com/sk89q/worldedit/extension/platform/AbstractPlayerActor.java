@@ -19,19 +19,37 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.NotABlockException;
+import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
+import com.boydti.fawe.regions.FaweMaskManager;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CylinderRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -43,8 +61,10 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
 import java.io.File;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -52,6 +72,27 @@ import java.io.File;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
+
+    private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
+
+    // Queue for async tasks
+    private AtomicInteger runningCount = new AtomicInteger();
+    private SimpleAsyncNotifyQueue asyncNotifyQueue = new SimpleAsyncNotifyQueue(
+        (thread, throwable) -> {
+            while (throwable.getCause() != null) {
+                throwable = throwable.getCause();
+            }
+            if (throwable instanceof WorldEditException) {
+                printError(throwable.getLocalizedMessage());
+            } else {
+                FaweException fe = FaweException.get(throwable);
+                if (fe != null) {
+                    printError(fe.getMessage());
+                } else {
+                    throwable.printStackTrace();
+                }
+            }
+        });
 
     @Override
     public final Extent getExtent() {
@@ -92,10 +133,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean isHoldingPickAxe() {
         ItemType item = getItemInHand(HandSide.MAIN_HAND).getType();
         return item == ItemTypes.IRON_PICKAXE
-                || item == ItemTypes.WOODEN_PICKAXE
-                || item == ItemTypes.STONE_PICKAXE
-                || item == ItemTypes.DIAMOND_PICKAXE
-                || item == ItemTypes.GOLDEN_PICKAXE;
+            || item == ItemTypes.WOODEN_PICKAXE
+            || item == ItemTypes.STONE_PICKAXE
+            || item == ItemTypes.DIAMOND_PICKAXE
+            || item == ItemTypes.GOLDEN_PICKAXE;
     }
 
     @Override
@@ -107,9 +148,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         byte free = 0;
 
-        BlockVector3 mutablePos = MutableBlockVector3.at(0, 0, 0);
+        BlockVector3 mutablePos = MutableBlockVector3.ZERO;
         while (y <= world.getMaximumPoint().getBlockY() + 2) {
-            if (!world.getBlock(mutablePos.setComponents(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (!world.getBlock(mutablePos.setComponents(x, y, z)).getBlockType().getMaterial()
+                .isMovementBlocker()) {
                 ++free;
             } else {
                 free = 0;
@@ -117,8 +159,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
             if (free == 2) {
                 final BlockVector3 pos = mutablePos.setComponents(x, y - 2, z);
-                final BlockStateHolder state = world.getBlock(pos);
-                setPosition(new Location(world, Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
+                final BlockState state = world.getBlock(pos);
+                setPosition(new Location(world,
+                    Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
                 return;
             }
 
@@ -137,7 +180,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             final BlockVector3 pos = BlockVector3.at(x, y, z);
             final BlockState id = world.getBlock(pos);
             if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(new Location(world, Vector3.at(x + 0.5, y + + BlockTypeUtil.centralTopLimit(id), z + 0.5)));
+                setPosition(new Location(world,
+                    Vector3.at(x + 0.5, y + +BlockTypeUtil.centralTopLimit(id), z + 0.5)));
                 return;
             }
 
@@ -147,21 +191,23 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void findFreePosition() {
-        findFreePosition(getBlockIn());
+        findFreePosition(getBlockLocation());
     }
 
     @Override
     public boolean ascendLevel() {
-        final Location pos = getBlockIn();
+        final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
         int y = Math.max(0, pos.getBlockY());
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
         int maxY = world.getMaxY();
-        if (y >= maxY) return false;
+        if (y >= maxY) {
+            return false;
+        }
 
-        BlockMaterial initialMaterial = world.getBlockType(BlockVector3.at(x, y, z)).getMaterial();
+        BlockMaterial initialMaterial = world.getBlock(BlockVector3.at(x, y, z)).getMaterial();
 
         boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
@@ -170,8 +216,11 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         for (int level = y + 1; level <= maxY + 2; level++) {
             BlockState state;
-            if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
-            else state = world.getBlock(BlockVector3.at(x, level, z));
+            if (level >= maxY) {
+                state = BlockTypes.VOID_AIR.getDefaultState();
+            } else {
+                state = world.getBlock(BlockVector3.at(x, level, z));
+            }
             BlockType type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
@@ -199,31 +248,36 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 lastState = true;
             }
         }
+
         return false;
     }
 
     @Override
     public boolean descendLevel() {
-        final Location pos = getBlockIn();
+        final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
         int y = Math.max(0, pos.getBlockY());
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
-        BlockMaterial initialMaterial = world.getBlockType(BlockVector3.at(x, y, z)).getMaterial();
+        BlockMaterial initialMaterial = world.getBlock(BlockVector3.at(x, y, z)).getMaterial();
 
         boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
-        double height = 1.85;
-        double freeEnd = -1;
-
         int maxY = world.getMaxY();
-        if (y <= 2) return false;
+        if (y <= 2) {
+            return false;
+        }
 
+        double freeEnd = -1;
+        double height = 1.85;
         for (int level = y + 1; level > 0; level--) {
             BlockState state;
-            if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
-            else state = world.getBlock(BlockVector3.at(x, level, z));
+            if (level >= maxY) {
+                state = BlockTypes.VOID_AIR.getDefaultState();
+            } else {
+                state = world.getBlock(BlockVector3.at(x, level, z));
+            }
             BlockType type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
@@ -252,6 +306,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 freeEnd = -1;
             }
         }
+
         return false;
     }
 
@@ -262,7 +317,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
-        Location pos = getBlockIn();
+        Location pos = getBlockLocation();
         int x = pos.getBlockX();
         int initialY = Math.max(0, pos.getBlockY());
         int y = Math.max(0, pos.getBlockY() + 2);
@@ -276,8 +331,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+                .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
+                if (platformY < initialY) { // if ==, they already have the given clearance, if <, clearance is too large
+                    printError("Not enough space above you!");
+                    return false;
+                } else if (platformY == initialY) {
+                    printError("You're already at the ceiling.");
+                    return false;
+                }
                 floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
             }
@@ -295,7 +358,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
-        final Location pos = getBlockIn();
+        final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
         final int initialY = Math.max(0, pos.getBlockY());
         int y = Math.max(0, pos.getBlockY() + 1);
@@ -304,7 +367,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         final Extent world = getLocation().getExtent();
 
         while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+                .isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;
@@ -321,36 +385,69 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
-        try {
+        if (alwaysGlass || !isAllowedToFly()) {
             BlockVector3 spot = BlockVector3.at(x, y - 1, z);
-            if (!getLocation().getExtent().getBlock(spot).getBlockType().getMaterial().isMovementBlocker()) {
-                getLocation().getExtent().setBlock(spot, BlockTypes.GLASS.getDefaultState());
+            final World world = getWorld();
+            if (!world.getBlock(spot).getBlockType().getMaterial().isMovementBlocker()) {
+                try (EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, 1, this)) {
+                    session.setBlock(spot, BlockTypes.GLASS.getDefaultState());
+                } catch (MaxChangedBlocksException ignored) {
             }
-        } catch (WorldEditException e) {
-            e.printStackTrace();
+            }
+        } else {
+            setFlying(true);
         }
         setPosition(Vector3.at(x + 0.5, y, z + 0.5));
     }
 
-    @Override
-    public Location getBlockIn() {
-        return getLocation().setPosition(getLocation().toVector().floor());
+    /**
+     * Check whether the player is allowed to fly.
+     *
+     * @return true if allowed flight
+     */
+    protected boolean isAllowedToFly() {
+        return false;
+    }
+
+    /**
+     * Set whether the player is currently flying.
+     *
+     * @param flying true to fly
+     */
+    protected void setFlying(boolean flying) {
     }
 
     @Override
     public Location getBlockOn() {
-        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).toVector().floor());
+        final Location location = getLocation();
+        return location.setPosition(location.setY(location.getY() - 1).toVector().floor());
     }
 
     @Override
     public Location getBlockTrace(int range, boolean useLastBlock) {
-        TargetBlock tb = new TargetBlock(this, range, 0.2);
-        return (useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock());
+        return getBlockTrace(range, useLastBlock, null);
     }
 
     @Override
     public Location getBlockTraceFace(int range, boolean useLastBlock) {
+        return getBlockTraceFace(range, useLastBlock, null);
+    }
+
+    @Override
+    public Location getBlockTrace(int range, boolean useLastBlock, @Nullable Mask stopMask) {
         TargetBlock tb = new TargetBlock(this, range, 0.2);
+        if (stopMask != null) {
+            tb.setStopMask(stopMask);
+        }
+        return (useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock());
+    }
+
+    @Override
+    public Location getBlockTraceFace(int range, boolean useLastBlock, @Nullable Mask stopMask) {
+        TargetBlock tb = new TargetBlock(this, range, 0.2);
+        if (stopMask != null) {
+            tb.setStopMask(stopMask);
+        }
         return (useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace());
     }
 
@@ -372,15 +469,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Direction getCardinalDirection(int yawOffset) {
-        if (getLocation().getPitch() > 67.5) {
+        final Location location = getLocation();
+        if (location.getPitch() > 67.5) {
             return Direction.DOWN;
         }
-        if (getLocation().getPitch() < -67.5) {
+        if (location.getPitch() < -67.5) {
             return Direction.UP;
         }
 
         // From hey0's code
-        double rot = (getLocation().getYaw() + yawOffset) % 360; //let's use real yaw now
+        double rot = (location.getYaw() + yawOffset) % 360; //let's use real yaw now
         if (rot < 0) {
             rot += 360.0;
         }
@@ -393,63 +491,78 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (typeId.hasBlockType()) {
             return typeId.getBlockType().getDefaultState().toBaseBlock();
         } else {
-            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock(); // FAWE returns air here
+            /*
+            throw new NotABlockException();
+            */
         }
     }
 
+    private boolean canPassThroughBlock(Location curBlock) {
+        BlockVector3 blockPos = curBlock.toVector().toBlockPoint();
+        BlockState block = curBlock.getExtent().getBlock(blockPos);
+        return !block.getBlockType().getMaterial().isMovementBlocker();
+    }
+
     /**
-     * Get the player's view yaw.
-     *
-     * @return yaw
+     * Advances the block target block until the current block is a wall
+     * @return true if a wall is found
      */
-
-    @Override
-    public boolean passThroughForwardWall(int range) {
-        int searchDist = 0;
-        TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
-        Extent world = getLocation().getExtent();
-        Location block;
-        boolean firstBlock = true;
-        int freeToFind = 2;
-        boolean inFree = false;
-
-        while ((block = hitBlox.getNextBlock()) != null) {
-            boolean free = !world.getBlock(block.toVector().toBlockPoint()).getBlockType().getMaterial().isMovementBlocker();
-
-            if (firstBlock) {
-                firstBlock = false;
-
-                if (!free) {
-                    --freeToFind;
-                    continue;
-                }
-            }
-
-            ++searchDist;
-            if (searchDist > 20) {
-                return false;
-            }
-
-            if (inFree != free) {
-                if (free) {
-                    --freeToFind;
-                }
-            }
-
-            if (freeToFind == 0) {
-                setOnGround(block);
+    private boolean advanceToWall(TargetBlock hitBlox) {
+        Location curBlock;
+        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
+            if (!canPassThroughBlock(curBlock)) {
                 return true;
             }
 
-            inFree = free;
+            hitBlox.getNextBlock();
+        }
+
+        return false;
+    }
+    /**
+     * Advances the block target block until the current block is a free
+     * @return true if a free spot is found
+     */
+    private boolean advanceToFree(TargetBlock hitBlox) {
+        Location curBlock;
+        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
+            if (canPassThroughBlock(curBlock)) {
+                return true;
+            }
+
+            hitBlox.getNextBlock();
         }
 
         return false;
     }
 
     @Override
+    public boolean passThroughForwardWall(int range) {
+        TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
+
+        if (!advanceToWall(hitBlox)) {
+                return false;
+            }
+
+        if (!advanceToFree(hitBlox)) {
+            return false;
+            }
+
+        Location foundBlock = hitBlox.getCurrentBlock();
+        if (foundBlock != null) {
+            setOnGround(foundBlock);
+                return true;
+            }
+
+
+        return false;
+    }
+
+    @Override
     public void setPosition(Vector3 pos) {
-        setPosition(pos, getLocation().getPitch(), getLocation().getYaw());
+        final Location location = getLocation();
+        setPosition(pos, location.getPitch(), location.getYaw());
     }
 
     @Override
@@ -524,4 +637,127 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
     }
+
+    /**
+     * Set some session only metadata for the player
+     *
+     * @param key
+     * @param value
+     * @return previous value
+     */
+    public final void setMeta(String key, Object value) {
+        this.meta.put(key, value);
+    }
+
+    public final <T> T getAndSetMeta(String key, T value) {
+        return (T) this.meta.put(key, value);
+    }
+
+    public final boolean hasMeta() {
+        return !meta.isEmpty();
+    }
+
+    /**
+     * Get the metadata for a key.
+     *
+     * @param <V>
+     * @param key
+     * @return
+     */
+    public final <V> V getMeta(String key) {
+        return (V) this.meta.get(key);
+    }
+
+
+    /**
+     * Delete the metadata for a key.
+     * - metadata is session only
+     * - deleting other plugin's metadata may cause issues
+     *
+     * @param key
+     */
+    public final <V> V deleteMeta(String key) {
+        return (V) this.meta.remove(key);
+    }
+
+    /**
+     * Run a task either async, or on the current thread
+     *
+     * @param ifFree
+     * @param checkFree Whether to first check if a task is running
+     * @param async
+     * @return false if the task was ran or queued
+     */
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
+        if (checkFree) {
+            if (runningCount.get() != 0) {
+                return false;
+            }
+        }
+        Runnable wrapped = () -> {
+            try {
+                runningCount.addAndGet(1);
+                ifFree.run();
+            } finally {
+                runningCount.decrementAndGet();
+            }
+        };
+        if (async) {
+            asyncNotifyQueue.queue(wrapped);
+        } else {
+            TaskManager.IMP.taskNow(wrapped, false);
+        }
+        return true;
+    }
+
+    /**
+     * Get the player's current allowed WorldEdit regions
+     *
+     * @return an array of allowed regions
+     */
+    @Deprecated
+    public Region[] getCurrentRegions() {
+        return WEManager.IMP.getMask(this);
+    }
+
+    @Deprecated
+    public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type);
+    }
+
+    /**
+     * Get the largest region in the player's allowed WorldEdit region
+     *
+     * @return
+     */
+    public Region getLargestRegion() {
+        int area = 0;
+        Region max = null;
+        for (Region region : this.getCurrentRegions()) {
+            final int tmp = region.getArea();
+            if (tmp > area) {
+                area = tmp;
+                max = region;
+            }
+        }
+        return max;
+    }
+
+    public void setSelection(Region region) {
+        RegionSelector selector;
+        if (region instanceof ConvexPolyhedralRegion) {
+            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
+        } else if (region instanceof CylinderRegion) {
+            selector = new CylinderRegionSelector((CylinderRegion) region);
+        } else if (region instanceof Polygonal2DRegion) {
+            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
+        } else {
+            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
+                region.getMaximumPoint());
+        }
+        selector.setWorld(region.getWorld());
+
+        getSession().setRegionSelector(getWorld(), selector);
+    }
+
 }

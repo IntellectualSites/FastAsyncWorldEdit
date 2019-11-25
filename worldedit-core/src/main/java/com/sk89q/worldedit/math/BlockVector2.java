@@ -19,16 +19,14 @@
 
 package com.sk89q.worldedit.math;
 
-import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-
 import java.util.Comparator;
 
 /**
  * An immutable 2-dimensional vector.
  */
 public class BlockVector2 {
-    
+
     public static final BlockVector2 ZERO = new BlockVector2(0, 0);
     public static final BlockVector2 UNIT_X = new BlockVector2(1, 0);
     public static final BlockVector2 UNIT_Z = new BlockVector2(0, 1);
@@ -48,18 +46,28 @@ public class BlockVector2 {
      * cdef
      * </pre>
      */
-    public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT = (a, b) -> {
-        return ComparisonChain.start()
-                .compare(a.getBlockZ(), b.getBlockZ())
-                .compare(a.getBlockX(), b.getBlockX())
-                .result();
-    };
+    public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT =
+        Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
 
     public static BlockVector2 at(double x, double z) {
         return at((int) Math.floor(x), (int) Math.floor(z));
     }
 
     public static BlockVector2 at(int x, int z) {
+        /* unnecessary
+        switch (x) {
+            case 0:
+                if (z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (z == 1) {
+                    return ONE;
+                }
+                break;
+        }
+        */
         return new BlockVector2(x, z);
     }
 
@@ -343,6 +351,26 @@ public class BlockVector2 {
     }
 
     /**
+     * Shift all components right.
+     *
+     * @param x the value to shift x by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector2 shr(int x, int z) {
+        return at(this.x >> x, this.z >> z);
+    }
+
+    /**
+     * Shift all components right by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector2 shr(int n) {
+        return shr(n, n);
+    }
+    /**
      * Get the length of the vector.
      *
      * @return length
@@ -491,8 +519,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMinimum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.min(x, v2.x),
-            Math.min(z, v2.z)
+                Math.min(x, v2.x),
+                Math.min(z, v2.z)
         );
     }
 
@@ -504,8 +532,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMaximum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.max(x, v2.x),
-            Math.max(z, v2.z)
+                Math.max(x, v2.x),
+                Math.max(z, v2.z)
         );
     }
 

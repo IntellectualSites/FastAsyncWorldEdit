@@ -22,8 +22,12 @@ package com.sk89q.worldedit.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import javax.annotation.Nullable;
 
@@ -56,6 +60,10 @@ public class BaseEntity implements NbtValued {
         setNbtData(nbtData);
     }
 
+    public BaseEntity(CompoundTag tag) {
+        this(EntityTypes.parse(tag.getString("Id")), tag);
+    }
+
     /**
      * Create a new base entity with no NBT data.
      *
@@ -74,6 +82,17 @@ public class BaseEntity implements NbtValued {
         checkNotNull(other);
         this.type = other.getType();
         setNbtData(other.getNbtData());
+    }
+
+    public Location getLocation(Extent extent) {
+        ListTag posTag = nbtData.getListTag("Pos");
+        ListTag rotTag = nbtData.getListTag("Rotation");
+        double x = posTag.getDouble(0);
+        double y = posTag.getDouble(1);
+        double z = posTag.getDouble(2);
+        float yaw = rotTag.getFloat(0);
+        float pitch = rotTag.getFloat(1);
+        return new Location(extent, x, y, z, yaw, pitch);
     }
 
     @Override

@@ -1,16 +1,15 @@
 package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.util.Perm;
+import com.boydti.fawe.util.Permission;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -25,10 +24,10 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = fp.parent;
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player p, MaskType type) {
+        final Player player = BukkitAdapter.adapt(p);
         final Chunk chunk = player.getLocation().getChunk();
-        final boolean perm = Perm.hasPermission(FawePlayer.wrap(player), "fawe.factions.wilderness");
+        final boolean perm = Permission.hasPermission(p, "fawe.factions.wilderness");
         final World world = player.getWorld();
 
         RegionWrapper locs = new RegionWrapper(chunk.getX(), chunk.getX(), chunk.getZ(), chunk.getZ());
@@ -38,7 +37,7 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
         if (this.isAdded(locs, world, player, perm, type)) {
             boolean hasPerm = true;
 
-            while (hasPerm && (count > 0)) {
+            while (hasPerm && count > 0) {
                 count--;
 
                 hasPerm = false;
@@ -72,9 +71,9 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
                 }
             }
 
-            final Location pos1 = new Location(world, locs.minX << 4, 1, locs.minZ << 4);
-            final Location pos2 = new Location(world, 15 + (locs.maxX << 4), 256, 15 + (locs.maxZ << 4));
-            return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint());
+            final BlockVector3 pos1 = BlockVector3.at(locs.minX << 4, 1, locs.minZ << 4);
+            final BlockVector3 pos2 = BlockVector3.at(15 + (locs.maxX << 4), 256, 15 + (locs.maxZ << 4));
+            return new FaweMask(pos1,pos2);
         }
         return null;
     }

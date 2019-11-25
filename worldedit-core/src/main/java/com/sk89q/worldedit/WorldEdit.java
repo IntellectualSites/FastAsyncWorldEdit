@@ -19,9 +19,13 @@
 
 package com.sk89q.worldedit;
 
-import com.boydti.fawe.config.BBC;
+import static com.sk89q.worldedit.event.platform.Interaction.HIT;
+import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
@@ -48,6 +52,7 @@ import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
@@ -60,11 +65,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.script.ScriptException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,10 +76,13 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import javax.annotation.Nullable;
+import javax.script.ScriptException;
 
-import static com.sk89q.worldedit.event.platform.Interaction.HIT;
-import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The entry point and container for a working implementation of WorldEdit.
@@ -105,6 +108,8 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
+            EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
 
     private final BlockFactory blockFactory = new BlockFactory(this);
@@ -155,12 +160,21 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the supervisor.
+     * Get the supervisor. Internal, not for API use.
      *
      * @return the supervisor
      */
     public Supervisor getSupervisor() {
         return supervisor;
+    }
+
+    /**
+     * Get the executor service. Internal, not for API use.
+     *
+     * @return the executor service
+     */
+    public ListeningExecutorService getExecutorService() {
+        return executorService;
     }
 
     /**
@@ -218,7 +232,7 @@ public final class WorldEdit {
      * traversal exploits by checking the root directory and the file directory.
      * On success, a {@code java.io.File} object will be returned.
      *
-     * @param player the player
+     * @param actor the actor
      * @param dir sub-directory to look in
      * @param filename filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
@@ -226,8 +240,8 @@ public final class WorldEdit {
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    public File getSafeSaveFile(Player player, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
-        return getSafeFile(player, dir, filename, defaultExt, extensions, true);
+    public File getSafeSaveFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
+        return getSafeFile(actor, dir, filename, defaultExt, extensions, true);
     }
 
     /**
@@ -236,7 +250,7 @@ public final class WorldEdit {
      * traversal exploits by checking the root directory and the file directory.
      * On success, a {@code java.io.File} object will be returned.
      *
-     * @param player the player
+     * @param actor the actor
      * @param dir sub-directory to look in
      * @param filename filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
@@ -244,14 +258,14 @@ public final class WorldEdit {
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    public File getSafeOpenFile(Player player, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
-        return getSafeFile(player, dir, filename, defaultExt, extensions, false);
+    public File getSafeOpenFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
+        return getSafeFile(actor, dir, filename, defaultExt, extensions, false);
     }
 
     /**
      * Get a safe path to a file.
      *
-     * @param player the player
+     * @param actor the actor
      * @param dir sub-directory to look in
      * @param filename filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
@@ -260,16 +274,16 @@ public final class WorldEdit {
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    private File getSafeFile(@Nullable Player player, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
+    private File getSafeFile(@Nullable Actor actor, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
         if (extensions != null && (extensions.length == 1 && extensions[0] == null)) extensions = null;
 
         File f;
 
-        if (filename.equals("#") && player != null) {
+        if (filename.equals("#") && actor != null) {
             if (isSave) {
-                f = player.openFileSaveDialog(extensions);
+                f = actor.openFileSaveDialog(extensions);
             } else {
-                f = player.openFileOpenDialog(extensions);
+                f = actor.openFileOpenDialog(extensions);
             }
 
             if (f == null) {
@@ -307,6 +321,17 @@ public final class WorldEdit {
             if (exts.size() != 1) {
                 exts = exts.subList(0, 1);
             }
+        } else {
+            int dot = filename.lastIndexOf('.');
+            if (dot < 0 || dot == filename.length() - 1) {
+                String currentExt = filename.substring(dot + 1);
+                if (exts.contains(currentExt) && checkFilename(filename)) {
+                    File f = new File(dir, filename);
+                    if (f.exists()) {
+                        return f;
+                    }
+                }
+            }
         }
         File result = null;
         for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || (!isSave && !result.exists()));) {
@@ -321,7 +346,7 @@ public final class WorldEdit {
     private File getSafeFileWithExtension(File dir, String filename, String extension) {
         if (extension != null) {
             int dot = filename.lastIndexOf('.');
-            if (dot < 0 || !filename.substring(dot).equalsIgnoreCase(extension)) {
+            if (dot < 0 || dot == filename.length() - 1 || !filename.substring(dot + 1).equalsIgnoreCase(extension)) {
                 filename += "." + extension;
             }
         }
@@ -396,16 +421,15 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction vector
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    public BlockVector3 getDirection(Player player, String dirStr) throws UnknownDirectionException {
-        dirStr = dirStr.toLowerCase();
+    public BlockVector3 getDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
+        dirStr = dirStr.toLowerCase(Locale.ROOT);
 
         final Direction dir = getPlayerDirection(player, dirStr);
 
@@ -417,16 +441,15 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction vector
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    public BlockVector3 getDiagonalDirection(Player player, String dirStr) throws UnknownDirectionException {
-        dirStr = dirStr.toLowerCase();
+    public BlockVector3 getDiagonalDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
+        dirStr = dirStr.toLowerCase(Locale.ROOT);
 
         final Direction dir = getPlayerDirection(player, dirStr);
 
@@ -438,15 +461,14 @@ public final class WorldEdit {
     }
 
     /**
-     * Get the direction vector for a player's direction. May return
-     * null if a direction could not be found.
+     * Get the direction vector for a player's direction.
      *
      * @param player the player
      * @param dirStr the direction string
      * @return a direction enum value
-     * @throws UnknownDirectionException thrown if the direction is not known
+     * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
-    private Direction getPlayerDirection(Player player, String dirStr) throws UnknownDirectionException {
+    private Direction getPlayerDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
         final Direction dir;
 
         switch (dirStr.charAt(0)) {
@@ -490,25 +512,32 @@ public final class WorldEdit {
 
         case 'm': // me
         case 'f': // forward
-            dir = player.getCardinalDirection(0);
+            dir = getDirectionRelative(player, 0);
             break;
 
         case 'b': // back
-            dir = player.getCardinalDirection(180);
+            dir = getDirectionRelative(player, 180);
             break;
 
         case 'l': // left
-            dir = player.getCardinalDirection(-90);
+            dir = getDirectionRelative(player, -90);
             break;
 
         case 'r': // right
-            dir = player.getCardinalDirection(90);
+            dir = getDirectionRelative(player, 90);
             break;
 
         default:
             throw new UnknownDirectionException(dirStr);
         }
         return dir;
+    }
+
+    private Direction getDirectionRelative(Player player, int yawOffset) throws UnknownDirectionException {
+        if (player != null) {
+            return player.getCardinalDirection(yawOffset);
+        }
+        throw new UnknownDirectionException("Only a player can use relative directions");
     }
 
     /**
@@ -650,9 +679,9 @@ public final class WorldEdit {
 
         try {
             engine = new RhinoCraftScriptEngine();
-        } catch (NoClassDefFoundError e) {
+        } catch (NoClassDefFoundError ignored) {
             player.printError("Failed to find an installed script engine.");
-            player.printError("Please see http://wiki.sk89q.com/wiki/WorldEdit/Installation");
+            player.printError("Please see https://worldedit.enginehub.org/en/latest/usage/other/craftscripts/");
             return;
         }
 

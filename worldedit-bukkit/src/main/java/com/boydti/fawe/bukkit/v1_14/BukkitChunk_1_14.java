@@ -1,9 +1,16 @@
 package com.boydti.fawe.bukkit.v1_14;
 
+import static com.boydti.fawe.bukkit.v0.BukkitQueue_0.getAdapter;
+import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryb;
+import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryc;
+import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryd;
+import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistrye;
+import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryf;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
-import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
+import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
@@ -23,6 +30,15 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -49,23 +65,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static com.boydti.fawe.bukkit.v0.BukkitQueue_0.getAdapter;
-import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryb;
-import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryc;
-import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryd;
-import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistrye;
-import static com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14.fieldRegistryf;
 
 public class BukkitChunk_1_14 extends IntFaweChunk<Chunk, BukkitQueue_1_14> {
 
@@ -133,7 +132,7 @@ public class BukkitChunk_1_14 extends IntFaweChunk<Chunk, BukkitQueue_1_14> {
                             if (ibd == null) {
                                 ibd = defaultBlock;
                             }
-                            int ordinal = ((Spigot_v1_14_R1) getAdapter()).adaptToInt(ibd);
+                            int ordinal = ((Spigot_v1_14_R4) getAdapter()).adaptToInt(ibd);
                             idsArray[i] = BlockTypes.states[ordinal].getInternalId();
                         }
                     } catch (IllegalAccessException e) {
@@ -310,7 +309,7 @@ public class BukkitChunk_1_14 extends IntFaweChunk<Chunk, BukkitQueue_1_14> {
 
     @Override
     public FaweChunk call() {
-        Spigot_v1_14_R1 adapter = (Spigot_v1_14_R1) BukkitQueue_0.getAdapter();
+        Spigot_v1_14_R4 adapter = (Spigot_v1_14_R4) BukkitQueue_0.getAdapter();
         try {
             BukkitChunk_1_14 copy = getParent().getChangeTask() != null ? new BukkitChunk_1_14(getParent(), getX(), getZ()) : null;
             final Chunk chunk = this.getChunk();

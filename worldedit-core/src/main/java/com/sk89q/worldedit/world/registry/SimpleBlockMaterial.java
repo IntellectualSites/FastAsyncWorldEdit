@@ -45,7 +45,7 @@ class SimpleBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isAir() {
-        return isAir;
+        return this.isAir;
     }
 
     @Override

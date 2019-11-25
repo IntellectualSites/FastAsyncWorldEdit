@@ -21,20 +21,21 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.CFICommands;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.Step;
+import com.sk89q.worldedit.command.ToolUtilCommands;
+import com.sk89q.worldedit.internal.annotation.Range;
+import org.enginehub.piston.annotation.Command;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BrushCommands;
-import com.sk89q.worldedit.command.BrushOptionsCommands;
 import com.sk89q.worldedit.command.ChunkCommands;
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.HistoryCommands;
-import com.sk89q.worldedit.command.MaskCommands;
+//import com.sk89q.worldedit.command.MaskCommands;
 import com.sk89q.worldedit.command.NavigationCommands;
-import com.sk89q.worldedit.command.OptionsCommands;
-import com.sk89q.worldedit.command.PatternCommands;
+//import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.command.ScriptingCommands;
@@ -43,13 +44,21 @@ import com.sk89q.worldedit.command.SnapshotCommands;
 import com.sk89q.worldedit.command.SnapshotUtilCommands;
 import com.sk89q.worldedit.command.SuperPickaxeCommands;
 import com.sk89q.worldedit.command.ToolCommands;
-import com.sk89q.worldedit.command.TransformCommands;
+//import com.sk89q.worldedit.command.TransformCommands;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.WorldEditCommands;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @SuppressWarnings("UseOfSystemOutOrSystemErr")
 public final class DocumentationPrinter {
@@ -113,13 +122,12 @@ public final class DocumentationPrinter {
             writePermissionsWikiTable(stream, builder, "/", SnapshotUtilCommands.class);
             writePermissionsWikiTable(stream, builder, "/", ScriptingCommands.class);
             writePermissionsWikiTable(stream, builder, "/", ChunkCommands.class);
-            writePermissionsWikiTable(stream, builder, "/", OptionsCommands.class);
-            writePermissionsWikiTable(stream, builder, "/", BrushOptionsCommands.class);
+            writePermissionsWikiTable(stream, builder, "/", ToolUtilCommands.class);
             writePermissionsWikiTable(stream, builder, "/tool ", ToolCommands.class);
             writePermissionsWikiTable(stream, builder, "/brush ", BrushCommands.class);
-            writePermissionsWikiTable(stream, builder, "", MaskCommands.class, "/Masks");
-            writePermissionsWikiTable(stream, builder, "", PatternCommands.class, "/Patterns");
-            writePermissionsWikiTable(stream, builder, "", TransformCommands.class, "/Transforms");
+            //writePermissionsWikiTable(stream, builder, "", MaskCommands.class, "/Masks");
+            //writePermissionsWikiTable(stream, builder, "", PatternCommands.class, "/Patterns");
+            //writePermissionsWikiTable(stream, builder, "", TransformCommands.class, "/Transforms");
             writePermissionsWikiTable(stream, builder, "/cfi ", CFICommands.class, "Create From Image");
             stream.println();
             stream.print("#### Uncategorized\n");
@@ -153,7 +161,6 @@ public final class DocumentationPrinter {
     }
 
     private static void writePermissionsWikiTable(StringBuilder stream, String prefix, Class<?> cls, String name, boolean title) {
-        //  //setbiome || worldedit.biome.set || //setbiome || p || Sets the biome of the player's current block or region.
         if (title) {
             String path = "https://github.com/boy0001/FastAsyncWorldedit/edit/master/core/src/main/java/" + cls.getName().replaceAll("\\.", "/") + ".java";
             stream.append("### **" + name + "** `[`[`edit`](" + path + ")`|`[`top`](#overview)`]`");
@@ -163,8 +170,8 @@ public final class DocumentationPrinter {
                 if (!cmd.desc().isEmpty()) {
                     stream.append("> (" + (cmd.desc()) + ")    \n");
                 }
-                if (!cmd.help().isEmpty()) {
-                    stream.append("" + (cmd.help()) + "    \n");
+                if (!cmd.descFooter().isEmpty()) {
+                    stream.append("" + (cmd.descFooter()) + "    \n");
                 }
             }
             stream.append("\n");
@@ -176,22 +183,16 @@ public final class DocumentationPrinter {
             if (!method.isAnnotationPresent(Command.class)) {
                 continue;
             }
-
             Command cmd = method.getAnnotation(Command.class);
             String[] aliases = cmd.aliases();
-            String usage = prefix + aliases[0] + " " + cmd.usage();
-            if (!cmd.flags().isEmpty()) {
-                for (char c : cmd.flags().toCharArray()) {
-                    usage += " [-" + c + "]";
-                }
-            }
-//            stream.append("#### [`" + usage + "`](" + "https://github.com/boy0001/FastAsyncWorldedit/wiki/" + aliases[0] + ")\n");
+            String usage = prefix + aliases[0] + " " + getUsage(cmd, method);
+
             stream.append("#### `" + usage + "`\n");
             if (method.isAnnotationPresent(CommandPermissions.class)) {
                 CommandPermissions perms = method.getAnnotation(CommandPermissions.class);
                 stream.append("**Perm**: `" + StringMan.join(perms.value(), "`, `") + "`    \n");
             }
-            String help = cmd.help() == null || cmd.help().isEmpty() ? cmd.desc() : cmd.help();
+            String help = getDesc(cmd, method);
             stream.append("**Desc**: " + help.trim().replaceAll("\n", "<br />") + "    \n");
 
             if (method.isAnnotationPresent(NestedCommand.class)) {
@@ -208,5 +209,79 @@ public final class DocumentationPrinter {
         if (title) stream.append("---");
         stream.append("\n");
         stream.append("\n");
+    }
+
+    public static String getDesc(Command command, Method method) {
+        Parameter[] params = method.getParameters();
+        List<String> desc = new ArrayList<>();
+        for (Parameter param : params) {
+            String[] info = getParamInfo(param);
+            if (info != null) {
+                desc.add(info[0].replace("%s0", info[1]) + " - " + info[2] + ": " + info[3]);
+            }
+        }
+        String footer = command.descFooter();
+        if (!footer.isEmpty()) footer += "\n";
+        return footer + StringMan.join(desc, "\n");
+    }
+
+    public static String getUsage(Command command, Method method) {
+        Parameter[] params = method.getParameters();
+        List<String> usage = new ArrayList<>();
+        for (Parameter param : params) {
+            String[] info = getParamInfo(param);
+            if (info != null) {
+                usage.add(info[0].replace("%s0", info[1]));
+            }
+        }
+        return StringMan.join(usage, " ");
+    }
+
+    /*
+    Return format, name, type, description
+     */
+    public static String[] getParamInfo(Parameter param) {
+        Switch switchAnn = param.getAnnotation(Switch.class);
+        Arg argAnn = param.getAnnotation(Arg.class);
+        Range rangeAnn = param.getAnnotation(Range.class);
+        Step stepAnn = param.getAnnotation(Step.class);
+        if (switchAnn != null || argAnn != null || rangeAnn != null || stepAnn != null) {
+            String[] result = new String[] { "[%s0]", param.getName(), param.getType().getSimpleName(), ""};
+            boolean optional = argAnn != null && argAnn.def().length != 0;
+            if (optional) {
+                result[0] = "<%s0>";
+            }
+            if (argAnn != null) result[1] = argAnn.name();
+            if (argAnn != null) {
+                if (argAnn.def().length != 0) {
+                    result[0] = result[0].replace("%s0", "%s0=" + argAnn.def());
+                }
+                result[3] = argAnn.desc();
+            } else if (switchAnn != null) {
+                result[0] = result[0].replace("%s0", "-" + switchAnn.name() + " %s0");
+            }
+            if (switchAnn != null) result[3] = switchAnn.desc();
+            if (rangeAnn != null) {
+                String step;
+                String min = rangeAnn.min() == Double.MIN_VALUE ? "(-∞" : ("[" + rangeAnn.min());
+                String max = rangeAnn.max() == Double.MAX_VALUE ? "∞)" : (rangeAnn.max() + "]");
+                result[0] += min + "," + max;
+            }
+            if (stepAnn != null) {
+                result[0] += "⦧" + stepAnn.value();
+            }
+            return result;
+        }
+        return null;
+    }
+
+    public static Collection<ArgFlag> getFlags(Command command, Method method) {
+        Parameter[] params = method.getParameters();
+        List<ArgFlag> flags = new ArrayList<>();
+        for (Parameter param : params) {
+            ArgFlag flagAnn = param.getAnnotation(ArgFlag.class);
+            if (flagAnn != null) flags.add(flagAnn);
+        }
+        return flags;
     }
 }

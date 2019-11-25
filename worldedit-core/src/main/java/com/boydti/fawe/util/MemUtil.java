@@ -28,8 +28,7 @@ public class MemUtil {
     }
 
     public static long getUsedBytes() {
-        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        return used;
+        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
 
     public static long getFreeBytes() {

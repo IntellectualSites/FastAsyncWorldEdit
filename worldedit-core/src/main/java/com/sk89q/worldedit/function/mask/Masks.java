@@ -21,7 +21,6 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -32,8 +31,8 @@ import javax.annotation.Nullable;
  */
 public final class Masks {
 
-    protected static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
-    protected static final AlwaysFalse ALWAYS_FALSE = new AlwaysFalse();
+    static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
+    static final AlwaysFalse ALWAYS_FALSE = new AlwaysFalse();
 
     private Masks() {
     }
@@ -135,12 +134,12 @@ public final class Masks {
         }
 
         @Override
-        public Mask and(Mask other) {
+        public Mask tryCombine(Mask other) {
             return other;
         }
 
         @Override
-        public Mask or(Mask other) {
+        public Mask tryOr(Mask other) {
             return this;
         }
     }
@@ -163,12 +162,12 @@ public final class Masks {
         }
 
         @Override
-        public Mask and(Mask other) {
+        public Mask tryCombine(Mask other) {
             return this;
         }
 
         @Override
-        public Mask or(Mask other) {
+        public Mask tryOr(Mask other) {
             return other;
         }
     }

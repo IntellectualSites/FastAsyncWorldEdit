@@ -1,8 +1,7 @@
 package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -37,30 +36,10 @@ public class MutableTileChange implements Change {
         }
     }
 
-    private FaweQueue queue;
-    private boolean checkedQueue;
-
     public void create(UndoContext context) {
-        if (queue != null) {
-            perform(queue);
-        }
-        if (!checkedQueue) {
-            checkedQueue = true;
-            Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
-            if (found != null) {
-                perform(queue = ((HasFaweQueue) found.get()).getQueue());
-            } else {
-                Fawe.debug("FAWE does not support: " + extent + " for " + getClass() + " (bug Empire92)");
-            }
-        }
-    }
-
-    public void perform(FaweQueue queue) {
-        Map<String, Tag> map = tag.getValue();
-        int x = ((IntTag) map.get("x")).getValue();
-        int y = ((IntTag) map.get("y")).getValue();
-        int z = ((IntTag) map.get("z")).getValue();
-        queue.setTile(x, y, z, tag);
+        int x = tag.getInt("x");
+        int y = tag.getInt("y");
+        int z = tag.getInt("z");
+        context.getExtent().setTile(x, y, z, tag);
     }
 }

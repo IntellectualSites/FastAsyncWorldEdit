@@ -19,19 +19,21 @@
 
 package com.boydti.fawe.object.regions;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
 import com.sk89q.worldedit.world.World;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PolyhedralRegion extends AbstractRegion {
 
@@ -66,7 +68,7 @@ public class PolyhedralRegion extends AbstractRegion {
     private BlockVector3 centerAccum = BlockVector3.ZERO;
 
     /**
-     * The last triangle that caused a {@link #contains(Vector)} to classify a point as "outside". Used for optimization.
+     * The last triangle that caused a {@link #contains(BlockVector3)} to classify a point as "outside". Used for optimization.
      */
     private Triangle lastTriangle;
 
@@ -145,8 +147,8 @@ public class PolyhedralRegion extends AbstractRegion {
         } else {
 //            minimumPoint = new MutableBlockVector3(minimumPoint.getMinimum(vertex));
 //            maximumPoint = new MutableBlockVector3(maximumPoint.getMaximum(vertex));
-        	minimumPoint = minimumPoint.getMinimum(vertex);
-        	maximumPoint = maximumPoint.getMaximum(vertex);
+            minimumPoint = minimumPoint.getMinimum(vertex);
+            maximumPoint = maximumPoint.getMaximum(vertex);
         }
 
         int size = vertices.size();

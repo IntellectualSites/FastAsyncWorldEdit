@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.BlockFactory;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -29,6 +28,7 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class RandomPatternParser extends InputParser<Pattern> {
 
@@ -37,11 +37,34 @@ public class RandomPatternParser extends InputParser<Pattern> {
     }
 
     @Override
+    public Stream<String> getSuggestions(String input) {
+        String[] splits = input.split(",", -1);
+        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);
+        if (patterns.size() == 1) {
+            return Stream.empty();
+        }
+        // get suggestions for the last token only
+        String token = patterns.get(patterns.size() - 1);
+        String previous = String.join(",", patterns.subList(0, patterns.size() - 1));
+        if (token.matches("[0-9]+(\\.[0-9]*)?%.*")) {
+            String[] p = token.split("%");
+
+            if (p.length < 2) {
+                return Stream.empty();
+            } else {
+                token = p[1];
+            }
+        }
+        final List<String> innerSuggestions = worldEdit.getPatternFactory().getSuggestions(token);
+        return innerSuggestions.stream().map(s -> previous + "," + s);
+    }
+
+    @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
         RandomPattern randomPattern = new RandomPattern();
 
-        String[] splits = input.split(",");
-        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']');
+        String[] splits = input.split(",", -1);
+        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);
         if (patterns.size() == 1) {
             return null; // let a 'single'-pattern parser handle it
         }

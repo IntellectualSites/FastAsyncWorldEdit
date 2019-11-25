@@ -20,19 +20,18 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
@@ -41,8 +40,8 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
     }
 
     @Override
-    public List<String> getSuggestions() {
-        return BlockCategory.REGISTRY.keySet().stream().map(str -> "##" + str).collect(Collectors.toList());
+    public Stream<String> getSuggestions(String input) {
+        return SuggestionHelper.getBlockCategorySuggestions(input, true);
     }
 
     @Override
@@ -70,10 +69,10 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         if (anyState) {
             blocks.stream().flatMap(blockType -> blockType.getAllStates().stream()).forEach(state ->
-                randomPattern.add((state), 1.0));
+                randomPattern.add(state, 1.0));
         } else {
             for (BlockType blockType : blocks) {
-                randomPattern.add((blockType.getDefaultState()), 1.0);
+                randomPattern.add(blockType.getDefaultState(), 1.0);
             }
         }
 

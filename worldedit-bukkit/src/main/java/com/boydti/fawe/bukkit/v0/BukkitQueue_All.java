@@ -15,6 +15,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.google.common.collect.MapMaker;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -391,5 +392,10 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     @Override
     public void endSet(boolean parallel) {
         super.endSet(true);
+    }
+
+    @Override
+    public void sendBlockUpdate(FaweChunk chunk, Player... players) {
+
     }
 }

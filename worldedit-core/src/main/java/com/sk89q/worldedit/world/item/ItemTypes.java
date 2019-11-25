@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.item;
 
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
@@ -935,7 +934,7 @@ public final class ItemTypes {
     }
 
     @Deprecated
-    public static ItemType get(final int ordinal) {
+    public static ItemType get(int ordinal) {
         return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 

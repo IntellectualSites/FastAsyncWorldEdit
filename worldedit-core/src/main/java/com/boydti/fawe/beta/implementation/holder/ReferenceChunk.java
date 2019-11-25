@@ -3,7 +3,6 @@ package com.boydti.fawe.beta.implementation.holder;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IDelegateChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-
 import java.lang.ref.Reference;
 
 /**
@@ -12,17 +11,18 @@ import java.lang.ref.Reference;
  *  - If it is garbage collected, the {@link FinalizedChunk} logic is run
  */
 public abstract class ReferenceChunk implements IDelegateChunk {
-    private final Reference<FinalizedChunk> ref;
+
+    private final Reference<FinalizedChunk> reference;
 
     public ReferenceChunk(final IChunk parent, final IQueueExtent queueExtent) {
-        this.ref = toRef(new FinalizedChunk(parent, queueExtent));
+        this.reference = toReference(new FinalizedChunk(parent, queueExtent));
     }
 
-    protected abstract Reference<FinalizedChunk> toRef(FinalizedChunk parent);
+    protected abstract Reference<FinalizedChunk> toReference(FinalizedChunk parent);
 
     @Override
     public IChunk getParent() {
-        final FinalizedChunk finalized = ref.get();
+        final FinalizedChunk finalized = reference.get();
         return finalized != null ? finalized.getParent() : null;
     }
 }

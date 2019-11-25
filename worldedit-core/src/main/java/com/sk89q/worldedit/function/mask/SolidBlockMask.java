@@ -20,14 +20,21 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import javax.annotation.Nullable;
 
 public class SolidBlockMask extends BlockMask {
     public SolidBlockMask(Extent extent) {
         super(extent);
-        add(state -> state.getMaterial().isSolid());
+        add(state -> state.getMaterial().isMovementBlocker());
     }
+
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
+    }
+
 }

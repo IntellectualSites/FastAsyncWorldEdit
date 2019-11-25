@@ -323,6 +323,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         return inside;
     }
 
+    @Override
     public boolean contains(BlockVector3 position) {
         return contains(points, minY, maxY, position);
     }
@@ -460,7 +461,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     public Polygonal2DRegion clone() {
         Polygonal2DRegion clone = (Polygonal2DRegion) super.clone();
         clone.points = new ArrayList<>(points);
-        return clone; 
+        return clone;
     }
 
     @Override

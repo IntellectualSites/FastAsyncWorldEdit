@@ -19,22 +19,22 @@
 
 package com.sk89q.worldedit.extent.reorder;
 
+import com.google.common.collect.ImmutableSortedSet;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.AbstractBufferingExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
-import com.sk89q.worldedit.function.operation.SetLocatedBlocks;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.collection.LocatedBlockList;
+import com.sk89q.worldedit.math.RegionOptimizedComparator;
+import com.sk89q.worldedit.util.collection.BlockMap;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Optional;
 
 /**
  * A special extent that batches changes into Minecraft chunks. This helps
@@ -42,17 +42,9 @@ import java.util.TreeMap;
  * loaded repeatedly, however it does take more memory due to caching the
  * blocks.
  */
-public class ChunkBatchingExtent extends AbstractDelegateExtent {
+public class ChunkBatchingExtent extends AbstractBufferingExtent {
 
-    /**
-     * Comparator optimized for sorting chunks by the region file they reside
-     * in. This allows for file caches to be used while loading the chunk.
-     */
-    private static final Comparator<BlockVector2> REGION_OPTIMIZED_SORT =
-            Comparator.comparing((BlockVector2 vec) -> vec.divide(32), BlockVector2.COMPARING_GRID_ARRANGEMENT)
-                    .thenComparing(BlockVector2.COMPARING_GRID_ARRANGEMENT);
-
-    private final SortedMap<BlockVector2, LocatedBlockList> batches = new TreeMap<>(REGION_OPTIMIZED_SORT);
+    private final BlockMap blockMap = BlockMap.create();
     private boolean enabled;
 
     public ChunkBatchingExtent(Extent extent) {
@@ -79,11 +71,15 @@ public class ChunkBatchingExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (!enabled) {
-            return getExtent().setBlock(location, block);
+            return setDelegateBlock(location, block);
         }
-        BlockVector2 chunkPos = BlockVector2.at(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        batches.computeIfAbsent(chunkPos, k -> new LocatedBlockList()).add(location, block);
+        blockMap.put(location, block.toBaseBlock());
         return true;
+    }
+
+    @Override
+    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
+        return Optional.ofNullable(blockMap.get(position));
     }
 
     @Override
@@ -94,19 +90,21 @@ public class ChunkBatchingExtent extends AbstractDelegateExtent {
         return new Operation() {
 
             // we get modified between create/resume -- only create this on resume to prevent CME
-            private Iterator<LocatedBlockList> batchIterator;
+            private Iterator<BlockVector3> iterator;
 
             @Override
             public Operation resume(RunContext run) throws WorldEditException {
-                if (batchIterator == null) {
-                    batchIterator = batches.values().iterator();
+                if (iterator == null) {
+                    iterator = ImmutableSortedSet.copyOf(RegionOptimizedComparator.INSTANCE,
+                        blockMap.keySet()).iterator();
                 }
-                if (!batchIterator.hasNext()) {
-                    return null;
+                while (iterator.hasNext()) {
+                    BlockVector3 position = iterator.next();
+                    BaseBlock block = blockMap.get(position);
+                    getExtent().setBlock(position, block);
                 }
-                new SetLocatedBlocks(getExtent(), batchIterator.next()).resume(run);
-                batchIterator.remove();
-                return this;
+                blockMap.clear();
+                return null;
             }
 
             @Override

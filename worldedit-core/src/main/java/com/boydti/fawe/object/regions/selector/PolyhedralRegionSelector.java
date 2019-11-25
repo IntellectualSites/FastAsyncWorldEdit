@@ -19,6 +19,8 @@
 
 package com.boydti.fawe.object.regions.selector;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.object.regions.PolyhedralRegion;
 import com.boydti.fawe.object.regions.Triangle;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -32,12 +34,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates a {@code PolyhedralRegion} from a user's selections.
@@ -51,7 +54,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
      * Create a new selector with a {@code null} world.
      */
     public PolyhedralRegionSelector() {
-        this((World) null);
+        this(null);
     }
 
     /**
@@ -230,7 +233,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<BlockVector3> getVerticies() {
+    public List<BlockVector3> getVertices() {
         return new ArrayList<>(region.getVertices());
     }
 }

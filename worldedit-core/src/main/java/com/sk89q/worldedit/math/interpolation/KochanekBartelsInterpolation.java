@@ -31,8 +31,8 @@ import java.util.List;
 /**
  * A Kochanek-Bartels interpolation; continuous in the 2nd derivative.
  *
- * <p>Supports Node#tension tension, Node#bias bias and
- * Node#continuity continuity parameters per {@link Node}.</p>
+ * <p>Supports {@link Node#getTension() tension} , {@link Node#getBias() bias} and
+ * {@link Node#getContinuity() continuity} parameters per {@link Node}.</p>
  */
 public class KochanekBartelsInterpolation implements Interpolation {
 
@@ -42,6 +42,7 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3[] coeffC;
     private Vector3[] coeffD;
     private double scaling;
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public KochanekBartelsInterpolation() {
         setNodes(Collections.<Node>emptyList());
@@ -135,8 +136,6 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3 fastRetrieve(int index) {
         return nodes.get(index).getPosition();
     }
-
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public Vector3 getPosition(double position) {

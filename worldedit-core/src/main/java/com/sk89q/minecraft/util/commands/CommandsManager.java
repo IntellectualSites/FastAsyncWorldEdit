@@ -20,9 +20,6 @@
 package com.sk89q.minecraft.util.commands;
 
 import com.sk89q.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,8 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manager for handling commands. This allows you to easily process commands,
@@ -60,6 +61,7 @@ import java.util.Set;
  * @param <T> command sender class
  */
 @SuppressWarnings("ProtectedField")
+@Deprecated
 public abstract class CommandsManager<T> {
 
     protected static final Logger logger =
@@ -253,7 +255,7 @@ public abstract class CommandsManager<T> {
      * @return true if the command exists
      */
     public boolean hasCommand(String command) {
-        return commands.get(null).containsKey(command.toLowerCase());
+        return commands.get(null).containsKey(command.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -433,7 +435,7 @@ public abstract class CommandsManager<T> {
         String cmdName = args[level];
 
         Map<String, Method> map = commands.get(parent);
-        Method method = map.get(cmdName.toLowerCase());
+        Method method = map.get(cmdName.toLowerCase(Locale.ROOT));
 
         if (method == null) {
             if (parent == null) { // Root

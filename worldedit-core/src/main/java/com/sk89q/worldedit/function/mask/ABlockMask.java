@@ -2,14 +2,12 @@ package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public abstract class ABlockMask extends AbstractExtentMask {
     public ABlockMask(Extent extent) {
@@ -23,16 +21,12 @@ public abstract class ABlockMask extends AbstractExtentMask {
         List<String> strings = new ArrayList<>();
         for (BlockType type : BlockTypes.values) {
             if (type != null) {
-                boolean hasAll = true;
-                boolean hasAny = false;
+                boolean hasAll;
                 List<BlockState> all = type.getAllStates();
-                for (BlockState state : all) {
-                    hasAll &= test(state);
-                    hasAny = true;
-                }
+                hasAll = all.stream().map(this::test).reduce(true, (a, b) -> a && b);
                 if (hasAll) {
                     strings.add(type.getId());
-                } else if (hasAny) {
+                } else {
                     for (BlockState state : all) {
                         if (test(state)) {
                             strings.add(state.getAsString());
@@ -45,7 +39,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask and(Mask mask) {
+    public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -56,7 +50,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
                     }
                 }
             }
-            Mask tmp = newMask.optimize();
+            Mask tmp = newMask.tryOptimize();
             if (tmp == null) tmp = newMask;
             return tmp;
         }
@@ -64,7 +58,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask or(Mask mask) {
+    public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -75,7 +69,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
                     }
                 }
             }
-            Mask tmp = newMask.optimize();
+            Mask tmp = newMask.tryOptimize();
             if (tmp == null) tmp = newMask;
             return tmp;
         }

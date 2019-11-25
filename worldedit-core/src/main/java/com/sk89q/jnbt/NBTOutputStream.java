@@ -45,7 +45,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     /**
      * The output stream.
      */
-    private DataOutput os;
+    private final DataOutput os;
 
     /**
      * Creates a new {@code NBTOutputStream}, which will write data to the
@@ -57,24 +57,25 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      *             if an I/O error occurs.
      */
     public NBTOutputStream(OutputStream os) throws IOException {
-        this.os = new DataOutputStream(os);
+        this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
     }
 
-    public NBTOutputStream(DataOutput os) throws IOException {
+    // Don't delete
+    public NBTOutputStream(DataOutput os) {
         this.os = os;
+    }
+
+    public NBTOutputStream(DataOutputStream os) {
+        this.os = os;
+    }
+
+    // Don't delete
+    public NBTOutputStream(OutputStream os, boolean littleEndian) throws IOException {
+        this(littleEndian ? new LittleEndianOutputStream(os) : os);
     }
 
     public DataOutput getOutputStream() {
         return os;
-    }
-
-    /**
-     * Use a little endian output stream
-     */
-    public void setLittleEndian() {
-        if (!(os instanceof LittleEndianOutputStream)) {
-            this.os = new LittleEndianOutputStream((OutputStream) os);
-        }
     }
 
     /**
@@ -159,7 +160,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         writeNamedEmptyList(name, NBTConstants.TYPE_COMPOUND);
     }
 
-    public void writeNamedEmptyList(String name, int type) throws IOException {
+    private void writeNamedEmptyList(String name, int type) throws IOException {
         writeNamedTagName(name, NBTConstants.TYPE_LIST);
         os.writeByte(type);
         os.writeInt(0);
@@ -420,7 +421,9 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     @Override
     public void close() throws IOException {
-        if (os instanceof Closeable) ((Closeable) os).close();
+        if (os instanceof Closeable) {
+            ((Closeable) os).close();
+        }
     }
 
     @Override
@@ -500,6 +503,8 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      */
     @Override
     public void flush() throws IOException {
-        if (os instanceof Flushable) ((Flushable) os).flush();
+        if (os instanceof Flushable) {
+            ((Flushable) os).flush();
+        }
     }
 }

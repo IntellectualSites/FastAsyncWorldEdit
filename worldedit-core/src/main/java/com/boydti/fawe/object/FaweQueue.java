@@ -13,8 +13,7 @@ import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -22,10 +21,11 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -351,9 +351,9 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         return count;
     }
 
-    void sendBlockUpdate(FaweChunk chunk, FawePlayer... players);
+    void sendBlockUpdate(FaweChunk chunk, Player... players);
 
-    default void sendChunkUpdate(FaweChunk chunk, FawePlayer... players) {
+    default void sendChunkUpdate(FaweChunk chunk, Player... players) {
         sendBlockUpdate(chunk, players);
     }
 
@@ -452,7 +452,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         try {
             return getCombinedId4Data(x, y, z);
         } catch (FaweException ignore) {
-            session.debug(BBC.WORLDEDIT_FAILED_LOAD_CHUNK, x >> 4, z >> 4);
+            Fawe.debug(BBC.WORLDEDIT_FAILED_LOAD_CHUNK.format(x >> 4, z >> 4));
             return def;
         } catch (Throwable e) {
             e.printStackTrace();

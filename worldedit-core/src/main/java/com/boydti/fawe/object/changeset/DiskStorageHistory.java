@@ -4,17 +4,19 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweInputStream;
+import com.boydti.fawe.object.FaweOutputStream;
+import com.boydti.fawe.object.IntegerPair;
+import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,11 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Store the change on disk
- * - High disk usage
- * - Moderate CPU usage
- * - Minimal memory usage
- * - Slow
+ * Stores the change on disk which is slower than storing in memory but has high disk usage. Another
+ * benefit is that it has moderate CPU Usage.
  */
 public class DiskStorageHistory extends FaweStreamChangeSet {
 
@@ -74,7 +73,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(),
+            Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
         int max = MainUtil.getMaxFileId(folder);
         init(uuid, max);
     }
@@ -115,10 +115,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(),
+            Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator
+                + uuid);
         initFiles(folder);
     }
 
+    @Override
     public void delete() {
 //        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
         deleteFiles();
@@ -136,23 +139,23 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         enttFile.delete();
     }
 
-    public void undo(FawePlayer fp, Region[] regions) {
-        EditSession session = toEditSession(fp, regions);
+    public void undo(Player player, Region[] regions) {
+        EditSession session = toEditSession(player, regions);
         session.undo(session);
         deleteFiles();
     }
 
-    public void undo(FawePlayer fp) {
-        undo(fp, null);
+    public void undo(Player player) {
+        undo(player, null);
     }
 
-    public void redo(FawePlayer fp, Region[] regions) {
-        EditSession session = toEditSession(fp, regions);
+    public void redo(Player player, Region[] regions) {
+        EditSession session = toEditSession(player, regions);
         session.redo(session);
     }
 
-    public void redo(FawePlayer fp) {
-        undo(fp, null);
+    public void redo(Player player) {
+        undo(player, null);
     }
 
     public UUID getUUID() {
@@ -171,14 +174,28 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public boolean flush() {
         super.flush();
         synchronized (this) {
-            boolean flushed = osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null || osENTCT != null;
+            boolean flushed =
+                osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null
+                    || osENTCT != null;
             try {
-                if (osBD != null) osBD.flush();
-                if (osBIO != null) osBIO.flush();
-                if (osNBTF != null) osNBTF.flush();
-                if (osNBTT != null) osNBTT.flush();
-                if (osENTCF != null) osENTCF.flush();
-                if (osENTCT != null) osENTCT.flush();
+                if (osBD != null) {
+                    osBD.flush();
+                }
+                if (osBIO != null) {
+                    osBIO.flush();
+                }
+                if (osNBTF != null) {
+                    osNBTF.flush();
+                }
+                if (osNBTT != null) {
+                    osNBTT.flush();
+                }
+                if (osENTCF != null) {
+                    osENTCF.flush();
+                }
+                if (osENTCT != null) {
+                    osENTCT.flush();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -190,7 +207,9 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public boolean close() {
         super.close();
         synchronized (this) {
-            boolean flushed = osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null || osENTCT != null;
+            boolean flushed =
+                osBD != null || osBIO != null || osNBTF != null || osNBTT != null && osENTCF != null
+                    || osENTCT != null;
             try {
                 if (osBD != null) {
                     osBD.close();
@@ -291,7 +310,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         enttFile.getParentFile().mkdirs();
         enttFile.createNewFile();
-        osENTCT = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(enttFile)));
+        osENTCT = new NBTOutputStream(getCompressedOS(new FileOutputStream(enttFile)));
         return osENTCT;
     }
 
@@ -302,7 +321,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         entfFile.getParentFile().mkdirs();
         entfFile.createNewFile();
-        osENTCF = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(entfFile)));
+        osENTCF = new NBTOutputStream(getCompressedOS(new FileOutputStream(entfFile)));
         return osENTCF;
     }
 
@@ -313,7 +332,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         nbttFile.getParentFile().mkdirs();
         nbttFile.createNewFile();
-        osNBTT = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(nbttFile)));
+        osNBTT = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbttFile)));
         return osNBTT;
     }
 
@@ -324,7 +343,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
         nbtfFile.getParentFile().mkdirs();
         nbtfFile.createNewFile();
-        osNBTF = new NBTOutputStream((DataOutput) getCompressedOS(new FileOutputStream(nbtfFile)));
+        osNBTF = new NBTOutputStream(getCompressedOS(new FileOutputStream(nbtfFile)));
         return osNBTF;
     }
 
@@ -343,8 +362,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!bioFile.exists()) {
             return null;
         }
-        FaweInputStream is = MainUtil.getCompressedIS(new FileInputStream(bioFile));
-        return is;
+        return MainUtil.getCompressedIS(new FileInputStream(bioFile));
     }
 
     @Override
@@ -391,8 +409,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 // skip mode
                 gis.skipFully(1);
                 // origin
-                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
-                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
+                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
+                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
                 DiskStorageSummary summary = new DiskStorageSummary(ox, oz);
                 if (!requiredRegion.isIn(ox, oz)) {
@@ -432,8 +450,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 // skip mode
                 gis.skipFully(1);
                 // origin
-                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
-                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + (gis.read() << 0));
+                ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
+                oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
                 fis.close();
                 gis.close();
@@ -446,8 +464,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     public static class DiskStorageSummary {
 
-        private final int z;
-        private final int x;
         public int[] blocks;
 
         public int minX;
@@ -458,8 +474,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
         public DiskStorageSummary(int x, int z) {
             blocks = new int[BlockTypes.states.length];
-            this.x = x;
-            this.z = z;
             minX = x;
             maxX = x;
             minZ = z;
@@ -485,7 +499,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             for (int i = 0; i < blocks.length; i++) {
                 if (blocks[i] != 0) {
                     BlockState state = BlockTypes.states[i];
-                    map.put(state, (Integer) blocks[i]);
+                    map.put(state, blocks[i]);
                 }
             }
             return map;
@@ -498,8 +512,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             for (Map.Entry<BlockState, Integer> entry : map.entrySet()) {
                 BlockState id = entry.getKey();
                 int changes = entry.getValue();
-                double percent = ((changes * 1000l) / count) / 10d;
-                newMap.put(id, (Double) percent);
+                double percent = (changes * 1000L / count) / 10d;
+                newMap.put(id, percent);
             }
             return newMap;
         }
@@ -513,15 +527,15 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
     }
 
-	@Override
-	public boolean isRecordingChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isRecordingChanges() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void setRecordChanges(boolean recordChanges) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setRecordChanges(boolean recordChanges) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

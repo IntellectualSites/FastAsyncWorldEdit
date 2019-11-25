@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.internal.annotation;
 
+import org.enginehub.piston.inject.InjectAnnotation;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,7 +30,7 @@ import java.lang.annotation.Target;
  * Indicates that this value should come from the current selection.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
+@InjectAnnotation
 public @interface Selection {
-
 }

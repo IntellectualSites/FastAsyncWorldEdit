@@ -23,18 +23,20 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 
-public class ItemType implements RegistryItem {
+public class ItemType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
 
     private String id;
+    private String name;
     private BlockType blockType;
     private boolean initBlockType;
     private BaseItem defaultState;
@@ -47,6 +49,7 @@ public class ItemType implements RegistryItem {
         this.id = id;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }
@@ -69,12 +72,14 @@ public class ItemType implements RegistryItem {
      * @return The name, or ID
      */
     public String getName() {
-        String name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().getName(this);
         if (name == null) {
-            return getId();
-        } else {
-            return name;
+            name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries()
+                    .getItemRegistry().getName(this);
+            if (name == null) {
+                name = "";
+            }
         }
+        return name.isEmpty() ? getId() : name;
     }
 
 
@@ -101,15 +106,11 @@ public class ItemType implements RegistryItem {
         return this.blockType;
     }
 
-    public void setBlockType(BlockType blockType) {
-    	this.blockType = blockType;
-    }
-
     public BaseItem getDefaultState() {
         if (defaultState == null) {
             this.defaultState = new BaseItemStack(this);
         }
-    	return this.defaultState;
+        return this.defaultState;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -26,18 +27,23 @@ public class MaskTraverser {
         }
         Class<?> current = mask.getClass();
         while (current.getSuperclass() != null) {
-            try {
-                Field field = current.getDeclaredField("extent");
-                field.setAccessible(true);
-                field.set(mask, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            if (mask instanceof AbstractExtentMask) {
+                AbstractExtentMask mask1 = (AbstractExtentMask) mask;
+                mask1.setExtent(newExtent);
+            } else {
+                try {
+                    Field field = current.getDeclaredField("extent");
+                    field.setAccessible(true);
+                    field.set(mask, newExtent);
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
             }
             try {
                 Field field = current.getDeclaredField("mask");
                 field.setAccessible(true);
                 Mask next = (Mask) field.get(mask);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("masks");
@@ -46,7 +52,7 @@ public class MaskTraverser {
                 for (Mask next : masks) {
                     reset(next, newExtent);
                 }
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             current = current.getSuperclass();
         }

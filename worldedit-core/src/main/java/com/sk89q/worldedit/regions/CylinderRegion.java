@@ -35,7 +35,6 @@ import com.sk89q.worldedit.math.geom.Polygons;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
 import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
 import com.sk89q.worldedit.world.World;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -293,6 +292,24 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         minY += changeY;
     }
 
+    /**
+     * Checks to see if a point is inside this region.
+     */
+    /* Slow and unnecessary
+    @Override
+    public boolean contains(BlockVector3 position) {
+        final int blockY = position.getBlockY();
+        if (blockY < minY || blockY > maxY) {
+            return false;
+        }
+
+        return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
+    }
+    */
+
+    /**
+     * Checks to see if a point is inside this region.
+     */
     @Override
     public boolean contains(int x, int y, int z) {
         if (y < minY || y > maxY) {
@@ -307,6 +324,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         double dz = Math.abs(z - center.getBlockZ()) * radiusInverse.getZ();
 
         return dx * dx + dz * dz <= 1;
+    }
+
+    @Override
+    public boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
     }
 
     /**
@@ -393,7 +415,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
+        final IChunkGet get, final IChunkSet set) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;

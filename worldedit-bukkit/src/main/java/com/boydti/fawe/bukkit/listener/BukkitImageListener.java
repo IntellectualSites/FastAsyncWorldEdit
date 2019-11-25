@@ -1,11 +1,9 @@
 package com.boydti.fawe.bukkit.listener;
 
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.extent.FastWorldEditExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -13,10 +11,20 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.HandSide;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Rotation;
@@ -41,14 +49,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 public class BukkitImageListener implements Listener {
+
     private Location mutable = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
 
     public BukkitImageListener(Plugin plugin) {
@@ -61,19 +63,20 @@ public class BukkitImageListener implements Listener {
         Iterator<Player> iter = recipients.iterator();
         while (iter.hasNext()) {
             Player player = iter.next();
-            if (player.equals(event.getPlayer())) continue;
-
-            FawePlayer<Object> fp = FawePlayer.wrap(player);
-            if (!fp.hasMeta()) continue;
-
+            BukkitPlayer fp = BukkitAdapter.adapt(player);
             CFICommands.CFISettings settings = fp.getMeta("CFISettings");
-            if (settings == null || !settings.hasGenerator()) continue;
+            if (player.equals(event.getPlayer()) || !fp.hasMeta() || settings == null || !settings.hasGenerator()) {
+                continue;
+            }
 
             String name = player.getName().toLowerCase();
             if (!event.getMessage().toLowerCase().contains(name)) {
                 ArrayDeque<String> buffered = fp.getMeta("CFIBufferedMessages");
-                if (buffered == null) fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
-                String full = String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage());
+                if (buffered == null) {
+                    fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
+                }
+                String full = String.format(event.getFormat(), event.getPlayer().getDisplayName(),
+                    event.getMessage());
                 buffered.add(full);
                 iter.remove();
             }
@@ -82,29 +85,42 @@ public class BukkitImageListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onHangingBreakByEntity(HangingBreakByEntityEvent event) {
-        if(!(event.getRemover() instanceof Player)) return;
+        if (!(event.getRemover() instanceof Player)) {
+            return;
+        }
         handleInteract(event, (Player) event.getRemover(), event.getEntity(), false);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if(!(event.getDamager() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player)) {
+            return;
+        }
         handleInteract(event, (Player) event.getDamager(), event.getEntity(), false);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.useItemInHand() == Event.Result.DENY) return;
+        if (event.useItemInHand() == Event.Result.DENY) {
+            return;
+        }
 
         Player player = event.getPlayer();
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
-        if (fp.getMeta("CFISettings") == null) return;
+        BukkitPlayer fp = BukkitAdapter.adapt(player);
+        if (fp.getMeta("CFISettings") == null) {
+            return;
+        }
         try {
-            if (event.getHand() == EquipmentSlot.OFF_HAND) return;
-        } catch (NoSuchFieldError | NoSuchMethodError ignored) {}
+            if (event.getHand() == EquipmentSlot.OFF_HAND) {
+                return;
+            }
+        } catch (NoSuchFieldError | NoSuchMethodError ignored) {
+        }
 
         List<Block> target = player.getLastTwoTargetBlocks(null, 100);
-        if (target.isEmpty()) return;
+        if (target.isEmpty()) {
+            return;
+        }
 
         Block targetBlock = target.get(0);
         World world = player.getWorld();
@@ -116,7 +132,8 @@ public class BukkitImageListener implements Listener {
 
         if (!entities.isEmpty()) {
             Action action = event.getAction();
-            boolean primary = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
+            boolean primary =
+                action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
 
             double minDist = Integer.MAX_VALUE;
             ItemFrame minItemFrame = null;
@@ -137,7 +154,9 @@ public class BukkitImageListener implements Listener {
             }
             if (minItemFrame != null) {
                 handleInteract(event, minItemFrame, primary);
-                if (event.isCancelled()) return;
+                if (event.isCancelled()) {
+                    return;
+                }
             }
         }
     }
@@ -148,10 +167,14 @@ public class BukkitImageListener implements Listener {
     }
 
     private BukkitImageViewer get(HeightMapMCAGenerator generator) {
-        if (generator == null) return null;
+        if (generator == null) {
+            return null;
+        }
 
         ImageViewer viewer = generator.getImageViewer();
-        if (!(viewer instanceof BukkitImageViewer)) return null;
+        if (!(viewer instanceof BukkitImageViewer)) {
+            return null;
+        }
 
         return (BukkitImageViewer) viewer;
     }
@@ -161,14 +184,18 @@ public class BukkitImageListener implements Listener {
     }
 
     private void handleInteract(Event event, Player player, Entity entity, boolean primary) {
-        if (!(entity instanceof ItemFrame)) return;
+        if (!(entity instanceof ItemFrame)) {
+            return;
+        }
         ItemFrame itemFrame = (ItemFrame) entity;
 
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
+        BukkitPlayer fp = BukkitAdapter.adapt(player);
         CFICommands.CFISettings settings = fp.getMeta("CFISettings");
         HeightMapMCAGenerator generator = settings == null ? null : settings.getGenerator();
         BukkitImageViewer viewer = get(generator);
-        if (viewer == null) return;
+        if (viewer == null) {
+            return;
+        }
 
         if (itemFrame.getRotation() != Rotation.NONE) {
             itemFrame.setRotation(Rotation.NONE);
@@ -177,8 +204,10 @@ public class BukkitImageListener implements Listener {
         LocalSession session = fp.getSession();
         BrushTool tool;
         try {
-            tool = session.getBrushTool(fp.getPlayer(), false);
-        } catch (InvalidToolBindException e) { return; }
+            tool = session.getBrushTool(fp.getItemInHand(HandSide.MAIN_HAND).getType());
+        } catch (InvalidToolBindException e) {
+            return;
+        }
 
         ItemFrame[][] frames = viewer.getItemFrames();
         if (frames == null || tool == null) {
@@ -188,10 +217,10 @@ public class BukkitImageListener implements Listener {
             return;
         }
 
-        BrushSettings context = primary ? tool.getPrimary() : tool.getSecondary();
-        Brush brush = context.getBrush();
-        if (brush == null) return;
-        tool.setContext(context);
+        Brush brush = tool.getBrush();
+        if (brush == null) {
+            return;
+        }
 
         if (event instanceof Cancellable) {
             ((Cancellable) event).setCancelled(true);
@@ -208,7 +237,7 @@ public class BukkitImageListener implements Listener {
         double zRat = Math.sin(yawRad) * a;
 
         BlockFace facing = itemFrame.getFacing();
-        double thickness = 1/32D + 1/128D;
+        double thickness = 1 / 32D + 1 / 128D;
         double modX = facing.getModX();
         double modZ = facing.getModZ();
         double dx = source.getX() - target.getX() - modX * thickness;
@@ -225,8 +254,8 @@ public class BukkitImageListener implements Listener {
             localX = (modZ) * (dx - offset * xRat);
         }
         double localY = dy - offset * Math.sin(pitchRad);
-        int localPixelX = (int)((localX + 0.5) * 128);
-        int localPixelY = (int)((localY + 0.5) * 128);
+        int localPixelX = (int) ((localX + 0.5) * 128);
+        int localPixelY = (int) ((localY + 0.5) * 128);
 
         UUID uuid = itemFrame.getUniqueId();
         for (int blockX = 0; blockX < frames.length; blockX++) {
@@ -240,30 +269,35 @@ public class BukkitImageListener implements Listener {
                     int worldX = (int) (pixelX * width / (frames.length * 128d));
                     int worldZ = (int) (pixelY * length / (frames[0].length * 128d));
 
-                    if (worldX < 0 || worldX > width || worldZ < 0 || worldZ > length) return;
-
+                    if (worldX < 0 || worldX > width || worldZ < 0 || worldZ > length) {
+                        return;
+                    }
 
                     fp.runAction(() -> {
                         BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
                         viewer.refresh();
-                        int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
+                        int topY = generator
+                            .getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255,
+                                0, 255);
                         wPos = wPos.withY(topY);
 
-                        EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
+                        EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp)
+                            .combineStages(false).autoQueue(false).blockBag(null).limitUnlimited()
+                            .build();
                         ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
-                        if (last.get() instanceof FastWorldEditExtent) last = last.previous();
+                        Extent extent = last.get();
+                        if (extent instanceof IQueueExtent) {
+                            last = last.previous();
+                        }
                         last.setNext(generator);
                         try {
-                            brush.build(es, wPos, context.getMaterial(), context.getSize());
+                            brush.build(es, wPos, tool.getMaterial(), tool.getSize());
                         } catch (WorldEditException e) {
                             e.printStackTrace();
                         }
                         es.flushQueue();
                         viewer.view(generator);
                     }, true, true);
-
-
-
 
                     return;
                 }

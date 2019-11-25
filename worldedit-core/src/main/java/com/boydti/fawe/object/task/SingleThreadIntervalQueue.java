@@ -5,10 +5,11 @@ import com.boydti.fawe.util.TaskManager;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class SingleThreadIntervalQueue<T> {
-    private final ConcurrentHashMap<T, Long> objMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<T, Long> objMap = new ConcurrentHashMap<>();
     private final Runnable task;
     private AtomicBoolean queued = new AtomicBoolean();
 

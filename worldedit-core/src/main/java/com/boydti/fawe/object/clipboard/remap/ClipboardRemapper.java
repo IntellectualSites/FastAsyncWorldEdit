@@ -5,9 +5,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import java.io.File;
@@ -223,7 +223,7 @@ public class ClipboardRemapper {
 //                String name = entry.getKey();
 //                int id = value.get("id").getAsInt();
 //                int data = value.get("data").getAsInt();
-//                int combined = FaweCache.getCombined(id, data);
+//                int combined = FaweCache.IMP.getCombined(id, data);
 //                map.putIfAbsent(name, new ArrayList<>());
 //                map.get(name).add(combined);
 //            }
@@ -247,12 +247,11 @@ public class ClipboardRemapper {
 
         mapPEtoPC.put(new BaseBlock(198,-1), new BaseBlock(208,-1));
         mapPEtoPC.put(new BaseBlock(207,-1), new BaseBlock(212,-1));
-        { // beetroot
-            mapPEtoPC.put(new BaseBlock(244, 2), new BaseBlock(207, 1));
-            mapPEtoPC.put(new BaseBlock(244, 4), new BaseBlock(207, 2));
-            mapPEtoPC.put(new BaseBlock(244, 7), new BaseBlock(207, 3));
-            for (int data = 3; data < 16; data++) mapPEtoPC.putIfAbsent(new BaseBlock(244, data), new BaseBlock(207, data));
-        }
+        // beetroot
+        mapPEtoPC.put(new BaseBlock(244, 2), new BaseBlock(207, 1));
+        mapPEtoPC.put(new BaseBlock(244, 4), new BaseBlock(207, 2));
+        mapPEtoPC.put(new BaseBlock(244, 7), new BaseBlock(207, 3));
+        for (int data = 3; data < 16; data++) mapPEtoPC.putIfAbsent(new BaseBlock(244, data), new BaseBlock(207, data));
 
         for (int data = 0; data < 16; data++) {
             mapPEtoPC.put(new BaseBlock(218, data), new BaseBlock(219 + data, -1));
@@ -497,7 +496,7 @@ public class ClipboardRemapper {
 //        int combined = block.getCombined();
 //        if (remap[combined]) {
 //            char value = remapCombined[combined];
-//            BaseBlock newBlock = FaweCache.CACHE_BLOCK[value];
+//            BaseBlock newBlock = FaweCache.IMP.CACHE_BLOCK[value];
 //            newBlock.setNbtData(block.getNbtData());
 //            return newBlock;
 //        }

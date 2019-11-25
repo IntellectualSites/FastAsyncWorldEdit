@@ -2,29 +2,32 @@ package com.boydti.fawe.bukkit.v1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.bukkit.BukkitPlayer;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
-import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
+import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.brush.visualization.VisualChunk;
-import com.boydti.fawe.object.visitor.FaweChunkVisitor;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.atomic.LongAdder;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -39,12 +42,10 @@ import net.minecraft.server.v1_14_R1.DataPaletteHash;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EnumSkyBlock;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.IChunkAccess;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.Packet;
 import net.minecraft.server.v1_14_R1.PacketDataSerializer;
 import net.minecraft.server.v1_14_R1.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
@@ -61,15 +62,6 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[], ChunkSection> {
 
@@ -530,7 +522,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
     public int getCombinedId4Data(ChunkSection lastSection, int x, int y, int z) {
         DataPaletteBlock<IBlockData> dataPalette = lastSection.getBlocks();
         IBlockData ibd = dataPalette.a(x & 15, y & 15, z & 15);
-        int ordinal = ((Spigot_v1_14_R1) getAdapter()).adaptToInt(ibd);
+        int ordinal = ((Spigot_v1_14_R4) getAdapter()).adaptToInt(ibd);
         return BlockTypes.states[ordinal].getInternalId();
     }
 
@@ -559,12 +551,12 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
     public void sendChunk(int x, int z, int bitMask) {
         IChunkAccess chunk = getCachedChunk(getWorld(), x, z);
         if (chunk != null) {
-            sendChunk(getPlayerChunk((WorldServer) nmsWorld, x, z), chunk, bitMask);
+            sendChunk(getPlayerChunk(nmsWorld, x, z), chunk, bitMask);
         }
     }
 
     @Override
-    public void sendChunkUpdatePLIB(FaweChunk chunk, FawePlayer... players) {
+    public void sendChunkUpdatePLIB(FaweChunk chunk, Player... players) {
 //        PlayerChunkMap playerManager = ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap();
 //        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 //        WirePacket packet = null;
@@ -597,7 +589,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
     }
 
     @Override
-    public void sendBlockUpdate(FaweChunk chunk, FawePlayer... players) {
+    public void sendBlockUpdate(FaweChunk chunk, Player... players) {
         try {
             PlayerChunkMap playerManager = ((CraftWorld) getWorld()).getHandle().getChunkProvider().playerChunkMap;
             boolean[] watching = new boolean[1];
@@ -605,15 +597,12 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
             ChunkCoordIntPair pair = new ChunkCoordIntPair(chunk.getX(), chunk.getZ());
             PlayerChunk plrChunk = playerManager.visibleChunks.get(pair.pair());
             if (plrChunk != null) {
-                plrChunk.players.a(pair, false).forEach(new Consumer<EntityPlayer>() {
-                    @Override
-                    public void accept(EntityPlayer entityPlayer) {
-                        for (int i = 0; i < players.length; i++) {
-                            EntityPlayer player = ((CraftPlayer) ((BukkitPlayer) players[i]).parent).getHandle();
-                            if (player == entityPlayer) {
-                                watchingArr[i] = true;
-                                watching[0] = true;
-                            }
+                plrChunk.players.a(pair, false).forEach(entityPlayer -> {
+                    for (int i = 0; i < players.length; i++) {
+                        EntityPlayer player = ((CraftPlayer) players[i]).getHandle();
+                        if (player == entityPlayer) {
+                            watchingArr[i] = true;
+                            watching[0] = true;
                         }
                     }
                 });
@@ -625,12 +614,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
             } else if (chunk instanceof IntFaweChunk) {
                 size.add(((IntFaweChunk) chunk).getTotalCount());
             } else {
-                chunk.forEachQueuedBlock(new FaweChunkVisitor() {
-                    @Override
-                    public void run(int localX, int y, int localZ, int combined) {
-                        size.add(1);
-                    }
-                });
+                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> size.add(1));
             }
             if (size.intValue() == 0) return;
             PacketPlayOutMultiBlockChange packet = new PacketPlayOutMultiBlockChange();
@@ -639,18 +623,15 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
             buffer.writeInt(chunk.getX());
             buffer.writeInt(chunk.getZ());
             buffer.d(size.intValue());
-            chunk.forEachQueuedBlock(new FaweChunkVisitor() {
-                @Override
-                public void run(int localX, int y, int localZ, int combined) {
-                    short index = (short) (localX << 12 | localZ << 8 | y);
-                    if (combined < 16) combined = 0;
-                    buffer.writeShort(index);
-                    buffer.d(combined);
-                }
+            chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
+                short index = (short) (localX << 12 | localZ << 8 | y);
+                if (combined < 16) combined = 0;
+                buffer.writeShort(index);
+                buffer.d(combined);
             });
             packet.a(buffer);
             for (int i = 0; i < players.length; i++) {
-                if (watchingArr[i]) ((CraftPlayer) ((BukkitPlayer) players[i]).parent).getHandle().playerConnection.sendPacket(packet);
+                if (watchingArr[i]) ((CraftPlayer) players[i]).getHandle().playerConnection.sendPacket(packet);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -664,11 +645,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
 
     private PlayerChunk getPlayerChunk(WorldServer w, int cx, int cz) {
         PlayerChunkMap chunkMap = w.getChunkProvider().playerChunkMap;
-        PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
-        if (playerChunk == null) {
-            return null;
-        }
-        return playerChunk;
+        return chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
     }
 
     public boolean sendChunk(PlayerChunk playerChunk, IChunkAccess nmsChunk, int mask) {
@@ -681,27 +658,24 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
                 sections[layer] = new ChunkSection(layer << 4);
             }
         }
-        TaskManager.IMP.sync(new Supplier<Object>() {
-            @Override
-            public Object get() {
-                try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
-                        ((CraftWorld) getWorld()).getHandle().getChunkProvider().playerChunkMap.a(playerChunk);
-                    }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
-                    }
-
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+        TaskManager.IMP.sync(() -> {
+            try {
+                int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                if (dirtyBits == 0) {
+                    ((CraftWorld) getWorld()).getHandle().getChunkProvider().playerChunkMap.a(playerChunk);
                 }
-                return null;
+                if (mask == 0) {
+                    dirtyBits = 65535;
+                } else {
+                    dirtyBits |= mask;
+                }
+
+                fieldDirtyBits.set(playerChunk, dirtyBits);
+                fieldDirtyCount.set(playerChunk, 64);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
+            return null;
         });
 //        if (mask == 0) {
 //            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65535);
@@ -743,8 +717,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[]
     public boolean hasEntities(net.minecraft.server.v1_14_R1.Chunk nmsChunk) {
         try {
             final Collection<Entity>[] entities = nmsChunk.entitySlices;
-            for (int i = 0; i < entities.length; i++) {
-                Collection<Entity> slice = entities[i];
+            for (Collection<Entity> slice : entities) {
                 if (slice != null && !slice.isEmpty()) {
                     return true;
                 }

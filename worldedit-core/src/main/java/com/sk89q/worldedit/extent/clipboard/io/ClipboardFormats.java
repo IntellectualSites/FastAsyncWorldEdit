@@ -36,8 +36,6 @@ import com.google.common.io.Files;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,8 +57,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 public class ClipboardFormats {
 
@@ -72,7 +69,7 @@ public class ClipboardFormats {
         checkNotNull(format);
 
         for (String key : format.getAliases()) {
-            String lowKey = key.toLowerCase(Locale.ROOT);
+            String lowKey = key.toLowerCase(Locale.ENGLISH);
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
@@ -80,7 +77,7 @@ public class ClipboardFormats {
             }
         }
         for (String ext : format.getFileExtensions()) {
-            String lowExt = ext.toLowerCase(Locale.ROOT);
+            String lowExt = ext.toLowerCase(Locale.ENGLISH);
             fileExtensionMap.put(lowExt, format);
         }
         registeredFormats.add(format);
@@ -102,7 +99,7 @@ public class ClipboardFormats {
     @Nullable
     public static ClipboardFormat findByAlias(String alias) {
         checkNotNull(alias);
-        return aliasMap.get(alias.toLowerCase(Locale.ROOT).trim());
+        return aliasMap.get(alias.toLowerCase(Locale.ENGLISH).trim());
     }
 
     /**
@@ -132,15 +129,15 @@ public class ClipboardFormats {
      */
     @Nullable
     public static ClipboardFormat findByExtension(String extension) {
-    	checkNotNull(extension);
+        checkNotNull(extension);
 
-    	Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
-    	for(Map.Entry<String, ClipboardFormat> entry : entries) {
-    		if(entry.getKey().equalsIgnoreCase(extension)) {
-    			return entry.getValue();
-    		}
-    	}
-    	return null;
+        Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
+        for(Map.Entry<String, ClipboardFormat> entry : entries) {
+            if(entry.getKey().equalsIgnoreCase(extension)) {
+                return entry.getValue();
+            }
+        }
+        return null;
 
     }
 
@@ -190,8 +187,7 @@ public class ClipboardFormats {
                 if (message) BBC.WEB_UNAUTHORIZED.send(player, url);
                 return null;
             }
-            MultiClipboardHolder clipboards = loadAllFromUrl(url);
-            return clipboards;
+            return loadAllFromUrl(url);
         } else {
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
                 BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
@@ -218,7 +214,7 @@ public class ClipboardFormats {
                     return null;
                 }
                 if (format == null && input.matches(".*\\.[\\w].*")) {
-                    String extension = input.substring(input.lastIndexOf('.') + 1, input.length());
+                    String extension = input.substring(input.lastIndexOf('.') + 1);
                     format = findByExtension(extension);
                 }
                 f = MainUtil.resolve(dir, input, format, true);
@@ -230,7 +226,7 @@ public class ClipboardFormats {
                 }
             }
             if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
+                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
                 return null;
             }
             if (format == null && f.isFile()) {
@@ -262,8 +258,8 @@ public class ClipboardFormats {
         HashSet<String> extensions = new HashSet<>(Arrays.asList(ClipboardFormats.getFileExtensionArray()));
         File[] files = dir.listFiles(pathname -> {
             String input = pathname.getName();
-            String extension = input.substring(input.lastIndexOf('.') + 1, input.length());
-            return (extensions.contains(extension.toLowerCase()));
+            String extension = input.substring(input.lastIndexOf('.') + 1);
+            return (extensions.contains(extension.toLowerCase(Locale.ENGLISH)));
         });
         LazyClipboardHolder[] clipboards = new LazyClipboardHolder[files.length];
         for (int i = 0; i < files.length; i++) {
@@ -287,11 +283,11 @@ public class ClipboardFormats {
                         ClipboardFormat format = findByExtension(filename);
                         if (format != null) {
                             FastByteArrayOutputStream out = new FastByteArrayOutputStream();
-                            int len = 0;
+                            int len;
                             while ((len = zip.read(buffer)) > 0) {
                                 out.write(buffer, 0, len);
                             }
-                            byte[] array = out.toByteArray();
+                            byte[] array = out.toByteArrayUnsafe();
                             ByteSource source = ByteSource.wrap(array);
                             LazyClipboardHolder clipboard = new LazyClipboardHolder(url.toURI(), source, format, null);
                             clipboards.add(clipboard);
@@ -302,7 +298,7 @@ public class ClipboardFormats {
                 }
             }
         }
-        LazyClipboardHolder[] arr = clipboards.toArray(new LazyClipboardHolder[clipboards.size()]);
+        LazyClipboardHolder[] arr = clipboards.toArray(new LazyClipboardHolder[0]);
         try {
             MultiClipboardHolder multi = new MultiClipboardHolder(url.toURI());
             for (LazyClipboardHolder h : arr) multi.add(h);

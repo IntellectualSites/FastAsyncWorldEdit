@@ -1,10 +1,6 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.FaweCache;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.FileNotFoundException;
 

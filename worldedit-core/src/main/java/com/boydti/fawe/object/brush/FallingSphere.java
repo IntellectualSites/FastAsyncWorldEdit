@@ -15,8 +15,6 @@ public class FallingSphere implements Brush {
         int pz = position.getBlockZ();
         int maxY = editSession.getMaxY();
 
-        int lastY = py;
-
         int radius = (int) Math.round(size);
         int radiusSqr = (int) Math.round(size * size);
         for (int z = -radius; z <= radius; z++) {

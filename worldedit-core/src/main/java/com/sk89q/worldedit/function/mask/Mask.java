@@ -19,17 +19,12 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.FilterBlock;
-import com.sk89q.minecraft.util.commands.Link;
-import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import javax.annotation.Nullable;
 
 /**
  * Tests whether a given vector meets a criteria.
  */
-@Link(clazz = UtilityCommands.class, value = "masks")
 public interface Mask {
 
     /**
@@ -50,16 +45,26 @@ public interface Mask {
         return null;
     }
 
+    /**
+     * Returns null if no optimization took place
+     * otherwise a new/same mask
+     * @return
+     */
+    default Mask tryOptimize() {
+        return null;
+    }
+
+    default Mask tryCombine(Mask other) {
+        return null;
+    }
+
+    default Mask tryOr(Mask other) {
+        return null;
+    }
+
     default Mask optimize() {
-        return null;
-    }
-
-    default Mask and(Mask other) {
-        return null;
-    }
-
-    default Mask or(Mask other) {
-        return null;
+        Mask value = tryOptimize();
+        return value == null ? this : value;
     }
 
     default Mask inverse() {

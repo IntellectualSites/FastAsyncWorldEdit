@@ -19,34 +19,34 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.util.IOUtil;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.FloatTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
@@ -57,11 +57,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 
 /**
  * Writes schematic files using the Sponge schematic format.
  */
 public class SpongeSchematicWriter implements ClipboardWriter {
+
+    private static final int CURRENT_VERSION = 2;
 
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     private final NBTOutputStream outputStream;
@@ -78,16 +84,16 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
-        write1(clipboard);
+        // For now always write the latest version. Maybe provide support for earlier if more appear.
+        write2(clipboard);
     }
 
     /**
-     * Writes a version 1 schematic file.
+     * Writes a version 2 schematic file.
      *
      * @param clipboard The clipboard
-     * @throws IOException If an error occurs
      */
-    private void write1(Clipboard clipboard) throws IOException {
+    private void write2(Clipboard clipboard) throws IOException {
         Region region = clipboard.getRegion();
         BlockVector3 origin = clipboard.getOrigin();
         BlockVector3 min = region.getMinimumPoint();
@@ -108,8 +114,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
-            out.writeNamedTag("Version", 1);
-            out.writeNamedTag("Width",  (short) width);
+            out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
+            out.writeNamedTag("Version", CURRENT_VERSION);
+            out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
 
@@ -173,11 +180,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                             palette[ordinal] = value = (char) size;
                             paletteList.add(ordinal);
                         }
-                        while ((value & -128) != 0) {
-                            blocksOut.write(value & 127 | 128);
-                            value >>>= 7;
-                        }
-                        blocksOut.write(value);
+                        IOUtil.writeVarInt(blocksOut, value);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -225,6 +228,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 out.writeNamedEmptyList("TileEntities");
             }
 
+            if (clipboard.hasBiomes()) {
+                writeBiomes(clipboard, out);
+            }
+
             List<Tag> entities = new ArrayList<>();
             for (Entity entity : clipboard.getEntities()) {
                 BaseEntity state = entity.getState();
@@ -239,9 +246,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                     }
 
                     // Store our location data, overwriting any
-                    values.put("id", new StringTag(state.getType().getId()));
-                    values.put("Pos", writeVector(entity.getLocation(), "Pos"));
-                    values.put("Rotation", writeRotation(entity.getLocation(), "Rotation"));
+                    values.remove("id");
+                    values.put("Id", new StringTag(state.getType().getId()));
+                    values.put("Pos", writeVector(entity.getLocation()));
+                    values.put("Rotation", writeRotation(entity.getLocation()));
 
                     CompoundTag entityTag = new CompoundTag(values);
                     entities.add(entityTag);
@@ -255,19 +263,87 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         });
     }
 
-    private static Tag writeVector(Vector3 vector, String name) {
-        List<DoubleTag> list = new ArrayList<>();
-        list.add(new DoubleTag(vector.getX()));
-        list.add(new DoubleTag(vector.getY()));
-        list.add(new DoubleTag(vector.getZ()));
-        return new ListTag(DoubleTag.class, list);
+    private void writeBiomes(Clipboard clipboard, NBTOutputStream out) throws IOException {
+        ByteArrayOutputStream biomesCompressed = new ByteArrayOutputStream();
+        DataOutputStream biomesOut = new DataOutputStream(new LZ4BlockOutputStream(biomesCompressed));
+
+        List<Integer> paletteList = new ArrayList<>();
+        int[] palette = new int[BiomeTypes.getMaxId() + 1];
+        Arrays.fill(palette, Integer.MAX_VALUE);
+        int[] paletteMax = {0};
+        NBTStreamer.ByteReader task = new NBTStreamer.ByteReader() {
+            @Override
+            public void run(int index, int ordinal) {
+                try {
+                    int value = palette[ordinal];
+                    if (value == Integer.MAX_VALUE) {
+                        int size = paletteMax[0]++;
+                        palette[ordinal] = value = size;
+                        paletteList.add(ordinal);
+                    }
+                    IOUtil.writeVarInt(biomesOut, value);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        if (clipboard instanceof BlockArrayClipboard) {
+            ((BlockArrayClipboard) clipboard).IMP.streamBiomes(task);
+        } else {
+            BlockVector3 min = clipboard.getMinimumPoint();
+            int width = clipboard.getRegion().getWidth();
+            int length = clipboard.getRegion().getLength();
+            for (int z = 0, i = 0; z < length; z++) {
+                int z0 = min.getBlockZ() + z;
+                for (int x = 0; x < width; x++, i++) {
+                    int x0 = min.getBlockX() + x;
+                    BlockVector2 pt = BlockVector2.at(x0, z0);
+                    BiomeType biome = clipboard.getBiome(pt);
+                    task.run(i, biome.getInternalId());
+                }
+            }
+        }
+        biomesOut.close();
+
+        out.writeNamedTag("BiomePaletteMax", paletteMax[0]);
+
+        out.writeLazyCompoundTag("BiomePalette", out12 -> {
+            for (int i = 0; i < paletteList.size(); i++) {
+                int ordinal = paletteList.get(i);
+                BiomeType state = BiomeTypes.get(ordinal);
+                out12.writeNamedTag(state.getId(), i);
+            }
+        });
+
+        out.writeNamedTagName("BiomeData", NBTConstants.TYPE_BYTE_ARRAY);
+        out.writeInt(biomesOut.size());
+        try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(biomesCompressed.toByteArray()))) {
+            IOUtil.copy(in, (DataOutput) out);
+        }
     }
 
-    private static Tag writeRotation(Location location, String name) {
-        List<FloatTag> list = new ArrayList<>();
-        list.add(new FloatTag(location.getYaw()));
-        list.add(new FloatTag(location.getPitch()));
-        return new ListTag(FloatTag.class, list);
+    private void writeEntities(Clipboard clipboard, NBTOutputStream schematic) throws IOException {
+        List<CompoundTag> entities = clipboard.getEntities().stream().map(e -> {
+            BaseEntity state = e.getState();
+            if (state == null) {
+                return null;
+            }
+            Map<String, Tag> values = Maps.newHashMap();
+            CompoundTag rawData = state.getNbtData();
+            if (rawData != null) {
+                values.putAll(rawData.getValue());
+            }
+            values.remove("id");
+            values.put("Id", new StringTag(state.getType().getId()));
+            values.put("Pos", writeVector(e.getLocation().toVector()));
+            values.put("Rotation", writeRotation(e.getLocation()));
+
+            return new CompoundTag(values);
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        if (entities.isEmpty()) {
+            return;
+        }
+        schematic.writeNamedTag("Entities", new ListTag(CompoundTag.class, entities));
     }
 
     @Override

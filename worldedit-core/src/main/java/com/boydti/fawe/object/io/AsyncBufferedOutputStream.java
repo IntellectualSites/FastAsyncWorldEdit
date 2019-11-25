@@ -36,7 +36,7 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Creates an asynchronous buffered output stream with defined buffersize and
+     * Creates an asynchronous buffered output stream with defined bufferSize and
      * 5 maximal buffers.
      */
     public AsyncBufferedOutputStream(OutputStream out, int bufSize) {
@@ -46,7 +46,7 @@ public final class AsyncBufferedOutputStream extends FilterOutputStream {
     /**
      * Creates an asynchronous buffered output stream.
      *
-     * @param out        the outputstream to layer on.
+     * @param out        the outputStream to layer on.
      * @param bufSize    the buffer size.
      * @param maxBuffers the number of buffers to keep in parallel.
      */

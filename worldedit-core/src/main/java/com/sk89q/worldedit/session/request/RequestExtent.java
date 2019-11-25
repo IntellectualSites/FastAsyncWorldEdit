@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.session.request;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -33,9 +34,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class RequestExtent implements Extent {
 
@@ -45,7 +45,8 @@ public class RequestExtent implements Extent {
         if (request == null || !request.isValid()) {
             request = Request.request();
         }
-        return request.getEditSession();
+        final EditSession editSession = request.getEditSession();
+        return editSession == null ? request.getWorld() : editSession;
     }
 
     @Override
@@ -95,8 +96,24 @@ public class RequestExtent implements Extent {
     }
 
     @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return getExtent().setBlock(x, y, z, block);
+    }
+
+    @Override
+    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        getExtent().setTile(x, y, z, tile);
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return getExtent().setBiome(BlockVector2.at(x,z), biome);
     }
 
     @Override

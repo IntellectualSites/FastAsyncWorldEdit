@@ -1,16 +1,14 @@
 package com.boydti.fawe.beta;
 
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent}
@@ -52,8 +50,8 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
 
     /**
      * Call and join
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws ExecutionException if the computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted while waiting
      */
     default void join() throws ExecutionException, InterruptedException {
         T future = call();
@@ -68,8 +66,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
      * @param filter the filter
      * @param block The filter block
      * @param region The region allowed to filter (may be null)
-     * @param unitialized a mutable block vector (buffer)
-     * @param unitialized2 a mutable block vector (buffer)
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 

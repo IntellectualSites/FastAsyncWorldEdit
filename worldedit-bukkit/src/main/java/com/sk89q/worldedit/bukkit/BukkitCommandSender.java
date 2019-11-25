@@ -22,19 +22,19 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.extension.platform.AbstractNonPlayerActor;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
+import java.util.UUID;
+import javax.annotation.Nullable;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
-public class BukkitCommandSender implements Actor {
+public class BukkitCommandSender extends AbstractNonPlayerActor {
 
     /**
      * One time generated ID.
@@ -92,8 +92,8 @@ public class BukkitCommandSender implements Actor {
     }
 
     @Override
-    public boolean canDestroyBedrock() {
-        return true;
+    public void print(Component component) {
+        TextAdapter.sendComponent(sender, WorldEditText.format(component));
     }
 
     @Override
@@ -106,27 +106,15 @@ public class BukkitCommandSender implements Actor {
         return true;
     }
 
-    @Override
-    public void checkPermission(String permission) throws AuthorizationException {
-    }
-
-    @Override
-    public boolean isPlayer() {
+    @Override public boolean togglePermission(String permission) {
         return false;
     }
 
-    @Override
-    public File openFileOpenDialog(String[] extensions) {
-        return null;
+    @Override public void setPermission(String permission, boolean value) {
     }
 
     @Override
-    public File openFileSaveDialog(String[] extensions) {
-        return null;
-    }
-
-    @Override
-    public void dispatchCUIEvent(CUIEvent event) {
+    public void checkPermission(String permission) throws AuthorizationException {
     }
 
     @Override
@@ -135,17 +123,21 @@ public class BukkitCommandSender implements Actor {
             @Nullable
             @Override
             public String getName() {
-                return null;
+                return sender.getName();
             }
 
             @Override
             public boolean isActive() {
-                return false;
+                if (sender instanceof Entity) {
+                    Entity entity = (Entity) sender;
+                    return (entity.isValid() && !entity.isDead());
+                }
+                return true;
             }
 
             @Override
             public boolean isPersistent() {
-                return false;
+                return true;
             }
 
             @Override

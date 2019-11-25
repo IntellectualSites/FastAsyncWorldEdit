@@ -187,6 +187,7 @@ public class OldChunk implements Chunk {
         }
         if (state.getBlockType().getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
+
             if (tileEntity != null) {
                 return state.toBaseBlock(tileEntity);
             }

@@ -2,32 +2,43 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
-import com.boydti.fawe.regions.general.plot.PlotSquaredFeature;
-import com.boydti.fawe.util.*;
-import com.boydti.fawe.util.chat.ChatManager;
-import com.boydti.fawe.util.chat.PlainChatManager;
+import com.boydti.fawe.util.CachedTextureUtil;
+import com.boydti.fawe.util.CleanTextureUtil;
+import com.boydti.fawe.util.FaweTimer;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.MemUtil;
+import com.boydti.fawe.util.RandomTextureUtil;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.TextureUtil;
+import com.boydti.fawe.util.WEManager;
+import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
-
-import javax.annotation.Nullable;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.NotificationEmitter;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.NotificationEmitter;
 
 /**
  * [ WorldEdit action]
@@ -80,7 +91,6 @@ public class Fawe {
     private VisualQueue visualQueue;
     private TextureUtil textures;
     private DefaultTransformParser transformParser;
-    private ChatManager chatManager = new PlainChatManager();
 
     private QueueHandler queueHandler;
 
@@ -95,16 +105,14 @@ public class Fawe {
     }
 
     /**
-     * Get the implementation independent class
-     *
-     * @return
+     * Gets the implementation independent class.
      */
     public static Fawe get() {
         return INSTANCE;
     }
 
     /**
-     * Setup Fawe
+     * Setup Fawe.
      *
      * @param implementation
      * @throws InstanceAlreadyExistsException
@@ -123,7 +131,7 @@ public class Fawe {
         if (INSTANCE != null) {
             INSTANCE.IMP.debug(s);
         } else {
-            System.out.println(BBC.stripColor(BBC.color(s)));
+            System.out.println(s);
         }
     }
 
@@ -135,10 +143,10 @@ public class Fawe {
     public static void debug(Object s) {
         Actor actor = Request.request().getActor();
         if (actor != null && actor.isPlayer()) {
-            actor.print(BBC.color(BBC.PREFIX.original() + " " + s));
+            actor.print((String)s);
             return;
         }
-        debugPlain(BBC.PREFIX.original() + " " + s);
+        debugPlain((String) s);
     }
 
     /**
@@ -175,13 +183,12 @@ public class Fawe {
                 transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                WEManager.IMP.managers.add(new PlotSquaredFeature());
                 Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
             try {
                 imp().startMetrics();
-            } catch (Throwable ignored) {
-                debug(ignored.getMessage());
+            } catch (Throwable e) {
+                debug(e.getMessage());
             }
         }, 0);
 
@@ -202,20 +209,12 @@ public class Fawe {
         return queueHandler;
     }
 
-    public ChatManager getChatManager() {
-        return chatManager;
-    }
-
-    public void setChatManager(ChatManager chatManager) {
-        checkNotNull(chatManager);
-        this.chatManager = chatManager;
-    }
-
     public DefaultTransformParser getTransformParser() {
         return transformParser;
     }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
+        // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util
         TextureUtil tu = getTextureUtil();
         try {
             tu = min == 0 && max == 100 ? tu : new CleanTextureUtil(tu, min, max);
@@ -245,18 +244,18 @@ public class Fawe {
     }
 
     /**
-     * The FaweTimer is a useful class for monitoring TPS
+     * The FaweTimer is a useful class for monitoring TPS.
      *
-     * @return FaweTimer
+     * @return the FaweTimer object
      */
     public FaweTimer getTimer() {
         return timer;
     }
 
     /**
-     * The visual queue is used to queue visualizations
+     * The visual queue is used to queue visualizations.
      *
-     * @return
+     * @return the VisualQueue object
      */
     public VisualQueue getVisualQueue() {
         return visualQueue;
@@ -268,9 +267,8 @@ public class Fawe {
      *
      * @return FaweVersion
      */
-    public
     @Nullable
-    FaweVersion getVersion() {
+    public FaweVersion getVersion() {
         return version;
     }
 
@@ -308,7 +306,6 @@ public class Fawe {
             // Setting up message.yml
             String lang = Objects.toString(Settings.IMP.LANGUAGE);
             BBC.load(new File(this.IMP.getDirectory(), (lang.isEmpty() ? "" : lang + File.separator) + "message.yml"));
-            Commands.load(new File(INSTANCE.IMP.getDirectory(), "commands.yml"));
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");
@@ -331,7 +328,7 @@ public class Fawe {
          */
         if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {
             try {
-                com.github.luben.zstd.util.Native.load();
+                Native.load();
             } catch (Throwable e) {
                 if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
@@ -364,7 +361,6 @@ public class Fawe {
             if (x86OS != x86JVM) {
                 debug("====== UPGRADE TO 64-BIT JAVA ======");
                 debug("You are running 32-bit Java on a 64-bit machine");
-                debug(" - This is only a recommendation");
                 debug("====================================");
             }
         } catch (Throwable ignore) {}
@@ -399,9 +395,8 @@ public class Fawe {
                     mp.setUsageThreshold(alert);
                 }
             }
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
             debug("====== MEMORY LISTENER ERROR ======");
-            e.printStackTrace();
             debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");
@@ -411,8 +406,8 @@ public class Fawe {
     }
 
     /**
-     * Get the main thread
-     *
+     * Gets the main thread.
+     * //TODO Consider removing this (see setMainThread)
      * @return
      */
     public Thread getMainThread() {
@@ -424,37 +419,37 @@ public class Fawe {
     }
 
     /**
-     * Sets the main thread to the current thread
-     *
+     * Sets the main thread to the current thread.
+     * //TODO Consider removing this changing the main thread can cause confusion especially if someone is using getMainThread)
      * @return
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
     }
 
-    private ConcurrentHashMap<String, FawePlayer> players = new ConcurrentHashMap<>(8, 0.9f, 1);
-    private ConcurrentHashMap<UUID, FawePlayer> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private ConcurrentHashMap<UUID, Player> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
 
-    public <T> void register(FawePlayer<T> player) {
+    public <T> void register(Player player) {
         players.put(player.getName(), player);
-        playersUUID.put(player.getUUID(), player);
+        playersUUID.put(player.getUniqueId(), player);
 
     }
 
     public <T> void unregister(String name) {
-        FawePlayer player = players.remove(name);
-        if (player != null) playersUUID.remove(player.getUUID());
+        Player player = players.remove(name);
+        if (player != null) playersUUID.remove(player.getUniqueId());
     }
 
-    public FawePlayer getCachedPlayer(String name) {
+    public Player getCachedPlayer(String name) {
         return players.get(name);
     }
 
-    public FawePlayer getCachedPlayer(UUID uuid) {
+    public Player getCachedPlayer(UUID uuid) {
         return playersUUID.get(uuid);
     }
 
-    public Collection<FawePlayer> getCachedPlayers() {
+    public Collection<Player> getCachedPlayers() {
         return players.values();
     }
 }

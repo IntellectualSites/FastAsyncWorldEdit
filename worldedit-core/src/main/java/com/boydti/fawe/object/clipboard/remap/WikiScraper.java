@@ -2,12 +2,10 @@ package com.boydti.fawe.object.clipboard.remap;
 
 
 import com.boydti.fawe.util.MainUtil;
-
 import com.google.common.io.Resources;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;

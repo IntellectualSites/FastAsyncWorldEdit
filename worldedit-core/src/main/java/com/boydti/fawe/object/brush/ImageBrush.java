@@ -81,7 +81,7 @@ public class ImageBrush implements Brush {
 
         double scale = Math.max(width, height) / sizeDouble;
 
-        Location loc = editSession.getPlayer().getPlayer().getLocation();
+        Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
@@ -127,7 +127,7 @@ public class ImageBrush implements Brush {
                 }
                 return false;
             }
-        }, vector -> true, Integer.MAX_VALUE, editSession);
+        }, vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);

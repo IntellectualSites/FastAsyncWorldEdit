@@ -310,7 +310,7 @@ public final class StringUtil {
     }
 
     public static List<String> parseListInQuotes(String[] input, char delimiter, char quoteOpen, char quoteClose, boolean appendLeftover) {
-        List<String> parsableBlocks = new ArrayList<>();
+       List<String> parsableBlocks = new ArrayList<>();
         StringBuilder buffer = new StringBuilder();
         for (String split : input) {
             if (split.indexOf(quoteOpen) != -1 && split.indexOf(quoteClose) == -1) {

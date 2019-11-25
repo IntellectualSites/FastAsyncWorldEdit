@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -37,11 +36,12 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /**
  * An immutable class that represents the state a block can be in.
@@ -69,7 +69,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
      * @deprecated magic number
      * @return BlockState
      */
-	
+
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -211,7 +211,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return getBlockType().withPropertyId(propertyId);
     }
 
-
     @Override
     public BlockType getBlockType() {
         return this.blockType;
@@ -254,6 +253,16 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
+    public <V> V getState(final Property<V> property) {
+        try {
+            AbstractProperty ap = (AbstractProperty) property;
+            return (V) ap.getValue(this.getInternalId());
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Property not found: " + property);
+        }
+    }
+
+    @Override
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
             BlockType type = getBlockType();
@@ -283,21 +292,26 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
-    public final Map<Property<?>, Object> getStates() {
+    public Map<Property<?>, Object> getStates() {
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
-        return (Map<Property<?>, Object>) map;
+        return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
     }
 
     @Override
-    public final <V> V getState(final Property<V> property) {
-        try {
-            AbstractProperty ap = (AbstractProperty) property;
-            return (V) ap.getValue(this.getInternalId());
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Property not found: " + property);
+    public boolean equalsFuzzy(BlockStateHolder<?> o) {
+        if (null == o) {
+            return false;
         }
+        if (this == o) {
+            // Added a reference equality check for speediness
+            return true;
+        }
+        if (o.getClass() == BlockState.class) {
+            return o.getOrdinal() == this.getOrdinal();
+        }
+        return o.equalsFuzzy(this);
     }
 
     @Override
@@ -312,7 +326,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Deprecated
     @Override
-    public final <V> V getState(final PropertyKey key) {
+    public <V> V getState(PropertyKey key) {
         return getState(getBlockType().getProperty(key));
     }
 
@@ -325,20 +339,12 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
-    public boolean equalsFuzzy(BlockStateHolder<?> o) {
-        if (o.getClass() == BlockState.class) {
-            return o.getOrdinal() == this.getOrdinal();
-        }
-        return o.equalsFuzzy(this);
+    public int getInternalId() {
+        return internalId;
     }
 
-	@Override
-	public int getInternalId() {
-		return internalId;
-	}
-
-	@Override
-	public BlockMaterial getMaterial() {
+    @Override
+    public BlockMaterial getMaterial() {
         if (this.material == null) {
             if (blockType == BlockTypes.__RESERVED__) {
                 return this.material = blockType.getMaterial();
@@ -346,7 +352,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
         }
         return material;
-	}
+    }
 
     @Override
     public final int getOrdinal() {

@@ -1,8 +1,6 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.command.CFICommands.CFISettings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -17,17 +15,16 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.sk89q.worldedit.function.pattern.FawePattern;
-import com.sk89q.worldedit.util.Location;
-
+import com.sk89q.worldedit.entity.Player;
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PlotLoader {
+
     @Deprecated
-    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.github.intellectualsites.plotsquared.plot.object.RunnableVal<Plot> whenDone) {
+    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start,
+        com.github.intellectualsites.plotsquared.plot.object.RunnableVal<Plot> whenDone) {
         final Plot plot = area.getNextFreePlot(player, start);
         if (plot == null) {
             whenDone.run(null);
@@ -35,26 +32,24 @@ public class PlotLoader {
         }
         whenDone.value = plot;
         plot.owner = player.getUUID();
-        DBFunc.createPlotSafe(plot, whenDone, new Runnable() {
-            @Override
-            public void run() {
-                autoClaimFromDatabase(player, area, plot.getId(), whenDone);
-            }
-        });
+        DBFunc.createPlotSafe(plot, whenDone,
+            () -> autoClaimFromDatabase(player, area, plot.getId(), whenDone));
     }
 
-    public void load(FawePlayer fp, CFICommands.CFISettings settings, Function<File, Boolean> createTask) throws IOException {
+    public void load(Player fp, CFISettings  settings,
+        Function<File, Boolean> createTask) throws IOException {
         PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
             SinglePlotArea area = sManager.getArea();
-            PlotPlayer player = PlotPlayer.wrap(fp.parent);
+            PlotPlayer player = PlotPlayer.get(fp.getName());
 
-            fp.sendMessage("Claiming world");
+            fp.print("Claiming world");
             Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
                 @Override
                 public void run(Plot o) {
-                    int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount() : player.getPlotCount(area.worldname);
+                    int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount()
+                        : player.getPlotCount(area.worldname);
                     int diff = player.getAllowedPlots() - currentPlots;
                     if (diff < 1) {
                         Captions.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
@@ -78,12 +73,7 @@ public class PlotLoader {
                 File folder = CFICommands.getFolder(plot.getWorldName());
                 Boolean result = createTask.apply(folder);
                 if (result == Boolean.TRUE) {
-                    TaskManager.IMP.sync(new RunnableVal<Object>() {
-                        @Override
-                        public void run(Object value) {
-                            plot.teleportPlayer(player);
-                        }
-                    });
+                    TaskManager.IMP.sync(() -> plot.teleportPlayer(player));
                 }
                 return;
             }

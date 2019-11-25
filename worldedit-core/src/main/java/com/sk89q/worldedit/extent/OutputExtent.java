@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -51,7 +52,9 @@ public interface OutputExtent {
      * @param block block to set
      * @return true if the block was successfully set (return value may not be accurate)
      * @throws WorldEditException thrown on an error
+     * @deprecated It is recommended that you use {@link #setBlock(int, int, int, BlockStateHolder)} in FAWE
      */
+    @Deprecated
     default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return true;
     }
@@ -59,6 +62,8 @@ public interface OutputExtent {
     default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return setBlock(MutableBlockVector3.get(x, y, z), block);
     }
+
+    default void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {}
 
     /**
      * Set the biome.

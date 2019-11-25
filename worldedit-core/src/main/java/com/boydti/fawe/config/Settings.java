@@ -1,9 +1,12 @@
 package com.boydti.fawe.config;
 
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
+import com.sk89q.worldedit.extension.platform.Actor;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 public class Settings extends Config {
     @Ignore
@@ -142,7 +145,7 @@ public class Settings extends Config {
         public int MAX_EXPRESSION_MS = 50;
         @Comment({
                 "Cinematic block placement:",
-                " - Adds a delay to block placement (ms/block)",
+                " - Adds a delay to block placement (nanoseconds/block)",
                 " - Having an artificial delay will use more CPU/Memory",
         })
         public int SPEED_REDUCTION = 0;
@@ -293,7 +296,13 @@ public class Settings extends Config {
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
         })
-        public int PRELOAD_CHUNKS = 32;
+        public int PRELOAD_CHUNKS = 100000;
+
+        @Comment({
+                "If pooling is enabled (reduces GC, higher memory usage)",
+                " - Enable to improve performance at the expense of memory",
+        })
+        public boolean POOL = true;
 
         @Comment({
                 "Discard edits which have been idle for a certain amount of time (ms)",
@@ -457,9 +466,9 @@ public class Settings extends Config {
         save(file);
     }
 
-    public FaweLimit getLimit(FawePlayer player) {
+    public FaweLimit getLimit(Actor actor) {
         FaweLimit limit;
-        if (player.hasPermission("fawe.limit.*") || player.hasPermission("fawe.bypass")) {
+        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
             limit = FaweLimit.MAX.copy();
         } else {
             limit = new FaweLimit();
@@ -469,7 +478,7 @@ public class Settings extends Config {
 
         boolean limitFound = false;
         for (String key : keys) {
-            if ((player != null && player.hasPermission("fawe.limit." + key)) || (!limitFound && key.equals("default"))) {
+            if (actor.hasPermission("fawe.limit." + key) || !limitFound && key.equals("default")) {
                 limitFound = true;
                 LIMITS newLimit = LIMITS.get(key);
                 limit.MAX_ACTIONS = Math.max(limit.MAX_ACTIONS, newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE);

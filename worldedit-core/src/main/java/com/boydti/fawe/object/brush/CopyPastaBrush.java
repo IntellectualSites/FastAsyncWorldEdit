@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -9,7 +8,6 @@ import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -21,11 +19,10 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CopyPastaBrush implements Brush, ResettableTool {
@@ -50,8 +47,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(final EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        FawePlayer fp = editSession.getPlayer();
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+        Player player = editSession.getPlayer();
+        if (player == null) {
+            return;
+        }
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
             if (editSession.getExtent() instanceof VisualExtent) {
@@ -62,13 +62,12 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 mask = Masks.alwaysTrue();
             }
             final ResizableClipboardBuilder builder = new ResizableClipboardBuilder(editSession.getWorld());
-            final int size2 = (int) (size * size);
             final int minY = position.getBlockY();
             mask = new AbstractDelegateMask(mask) {
                 @Override
                 public boolean test(BlockVector3 vector) {
                     if (super.test(vector) && vector.getBlockY() >= minY) {
-                    	BaseBlock block = editSession.getFullBlock(vector);
+                        BaseBlock block = editSession.getFullBlock(vector);
                         if (!block.getBlockType().getMaterial().isAir()) {
                             builder.add(vector, BlockTypes.AIR.getDefaultState().toBaseBlock(), block);
                             return true;
@@ -79,7 +78,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             };
             // Add origin
             mask.test(position);
-            RecursiveVisitor visitor = new RecursiveVisitor(mask, new NullRegionFunction(), (int) size, editSession);
+            RecursiveVisitor visitor = new RecursiveVisitor(mask, new NullRegionFunction(), (int) size);
             visitor.visit(position);
             Operations.completeBlindly(visitor);
             // Build the clipboard
@@ -88,28 +87,25 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
             int blocks = builder.size();
-            BBC.COMMAND_COPY.send(fp, blocks);
-            return;
+            BBC.COMMAND_COPY.send(player, blocks);
         } else {
             AffineTransform transform = null;
             if (randomRotate) {
-                if (transform == null) transform = new AffineTransform();
+                transform = new AffineTransform();
                 int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
                 transform = transform.rotateY(rotate);
             }
             if (autoRotate) {
                 if (transform == null) transform = new AffineTransform();
-                Location loc = editSession.getPlayer().getPlayer().getLocation();
+                Location loc = player.getLocation();
                 float yaw = loc.getYaw();
                 float pitch = loc.getPitch();
-                transform = transform.rotateY((-yaw) % 360);
+                transform = transform.rotateY(-yaw % 360);
                 transform = transform.rotateX(pitch - 90);
             }
             if (transform != null && !transform.isIdentity()) {
                 clipboard.setTransform(transform);
             }
-            Clipboard faweClip = clipboard.getClipboard();
-            Region region = faweClip.getRegion();
 
             Operation operation = clipboard
                     .createPaste(editSession)

@@ -1,16 +1,13 @@
 package com.boydti.fawe.bukkit.v0;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.BukkitPlayer;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.queue.LazyFaweChunk;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
-import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -18,28 +15,26 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.injector.netty.WirePacket;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMappedFaweQueue<World, CHUNK, CHUNKSECTIONS, SECTION> implements Listener {
 
@@ -95,7 +90,7 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
     }
 
     @Override
-    public void sendChunkUpdate(FaweChunk chunk, FawePlayer... players) {
+    public void sendChunkUpdate(FaweChunk chunk, Player... players) {
         if (supports(Capability.CHUNK_PACKETS)) {
             sendChunkUpdatePLIB(chunk, players);
         } else {
@@ -103,16 +98,16 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
         }
     }
 
-    public void sendChunkUpdatePLIB(FaweChunk chunk, FawePlayer... players) {
+    public void sendChunkUpdatePLIB(FaweChunk chunk, Player... players) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         WirePacket packet = null;
         int viewDistance = Bukkit.getViewDistance();
         try {
-            for (FawePlayer fawePlayer : players) {
+            for (Player fawePlayer : players) {
                 int cx = chunk.getX();
                 int cz = chunk.getZ();
 
-                Player player = ((BukkitPlayer) fawePlayer).parent;
+                org.bukkit.entity.Player player = ((BukkitPlayer)fawePlayer).getPlayer();
                 Location loc = player.getLocation();
 
                 if (Math.abs((loc.getBlockX() >> 4) - cx) <= viewDistance
@@ -329,7 +324,7 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
     }
 
     @Override
-    public void sendBlockUpdate(final FaweChunk chunk, FawePlayer... players) {
+    public void sendBlockUpdate(final FaweChunk chunk, Player... players) {
         if (players.length == 0) {
             return;
         }
@@ -339,9 +334,9 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
         boolean sendAny = false;
         boolean[] send = new boolean[players.length];
         for (int i = 0; i < players.length; i++) {
-            FawePlayer player = players[i];
-            Player bp = ((BukkitPlayer) player).parent;
-            Location loc = bp.getLocation();
+            Player player = players[i];
+            Locatable bp = (Player) ((BukkitPlayer)player).getPlayer();
+            com.sk89q.worldedit.util.Location loc = bp.getLocation();
             if (Math.abs((loc.getBlockX() >> 4) - cx) <= view && Math.abs((loc.getBlockZ() >> 4) - cz) <= view) {
                 sendAny = true;
                 send[i] = true;
@@ -359,7 +354,7 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
                 Location loc = new Location(world, bx + localX, y, bz + localZ);
                 for (int i = 0; i < players.length; i++) {
                     if (send[i]) {
-                        ((BukkitPlayer) players[i]).parent.sendBlockChange(loc, BukkitAdapter.adapt(BlockState.getFromInternalId(combined)));
+                        ((BukkitPlayer)players[i]).getPlayer().sendBlockChange(loc, BukkitAdapter.adapt(BlockState.getFromInternalId(combined)));
                     }
                 }
             }

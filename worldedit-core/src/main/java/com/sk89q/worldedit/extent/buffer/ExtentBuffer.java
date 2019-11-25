@@ -19,9 +19,11 @@
 
 package com.sk89q.worldedit.extent.buffer;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.AbstractBufferingExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -29,16 +31,14 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Optional;
 
 /**
  * Buffers changes to an {@link Extent} and allows retrieval of the changed blocks,
  * without modifying the underlying extent.
  */
-public class ExtentBuffer extends AbstractDelegateExtent {
+public class ExtentBuffer extends AbstractBufferingExtent {
 
     private final Map<BlockVector3, BaseBlock> buffer = Maps.newHashMap();
     private final Mask mask;
@@ -64,6 +64,14 @@ public class ExtentBuffer extends AbstractDelegateExtent {
         checkNotNull(delegate);
         checkNotNull(mask);
         this.mask = mask;
+    }
+
+    @Override
+    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
+        if (mask.test(position)) {
+            return Optional.of(buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos))));
+        }
+        return Optional.empty();
     }
 
     @Override

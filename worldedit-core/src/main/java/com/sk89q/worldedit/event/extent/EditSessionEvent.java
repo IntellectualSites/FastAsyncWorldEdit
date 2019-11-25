@@ -28,6 +28,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 
@@ -70,10 +71,10 @@ public class EditSessionEvent extends Event implements Cancellable {
     /**
      * Create a new event.
      *
-     * @param world     the world
-     * @param actor     the actor, or null if there is no actor specified
+     * @param world the world
+     * @param actor the actor, or null if there is no actor specified
      * @param maxBlocks the maximum number of block changes
-     * @param stage     the stage
+     * @param stage the stage
      */
     public EditSessionEvent(@Nullable World world, Actor actor, int maxBlocks, Stage stage) {
         this.world = world;
@@ -87,9 +88,7 @@ public class EditSessionEvent extends Event implements Cancellable {
      *
      * @return the actor, which may be null if unavailable
      */
-    public
-    @Nullable
-    Actor getActor() {
+    public @Nullable Actor getActor() {
         return actor;
     }
 
@@ -98,9 +97,7 @@ public class EditSessionEvent extends Event implements Cancellable {
      *
      * @return the world
      */
-    public
-    @Nullable
-    World getWorld() {
+    public @Nullable World getWorld() {
         return world;
     }
 
@@ -161,6 +158,5 @@ public class EditSessionEvent extends Event implements Cancellable {
     public EditSessionEvent clone(Stage stage) {
         return new EditSessionEvent(world, actor, maxBlocks, stage);
     }
-
 
 }

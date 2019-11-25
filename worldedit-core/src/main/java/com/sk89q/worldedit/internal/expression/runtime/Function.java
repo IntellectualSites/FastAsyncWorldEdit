@@ -54,7 +54,7 @@ public class Function extends Node {
         return invokeMethod(method, args);
     }
 
-    public static double invokeMethod(Method method, Object[] args) throws EvaluationException {
+    protected static double invokeMethod(Method method, Object[] args) throws EvaluationException {
         try {
             return (Double) method.invoke(null, args);
         } catch (InvocationTargetException e) {
