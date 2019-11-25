@@ -1,16 +1,16 @@
 //package com.boydti.fawe.object.schematic.visualizer;
 //
+//import com.boydti.fawe.FaweCache;
+//import com.boydti.fawe.beta.IBlocks;
+//import com.boydti.fawe.beta.IChunk;
+//import com.boydti.fawe.beta.IQueueExtent;
 //import com.boydti.fawe.config.BBC;
-//import com.boydti.fawe.jnbt.anvil.MCAChunk;
-//import com.boydti.fawe.jnbt.anvil.MCAQueue;
 //import com.boydti.fawe.object.*;
 //import com.boydti.fawe.object.brush.visualization.ImmutableVirtualWorld;
 //import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
 //import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 //import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-//import com.boydti.fawe.object.exception.FaweException;
 //import com.boydti.fawe.object.io.NonCloseableInputStream;
-//import com.boydti.fawe.object.queue.LazyFaweChunk;
 //import com.boydti.fawe.object.schematic.Schematic;
 //import com.boydti.fawe.util.*;
 //import com.google.common.io.ByteSource;
@@ -32,6 +32,7 @@
 //import com.sk89q.worldedit.session.ClipboardHolder;
 //import com.sk89q.worldedit.util.Location;
 //import com.sk89q.worldedit.util.TargetBlock;
+//import com.sk89q.worldedit.world.World;
 //import com.sk89q.worldedit.world.biome.BiomeType;
 //import com.sk89q.worldedit.world.biome.BiomeTypes;
 //import com.sk89q.worldedit.world.block.BlockState;
@@ -55,15 +56,15 @@
 //    private static final WeakHashMap<File, Integer> DIMENSION_CACHE = new WeakHashMap<>();
 //
 //    private final Long2ObjectOpenHashMap<Map.Entry<File, Long>> files;
-//    private final Long2ObjectOpenHashMap<MCAChunk> chunks; // TODO use soft references OR clear chunks outside view distance
+//    private final Long2ObjectOpenHashMap<IChunk> chunks; // TODO use soft references OR clear chunks outside view distance
 //
 //    private final MutableBlockVector2 lastPos = new MutableBlockVector2();
-//    private final FawePlayer player;
+//    private final Player player;
 //    private final Location origin;
 //    private final BlockVector2 chunkOffset;
 //    private BlockVector2 lastPosition;
 //
-//    public static SchemVis create(FawePlayer player, Collection<File> files) throws IOException {
+//    public static SchemVis create(Player player, Collection<File> files) throws IOException {
 //        checkNotNull(player);
 //        checkNotNull(files);
 //        SchemVis visExtent = new SchemVis(player);
@@ -75,14 +76,14 @@
 //        return visExtent;
 //    }
 //
-//    public SchemVis(FawePlayer player) {
+//    public SchemVis(Player player) {
 //        this.files = new Long2ObjectOpenHashMap<>();
 //        this.chunks = new Long2ObjectOpenHashMap<>();
 //        this.player = player;
 //
 //        // Set the origin to somewhere around where the player currently is
-//        Location pos = player.toWorldEditPlayer().getLocation();
-//        this.origin = player.getPlayer().getLocation();
+//        Location pos = player.getLocation();
+//        this.origin = player.getLocation();
 //        this.chunkOffset = BlockVector2.at(pos.getBlockX() >> 4,pos.getBlockZ() >> 4);
 //    }
 //
@@ -168,12 +169,12 @@
 //                            }
 //                        }
 //                        // Resend relevant chunks
-//                        IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(this.player.getWorld(), true, false);
-//                        if (packetQueue.supports(Capability.CHUNK_PACKETS)) {
-//                            ArrayDeque<Long> toSend = new ArrayDeque<>();
-//                            ObjectIterator<Long2ObjectMap.Entry<MCAChunk>> iter = chunks.long2ObjectEntrySet().fastIterator();
+//                        World world = this.player.getWorld();
+//
+//                        ArrayDeque<Long> toSend = new ArrayDeque<>();
+//                        ObjectIterator<Long2ObjectMap.Entry<IBlocks>> iter = chunks.long2ObjectEntrySet().fastIterator();
 //                            while (iter.hasNext()) {
-//                                Long2ObjectMap.Entry<MCAChunk> mcaChunkEntry = iter.next();
+//                                Long2ObjectMap.Entry<IBlocks> mcaChunkEntry = iter.next();
 //                                long curChunkPos = mcaChunkEntry.getLongKey();
 //                                Map.Entry<File, Long> curFileEntry = files.get(curChunkPos);
 //                                if (curFileEntry != null) {
@@ -189,7 +190,6 @@
 //                                }
 //                            }
 //                            for (long curChunkPos : toSend) send(packetQueue, MathMan.unpairIntX(curChunkPos), MathMan.unpairIntY(curChunkPos));
-//                        }
 //                    } catch (IOException e) {
 //                        throw new RuntimeException(e);
 //                    }
@@ -263,9 +263,11 @@
 //     * Replace the blocks with glass, to indicate it's been selected
 //     * @param chunk
 //     */
-//    private void select(MCAChunk chunk) {
+//    private void select(IBlocks chunk) {
 //        for (int layer = 0; layer < 16; layer++) {
-//            int[] ids = chunk.ids[layer];
+//            if (!chunk.hasSection(layer)) continue;
+//
+//            char[] ids = chunk.ids[layer];
 //            if (ids != null) {
 //                for (int i = 0; i < ids.length; i++) {
 //                    // TODO FIXME update to 1.13
@@ -279,14 +281,7 @@
 //     * Cache a chunk
 //     * @param chunk
 //     */
-//    private void cacheChunk(MCAChunk chunk, boolean selected) {
-//        long pair = MathMan.pairInt(chunk.getX(), chunk.getZ());
-//        // Light chunk
-//        for (int layer = 0; layer < 16; layer++) {
-//            if (chunk.skyLight[layer] != null) {
-//                Arrays.fill(chunk.skyLight[layer], (byte) 255);
-//            }
-//        }
+//    private void cacheChunk(IChunk chunk, boolean selected) {
 //        if (selected) {
 //            select(chunk);
 //        }
@@ -366,7 +361,7 @@
 //            }
 //        } else {
 //            try {
-//                player.sendMessage(BBC.getPrefix() + "Converting: " + file);
+//                player.print("Converting: " + file);
 //                cached.createNewFile();
 //                try (FileInputStream in = new FileInputStream(file)) {
 //                    ClipboardFormat format = ClipboardFormats.findByFile(file);
@@ -551,13 +546,13 @@
 //    public void sendChunk(int x, int z, int bitMask) { /* do nothing - never used*/ }
 //
 //    @Override
-//    public BiomeType getBiomeType(int x, int z) throws FaweException.CHUNK {
+//    public BiomeType getBiomeType(int x, int z) throws FaweCache.CHUNK {
 //        // TODO later (currently not used)
 //        return BiomeTypes.FOREST;
 //    }
 //
 //    @Override
-//    public int getCombinedId4Data(int x, int y, int z) throws FaweException.CHUNK {
+//    public int getCombinedId4Data(int x, int y, int z) throws FaweCache.CHUNK {
 //        MCAChunk chunk = getChunk(x >> 4, z >> 4);
 //        if (y < 0 || y > 255) return 0;
 //        return chunk.getBlockCombinedId(x & 15, y, z & 15);

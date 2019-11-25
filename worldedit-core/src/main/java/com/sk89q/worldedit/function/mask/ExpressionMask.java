@@ -75,8 +75,7 @@ public class ExpressionMask extends AbstractMask {
             if (timeout == null) {
                 return expression.evaluate(vector.getX(), vector.getY(), vector.getZ()) > 0;
             } else {
-                return expression.evaluate(new double[]{vector.getX(), vector.getY(), vector.getZ()},
-                        timeout.getAsInt()) > 0;
+                return expression.evaluateTimeout(timeout.getAsInt(), vector.getX(), vector.getY(), vector.getZ()) > 0;
             }
         } catch (EvaluationException e) {
             return false;

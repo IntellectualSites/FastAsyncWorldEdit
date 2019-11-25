@@ -83,7 +83,7 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void faweRollback(Player player, LocalSession session, String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
+    public void faweRollback(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name = 'r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return;
@@ -186,7 +186,7 @@ public class HistoryCommands {
 
         Region[] allowedRegions = player.getCurrentRegions(FaweMaskManager.MaskType.OWNER);
         if (allowedRegions == null) {
-            BBC.NO_REGION.send(player);
+            player.printError(BBC.NO_REGION.s());
             return;
         }
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
@@ -214,13 +214,13 @@ public class HistoryCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void restore(Player player, LocalSession session, String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
+    public void restore(Player player, LocalSession session, @Arg(desc = "String user") String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
         faweRollback(player, session, user, radius, time, true);
     }
 
     @Command(
-        name = "undo",
-        aliases = { "/undo" },
+        name = "/undo",
+        aliases = { "/un", "/ud", "undo" },
         desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
@@ -252,23 +252,21 @@ public class HistoryCommands {
             int i = 0;
             for (; i < finalTimes; ++i) {
                 undone = undoSession.undo(undoSession.getBlockBag(player), player);
-                if (undone != null) {
-                    worldEdit.flushBlockBag(player, undone);
-                } else {
-                    break;
-                }
+                if (undone == null) break;
+                worldEdit.flushBlockBag(player, undone);
             }
             if (i > 0) {
                 BBC.COMMAND_UNDO_SUCCESS.send(player, i == 1 ? "" : " x" + i);
-            } else {
+            }
+            if (undone == null) {
                 player.printError(BBC.COMMAND_UNDO_ERROR.s());
             }
         }, "undo", times, 50, context);
     }
 
     @Command(
-        name = "redo",
-        aliases = { "/redo" },
+        name = "/redo",
+        aliases = { "/do", "/rd", "redo" },
         desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})

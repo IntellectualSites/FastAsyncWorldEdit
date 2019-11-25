@@ -1,7 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;

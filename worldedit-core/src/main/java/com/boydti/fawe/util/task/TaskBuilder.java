@@ -1,7 +1,8 @@
 package com.boydti.fawe.util.task;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.SetQueue;
@@ -80,7 +81,7 @@ public class TaskBuilder extends Metadatable {
 
     /**
      * Run some sync tasks in parallel<br>
-     * - All sync parallel tasks which occur directly after each other will be run at the same time
+     * - All sync parallel tasks, which occur directly after each other will be run at the same time
      *
      * @param run
      * @return this
@@ -200,8 +201,8 @@ public class TaskBuilder extends Metadatable {
     }
 
     /**
-     * Have all async tasks run on a new thread.<br>
-     * As opposed to trying to using the current thread.
+     * Have all async tasks run on a new thread<br>
+     * - As opposed to trying to use the current thread
      */
     public void buildAsync() {
         TaskManager.IMP.async(this::build);

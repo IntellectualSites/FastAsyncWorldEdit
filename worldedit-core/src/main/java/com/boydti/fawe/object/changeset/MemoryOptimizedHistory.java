@@ -50,38 +50,24 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     }
 
     @Override
-    public boolean flush() {
+    public void flush() {
         super.flush();
         synchronized (this) {
             try {
-                if (idsStream != null) {
-                    idsStreamZip.flush();
-                }
-                if (biomeStream != null) {
-                    biomeStreamZip.flush();
-                }
-                if (entCStream != null) {
-                    entCStreamZip.flush();
-                }
-                if (entRStream != null) {
-                    entRStreamZip.flush();
-                }
-                if (tileCStream != null) {
-                    tileCStreamZip.flush();
-                }
-                if (tileRStream != null) {
-                    tileRStreamZip.flush();
-                }
-                return true;
+                if (idsStream != null) idsStreamZip.flush();
+                if (biomeStream != null) biomeStreamZip.flush();
+                if (entCStream != null) entCStreamZip.flush();
+                if (entRStream != null) entRStreamZip.flush();
+                if (tileCStream != null) tileCStreamZip.flush();
+                if (tileRStream != null) tileRStreamZip.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
     @Override
-    public boolean close() {
+    public void close() throws IOException {
         super.close();
         synchronized (this) {
             try {
@@ -121,12 +107,10 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
                     tileRStream = null;
                     tileRStreamZip = null;
                 }
-                return true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
     @Override

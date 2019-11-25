@@ -1,9 +1,10 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
+import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -15,7 +16,6 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
@@ -29,16 +29,15 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * [ WorldEdit action]
@@ -65,19 +64,22 @@ import javax.management.NotificationEmitter;
  * - The chunk is modified directly rather than through the API
  * \ Removes some overhead, and means some processing can be done async
  * - Lighting updates are performed on the chunk level rather than for every block
- * \ e.g. A blob of stone: only the visible blocks need to have the lighting calculated
+ * \ e.g., A blob of stone: only the visible blocks need to have the lighting calculated
  * - Block changes are sent with a chunk packet
  * \ A chunk packet is generally quicker to create and smaller for large world edits
  * - No physics updates
  * \ Physics updates are slow, and are usually performed on each block
  * - Block data shortcuts
- * \ Some known blocks don't need to have the data set or accessed (e.g. air is never going to have data)
+ * \ Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
  * - Remove redundant extents
  * \ Up to 11 layers of extents can be removed
  * - History bypassing
  * \ FastMode bypasses history and means blocks in the world don't need to be checked and recorded
  */
 public class Fawe {
+
+    private static final Logger log = LoggerFactory.getLogger(Fawe.class);
+
     /**
      * The FAWE instance;
      */
@@ -183,7 +185,8 @@ public class Fawe {
                 transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
+                WEManager.IMP.managers.add(new PlotSquaredFeature());
+                log.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
             try {
                 imp().startMetrics();
@@ -298,7 +301,7 @@ public class Fawe {
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/" + version.build;
+            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-commanding-pipeline/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
         try {
@@ -323,7 +326,7 @@ public class Fawe {
     public static void setupInjector() {
         /*
          * Modify the sessions
-         *  - EditSession supports custom queue and a lot of optimizations
+         *  - EditSession supports a custom queue, and a lot of optimizations
          *  - LocalSession supports VirtualPlayers and undo on disk
          */
         if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {
@@ -425,31 +428,5 @@ public class Fawe {
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
-    }
-
-    private ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>(8, 0.9f, 1);
-    private ConcurrentHashMap<UUID, Player> playersUUID = new ConcurrentHashMap<>(8, 0.9f, 1);
-
-    public <T> void register(Player player) {
-        players.put(player.getName(), player);
-        playersUUID.put(player.getUniqueId(), player);
-
-    }
-
-    public <T> void unregister(String name) {
-        Player player = players.remove(name);
-        if (player != null) playersUUID.remove(player.getUniqueId());
-    }
-
-    public Player getCachedPlayer(String name) {
-        return players.get(name);
-    }
-
-    public Player getCachedPlayer(UUID uuid) {
-        return playersUUID.get(uuid);
-    }
-
-    public Collection<Player> getCachedPlayers() {
-        return players.values();
     }
 }

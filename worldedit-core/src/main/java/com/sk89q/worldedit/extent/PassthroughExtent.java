@@ -1,13 +1,15 @@
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.boydti.fawe.jnbt.anvil.generator.GenBase;
-import com.boydti.fawe.jnbt.anvil.generator.Resource;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.generator.GenBase;
+import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -16,19 +18,18 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class PassthroughExtent extends AbstractDelegateExtent {
+
     /**
      * Create a new instance.
      *
@@ -39,38 +40,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return getExtent().getEntities(region);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return getExtent().getEntities();
-    }
-
-    @Override
-    @Nullable
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return getExtent().createEntity(location, entity);
-    }
-
-    @Override
-    @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         getExtent().removeEntity(x, y, z, uuid);
-    }
-
-    public void enableQueue() {
-        getExtent().enableQueue();
-    }
-
-    public void disableQueue() {
-        getExtent().disableQueue();
-    }
-
-    @Override
-    public boolean isWorld() {
-        return getExtent().isWorld();
     }
 
     @Override
@@ -164,18 +135,7 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    @Nullable
-    public Operation commit() {
-        return getExtent().commit();
-    }
-
-    @Override
-    public int getMaxY() {
-        return getExtent().getMaxY();
-    }
-
-    @Override
-    public BlockArrayClipboard lazyCopy(Region region) {
+    public Clipboard lazyCopy(Region region) {
         return getExtent().lazyCopy(region);
     }
 
@@ -224,30 +184,14 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().setBlocks(vset, pattern);
     }
 
+    @Override
     public BlockState getBlock(BlockVector3 position) {
         return getExtent().getBlock(position);
-    }
-
-    public BlockState getBlock(int x, int y, int z) {
-        return getExtent().getBlock(x, y, z);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return getExtent().getFullBlock(position);
-    }
-
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        return getExtent().getFullBlock(x, y, z);
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return getExtent().getBiome(position);
-    }
-
-    public BiomeType getBiomeType(int x, int z) {
-        return getExtent().getBiomeType(x, z);
     }
 
     @Override
@@ -257,13 +201,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return getExtent().setBlock(x, y, z, block);
-    }
-
-    @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        getExtent().setTile(x, y, z, tile);
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return getExtent().setTile(x, y, z, tile);
     }
 
     @Override
@@ -271,8 +210,59 @@ public class PassthroughExtent extends AbstractDelegateExtent {
         return getExtent().setBiome(position, biome);
     }
 
+    // special
     @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x, y, z, biome);
+    public Extent disableHistory() {
+        return super.disableHistory();
+    }
+
+    @Override
+    public Extent addProcessor(IBatchProcessor processor) {
+        return super.addProcessor(processor);
+    }
+
+    public Extent enableHistory(FaweChangeSet changeSet) {
+        return super.enableHistory(changeSet);
+    }
+
+    @Override
+    @Nullable
+    public Operation commit() {
+        return getExtent().commit();
+    }
+
+    @Override
+    public boolean cancel() {
+        return getExtent().cancel();
+    }
+
+    @Override
+    public boolean isQueueEnabled() {
+        return getExtent().isQueueEnabled();
+    }
+
+    @Override
+    public void enableQueue() {
+        getExtent().enableQueue();
+    }
+
+    @Override
+    public void disableQueue() {
+        getExtent().disableQueue();
+    }
+
+    @Override
+    public boolean isWorld() {
+        return getExtent().isWorld();
+    }
+
+    @Override
+    public <T extends Filter> T apply(Region region, T filter, boolean full) {
+        return getExtent().apply(region, filter, full);
+    }
+
+    @Override
+    public <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
+        return getExtent().apply(positions, filter);
     }
 }

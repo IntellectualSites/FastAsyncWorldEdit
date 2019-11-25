@@ -1,8 +1,10 @@
 package com.boydti.fawe.util;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +67,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a buch of tasks in parallel using the shared thread pool
+     * Run a bunch of tasks in parallel using the shared thread pool
      *
      * @param runnables
      */
@@ -79,8 +81,8 @@ public abstract class TaskManager {
     /**
      * Run a bunch of tasks in parallel
      *
-     * @param runnables  The tasks to run
-     * @param numThreads Number of threads (null = config.yml parallel threads)
+     * @param runnables  the tasks to run
+     * @param numThreads number of threads (null = config.yml parallel threads)
      */
     @Deprecated
     public void parallel(Collection<Runnable> runnables, @Nullable Integer numThreads) {
@@ -135,7 +137,6 @@ public abstract class TaskManager {
     /**
      * Disable async catching for a specific task
      *
-     * @param queue
      * @param run
      */
     public void runUnsafe(FaweQueue queue, Runnable run) {
@@ -229,10 +230,9 @@ public abstract class TaskManager {
      * Break up a task and run it in fragments of 5ms.<br>
      * - Each task will run on the main thread.<br>
      *
-     * @param objects  - The list of objects to run the task for
-     * @param task     - The task to run on each object
-     * @param whenDone - When the object task completes
-     * @param <T>
+     * @param objects  the list of objects to run the task for
+     * @param task     the task to run on each object
+     * @param whenDone when the object task completes
      */
     public <T> void objectTask(Collection<T> objects, final RunnableVal<T> task, final Runnable whenDone) {
         final Iterator<T> iterator = objects.iterator();
@@ -279,7 +279,7 @@ public abstract class TaskManager {
                     running.wait(timout);
                     if (running.get() && System.currentTimeMillis() - start > Settings.IMP.QUEUE.DISCARD_AFTER_MS) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
-                        Fawe.debug("For full debug information use: /fawe threads");
+                        getLogger(TaskManager.class).debug("For full debug information use: /fawe threads");
                     }
                 }
             }
@@ -310,11 +310,9 @@ public abstract class TaskManager {
     /**
      * Run a task on the main thread when the TPS is high enough, and wait for execution to finish:<br>
      * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usualy wait time is around 25ms<br>
+     * - Usually wait time is around 25ms<br>
      *
      * @param function
-     * @param timeout  - How long to wait for execution
-     * @param <T>
      * @return
      */
     public <T> T syncWhenFree(@NotNull final RunnableVal<T> function, int timeout) {
@@ -359,18 +357,24 @@ public abstract class TaskManager {
     /**
      * Quickly run a task on the main thread, and wait for execution to finish:<br>
      * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usualy wait time is around 25ms<br>
+     * - Usually wait time is around 25ms<br>
      *
      * @param function
-     * @param timeout  - How long to wait for execution
-     * @param <T>
      * @return
      */
     public <T> T sync(@NotNull final RunnableVal<T> function, int timeout) {
         return sync((Supplier<T>) function, timeout);
     }
 
-    public <T> T sync(final Supplier<T> function, int timeout) {
+    /**
+     * Quickly run a task on the main thread, and wait for execution to finish:<br>
+     * - Useful if you need to access something from the Bukkit API from another thread<br>
+     * - Usually wait time is around 25ms<br>
+     *
+     * @param function
+     * @return
+     */
+    public <T> T sync(final Supplier<T> function) {
         if (Fawe.isMainThread()) {
             return function.get();
         }

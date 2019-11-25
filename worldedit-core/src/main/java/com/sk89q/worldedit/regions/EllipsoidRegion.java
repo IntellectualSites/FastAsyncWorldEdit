@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.regions;
 
 
-import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
@@ -246,9 +246,17 @@ public class EllipsoidRegion extends AbstractRegion {
        return cxd + cyd + czd <= 1;
     }
 
+    /*
+    /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         return position.subtract(center).toVector3().divide(radius).lengthSq() <= 1;
+    }
+    */
+
+    @Override
+    public boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -328,7 +336,7 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     @Override
-    public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+    public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set, boolean full) {
         // Check bounds
         // This needs to be able to perform 50M blocks/sec otherwise it becomes a bottleneck
         int cx = center.getBlockX();
@@ -377,7 +385,7 @@ public class EllipsoidRegion extends AbstractRegion {
                 int yBotFull = Math.max(0, cy - diffYFull);
                 int yTopFull = Math.min(255, cy + diffYFull);
                 // Set those layers
-                filter(chunk, filter, block, get, set, yBotFull, yTopFull);
+                filter(chunk, filter, block, get, set, yBotFull, yTopFull, full);
 
                 // Fill the remaining layers
                 if (yBotFull != 0 || yTopFull != 255) {
@@ -397,7 +405,7 @@ public class EllipsoidRegion extends AbstractRegion {
 
 
         } else {
-            super.filter(chunk, filter, block, get, set); // TODO optimize non spheres
+            super.filter(chunk, filter, block, get, set, full); // TODO optimize non spheres
         }
     }
 }

@@ -6,6 +6,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -177,6 +178,18 @@ public class FaweAPI {
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
         return format.uploadAnonymous(clipboard);
+    }
+
+    /**
+     * Just forwards to ClipboardFormat.SCHEMATIC.load(file)
+     *
+     * @param file
+     * @return
+     * @see ClipboardFormat
+     * @see Schematic
+     */
+    public static Clipboard load(File file) throws IOException {
+        return ClipboardFormats.findByFile(file).load(file);
     }
 
     /**

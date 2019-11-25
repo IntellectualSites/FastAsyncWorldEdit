@@ -7,7 +7,7 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/") }
+    maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
 }
 
 applyPlatformAndCoreConfiguration()
@@ -29,7 +29,6 @@ dependencies {
     "compile"("org.slf4j:slf4j-api:1.7.26")
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "compile"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
-
     "compileOnly"(project(":worldedit-libs:core:ap"))
     "annotationProcessor"(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP

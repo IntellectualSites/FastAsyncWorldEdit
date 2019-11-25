@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.google.common.collect.Iterators;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
@@ -141,4 +144,29 @@ public class RegionIntersection extends AbstractRegion {
         return Iterators.concat(iterators);
     }
 
+    @Override
+    public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
+        for (Region region : regions) {
+            if (region.containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        for (Region region : regions) {
+            BlockVector3 regMin = region.getMinimumPoint();
+            BlockVector3 regMax = region.getMaximumPoint();
+            if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
+                return region.processSet(chunk, get, set);
+            }
+        }
+        return null;
+    }
 }

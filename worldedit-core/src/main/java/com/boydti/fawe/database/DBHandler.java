@@ -1,11 +1,16 @@
 package com.boydti.fawe.database;
 
-import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Config;
 import com.sk89q.worldedit.world.World;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DBHandler {
+
+    private final Logger log = LoggerFactory.getLogger(Config.class);
+
     public final static DBHandler IMP = new DBHandler();
 
     private Map<String, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -21,11 +26,7 @@ public class DBHandler {
             databases.put(worldName, database);
             return database;
         } catch (Throwable e) {
-            Fawe.debug("============ NO JDBC DRIVER! ============");
-            Fawe.debug("TODO: Bundle driver with FAWE (or disable database)");
-            Fawe.debug("=========================================");
-            e.printStackTrace();
-            Fawe.debug("=========================================");
+            log.error("No JDBC driver found!\n TODO: Bundle driver with FAWE (or disable database)", e);
             return null;
         }
     }

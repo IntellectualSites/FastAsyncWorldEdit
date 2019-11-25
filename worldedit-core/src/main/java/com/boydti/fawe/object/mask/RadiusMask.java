@@ -21,7 +21,7 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
     @Override
     public boolean test(BlockVector3 to) {
         if (pos == null) {
-            pos = to;
+            pos = to.toImmutable();
         }
         int dx = pos.getBlockX() - to.getBlockX();
         int d = dx * dx;

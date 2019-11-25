@@ -32,7 +32,7 @@ import com.sk89q.worldedit.util.Location;
  */
 public class EntityRemove implements Change {
 
-    public final Location location;
+    private final Location location;
     public final BaseEntity state;
     private Entity entity;
 

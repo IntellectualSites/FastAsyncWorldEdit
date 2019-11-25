@@ -96,8 +96,7 @@ public class RenderListener implements Listener {
                 }
             }
         }
-        throw new UnsupportedOperationException("TODO FIXME: PAPER 1.14");
-//        player.setViewDistance(value);
+        player.setViewDistance(value);
     }
 
     private int getViewDistance(Player player) {

@@ -2,6 +2,7 @@ package com.sk89q.worldedit.bukkit.adapter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
@@ -19,6 +20,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import java.util.Locale;
 import org.bukkit.Bukkit;
@@ -271,5 +275,63 @@ public interface IBukkitAdapter {
 
     default BiomeType adapt(Biome biome) {
         return BiomeTypes.get(biome.name().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Checks equality between a WorldEdit BlockType and a Bukkit Material
+     *
+     * @param blockType The WorldEdit BlockType
+     * @param type The Bukkit Material
+     * @return If they are equal
+     */
+    default boolean equals(BlockType blockType, Material type) {
+        return blockType == asItemType(type).getBlockType();
+    }
+
+    /**
+     * Create a WorldEdit world from a Bukkit world.
+     *
+     * @param world the Bukkit world
+     * @return a WorldEdit world
+     */
+    default World adapt(org.bukkit.World world) {
+        checkNotNull(world);
+        return new BukkitWorld(world);
+    }
+
+    /**
+     * Create a WorldEdit GameMode from a Bukkit one.
+     *
+     * @param gameMode Bukkit GameMode
+     * @return WorldEdit GameMode
+     */
+    default GameMode adapt(org.bukkit.GameMode gameMode) {
+        checkNotNull(gameMode);
+        return GameModes.get(gameMode.name().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Create a WorldEdit EntityType from a Bukkit one.
+     *
+     * @param entityType Bukkit EntityType
+     * @return WorldEdit EntityType
+     */
+    default EntityType adapt(org.bukkit.entity.EntityType entityType) {
+        return EntityTypes.get(entityType.getName().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Create a WorldEdit BlockStateHolder from a Bukkit ItemStack
+     *
+     * @param itemStack The Bukkit ItemStack
+     * @return The WorldEdit BlockState
+     */
+    default BlockState asBlockState(ItemStack itemStack) {
+        checkNotNull(itemStack);
+        if (itemStack.getType().isBlock()) {
+            return adapt(itemStack.getType().createBlockData());
+        } else {
+            throw new NotABlockException();
+        }
     }
 }

@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.math.BlockVector3;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -46,6 +46,7 @@ public class MaskIntersection extends AbstractMask {
 
     private final Set<Mask> masks;
     private Mask[] masksArray;
+    private boolean defaultReturn;
 
     /**
      * Create a new intersection.
@@ -97,6 +98,7 @@ public class MaskIntersection extends AbstractMask {
         } else {
             masksArray = masks.toArray(new Mask[0]);
         }
+        this.defaultReturn = masksArray.length != 0;
     }
 
     public Function<Entry<Mask, Mask>, Mask> pairingFunction() {
@@ -142,13 +144,13 @@ public class MaskIntersection extends AbstractMask {
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
         boolean changed = false;
-        while (changed |= combineMasks(pairingFunction(), failedCombines));
+        while (combineMasks(pairingFunction(), failedCombines)) changed = true;
         // Optimize / combine
         do changed |= optimizeMasks(optimized);
-        while (changed |= combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
+        while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
-            Fawe.debug("Failed optimize MaskIntersection");
+            getLogger(MaskIntersection.class).debug("Failed optimize MaskIntersection");
             for (Mask mask : masks) {
                 System.out.println(mask.getClass() + " / " + mask);
             }
@@ -167,16 +169,15 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
-                    if (mask != other) {
-                        AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
-                        if (failedCombines.contains(pair)) continue;
-                        Mask combined = pairing.apply(pair);
-                        if (combined != null) {
-                            result = new Mask[]{combined, mask, other};
-                            break outer;
-                        } else {
-                            failedCombines.add(pair);
-                        }
+                    if (mask == other) continue;
+                    AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
+                    if (failedCombines.contains(pair)) continue;
+                    Mask combined = pairing.apply(pair);
+                    if (combined != null) {
+                        result = new Mask[]{combined, mask, other};
+                        break outer;
+                    } else {
+                        failedCombines.add(pair);
                     }
                 }
             }
@@ -224,17 +225,13 @@ public class MaskIntersection extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        if (masksArray.length == 0) {
-            return false;
-        }
-
         for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;
             }
         }
 
-        return true;
+        return defaultReturn;
     }
 
     @Nullable

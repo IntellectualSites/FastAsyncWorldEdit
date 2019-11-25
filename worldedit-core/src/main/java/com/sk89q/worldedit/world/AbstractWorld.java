@@ -24,6 +24,7 @@ import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -71,7 +72,7 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public Mask createLiquidMask() {
-        return new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        return new BlockMaskBuilder().addTypes(BlockTypes.LAVA, BlockTypes.WATER).build(this);
     }
 
     @Override

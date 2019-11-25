@@ -19,15 +19,75 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
+import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
+import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
+import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.MaskTraverser;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.visitor.Order;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.Regions;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+
+import javax.annotation.Nullable;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
-public interface Clipboard extends Extent {
+public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
+    static Clipboard create(Region region) {
+        checkNotNull(region);
+        checkNotNull(region.getWorld(),
+                "World cannot be null (use the other constructor for the region)");
+        EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
+                .autoQueue(false).build();
+        return ReadOnlyClipboard.of(session, region);
+    }
+
+    static Clipboard create(BlockVector3 size, UUID uuid) {
+        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            return new DiskOptimizedClipboard(size, uuid);
+        } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
+            return new CPUOptimizedClipboard(size);
+        } else {
+            return new MemoryOptimizedClipboard(size);
+        }
+    }
 
     /**
      * Get the bounding region of this extent.
@@ -69,5 +129,240 @@ public interface Clipboard extends Extent {
      */
     default boolean hasBiomes() {
         return false;
+    }
+
+    /**
+     * Remove entity from clipboard
+     * @param entity
+     */
+    void removeEntity(Entity entity);
+
+    default int getWidth() {
+        return getDimensions().getBlockX();
+    }
+
+    default int getHeight() {
+        return getDimensions().getBlockY();
+    }
+
+    default int getLength() {
+        return getDimensions().getBlockZ();
+    }
+
+    default int getArea() {
+        return getWidth() * getLength();
+    }
+
+    default int getVolume() {
+        return getWidth() * getHeight() * getLength();
+    }
+
+    default Iterator<BlockVector3> iterator(Order order) {
+        return order.create(getRegion());
+    }
+
+    default Iterator<BlockVector3> iterator() {
+        return getRegion().iterator();
+    }
+
+    default Iterator<BlockVector2> iterator2d() {
+        return Regions.asFlatRegion(getRegion()).asFlatRegion().iterator();
+    }
+
+    default URI getURI() {
+        return null;
+    }
+
+//    default void paste(Extent other, BlockVector3 to) {
+//      TODO FIXME
+//    }
+
+    @Override
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
+        if (region.equals(getRegion())) {
+            return apply(this, filter);
+        } else {
+            return apply((Iterable<BlockVector3>) region, filter);
+        }
+    }
+
+    @Override
+    default void close() {
+
+    }
+
+
+    /*
+    Utility methods
+     */
+
+    /**
+     * Forwards to paste(world, to, true, true, null)
+     *
+     * @param world
+     * @param to
+     * @return
+     */
+    default EditSession paste(World world, BlockVector3 to) {
+        return paste(world, to, true, true, null);
+    }
+
+    default void save(File file, ClipboardFormat format) throws IOException {
+        checkNotNull(file);
+        checkNotNull(format);
+        if (!file.exists()) {
+            File parent = file.getParentFile();
+            if (parent != null) {
+                parent.mkdirs();
+            }
+            file.createNewFile();
+        }
+        save(new FileOutputStream(file), format);
+    }
+
+    /**
+     * Save this schematic to a stream
+     *
+     * @param stream
+     * @param format
+     * @throws IOException
+     */
+    default void save(OutputStream stream, ClipboardFormat format) throws IOException {
+        checkNotNull(stream);
+        checkNotNull(format);
+        try (ClipboardWriter writer = format.getWriter(stream)) {
+            writer.write(this);
+        }
+    }
+
+    default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+                             @Nullable Transform transform) {
+        return paste(world, to, allowUndo, pasteAir, true, transform);
+    }
+
+    /**
+     * Paste this schematic in a world
+     *
+     * @param world
+     * @param to
+     * @param allowUndo
+     * @param pasteAir
+     * @param transform
+     * @return
+     */
+    default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+                             boolean copyEntities, @Nullable Transform transform) {
+        checkNotNull(world);
+        checkNotNull(to);
+        EditSession editSession;
+        if (world instanceof EditSession) {
+            editSession = (EditSession) world;
+        } else {
+            EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
+                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+            if (allowUndo) {
+                editSession = builder.build();
+            } else {
+                editSession = builder.changeSetNull().fastmode(true).build();
+            }
+        }
+        Extent extent = this;
+        Mask sourceMask = editSession.getSourceMask();
+        if (transform != null && !transform.isIdentity()) {
+            extent = new BlockTransformExtent(this, transform);
+        } else if (sourceMask == null) {
+            paste(editSession, to, pasteAir);
+            editSession.flushQueue();
+            return editSession;
+        }
+        ForwardExtentCopy copy = new ForwardExtentCopy(extent, this.getRegion(),
+                this.getOrigin(), editSession, to);
+        if (transform != null && !transform.isIdentity()) {
+            copy.setTransform(transform);
+        }
+        copy.setCopyingEntities(copyEntities);
+        if (sourceMask != null) {
+            new MaskTraverser(sourceMask).reset(extent);
+            copy.setSourceMask(sourceMask);
+            editSession.setSourceMask(null);
+        }
+        if (!pasteAir) {
+            copy.setSourceMask(new ExistingBlockMask(this));
+        }
+        try {
+            Operations.completeLegacy(copy);
+        } catch (MaxChangedBlocksException e) {
+            e.printStackTrace();
+        }
+        editSession.flushQueue();
+        return editSession;
+    }
+
+    default void paste(Extent extent, BlockVector3 to, boolean pasteAir, @Nullable Transform transform) {
+        Extent source = this;
+        if (transform != null && !transform.isIdentity()) {
+            source = new BlockTransformExtent(this, transform);
+        }
+        ForwardExtentCopy copy = new ForwardExtentCopy(source, this.getRegion(), this.getOrigin(), extent, to);
+        if (transform != null) {
+            copy.setTransform(transform);
+        }
+        copy.setCopyingBiomes(this.hasBiomes());
+        if (extent instanceof EditSession) {
+            EditSession editSession = (EditSession) extent;
+            Mask sourceMask = editSession.getSourceMask();
+            if (sourceMask != null) {
+                new MaskTraverser(sourceMask).reset(extent);
+                copy.setSourceMask(sourceMask);
+                editSession.setSourceMask(null);
+            }
+        }
+        if (!pasteAir) {
+            copy.setSourceMask(new ExistingBlockMask(this));
+        }
+        Operations.completeBlindly(copy);
+    }
+
+    default void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
+        final BlockVector3 origin = this.getOrigin();
+
+        final boolean copyBiomes = this.hasBiomes();
+        // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
+        final int relx = to.getBlockX() - origin.getBlockX();
+        final int rely = to.getBlockY() - origin.getBlockY();
+        final int relz = to.getBlockZ() - origin.getBlockZ();
+
+        MutableBlockVector2 mpos2d = new MutableBlockVector2();
+        mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        for (BlockVector3 pos : this) {
+            BaseBlock block = pos.getFullBlock(this);
+            int xx = pos.getX() + relx;
+            int zz = pos.getZ() + relz;
+            if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
+                mpos2d.setComponents(xx, zz);
+                extent.setBiome(mpos2d, Clipboard.this.getBiome(pos.toBlockVector2()));
+            }
+            if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
+                continue;
+            }
+            extent.setBlock(xx, pos.getY() + rely, zz, block);
+        }
+        // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
+        final int entityOffsetX = to.getBlockX() - origin.getBlockX();
+        final int entityOffsetY = to.getBlockY() - origin.getBlockY();
+        final int entityOffsetZ = to.getBlockZ() - origin.getBlockZ();
+        // entities
+        for (Entity entity : this.getEntities()) {
+            // skip players on pasting schematic
+            if (entity.getState() != null && entity.getState().getType().getId()
+                    .equals("minecraft:player")) {
+                continue;
+            }
+            Location pos = entity.getLocation();
+            Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
+                    pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                    pos.getPitch());
+            extent.createEntity(newPos, entity.getState());
+        }
     }
 }

@@ -27,8 +27,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player fp, final MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp);
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, final MaskType type) {
+        final Player player = BukkitAdapter.adapt(wePlayer);
         final Location location = player.getLocation();
         ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
         if (residence != null) {

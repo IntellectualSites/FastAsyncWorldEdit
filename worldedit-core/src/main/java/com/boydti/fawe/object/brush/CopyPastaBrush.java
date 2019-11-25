@@ -42,7 +42,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     @Override
     public boolean reset() {
         session.setClipboard(null);
-        BBC.BRUSH_RESET.send(player);
+        player.print(BBC.BRUSH_RESET.s());
         return true;
     }
 

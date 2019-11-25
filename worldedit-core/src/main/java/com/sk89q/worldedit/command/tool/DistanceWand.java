@@ -74,14 +74,15 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
     private Location getTarget(Player player) {
         Location target;
         Mask mask = getTraceMask();
-        if (this.range > -1) {
+        int range = getRange();
+        if (range < MAX_RANGE) {
             target = player.getBlockTrace(getRange(), true, mask);
         } else {
             target = player.getBlockTrace(MAX_RANGE, false, mask);
         }
 
         if (target == null) {
-            BBC.NO_BLOCK.send(player);
+            player.printError(BBC.NO_BLOCK.s());
             return null;
         }
 

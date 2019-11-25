@@ -476,4 +476,14 @@ public class FastByteArrayOutputStream extends OutputStream {
         }
     }
 
+    @Override
+    public void close() {
+    }
+
+    public void reset() {
+        Arrays.fill(buffer, (byte) 0);
+        index = 0;
+        size = 0;
+        buffers.clear();
+    }
 }

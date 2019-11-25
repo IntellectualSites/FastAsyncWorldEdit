@@ -20,6 +20,7 @@ repositories {
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
     maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
+    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
 }
 
 configurations.all {
@@ -36,6 +37,7 @@ dependencies {
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
+        isTransitive = false
     }
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.2")
@@ -48,6 +50,9 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
+    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
+    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
+
     "implementation"("com.massivecraft:factions:2.8.0") { isTransitive = false }
     "implementation"("com.drtshock:factions:1.6.9.5") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
@@ -58,9 +63,6 @@ dependencies {
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     "implementation"("com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT") { isTransitive = false }
     "implementation"("com.wasteofplastic:askyblock:3.0.8.2") { isTransitive = false }
-    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
-        isTransitive = false
-    }
 }
 
 tasks.named<Copy>("processResources") {

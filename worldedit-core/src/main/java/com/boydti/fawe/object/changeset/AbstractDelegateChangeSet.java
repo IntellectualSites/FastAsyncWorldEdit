@@ -14,6 +14,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
+import java.io.IOException;
 import java.util.Iterator;
 
 public class AbstractDelegateChangeSet extends FaweChangeSet {
@@ -27,23 +29,18 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addChangeTask(FaweQueue queue) {
-        super.addChangeTask(queue);
+    public void closeAsync() {
+        parent.closeAsync();
     }
 
     @Override
-    public boolean closeAsync() {
-        return super.closeAsync();
+    public void flush() {
+        parent.flush();
     }
 
     @Override
-    public boolean flush() {
-        return parent.flush();
-    }
-
-    @Override
-    public boolean close() {
-        return super.close() && parent.close();
+    public void close() throws IOException {
+        parent.close();
     }
 
     public final FaweChangeSet getParent() {
@@ -58,12 +55,6 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     @Override
     public World getWorld() {
         return parent.getWorld();
-    }
-
-    @Override
-    @Deprecated
-    public boolean flushAsync() {
-        return parent.flushAsync();
     }
 
     @Override

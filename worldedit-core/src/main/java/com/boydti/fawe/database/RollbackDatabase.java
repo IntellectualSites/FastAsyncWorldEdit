@@ -22,8 +22,13 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RollbackDatabase extends AsyncNotifyQueue {
+
+    private static final Logger log = LoggerFactory.getLogger(RollbackDatabase.class);
 
     private final String prefix;
     private final File dbLocation;
@@ -113,27 +118,55 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     public void purge(int diff) {
         long now = System.currentTimeMillis() / 1000;
         final int then = (int) (now - diff);
-        addTask(new Runnable() {
-            @Override
-            public void run() {
-                try (PreparedStatement stmt = connection.prepareStatement(PURGE)) {
-                    stmt.setInt(1, then);
-                    stmt.executeUpdate();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        addTask(() -> {
+            try (PreparedStatement stmt = connection.prepareStatement(PURGE)) {
+                stmt.setInt(1, then);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         });
     }
 
     public void getPotentialEdits(UUID uuid, long minTime, BlockVector3 pos1, BlockVector3 pos2, RunnableVal<DiskStorageHistory> onEach, Runnable whenDone, boolean delete, boolean ascending) {
         final World world = FaweAPI.getWorld(this.worldName);
-        addTask(new Runnable() {
-            @Override
-            public void run() {
-                String stmtStr = ascending ? uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC :
-                    uuid == null ? GET_EDITS : GET_EDITS_USER;
-                try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
+        addTask(() -> {
+            String stmtStr = ascending ? uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC :
+                uuid == null ? GET_EDITS : GET_EDITS_USER;
+            try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
+                stmt.setInt(1, pos1.getBlockX());
+                stmt.setInt(2, pos2.getBlockX());
+                stmt.setByte(3, (byte) (pos1.getBlockY() - 128));
+                stmt.setByte(4, (byte) (pos2.getBlockY() - 128));
+                stmt.setInt(5, pos1.getBlockZ());
+                stmt.setInt(6, pos2.getBlockZ());
+                stmt.setInt(7, (int) (minTime / 1000));
+                if (uuid != null) {
+                    byte[] uuidBytes = ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
+                    stmt.setBytes(8, uuidBytes);
+                }
+                ResultSet result = stmt.executeQuery();
+                if (!result.next()) {
+                    TaskManager.IMP.taskNow(whenDone, false);
+                    return;
+                }
+                do {
+                    byte[] uuidBytes = result.getBytes(1);
+                    int index = result.getInt(2);
+                    ByteBuffer bb = ByteBuffer.wrap(uuidBytes);
+                    long high = bb.getLong();
+                    long low = bb.getLong();
+                    DiskStorageHistory history = new DiskStorageHistory(world, new UUID(high, low), index);
+                    if (history.getBDFile().exists()) {
+                        onEach.run(history);
+                    }
+                } while (result.next());
+                TaskManager.IMP.taskNow(whenDone, false);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (delete && uuid != null) {
+                try (PreparedStatement stmt = connection.prepareStatement(DELETE_EDITS_USER)) {
                     stmt.setInt(1, pos1.getBlockX());
                     stmt.setInt(2, pos2.getBlockX());
                     stmt.setByte(3, (byte) (pos1.getBlockY() - 128));
@@ -141,44 +174,10 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     stmt.setInt(5, pos1.getBlockZ());
                     stmt.setInt(6, pos2.getBlockZ());
                     stmt.setInt(7, (int) (minTime / 1000));
-                    if (uuid != null) {
-                        byte[] uuidBytes = ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
-                        stmt.setBytes(8, uuidBytes);
-                    }
-                    ResultSet result = stmt.executeQuery();
-                    if (!result.next()) {
-                        TaskManager.IMP.taskNow(whenDone, false);
-                        return;
-                    }
-                    do {
-                        byte[] uuidBytes = result.getBytes(1);
-                        int index = result.getInt(2);
-                        ByteBuffer bb = ByteBuffer.wrap(uuidBytes);
-                        long high = bb.getLong();
-                        long low = bb.getLong();
-                        DiskStorageHistory history = new DiskStorageHistory(world, new UUID(high, low), index);
-                        if (history.getBDFile().exists()) {
-                            onEach.run(history);
-                        }
-                    } while (result.next());
-                    TaskManager.IMP.taskNow(whenDone, false);
+                    byte[] uuidBytes = ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
+                    stmt.setBytes(8, uuidBytes);
                 } catch (SQLException e) {
                     e.printStackTrace();
-                }
-                if (delete && uuid != null) {
-                    try (PreparedStatement stmt = connection.prepareStatement(DELETE_EDITS_USER)) {
-                        stmt.setInt(1, pos1.getBlockX());
-                        stmt.setInt(2, pos2.getBlockX());
-                        stmt.setByte(3, (byte) (pos1.getBlockY() - 128));
-                        stmt.setByte(4, (byte) (pos2.getBlockY() - 128));
-                        stmt.setInt(5, pos1.getBlockZ());
-                        stmt.setInt(6, pos2.getBlockZ());
-                        stmt.setInt(7, (int) (minTime / 1000));
-                        byte[] uuidBytes = ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
-                        stmt.setBytes(8, uuidBytes);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
         });
@@ -216,10 +215,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 return false;
             }
 
-            RollbackOptimizedHistory[] copy = new RollbackOptimizedHistory[size];
-            for (int i = 0; i < size; i++) {
-                copy[i] = historyChanges.poll();
-            }
+            RollbackOptimizedHistory[] copy = IntStream.range(0, size)
+                .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
 
             try (PreparedStatement stmt = connection.prepareStatement(INSERT_EDIT)) {
                 for (RollbackOptimizedHistory change : copy) {
@@ -276,7 +273,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 dbLocation.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
-                Fawe.debug("&cUnable to create database!");
+                log.debug("Unable to create the database!");
             }
         }
         Class.forName("org.sqlite.JDBC");
@@ -329,7 +326,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     /**
      * Checks if a connection is open with the database.
      *
-     * @return returns {@code true} if the connection is open, otherwise {@code false}
+     * @return true if the connection is open
      */
     public boolean checkConnection() {
         try {

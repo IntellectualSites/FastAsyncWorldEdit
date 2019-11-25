@@ -19,9 +19,7 @@ public class NullChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public final boolean close() {
-        return false;
-    }
+    public final void close() {}
 
     @Override
     public final void add(int x, int y, int z, int combinedFrom, int combinedTo) {

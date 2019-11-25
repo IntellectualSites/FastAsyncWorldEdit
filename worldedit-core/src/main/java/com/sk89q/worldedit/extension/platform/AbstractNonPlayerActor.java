@@ -26,12 +26,18 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractNonPlayerActor implements Actor {
 
     private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
+
+    @Override
+    public Map<String, Object> getRawMeta() {
+        return meta;
+    }
 
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
@@ -106,45 +112,4 @@ public abstract class AbstractNonPlayerActor implements Actor {
         }
         return true;
     }
-
-    /**
-     * Set some session only metadata for the player
-     *
-     * @param key
-     * @param value
-     */
-    @Override
-    public final void setMeta(String key, Object value) {
-        this.meta.put(key, value);
-    }
-
-    @Override
-    public final boolean hasMeta() {
-        return !meta.isEmpty();
-    }
-
-    /**
-     * Get the metadata for a key.
-     *
-     * @param <V>
-     * @param key
-     * @return
-     */
-    @Override
-    public final <V> V getMeta(String key) {
-        return (V) this.meta.get(key);
-    }
-
-    /**
-     * Delete the metadata for a key.
-     * - metadata is session only
-     * - deleting other plugin's metadata may cause issues
-     *
-     * @param key
-     */
-    @Override
-    public final <V> V deleteMeta(String key) {
-        return (V) this.meta.remove(key);
-    }
-
 }

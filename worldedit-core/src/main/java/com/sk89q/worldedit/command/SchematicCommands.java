@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.boydti.fawe.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,15 +30,17 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.MathMan;
+import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -52,6 +55,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -77,6 +81,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
@@ -146,7 +151,7 @@ public class SchematicCommands {
     @CommandPermissions({"worldedit.clipboard.clear", "worldedit.schematic.clear"})
     public void clear(Player player, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
-        BBC.CLIPBOARD_CLEARED.send(player);
+        player.print(BBC.CLIPBOARD_CLEARED.s());
     }
 
     @Command(
@@ -176,7 +181,7 @@ public class SchematicCommands {
                 } else {
                     session.setClipboard(null);
                 }
-                BBC.CLIPBOARD_CLEARED.send(player);
+                player.print(BBC.CLIPBOARD_CLEARED.s());
                 return;
             }
         }
@@ -206,11 +211,11 @@ public class SchematicCommands {
     public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "sponge")
+                     @Arg(desc = "Format name.", def = "")
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
+        ClipboardFormat format = formatName != null ? ClipboardFormats.findByAlias(formatName) : null;
         InputStream in = null;
         try {
             URI uri;
@@ -392,7 +397,7 @@ public class SchematicCommands {
         ClipboardHolder clipboard = session.getClipboard();
         List<File> sources = getFiles(clipboard);
         if (sources.isEmpty()) {
-            BBC.SCHEMATIC_NONE.send(player);
+            player.printError(BBC.SCHEMATIC_NONE.s());
             return;
         }
         if (!destDir.exists() && !destDir.mkdirs()) {
@@ -443,7 +448,7 @@ public class SchematicCommands {
         }
 
         if (files.isEmpty()) {
-            BBC.SCHEMATIC_NONE.send(actor);
+            actor.printError(BBC.SCHEMATIC_NONE.s());
             return;
         }
         for (File f : files) {
@@ -572,68 +577,115 @@ public class SchematicCommands {
         descFooter = "Note: Format is not fully verified until loading."
     )
     @CommandPermissions("worldedit.schematic.list")
-    public void list(Actor actor,
-                     @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
+    public void list(Actor actor, LocalSession session,
+                     @ArgFlag(name = 'p', desc = "Page to view.", def = "-1")
                          int page,
                      @Switch(name = 'd', desc = "Sort by date, oldest first")
                          boolean oldFirst,
                      @Switch(name = 'n', desc = "Sort by date, newest first")
                          boolean newFirst,
-                     @ArgFlag(name = 'f', desc = "Restricts by format.")
+                     @ArgFlag(name = 'f', desc = "Restricts by format.", def = "")
                          String formatName,
-                    @Arg(name = "filter", desc = "Filter for schematics", def = "all")
-                        String filter) throws WorldEditException {
+                     @Arg(name = "filter", desc = "Filter for schematics", def = "all")
+                         String filter,
+                     Arguments arguments
+                    ) throws WorldEditException {
         if (oldFirst && newFirst) {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
-        final String saveDir = worldEdit.getConfiguration().saveDir;
-        final int sortType = oldFirst ? -1 : newFirst ? 1 : 0;
+        String pageCommand = arguments.get();
+        if (pageCommand.contains("-p ")) {
+            pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
+        } else{
+            pageCommand = pageCommand + " -p %page%";
+        }
+        LocalConfiguration config = worldEdit.getConfiguration();
+        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
 
-        final String pageCommand = actor.isPlayer()
-                ? "//schem list -p %page%" + (sortType == -1 ? " -d" : sortType == 1 ? " -n" : "") : null;
+        String schemCmd = "/schematic";
+        String loadSingle = schemCmd + " load";
+        String loadMulti = schemCmd + " loadall";
+        String unload = schemCmd + " unload";
+        String delete = schemCmd + " delete";
+        String list = schemCmd + " list";
+        String showCmd = schemCmd + " show";
 
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor,
-                new SchematicListTask(saveDir, sortType, page, pageCommand, filter, formatName), "(Please wait... gathering schematic list.)");
+        List<String> args = filter.isEmpty() ? Collections.emptyList() : Arrays.asList(filter.split(" "));
 
-//        UtilityCommands.list(dir, actor, args, page, -1, formatName, Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS, new RunnableVal3<Message, URI, String>() {
-//            @Override
-//            public void run(Message msg, URI uri, String relFilePath) {
-//                boolean isDir = false;
-//                boolean loaded = multi != null && multi.contains(uri);
-//
-//                String name = relFilePath;
-//                String uriStr = uri.toString();
-//                if (uriStr.startsWith("file:/")) {
-//                    File file1 = new File(uri.getPath());
-//                    name = file1.getName();
-//                    try {
-//                        if (!MainUtil.isInSubDirectory(dir, file1)) {
-//                            throw new RuntimeException(new CommandException("Invalid path"));
-//                        }
-//                    } catch (IOException ignore) {}
-//                    if (file1.isDirectory()) {
-//                        isDir = true;
-//                    } else if (name.indexOf('.') != -1) {
-//                        name = name.substring(0, name.lastIndexOf('.'));
-//                    }
-//                }  // url
-//
-//                msg.text(" - ");
-//
-//                if (loaded) {
-//                    msg.text("[-]").command(unload + " " + relFilePath).tooltip("Unload");
-//                } else {
-//                    msg.text("[+]").command(loadMulti + " " + relFilePath).tooltip("Add to clipboard");
-//                }
-//                if (!isDir) msg.text("[X]").suggest("/" + delete + " " + relFilePath).tooltip("Delete");
-//                msg.text(name);
-//                if (isDir) {
-//                    msg.command(list + " " + relFilePath).tooltip("List");
-//                } else {
-//                    msg.command(loadSingle + " " + relFilePath).tooltip("Load");
-//                }
-//            }
-//        });
+        URIClipboardHolder multi = as(URIClipboardHolder.class, session.getExistingClipboard());
+
+        final boolean hasShow = false;
+
+        //If player forgot -p argument
+        if (page == -1) {
+            page = 1;
+            if (args.size() != 0) {
+                String lastArg = args.get(args.size() - 1);
+                if (MathMan.isInteger(lastArg)) {
+                    page = Integer.parseInt(lastArg);
+                }
+            }
+        }
+        boolean playerFolder = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
+        UUID uuid = playerFolder ? actor.getUniqueId() : null;
+        List<File> files = UtilityCommands.getFiles(dir, actor, args, formatName, playerFolder, oldFirst, newFirst);
+        List<Map.Entry<URI, String>> entries = UtilityCommands.filesToEntry(dir, files, uuid);
+
+        Function<URI, Boolean> isLoaded = multi == null ? f -> false : multi::contains;
+
+        List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
+            (name, path, type, loaded) -> {
+                TextColor color = TextColor.GRAY;
+                switch (type) {
+                    case URL:
+                        color = TextColor.DARK_GRAY;
+                        break;
+                    case FILE:
+                        color = TextColor.GREEN;
+                        break;
+                    case DIRECTORY:
+                        color = TextColor.GOLD;
+                        break;
+                }
+
+                TextComponentProducer msg = new TextComponentProducer();
+
+                msg.append(TextComponent.of(" - ", color));
+
+                if (loaded) {
+                    msg.append(TextComponent.of("[-]", TextColor.RED)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Unload"))));
+                } else {
+                    msg.append(TextComponent.of("[+]", TextColor.GREEN)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Add to clipboard"))));
+                }
+                if (type != UtilityCommands.URIType.DIRECTORY) {
+                    msg.append(TextComponent.of("[X]", TextColor.DARK_RED)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("delete")))
+                    );
+                } else if (hasShow) {
+                    msg.append(TextComponent.of("[O]", TextColor.DARK_AQUA)
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("visualize")))
+                    );
+                }
+                TextComponent msgElem = TextComponent.of(name, color);
+                if (type != UtilityCommands.URIType.DIRECTORY) {
+                    msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + path));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Load")));
+                } else {
+                    msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + path));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("List")));
+                }
+                msg.append(msgElem);
+
+                return msg.create();
+            });
+        PaginationBox paginationBox = PaginationBox.fromStrings("Available schematics", pageCommand, components);
+        actor.print(paginationBox.create(page));
     }
 
     private static class SchematicLoadTask implements Callable<ClipboardHolder> {
@@ -709,7 +761,7 @@ public class SchematicCommands {
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
                     BBC.SCHEMATIC_SAVED.send(actor, file.getName());
                 } else {
-                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(actor);
+                    actor.printError(BBC.WORLDEDIT_CANCEL_REASON_MANUAL.s());
                 }
             }
             return null;

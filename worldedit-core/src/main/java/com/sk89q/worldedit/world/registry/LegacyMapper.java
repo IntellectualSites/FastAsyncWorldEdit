@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.world.registry;
 
-import com.github.intellectualsites.plotsquared.plot.object.LegacyPlotBlock;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
-import com.github.intellectualsites.plotsquared.plot.object.StringPlotBlock;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.Resources;
@@ -57,7 +54,7 @@ import java.util.Map;
 public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
-    private static LegacyMapper INSTANCE;
+    private static LegacyMapper INSTANCE = new LegacyMapper();
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
@@ -244,33 +241,7 @@ public final class LegacyMapper {
         return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
 
-    public BaseBlock getBaseBlockFromPlotBlock(PlotBlock plotBlock) {
-        if(plotBlock instanceof StringPlotBlock) {
-            try {
-                return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
-            } catch (Throwable failed) {
-                log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
-                failed.printStackTrace();
-                return null;
-            }
-        }else if(plotBlock instanceof LegacyPlotBlock) {
-            try {
-                return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
-            } catch (Throwable failed) {
-                log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-                failed.printStackTrace();
-                return null;
-            }
-        }else {
-            log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-            return null;
-        }
-    }
-
-    public static LegacyMapper getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LegacyMapper();
-        }
+    public final static LegacyMapper getInstance() {
         return INSTANCE;
     }
 

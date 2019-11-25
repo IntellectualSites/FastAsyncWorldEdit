@@ -21,6 +21,15 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
+import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -28,6 +37,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -48,7 +58,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import io.papermc.lib.PaperLib;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -175,47 +188,48 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean regenerate(Region region, EditSession editSession) {
-        BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
-
-        for (BlockVector2 chunk : region.getChunks()) {
-            BlockVector3 min = BlockVector3.at(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
-
-            // First save all the blocks inside
-            for (int x = 0; x < 16; ++x) {
-                for (int y = 0; y < (getMaxY() + 1); ++y) {
-                    for (int z = 0; z < 16; ++z) {
-                        BlockVector3 pt = min.add(x, y, z);
-                        int index = y * 16 * 16 + z * 16 + x;
-                        history[index] = editSession.getFullBlock(pt);
-                    }
-                }
-            }
-
-            try {
-                getWorld().regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
-            } catch (Throwable t) {
-                logger.warn("Chunk generation via Bukkit raised an error", t);
-            }
-
-            // Then restore
-            for (int x = 0; x < 16; ++x) {
-                for (int y = 0; y < (getMaxY() + 1); ++y) {
-                    for (int z = 0; z < 16; ++z) {
-                        BlockVector3 pt = min.add(x, y, z);
-                        int index = y * 16 * 16 + z * 16 + x;
-
-                        // We have to restore the block if it was outside
-                        if (!region.contains(pt)) {
-                            editSession.smartSetBlock(pt, history[index]);
-                        } else { // Otherwise fool with history
-                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
+        return editSession.regenerate(region);
+//        BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
+//
+//        for (BlockVector2 chunk : region.getChunks()) {
+//            BlockVector3 min = BlockVector3.at(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
+//
+//            // First save all the blocks inside
+//            for (int x = 0; x < 16; ++x) {
+//                for (int y = 0; y < (getMaxY() + 1); ++y) {
+//                    for (int z = 0; z < 16; ++z) {
+//                        BlockVector3 pt = min.add(x, y, z);
+//                        int index = y * 16 * 16 + z * 16 + x;
+//                        history[index] = editSession.getFullBlock(pt);
+//                    }
+//                }
+//            }
+//
+//            try {
+//                getWorld().regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
+//            } catch (Throwable t) {
+//                logger.warn("Chunk generation via Bukkit raised an error", t);
+//            }
+//
+//            // Then restore
+//            for (int x = 0; x < 16; ++x) {
+//                for (int y = 0; y < (getMaxY() + 1); ++y) {
+//                    for (int z = 0; z < 16; ++z) {
+//                        BlockVector3 pt = min.add(x, y, z);
+//                        int index = y * 16 * 16 + z * 16 + x;
+//
+//                        // We have to restore the block if it was outside
+//                        if (!region.contains(pt)) {
+//                            editSession.smartSetBlock(pt, history[index]);
+//                        } else { // Otherwise fool with history
+//                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return true;
     }
 
     /**
@@ -314,8 +328,19 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-
-        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
+        int X = pt.getBlockX() >> 4;
+        int Z = pt.getBlockZ() >> 4;
+        if (Fawe.isMainThread()) {
+            world.getChunkAt(X, Z);
+        } else if (!world.isChunkLoaded(X, Z)) {
+            if (PaperLib.isPaper()) {
+                world.getChunkAtAsync(X, Z, true);
+            } else {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    world.getChunkAt(X, Z);
+                });
+            }
+        }
     }
 
     @Override
@@ -511,4 +536,19 @@ public class BukkitWorld extends AbstractWorld {
         return setBiome(BlockVector2.at(x,z), biome);
     }
 
+    @Override
+    public void refreshChunk(int X, int Z) {
+        getWorld().refreshChunk(X, Z);
+    }
+
+    @Override
+    public IChunkGet get(int chunkX, int chunkZ) {
+        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
+    }
+
+    @Override
+    public void sendFakeChunk(Player player, ChunkPacket packet) {
+        org.bukkit.entity.Player bukkitPlayer = BukkitAdapter.adapt(player);
+        WorldEditPlugin.getInstance().getBukkitImplAdapter().sendFakeChunk(getWorld(), bukkitPlayer, packet);
+    }
 }

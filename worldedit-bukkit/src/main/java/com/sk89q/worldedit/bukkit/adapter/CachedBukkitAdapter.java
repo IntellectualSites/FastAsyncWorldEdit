@@ -6,6 +6,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import java.util.List;
@@ -48,7 +49,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public ItemType asItemType(Material material) {
         try {
-            return ItemTypes.get(material.getKey().getKey());
+            return ItemTypes.get(itemTypes[material.ordinal()]);
         } catch (NullPointerException e) {
             if (init()) return asItemType(material);
             return ItemTypes.get(itemTypes[material.ordinal()]);
@@ -58,7 +59,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public BlockType adapt(Material material) {
         try {
-            return BlockTypes.values[blockTypes[material.ordinal()]];
+            return BlockTypesCache.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
             if (init()) return adapt(material);
             throw e;

@@ -177,7 +177,7 @@ public class SnapshotCommands {
                 return;
             }
             session.setSnapshot(snapshot);
-            actor.print("Snapshot set to: " + snapshot.getName());
+            BBC.SNAPSHOT_SET.send(actor, snapshot.getName());
         } catch (MissingWorldException e) {
             actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());
         }
@@ -207,7 +207,7 @@ public class SnapshotCommands {
                     + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
             } else {
                 session.setSnapshot(snapshot);
-                actor.print("Snapshot set to: " + snapshot.getName());
+                BBC.SNAPSHOT_SET.send(actor, snapshot.getName());
             }
         } catch (MissingWorldException ex) {
             actor.printError(BBC.SNAPSHOT_NOT_FOUND_WORLD.s());

@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
@@ -28,7 +29,7 @@ public interface Filter {
      * @param chunk
      * @return
      */
-    default IChunk applyChunk(IChunk chunk, @Nullable Region region) {
+    default <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         return chunk;
     }
 
@@ -37,7 +38,7 @@ public interface Filter {
     }
 
     /**
-     * Make changes to the block here<br> - e.g. block.setId(...)<br> - Note: Performance is
+     * Make changes to the block here<br> - e.g., block.setId(...)<br> - Note: Performance is
      * critical here<br>
      *
      * @param block
@@ -49,7 +50,6 @@ public interface Filter {
      * Do something with the IChunk after block filtering.
      *
      * @param chunk
-     * @return
      */
     default void finishChunk(IChunk chunk) {
     }

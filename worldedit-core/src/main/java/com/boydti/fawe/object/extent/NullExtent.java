@@ -1,5 +1,10 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
@@ -29,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-public class NullExtent extends FaweRegionExtent {
+public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     private final FaweException reason;
 
@@ -48,7 +53,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     public NullExtent() {
-        this(new com.sk89q.worldedit.extent.NullExtent(), FaweException.MANUAL);
+        this(new com.sk89q.worldedit.extent.NullExtent(), FaweCache.MANUAL);
     }
 
     @Override
@@ -311,6 +316,21 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
+        throw reason;
+    }
+
+    @Override
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        throw reason;
+    }
+
+    @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        throw reason;
+    }
+
+    @Override
+    public Extent construct(Extent child) {
         throw reason;
     }
 }

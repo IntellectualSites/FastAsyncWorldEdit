@@ -20,8 +20,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Config {
+
+    private final Logger log = LoggerFactory.getLogger(Config.class);
 
     public Config() {
         save(new PrintWriter(new ByteArrayOutputStream(0)), getClass(), this, 0);
@@ -48,7 +52,7 @@ public class Config {
                 }
             }
         }
-        Fawe.debug("Failed to get config option: " + key);
+        log.debug("Failed to get config option: " + key);
         return null;
     }
 
@@ -80,7 +84,7 @@ public class Config {
                 }
             }
         }
-        Fawe.debug("Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
+        log.debug("Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
     }
 
     public boolean load(File file) {
@@ -203,7 +207,7 @@ public class Config {
     private Map<String, Object> getFields(Class clazz) {
         HashMap<String, Object> map = new HashMap<>();
         for (Field field : clazz.getFields()) {
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+            if (Modifier.isStatic(field.getModifiers())) {
                 try {
                     map.put(toNodeName(field.getName()), field.get(null));
                 } catch (IllegalAccessException e) {
@@ -339,8 +343,8 @@ public class Config {
             Field field = instance.getClass().getField(toFieldName(split[split.length - 1]));
             setAccessible(field);
             return field;
-        } catch (Throwable e) {
-            Fawe.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
+        } catch (Throwable ignored) {
+                log.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
             return null;
         }
     }

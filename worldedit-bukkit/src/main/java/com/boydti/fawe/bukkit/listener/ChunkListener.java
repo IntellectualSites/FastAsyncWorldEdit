@@ -1,5 +1,7 @@
 package com.boydti.fawe.bukkit.listener;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Settings;
@@ -61,7 +63,7 @@ public abstract class ChunkListener implements Listener {
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
-                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics lag source at "
+                    getLogger(ChunkListener.class).debug("[FAWE `tick-limiter`] Detected and cancelled physics lag source at "
                         + tmpLoc);
                 }
                 rateLimit--;
@@ -351,7 +353,6 @@ public abstract class ChunkListener implements Listener {
                         lastCancelPos = block.getLocation();
                     }
                     event.setCancelled(true);
-                    return;
                 } else {
                     count[1] = 0;
                 }
@@ -391,7 +392,7 @@ public abstract class ChunkListener implements Listener {
                             double vertical = Math.abs(velocity.getY());
                             if (Math.abs(velocity.getX()) > vertical
                                 || Math.abs(velocity.getZ()) > vertical) {
-                                Fawe.debug(
+                                getLogger(ChunkListener.class).warn(
                                     "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
                                         + ent.getLocation());
                                 ent.remove();
@@ -422,11 +423,10 @@ public abstract class ChunkListener implements Listener {
             cancelNearby(cx, cz);
             if (rateLimit <= 0) {
                 rateLimit = 20;
-                Fawe.debug(
+                getLogger(ChunkListener.class).warn(
                     "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
             }
             event.setCancelled(true);
-            return;
         }
     }
 }

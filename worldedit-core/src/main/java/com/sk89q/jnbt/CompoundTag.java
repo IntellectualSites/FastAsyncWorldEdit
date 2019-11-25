@@ -19,17 +19,21 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * The {@code TAG_Compound} tag.
  */
 public class CompoundTag extends Tag {
 
-    private final Map<String, Tag> value;
+    private Map<String, Tag> value;
 
     /**
      * Creates the tag with an empty name.
@@ -48,7 +52,7 @@ public class CompoundTag extends Tag {
      * @return true if the tag contains the given key
      */
     public boolean containsKey(String key) {
-        return value.containsKey(key);
+        return getValue().containsKey(key);
     }
 
     @Override
@@ -63,7 +67,8 @@ public class CompoundTag extends Tag {
      * @return the new compound tag
      */
     public CompoundTag setValue(Map<String, Tag> value) {
-        return new CompoundTag(value);
+        this.value = value;
+        return this;
     }
 
     /**
@@ -85,7 +90,7 @@ public class CompoundTag extends Tag {
      * @return a byte array
      */
     public byte[] getByteArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteArrayTag) {
             return ((ByteArrayTag) tag).getValue();
         } else {
@@ -103,7 +108,7 @@ public class CompoundTag extends Tag {
      * @return a byte
      */
     public byte getByte(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteTag) {
             return ((ByteTag) tag).getValue();
         } else {
@@ -121,7 +126,7 @@ public class CompoundTag extends Tag {
      * @return a double
      */
     public double getDouble(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof DoubleTag) {
             return ((DoubleTag) tag).getValue();
         } else {
@@ -140,25 +145,9 @@ public class CompoundTag extends Tag {
      * @return a double
      */
     public double asDouble(String key) {
-        Tag tag = value.get(key);
-        if (tag instanceof ByteTag) {
-            return ((ByteTag) tag).getValue();
-
-        } else if (tag instanceof ShortTag) {
-            return ((ShortTag) tag).getValue();
-
-        } else if (tag instanceof IntTag) {
-            return ((IntTag) tag).getValue();
-
-        } else if (tag instanceof LongTag) {
-            return ((LongTag) tag).getValue();
-
-        } else if (tag instanceof FloatTag) {
-            return ((FloatTag) tag).getValue();
-
-        } else if (tag instanceof DoubleTag) {
-            return ((DoubleTag) tag).getValue();
-
+        Tag tag = getValue().get(key);
+        if (tag instanceof NumberTag) {
+            return ((NumberTag) tag).getValue().doubleValue();
         } else {
             return 0;
         }
@@ -174,7 +163,7 @@ public class CompoundTag extends Tag {
      * @return a float
      */
     public float getFloat(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof FloatTag) {
             return ((FloatTag) tag).getValue();
         } else {
@@ -192,7 +181,7 @@ public class CompoundTag extends Tag {
      * @return an int array
      */
     public int[] getIntArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof IntArrayTag) {
             return ((IntArrayTag) tag).getValue();
         } else {
@@ -210,7 +199,7 @@ public class CompoundTag extends Tag {
      * @return an int
      */
     public int getInt(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof IntTag) {
             return ((IntTag) tag).getValue();
         } else {
@@ -229,25 +218,9 @@ public class CompoundTag extends Tag {
      * @return an int
      */
     public int asInt(String key) {
-        Tag tag = value.get(key);
-        if (tag instanceof ByteTag) {
-            return ((ByteTag) tag).getValue();
-
-        } else if (tag instanceof ShortTag) {
-            return ((ShortTag) tag).getValue();
-
-        } else if (tag instanceof IntTag) {
-            return ((IntTag) tag).getValue();
-
-        } else if (tag instanceof LongTag) {
-            return ((LongTag) tag).getValue().intValue();
-
-        } else if (tag instanceof FloatTag) {
-            return ((FloatTag) tag).getValue().intValue();
-
-        } else if (tag instanceof DoubleTag) {
-            return ((DoubleTag) tag).getValue().intValue();
-
+        Tag tag = getValue().get(key);
+        if (tag instanceof NumberTag) {
+            return ((NumberTag) tag).getValue().intValue();
         } else {
             return 0;
         }
@@ -263,7 +236,7 @@ public class CompoundTag extends Tag {
      * @return a list of tags
      */
     public List<Tag> getList(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             return ((ListTag) tag).getValue();
         } else {
@@ -281,7 +254,7 @@ public class CompoundTag extends Tag {
      * @return a tag list instance
      */
     public ListTag getListTag(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             return (ListTag) tag;
         } else {
@@ -294,7 +267,7 @@ public class CompoundTag extends Tag {
      *
      * <p>If the key does not exist or its value is not a list tag,
      * then an empty list will be returned. If the given key references
-     * a list but the list of of a different type, then an empty
+     * a list but the list of a different type, then an empty
      * list will also be returned.</p>
      *
      * @param key the key
@@ -304,7 +277,7 @@ public class CompoundTag extends Tag {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tag> List<T> getList(String key, Class<T> listType) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             ListTag listTag = (ListTag) tag;
             if (listTag.getType().equals(listType)) {
@@ -320,14 +293,14 @@ public class CompoundTag extends Tag {
     /**
      * Get a {@code long[]} named with the given key.
      *
-     * <p>If the key does not exist or its value is not an long array tag,
+     * <p>If the key does not exist or its value is not a long array tag,
      * then an empty array will be returned.</p>
      *
      * @param key the key
      * @return an int array
      */
     public long[] getLongArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof LongArrayTag) {
             return ((LongArrayTag) tag).getValue();
         } else {
@@ -345,7 +318,7 @@ public class CompoundTag extends Tag {
      * @return a long
      */
     public long getLong(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof LongTag) {
             return ((LongTag) tag).getValue();
         } else {
@@ -364,25 +337,9 @@ public class CompoundTag extends Tag {
      * @return a long
      */
     public long asLong(String key) {
-        Tag tag = value.get(key);
-        if (tag instanceof ByteTag) {
-            return ((ByteTag) tag).getValue();
-
-        } else if (tag instanceof ShortTag) {
-            return ((ShortTag) tag).getValue();
-
-        } else if (tag instanceof IntTag) {
-            return ((IntTag) tag).getValue();
-
-        } else if (tag instanceof LongTag) {
-            return ((LongTag) tag).getValue();
-
-        } else if (tag instanceof FloatTag) {
-            return ((FloatTag) tag).getValue().longValue();
-
-        } else if (tag instanceof DoubleTag) {
-            return ((DoubleTag) tag).getValue().longValue();
-
+        Tag tag = getValue().get(key);
+        if (tag instanceof NumberTag) {
+            return ((NumberTag) tag).getValue().longValue();
         } else {
             return 0L;
         }
@@ -398,7 +355,7 @@ public class CompoundTag extends Tag {
      * @return a short
      */
     public short getShort(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ShortTag) {
             return ((ShortTag) tag).getValue();
         } else {
@@ -416,7 +373,7 @@ public class CompoundTag extends Tag {
      * @return a string
      */
     public String getString(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof StringTag) {
             return ((StringTag) tag).getValue();
         } else {
@@ -427,18 +384,40 @@ public class CompoundTag extends Tag {
     @Override
     public Map<String, Object> toRaw() {
         HashMap<String, Object> raw = new HashMap<>();
-        if (this.value.isEmpty()) return raw;
-        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+        if (this.getValue().isEmpty()) return raw;
+        for (Map.Entry<String, Tag> entry : getValue().entrySet()) {
             raw.put(entry.getKey(), entry.getValue().toRaw());
         }
         return raw;
     }
 
+    public UUID getUUID() {
+        long most = getLong("UUIDMost");
+        long least = getLong("UUIDLeast");
+        return new UUID(most, least);
+    }
+
+    public Vector3 getEntityPosition() {
+        List<Tag> posTags = getList("Pos");
+        double x = ((NumberTag) posTags.get(0)).getValue().doubleValue();
+        double y = ((NumberTag) posTags.get(1)).getValue().doubleValue();
+        double z = ((NumberTag) posTags.get(2)).getValue().doubleValue();
+        return Vector3.at(x, y, z);
+    }
+
+    public Location getEntityLocation(Extent extent) {
+        List<Tag> rotTag = getList("Rotation");
+        float yaw = ((NumberTag) rotTag.get(0)).getValue().floatValue();
+        float pitch = ((NumberTag) rotTag.get(1)).getValue().floatValue();
+        return new Location(extent, getEntityPosition(), yaw, pitch);
+    }
+
     @Override
     public String toString() {
+        Map<String, Tag> value = getValue();
         StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_Compound").append(": ").append(value.size()).append(" entries\r\n{\r\n");
-        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+        bldr.append("TAG_Compound").append(": ").append(getValue().size()).append(" entries\r\n{\r\n");
+        for (Map.Entry<String, Tag> entry : getValue().entrySet()) {
             bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }
         bldr.append("}");

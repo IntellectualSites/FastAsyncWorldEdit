@@ -22,7 +22,7 @@ package com.sk89q.jnbt;
 /**
  * The {@code TAG_Int} tag.
  */
-public final class IntTag extends Tag {
+public final class IntTag extends NumberTag {
 
     private final int value;
 

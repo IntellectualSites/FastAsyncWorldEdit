@@ -1,6 +1,7 @@
 package com.boydti.fawe.config;
 
-import com.boydti.fawe.Fawe;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -114,7 +115,7 @@ public enum BBC {
     BRUSH_TARGET_MASK_SET("Set target mask to %s0", "WorldEdit.Brush"),
     BRUSH_TARGET_OFFSET_SET("Set target offset to %s0", "WorldEdit.Brush"),
     BRUSH_EQUIPPED("Equipped brush %s0", "WorldEdit.Brush"),
-    BRUSH_TRY_OTHER("There are other more suitable brushes e.g.\n - //br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]", "WorldEdit.Brush"),
+    BRUSH_TRY_OTHER("There are other more suitable brushes e.g.,\n - //br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]", "WorldEdit.Brush"),
     BRUSH_COPY("Left click the base of an object to copy, right click to paste. Increase the brush radius if necessary.", "WorldEdit.Brush"),
     BRUSH_HEIGHT_INVALID("Invalid height map file (%s0)", "WorldEdit.Brush"),
     BRUSH_SMOOTH("Note: Use the blend brush if you want to smooth overhangs or caves.", "WorldEdit.Brush"),
@@ -484,7 +485,7 @@ public enum BBC {
             return;
         }
         if (actor == null) {
-            Fawe.debug(this.format(args));
+            getLogger(BBC.class).debug(this.format(args));
         } else {
             try {
                 Method method = actor.getClass().getMethod("print", String.class);
@@ -501,7 +502,7 @@ public enum BBC {
             return;
         }
         if (player == null) {
-            Fawe.debug(this.format(args));
+            getLogger(BBC.class).debug(this.format(args));
         } else {
             player.print(this.format(args));
         }

@@ -29,6 +29,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +56,7 @@ public class BlockMask extends ABlockMask {
     }
 
     public BlockMask(Extent extent) {
-        this(extent, new boolean[BlockTypes.states.length]);
+        this(extent, new boolean[BlockTypesCache.states.length]);
     }
 
     public BlockMask(Extent extent, boolean[] ordinals) {
@@ -91,7 +93,7 @@ public class BlockMask extends ABlockMask {
     public BlockMask add(Predicate<BlockState> predicate) {
         for (int i = 0; i < ordinals.length; i++) {
             if (!ordinals[i]) {
-                BlockState state = BlockTypes.states[i];
+                BlockState state = BlockTypesCache.states[i];
                 if (state != null) {
                     ordinals[i] = predicate.test(state);
                 }
@@ -142,8 +144,9 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
-        this.blocks.addAll(blocks);
-        blocks.forEach(baseBlock -> add(baseBlock.toBlockState()));
+        for (BaseBlock block : blocks) {
+            add(block.toBlockState());
+        }
     }
 
     /**
@@ -185,12 +188,22 @@ public class BlockMask extends ABlockMask {
     public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
+            boolean modified = false;
+            boolean hasAny = false;
             for (int i = 0; i < ordinals.length; i++) {
                 if (ordinals[i]) {
-                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                    boolean result = other.test(BlockState.getFromOrdinal(i));
+                    hasAny |= result;
+                    modified |= !result;
+                    ordinals[i] = result;
                 }
             }
-            return this;
+            if (modified) {
+                if (!hasAny) {
+                    return Masks.alwaysFalse();
+                }
+                return this;
+            }
         }
         return null;
     }
@@ -199,12 +212,17 @@ public class BlockMask extends ABlockMask {
     public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
+            boolean modified = false;
             for (int i = 0; i < ordinals.length; i++) {
                 if (!ordinals[i]) {
-                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                    boolean result = other.test(BlockState.getFromOrdinal(i));
+                    modified |= result;
+                    ordinals[i] = result;
                 }
             }
-            return this;
+            if (modified) {
+                return this;
+            }
         }
         return null;
     }
@@ -226,7 +244,7 @@ public class BlockMask extends ABlockMask {
         BlockType setType = null;
         int totalTypes = 0;
 
-        for (BlockType type : BlockTypes.values) {
+        for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;

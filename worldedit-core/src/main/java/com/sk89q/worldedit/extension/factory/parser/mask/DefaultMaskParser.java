@@ -46,7 +46,7 @@ import java.util.stream.Stream;
 
 public class DefaultMaskParser extends FaweParser<Mask> {
     public DefaultMaskParser(WorldEdit worldEdit) {
-        super(worldEdit, Mask.class);
+        super(worldEdit, "masks");
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        mask = Iterables.getFirst(parse(cmdArgs, actor), null);
+                        mask = parse(command + cmdArgs, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {

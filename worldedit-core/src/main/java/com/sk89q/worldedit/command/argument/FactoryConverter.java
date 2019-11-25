@@ -116,6 +116,7 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
         }
         parserContext.setSession(session);
         parserContext.setRestricted(true);
+        parserContext.setInjected(context);
 
         if (contextTweaker != null) {
             contextTweaker.accept(parserContext);

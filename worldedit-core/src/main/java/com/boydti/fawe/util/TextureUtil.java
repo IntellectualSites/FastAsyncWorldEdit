@@ -1,7 +1,9 @@
 package com.boydti.fawe.util;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.SingleFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
@@ -12,6 +14,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -69,10 +72,10 @@ public class TextureUtil implements TextureHolder {
     private BiomeColor[] biomes = new BiomeColor[]{
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
-        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 7842607),
+        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain
-        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 7842607),
-        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 7842607),
+        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
         new BiomeColor(3, "mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(4, "forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(5, "taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
@@ -97,7 +100,7 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(22, "jungle_hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(23, "jungle_edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(24, "deep_ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 9616729, 0x77AB2F),
+        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(26, "snowy_beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
         new BiomeColor(27, "birch_forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
         new BiomeColor(28, "birch_forest_hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
@@ -497,13 +500,13 @@ public class TextureUtil implements TextureHolder {
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color,
+    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color,
         int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
-        blockAndBiomeIdOutput[1] = biome.id;
+        blockAndBiomeIdOutput[1] = (char) biome.id;
         if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
             color)) {
             return true;
@@ -593,7 +596,7 @@ public class TextureUtil implements TextureHolder {
         if (folder.exists()) {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-            for (BlockType blockType : BlockTypes.values) {
+            for (BlockType blockType : BlockTypesCache.values) {
                 BlockMaterial material = blockType.getMaterial();
                 if (!material.isSolid() || !material.isFullCube()) {
                     continue;
@@ -604,8 +607,8 @@ public class TextureUtil implements TextureHolder {
                 }
             }
             if (files.length == 0) {
-                Fawe.debug(
-                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.13.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                getLogger(TextureUtil.class).debug(
+                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.14.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
@@ -635,7 +638,7 @@ public class TextureUtil implements TextureHolder {
                     Type typeToken = new TypeToken<Map<String, Object>>() {
                     }.getType();
 
-                    for (BlockType blockType : BlockTypes.values) {
+                    for (BlockType blockType : BlockTypesCache.values) {
                         if (!blockType.getMaterial().isFullCube()) {
                             continue;
                         }

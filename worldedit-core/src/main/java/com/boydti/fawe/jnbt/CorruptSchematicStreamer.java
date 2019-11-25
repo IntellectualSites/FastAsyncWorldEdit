@@ -4,17 +4,11 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -24,12 +18,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CorruptSchematicStreamer {
 
+    private final Logger log = LoggerFactory.getLogger(CorruptSchematicStreamer.class);
     private final InputStream stream;
     private final UUID uuid;
-    private FaweClipboard fc;
+    private LinearClipboard fc;
     final AtomicInteger volume = new AtomicInteger();
     final AtomicInteger width = new AtomicInteger();
     final AtomicInteger height = new AtomicInteger();
@@ -71,27 +68,26 @@ public class CorruptSchematicStreamer {
                         matchIndex = 0;
                 }
             }
-            Fawe.debug(" - Recover " + matchTag + " = success");
+            log.debug(" - Recover " + matchTag + " = success");
         } catch (Throwable e) {
-            Fawe.debug(" - Recover " + matchTag + " = partial failure");
-            e.printStackTrace();
+            log.error(" - Recover " + matchTag + " = partial failure", e);
         }
     }
 
-    public FaweClipboard setupClipboard() {
+    public LinearClipboard setupClipboard() {
         if (fc != null) {
             return fc;
         }
         BlockVector3 dimensions = guessDimensions(volume.get(), width.get(), height.get(), length.get());
         if (width.get() == 0 || height.get() == 0 || length.get() == 0) {
-            Fawe.debug("No dimensions found! Estimating based on factors:" + dimensions);
+            log.debug("No dimensions found! Estimating based on factors:" + dimensions);
         }
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
-            fc = new DiskOptimizedClipboard(dimensions.getBlockX(), dimensions.getBlockY(), dimensions.getBlockZ(), uuid);
+            fc = new DiskOptimizedClipboard(dimensions, uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
-            fc = new CPUOptimizedClipboard(dimensions.getBlockX(), dimensions.getBlockY(), dimensions.getBlockZ());
+            fc = new CPUOptimizedClipboard(dimensions);
         } else {
-            fc = new MemoryOptimizedClipboard(dimensions.getBlockX(), dimensions.getBlockY(), dimensions.getBlockZ());
+            fc = new MemoryOptimizedClipboard(dimensions);
         }
         return fc;
     }

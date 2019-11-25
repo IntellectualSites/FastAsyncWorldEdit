@@ -27,6 +27,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -233,6 +234,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         set.setFullBlock(extent, this);
         return true;
+    }
+
+    @Override
+    public void applyTileEntity(OutputExtent output, int x, int y, int z) {
+        CompoundTag nbt = getNbtData();
+        if (nbt != null) output.setTile(x, y, z, nbt);
     }
 
     @Override

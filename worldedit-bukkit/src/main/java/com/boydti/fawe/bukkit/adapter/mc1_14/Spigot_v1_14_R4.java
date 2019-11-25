@@ -21,7 +21,8 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -64,6 +65,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.lang.reflect.Field;
@@ -73,12 +75,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -91,6 +93,7 @@ import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.EnumDirection;
 import net.minecraft.server.v1_14_R1.EnumHand;
@@ -118,7 +121,9 @@ import net.minecraft.server.v1_14_R1.NBTTagLongArray;
 import net.minecraft.server.v1_14_R1.NBTTagShort;
 import net.minecraft.server.v1_14_R1.NBTTagString;
 import net.minecraft.server.v1_14_R1.PacketPlayOutEntityStatus;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PacketPlayOutTileEntityData;
+import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.Vec3D;
@@ -137,6 +142,8 @@ import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
@@ -170,7 +177,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         if (idbToStateOrdinal != null) return false;
         idbToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < idbToStateOrdinal.length; i++) {
-            BlockState state = BlockTypes.states[i];
+            BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
             idbToStateOrdinal[id] = state.getOrdinalChar();
@@ -188,7 +195,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         try {
             tileEntity.load(tag);
         } catch (Throwable e) {
-            Fawe.debug("Invalid tag " + tag + " | " + tileEntity);
+            //Fawe.debug("Invalid tag " + tag + " | " + tileEntity);
         }
     }
 
@@ -410,7 +417,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
             worldServer.addEntity(createdEntity, SpawnReason.CUSTOM);
             return createdEntity.getBukkitEntity();
         } else {
-            Fawe.debug("Invalid entity " + state.getType().getId());
+            logger.debug("Invalid entity " + state.getType().getId());
             return null;
         }
     }
@@ -604,6 +611,13 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
     }
 
     @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
+        IBlockData mcState = material.getCraftBlockData().getState();
+        return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
+    }
+
+    @Override
     public BlockState adapt(BlockData blockData) {
         CraftBlockData cbd = ((CraftBlockData) blockData);
         IBlockData ibd = cbd.getState();
@@ -611,7 +625,7 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
     }
 
     public BlockState adapt(IBlockData ibd) {
-        return BlockTypes.states[adaptToInt(ibd)];
+        return BlockTypesCache.states[adaptToInt(ibd)];
     }
 
     public int adaptToInt(IBlockData ibd) {
@@ -659,6 +673,35 @@ public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements Bukkit
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityStatus(
                 ((CraftPlayer) player).getHandle(), (byte) 28
         ));
+    }
+
+    @Override
+    public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
+        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+        PlayerChunk map = BukkitAdapter_1_14.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
+        if (map != null && map.hasBeenLoaded()) {
+            boolean flag = false;
+            PlayerChunk.d players = map.players;
+            Stream<EntityPlayer> stream = players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag);
+
+            EntityPlayer checkPlayer = player == null ? null : ((CraftPlayer) player).getHandle();
+            stream.filter(entityPlayer -> checkPlayer == null || entityPlayer == checkPlayer)
+                .forEach(entityPlayer -> {
+                synchronized (packet) {
+                    PacketPlayOutMapChunk nmsPacket = (PacketPlayOutMapChunk) packet.getNativePacket();
+                    if (nmsPacket == null) {
+                        nmsPacket = MapChunkUtil_1_14.create(nmsWorld, this, packet);
+                        packet.setNativePacket(nmsPacket);
+                    }
+                    try {
+                        FaweCache.IMP.CHUNK_FLAG.get().set(true);
+                        entityPlayer.playerConnection.sendPacket(nmsPacket);
+                    } finally {
+                        FaweCache.IMP.CHUNK_FLAG.get().set(false);
+                    }
+                }
+            });
+        }
     }
 
     private static EnumDirection adapt(Direction face) {

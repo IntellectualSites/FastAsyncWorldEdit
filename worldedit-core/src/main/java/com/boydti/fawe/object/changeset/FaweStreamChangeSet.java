@@ -18,12 +18,12 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -667,8 +667,8 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
 
     @Override
     public Iterator<Change> getIterator(final boolean dir) {
-        close();
         try {
+            close();
             final Iterator<MutableTileChange> tileCreate = getTileIterator(getTileCreateIS(), true);
             final Iterator<MutableTileChange> tileRemove = getTileIterator(getTileRemoveIS(), false);
 
@@ -717,7 +717,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ArrayList<Change>().iterator();
+        return Collections.emptyIterator();
     }
 
     @Override

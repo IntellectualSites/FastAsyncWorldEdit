@@ -30,6 +30,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -77,12 +78,12 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Deprecated
     public static BlockState getFromOrdinal(int ordinal) {
-        return BlockTypes.states[ordinal];
+        return BlockTypesCache.states[ordinal];
     }
 
     /**
      * Returns a temporary BlockState for a given type and string
-     * @param state String e.g. minecraft:water[level=4]
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(String state) throws InputParseException {
@@ -92,8 +93,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     /**
      * Returns a temporary BlockState for a given type and string
      *  - It's faster if a BlockType is provided compared to parsing the string
-     * @param type BlockType e.g. BlockTypes.STONE (or null)
-     * @param state String e.g. minecraft:water[level=4]
+     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
@@ -103,8 +104,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     /**
      * Returns a temporary BlockState for a given type and string
      *  - It's faster if a BlockType is provided compared to parsing the string
-     * @param type BlockType e.g. BlockTypes.STONE (or null)
-     * @param state String e.g. minecraft:water[level=4]
+     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
     public static BlockState get(@Nullable BlockType type, String state, BlockState defaultState) throws InputParseException {
@@ -122,7 +123,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             type = BlockTypes.get(key);
             if (type == null) {
                 String input = key.toString();
-                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypes.values)
+                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypesCache.values)
                         .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
                         .sorted(StringMan.blockStateComparator(input))
@@ -203,7 +204,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                     continue;
             }
         }
-        return type.withPropertyId(stateId >> BlockTypes.BIT_OFFSET);
+        return type.withPropertyId(stateId >> BlockTypesCache.BIT_OFFSET);
     }
 
     @Override
@@ -225,6 +226,11 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return this.toBaseBlock();
     }
 
+    @Override
+    public void applyTileEntity(OutputExtent output, int x, int y, int z) {
+
+    }
+
     /**
      * The internal id with no type information
      * @return
@@ -232,13 +238,13 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     @Deprecated
     @Override
     public final int getInternalPropertiesId() {
-        return this.getInternalId() >> BlockTypes.BIT_OFFSET;
+        return this.getInternalId() >> BlockTypesCache.BIT_OFFSET;
     }
 
     @Deprecated
     @Override
     public final int getInternalBlockTypeId() {
-        return this.getInternalId() & BlockTypes.BIT_MASK;
+        return this.getInternalId() & BlockTypesCache.BIT_MASK;
     }
 
     @Override

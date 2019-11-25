@@ -7,14 +7,14 @@ import org.enginehub.piston.inject.InjectedValueAccess;
  * Dummy class
  */
 public class CommandQueuedCondition implements Command.Condition {
-    private final boolean value;
+    private final boolean isQueued;
 
-    public CommandQueuedCondition(boolean value) {
-        this.value = value;
+    public CommandQueuedCondition(boolean isQueued) {
+        this.isQueued = isQueued;
     }
 
     public boolean isQueued() {
-        return value;
+        return isQueued;
     }
 
     @Override

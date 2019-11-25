@@ -21,19 +21,21 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
-import com.boydti.fawe.jnbt.anvil.generator.GenBase;
-import com.boydti.fawe.jnbt.anvil.generator.OreGen;
-import com.boydti.fawe.jnbt.anvil.generator.Resource;
-import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
-
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.NullExtent;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -144,7 +146,6 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param y the y coordinate
      * @param z the z coordinate
      * @param uuid the unique identifier of the entity
-     * @return a reference to the created entity, or null if the entity could not be created
      */
     default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
 
@@ -449,6 +450,22 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
+    default boolean cancel() {
+        ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
+
+        NullExtent nullExtent = new NullExtent(this, FaweCache.MANUAL);
+
+        ExtentTraverser<Extent> next = traverser.next();
+        if (next != null) {
+            Extent child = next.get();
+            if (child instanceof NullExtent) return true;
+            traverser.setNext(nullExtent);
+            child.cancel();
+        }
+        addProcessor(nullExtent);
+        return true;
+    }
+
     default int getMaxY() {
         return 255;
     }
@@ -459,11 +476,10 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param region
      * @return
      */
-    default BlockArrayClipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
-        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
-        weClipboard.setOrigin(region.getMinimumPoint());
-        return weClipboard;
+    default Clipboard lazyCopy(Region region) {
+        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
+        faweClipboard.setOrigin(region.getMinimumPoint());
+        return faweClipboard;
     }
 
 
@@ -628,4 +644,33 @@ public interface Extent extends InputExtent, OutputExtent {
         return count;
     }
 
+    /**
+     * Have an extent processed
+     *  - Either block (Extent) processing or chunk processing
+     * @param processor
+     * @return processed Extent
+     */
+    default Extent addProcessor(IBatchProcessor processor) {
+        return processor.construct(this);
+    }
+
+    default Extent enableHistory(FaweChangeSet changeSet) {
+        return addProcessor(changeSet);
+    }
+
+    default Extent disableHistory() {
+        return this;
+    }
+
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
+        return apply((Iterable<BlockVector3>) region, filter);
+    }
+
+    default <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
+        ExtentFilterBlock block = new ExtentFilterBlock(this);
+        for (BlockVector3 pos : positions) {
+            filter.applyBlock(block.init(pos));
+        }
+        return filter;
+    }
 }

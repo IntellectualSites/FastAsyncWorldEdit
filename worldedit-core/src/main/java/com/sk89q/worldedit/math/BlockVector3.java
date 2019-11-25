@@ -779,4 +779,9 @@ public abstract class BlockVector3 {
         return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
     }
 
+    //Used by VS fork
+    public BlockVector3 plus(BlockVector3 other) {
+        return add(other);
+    }
+
 }

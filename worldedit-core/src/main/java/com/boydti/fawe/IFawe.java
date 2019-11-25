@@ -1,6 +1,7 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -17,8 +18,6 @@ public interface IFawe {
     void debug(final String s);
 
     File getDirectory();
-
-    void setupCommand(final String label, final FaweCommand cmd);
 
     Player wrap(final Object obj);
 
@@ -40,13 +39,7 @@ public interface IFawe {
         return null;
     }
 
-    default int getPlayerCount() {
-        return Fawe.get().getCachedPlayers().size();
-    }
-
-    String getPlatformVersion();
-
-    boolean isOnlineMode();
+    public default void registerPacketListener() {}
 
     String getPlatform();
 
@@ -61,5 +54,7 @@ public interface IFawe {
     }
 
     QueueHandler getQueueHandler();
+
+    Preloader getPreloader();
 
 }

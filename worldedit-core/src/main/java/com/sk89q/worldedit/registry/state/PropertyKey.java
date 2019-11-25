@@ -1,10 +1,6 @@
 package com.sk89q.worldedit.registry.state;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.util.ReflectionUtil;
-import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -68,6 +64,14 @@ public enum PropertyKey {
     WATERLOGGED,
     WEST,
     UNSTABLE,
+    LEAVES,
+    ATTACHMENT,
+    SIGNAL_FIRE,
+    HANGING,
+    HAS_BOOK,
+    BOTTOM,
+
+
 
     ;
 
@@ -94,19 +98,18 @@ public enum PropertyKey {
 
     /**
      * Get or create the property key
-     * @param id The name of the property (e.g. `waterlogged`)
+     * @param id The name of the property (e.g., `waterlogged`)
      * @return PropertyKey enum
      */
-    public static final PropertyKey getOrCreate(String id) {
+    public static PropertyKey getOrCreate(String id) {
         PropertyKey property = PropertyKey.get(id);
         if (property == null) {
-            Fawe.debug("Registering property " + id);
             property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase(Locale.ROOT));
             if (property.getId() == null) {
                 try {
                     ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase());
                 } catch (Throwable e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("Could not register property with an id of " + id , e);
                 }
             }
             keys.put(property.name().toLowerCase(), property);

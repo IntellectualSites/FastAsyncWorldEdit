@@ -351,7 +351,7 @@ public class PlatformManager {
                     }
                 }
 
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
                     player.runAction(() -> reset(((DoubleActionBlockTool) tool))
                         .actSecondary(queryCapability(Capability.WORLD_EDITING),
@@ -361,19 +361,16 @@ public class PlatformManager {
                 }
 
             } else if (event.getType() == Interaction.OPEN) {
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                Tool tool = session.getTool(player);
                 if (tool instanceof BlockTool && tool.canUse(player)) {
                     if (player.checkAction()) {
                         player.runAction(() -> {
-                            if (tool instanceof BrushTool) {
-                                ((BlockTool) tool)
-                                    .actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                        getConfiguration(), player, session, location);
-                            } else {
-                                reset((BlockTool) tool)
-                                    .actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                        getConfiguration(), player, session, location);
+                            BlockTool blockTool = (BlockTool) tool;
+                            if (!(tool instanceof BrushTool)) {
+                                blockTool = reset(blockTool);
                             }
+                            blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                    getConfiguration(), player, session, location);
                         }, false, true);
                         event.setCancelled(true);
                     }
@@ -422,13 +419,13 @@ public class PlatformManager {
                         if (pos != null) {
                             player.findFreePosition(pos);
                         } else {
-                            player.print(BBC.NO_BLOCK.s());
+                            player.printError(BBC.NO_BLOCK.s());
                         }
 
                         event.setCancelled(true);
                         return;
                     }
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session));
@@ -446,13 +443,13 @@ public class PlatformManager {
                         }
 
                         if (!player.passThroughForwardWall(40)) {
-                            player.print(BBC.NAVIGATION_WAND_ERROR.s());
+                            player.printError(BBC.NAVIGATION_WAND_ERROR.s());
                         }
 
                         event.setCancelled(true);
                         return;
                     }
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool && tool.canUse(player)) {
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),

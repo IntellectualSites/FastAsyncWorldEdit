@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 import javax.annotation.Nullable;
 
@@ -42,6 +43,7 @@ public class ParserContext {
     private boolean restricted = true;
     private boolean tryLegacy = true;
     private boolean preferringWildcard;
+    private InjectedValueAccess injected;
 
     /**
      * Create a new instance.
@@ -247,5 +249,13 @@ public class ParserContext {
      */
     public boolean isTryingLegacy() {
         return tryLegacy;
+    }
+
+    public void setInjected(InjectedValueAccess injected) {
+        this.injected = injected;
+    }
+
+    public InjectedValueAccess getInjected() {
+        return injected;
     }
 }

@@ -19,11 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -34,12 +31,9 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.WorldCutClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -51,6 +45,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
@@ -75,7 +70,15 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.world.World;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -85,14 +88,13 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 
 /**
@@ -116,6 +118,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/copy",
+        aliases = "/cp",
         desc = "Copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.copy")
@@ -134,12 +137,12 @@ public class ClipboardCommands {
             ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         actor.checkConfirmationRegion(() -> {
             session.setClipboard(null);
 
-            BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
+            Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
 
             session.setClipboard(new ClipboardHolder(clipboard));
 
@@ -186,48 +189,46 @@ public class ClipboardCommands {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
         }
         session.setClipboard(null);
-        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(editSession, region, !skipEntities, copyBiomes);
+        ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
 
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
-        clipboard.setOrigin(session.getPlacementPosition(actor));
-        session.setClipboard(new ClipboardHolder(clipboard));
+        lazyClipboard.setOrigin(session.getPlacementPosition(actor));
+        session.setClipboard(new ClipboardHolder(lazyClipboard));
         BBC.COMMAND_COPY.send(actor, region.getArea());
         if (!actor.hasPermission("fawe.tips")) {
             BBC.TIP_PASTE.or(BBC.TIP_LAZYCOPY, BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(actor);
         }
     }
 
-    @Command(
-            name = "/lazycut",
-            desc = "Lazily cut the selection to the clipboard"
-    )
-    @CommandPermissions("worldedit.clipboard.lazycut")
-    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
-                        @Selection final Region region,
-                        @Switch(name = 'e', desc = "Skip copy entities")
-                                boolean skipEntities,
-                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                                Mask maskOpt,
-                        @Switch(name = 'b', desc = "Also copy biomes")
-                                boolean copyBiomes) throws WorldEditException {
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 max = region.getMaximumPoint();
-        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
-        FaweLimit limit = actor.getLimit();
-        if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
-        }
-        if (volume >= limit.MAX_CHANGES) {
-            throw FaweException.MAX_CHANGES;
-        }
-        session.setClipboard(null);
-
-        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
-        clipboard.setOrigin(session.getPlacementPosition(actor));
-        session.setClipboard(new ClipboardHolder(clipboard));
-        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
-    }
+//    @Command(
+//            name = "/lazycut",
+//            desc = "Lazily cut the selection to the clipboard"
+//    )
+//    @CommandPermissions("worldedit.clipboard.lazycut")
+//    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
+//                        @Selection final Region region,
+//                        @Switch(name = 'e', desc = "Skip copy entities")
+//                                boolean skipEntities,
+//                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
+//                                Mask maskOpt,
+//                        @Switch(name = 'b', desc = "Also copy biomes")
+//                                boolean copyBiomes) throws WorldEditException {
+//        BlockVector3 min = region.getMinimumPoint();
+//        BlockVector3 max = region.getMaximumPoint();
+//        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
+//        FaweLimit limit = actor.getLimit();
+//        if (volume >= limit.MAX_CHECKS) {
+//            throw FaweCache.MAX_CHECKS;
+//        }
+//        if (volume >= limit.MAX_CHANGES) {
+//            throw FaweCache.MAX_CHANGES;
+//        }
+//        session.setClipboard(null);
+//
+//        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
+//        clipboard.setOrigin(session.getPlacementPosition(actor));
+//        session.setClipboard(new ClipboardHolder(lazyClipboard));
+//        BBC.COMMAND_CUT_LAZY.send(actor, region.getArea());
+//    }
 
     @Command(
         name = "/cut",
@@ -254,10 +255,10 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweException.MAX_CHECKS;
+            throw FaweCache.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw FaweException.MAX_CHANGES;
+            throw FaweCache.MAX_CHANGES;
         }
         actor.checkConfirmationRegion(() -> {
             session.setClipboard(null);
@@ -365,13 +366,7 @@ public class ClipboardCommands {
                     ClipboardWriter writer = format.getWriter(baos);
                     writer.write(target);
                     baos.flush();
-                    String json = ImgurUtility
-                        .getImgurContent(ImgurUtility.CLIENT_ID, baos.toByteArrayUnsafe());
-                    Gson gson = new Gson();
-                    JsonObject obj = gson.fromJson(json, JsonObject.class);
-                    JsonObject data = obj.get("data").getAsJsonObject();
-                    String link = data.get("link").getAsString();
-                    url = new URL(link);
+                    url = ImgurUtility.uploadImage(baos.toByteArray());
                 } catch (IOException e) {
                     e.printStackTrace();
                     url = null;
@@ -383,19 +378,19 @@ public class ClipboardCommands {
                 }
                 url = FaweAPI.upload(target, format);
             }
-            if (url == null) {
-                BBC.GENERATING_LINK_FAILED.send(player);
-            } else {
-                String urlText = url.toString();
-                if (Settings.IMP.WEB.SHORTEN_URLS) {
-                    try {
-                        urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        }
+        if (url == null) {
+            player.printError(BBC.GENERATING_LINK_FAILED.s());
+        } else {
+            String urlText = url.toString();
+            if (Settings.IMP.WEB.SHORTEN_URLS) {
+                try {
+                    urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                BBC.DOWNLOAD_LINK.send(player, urlText);
             }
+            BBC.DOWNLOAD_LINK.send(player, urlText);
         }
     }
 
@@ -426,7 +421,7 @@ public class ClipboardCommands {
         }
         URL url = format.uploadPublic(target, category.replaceAll("[/|\\\\]", "."), player.getName());
         if (url == null) {
-            BBC.GENERATING_LINK_FAILED.send(player);
+            player.printError(BBC.GENERATING_LINK_FAILED.s());
         } else {
             BBC.DOWNLOAD_LINK.send(player, Settings.IMP.WEB.ASSETS);
         }
@@ -434,6 +429,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/paste",
+        aliases = { "/p", "/pa" },
         desc = "Paste the clipboard's contents"
 
     )
@@ -464,6 +460,7 @@ public class ClipboardCommands {
 
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
+
         Operation operation = holder
                 .createPaste(editSession)
                 .to(to)
@@ -521,8 +518,7 @@ public class ClipboardCommands {
         final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
 
-        Schematic schem = new Schematic(clipboard);
-        schem.paste(editSession, to, !ignoreAirBlocks);
+        clipboard.paste(editSession, to, !ignoreAirBlocks);
 
         Region region = clipboard.getRegion().clone();
         if (selectPasted) {
@@ -543,6 +539,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "/rotate",
+        aliases = {"/rt"},
         desc = "Rotate the contents of the clipboard",
         descFooter = "Non-destructively rotate the contents of the clipboard.\n" +
             "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +

@@ -41,7 +41,8 @@ public class FaweTimer implements Runnable {
         if (tick < lastGetTPSTick + tickInterval) {
             return lastGetTPSValue;
         }
-        double total = Arrays.stream(history).sum();
+        double total = 0;
+        for (double v : history) total += v;
         lastGetTPSValue = total / history.length;
         lastGetTPSTick = tick;
         return lastGetTPSValue;

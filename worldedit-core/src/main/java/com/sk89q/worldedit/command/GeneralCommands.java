@@ -37,7 +37,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -190,7 +189,7 @@ public class GeneralCommands {
         } else {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
+            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32×32×32.");
         }
     }
 
@@ -212,7 +211,7 @@ public class GeneralCommands {
     @Command(
             name = "gmask",
             aliases = {"/gmask"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
             desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
@@ -220,10 +219,8 @@ public class GeneralCommands {
                       @Arg(desc = "The mask to set", def = "")
                           Mask mask) {
         if (mask == null) {
-            session.setMask(null);
             actor.print(BBC.MASK_DISABLED.s());
         } else {
-            session.setMask(mask);
             actor.print(BBC.MASK.s());
         }
     }
@@ -255,7 +252,7 @@ public class GeneralCommands {
                            @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
                                int page,
                            @Arg(desc = "Search query", variable = true)
-                               List<String> query) {
+                               List<String> query) throws Exception {
         String search = String.join(" ", query);
         if (search.length() <= 2) {
             actor.printError("Enter a longer search string (len > 2).");
@@ -266,8 +263,7 @@ public class GeneralCommands {
             return;
         }
 
-        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new ItemSearcher(search, blocksOnly, itemsOnly, page),
-                "(Please wait... searching items.)");
+        actor.print(new ItemSearcher(search, blocksOnly, itemsOnly, page).call());
     }
 
     public static class ItemSearcher implements Callable<Component> {
@@ -313,7 +309,7 @@ public class GeneralCommands {
     @Command(
             name = "/gtexture",
             aliases = {"gtexture"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
@@ -322,7 +318,7 @@ public class GeneralCommands {
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
             session.setTextureUtil(null);
-            BBC.TEXTURE_DISABLED.send(player);
+            player.print(BBC.TEXTURE_DISABLED.s());
         } else {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
@@ -373,15 +369,15 @@ public class GeneralCommands {
             name = "/gsmask",
             aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
             desc = "Set the global source mask",
-            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)"
+            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
-            BBC.SOURCE_MASK_DISABLED.send(player);
+            player.print(BBC.SOURCE_MASK_DISABLED.s());
         } else {
-            BBC.SOURCE_MASK.send(player);
+            player.print(BBC.SOURCE_MASK.s());
         }
     }
 
@@ -395,9 +391,9 @@ public class GeneralCommands {
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
-            BBC.TRANSFORM_DISABLED.send(player);
+            player.print(BBC.TRANSFORM_DISABLED.s());
         } else {
-            BBC.TRANSFORM.send(player);
+            player.print(BBC.TRANSFORM.s());
         }
     }
 
@@ -409,9 +405,9 @@ public class GeneralCommands {
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         if (player.togglePermission("fawe.tips")) {
-            BBC.WORLDEDIT_TOGGLE_TIPS_ON.send(player);
+            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_ON.s());
         } else {
-            BBC.WORLDEDIT_TOGGLE_TIPS_OFF.send(player);
+            player.print(BBC.WORLDEDIT_TOGGLE_TIPS_OFF.s());
         }
     }
 }

@@ -22,7 +22,7 @@ package com.sk89q.jnbt;
 /**
  * The {@code TAG_Short} tag.
  */
-public final class ShortTag extends Tag {
+public final class ShortTag extends NumberTag {
 
     private final short value;
 

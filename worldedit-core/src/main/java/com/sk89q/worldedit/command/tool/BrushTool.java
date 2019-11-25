@@ -20,19 +20,27 @@
 package com.sk89q.worldedit.command.tool;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
+import com.boydti.fawe.beta.implementation.processors.NullProcessor;
+import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.MovableTool;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.visualization.VisualChunk;
+import com.boydti.fawe.object.brush.scroll.Scroll;
+import com.boydti.fawe.object.brush.scroll.ScrollTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.object.mask.MaskedTargetBlock;
 import com.boydti.fawe.object.pattern.PatternTraverser;
 import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
@@ -46,6 +54,7 @@ import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
@@ -55,16 +64,36 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 /**
  * Builds a shape at the place being looked at.
  */
-public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serializable {
+public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable {
+//    TODO:
+    // Serialize methods
+    // serialize BrushSettings (primary and secondary only if different)
+    // set transient values e.g., context
+
+    public enum BrushAction {
+        PRIMARY,
+        SECONDARY
+    }
 
     protected static int MAX_RANGE = 500;
+    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
     protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
@@ -80,7 +109,10 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
 
     private int targetOffset;
 
-    private transient VisualExtent visualExtent;
+    private transient PersistentChunkSendProcessor visualExtent;
+    private transient Lock lock = new ReentrantLock();
+
+    private transient BaseItem holder;
 
     /**
      * Construct the tool.
@@ -89,7 +121,116 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
      */
     public BrushTool(String permission) {
         checkNotNull(permission);
-        this.permission = permission;
+        getContext().addPermission(permission);
+    }
+
+    public BrushTool() {
+    }
+
+    public static BrushTool fromString(Player player, LocalSession session, String json) throws CommandException, InputParseException {
+        Gson gson = new Gson();
+        Type type = new TypeToken<Map<String, Object>>() {
+        }.getType();
+        Map<String, Object> root = gson.fromJson(json, type);
+        if (root == null) {
+            getLogger(BrushTool.class).debug("Failed to load " + json);
+            return new BrushTool();
+        }
+        Map<String, Object> primary = (Map<String, Object>) root.get("primary");
+        Map<String, Object> secondary = (Map<String, Object>) root.getOrDefault("secondary", primary);
+
+        VisualMode visual = VisualMode.valueOf((String) root.getOrDefault("visual", "NONE"));
+        TargetMode target = TargetMode.valueOf((String) root.getOrDefault("target", "TARGET_BLOCK_RANGE"));
+        int range = ((Number) root.getOrDefault("range", -1)).intValue();
+        int offset = ((Number) root.getOrDefault("offset", 0)).intValue();
+
+        BrushTool tool = new BrushTool();
+        tool.visualMode = visual;
+        tool.targetMode = target;
+        tool.range = range;
+        tool.targetOffset = offset;
+
+        BrushSettings primarySettings = BrushSettings.get(tool, player, session, primary);
+        tool.setPrimary(primarySettings);
+        if (primary != secondary) {
+            BrushSettings secondarySettings = BrushSettings.get(tool, player, session, secondary);
+            tool.setSecondary(secondarySettings);
+        }
+
+        return tool;
+    }
+
+    public void setHolder(BaseItem holder) {
+        this.holder = holder;
+    }
+
+    public boolean isSet() {
+        return primary.getBrush() != null || secondary.getBrush() != null;
+    }
+
+    @Override
+    public String toString() {
+        return toString(new Gson());
+    }
+
+    public String toString(Gson gson) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("primary", primary.getSettings());
+        if (primary != secondary) {
+            map.put("secondary", secondary.getSettings());
+        }
+        if (visualMode != null && visualMode != VisualMode.NONE) {
+            map.put("visual", visualMode);
+        }
+        if (targetMode != TargetMode.TARGET_BLOCK_RANGE) {
+            map.put("target", targetMode);
+        }
+        if (range != -1 && range != DEFAULT_RANGE) {
+            map.put("range", range);
+        }
+        if (targetOffset != 0) {
+            map.put("offset", targetOffset);
+        }
+        return gson.toJson(map);
+    }
+
+    public void update() {
+        if (holder != null) {
+            BrushCache.setTool(holder, this);
+        }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+        stream.defaultWriteObject();
+        stream.writeBoolean(primary == secondary);
+        stream.writeObject(primary);
+        if (primary != secondary) {
+            stream.writeObject(secondary);
+        }
+    }
+
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        lock = new ReentrantLock();
+        boolean multi = stream.readBoolean();
+        primary = (BrushSettings) stream.readObject();
+        if (multi) {
+            secondary = (BrushSettings) stream.readObject();
+        } else {
+            secondary = primary;
+        }
+        context = primary;
+    }
+
+    public BrushSettings getContext() {
+        BrushSettings tmp = context;
+        if (tmp == null) {
+            context = tmp = primary;
+        }
+        return tmp;
+    }
+
+    public void setContext(BrushSettings context) {
+        this.context = context;
     }
 
     @Override
@@ -119,6 +260,7 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
      *
      * @return the filter
      */
+    //TODO A better description is needed here to explain what makes a source-mask different from a regular mask.
     public Mask getSourceMask() {
         return sourceMask;
     }
@@ -230,7 +372,7 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
      * @return the range of the brush in blocks
      */
     public int getRange() {
-        return (range < 0) ? MAX_RANGE : Math.min(range, MAX_RANGE);
+        return (range < 0) ? DEFAULT_RANGE : Math.min(range, MAX_RANGE);
     }
 
     /**
@@ -339,14 +481,91 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
         Mask mask = traceMask == null ? new SolidBlockMask(editSession) : traceMask;
         new MaskTraverser(mask).reset(editSession);
         MaskedTargetBlock tb = new MaskedTargetBlock(mask, player, range, 0.2);
-        return TaskManager.IMP.sync(new RunnableVal<Vector3>() {
-            @Override
-            public void run(Vector3 value) {
-                this.value = tb.getMaskedTargetBlock(useLastBlock);
-            }
-        });
+        return tb.getMaskedTargetBlock(useLastBlock);
     }
 
+    public boolean act(BrushAction action, Player player, LocalSession session) {
+        switch (action) {
+            case PRIMARY:
+                setContext(primary);
+                break;
+            case SECONDARY:
+                setContext(secondary);
+                break;
+        }
+        BrushSettings current = getContext();
+        Brush brush = current.getBrush();
+        if (brush == null) return false;
+
+        if (current.setWorld(player.getWorld().getName()) && !current.canUse(player)) {
+            BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
+            return false;
+        }
+        try (EditSession editSession = session.createEditSession(player)) {
+            Location target = player.getBlockTrace(getRange(), true, traceMask);
+
+            if (target == null) {
+                editSession.cancel();
+                player.print(BBC.NO_BLOCK.s());
+                return true;
+            }
+            BlockBag bag = session.getBlockBag(player);
+
+            Request.request().setEditSession(editSession);
+            Mask mask = current.getMask();
+            if (mask != null) {
+                Mask existingMask = editSession.getMask();
+
+                if (existingMask == null) {
+                    editSession.setMask(mask);
+                } else if (existingMask instanceof MaskIntersection) {
+                    ((MaskIntersection) existingMask).add(mask);
+                } else {
+                    MaskIntersection newMask = new MaskIntersection(existingMask);
+                    newMask.add(mask);
+                    editSession.setMask(newMask);
+                }
+            }
+
+            Mask sourceMask = current.getSourceMask();
+            if (sourceMask != null) {
+                editSession.addSourceMask(sourceMask);
+            }
+            ResettableExtent transform = current.getTransform();
+            if (transform != null) {
+                editSession.addTransform(transform);
+            }
+            try {
+                new PatternTraverser(current).reset(editSession);
+                double size = current.getSize();
+                WorldEdit.getInstance().checkMaxBrushRadius(size);
+                brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max blocks change limit reached.");
+            } finally {
+                session.remember(editSession);
+                if (bag != null) {
+                    bag.flushChanges();
+                }
+            }
+        } finally {
+            Request.reset();
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        return act(BrushAction.SECONDARY, player, session);
+    }
+
+
+
+    public void setScrollAction(Scroll scrollAction) {
+        this.getContext().setScrollAction(scrollAction);
+        update();
+    }
 
     public void setTargetOffset(int targetOffset) {
         this.targetOffset = targetOffset;
@@ -385,6 +604,29 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
         return visualMode;
     }
 
+    @Override
+    public boolean increment(Player player, int amount) {
+        BrushSettings current = getContext();
+        Scroll tmp = current.getScrollAction();
+        if (tmp != null) {
+            tmp.setTool(this);
+            if (tmp.increment(player, amount)) {
+                if (visualMode != VisualMode.NONE) {
+                    try {
+                        queueVisualization(player);
+                    } catch (Throwable e) {
+                        WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
+                    }
+                }
+                return true;
+            }
+        }
+        if (visualMode != VisualMode.NONE) {
+            clear(player);
+        }
+        return false;
+    }
+
     public void queueVisualization(Player player) {
         Fawe.get().getVisualQueue().queue(player);
     }
@@ -403,12 +645,30 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
                 .autoQueue(false)
                 .blockBag(null)
                 .changeSetNull()
-                .combineStages(false);
+                .fastmode(true)
+                .combineStages(true);
         EditSession editSession = builder.build();
-        VisualExtent newVisualExtent = new VisualExtent(editSession, builder.getQueue());
+
+        World world = editSession.getWorld();
+        Supplier<Collection<Player>> players = () -> Collections.singleton(player);
+
+        PersistentChunkSendProcessor newVisualExtent = new PersistentChunkSendProcessor(world, this.visualExtent, players);
+        ExtentTraverser<IChunkExtent> traverser = new ExtentTraverser<>(editSession).find(IChunkExtent.class);
+        if (traverser == null) {
+            throw new IllegalStateException("No queue found");
+        }
+
+        IChunkExtent chunkExtent = traverser.get();
+        if (this.visualExtent != null) {
+            this.visualExtent.init(chunkExtent);
+        }
+        newVisualExtent.init(chunkExtent);
+
+        editSession.addProcessor(newVisualExtent);
+        editSession.addProcessor(NullProcessor.INSTANCE);
+
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
-            editSession.setExtent(newVisualExtent);
             switch (mode) {
                 case POINT:
                     editSession.setBlock(position, VisualChunk.VISUALIZE_BLOCK);
@@ -420,12 +680,14 @@ public class BrushTool implements TraceTool, MovableTool, ResettableTool, Serial
                 }
             }
         }
+        editSession.flushQueue();
+
         if (visualExtent != null) {
             // clear old data
-            visualExtent.clear(newVisualExtent, player);
+            visualExtent.flush();
         }
         visualExtent = newVisualExtent;
-        newVisualExtent.commit();
+        newVisualExtent.flush();
     }
 
     public void clear(Player player) {

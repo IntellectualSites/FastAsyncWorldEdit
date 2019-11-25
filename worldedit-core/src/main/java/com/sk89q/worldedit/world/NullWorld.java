@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.beta.implementation.blocks.NullChunkGet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -26,6 +29,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -146,6 +150,16 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
+    public void refreshChunk(int X, int Z) {
+
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return NullChunkGet.INSTANCE;
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState();
     }
@@ -194,4 +208,8 @@ public class NullWorld extends AbstractWorld {
         return INSTANCE;
     }
 
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+
+    }
 }

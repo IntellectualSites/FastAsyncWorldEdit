@@ -21,14 +21,11 @@ package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.boydti.fawe.command.FaweParser;
 import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.random.TrueRandom;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;
-//import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -36,12 +33,11 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
-import com.sk89q.worldedit.internal.command.ActorAuthorizer;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +45,7 @@ import java.util.stream.Stream;
 public class DefaultPatternParser extends FaweParser<Pattern> {
 
     public DefaultPatternParser(WorldEdit worldEdit) {
-        super(worldEdit, Pattern.class);
+        super(worldEdit, "patterns");
     }
 
     @Override
@@ -77,7 +73,7 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        pattern = Iterables.getFirst(parse(cmdArgs, actor), null);
+                        pattern = parse(command + cmdArgs, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {

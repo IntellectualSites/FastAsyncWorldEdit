@@ -25,9 +25,9 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp);
-        final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(BukkitAdapter.adapt(fp.getLocation()), true, null);
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+        final Player player = BukkitAdapter.adapt(wePlayer);
+        final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
         if (claim != null) {
             if (isAllowed(player, claim, type)) {
                 claim.getGreaterBoundaryCorner().getBlockX();
@@ -36,7 +36,7 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
                 return new FaweMask(pos1, pos2) {
 
                     @Override
-                    public boolean isValid(com.sk89q.worldedit.entity.Player fp, MaskType type) {
+                    public boolean isValid(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
                         return isAllowed(player, claim, type);
                     }
                 };

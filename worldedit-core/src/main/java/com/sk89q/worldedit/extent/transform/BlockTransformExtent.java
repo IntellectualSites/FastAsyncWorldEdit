@@ -67,6 +67,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -468,14 +470,14 @@ public class BlockTransformExtent extends ResettableExtent {
         int internalId = state.getInternalId();
 
         int maskedId = internalId & mask;
-        int newMaskedId = arr[maskedId >> BlockTypes.BIT_OFFSET];
+        int newMaskedId = arr[maskedId >> BlockTypesCache.BIT_OFFSET];
         if (newMaskedId != -1) {
             return BlockState.getFromInternalId(newMaskedId | (internalId & (~mask)));
         }
 
         newMaskedId = transformState(state, transform);
 
-        arr[maskedId >> BlockTypes.BIT_OFFSET] = newMaskedId & mask;
+        arr[maskedId >> BlockTypesCache.BIT_OFFSET] = newMaskedId & mask;
         return BlockState.getFromInternalId(newMaskedId);
     }
 

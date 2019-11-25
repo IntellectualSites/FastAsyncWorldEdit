@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;

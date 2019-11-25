@@ -2,15 +2,40 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
-public class CharBlocks implements IBlocks {
+public abstract class CharBlocks implements IBlocks {
+
+    public static final Section FULL = new Section() {
+        @Override
+        public final char[] get(CharBlocks blocks, int layer) {
+            return blocks.blocks[layer];
+        }
+    };
+    public static final Section EMPTY = new Section() {
+        @Override
+        public final char[] get(CharBlocks blocks, int layer) {
+            char[] arr = blocks.blocks[layer];
+            if (arr == null) {
+                arr = blocks.blocks[layer] = blocks.update(layer, null);
+                if (arr == null) {
+                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                }
+            } else {
+                blocks.blocks[layer] = blocks.update(layer, arr);
+                if (blocks.blocks[layer] == null) {
+                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                }
+            }
+            if (blocks.blocks[layer] != null) {
+                blocks.sections[layer] = FULL;
+            }
+            return arr;
+        }
+    };
     public final char[][] blocks;
     public final Section[] sections;
-
-    public CharBlocks(CharBlocks other) {
-        this.blocks = other.blocks;
-        this.sections = other.sections;
-    }
 
     public CharBlocks() {
         blocks = new char[16][];
@@ -22,7 +47,7 @@ public class CharBlocks implements IBlocks {
     public boolean trim(final boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
-            if (sections[i] == EMPTY) {
+            if (sections[i] == EMPTY && blocks[i] != null) {
                 blocks[i] = null;
             } else {
                 result = false;
@@ -41,12 +66,13 @@ public class CharBlocks implements IBlocks {
         sections[layer] = EMPTY;
     }
 
-    public char[] load(final int layer) {
-        return new char[4096];
-    }
-
-    public char[] load(final int layer, final char[] data) {
-        for (int i = 0; i < 4096; i++) data[i] = 0;
+    public char[] update(int layer, char[] data) {
+        if (data == null) {
+            return new char[4096];
+        }
+        for (int i = 0; i < 4096; i++) {
+            data[i] = 0;
+        }
         return data;
     }
 
@@ -55,7 +81,17 @@ public class CharBlocks implements IBlocks {
         return sections[layer] == FULL;
     }
 
-    public char get(final int x, final int y, final int z) {
+    @Override
+    public char[] load(int layer) {
+        return sections[layer].get(this, layer);
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return BlockTypesCache.states[get(x, y, z)];
+    }
+
+    public char get(int x, int y, int z) {
         final int layer = y >> 4;
         final int index = ((y & 15) << 8) | (z << 4) | (x & 15);
         return sections[layer].get(this, layer, index);

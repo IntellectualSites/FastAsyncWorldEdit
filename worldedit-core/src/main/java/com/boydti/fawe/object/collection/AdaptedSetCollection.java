@@ -9,6 +9,8 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,14 +20,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <T>
  */
 public class AdaptedSetCollection<T, V> implements Set<V> {
-    private final Function<T, V> adapter;
     private final Collection<V> adapted;
     private final Collection<T> original;
 
     public AdaptedSetCollection(Collection<T> collection, Function<T, V> adapter) {
         this.original = collection;
         this.adapted = Collections2.transform(collection, adapter);
-        this.adapter = adapter;
     }
 
     public Collection<T> getOriginal() {

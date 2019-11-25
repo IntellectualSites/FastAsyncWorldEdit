@@ -28,7 +28,7 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.SetQueue;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -44,6 +44,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -51,8 +52,10 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-import java.io.File;
+
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Represents a player
@@ -354,7 +357,7 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g. If
+     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g., If
      * they are editing a CFI world.<br/>
      *
      * @return Editing world
@@ -371,14 +374,6 @@ public interface Player extends Entity, Actor {
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
-    default boolean runAsyncIfFree(Runnable r) {
-        return runAction(r, true, true);
-    }
-
-    default boolean runIfFree(Runnable r) {
-        return runAction(r, true, false);
-    }
-
     /**
      * Unregister this player (deletes all metadata etc) - Usually called on logout
      */
@@ -388,36 +383,39 @@ public interface Player extends Entity, Actor {
             getSession().setClipboard(null);
             getSession().clearHistory();
         }
-        Fawe.get().unregister(getName());
     }
 
     default int cancel(boolean close) {
-//        Collection<IQueueExtent> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
-//        int cancelled = 0;
-//        clearActions();
-//        for (IQueueExtent queue : queues) {
-//            Collection<EditSession> sessions = queue.getEditSessions();
-//            for (EditSession session : sessions) {
-//                FawePlayer currentPlayer = session.getPlayer();
-//                if (currentPlayer == this) {
-//                    if (session.cancel()) {
-//                        cancelled++;
-//                    }
-//                }
-//            }
-//        }
-//        VirtualWorld world = getSession().getVirtualWorld();
-//        if (world != null) {
-//            if (close) {
-//                try {
-//                    world.close(false);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            else world.clear();
-//        }
-        return 0;
+        int cancelled = 0;
+
+        for (Request request : Request.getAll()) {
+            EditSession editSession = request.getEditSession();
+            if (editSession != null) {
+                Player player = editSession.getPlayer();
+                if (equals(player)) {
+                    editSession.cancel();
+                    cancelled++;
+                }
+            }
+        }
+        VirtualWorld world = getSession().getVirtualWorld();
+        if (world != null) {
+            if (close) {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                try {
+                    world.close(false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return cancelled;
     }
 
     void sendTitle(String title, String sub);
@@ -443,12 +441,12 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            Fawe.debug("====== INVALID CLIPBOARD ======");
+            printError("====== INVALID CLIPBOARD ======");
             event.printStackTrace();
-            Fawe.debug("===============---=============");
-            Fawe.debug("This shouldn't result in any failure");
-            Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
-            Fawe.debug("===============---=============");
+            printError("===============---=============");
+            printError("This shouldn't result in any failure");
+            printError("File: " + file.getName() + " (len:" + file.length() + ")");
+            printError("===============---=============");
         }
     }
 

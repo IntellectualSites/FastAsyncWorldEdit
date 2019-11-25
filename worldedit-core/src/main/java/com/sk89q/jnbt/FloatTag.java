@@ -22,7 +22,7 @@ package com.sk89q.jnbt;
 /**
  * The {@code TAG_Float} tag.
  */
-public final class FloatTag extends Tag {
+public final class FloatTag extends NumberTag {
 
     private final float value;
 

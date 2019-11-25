@@ -139,16 +139,16 @@ public abstract class PaginationBox extends MessageBox {
         return new ListPaginationBox(header, pageCommand, lines);
     }
 
-    private static class ListPaginationBox extends PaginationBox {
+    public static class ListPaginationBox extends PaginationBox {
         private final Collection lines;
         private int iterIndex;
         private Iterator iterator;
 
-        ListPaginationBox(String header, String pageCommand, List<String> lines) {
+        public ListPaginationBox(String header, String pageCommand, List<String> lines) {
             this(header, pageCommand, (Collection) lines);
         }
 
-        ListPaginationBox(String header, String pageCommand, Collection lines) {
+        public ListPaginationBox(String header, String pageCommand, Collection lines) {
             super(header, pageCommand);
             this.lines = lines;
         }
@@ -168,7 +168,10 @@ public abstract class PaginationBox extends MessageBox {
                     iterIndex++;
                 } while (iterIndex < number);
             }
-            return TextComponent.of(obj.toString());
+            if (obj instanceof Component) {
+                return (Component) obj;
+            }
+            return TextComponent.of(obj + "");
         }
 
         @Override

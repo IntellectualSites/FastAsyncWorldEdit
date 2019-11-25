@@ -41,11 +41,24 @@ public class RegionVisitor implements Operation {
     public final Iterable<? extends BlockVector3> iterable;
 
 
+    /**
+     * Deprecated in favor of the other constructors which will preload chunks during iteration
+     *
+     * @param region
+     * @param function
+     */
     @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {
         this((Iterable<BlockVector3>) region, function);
     }
 
+    /**
+     * Deprecated in favor of the other constructors which will preload chunks during iteration
+     *
+     * @param region
+     * @param function
+     */
+    @Deprecated
     public RegionVisitor(Iterable<BlockVector3> iterable, RegionFunction function) {
         this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;

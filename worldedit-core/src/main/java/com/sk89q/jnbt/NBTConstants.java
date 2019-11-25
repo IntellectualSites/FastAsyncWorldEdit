@@ -80,5 +80,4 @@ public final class NBTConstants {
             throw new IllegalArgumentException("Unknown tag type ID of " + id);
         }
     }
-
 }

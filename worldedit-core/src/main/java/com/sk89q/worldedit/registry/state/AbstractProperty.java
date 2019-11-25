@@ -23,6 +23,7 @@ import com.boydti.fawe.util.MathMan;
 
 import static com.google.common.base.Preconditions.checkState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class AbstractProperty<T> implements Property<T> {
         this.name = name;
         this.values = values;
         this.numBits = MathMan.log2nlz(values.size());
-        this.bitOffset = bitOffset + BlockTypes.BIT_OFFSET;
+        this.bitOffset = bitOffset + BlockTypesCache.BIT_OFFSET;
         this.bitMask = (((1 << numBits) - 1)) << this.bitOffset;
         this.bitMaskInverse = ~this.bitMask;
         this.key = PropertyKey.getOrCreate(name);

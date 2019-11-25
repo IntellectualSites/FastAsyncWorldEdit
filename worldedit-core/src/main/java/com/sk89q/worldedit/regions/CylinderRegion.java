@@ -21,7 +21,7 @@ package com.sk89q.worldedit.regions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
@@ -385,16 +385,6 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return Polygons.polygonizeCylinder(center, radius, maxPoints);
     }
 
-    @Override
-    public int getMinY() {
-        return minY;
-    }
-
-    @Override
-    public int getMaxY() {
-        return maxY;
-    }
-
     /**
      * Return a new instance with the given center and radius in the X and Z
      * axes with a Y that extends from the bottom of the extent to the top
@@ -416,15 +406,15 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
-        final IChunkGet get, final IChunkSet set) {
+        final IChunkGet get, final IChunkSet set, boolean full) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;
         int tcz = bcz + 15;
         if (contains(bcx, bcz) && contains(tcx, tcz)) {
-            filter(chunk, filter, block, get, set, minY, maxY);
+            filter(chunk, filter, block, get, set, minY, maxY, full);
             return;
         }
-        super.filter(chunk, filter, block, get, set);
+        super.filter(chunk, filter, block, get, set, full);
     }
 }

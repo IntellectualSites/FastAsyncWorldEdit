@@ -19,16 +19,23 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.inject.InjectedValueStore;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.Locale;
 
 public class PrimitiveBindings extends Bindings {
+    public PrimitiveBindings(WorldEdit worldEdit) {
+        super(worldEdit);
+    }
 
     /*
     Parsers
      */
+    @Binding
     public Expression getExpression(String argument) throws ExpressionException {
         try {
             return new Expression(Double.parseDouble(argument));
@@ -54,6 +61,7 @@ public class PrimitiveBindings extends Bindings {
      * @return an extent
      * @throws InputParseException on other error
      */
+    @Binding
     public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
         if (argument.equalsIgnoreCase("#null")) {
             return new NullExtent();
@@ -77,6 +85,7 @@ public class PrimitiveBindings extends Bindings {
      * @return the requested type
      * @throws InputParseException on error
      */
+    @Binding
     public Boolean getBoolean(String argument) {
         switch (argument.toLowerCase(Locale.ROOT)) {
             case "":
@@ -107,6 +116,7 @@ public class PrimitiveBindings extends Bindings {
      * @return the requested type
      * @throws InputParseException on error
      */
+    @Binding
     public Vector3 getVector3(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
@@ -136,6 +146,7 @@ public class PrimitiveBindings extends Bindings {
      * @return the requested type
      * @throws InputParseException on error
      */
+    @Binding
     public Vector2 getVector2(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
@@ -163,6 +174,7 @@ public class PrimitiveBindings extends Bindings {
      * @return the requested type
      * @throws InputParseException on error
      */
+    @Binding
     public BlockVector3 getBlockVector3(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
@@ -192,58 +204,25 @@ public class PrimitiveBindings extends Bindings {
      * @return the requested type
      * @throws InputParseException on error
      */
+    @Binding
     public BlockVector2 getBlockVector2(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusZ = Math.max(1, parseNumericInput(radii[0]));
                 break;
 
             case 2:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
+                radiusX = Math.max(1, parseNumericInput(radii[0]));
+                radiusZ = Math.max(1, parseNumericInput(radii[1]));
                 break;
 
             default:
                 throw new InputParseException("You must either specify 1 or 2 radius values.");
         }
         return BlockVector2.at(radiusX, radiusZ);
-    }
-
-    /*
-
-     */
-
-    public Long getLong(String argument, Annotation... modifiers) {
-        try {
-            Long v = Long.parseLong(argument);
-            validate(v, modifiers);
-            return v;
-
-        } catch (NumberFormatException ignore) {
-            return null;
-        }
-    }
-
-    private static void validate(long number, Annotation... modifiers) {
-        for (Annotation modifier : modifiers) {
-            if (modifier instanceof Range) {
-                Range range = (Range) modifier;
-                if (number < range.min()) {
-                    throw new InputParseException(
-                            String.format(
-                                    "A valid value is greater than or equal to %s " +
-                                            "(you entered %s)", range.min(), number));
-                } else if (number > range.max()) {
-                    throw new InputParseException(
-                            String.format(
-                                    "A valid value is less than or equal to %s " +
-                                            "(you entered %s)", range.max(), number));
-                }
-            }
-        }
     }
 
     /**
@@ -253,9 +232,7 @@ public class PrimitiveBindings extends Bindings {
      * @return a number
      * @throws InputParseException thrown on parse error
      */
-    public static
-    @Nullable
-    Double parseNumericInput(@Nullable String input) {
+    public static @Nullable Double parseNumericInput(@Nullable String input) {
         if (input == null) {
             return null;
         }
@@ -271,121 +248,6 @@ public class PrimitiveBindings extends Bindings {
             } catch (ExpressionException e) {
                 throw new InputParseException(String.format(
                         "Expected '%s' to be a number or valid math expression (error: %s)", input, e.getMessage()));
-            }
-        }
-    }
-
-    /**
-     * Gets a type from a {@link ArgumentStack}.
-     *
-     * @param argument the context
-     * @param modifiers a list of modifiers
-     * @return the requested type
-     * @throws InputParseException on error
-     */
-    public Integer getInteger(String argument, Annotation[] modifiers) {
-        Double v = parseNumericInput(argument);
-        if (v != null) {
-            int intValue = v.intValue();
-            validate(intValue, modifiers);
-            return intValue;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Gets a type from a {@link ArgumentStack}.
-     *
-     * @param argument the context
-     * @param modifiers a list of modifiers
-     * @return the requested type
-     * @throws InputParseException on error
-     */
-    public Short getShort(String argument, Annotation[] modifiers) {
-        Integer v = getInteger(argument, modifiers);
-        if (v != null) {
-            return v.shortValue();
-        }
-        return null;
-    }
-
-    /**
-     * Gets a type from a {@link ArgumentStack}.
-     *
-     * @param argument the context
-     * @param modifiers a list of modifiers
-     * @return the requested type
-     * @throws InputParseException on error
-     */
-    public Double getDouble(String argument, Annotation[] modifiers) {
-        Double v = parseNumericInput(argument);
-        if (v != null) {
-            validate(v, modifiers);
-            return v;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Gets a type from a {@link ArgumentStack}.
-     *
-     * @param argument the context
-     * @param modifiers a list of modifiers
-     * @return the requested type
-     * @throws InputParseException on error
-     */
-    public Float getFloat(String argument, Annotation[] modifiers) {
-        Double v = getDouble(argument, modifiers);
-        if (v != null) {
-            return v.floatValue();
-        }
-        return null;
-    }
-
-    /**
-     * Validate a number value using relevant modifiers.
-     *
-     * @param number the number
-     * @param modifiers the list of modifiers to scan
-     * @throws InputParseException on a validation error
-     */
-    private static void validate(double number, Annotation[] modifiers)  {
-        for (Annotation modifier : modifiers) {
-            if (modifier instanceof Range) {
-                Range range = (Range) modifier;
-                if (number < range.min()) {
-                    throw new InputParseException(
-                            String.format("A valid value is greater than or equal to %s (you entered %s)", range.min(), number));
-                } else if (number > range.max()) {
-                    throw new InputParseException(
-                            String.format("A valid value is less than or equal to %s (you entered %s)", range.max(), number));
-                }
-            }
-        }
-    }
-
-    /**
-     * Validate a number value using relevant modifiers.
-     *
-     * @param number the number
-     * @param modifiers the list of modifiers to scan
-     * @throws InputParseException on a validation error
-     */
-    private static void validate(int number, Annotation[] modifiers) {
-        for (Annotation modifier : modifiers) {
-            if (modifier instanceof Range) {
-                Range range = (Range) modifier;
-                if (number < range.min()) {
-                    throw new InputParseException(
-                            String.format(
-                                    "A valid value is greater than or equal to %s (you entered %s)", range.min(), number));
-                } else if (number > range.max()) {
-                    throw new InputParseException(
-                            String.format(
-                                    "A valid value is less than or equal to %s (you entered %s)", range.max(), number));
-                }
             }
         }
     }

@@ -43,8 +43,8 @@ public class CFICommand extends CommandProcessor<Object, Object> {
     }
 
     @Override
-    public int process(InjectedValueAccess context, List<String> args, Object result) {
-        return 0;
+    public Object process(InjectedValueAccess context, List<String> args, Object result) {
+        return result;
     }
 
     private List<String> dispatch(Player player, CFISettings settings, List<String> args, InjectedValueAccess context) {

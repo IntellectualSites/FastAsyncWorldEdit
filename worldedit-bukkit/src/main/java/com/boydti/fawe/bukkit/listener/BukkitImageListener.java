@@ -63,17 +63,17 @@ public class BukkitImageListener implements Listener {
         Iterator<Player> iter = recipients.iterator();
         while (iter.hasNext()) {
             Player player = iter.next();
-            BukkitPlayer fp = BukkitAdapter.adapt(player);
-            CFICommands.CFISettings settings = fp.getMeta("CFISettings");
-            if (player.equals(event.getPlayer()) || !fp.hasMeta() || settings == null || !settings.hasGenerator()) {
+            BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
+            CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
+            if (player.equals(event.getPlayer()) || !bukkitPlayer.hasMeta() || settings == null || !settings.hasGenerator()) {
                 continue;
             }
 
             String name = player.getName().toLowerCase();
             if (!event.getMessage().toLowerCase().contains(name)) {
-                ArrayDeque<String> buffered = fp.getMeta("CFIBufferedMessages");
+                ArrayDeque<String> buffered = bukkitPlayer.getMeta("CFIBufferedMessages");
                 if (buffered == null) {
-                    fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
+                    bukkitPlayer.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
                 }
                 String full = String.format(event.getFormat(), event.getPlayer().getDisplayName(),
                     event.getMessage());
@@ -106,8 +106,8 @@ public class BukkitImageListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        BukkitPlayer fp = BukkitAdapter.adapt(player);
-        if (fp.getMeta("CFISettings") == null) {
+        BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
+        if (bukkitPlayer.getMeta("CFISettings") == null) {
             return;
         }
         try {
@@ -189,8 +189,8 @@ public class BukkitImageListener implements Listener {
         }
         ItemFrame itemFrame = (ItemFrame) entity;
 
-        BukkitPlayer fp = BukkitAdapter.adapt(player);
-        CFICommands.CFISettings settings = fp.getMeta("CFISettings");
+        BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
+        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
         HeightMapMCAGenerator generator = settings == null ? null : settings.getGenerator();
         BukkitImageViewer viewer = get(generator);
         if (viewer == null) {
@@ -201,10 +201,10 @@ public class BukkitImageListener implements Listener {
             itemFrame.setRotation(Rotation.NONE);
         }
 
-        LocalSession session = fp.getSession();
+        LocalSession session = bukkitPlayer.getSession();
         BrushTool tool;
         try {
-            tool = session.getBrushTool(fp.getItemInHand(HandSide.MAIN_HAND).getType());
+            tool = session.getBrushTool(bukkitPlayer, false);
         } catch (InvalidToolBindException e) {
             return;
         }
@@ -273,7 +273,7 @@ public class BukkitImageListener implements Listener {
                         return;
                     }
 
-                    fp.runAction(() -> {
+                    bukkitPlayer.runAction(() -> {
                         BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
                         viewer.refresh();
                         int topY = generator
@@ -281,7 +281,7 @@ public class BukkitImageListener implements Listener {
                                 0, 255);
                         wPos = wPos.withY(topY);
 
-                        EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp)
+                        EditSession es = new EditSessionBuilder(bukkitPlayer.getWorld()).player(bukkitPlayer)
                             .combineStages(false).autoQueue(false).blockBag(null).limitUnlimited()
                             .build();
                         ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();

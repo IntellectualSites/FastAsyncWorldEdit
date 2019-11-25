@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -39,6 +41,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class PlayerProxy extends AbstractPlayerActor {
 
@@ -48,7 +51,12 @@ public class PlayerProxy extends AbstractPlayerActor {
     private final World world;
     private Vector3 offset = Vector3.ZERO;
 
+    public PlayerProxy(Player player) {
+        this(player, player, player, player.getWorld());
+    }
+
     public PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
+        super(basePlayer.getRawMeta());
         checkNotNull(basePlayer);
         checkNotNull(permActor);
         checkNotNull(cuiActor);
@@ -57,6 +65,13 @@ public class PlayerProxy extends AbstractPlayerActor {
         this.permActor = permActor;
         this.cuiActor = cuiActor;
         this.world = world;
+    }
+
+    public static Player unwrap(Player player) {
+        if (player instanceof PlayerProxy) {
+            return unwrap(((PlayerProxy) player).getBasePlayer());
+        }
+        return player;
     }
 
     public void setOffset(Vector3 position) {
@@ -121,7 +136,7 @@ public class PlayerProxy extends AbstractPlayerActor {
 
     @Override
     public World getWorld() {
-        return world;
+        return world == null ? basePlayer.getWorld() : world;
     }
 
     @Override

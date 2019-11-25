@@ -1,9 +1,9 @@
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 
@@ -33,6 +33,11 @@ public final class ImmutableBaseBlock extends BaseBlock {
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setBlock(extent, toBlockState());
+    }
+
+    @Override
+    public void applyTileEntity(OutputExtent output, int x, int y, int z) {
+
     }
 
     @Override

@@ -1,9 +1,18 @@
 package com.boydti.fawe;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.anvil.BitArray4096;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.CleanableThreadLocal;
+import com.boydti.fawe.object.collection.VariableThreadLocal;
+import com.boydti.fawe.object.exception.FaweBlockBagException;
+import com.boydti.fawe.object.exception.FaweChunkLoadException;
+import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
@@ -21,8 +30,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +39,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
+public enum FaweCache implements Trimable {
+    IMP
+    ; // singleton
+
+    public final int BLOCKS_PER_LAYER = 4096;
+    public final int CHUNK_LAYERS = 16;
+    public final int WORLD_HEIGHT = CHUNK_LAYERS << 4;
+    public final int WORLD_MAX_Y = WORLD_HEIGHT - 1;
+
+    public final char[] EMPTY_CHAR_4096 = new char[4096];
+
+    private final IdentityHashMap<Class, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
+    private final IdentityHashMap<Class, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
+
+    public interface Pool<T> {
+        T poll();
+        default boolean offer(T recycle) {
+            return false;
+        }
+        default void clear() {}
+    }
+
+    public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
+        private final Supplier<T> supplier;
+
+        public QueuePool(Supplier<T> supplier) {
+            this.supplier = supplier;
+        }
 
 public class FaweCache implements Trimable {
     public static final char[] EMPTY_CHAR_4096 = new char[4096];
@@ -43,41 +86,70 @@ public class FaweCache implements Trimable {
      */
 
     @Override
-    public boolean trim(boolean aggressive) {
-        BLOCK_TO_PALETTE.clean();
-        PALETTE_TO_BLOCK.clean();
-        BLOCK_STATES.clean();
-        SECTION_BLOCKS.clean();
-        PALETTE_CACHE.clean();
-        PALETTE_TO_BLOCK_CHAR.clean();
+    public synchronized boolean trim(boolean aggressive) {
+        if (aggressive) {
+            CleanableThreadLocal.cleanAll();
+        } else {
+            CHUNK_FLAG.clean();
+            BYTE_BUFFER_8192.clean();
+            BLOCK_TO_PALETTE.clean();
+            PALETTE_TO_BLOCK.clean();
+            BLOCK_STATES.clean();
+            SECTION_BLOCKS.clean();
+            PALETTE_CACHE.clean();
+            PALETTE_TO_BLOCK_CHAR.clean();
+            INDEX_STORE.clean();
 
-        MUTABLE_VECTOR3.clean();
-        MUTABLE_BLOCKVECTOR3.clean();
+            MUTABLE_VECTOR3.clean();
+            MUTABLE_BLOCKVECTOR3.clean();
+            SECTION_BITS_TO_CHAR.clean();
+            for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
+                entry.getValue().clean();
+            }
+        }
+        for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
+            Pool pool = entry.getValue();
+            pool.clear();
+        }
+
         return false;
     }
 
-    public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
-        @Override
-        public int[] init() {
-            int[] result = new int[BlockTypes.states.length];
-            Arrays.fill(result, Integer.MAX_VALUE);
-            return result;
+    public final <T> Pool<T> getPool(Class<T> clazz) {
+        Pool<T> pool = REGISTERED_POOLS.get(clazz);
+        if (pool == null) {
+            synchronized (this) {
+                pool = REGISTERED_POOLS.get(clazz);
+                if (pool == null) {
+                    getLogger(FaweCache.class).debug("Not registered " + clazz);
+                    Supplier<T> supplier = IOUtil.supplier(clazz::newInstance);
+                    pool = supplier::get;
+                    REGISTERED_POOLS.put(clazz, pool);
+                }
+            }
         }
     };
 
-    public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
-        @Override
-        public int[] init() {
-            return new int[Character.MAX_VALUE + 1];
+    public final <T> T getSingleton(Class<T> clazz) {
+        CleanableThreadLocal<T> cache = REGISTERED_SINGLETONS.get(clazz);
+        if (cache == null) {
+            synchronized (this) {
+                cache = REGISTERED_SINGLETONS.get(clazz);
+                if (cache == null) {
+                    getLogger(FaweCache.class).debug("Not registered " + clazz);
+                    cache = new CleanableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
+                    REGISTERED_SINGLETONS.put(clazz, cache);
+                }
+            }
         }
     };
 
-    public static final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<char[]>() {
-        @Override
-        public char[] init() {
-            char[] result = new char[Character.MAX_VALUE + 1];
-            Arrays.fill(result, Character.MAX_VALUE);
-            return result;
+    public synchronized <T> CleanableThreadLocal<T> registerSingleton(Class<T> clazz, Supplier<T> cache) {
+        checkNotNull(cache);
+        CleanableThreadLocal<T> local = new CleanableThreadLocal<>(cache);
+        CleanableThreadLocal previous = REGISTERED_SINGLETONS.putIfAbsent(clazz, local);
+        if (previous != null) {
+            throw new IllegalStateException("Previous key");
         }
     };
 
@@ -86,19 +158,65 @@ public class FaweCache implements Trimable {
         public long[] init() {
             return new long[2048];
         }
-    };
+        return pool;
+    }
 
-    public static final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<int[]>() {
-        @Override
-        public int[] init() {
-            return new int[4096];
+    /*
+    Exceptions
+     */
+    public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
+    public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
+    public static final FaweException MANUAL = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+    public static final FaweException NO_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
+    public static final FaweException OUTSIDE_REGION = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+    public static final FaweException MAX_CHECKS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+    public static final FaweException MAX_CHANGES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+    public static final FaweException LOW_MEMORY = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
+    public static final FaweException MAX_ENTITIES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ENTITIES);
+    public static final FaweException MAX_TILES = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
+    public static final FaweException MAX_ITERATIONS = new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_ITERATIONS);
+
+    /*
+    thread cache
+     */
+    public final CleanableThreadLocal<AtomicBoolean> CHUNK_FLAG = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
+
+    public final CleanableThreadLocal<long[]> LONG_BUFFER_1024 = new CleanableThreadLocal<>(() -> new long[1024]);
+
+    public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
+
+    public final VariableThreadLocal BYTE_BUFFER_VAR = new VariableThreadLocal();
+
+    public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
+        int[] result = new int[BlockTypesCache.states.length];
+        Arrays.fill(result, Integer.MAX_VALUE);
+        return result;
+    });
+
+    public final CleanableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new CleanableThreadLocal<>(() -> new char[4096]);
+
+    public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK = new CleanableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
+
+    public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
+        () -> new char[Character.MAX_VALUE + 1], a -> {
+            Arrays.fill(a, Character.MAX_VALUE);
         }
-    };
+    );
+
+    public final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<>(() -> new long[2048]);
+
+    public final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<>(() -> new int[4096]);
+
+    public final CleanableThreadLocal<int[]> INDEX_STORE = new CleanableThreadLocal<>(() -> new int[256]);
+
+    public final CleanableThreadLocal<int[]> HEIGHT_STORE = new CleanableThreadLocal<>(() -> new int[256]);
 
     /**
      * Holds data for a palette used in a chunk section
      */
-    public static final class Palette {
+    public final class Palette {
+        public int bitsPerEntry;
+
         public int paletteToBlockLength;
         /**
          * Reusable buffer array, MUST check paletteToBlockLength for actual length
@@ -112,12 +230,7 @@ public class FaweCache implements Trimable {
         public long[] blockstates;
     }
 
-    private static final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<Palette>() {
-        @Override
-        public Palette init() {
-            return new Palette();
-        }
-    };
+    private final CleanableThreadLocal<Palette> PALETTE_CACHE = new CleanableThreadLocal<>(Palette::new);
 
     /**
      * Convert raw char array to palette
@@ -154,7 +267,6 @@ public class FaweCache implements Trimable {
                     int ordinal = blocksChars[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-//                        BlockState state = BlockTypes.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -166,7 +278,7 @@ public class FaweCache implements Trimable {
                     int ordinal = blocksInts[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-                        BlockState state = BlockTypes.states[ordinal];
+//                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -183,6 +295,11 @@ public class FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+                bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+            } else {
+                bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+            }
             int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
                 // Set a value, because minecraft needs it for some  reason
@@ -195,6 +312,7 @@ public class FaweCache implements Trimable {
 
             // Construct palette
             Palette palette = PALETTE_CACHE.get();
+            palette.bitsPerEntry = bitsPerEntry;
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
 
@@ -203,8 +321,8 @@ public class FaweCache implements Trimable {
 
             return palette;
         } catch (Throwable e) {
-            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             e.printStackTrace();
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             throw e;
         }
     }
@@ -213,14 +331,9 @@ public class FaweCache implements Trimable {
      * Vector cache
      */
 
-    public static IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<MutableBlockVector3>() {
-        @Override
-        public MutableBlockVector3 init() {
-            return new MutableBlockVector3();
-        }
-    };
+    public CleanableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new CleanableThreadLocal<>(MutableBlockVector3::new);
 
-    public static IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>() {
+    public CleanableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new CleanableThreadLocal<MutableVector3>(MutableVector3::new) {
         @Override
         public MutableVector3 init() {
             return new MutableVector3();
@@ -380,6 +493,31 @@ public class FaweCache implements Trimable {
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue
                 , Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                new ThreadPoolExecutor.CallerRunsPolicy()) {
+            protected void afterExecute(Runnable r, Throwable t) {
+                try {
+                    super.afterExecute(r, t);
+                    if (t == null && r instanceof Future<?>) {
+                        try {
+                            Future<?> future = (Future<?>) r;
+                            if (future.isDone()) {
+                                future.get();
+                            }
+                        } catch (CancellationException ce) {
+                            t = ce;
+                        } catch (ExecutionException ee) {
+                            t = ee.getCause();
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    if (t != null) {
+                        t.printStackTrace();
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 }

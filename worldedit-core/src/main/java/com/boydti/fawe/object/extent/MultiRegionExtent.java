@@ -1,13 +1,19 @@
 package com.boydti.fawe.object.extent;
 
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionIntersection;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 public class MultiRegionExtent extends FaweRegionExtent {
 
+    private final RegionIntersection intersection;
     private Region region;
     private final Region[] regions;
     private int index;
@@ -22,6 +28,7 @@ public class MultiRegionExtent extends FaweRegionExtent {
         this.index = 0;
         this.region = regions[0];
         this.regions = regions;
+        this.intersection = new RegionIntersection(Arrays.asList(regions));
     }
 
     @Override
@@ -37,6 +44,16 @@ public class MultiRegionExtent extends FaweRegionExtent {
                     index = i;
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean processGet(int chunkX, int chunkZ) {
+        for (Region region : regions) {
+            if (region.containsChunk(chunkX, chunkZ)) {
+                return true;
             }
         }
         return false;
@@ -63,5 +80,10 @@ public class MultiRegionExtent extends FaweRegionExtent {
     @Override
     public Collection<Region> getRegions() {
         return Arrays.asList(regions);
+    }
+
+    @Override
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return intersection.processSet(chunk, get, set);
     }
 }

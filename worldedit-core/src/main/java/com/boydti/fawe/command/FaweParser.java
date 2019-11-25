@@ -8,27 +8,31 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 import java.util.*;
 
 public abstract class FaweParser<T> extends InputParser<T> {
-    private final Class<T> type;
 
-    protected FaweParser(WorldEdit worldEdit, Class<T> type) {
+    private final String prefix;
+
+    protected FaweParser(WorldEdit worldEdit, String prefix) {
         super(worldEdit);
-        this.type = type;
+        this.prefix = prefix;
     }
 
     public PlatformCommandManager getPlatform() {
         return PlatformCommandManager.getInstance();
     }
 
-    public Class<T> getType() {
-        return type;
-    }
-
-    public Collection<T> parse(String input, Actor actor) {
-        return getPlatform().parse(getType(), "pattern " + input, actor);
+    public T parse(String input, ParserContext context) {
+        input = prefix + " " + input;
+        InjectedValueAccess injected = context.getInjected();
+        if (injected != null) {
+            return getPlatform().parse(input, injected);
+        } else {
+            return getPlatform().parse(input, context.getActor());
+        }
     }
 
     public T catchSuggestion(String currentInput, String nextInput, ParserContext context) throws InputParseException {

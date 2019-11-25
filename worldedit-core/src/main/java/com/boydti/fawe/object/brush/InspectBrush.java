@@ -46,7 +46,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
     }
 
     public Vector3 getTarget(Player player, boolean adjacent) {
-        int range = this.range > -1 ? getRange() : MAX_RANGE;
+        int range = this.range > -1 ? getRange() : DEFAULT_RANGE;
         if (adjacent) {
             Location face = player.getBlockTraceFace(range, true);
             return face.add(face.getDirection());
@@ -87,7 +87,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                         String name = Fawe.imp().getName(uuid);
                         long age = System.currentTimeMillis() - value.getBDFile().lastModified();
                         String ageFormatted = MainUtil.secToTime(age / 1000);
-                        BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromInternalId(from).getAsString(), BlockState.getFromInternalId(to).getAsString(), ageFormatted);
+                        BBC.TOOL_INSPECT_INFO.send(player, name, BlockState.getFromOrdinal(from).getAsString(), BlockState.getFromOrdinal(to).getAsString(), ageFormatted);
                         count.incrementAndGet();
                         return;
                     }

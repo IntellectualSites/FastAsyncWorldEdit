@@ -30,14 +30,10 @@ public class CFIChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public boolean close() {
-        return true;
-    }
+    public void close() {}
 
     @Override
-    public boolean closeAsync() {
-        return true;
-    }
+    public void closeAsync() {}
 
     @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {

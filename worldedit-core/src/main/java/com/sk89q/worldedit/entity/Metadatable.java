@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.entity;
 
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface Metadatable {
 
@@ -12,6 +12,8 @@ public interface Metadatable {
      * @param value
      */
     void setMeta(String key, Object value);
+
+    <T> T getAndSetMeta(String key, T value);
 
     /**
      * Checks if the object contains any metadata.
@@ -39,7 +41,7 @@ public interface Metadatable {
      */
     @NotNull
     default <V> V getMeta(String key, @NotNull V defaultValue) {
-        V value = (V) getMeta(key);
+        V value = getMeta(key);
         return value == null ? defaultValue : value;    }
 
     /**

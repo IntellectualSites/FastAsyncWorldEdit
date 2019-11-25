@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import static java.lang.System.arraycopy;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
@@ -86,15 +87,6 @@ import net.jpountz.lz4.LZ4InputStream;
 import net.jpountz.lz4.LZ4Utils;
 
 public class MainUtil {
-
-    public static void sendAdmin(final String s) {
-        for (final Player player : Fawe.get().getCachedPlayers()) {
-            if (player.hasPermission("fawe.admin")) {
-                player.print(s);
-            }
-        }
-        Fawe.debug(s);
-    }
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -244,7 +236,7 @@ public class MainUtil {
         return LZ4Utils.maxCompressedLength(size);
     }
 
-    public static byte[] compress(byte[] bytes, byte[] buffer, Deflater deflate) {
+    public static int compress(byte[] bytes, int length, byte[] buffer, OutputStream out, Deflater deflate) throws IOException {
         if (buffer == null) {
             buffer = new byte[8192];
         }
@@ -253,14 +245,17 @@ public class MainUtil {
         } else {
             deflate.reset();
         }
-        deflate.setInput(bytes);
+        deflate.setInput(bytes, 0, length);
         deflate.finish();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int written = 0;
         while (!deflate.finished()) {
             int n = deflate.deflate(buffer);
-            if (n != 0) baos.write(buffer, 0, n);
+            if (n != 0) {
+                written += n;
+                out.write(buffer, 0, n);
+            }
         }
-        return baos.toByteArray();
+        return written;
     }
 
     public static byte[] decompress(byte[] bytes, byte[] buffer, Inflater inflater) throws DataFormatException {
@@ -378,7 +373,7 @@ public class MainUtil {
 
     public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
         if (writeTask == null) {
-            Fawe.debug("&cWrite task cannot be null");
+            getLogger(MainUtil.class).debug("Write task cannot be null");
             return null;
         }
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
@@ -426,7 +421,7 @@ public class MainUtil {
                 content = scanner.next().trim();
             }
             if (!content.startsWith("<")) {
-                Fawe.debug(content);
+                getLogger(MainUtil.class).debug(content);
             }
             if (responseCode == 200) {
                 return url;
@@ -604,8 +599,7 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            Fawe.debug("&cCould not save " + resource);
+            getLogger(MainUtil.class).debug("Could not save " + resource, e);
         }
         return null;
     }
@@ -754,7 +748,6 @@ public class MainUtil {
         if (time >= 33868800) {
             int years = (int) (time / 33868800);
             int time1 = years * 33868800;
-            System.out.println(time1);
             time -= time1;
             toreturn.append(years + "y ");
         }

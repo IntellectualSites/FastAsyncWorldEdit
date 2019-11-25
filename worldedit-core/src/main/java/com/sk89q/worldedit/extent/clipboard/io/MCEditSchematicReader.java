@@ -357,10 +357,6 @@ public class MCEditSchematicReader extends NBTSchematicReader {
 
     private String convertBlockEntityId(String id) {
         switch (id) {
-            case "Chest":
-                return "chest";
-            case "Sign":
-                return "sign";
             case "Cauldron":
                 return "brewing_stand";
             case "Control":
@@ -388,6 +384,24 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 return "note_block";
             case "Structure":
                 return "structure_block";
+            case "Chest":
+                return "chest";
+            case "Sign":
+                return "sign";
+            case "Banner":
+                return "banner";
+            case "Beacon":
+                return "beacon";
+            case "Comparator":
+                return "comparator";
+            case "Dropper":
+                return "dropper";
+            case "Furnace":
+                return "furnace";
+            case "Hopper":
+                return "hopper";
+            case "Skull":
+                return "skull";
             default:
                 return id;
         }

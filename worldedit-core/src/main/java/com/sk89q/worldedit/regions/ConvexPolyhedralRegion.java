@@ -331,4 +331,9 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
     public AbstractRegion clone() {
         return new ConvexPolyhedralRegion(this);
     }
+
+    @Override
+    public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
+        return false;
+    }
 }

@@ -29,7 +29,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.util.Location;
 
-public class SelectionWand implements DoubleActionBlockTool {
+public enum SelectionWand implements DoubleActionBlockTool {
+    INSTANCE;
 
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {

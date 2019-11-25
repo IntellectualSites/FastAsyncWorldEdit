@@ -1,81 +1,63 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import com.boydti.fawe.object.extent.FastWorldEditExtent;
-import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.SimpleWorld;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
 import javax.annotation.Nullable;
+import java.io.File;
 
-public class MCAWorld implements SimpleWorld {
+import static com.google.common.base.Preconditions.checkArgument;
 
-    private final String name;
-    private final MCAQueue queue;
-    private final FastWorldEditExtent extent;
+public class MCAWorld extends AbstractWorld {
+    private final File path;
 
-    public MCAWorld(String name, File saveFolder, boolean hasSky) {
-        this.name = name;
-        this.queue = new MCAQueue(name, saveFolder, hasSky);
-        this.extent = new FastWorldEditExtent(this, queue);
-    }
-
-    public MCAQueue getQueue() {
-        return queue;
+    public MCAWorld(File path) {
+        checkArgument(path.isDirectory());
+        this.path = path;
     }
 
     @Override
     public String getName() {
-        return name;
+        return path.getName();
+    }
+
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return false;
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
-        return extent.setBlock(position, block);
-    }
-
-    @Override
-    public int getBlockLightLevel(BlockVector3 position) {
-        return queue.getEmmittedLight(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+        return false;
     }
 
     @Override
     public boolean clearContainerBlockContents(BlockVector3 position) {
-        BaseBlock block = extent.getFullBlock(position);
-        if (block.hasNbtData()) {
-            Map<String, Tag> nbt = ReflectionUtils.getMap(block.getNbtData().getValue());
-            if (nbt.containsKey("Items")) {
-                nbt.put("Items", new ListTag(CompoundTag.class, new ArrayList<CompoundTag>()));
-                try {
-                    extent.setBlock(position, block);
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     @Override
     public void dropItem(Vector3 position, BaseItemStack item) {
+
+    }
+
+    @Override
+    public void simulateBlockMine(BlockVector3 position) {
 
     }
 
@@ -85,61 +67,27 @@ public class MCAWorld implements SimpleWorld {
     }
 
     @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return new ArrayList<>();
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+        return false;
     }
 
     @Override
-    public List<? extends Entity> getEntities() {
-        return new ArrayList<>();
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return extent.createEntity(location, entity);
+    public BlockVector3 getSpawnPosition() {
+        return null;
     }
 
     @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return extent.getBlock(position);
+    public void refreshChunk(int chunkX, int chunkZ) {
+
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return extent.getBiome(position);
+    public IChunkGet get(int x, int z) {
+        return null;
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return extent.setBlock(x, y, z, block);
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+
     }
-
-    @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        extent.setTile(x, y, z, tile);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return extent.setBiome(position, biome);
-    }
-
-	@Override
-	public boolean playEffect(Vector3 position, int type, int data) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public BlockVector3 getSpawnPosition() {
-		return queue.getWEWorld().getSpawnPosition();
-	}
 }

@@ -4,6 +4,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class InverseSingleBlockTypeMask extends ABlockMask {
     private final BlockType type;
@@ -25,7 +27,7 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
 
     @Override
     public Mask inverse() {
-        return new SingleBlockTypeMask(getExtent(), type);
+        return new SingleBlockTypeMask(getExtent(), BlockTypesCache.values[internalId]);
     }
 
     public BlockType getBlockType() {

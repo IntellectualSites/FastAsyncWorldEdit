@@ -1,69 +1,74 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.IChunkExtent;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.IBatchProcessorHolder;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
+import com.sk89q.worldedit.regions.Region;
 import java.io.Flushable;
+import java.util.Set;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * TODO: implement Extent (need to refactor Extent first)
  * Interface for a queue based extent which uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, Extent {
-    void init(WorldChunkCache world);
+public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, IChunkExtent<T>, IBatchProcessorHolder {
+
+    @Override
+    default boolean isQueueEnabled() {
+        return true;
+    }
 
     /**
-     * Get the {@link WorldChunkCache}
+     * Must ensure that it is enqueued with QueueHandler
+     */
+    @Override
+    void enableQueue();
+
+    /**
+     * Must ensure it is not in the queue handler (i.e. does not change blocks in the world)
+     */
+    @Override
+    void disableQueue();
+
+
+    /**
+     * Initialize the queue (for reusability)
+     * @param extent
+     * @param get
+     * @param set
+     */
+    void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
+
+    /**
+     * Get the cached get object
+     *  - Faster than getting it using NMS and allows for wrapping
+     * @param x
+     * @param z
      * @return
      */
-    WorldChunkCache getCache();
+    IChunkGet getCachedGet(int x, int z);
 
     /**
-     * Get the IChunk at a position (and cache it if it's not already)
-     * @param X
-     * @param Z
-     * @return IChunk
+     * Get the cached chunk set object
+     * @param x
+     * @param z
+     * @return
      */
-    IChunk getCachedChunk(int X, int Z);
+    IChunkSet getCachedSet(int x, int z);
 
     /**
      * Submit the chunk so that it's changes are applied to the world
      * @param chunk
      * @return result
      */
-    <T extends Future<T>> T submit(IChunk<T> chunk);
-
-    default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.setBlock(x & 15, y, z & 15, state);
-    }
-
-    default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.setBiome(x & 15, y, z & 15, biome);
-    }
-
-    default BlockState getBlock(final int x, final int y, final int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.getBlock(x & 15, y, z & 15);
-    }
-
-    @Override
-    default BaseBlock getFullBlock(int x, int y, int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.getFullBlock(x & 15, y, z & 15);
-    }
-
-    default BiomeType getBiome(final int x, final int z) {
-        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.getBiome(x & 15, z & 15);
-    }
+    <V extends Future<V>> V submit(T chunk);
 
     @Override
     default BlockVector3 getMinimumPoint() {
@@ -75,21 +80,30 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
         return getCache().getWorld().getMaximumPoint();
     }
     /**
-     * Create a new root IChunk object<br>
-     *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>
-     *  - Don't wrap the chunk, that should be done in {@link #wrap(IChunk)}
-     * @param full
-     * @return
+     * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
+     * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
+     * #wrap(T)}
+     *
+     * @param isFull true if a more optimized chunk should be returned
+     * @return a more optimized chunk object
      */
-    IChunk create(boolean full);
+    T create(boolean isFull);
 
     /**
-     * Wrap the chunk object (i.e. for region restrictions / limits etc.)
+     * Wrap the chunk object (i.e., for region restrictions / limits etc.)
+     *
      * @param root
      * @return wrapped chunk
      */
-    default IChunk wrap(final IChunk root) {
+    default T wrap(T root) {
         return root;
+    }
+
+    @Nullable
+    @Override
+    default Operation commit() {
+        flush();
+        return null;
     }
 
     /**
@@ -100,4 +114,49 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     void flush();
 
     ChunkFilterBlock initFilterBlock();
+
+    /**
+     * Returns the number of chunks in this queue.
+     *
+     * @return the number of chunks in this queue
+     */
+    int size();
+
+    /**
+     * Returns <tt>true</tt> if this queue contains no elements.
+     *
+     * @return <tt>true</tt> if this queue contains no elements
+     */
+    boolean isEmpty();
+
+    default ChunkFilterBlock apply(ChunkFilterBlock block, Filter filter, Region region, int chunkX, int chunkZ, boolean full) {
+        if (!filter.appliesChunk(chunkX, chunkZ)) {
+            return block;
+        }
+        T chunk = this.getOrCreateChunk(chunkX, chunkZ);
+        // Initialize
+        chunk.init(this, chunkX, chunkZ);
+
+        T newChunk = filter.applyChunk(chunk, region);
+        if (newChunk != null) {
+            chunk = newChunk;
+            if (block == null) {
+                block = this.initFilterBlock();
+            }
+            chunk.filterBlocks(filter, block, region, full);
+        }
+        this.submit(chunk);
+        return block;
+    }
+
+    @Override
+    default <T extends Filter> T apply(Region region, T filter, boolean full) {
+        final Set<BlockVector2> chunks = region.getChunks();
+        ChunkFilterBlock block = null;
+        for (BlockVector2 chunk : chunks) {
+            block = apply(block, filter, region, chunk.getX(), chunk.getZ(), full);
+        }
+        flush();
+        return filter;
+    }
 }

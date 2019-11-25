@@ -2,6 +2,7 @@ package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -37,6 +38,11 @@ public class EmptyClipboard implements Clipboard {
 
     @Override
     public void setOrigin(BlockVector3 origin) {
+    }
+
+    @Override
+    public void removeEntity(Entity entity) {
+
     }
 
     @Override

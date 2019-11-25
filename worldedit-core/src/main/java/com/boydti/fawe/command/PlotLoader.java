@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Function;
@@ -36,15 +36,14 @@ public class PlotLoader {
             () -> autoClaimFromDatabase(player, area, plot.getId(), whenDone));
     }
 
-    public void load(Player fp, CFISettings  settings,
-        Function<File, Boolean> createTask) throws IOException {
+    public void load(Actor actor, CFISettings  settings, Function<File, Boolean> createTask) throws IOException {
         PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
             SinglePlotArea area = sManager.getArea();
-            PlotPlayer player = PlotPlayer.get(fp.getName());
+            PlotPlayer player = PlotPlayer.get(actor.getName());
 
-            fp.print("Claiming world");
+            actor.print("Claiming world");
             Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
                 @Override
                 public void run(Plot o) {

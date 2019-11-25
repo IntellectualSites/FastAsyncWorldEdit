@@ -56,9 +56,10 @@ public interface OutputExtent {
      */
     @Deprecated
     default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
-        return true;
+        return setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
+    // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
     default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return setBlock(MutableBlockVector3.get(x, y, z), block);
     }
@@ -76,6 +77,7 @@ public interface OutputExtent {
         return setBiome(position.getX(), 0, position.getBlockZ(), biome);
     }
 
+    // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
         return setBiome(MutableBlockVector2.get(x, z), biome);
     }

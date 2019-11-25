@@ -1,89 +1,234 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.number.MutableLong;
-import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.jnbt.streamer.StreamDelegate;
+import com.boydti.fawe.jnbt.streamer.ValueReader;
+import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.NBTConstants;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
-import java.io.DataOutput;
-import java.io.DataOutputStream;
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Future;
 
-public class MCAChunk extends FaweChunk<Void> {
+public class MCAChunk implements IChunk {
+    public final boolean[] hasSections = new boolean[16];
 
-    public int[][] ids;
-    public byte[][] skyLight;
-    public byte[][] blockLight;
-    public byte[] biomes;
-    public Map<Short, CompoundTag> tiles = new HashMap<>();
-    public Map<UUID, CompoundTag> entities = new HashMap<>();
-    private long inhabitedTime;
-    private long lastUpdate;
-    private int[] heightMap;
+    public boolean hasBiomes = false;
+    public final BiomeType[] biomes = new BiomeType[256];
 
-    private int modified;
-    private boolean deleted;
+    public final char[] blocks = new char[65536];
 
-    public MCAChunk(FaweQueue queue, int x, int z) {
-        super(queue, x, z);
-        this.ids = new int[16][];
-        this.skyLight = new byte[16][];
-        this.blockLight = new byte[16][];
-        this.biomes = new byte[256];
-        this.tiles = new HashMap<>();
-        this.entities = new HashMap<>();
-        this.lastUpdate = System.currentTimeMillis();
-        this.heightMap = new int[256];
-        this.setModified();
+    public final BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<CompoundTag>();
+    public final Map<UUID, CompoundTag> entities = new HashMap<>();
+    public long inhabitedTime = System.currentTimeMillis();
+    public long lastUpdate;
+
+    public int modified;
+    public boolean deleted;
+
+    public int chunkX;
+    public int chunkZ;
+
+    public MCAChunk() {}
+
+    private boolean readLayer(Section section) {
+        if (section.palette == null || section.layer == -1 || section.blocksLength == -1 || section.palette[section.palette.length - 1] == null || section.blocks == null) {
+            // not initialized
+            return false;
+        }
+
+        int bitsPerEntry = MathMan.log2nlz(section.palette.length - 1);
+        BitArray4096 bitArray = new BitArray4096(section.blocks, bitsPerEntry);
+        char[] buffer = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        bitArray.toRaw(buffer);
+        int offset = section.layer << 12;
+        for (int i = 0; i < buffer.length; i++) {
+            BlockState block = section.palette[buffer[i]];
+            blocks[offset + i] = block.getOrdinalChar();
+        }
+
+        section.layer = -1;
+        section.blocksLength = -1;
+        section.blocks = null;
+        section.palette = null;
+        return true;
     }
 
-    public MCAChunk(MCAChunk parent, boolean shallow) {
-        super(parent.getParent(), parent.getX(), parent.getZ());
-        if (shallow) {
-            this.ids = parent.ids;
-            this.skyLight = parent.skyLight;
-            this.blockLight = parent.blockLight;
-            this.biomes = parent.biomes;
-            this.tiles = parent.tiles;
-            this.entities = parent.entities;
-            this.inhabitedTime = parent.inhabitedTime;
-            this.lastUpdate = parent.lastUpdate;
-            this.heightMap = parent.heightMap;
-            this.modified = parent.modified;
-            this.deleted = parent.deleted;
-        } else {
-            this.ids = (int[][]) MainUtil.copyNd(parent.ids);
-            this.skyLight = (byte[][]) MainUtil.copyNd(parent.skyLight);
-            this.blockLight = (byte[][]) MainUtil.copyNd(parent.blockLight);
-            this.biomes = parent.biomes.clone();
-            this.tiles = new HashMap<>(parent.tiles);
-            this.entities = new HashMap<>(parent.entities);
-            this.inhabitedTime = parent.inhabitedTime;
-            this.lastUpdate = parent.lastUpdate;
-            this.heightMap = parent.heightMap.clone();
-            this.modified = parent.modified;
-            this.deleted = parent.deleted;
+    private static class Section {
+        public int layer = -1;
+        public long[] blocks;
+        public int blocksLength = -1;
+        public BlockState[] palette;
+    }
+
+    public MCAChunk(NBTInputStream nis, int chunkX, int chunkZ, boolean readPos) throws IOException {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+        read(nis, readPos);
+    }
+
+    @Override
+    public void init(IQueueExtent extent, int x, int z) {
+        if (x != chunkX || z != chunkZ) {
+            throw new UnsupportedOperationException("Not reuse capable");
         }
     }
 
+    public void read(NBTInputStream nis, boolean readPos) throws IOException {
+        StreamDelegate root = createDelegate(nis, readPos);
+        nis.readNamedTagLazy(root);
+    }
+
+    public StreamDelegate createDelegate(NBTInputStream nis, boolean readPos) {
+        StreamDelegate root = new StreamDelegate();
+        StreamDelegate level = root.add("").add("Level");
+
+        level.add("InhabitedTime").withLong((i, v) -> inhabitedTime = v);
+        level.add("LastUpdate").withLong((i, v) -> lastUpdate = v);
+
+        if (readPos) {
+            level.add("xPos").withInt((i, v) -> MCAChunk.this.chunkX = v);
+            level.add("zPos").withInt((i, v) -> MCAChunk.this.chunkZ = v);
+        }
+
+        Section section = new Section();
+
+        StreamDelegate layers = level.add("Sections");
+        StreamDelegate layer = layers.add();
+        layer.withInfo((length, type) -> {
+            section.layer = -1;
+            section.blocksLength = -1;
+        });
+        layer.add("Y").withInt((i, y) -> section.layer = y);
+        layer.add("Palette").withElem((ValueReader<Map<String, Object>>) (index, map) -> {
+            String name = (String) map.get("Name");
+            BlockType type = BlockTypes.get(name);
+            BlockState state = type.getDefaultState();
+            Map<String, String> properties = (Map<String, String>) map.get("Properties");
+            if (properties != null) {
+                for (Map.Entry<String, String> entry : properties.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    Property property = type.getProperty(key);
+                    state = state.with(property, property.getValueFor(value));
+                }
+            }
+            section.palette[index] = state;
+            readLayer(section);
+        });
+        StreamDelegate blockStates = layer.add("BlockStates");
+        blockStates.withInfo((length, type) -> {
+            if (section.blocks == null) {
+                section.blocks = FaweCache.IMP.LONG_BUFFER_1024.get();
+            }
+            section.blocksLength = length;
+        });
+        blockStates.withLong((index, value) -> section.blocks[index] = value);
+        level.add("TileEntities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
+            CompoundTag tile = FaweCache.IMP.asTag(value);
+            int x = tile.getInt("x") & 15;
+            int y = tile.getInt("y");
+            int z = tile.getInt("z") & 15;
+            tiles.put(x, y, z, tile);
+        });
+        level.add("Entities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
+            CompoundTag entity = FaweCache.IMP.asTag(value);
+            entities.put(entity.getUUID(), entity);
+        });
+        level.add("Biomes").withInt((index, value) -> biomes[index] = BiomeTypes.getLegacy(value));
+
+        return root;
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
+    }
+
+    @Override
+    public boolean hasSection(int layer) {
+        return hasSections[layer];
+    }
+
+    public void setPosition(int X, int Z) {
+        this.chunkX = X;
+        this.chunkZ = Z;
+    }
+
+    @Override
+    public MCAChunk reset() {
+        return this.reset(true);
+    }
+
+    public MCAChunk reset(boolean full) {
+        if (!tiles.isEmpty()) {
+            tiles.clear();
+        }
+        if (!entities.isEmpty()) {
+            entities.clear();
+        }
+        modified = 0;
+        deleted = false;
+        hasBiomes = false;
+        if (full) {
+            for (int i = 0; i < 65536; i++) {
+                blocks[i] = BlockID.AIR;
+            }
+        }
+        Arrays.fill(hasSections, false);
+        return this;
+    }
+
     public void write(NBTOutputStream nbtOut) throws IOException {
+        int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+        long[] blockstates = FaweCache.IMP.BLOCK_STATES.get();
+        int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
+        nbtOut.writeNamedTag("DataVersion", 1631);
         nbtOut.writeLazyCompoundTag("Level", out -> {
-            out.writeNamedTag("V", (byte) 1);
+            out.writeNamedTag("Status", "decorated");
             out.writeNamedTag("xPos", getX());
             out.writeNamedTag("zPos", getZ());
-            out.writeNamedTag("LightPopulated", (byte) 0);
-            out.writeNamedTag("TerrainPopulated", (byte) 1);
             if (entities.isEmpty()) {
                 out.writeNamedEmptyList("Entities");
             } else {
@@ -93,47 +238,134 @@ public class MCAChunk extends FaweChunk<Void> {
                 out.writeNamedEmptyList("TileEntities");
             } else {
                 out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
-                    new ArrayList<>(tiles.values())));
+                        new ArrayList<>(tiles.values())));
             }
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
-            if (biomes != null) {
-                out.writeNamedTag("Biomes", biomes);
+            if (hasBiomes) {
+                int type = NBTConstants.TYPE_BYTE_ARRAY;
+                out.writeNamedTagName("Biomes", type);
+                out.writeInt(biomes.length);
+                for (int i = 0; i < biomes.length; i++) {
+                    out.write(biomes[i].getLegacyId());
+                }
             }
-            out.writeNamedTag("HeightMap", heightMap);
-            out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
-            nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
             int len = 0;
-            for (int[] id : ids) {
-                if (id != null) len++;
+            for (boolean hasSection : hasSections) {
+                if (hasSection) {
+                    len++;
+                }
             }
-            nbtOut.getOutputStream().writeInt(len);
-            for (int layer = 0; layer < ids.length; layer++) {
-                int[] idLayer = ids[layer];
-                if (idLayer == null) {
+            out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
+            nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
+            nbtOut.writeInt(len);
+
+            for (int layer = 0; layer < hasSections.length; layer++) {
+                if (!hasSections[layer]) {
                     continue;
                 }
                 out.writeNamedTag("Y", (byte) layer);
-                out.writeNamedTag("BlockLight", blockLight[layer]);
-                out.writeNamedTag("SkyLight", skyLight[layer]);
-                out.writeNamedTag("Blocks", idLayer);
-                out.writeEndTag();
+
+                int blockIndexStart = layer << 12;
+                int blockIndexEnd = blockIndexStart + 4096;
+                int num_palette = 0;
+                try {
+                    for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                        int ordinal = blocks[i];
+                        int palette = blockToPalette[ordinal];
+                        if (palette == Integer.MAX_VALUE) {
+//                            BlockState state = BlockTypesCache.states[ordinal];
+                            blockToPalette[ordinal] = palette = num_palette;
+                            paletteToBlock[num_palette] = ordinal;
+                            num_palette++;
+                        }
+                        blocksCopy[j] = palette;
+                    }
+
+                    for (int i = 0; i < num_palette; i++) {
+                        blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
+                    }
+
+                    out.writeNamedTagName("Palette", NBTConstants.TYPE_LIST);
+                    out.writeByte(NBTConstants.TYPE_COMPOUND);
+                    out.writeInt(num_palette);
+
+                    for (int i = 0; i < num_palette; i++) {
+                        int ordinal = paletteToBlock[i];
+                        BlockState state = BlockTypesCache.states[ordinal];
+                        BlockType type = state.getBlockType();
+                        out.writeNamedTag("Name", type.getId());
+
+                        // Has no properties
+                        if (type.getDefaultState() != state) {
+                            // Write properties
+                            out.writeNamedTagName("Properties", NBTConstants.TYPE_COMPOUND);
+                            for (Property<?> property : type.getProperties()) {
+                                String key = property.getName();
+                                Object value = state.getState(property);
+                                String valueStr = value.toString();
+                                if (Character.isUpperCase(valueStr.charAt(0))) {
+                                    System.out.println("Invalid uppercase value " + value);
+                                    valueStr = valueStr.toLowerCase();
+                                }
+                                out.writeNamedTag(key, valueStr);
+                            }
+                            out.writeEndTag();
+                        }
+                        out.writeEndTag();
+                    }
+
+
+                    // BlockStates
+                    int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+                    int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
+                    if (num_palette == 1) {
+                        // Set a value, because minecraft needs it for some  reason
+                        blockstates[0] = 0;
+                        blockBitArrayEnd = 1;
+                    } else {
+                        BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                        bitArray.fromRaw(blocksCopy);
+                    }
+
+                    out.writeNamedTagName("BlockStates", NBTConstants.TYPE_LONG_ARRAY);
+                    out.writeInt(blockBitArrayEnd);
+                    for (int i = 0; i < blockBitArrayEnd; i++) {
+                        out.writeLong(blockstates[i]);
+                    }
+
+
+//                    out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
+//                    out.writeInt(2048);
+//                    out.write(blockLight, layer << 11, 1 << 11);
+//
+//                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
+//                    out.writeInt(2048);
+//                    out.write(skyLight, layer << 11, 1 << 11);
+
+
+                    out.writeEndTag();
+
+                    // cleanup
+                } catch (Throwable e) {
+                    Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+                    e.printStackTrace();
+                    throw e;
+                }
             }
         });
         nbtOut.writeEndTag();
     }
 
-    public byte[] toBytes(byte[] buffer) throws IOException {
+    public FastByteArrayOutputStream toBytes(byte[] buffer) throws IOException {
         if (buffer == null) {
             buffer = new byte[8192];
         }
-        FastByteArrayOutputStream buffered = new FastByteArrayOutputStream();
-        buffered.write(buffer);
-        DataOutputStream dataOut = new DataOutputStream(buffered);
-        try (NBTOutputStream nbtOut = new NBTOutputStream((DataOutput) dataOut)) {
+        FastByteArrayOutputStream buffered = new FastByteArrayOutputStream(buffer);
+        try (NBTOutputStream nbtOut = new NBTOutputStream(buffered)) {
             write(nbtOut);
         }
-        return buffered.toByteArray();
+        return buffered;
     }
 
     public long getInhabitedTime() {
@@ -152,355 +384,6 @@ public class MCAChunk extends FaweChunk<Void> {
         this.lastUpdate = lastUpdate;
     }
 
-    public void copyFrom(MCAChunk other, int minX, int maxX, int minY, int maxY, int minZ, int maxZ, int offsetX, int offsetY, int offsetZ) {
-        minY = Math.max(-offsetY - minY, minY);
-        maxY = Math.min(255 - offsetY, maxY);
-        minZ = Math.max(-offsetZ - minZ, minZ);
-        maxZ = Math.min(15 - offsetZ, maxZ);
-        minX = Math.max(-offsetX - minX, minX);
-        maxX = Math.min(15 - offsetX, maxX);
-        if (minX > maxX || minZ > maxZ || minY > maxY) return;
-        int startLayer = minY >> 4;
-        int endLayer = maxY >> 4;
-        for (int otherY = minY, thisY = minY + offsetY; otherY <= maxY; otherY++, thisY++) {
-            int thisLayer = thisY >> 4;
-            int otherLayer = otherY >> 4;
-            int[] thisIds = ids[thisLayer];
-            int[] otherIds = other.ids[otherLayer];
-            if (otherIds == null) {
-                if (thisIds != null) {
-                    int indexY = (thisY & 15) << 8;
-                    byte[] thisSkyLight = skyLight[thisLayer];
-                    byte[] thisBlockLight = blockLight[thisLayer];
-                    for (int otherZ = minZ, thisZ = minZ + offsetZ; otherZ <= maxZ; otherZ++, thisZ++) {
-                        int startIndex = indexY + (thisZ << 4) + minX + offsetX;
-                        int endIndex = startIndex + maxX - minX;
-                        Arrays.fill(thisIds, startIndex, endIndex + 1, 0);
-                        int startIndexShift = startIndex >> 1;
-                        int endIndexShift = endIndex >> 1;
-                        if ((startIndex & 1) != 0) {
-                            startIndexShift++;
-                            setNibble(startIndex, thisSkyLight, (byte) 0);
-                            setNibble(startIndex, thisBlockLight, (byte) 0);
-                        }
-                        if ((endIndex & 1) != 1) {
-                            endIndexShift--;
-                            setNibble(endIndex, thisSkyLight, (byte) 0);
-                            setNibble(endIndex, thisBlockLight, (byte) 0);
-                        }
-                        Arrays.fill(thisSkyLight, startIndexShift, endIndexShift + 1, (byte) 0);
-                        Arrays.fill(thisBlockLight, startIndexShift, endIndexShift + 1, (byte) 0);
-                    }
-                }
-                continue;
-            } else if (thisIds == null) {
-                ids[thisLayer] = thisIds = new int[4096];
-                skyLight[thisLayer] = new byte[2048];
-                blockLight[thisLayer] = new byte[2048];
-            }
-            int indexY = (thisY & 15) << 8;
-            int otherIndexY = (otherY & 15) << 8;
-            byte[] thisSkyLight = skyLight[thisLayer];
-            byte[] thisBlockLight = blockLight[thisLayer];
-            byte[] otherSkyLight = other.skyLight[otherLayer];
-            byte[] otherBlockLight = other.blockLight[otherLayer];
-            for (int otherZ = minZ, thisZ = minZ + offsetZ; otherZ <= maxZ; otherZ++, thisZ++) {
-                int startIndex = indexY + (thisZ << 4) + minX + offsetX;
-                int endIndex = startIndex + maxX - minX;
-                int otherStartIndex = otherIndexY + (otherZ << 4) + minX;
-                int otherEndIndex = otherStartIndex + maxX - minX;
-                System.arraycopy(otherIds, otherStartIndex, thisIds, startIndex, endIndex - startIndex + 1);
-                if ((startIndex & 1) == (otherStartIndex & 1)) {
-                    int startIndexShift = startIndex >> 1;
-                    int endIndexShift = endIndex >> 1;
-                    int otherStartIndexShift = otherStartIndex >> 1;
-                    if ((startIndex & 1) != 0) {
-                        startIndexShift++;
-                        otherStartIndexShift++;
-                        setNibble(startIndex, thisSkyLight, getNibble(otherStartIndex, otherSkyLight));
-                        setNibble(startIndex, thisBlockLight, getNibble(otherStartIndex, otherBlockLight));
-                    }
-                    if ((endIndex & 1) != 1) {
-                        endIndexShift--;
-                        setNibble(endIndex, thisSkyLight, getNibble(otherEndIndex, otherSkyLight));
-                        setNibble(endIndex, thisBlockLight, getNibble(otherEndIndex, otherBlockLight));
-                    }
-                    System.arraycopy(otherSkyLight, otherStartIndexShift, thisSkyLight, startIndexShift, endIndexShift - startIndexShift + 1);
-                    System.arraycopy(otherBlockLight, otherStartIndexShift, thisBlockLight, startIndexShift, endIndexShift - startIndexShift + 1);
-                } else {
-                    for (int thisIndex = startIndex, otherIndex = otherStartIndex; thisIndex <= endIndex; thisIndex++, otherIndex++) {
-                        setNibble(thisIndex, thisSkyLight, getNibble(otherIndex, otherSkyLight));
-                        setNibble(thisIndex, thisBlockLight, getNibble(otherIndex, otherBlockLight));
-                    }
-                }
-            }
-        }
-        if (!other.tiles.isEmpty()) {
-            for (Map.Entry<Short, CompoundTag> entry : other.tiles.entrySet()) {
-                int key = entry.getKey();
-                int x = MathMan.untripleBlockCoordX(key);
-                int y = MathMan.untripleBlockCoordY(key);
-                int z = MathMan.untripleBlockCoordZ(key);
-                if (x < minX || x > maxX) continue;
-                if (z < minZ || z > maxZ) continue;
-                if (y < minY || y > maxY) continue;
-                x += offsetX;
-                y += offsetY;
-                z += offsetZ;
-                short pair = MathMan.tripleBlockCoord(x, y, z);
-                CompoundTag tag = entry.getValue();
-                Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
-                map.put("x", new IntTag((x & 15) + (getX() << 4)));
-                map.put("y", new IntTag(y));
-                map.put("z", new IntTag((z & 15) + (getZ() << 4)));
-                tiles.put(pair, tag);
-            }
-        }
-    }
-
-    public void copyFrom(MCAChunk other, int minY, int maxY, int offsetY) {
-        minY = Math.max(-offsetY - minY, minY);
-        maxY = Math.min(255 - offsetY, maxY);
-        if (minY > maxY) return;
-        if ((offsetY & 15) == 0) {
-            int offsetLayer = offsetY >> 4;
-            int startLayer = minY >> 4;
-            int endLayer = maxY >> 4;
-            for (int thisLayer = startLayer + offsetLayer, otherLayer = startLayer; thisLayer <= endLayer; thisLayer++, otherLayer++) {
-                int[] otherIds = other.ids[otherLayer];
-                int[] currentIds = ids[thisLayer];
-                int by = otherLayer << 4;
-                int ty = by + 15;
-                if (by >= minY && ty <= maxY) {
-                    if (otherIds != null) {
-                        ids[thisLayer] = otherIds;
-                        skyLight[thisLayer] = other.skyLight[otherLayer];
-                        blockLight[thisLayer] = other.blockLight[otherLayer];
-                    } else {
-                        ids[thisLayer] = null;
-                    }
-                } else {
-                    by = Math.max(by, minY) & 15;
-                    ty = Math.min(ty, maxY) & 15;
-                    int indexStart = by << 8;
-                    int indexEnd = 256 + (ty << 8);
-                    int indexStartShift = indexStart >> 1;
-                    int indexEndShift = indexEnd >> 1;
-                    if (otherIds == null) {
-                        if (currentIds != null) {
-                            Arrays.fill(currentIds, indexStart, indexEnd, 0);
-                            Arrays.fill(skyLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
-                            Arrays.fill(blockLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
-                        }
-                    } else {
-                        if (currentIds == null) {
-                            currentIds = this.ids[thisLayer] = new int[4096];
-                            this.skyLight[thisLayer] = new byte[2048];
-                            this.blockLight[thisLayer] = new byte[2048];
-                        }
-                        System.arraycopy(other.ids[otherLayer], indexStart, currentIds, indexStart, indexEnd - indexStart);
-                        System.arraycopy(other.skyLight[otherLayer], indexStartShift, skyLight[thisLayer], indexStartShift, indexEndShift - indexStartShift);
-                        System.arraycopy(other.blockLight[otherLayer], indexStartShift, blockLight[thisLayer], indexStartShift, indexEndShift - indexStartShift);
-                    }
-                }
-            }
-        } else {
-            for (int otherY = minY, thisY = minY + offsetY; otherY <= maxY; otherY++, thisY++) {
-                int otherLayer = otherY >> 4;
-                int thisLayer = thisY >> 4;
-                int[] thisIds = this.ids[thisLayer];
-                int[] otherIds = other.ids[otherLayer];
-                int thisStartIndex = (thisY & 15) << 8;
-                int thisStartIndexShift = thisStartIndex >> 1;
-                if (otherIds == null) {
-                    if (thisIds == null) {
-                        continue;
-                    }
-                    Arrays.fill(thisIds, thisStartIndex, thisStartIndex + 256, 0);
-                    Arrays.fill(this.skyLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
-                    Arrays.fill(this.blockLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
-                    continue;
-                } else if (thisIds == null) {
-                    ids[thisLayer] = thisIds = new int[4096];
-                    skyLight[thisLayer] = new byte[2048];
-                    blockLight[thisLayer] = new byte[2048];
-                }
-                int otherStartIndex = (otherY & 15) << 8;
-                int otherStartIndexShift = otherStartIndex >> 1;
-                System.arraycopy(other.ids[otherLayer], otherStartIndex, thisIds, thisStartIndex, 256);
-                System.arraycopy(other.skyLight[otherLayer], otherStartIndexShift, skyLight[thisLayer], thisStartIndexShift, 128);
-                System.arraycopy(other.blockLight[otherLayer], otherStartIndexShift, blockLight[thisLayer], thisStartIndexShift, 128);
-            }
-        }
-        // Copy nbt
-        int thisMinY = minY + offsetY;
-        int thisMaxY = maxY + offsetY;
-        if (!tiles.isEmpty()) {
-            Iterator<Map.Entry<Short, CompoundTag>> iter = tiles.entrySet().iterator();
-            while (iter.hasNext()) {
-                int y = MathMan.untripleBlockCoordY(iter.next().getKey());
-                if (y >= thisMinY && y <= thisMaxY) iter.remove();
-            }
-        }
-        if (!other.tiles.isEmpty()) {
-            for (Map.Entry<Short, CompoundTag> entry : other.tiles.entrySet()) {
-                int key = entry.getKey();
-                int y = MathMan.untripleBlockCoordY(key);
-                if (y >= minY && y <= maxY) {
-                    tiles.put((short) (key + offsetY), entry.getValue());
-                }
-            }
-        }
-        if (!other.entities.isEmpty()) {
-            for (Map.Entry<UUID, CompoundTag> entry : other.entities.entrySet()) {
-                // TODO FIXME
-            }
-        }
-    }
-
-    public int getMinLayer() {
-        for (int layer = 0; layer < ids.length; layer++) {
-            if (ids[layer] != null) {
-                return layer;
-            }
-        }
-        return Integer.MAX_VALUE;
-    }
-
-    public int getMaxLayer() {
-        for (int layer = ids.length - 1; layer >= 0; layer--) {
-            if (ids[layer] != null) {
-                return layer;
-            }
-        }
-        return Integer.MIN_VALUE;
-    }
-
-    /**
-     * Deprecated, use the toBytes method
-     *
-     * @return
-     */
-    @Deprecated
-    public CompoundTag toTag() {
-        if (deleted) {
-            return null;
-        }
-        // e.g. by precalculating the length
-        HashMap<String, Object> level = new HashMap<>();
-        level.put("Entities", new ListTag(CompoundTag.class, new ArrayList<>(entities.values())));
-        level.put("TileEntities", new ListTag(CompoundTag.class, new ArrayList<>(tiles.values())));
-        level.put("InhabitedTime", inhabitedTime);
-        level.put("LastUpdate", lastUpdate);
-        level.put("LightPopulated", (byte) 0);
-        level.put("TerrainPopulated", (byte) 1);
-        level.put("V", (byte) 1);
-        level.put("xPos", getX());
-        level.put("zPos", getZ());
-        if (biomes != null) {
-            level.put("Biomes", biomes);
-        }
-        level.put("HeightMap", heightMap);
-        ArrayList<HashMap<String, Object>> sections = new ArrayList<>();
-        for (int layer = 0; layer < ids.length; layer++) {
-            int[] idLayer = ids[layer];
-            if (idLayer == null) {
-                continue;
-            }
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("Y", (byte) layer);
-            map.put("BlockLight", blockLight[layer]);
-            map.put("SkyLight", skyLight[layer]);
-            map.put("Blocks", idLayer);
-            sections.add(map);
-        }
-        level.put("Sections", sections);
-        HashMap<String, Object> root = new HashMap<>();
-        root.put("Level", level);
-        return FaweCache.asTag(root);
-    }
-
-    public MCAChunk(NBTInputStream nis, FaweQueue parent, int x, int z, boolean readPos) throws IOException {
-        super(parent, x, z);
-        ids = new int[16][];
-        skyLight = new byte[16][];
-        blockLight = new byte[16][];
-        NBTStreamer streamer = new NBTStreamer(nis);
-        streamer.addReader(".Level.InhabitedTime",
-            (BiConsumer<Integer, Long>) (index, value) -> inhabitedTime = value);
-        streamer.addReader(".Level.LastUpdate",
-            (BiConsumer<Integer, Long>) (index, value) -> lastUpdate = value);
-        streamer.addReader(".Level.Sections.#", (BiConsumer<Integer, CompoundTag>) (index, tag) -> {
-            int layer = tag.getByte("Y");
-            ids[layer] = tag.getIntArray("Blocks");
-            skyLight[layer] = tag.getByteArray("SkyLight");
-            blockLight[layer] = tag.getByteArray("BlockLight");
-        });
-        streamer.addReader(".Level.TileEntities.#",
-            (BiConsumer<Integer, CompoundTag>) (index, tile) -> {
-                int x1 = tile.getInt("x") & 15;
-                int y = tile.getInt("y");
-                int z1 = tile.getInt("z") & 15;
-                short pair = MathMan.tripleBlockCoord(x1, y, z1);
-                tiles.put(pair, tile);
-            });
-        streamer.addReader(".Level.Entities.#",
-            (BiConsumer<Integer, CompoundTag>) (index, entityTag) -> {
-                if (entities == null) {
-                    entities = new HashMap<>();
-                }
-                long least = entityTag.getLong("UUIDLeast");
-                long most = entityTag.getLong("UUIDMost");
-                entities.put(new UUID(most, least), entityTag);
-            });
-        streamer.addReader(".Level.Biomes",
-            (BiConsumer<Integer, byte[]>) (index, value) -> biomes = value);
-        streamer.addReader(".Level.HeightMap",
-            (BiConsumer<Integer, int[]>) (index, value) -> heightMap = value);
-        if (readPos) {
-            streamer.addReader(".Level.xPos",
-                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), value, getZ()));
-            streamer.addReader(".Level.zPos",
-                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), getX(), value));
-        }
-        streamer.readFully();
-    }
-
-    public long filterBlocks(MutableMCABackedBaseBlock mutableBlock, MCAFilter filter) {
-        MutableLong result = new MutableLong();
-        mutableBlock.setChunk(this);
-        int bx = getX() << 4;
-        int bz = getZ() << 4;
-        int tx = bx + 15;
-        int tz = bz + 15;
-        for (int layer = 0; layer < ids.length; layer++) {
-            if (doesSectionExist(layer)) {
-                mutableBlock.setArrays(layer);
-                int yStart = layer << 4;
-                int yEnd = yStart + 15;
-                for (int y = yStart, y0 = (yStart & 15); y <= yEnd; y++, y0++) {
-                    int yIndex = ((y0) << 8);
-                    mutableBlock.setY(y);
-                    for (int z = bz, z0 = bz & 15; z <= tz; z++, z0++) {
-                        int zIndex = yIndex + ((z0) << 4);
-                        mutableBlock.setZ(z);
-                        for (int x = bx, x0 = bx & 15; x <= tx; x++, x0++) {
-                            int xIndex = zIndex + x0;
-                            mutableBlock.setX(x);
-                            mutableBlock.setIndex(xIndex);
-                            filter.applyBlock(x, y, z, mutableBlock, result);
-                        }
-                    }
-                }
-            }
-        }
-        return result.get();
-    }
-
-    public int[] getHeightMapArray() {
-        return heightMap;
-    }
-
     public void setDeleted(boolean deleted) {
         setModified();
         this.deleted = deleted;
@@ -508,6 +391,15 @@ public class MCAChunk extends FaweChunk<Void> {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        if (deleted) return true;
+        for (boolean hasSection : hasSections) {
+            if (hasSection) return false;
+        }
+        return true;
     }
 
     public boolean isModified() {
@@ -518,16 +410,14 @@ public class MCAChunk extends FaweChunk<Void> {
         return modified;
     }
 
-    @Deprecated
     public final void setModified() {
         this.modified++;
     }
 
-    @Override
     public int getBitMask() {
         int bitMask = 0;
-        for (int section = 0; section < ids.length; section++) {
-            if (ids[section] != null) {
+        for (int section = 0; section < hasSections.length; section++) {
+            if (hasSections[section]) {
                 bitMask += 1 << section;
             }
         }
@@ -535,14 +425,16 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean setTile(int x, int y, int z, CompoundTag tile) {
         setModified();
-        short pair = MathMan.tripleBlockCoord(x, y, z);
         if (tile != null) {
-            tiles.put(pair, tile);
+            tiles.put(x, y, z, tile);
         } else {
-            tiles.remove(pair);
+            if (tiles.remove(x, y, z) == null) {
+                return false;
+            }
         }
+        return true;
     }
 
     @Override
@@ -554,9 +446,25 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
+    public BiomeType getBiomeType(int x, int z) {
+        return this.biomes[(z << 4) | x];
+    }
+
+    @Override
+    public BiomeType[] getBiomes() {
+        return this.biomes;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 pos, BiomeType biome) {
+        return this.setBiome(pos.getX(), 0, pos.getZ(), biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[x + (z << 4)] = (byte) biome.getInternalId();
+        biomes[x + (z << 4)] = biome;
+        return true;
     }
 
     @Override
@@ -565,11 +473,10 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public Map<Short, CompoundTag> getTiles() {
-        return tiles == null ? new HashMap<>() : tiles;
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return tiles == null ? Collections.emptyMap() : tiles;
     }
 
-    @Override
     public CompoundTag getTile(int x, int y, int z) {
         if (tiles == null || tiles.isEmpty()) {
             return null;
@@ -578,37 +485,28 @@ public class MCAChunk extends FaweChunk<Void> {
         return tiles.get(pair);
     }
 
-    public boolean doesSectionExist(int cy) {
-        return ids[cy] != null;
+    private final int getIndex(int x, int y, int z) {
+        return x | (z << 4) | (y << 8);
+    }
+
+    public int getBlockOrdinal(int x, int y, int z) {
+        return blocks[x | (z << 4) | (y << 8)];
     }
 
     @Override
-    public FaweChunk<Void> copy(boolean shallow) {
-        return new MCAChunk(this, shallow);
+    public BlockState getBlock(int x, int y, int z) {
+        int ordinal = getBlockOrdinal(x, y, z);
+        return BlockState.getFromOrdinal(ordinal);
     }
 
     @Override
-    public int getBlockCombinedId(int x, int y, int z) {
-        int layer = y >> 4;
-        int[] idLayer = ids[layer];
-        if (idLayer == null) {
-            return 0;
-        }
-        return idLayer[(((y & 15) << 8) | ((z & 15) << 4) | (x & 15))];
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return null;
     }
 
     @Override
-    public BiomeType[] getBiomeArray() {
-        BiomeType[] arr = new BiomeType[256];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = BiomeTypes.get(biomes[i]);
-        }
-        return arr;
-    }
-
-    @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return BiomeTypes.get(biomes[(x & 15) + ((z & 15) << 4)]);
+    public CompoundTag getTag(int x, int y, int z) {
+        return null;
     }
 
     @Override
@@ -616,183 +514,76 @@ public class MCAChunk extends FaweChunk<Void> {
         return new HashSet<>();
     }
 
-    public void setSkyLight(int x, int y, int z, int value) {
-        setModified();
-        int layer = y >> 4;
-        byte[] skyLayer = skyLight[layer];
-        if (skyLayer == null) {
-            return;
-        }
-        setNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), skyLayer, value);
-    }
-
-    public void setBlockLight(int x, int y, int z, int value) {
-        setModified();
-        int layer = y >> 4;
-        byte[] blockLayer = blockLight[layer];
-        if (blockLayer == null) {
-            return;
-        }
-        setNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), blockLayer, value);
-    }
-
-    public int getSkyLight(int x, int y, int z) {
-        int layer = y >> 4;
-        byte[] skyLayer = skyLight[layer];
-        if (skyLayer == null) {
-            return 0;
-        }
-        return getNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), skyLayer);
-    }
-
-    public int getBlockLight(int x, int y, int z) {
-        int layer = y >> 4;
-        byte[] blockLayer = blockLight[layer];
-        if (blockLayer == null) {
-            return 0;
-        }
-        return getNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), blockLayer);
-    }
-
-    public void setFullbright() {
-        setModified();
-        for (byte[] array : skyLight) {
-            if (array != null) {
-                Arrays.fill(array, (byte) 255);
-            }
-        }
-    }
-
-    public void removeLight() {
-        for (int i = 0; i < skyLight.length; i++) {
-            removeLight(i);
-        }
-    }
-
-    public void removeLight(int i) {
-        byte[] array1 = skyLight[i];
-        if (array1 == null) {
-            return;
-        }
-        byte[] array2 = blockLight[i];
-        Arrays.fill(array1, (byte) 0);
-        Arrays.fill(array2, (byte) 0);
-    }
-
-    public int getNibble(int index, byte[] array) {
-        int indexShift = index >> 1;
-        if ((index & 1) == 0) {
-            return array[indexShift] & 15;
-        } else {
-            return array[indexShift] >> 4 & 15;
-        }
-    }
-
-    public void setNibble(int index, byte[] array, int value) {
-        int indexShift = index >> 1;
-        byte existing = array[indexShift];
-        int valueShift = value << 4;
-        if (existing == value + valueShift) {
-            return;
-        }
-        if ((index & 1) == 0) {
-            array[indexShift] = (byte) (existing & 240 | value);
-        } else {
-            array[indexShift] = (byte) (existing & 15 | valueShift);
-        }
-    }
-
-    public void setIdUnsafe(byte[] idsLayer, int index, byte id) {
-        idsLayer[index] = id;
-    }
-
-    public void setBlockUnsafe(byte[] idsLayer, byte[] dataLayer, int index, byte id, int data) {
-        idsLayer[index] = id;
-        setNibble(index, dataLayer, data);
+    @Override
+    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+        setBlock(x, y, z, holder.getOrdinalChar());
+        holder.applyTileEntity(this, x, y, z);
+        return true;
     }
 
     @Override
-    public void setBlock(int x, int y, int z, int combinedId) {
-        setModified();
-        int layer = y >> 4;
-        int[] idsLayer = ids[layer];
-        if (idsLayer == null) {
-            idsLayer = this.ids[layer] = new int[4096];
-            this.skyLight[layer] = new byte[2048];
-            this.blockLight[layer] = new byte[2048];
+    public void setBlocks(int layer, char[] data) {
+        int offset = layer << 12;
+        for (int i = 0; i < 4096; i++) {
+            blocks[offset + i] = data[i];
         }
-        idsLayer[(((y & 15) << 8) | ((z & 15) << 4) | (x & 15))] = combinedId;
     }
 
     @Override
+    public char[] load(int layer) {
+        char[] tmp = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        int offset = layer << 12;
+        for (int i = 0; i < 4096; i++) {
+            tmp[i] = blocks[offset + i];
+        }
+        return tmp;
+    }
+
+    public void setBlock(int x, int y, int z, char ordinal) {
+        blocks[getIndex(x, y, z)] = ordinal;
+    }
+
     public void setBiome(BiomeType biome) {
-        Arrays.fill(biomes, (byte) biome.getInternalId());
+        Arrays.fill(this.biomes, biome);
     }
 
     @Override
     public void removeEntity(UUID uuid) {
-        setModified();
         entities.remove(uuid);
     }
 
-    private final boolean idsEqual(int[] a, int[] b) {
-        // Assumes both are null, or none are (idsEqual - 2d array)
-        // Assumes length is 4096
-        if (a == b) return true;
-        for (char i = 0; i < 4096; i++) {
-            if (a[i] != b[i]) return false;
-        }
-        return true;
+    @Override
+    public boolean trim(boolean aggressive) {
+        return isEmpty();
     }
 
-    private final boolean idsEqual(int[][] a, int[][] b, boolean matchNullToAir) {
-        // Assumes length is 16
-        for (byte i = 0; i < 16; i++) {
-            if ((a[i] == null) != (b[i] == null)) {
-                if (matchNullToAir) {
-                    if (b[i] != null) {
-                        for (int c : b[i]) {
-                            if (c != 0) return false;
-                        }
-                    } else if (a[i] != null) {
-                        for (int c : a[i]) {
-                            if (c != 0) return false;
-                        }
+    @Override
+    public CompoundTag getEntity(UUID uuid) {
+        return this.entities.get(uuid);
+    }
+
+    @Override
+    public Future call(IChunkSet set, Runnable finalize) {
+        return null;
+    }
+
+    @Override
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
+        try {
+            if (region != null) {
+                region.filter(this, filter, block, this, this, full);
+            } else {
+                block = block.init(chunkX, chunkZ, this);
+                for (int layer = 0; layer < 16; layer++) {
+                    if ((!full && !this.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
+                        continue;
                     }
+                    block.init(this, this, layer);
+                    block.filter(filter);
                 }
-                return false;
             }
+        } finally {
+            filter.finishChunk(this);
         }
-        // Check the chunks close to the ground first
-        for (byte i = 4; i < 8; i++) {
-            if (!idsEqual(a[i], b[i])) return false;
-        }
-        for (byte i = 3; i >= 0; i--) {
-            if (!idsEqual(a[i], b[i])) return false;
-        }
-        for (byte i = 8; i < 16; i++) {
-            if (!idsEqual(a[i], b[i])) return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if the ids match the ids in the other chunk
-     * @param other
-     * @param matchNullToAir
-     * @return
-     */
-    public boolean idsEqual(MCAChunk other, boolean matchNullToAir) {
-        return idsEqual(other.ids, this.ids, matchNullToAir);
-    }
-
-    @Override
-    public Void getChunk() {
-        throw new UnsupportedOperationException("Not applicable for this");
-    }
-
-    @Override
-    public FaweChunk call() {
-        throw new UnsupportedOperationException("Not supported");
     }
 }

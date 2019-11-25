@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweCommand;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitBlockCommandSender;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
@@ -40,7 +41,7 @@ public class BukkitCommand implements CommandExecutor {
      * @return a wrapped player
      */
     public com.sk89q.worldedit.bukkit.BukkitPlayer wrapPlayer(Player player) {
-        return new BukkitPlayer(WorldEditPlugin.getInstance(), player);
+        return BukkitAdapter.adapt(player);
     }
 
     public Actor wrapCommandSender(CommandSender sender) {

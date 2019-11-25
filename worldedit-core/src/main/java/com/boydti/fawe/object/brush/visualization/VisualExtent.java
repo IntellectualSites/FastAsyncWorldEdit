@@ -56,44 +56,21 @@ public class VisualExtent extends AbstractDelegateExtent {
         }
     }
 
+    @Nullable
+    @Override
+    public Operation commit() {
+        IQueueExtent queue = (IQueueExtent) getExtent();
+        return null;
+    }
+
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         // Do nothing
         return false;
     }
 
-    public void clear(VisualExtent other, Player... players) {
-        for (Long2ObjectMap.Entry<VisualChunk> entry : chunks.long2ObjectEntrySet()) {
-            long pair = entry.getLongKey();
-            int cx = MathMan.unpairIntX(pair);
-            int cz = MathMan.unpairIntY(pair);
-            VisualChunk chunk = entry.getValue();
-            final VisualChunk otherChunk = other != null ? other.getChunk(cx, cz) : null;
-            final IntFaweChunk newChunk = new NullQueueIntFaweChunk(cx, cz);
-            final int bx = cx << 4;
-            final int bz = cz << 4;
-            if (otherChunk == null) {
-                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
-                    combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                    newChunk.setBlock(localX, y, localZ, combined);
-                });
-            } else {
-                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
-                    if (combined != otherChunk.getBlockCombinedId(localX, y, localZ)) {
-                        combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                        newChunk.setBlock(localX, y, localZ, combined);
-                    }
-                });
-            }
-            if (newChunk.getTotalCount() != 0) {
-                queue.sendBlockUpdate(newChunk, players);
-            }
-        }
-    }
-
-    public void visualize(Player players) {
-        for (VisualChunk chunk : chunks.values()) {
-            queue.sendBlockUpdate(chunk, players);
-        }
+    public void clear() {
+        IQueueExtent queue = (IQueueExtent) getExtent();
+        queue.cancel();
     }
 }

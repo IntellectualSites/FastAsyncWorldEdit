@@ -1,8 +1,15 @@
 package com.boydti.fawe.jnbt.anvil;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.example.SimpleIntFaweChunk;
-import com.boydti.fawe.object.FaweChunk;
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.beta.implementation.blocks.FallbackChunkGet;
+import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FaweQueue;
@@ -18,9 +25,7 @@ import com.boydti.fawe.object.collection.DifferentialBlockBuffer;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
 import com.boydti.fawe.object.collection.SummedAreaTable;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.queue.LazyFaweChunk;
-import com.boydti.fawe.object.schematic.Schematic;
+import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.ReflectionUtils;
@@ -60,6 +65,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,9 +78,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-// TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
@@ -87,22 +94,24 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private final DifferentialBlockBuffer blocks;
     protected final DifferentialArray<byte[]> heights;
     protected final DifferentialArray<byte[]> biomes;
-    protected final DifferentialArray<int[]> floor;
-    protected final DifferentialArray<int[]> main;
-    protected DifferentialArray<int[]> overlay;
+    protected final DifferentialArray<char[]> floor;
+    protected final DifferentialArray<char[]> main;
+    protected DifferentialArray<char[]> overlay;
+    protected Metadatable metaData = new Metadatable();
+    protected TextureUtil textureUtil;
 
     protected final CFIPrimtives primtives = new CFIPrimtives();
     private CFIPrimtives oldPrimitives = new CFIPrimtives();
 
-    public final class CFIPrimtives implements Cloneable {
-        protected int waterHeight = 0;
-        protected int floorThickness = 0;
-        protected int worldThickness = 0;
-        protected boolean randomVariation = true;
-        protected int biomePriority = 0;
-        protected int waterId = BlockID.WATER;
-        protected int bedrockId = BlockID.BEDROCK;
-        protected boolean modifiedMain = false;
+    public final class CFIPrimitives implements Cloneable {
+        int waterHeight;
+        int floorThickness;
+        int worldThickness;
+        boolean randomVariation = true;
+        int biomePriority;
+        char waterOrdinal = BlockTypes.WATER.getDefaultState().getOrdinalChar();
+        char bedrockOrdinal = BlockTypes.BEDROCK.getDefaultState().getOrdinalChar();
+        boolean modifiedMain;
 
         @Override
         public boolean equals(Object obj) {
@@ -124,10 +133,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             return super.clone();
         }
     }
-
-
-    protected Metadatable metaData = new Metadatable();
-    protected TextureUtil textureUtil;
 
     @Override
     public void flushChanges(FaweOutputStream out) throws IOException {
@@ -238,13 +243,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         blocks = new DifferentialBlockBuffer(width, length);
         heights = new DifferentialArray<>(new byte[getArea()]);
         biomes = new DifferentialArray<>(new byte[getArea()]);
-        floor = new DifferentialArray<>(new int[getArea()]);
-        main = new DifferentialArray<>(new int[getArea()]);
+        floor = new DifferentialArray<>(new char[getArea()]);
+        main = new DifferentialArray<>(new char[getArea()]);
 
-        int stone = BlockID.STONE;
-        int grass = BlockTypes.GRASS_BLOCK.getDefaultState().with(PropertyKey.SNOWY, false).getInternalId();
-        Arrays.fill(main.getIntArray(), stone);
-        Arrays.fill(floor.getIntArray(), grass);
+        char stone = BlockTypes.STONE.getDefaultState().getOrdinalChar();
+        char grass = BlockTypes.GRASS_BLOCK.getDefaultState().getOrdinalChar();
+        Arrays.fill(main.getCharArray(), stone);
+        Arrays.fill(floor.getCharArray(), grass);
     }
 
     public Metadatable getMetaData() {
@@ -277,10 +282,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return player;
     }
 
-    private int[][][] getChunkArray(int x, int z) {
-        int[][][][][] blocksData = blocks.get();
+    private char[][][] getChunkArray(int x, int z) {
+        char[][][][][] blocksData = blocks.get();
         if (blocksData == null) return null;
-        int[][][][] arr = blocksData[z];
+        char[][][][] arr = blocksData[z];
         return arr != null ? arr[x] : null;
     }
 
@@ -298,43 +303,60 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             viewer.view(this);
         }
         if (chunkOffset != null && player != null) {
-            FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
-
-            if (!packetQueue.supports(Capability.CHUNK_PACKETS)) {
-                return;
-            }
+            World world = player.getWorld();
 
             int lenCX = (getWidth() + 15) >> 4;
             int lenCZ = (getLength() + 15) >> 4;
 
-            int OX = chunkOffset.getBlockX();
-            int OZ = chunkOffset.getBlockZ();
 
             Location position = player.getLocation();
-            int pcx = (position.getBlockX() >> 4) - OX;
-            int pcz = (position.getBlockZ() >> 4) - OZ;
+            int pcx = (position.getBlockX() >> 4) - chunkOffset.getBlockX();
+            int pcz = (position.getBlockZ() >> 4) - chunkOffset.getBlockZ();
 
             int scx = Math.max(0, pcx - 15);
             int scz = Math.max(0, pcz - 15);
             int ecx = Math.min(lenCX - 1, pcx + 15);
             int ecz = Math.min(lenCZ - 1, pcz + 15);
 
-            for (int cz = scz; cz <= ecz; cz++) {
-                for (int cx = scx; cx <= ecx; cx++) {
-                    final int finalCX = cx;
-                    final int finalCZ = cz;
-                    TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
-                        try {
-                            FaweChunk toSend = getSnapshot(finalCX, finalCZ);
-                            toSend.setLoc(HeightMapMCAGenerator.this, finalCX + OX, finalCZ + OZ);
-                            packetQueue.sendChunkUpdate(toSend, player);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    });
+            for (int chunkZ = scz; chunkZ <= ecz; chunkZ++) {
+                for (int chunkX = scx; chunkX <= ecx; chunkX++) {
+                    refreshChunk(world, chunkX, chunkZ);
                 }
             }
         }
+
+    }
+
+    public void refreshChunk(World world, int chunkX, int chunkZ) {
+        Supplier<IBlocks> blocksSupplier = () -> getChunk(chunkX, chunkZ);
+        int realChunkX = chunkX + chunkOffset.getBlockX();
+        int realChunkZ = chunkZ + chunkOffset.getBlockZ();
+        ChunkPacket packet = new ChunkPacket(realChunkX, realChunkZ, blocksSupplier, true);
+        world.sendFakeChunk(player, packet);
+    }
+
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+        if (this.player != null) {
+            player.getWorld().sendFakeChunk(player, packet);
+        }
+    }
+
+    @Override
+    public void refreshChunk(int chunkX, int chunkZ) {
+        if (chunkOffset != null && player != null) {
+            refreshChunk(player.getWorld(), chunkX, chunkZ);
+        }
+    }
+
+    public IChunkSet getChunk(int chunkX, int chunkZ) {
+        // TODO don't generate new Writeable MCA chunk
+        System.out.println("TODO don't generate new Writeable MCA chunk");
+        MCAChunk tmp = new MCAChunk();
+        int bx = chunkX << 4;
+        int bz = chunkZ << 4;
+        write(tmp, bx, bx + 15, bz, bz + 15);
+        return tmp;
     }
 
     public TextureUtil getRawTextureUtil() {
@@ -362,8 +384,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         }
     }
 
-    public void setBedrockId(int bedrockId) {
-        this.primtives.bedrockId = bedrockId;
+    public void setBedrock(BlockState bedrock) {
+        this.primitives.bedrockOrdinal = bedrock.getOrdinalChar();
     }
 
     public void setFloorThickness(int floorThickness) {
@@ -378,8 +400,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         this.primtives.waterHeight = waterHeight;
     }
 
-    public void setWaterId(int waterId) {
-        this.primtives.waterId = waterId;
+    public void setWater(BlockState water) {
+        this.primitives.waterOrdinal = water.getOrdinalChar();
     }
 
     public void setTextureRandomVariation(boolean randomVariation) {
@@ -403,10 +425,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void smooth(BlockVector2 min, BlockVector2 max, int radius, int iterations) {
-        int snowLayer = BlockTypes.SNOW.getInternalId();
-        int snowBlock = BlockTypes.SNOW_BLOCK.getInternalId();
+        int snowLayer = BlockTypes.SNOW.getDefaultState().getOrdinalChar();
+        int snowBlock = BlockTypes.SNOW_BLOCK.getDefaultState().getOrdinalChar();
 
-        int[] floor = this.floor.get();
+        char[] floor = this.floor.get();
         byte[] heights = this.heights.get();
 
         int width = getWidth();
@@ -435,8 +457,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     int index = zIndex + minX;
                     for (int x = minX; x <= maxX; x++, index++, localIndex++) {
                         int combined = floor[index];
-                        if (BlockTypes.getFromStateId(combined) == BlockTypes.SNOW) {
-                            layers[localIndex] = (char) (((heights[index] & 0xFF) << 3) + (floor[index] >> BlockTypes.BIT_OFFSET) - 7);
+                        if (BlockTypes.getFromStateOrdinal(combined) == BlockTypes.SNOW) {
+                            layers[localIndex] = (char) (((heights[index] & 0xFF) << 3) + (floor[index] >> BlockTypesCache.BIT_OFFSET) - 7);
                         } else {
                             layers[localIndex] = (char) (((heights[index] & 0xFF) << 3));
                         }
@@ -468,16 +490,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeight(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        BlockType type = BlockTypes.getFromStateId(floorState);
-        switch (type.getInternalId()) {
+        switch (floorState) {
             case BlockID.SNOW:
             case BlockID.SNOW_BLOCK:
                 if (layerHeight != 0) {
                     this.heights.setByte(index, (byte) (blockHeight + 1));
-                    this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
+                    this.floor.setInt(index, BlockTypes.SNOW.getDefaultState().getOrdinalChar() + layerHeight);
                 } else {
-                    this.heights.setByte(index, (byte) (blockHeight));
-                    this.floor.setInt(index, (BlockTypes.SNOW_BLOCK.getInternalId()));
+                    this.heights.setByte(index, (byte) blockHeight);
+                    this.floor.setInt(index, BlockTypes.SNOW_BLOCK.getDefaultState().getOrdinalChar());
                 }
                 break;
             default:
@@ -494,16 +515,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeightRaw(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        BlockType type = BlockTypes.getFromStateId(floorState);
-        switch (type.getInternalId()) {
+        switch (floorState) {
             case BlockID.SNOW:
             case BlockID.SNOW_BLOCK:
                 if (layerHeight != 0) {
                     this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
-                    this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);
+                    this.overlay.getCharArray()[index] = (char) (BlockTypes.SNOW.getDefaultState().getOrdinalChar() + layerHeight);
                 } else {
-                    this.heights.getByteArray()[index] = (byte) (blockHeight);
-                    this.floor.getIntArray()[index] = (BlockTypes.SNOW_BLOCK.getInternalId());
+                    this.heights.getByteArray()[index] = (byte) blockHeight;
+                    this.overlay.getCharArray()[index] = BlockTypes.SNOW_BLOCK.getDefaultState().getOrdinalChar();
                 }
                 break;
             default:
@@ -513,7 +533,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     private void smooth(BufferedImage img, Mask mask, boolean white, int radius, int iterations) {
-        int[] floor = this.floor.get();
+        char[] floor = this.floor.get();
         byte[] heights = this.heights.get();
 
         long[] copy = new long[heights.length];
@@ -526,8 +546,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int j = 0; j < iterations; j++) {
                 for (int i = 0; i < heights.length; i++) {
                     int combined = floor[i];
-                    if (BlockTypes.getFromStateId(combined) == BlockTypes.SNOW) {
-                        layers[i] = (char) (((heights[i] & 0xFF) << 3) + (floor[i] >> BlockTypes.BIT_OFFSET) - 7);
+                    if (BlockTypes.getFromStateOrdinal(combined) == BlockTypes.SNOW) {
+                        layers[i] = (char) (((heights[i] & 0xFF) << 3) + (floor[i] >> BlockTypesCache.BIT_OFFSET) - 7);
                     } else {
                         layers[i] = (char) (((heights[i] & 0xFF) << 3));
                     }
@@ -624,12 +644,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
                 Clipboard clipboard = holder.getClipboard();
-                Schematic schematic = new Schematic(clipboard);
                 Transform transform = holder.getTransform();
                 if (transform.isIdentity()) {
-                    schematic.paste(this, mutable, false);
+                    clipboard.paste(this, mutable, false);
                 } else {
-                    schematic.paste(this, mutable, false, transform);
+                    clipboard.paste(this, mutable, false, transform);
                 }
                 if (x + distance < getWidth()) {
                     x += distance;
@@ -673,12 +692,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
                 Clipboard clipboard = holder.getClipboard();
-                Schematic schematic = new Schematic(clipboard);
                 Transform transform = holder.getTransform();
                 if (transform.isIdentity()) {
-                    schematic.paste(this, mutable, false);
+                    clipboard.paste(this, mutable, false);
                 } else {
-                    schematic.paste(this, mutable, false, transform);
+                    clipboard.paste(this, mutable, false, transform);
                 }
                 if (x + distance < getWidth()) {
                     x += distance;
@@ -719,13 +737,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return this.setBiome(position.getBlockX(), position.getBlockZ(), biome);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, int combined) {
+    private boolean setBlock(int x, int y, int z, char combined) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) return false;
         int height = heights.getByte(index) & 0xFF;
@@ -734,8 +746,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 floor.setInt(index, combined);
                 return true;
             case 1:
-                int mainId = main.getInt(index);
-                int floorId = floor.getInt(index);
+                char mainId = overlay.getChar(index);
+                char floorId = overlay.getChar(index);
                 floor.setInt(index, combined);
 
                 byte currentHeight = heights.getByte(index);
@@ -779,10 +791,79 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return true;
     }
 
-    @Override
-    public FaweChunk getFaweChunk(int chunkX, int chunkZ) {
-        return new SimpleIntFaweChunk(this, chunkX, chunkZ);
-    }
+//    @Override TODO NOT IMPLEMENTED
+//    public FaweChunk getFaweChunk(int chunkX, int chunkZ) {
+//        return new SimpleIntFaweChunk(this, chunkX, chunkZ);
+//    }
+//
+//    @Override
+//    public FaweChunk getSnapshot(int chunkX, int chunkZ) {
+//        return getSnapshot(null, chunkX, chunkZ);
+//    }
+//
+//    private FaweChunk getSnapshot(final MCAChunk chunk, int chunkX, int chunkZ) {
+//        return new LazyFaweChunk<MCAChunk>(this, chunkX, chunkZ) {
+//            @Override
+//            public MCAChunk getChunk() {
+//                MCAChunk tmp = chunk;
+//                if (tmp == null) {
+//                    tmp = new MCAChunk();
+//                }
+//                tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
+//                int cbx = chunkX << 4;
+//                int cbz = chunkZ << 4;
+//                int csx = Math.max(0, cbx);
+//                int csz = Math.max(0, cbz);
+//                int cex = Math.min(getWidth(), cbx + 15);
+//                int cez = Math.min(getLength(), cbz + 15);
+//                write(tmp, csx, cex, csz, cez);
+//                tmp.setLoc(HeightMapMCAGenerator.this, getX(), getZ());
+//                return tmp;
+//            }
+//
+//            @Override
+//            public void addToQueue() {
+//                MCAChunk cached = getCachedChunk();
+//                if (cached != null) setChunk(cached);
+//            }
+//        };
+//    }
+//
+//    @Override
+//    public Collection<FaweChunk> getFaweChunks() {
+//        return Collections.emptyList();
+//    }
+//
+//    @Override
+//    public void setChunk(FaweChunk chunk) {
+//        int[][] src = chunk.getCombinedIdArrays();
+//        for (int i = 0; i < src.length; i++) {
+//            if (src[i] != null) {
+//                int bx = chunk.getX() << 4;
+//                int bz = chunk.getZ() << 4;
+//                int by = i << 4;
+//                for (int layer = i; layer < src.length; layer++) {
+//                    int[] srcLayer = src[layer];
+//                    if (srcLayer != null) {
+//                        int index = 0;
+//                        for (int y = 0; y < 16; y++) {
+//                            int yy = by + y;
+//                            for (int z = 0; z < 16; z++) {
+//                                int zz = bz + z;
+//                                for (int x = 0; x < 16; x++, index++) {
+//                                    int combined = srcLayer[index];
+//                                    if (combined != 0) {
+//                                        setBlock(bx + x, yy, zz, combined);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public FaweChunk getSnapshot(int chunkX, int chunkZ) {
@@ -930,7 +1011,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
             for (int cz = scz; cz <= ecz; cz++) {
                 for (int cx = scx; cx <= ecx; cx++) {
-                    packetQueue.sendChunk(cx + OX, cz + OZ, 0);
+                    world.refreshChunk(cx + OX, cz + OZ);
                 }
             }
         }
@@ -944,26 +1025,25 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
         return BiomeTypes.get(biomes.getByte(index));
     }
 
-    @Override
-    public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
+    public int getOrdinal(int x, int y, int z) throws FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (y < 0) return 0;
         if (index < 0 || index >= getArea() || x < 0 || x >= getWidth()) return 0;
         int height = heights.getByte(index) & 0xFF;
         if (y > height) {
             if (y == height + 1) {
-                return overlay != null ? overlay.getInt(index) : 0;
+                return overlay != null ? overlay.getChar(index) : 0;
             }
             if (blocks != null) {
                 short chunkX = (short) (x >> 4);
                 short chunkZ = (short) (z >> 4);
-                int[][][] map = getChunkArray(chunkX, chunkZ);
+                char[][][] map = getChunkArray(chunkX, chunkZ);
                 if (map != null) {
                     int combined = get(map, x, y, z);
                     if (combined != 0) {
@@ -971,17 +1051,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
             }
-            if (y <= primtives.waterHeight) {
-                return primtives.waterId << 4;
+            if (y <= primitives.waterHeight) {
+                return primitives.waterOrdinal;
             }
             return 0;
         } else if (y == height) {
-            return floor.getInt(index);
+            return overlay.getChar(index);
         } else {
             if (blocks != null) {
                 short chunkX = (short) (x >> 4);
                 short chunkZ = (short) (z >> 4);
-                int[][][] map = getChunkArray(chunkX, chunkZ);
+                char[][][] map = getChunkArray(chunkX, chunkZ);
                 if (map != null) {
                     int combined = get(map, x, y, z);
                     if (combined != 0) {
@@ -989,7 +1069,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                 }
             }
-            return main.getInt(index);
+            return overlay.getChar(index);
         }
     }
 
@@ -1030,7 +1110,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return this.setBlock(x, y, z, block.getInternalId());
+        return this.setBlock(x, y, z, block.getOrdinalChar());
     }
 
     @Override
@@ -1045,7 +1125,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public BlockState getFloor(int x, int z) {
         int index = z * getWidth() + x;
-        return BlockState.getFromInternalId(floor.getInt(index));
+        return BlockState.getFromOrdinal(overlay.getChar(index));
     }
 
     public int getHeight(int x, int z) {
@@ -1059,19 +1139,19 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setFloor(int x, int z, BlockStateHolder block) {
         int index = z * getWidth() + x;
-        floor.setInt(index, block.getInternalId());
+        floor.setInt(index, block.getOrdinalChar());
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockState.getFromInternalId(getCombinedId4Data(x, y, z));
+        return BlockState.getFromOrdinal(getOrdinal(x, y, z));
     }
 
     @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
-        return ((heights.getByte(index) & 0xFF) << 3) + (floor.getInt(index) & 0xFF) + 1;
+        return ((heights.getByte(index) & 0xFF) << 3) + (overlay.getChar(index) & 0xFF) + 1;
     }
 
     @Override
@@ -1111,7 +1191,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public BufferedImage draw() {
-        return new HeightMapMCADrawer(this).draw();
+        return new CFIDrawer(this).draw();
     }
 
     public void setBiomePriority(int value) {
@@ -1136,12 +1216,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         int maxIndex = getArea() - 1;
 
         biomes.record(() -> floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
             byte[] biomesArr = biomes.get();
 
             int index = 0;
-            int[] buffer = new int[2];
+            char[] buffer = new char[2];
             for (int z = 0; z < img.getHeight(); z++) {
                 mutable.mutZ(z);
                 for (int x = 0; x < img.getWidth(); x++, index++) {
@@ -1156,8 +1236,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             .current().nextInt(256) > height)) continue;
                     }
                     int color = img.getRGB(x, z);
-                    if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primtives.biomePriority)) {
-                        int combined = buffer[0];
+                    if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primitives.biomePriority)) {
+                        char combined = buffer[0];
                         mainArr[index] = combined;
                         floorArr[index] = combined;
                     }
@@ -1171,23 +1251,20 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
         TextureUtil textureUtil = getTextureUtil();
-        int widthIndex = img.getWidth() - 1;
         int heightIndex = img.getHeight() - 1;
-        int maxIndex = getArea() - 1;
 
         biomes.record(() -> floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
             byte[] biomesArr = biomes.get();
 
-            int[] buffer = new int[2];
+            char[] buffer = new char[2];
             int index = 0;
             for (int y = 0; y < img.getHeight(); y++) {
-                boolean yBiome = y > 0 && y < heightIndex;
                 for (int x = 0; x < img.getWidth(); x++, index++) {
                     int color = img.getRGB(x, y);
-                    if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primtives.biomePriority)) {
-                        int combined = buffer[0];
+                    if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primitives.biomePriority)) {
+                        char combined = buffer[0];
                         mainArr[index] = combined;
                         floorArr[index] = combined;
                     }
@@ -1230,8 +1307,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         TextureUtil textureUtil = getTextureUtil();
 
         floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
 
             int index = 0;
             for (int z = 0; z < getLength(); z++) {
@@ -1242,7 +1319,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
-                            int combined = block.getInternalId();
+                            char combined = block.getDefaultState().getOrdinalChar();
                             mainArr[index] = combined;
                             floorArr[index] = combined;
                         }
@@ -1260,8 +1337,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
 
         floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
 
             int index = 0;
             for (int z = 0; z < getLength(); z++) {
@@ -1273,11 +1350,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
-                            int combined = block.getInternalId();
+                            char combined = block.getDefaultState().getOrdinalChar();
                             mainArr[index] = combined;
                             floorArr[index] = combined;
-                        } else {
-                            System.out.println("Block is null: " + color);
                         }
                     }
                 }
@@ -1292,8 +1367,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         TextureUtil textureUtil = getTextureUtil();
 
         floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
 
             int index = 0;
             for (int z = 0; z < img.getHeight(); z++) {
@@ -1301,7 +1376,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     int color = img.getRGB(x, z);
                     BlockType block = textureUtil.getNearestBlock(color);
                     if (block != null) {
-                        int combined = block.getInternalId();
+                        char combined = block.getDefaultState().getOrdinalChar();
                         mainArr[index] = combined;
                         floorArr[index] = combined;
                     } else {
@@ -1319,8 +1394,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         TextureUtil textureUtil = getTextureUtil();
 
         floor.record(() -> main.record(() -> {
-            int[] mainArr = main.get();
-            int[] floorArr = floor.get();
+            char[] mainArr = main.get();
+            char[] floorArr = floor.get();
 
             int index = 0;
             for (int y = 0; y < img.getHeight(); y++) {
@@ -1328,8 +1403,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     int color = img.getRGB(x, y);
                     BlockType[] layer = textureUtil.getNearestLayer(color);
                     if (layer != null) {
-                        floorArr[index] = layer[0].getInternalId();
-                        mainArr[index] = layer[1].getInternalId();
+                        floorArr[index] = layer[0].getDefaultState().getOrdinalChar();
+                        mainArr[index] = layer[1].getDefaultState().getOrdinalChar();
                     }
                     index++;
                 }
@@ -1355,18 +1430,18 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setOverlay(BufferedImage img, Pattern pattern, boolean white) {
         if (pattern instanceof BlockStateHolder) {
-            setOverlay(img, ((BlockStateHolder) pattern).getInternalId(), white);
+            setOverlay(img, ((BlockStateHolder) pattern).getOrdinalChar(), white);
         } else if (pattern instanceof BlockType) {
-            setOverlay(img, ((BlockType) pattern).getInternalId(), white);
+            setOverlay(img, ((BlockType) pattern).getDefaultState().getOrdinalChar(), white);
         } else {
             if (img.getWidth() != getWidth() || img.getHeight() != getLength())
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
             if (overlay == null) {
-                overlay = new DifferentialArray<>(new int[getArea()]);
+                overlay = new DifferentialArray<>(new char[getArea()]);
             }
 
             overlay.record(() -> {
-                int[] overlayArr = overlay.get();
+                char[] overlayArr = overlay.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1376,7 +1451,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
-                            overlayArr[index] = pattern.apply(mutable).getInternalId();
+                            overlayArr[index] = pattern.apply(mutable).getOrdinalChar();
                         }
                     }
                 }
@@ -1387,14 +1462,14 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setMain(BufferedImage img, Pattern pattern, boolean white) {
         if (pattern instanceof BlockStateHolder) {
-            setMain(img, ((BlockStateHolder) pattern).getInternalId(), white);
+            setMain(img, ((BlockStateHolder) pattern).getOrdinalChar(), white);
         } else {
             if (img.getWidth() != getWidth() || img.getHeight() != getLength())
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
             primtives.modifiedMain = true;
 
             main.record(() -> {
-                int[] mainArr = main.get();
+                char[] mainArr = main.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1404,7 +1479,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
-                            mainArr[index] = pattern.apply(mutable).getInternalId();
+                            mainArr[index] = pattern.apply(mutable).getOrdinalChar();
                         }
                     }
                 }
@@ -1414,13 +1489,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setFloor(BufferedImage img, Pattern pattern, boolean white) {
         if (pattern instanceof BlockStateHolder) {
-            setFloor(img, ((BlockStateHolder) pattern).getInternalId(), white);
+            setFloor(img, ((BlockStateHolder) pattern).getOrdinalChar(), white);
         } else {
             if (img.getWidth() != getWidth() || img.getHeight() != getLength())
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
 
             floor.record(() -> {
-                int[] floorArr = floor.get();
+                char[] floorArr = floor.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1430,7 +1505,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
-                            floorArr[index] = pattern.apply(mutable).getInternalId();
+                            floorArr[index] = pattern.apply(mutable).getOrdinalChar();
                         }
                     }
                 }
@@ -1440,15 +1515,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setColumn(BufferedImage img, Pattern pattern, boolean white) {
         if (pattern instanceof BlockStateHolder) {
-            setColumn(img, ((BlockStateHolder) pattern).getInternalId(), white);
+            setColumn(img, ((BlockStateHolder) pattern).getOrdinalChar(), white);
         } else {
             if (img.getWidth() != getWidth() || img.getHeight() != getLength())
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
             primtives.modifiedMain = true;
 
             main.record(() -> floor.record(() -> {
-                int[] floorArr = floor.get();
-                int[] mainArr = main.get();
+                char[] floorArr = floor.get();
+                char[] mainArr = main.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1458,7 +1533,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
-                            int combined = pattern.apply(mutable).getInternalId();
+                            char combined = pattern.apply(mutable).getOrdinalChar();
                             mainArr[index] = combined;
                             floorArr[index] = combined;
                         }
@@ -1470,10 +1545,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setOverlay(Mask mask, Pattern pattern) {
         if (pattern instanceof BlockStateHolder) {
-            setOverlay(mask, ((BlockStateHolder) pattern).getInternalId());
+            setOverlay(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
             int index = 0;
-            if (overlay == null) overlay = new DifferentialArray<>(new int[getArea()]);
+            if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
             for (int z = 0; z < getLength(); z++) {
                 mutable.mutZ(z);
                 for (int x = 0; x < getWidth(); x++, index++) {
@@ -1481,7 +1556,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutX(x);
                     mutable.mutY(y);
                     if (mask.test(mutable)) {
-                        overlay.setInt(index, pattern.apply(mutable).getInternalId());
+                        overlay.setInt(index, pattern.apply(mutable).getOrdinalChar());
                     }
                 }
             }
@@ -1490,7 +1565,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setFloor(Mask mask, Pattern pattern) {
         if (pattern instanceof BlockStateHolder) {
-            setFloor(mask, ((BlockStateHolder) pattern).getInternalId());
+            setFloor(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
             int index = 0;
             for (int z = 0; z < getLength(); z++) {
@@ -1500,7 +1575,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutX(x);
                     mutable.mutY(y);
                     if (mask.test(mutable)) {
-                        floor.setInt(index, pattern.apply(mutable).getInternalId());
+                        floor.setInt(index, pattern.apply(mutable).getOrdinalChar());
                     }
                 }
             }
@@ -1509,7 +1584,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setMain(Mask mask, Pattern pattern) {
         if (pattern instanceof BlockStateHolder) {
-            setMain(mask, ((BlockStateHolder) pattern).getInternalId());
+            setMain(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
             primtives.modifiedMain = true;
             int index = 0;
@@ -1520,7 +1595,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutX(x);
                     mutable.mutY(y);
                     if (mask.test(mutable)) {
-                        main.setInt(index, pattern.apply(mutable).getInternalId());
+                        main.setInt(index, pattern.apply(mutable).getOrdinalChar());
                     }
                 }
             }
@@ -1529,7 +1604,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setColumn(Mask mask, Pattern pattern) {
         if (pattern instanceof BlockStateHolder) {
-            setColumn(mask, ((BlockStateHolder) pattern).getInternalId());
+            setColumn(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
             primtives.modifiedMain = true;
             int index = 0;
@@ -1540,7 +1615,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutX(x);
                     mutable.mutY(y);
                     if (mask.test(mutable)) {
-                        int combined = pattern.apply(mutable).getInternalId();
+                        int combined = pattern.apply(mutable).getOrdinalChar();
                         floor.setInt(index, combined);
                         main.setInt(index, combined);
                     }
@@ -1555,10 +1630,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setFloor(Pattern value) {
         if (value instanceof BlockStateHolder) {
-            setFloor(((BlockStateHolder) value).getInternalId());
+            setFloor(((BlockStateHolder) value).getOrdinalChar());
         } else {
             floor.record(() -> {
-                int[] floorArr = floor.get();
+                char[] floorArr = floor.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1566,7 +1641,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int y = heights.getByte(index) & 0xFF;
                         mutable.mutX(x);
                         mutable.mutY(y);
-                        floorArr[index] = value.apply(mutable).getInternalId();
+                        floorArr[index] = value.apply(mutable).getOrdinalChar();
                     }
                 }
             });
@@ -1575,11 +1650,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setColumn(Pattern value) {
         if (value instanceof BlockStateHolder) {
-            setColumn(((BlockStateHolder) value).getInternalId());
+            setColumn(((BlockStateHolder) value).getOrdinalChar());
         } else {
             main.record(() -> floor.record(() -> {
-                int[] floorArr = floor.get();
-                int[] mainArr = main.get();
+                char[] floorArr = floor.get();
+                char[] mainArr = main.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1587,7 +1662,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int y = heights.getByte(index) & 0xFF;
                         mutable.mutX(x);
                         mutable.mutY(y);
-                        int combined = value.apply(mutable).getInternalId();
+                        char combined = value.apply(mutable).getOrdinalChar();
                         mainArr[index] = combined;
                         floorArr[index] = combined;
                     }
@@ -1598,10 +1673,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public void setMain(Pattern value) {
         if (value instanceof BlockStateHolder) {
-            setMain(((BlockStateHolder) value).getInternalId());
+            setMain(((BlockStateHolder) value).getOrdinalChar());
         } else {
             main.record(() -> {
-                int[] mainArr = main.get();
+                char[] mainArr = main.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1609,7 +1684,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int y = heights.getByte(index) & 0xFF;
                         mutable.mutX(x);
                         mutable.mutY(y);
-                        mainArr[index] = value.apply(mutable).getInternalId();
+                        mainArr[index] = value.apply(mutable).getOrdinalChar();
                     }
                 }
             });
@@ -1617,12 +1692,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void setOverlay(Pattern value) {
-        if (overlay == null) overlay = new DifferentialArray<>(new int[getArea()]);
+        if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
         if (value instanceof BlockStateHolder) {
-            setOverlay(((BlockStateHolder) value).getInternalId());
+            setOverlay(((BlockStateHolder) value).getOrdinalChar());
         } else {
             overlay.record(() -> {
-                int[] overlayArr = overlay.get();
+                char[] overlayArr = overlay.get();
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     mutable.mutZ(z);
@@ -1630,7 +1705,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int y = heights.getByte(index) & 0xFF;
                         mutable.mutX(x);
                         mutable.mutY(y);
-                        overlayArr[index] = value.apply(mutable).getInternalId();
+                        overlayArr[index] = value.apply(mutable).getOrdinalChar();
                     }
                 }
             });
@@ -1659,20 +1734,19 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public com.boydti.fawe.object.brush.visualization.cfi.WritableMCAChunk write(
-        WritableMCAChunk chunk, int csx, int cex, int csz, int cez) {
+    public MCAChunk write(MCAChunk chunk, int csx, int cex, int csz, int cez) {
         byte[] heights = this.heights.get();
         byte[] biomes = this.biomes.get();
-        int[] main = this.main.get();
-        int[] floor = this.floor.get();
-        int[] overlay = this.overlay != null ? this.overlay.get() : null;
+        char[] main = this.main.get();
+        char[] floor = this.floor.get();
+        char[] overlay = this.overlay != null ? this.overlay.get() : null;
         try {
             int[] indexes = indexStore.get();
 
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            int[] heightMap = chunk.biomes;
+            int[] heightMap = FaweCache.IMP.HEIGHT_STORE.get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;
@@ -1693,9 +1767,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int layer = 0; layer <= maxLayer; layer++) {
                 chunk.hasSections[layer] = true;
             }
-            if (primtives.waterHeight != 0) {
-                int maxIndex = (primtives.waterHeight) << 8;
-                Arrays.fill(chunk.blocks, 0, maxIndex, primtives.waterId);
+            if (primitives.waterHeight != 0) {
+                int maxIndex = primitives.waterHeight << 8;
+                Arrays.fill(chunk.blocks, 0, maxIndex, primitives.waterOrdinal);
             }
 
             if (primtives.modifiedMain) { // If the main block is modified, we can't short circuit this
@@ -1703,7 +1777,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     index = (z & 15) << 4;
                     for (int x = csx; x <= cex; x++, index++) {
                         globalIndex = indexes[index];
-                        int mainCombined = main[globalIndex];
+                        char mainCombined = main[globalIndex];
                         for (int y = 0; y < minY; y++) {
                             chunk.blocks[index + (y << 8)] = mainCombined;
                         }
@@ -1711,7 +1785,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
             } else {
                 int maxIndex = minY << 8;
-                Arrays.fill(chunk.blocks, 0, maxIndex, BlockID.STONE);
+                Arrays.fill(chunk.blocks, 0, maxIndex, (char) BlockID.STONE);
             }
 
             final boolean hasFloorThickness = primtives.floorThickness != 0 || primtives.worldThickness != 0;
@@ -1730,9 +1804,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     int maxMainY = height;
                     int minMainY = minY;
 
-                    int mainCombined = main[globalIndex];
+                    char mainCombined = main[globalIndex];
 
-                    int floorCombined = floor[globalIndex];
+                    char floorCombined = floor[globalIndex];
                     if (hasFloorThickness) {
                         if (x > 0) maxMainY = Math.min(heights[globalIndex - 1] & 0xFF, maxMainY);
                         if (x < getWidth() - 1) maxMainY = Math.min(heights[globalIndex + 1] & 0xFF, maxMainY);
@@ -1767,33 +1841,33 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
 
                     if (hasOverlay) {
-                        int overlayCombined = overlay[globalIndex];
-                        int overlayIndex = index + ((height + 1) << 8);
+                        char overlayCombined = overlay[globalIndex];
+                        int overlayIndex = index + (height + 1 << 8);
                         chunk.blocks[overlayIndex] = overlayCombined;
                     }
 
-                    if (primtives.bedrockId != 0) {
-                        chunk.blocks[index] = primtives.bedrockId;
+                    if (primitives.bedrockOrdinal != 0) {
+                        chunk.blocks[index] = primitives.bedrockOrdinal;
                     }
                 }
             }
 
-            int[][][] localBlocks = getChunkArray(chunk.getX(), chunk.getZ());
+            char[][][] localBlocks = getChunkArray(chunk.getX(), chunk.getZ());
             if (localBlocks != null) {
                 index = 0;
                 for (int layer = 0; layer < 16; layer++) {
                     int by = layer << 4;
                     int ty = by + 15;
                     for (int y = by; y <= ty; y++, index += 256) {
-                        int[][] yBlocks = localBlocks[y];
+                        char[][] yBlocks = localBlocks[y];
                         if (yBlocks != null) {
                             chunk.hasSections[layer] = true;
                             for (int z = 0; z < yBlocks.length; z++) {
-                                int[] zBlocks = yBlocks[z];
+                                char[] zBlocks = yBlocks[z];
                                 if (zBlocks != null) {
                                     int zIndex = index + (z << 4);
                                     for (int x = 0; x < zBlocks.length; x++, zIndex++) {
-                                        int combined = zBlocks[x];
+                                        char combined = zBlocks[x];
                                         if (combined == 0) continue;
                                         chunk.blocks[zIndex] = combined;
                                     }
@@ -1805,7 +1879,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             }
 
             for (int i = 0; i < 256; i++) {
-                chunk.biomes[i] = biomes[indexes[i]];
+                byte biomeId = biomes[indexes[i]];
+                if (biomeId != 0) {
+                    chunk.biomes[i] = BiomeTypes.get(biomeId);
+                }
             }
 
 
@@ -1815,24 +1892,24 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return chunk;
     }
 
-    private void setUnsafe(int[][][] map, int combined, int x, int y, int z) {
-        int[][] yMap = map[y];
+    private void setUnsafe(char[][][] map, char combined, int x, int y, int z) {
+        char[][] yMap = map[y];
         if (yMap == null) {
-            map[y] = yMap = new int[16][];
+            map[y] = yMap = new char[16][];
         }
-        int[] zMap = yMap[z];
+        char[] zMap = yMap[z];
         if (zMap == null) {
-            yMap[z] = zMap = new int[16];
+            yMap[z] = zMap = new char[16];
         }
         zMap[x] = combined;
     }
 
-    private int get(int[][][] map, int x, int y, int z) {
-        int[][] yMap = map[y];
+    private int get(char[][][] map, int x, int y, int z) {
+        char[][] yMap = map[y];
         if (yMap == null) {
             return 0;
         }
-        int[] zMap = yMap[z & 15];
+        char[] zMap = yMap[z & 15];
         if (zMap == null) {
             return 0;
         }
@@ -1841,7 +1918,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private void setOverlay(Mask mask, int combined) {
         int index = 0;
-        if (overlay == null) overlay = new DifferentialArray<>(new int[getArea()]);
+        if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
         for (int z = 0; z < getLength(); z++) {
             mutable.mutZ(z);
             for (int x = 0; x < getWidth(); x++, index++) {
@@ -1903,29 +1980,29 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         }
     }
 
-    private void setFloor(int value) {
+    private void setFloor(char value) {
         floor.record(() -> Arrays.fill(floor.get(), value));
     }
 
-    private void setColumn(int value) {
+    private void setColumn(char value) {
         setFloor(value);
         setMain(value);
     }
 
-    private void setMain(int value) {
-        primtives.modifiedMain = true;
+    private void setMain(char value) {
+        primitives.modifiedMain = true;
         main.record(() -> Arrays.fill(main.get(), value));
     }
 
-    private void setOverlay(int value) {
-        if (overlay == null) overlay = new DifferentialArray<>(new int[getArea()]);
+    private void setOverlay(char value) {
+        if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
         overlay.record(() -> Arrays.fill(overlay.get(), value));
     }
 
-    private void setOverlay(BufferedImage img, int combined, boolean white) {
+    private void setOverlay(BufferedImage img, char combined, boolean white) {
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
-        if (overlay == null) overlay = new DifferentialArray<>(new int[getArea()]);
+        if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
 
         overlay.record(() -> {
             int index = 0;
@@ -1941,7 +2018,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         });
     }
 
-    private void setMain(BufferedImage img, int combined, boolean white) {
+    private void setMain(BufferedImage img, char combined, boolean white) {
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
         primtives.modifiedMain = true;
@@ -1960,7 +2037,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         });
     }
 
-    private void setFloor(BufferedImage img, int combined, boolean white) {
+    private void setFloor(BufferedImage img, char combined, boolean white) {
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
 
@@ -1978,7 +2055,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         });
     }
 
-    private void setColumn(BufferedImage img, int combined, boolean white) {
+    private void setColumn(BufferedImage img, char combined, boolean white) {
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
         primtives.modifiedMain = true;
@@ -2108,6 +2185,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     // These aren't implemented yet...
     @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return false;
+    }
+
+    @Override
     public int getBlockLightLevel(BlockVector3 position) {
         return 0;
     }
@@ -2149,5 +2231,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public BlockVector3 getSpawnPosition() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        getLogger(HeightMapMCAGenerator.class).debug("Should not be using buffering with HMMG");
+        return new FallbackChunkGet(this, x, z);
     }
 }
