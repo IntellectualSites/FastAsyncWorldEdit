@@ -5,6 +5,9 @@ import com.mendhak.gradlecrowdin.UploadSourceFileTask
 
 plugins {
     id("java-library")
+    id("java")
+    id("maven")
+    id("maven-publish")
     id("net.ltgt.apt-eclipse")
     id("net.ltgt.apt-idea")
     id("antlr")
@@ -98,6 +101,45 @@ tasks.named<Copy>("processResources") {
                 "date" to "${rootProject.ext["date"]}")
     }
 }
+
+val jar: Jar by tasks
+jar.archiveName = "FAWE-API-${project.version}.jar"
+jar.destinationDir = file("../mvn/com/boydti/FAWE-API/" + project.version)
+
+task("writeNewPom") {
+    doLast {
+        maven.pom {
+            withGroovyBuilder {
+                "project" {
+                    groupId = "com.boydti"
+                    artifactId = "FAWE-API"
+                    version = "project.version"
+                }
+            }
+        }.writeTo("../mvn/com/boydti/FAWE-API/${project.version}/FAWE-API-${project.version}.pom")
+        maven.pom {
+            withGroovyBuilder {
+                "project" {
+                    groupId = "com.boydti"
+                    artifactId = "FAWE-API"
+                    version = "latest"
+                }
+            }
+        }.writeTo("../mvn/com/boydti/FAWE-API/latest/FAWE-API-latest.pom")
+    }
+}
+
+task("dataContent") {
+    doLast {
+        copySpec {
+            from("../mvn/com/boydti/FAWE-API/${project.version}/")
+            into("../mvn/com/boydti/FAWE-API/latest/")
+            include("*.jar")
+            rename("FAWE-API-${project.version}.jar", "FAWE-API-latest.jar")
+        }
+    }
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
@@ -129,3 +171,8 @@ if (project.hasProperty(crowdinApiKey)) {
         dependsOn("crowdinDownload")
     }
 }
+
+tasks.named("dataContent").configure {
+    dependsOn("writeNewPom")
+}
+
