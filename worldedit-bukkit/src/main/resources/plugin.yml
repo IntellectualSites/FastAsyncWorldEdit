@@ -2,16 +2,17 @@ name: WorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: 1.13
-description: Fast Async WorldEdit plugin
+api-version: 1.14
+website: https://github.com/IntellectualSites
+description: Blazingly fast world manipulation for builders, large networks and developers.
 authors: [Empire92, MattBDev]
 loadbefore: [BannerBoard, WorldGuard, PlotSquared, AsyncWorldEdit, AsyncWorldEditInjector]
 database: false
 permissions:
   fawe.plotsquared:
-      default: true
-      children:
-        fawe.plotsquared.trusted: true
+    default: true
+    children:
+      fawe.plotsquared.trusted: true
   fawe.bypass.regions:
     default: false
   fawe.bypass:
