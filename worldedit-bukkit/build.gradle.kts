@@ -60,7 +60,6 @@ dependencies {
     "implementation"("com.drtshock:factions:1.6.9.5") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
-    "implementation"("net.jzx7:regios:5.9.9") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
