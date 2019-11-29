@@ -2,9 +2,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
-    maven
-    java
-    `maven-publish`
 }
 
 applyPlatformAndCoreConfiguration()
@@ -23,8 +20,8 @@ repositories {
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
     maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
-    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/") }
-    flatDir { dir(File("src/main/resources")) }
+    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
+    flatDir {dir(File("src/main/resources"))}
 }
 
 configurations.all {
@@ -84,44 +81,6 @@ tasks.named<Jar>("jar") {
     }
 }
 
-val jar: Jar by tasks
-jar.archiveName = "FAWE-Bukkit-API-${project.version}.jar"
-jar.destinationDir = file("../mvn/com/boydti/FAWE-Bukkit-API/" + project.version)
-
-task("writeNewPom") {
-    doLast {
-        maven.pom {
-            withGroovyBuilder {
-                "project" {
-                    groupId = "com.boydti"
-                    artifactId = "FAWE-Bukkit-API"
-                    version = "project.version"
-                }
-            }
-        }.writeTo("../mvn/com/boydti/FAWE-Bukkit-API/${project.version}/FAWE-Bukkit-API-${project.version}.pom")
-        maven.pom {
-            withGroovyBuilder {
-                "project" {
-                    groupId = "com.boydti"
-                    artifactId = "FAWE-Bukkit-API"
-                    version = "latest"
-                }
-            }
-        }.writeTo("../mvn/com/boydti/FAWE-Bukkit-API/latest/FAWE-Bukkit-API-latest.pom")
-    }
-}
-
-task("dataContent") {
-    doLast {
-        copySpec {
-            from("../mvn/com/boydti/FAWE-Bukkit-API/${project.version}/")
-            into("../mvn/com/boydti/FAWE-Bukkit-API/latest/")
-            include("*.jar")
-            rename("FAWE-Bukkit-API-${project.version}.jar", "FAWE-Bukkit-API-latest.jar")
-        }
-    }
-}
-
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
@@ -147,8 +106,4 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
-}
-
-tasks.named("dataContent").configure {
-    dependsOn("writeNewPom")
 }
