@@ -12,7 +12,6 @@ import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
 import com.boydti.fawe.bukkit.regions.FactionsFeature;
 import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
@@ -296,15 +295,6 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
 
-        final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
-        if (aSkyBlock != null && aSkyBlock.isEnabled()) {
-            try {
-                managers.add(new ASkyBlockHook(aSkyBlock));
-                log.debug("Attempting to use plugin 'ASkyBlock' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
             try {
                 managers.add(new FreeBuildRegion());
