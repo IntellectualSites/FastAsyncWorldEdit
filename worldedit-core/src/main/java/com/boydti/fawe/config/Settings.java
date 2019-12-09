@@ -21,7 +21,7 @@ public class Settings extends Config {
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues";
     @Final
-    public String WIKI = "https://github.com/boy0001/FastAsyncWorldedit/wiki/";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
@@ -364,7 +364,7 @@ public class Settings extends Config {
 
         @Comment({
                 "[SAFE] Experimental scripting support for Java 9",
-                " - https://github.com/boy0001/FastAsyncWorldedit/wiki/JavaScript-API"
+                " - https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki/JavaScript-API"
         })
         public boolean MODERN_CRAFTSCRIPTS = false;
 
