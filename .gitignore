@@ -24,3 +24,6 @@ todo.txt
 mvn/*
 docs/
 *.sh
+# i18n
+worldedit-core/src/main/resources/lang/*
+!worldedit-core/src/main/resources/lang/strings.json

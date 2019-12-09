@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -210,5 +211,12 @@ public abstract class LocalConfiguration {
 
         return item;
     }
-
+    public void setDefaultLocaleName(String localeName) {
+        this.defaultLocaleName = localeName;
+        if (localeName.equals("default")) {
+            this.defaultLocale = Locale.getDefault();
+        } else {
+            this.defaultLocale = TextUtils.getLocaleByMinecraftTag(localeName);
+        }
+    }
 }

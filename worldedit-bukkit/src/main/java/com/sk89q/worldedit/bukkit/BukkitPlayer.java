@@ -22,6 +22,7 @@ package com.sk89q.worldedit.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Caption;
+import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
@@ -280,7 +281,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public Locale getLocale() {
-        return Locale.forLanguageTag(player.getLocale().replace('_', '-'));
+        return TextUtils.getLocaleByMinecraftTag(player.getLocale());
     }
 
     @Nullable
