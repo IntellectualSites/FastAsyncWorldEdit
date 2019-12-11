@@ -608,7 +608,7 @@ public class TextureUtil implements TextureHolder {
             }
             if (files.length == 0) {
                 getLogger(TextureUtil.class).debug(
-                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.14.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.15.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
