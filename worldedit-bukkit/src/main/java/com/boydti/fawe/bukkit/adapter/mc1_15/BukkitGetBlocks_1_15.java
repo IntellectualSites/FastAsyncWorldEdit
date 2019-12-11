@@ -215,7 +215,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                         }
                         if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
                             TileEntity tile = entry.getValue();
-                            tile.n();
+                            tile.hasWorld();
                             tile.invalidateBlockCache();
                         }
                     }
