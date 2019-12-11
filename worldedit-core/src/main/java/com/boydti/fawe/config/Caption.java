@@ -22,7 +22,7 @@ public class Caption {
 
     /**
      * Colorize a component with legacy color codes
-     * @param parent
+     * @param component
      * @param locale
      * @return Component
      */

@@ -19,9 +19,16 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -29,15 +36,15 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.NoiseFilter2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -58,34 +65,23 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
-
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.command.util.annotation.Confirm.Processor.RADIUS;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * Commands that operate on regions.
@@ -288,7 +284,7 @@ public class RegionCommands {
 
     @Command(
         name = "/replace",
-        aliases = { "/repl", "/rep" },
+        aliases = { "/re", "/rep" },
         desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.region.replace")
@@ -493,7 +489,7 @@ public class RegionCommands {
                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                             Mask mask) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
-		
+
 		Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
@@ -504,7 +500,7 @@ public class RegionCommands {
         } else {
             combinedMask = mask;
         }
-		
+
         int affected = editSession.moveRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask, replace);
 
         if (moveSelection) {
@@ -548,7 +544,8 @@ public class RegionCommands {
     public int stack(Actor actor, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(desc = "# of copies to stack", def = "1")
-                          @Confirm(Confirm.Processor.REGION) int count,
+                     @Confirm(Confirm.Processor.REGION)
+                         int count,
                      @Arg(desc = "The direction to stack", def = Direction.AIM)
                      @Direction(includeDiagonals = true)
                          BlockVector3 direction,
@@ -562,7 +559,7 @@ public class RegionCommands {
                          boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                          Mask mask) throws WorldEditException {
-        
+
 		Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
@@ -573,7 +570,7 @@ public class RegionCommands {
         } else {
             combinedMask = mask;
         }
-					
+
         int affected = editSession.stackCuboidRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask);
 
         if (moveSelection) {
@@ -592,6 +589,29 @@ public class RegionCommands {
 
         actor.printInfo(TranslatableComponent.of("worldedit.stack.changed", TextComponent.of(affected)));
         return affected;
+    }
+
+    @Command(
+        name = "/regen",
+        desc = "Regenerates the contents of the selection",
+        descFooter = "This command might affect things outside the selection,\n" +
+                "if they are within the same chunk."
+    )
+    @CommandPermissions("worldedit.regen")
+    @Logging(REGION)
+    @Confirm(Confirm.Processor.REGION)
+    public void regenerateChunk(Actor actor, World world, LocalSession session,
+            EditSession editSession, @Selection Region region,
+        @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
+        @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
+        Mask mask = session.getMask();
+        session.setMask((Mask) null);
+        session.setSourceMask((Mask) null);
+        world.regenerate(region, editSession);
+//        editSession.regenerate(region, biome, seed);
+        session.setMask(mask);
+        session.setSourceMask(mask);
+        actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
     }
 
     @Command(
@@ -643,30 +663,6 @@ public class RegionCommands {
         } catch (ExpressionException e) {
             actor.printError(TextComponent.of(e.getMessage()));
         }
-    }
-
-    @Command(
-            name = "/regen",
-            desc = "Regenerates the contents of the selection",
-            descFooter =
-                    "Regenerates the contents of the current selection.\n" +
-                            "This command might affect things outside the selection,\n" +
-                            "if they are within the same chunk."
-)
-    @CommandPermissions("worldedit.regen")
-    @Logging(REGION)
-    @Confirm(Confirm.Processor.REGION)
-    public void regenerateChunk(Actor actor, World world, LocalSession session, EditSession editSession, @Selection Region region,
-                                @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
-                                @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
-        Mask mask = session.getMask();
-        session.setMask((Mask) null);
-        session.setSourceMask((Mask) null);
-        world.regenerate(region, editSession);
-//        editSession.regenerate(region, biome, seed);
-        session.setMask(mask);
-        session.setSourceMask(mask);
-		actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
     }
 
     @Command(

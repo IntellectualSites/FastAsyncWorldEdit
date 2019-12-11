@@ -20,9 +20,6 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -31,6 +28,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 /**
@@ -60,7 +58,7 @@ public class RegionVisitor implements Operation {
     /**
      * Deprecated in favor of the other constructors which will preload chunks during iteration
      *
-     * @param region
+     * @param iterable
      * @param function
      */
     @Deprecated
