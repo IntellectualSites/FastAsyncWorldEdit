@@ -68,7 +68,10 @@ public final class ItemTypes {
     @Nullable public static final ItemType BAT_SPAWN_EGG = init();
     @Nullable public static final ItemType BEACON = init();
     @Nullable public static final ItemType BEDROCK = init();
+    @Nullable public static final ItemType BEE_NEST = init();
+    @Nullable public static final ItemType BEE_SPAWN_EGG = init();
     @Nullable public static final ItemType BEEF = init();
+    @Nullable public static final ItemType BEEHIVE = init();
     @Nullable public static final ItemType BEETROOT = init();
     @Nullable public static final ItemType BEETROOT_SEEDS = init();
     @Nullable public static final ItemType BEETROOT_SOUP = init();
@@ -409,6 +412,10 @@ public final class ItemTypes {
     @Nullable public static final ItemType HAY_BLOCK = init();
     @Nullable public static final ItemType HEART_OF_THE_SEA = init();
     @Nullable public static final ItemType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
+    @Nullable public static final ItemType HONEY_BLOCK = init();
+    @Nullable public static final ItemType HONEY_BOTTLE = init();
+    @Nullable public static final ItemType HONEYCOMB = init();
+    @Nullable public static final ItemType HONEYCOMB_BLOCK = init();
     @Nullable public static final ItemType HOPPER = init();
     @Nullable public static final ItemType HOPPER_MINECART = init();
     @Nullable public static final ItemType HORN_CORAL = init();

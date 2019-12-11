@@ -90,6 +90,8 @@ public final class BlockTypes {
     @Nullable public static final BlockType BARRIER = init();
     @Nullable public static final BlockType BEACON = init();
     @Nullable public static final BlockType BEDROCK = init();
+    @Nullable public static final BlockType BEE_NEST = init();
+    @Nullable public static final BlockType BEEHIVE = init();
     @Nullable public static final BlockType BEETROOTS = init();
     @Nullable public static final BlockType BELL = init();
     @Nullable public static final BlockType BIRCH_BUTTON = init();
@@ -336,6 +338,8 @@ public final class BlockTypes {
     @Nullable public static final BlockType GRINDSTONE = init();
     @Nullable public static final BlockType HAY_BLOCK = init();
     @Nullable public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = init();
+    @Nullable public static final BlockType HONEY_BLOCK = init();
+    @Nullable public static final BlockType HONEYCOMB_BLOCK = init();
     @Nullable public static final BlockType HOPPER = init();
     @Nullable public static final BlockType HORN_CORAL = init();
     @Nullable public static final BlockType HORN_CORAL_BLOCK = init();
