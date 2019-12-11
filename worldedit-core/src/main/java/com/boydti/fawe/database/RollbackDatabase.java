@@ -4,13 +4,9 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.collection.YieldIterable;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -22,19 +18,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
-
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -50,18 +40,19 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     private final World world;
     private Connection connection;
 
-    private @Language("sql") String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `{0}edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))";
-    private @Language("sql") String UPDATE_TABLE = "ALTER TABLE `{0}edits` ADD `command` VARCHAR, ADD `size` INT NOT NULL";
-    private @Language("sql") String INSERT_EDIT = "INSERT OR REPLACE INTO `{0}edits` (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-    private @Language("sql") String PURGE = "DELETE FROM `{0}edits` WHERE `time`<?";
-    private @Language("sql") String GET_EDITS_USER = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
-    private @Language("sql") String GET_EDITS_USER_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
-    private @Language("sql") String GET_EDITS = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
-    private @Language("sql") String GET_EDITS_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` ASC, `id` ASC";
-    private @Language("sql") String GET_EDIT_USER = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
+    private @Language("SQLite") String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `{0}edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))";
+    private @Language("SQLite") String UPDATE_TABLE1 = "ALTER TABLE `{0}edits` ADD COLUMN `command` VARCHAR";
+    private @Language("SQLite") String UPDATE_TABLE2 = "alter table `{0}edits` add size int default 0 not null";
+    private @Language("SQLite") String INSERT_EDIT = "INSERT OR REPLACE INTO `{0}edits` (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    private @Language("SQLite") String PURGE = "DELETE FROM `{0}edits` WHERE `time`<?";
+    private @Language("SQLite") String GET_EDITS_USER = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+    private @Language("SQLite") String GET_EDITS_USER_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
+    private @Language("SQLite") String GET_EDITS = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
+    private @Language("SQLite") String GET_EDITS_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` ASC, `id` ASC";
+    private @Language("SQLite") String GET_EDIT_USER = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
-    private @Language("sql") String DELETE_EDITS_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
-    private @Language("sql") String DELETE_EDIT_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
+    private @Language("SQLite") String DELETE_EDITS_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
+    private @Language("SQLite") String DELETE_EDIT_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
     private ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
 
@@ -79,7 +70,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
         // update vars
         CREATE_TABLE = CREATE_TABLE.replace("{0}", prefix);
-        UPDATE_TABLE = UPDATE_TABLE.replace("{0}", prefix);
+        UPDATE_TABLE1 = UPDATE_TABLE1.replace("{0}", prefix);
+        UPDATE_TABLE2 = UPDATE_TABLE2.replace("{0}", prefix);
         INSERT_EDIT = INSERT_EDIT.replace("{0}", prefix);
         PURGE = PURGE.replace("{0}", prefix);
         GET_EDITS_USER = GET_EDITS_USER.replace("{0}", prefix);
@@ -107,7 +99,10 @@ public class RollbackDatabase extends AsyncNotifyQueue {
             try (PreparedStatement stmt = connection.prepareStatement(CREATE_TABLE)) {
                 stmt.executeUpdate();
             }
-            try (PreparedStatement stmt = connection.prepareStatement(UPDATE_TABLE)) {
+            try (PreparedStatement stmt = connection.prepareStatement(UPDATE_TABLE1)) {
+                stmt.executeUpdate();
+            } catch (SQLException ignore) {} // Already updated
+            try (PreparedStatement stmt = connection.prepareStatement(UPDATE_TABLE2)) {
                 stmt.executeUpdate();
             } catch (SQLException ignore) {} // Already updated
             return true;
