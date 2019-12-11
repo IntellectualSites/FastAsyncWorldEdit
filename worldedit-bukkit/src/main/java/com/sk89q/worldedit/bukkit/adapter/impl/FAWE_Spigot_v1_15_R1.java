@@ -19,21 +19,18 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.material;
-import com.bekvon.bukkit.residence.commands.server;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BlockMaterial_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitAdapter_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitGetBlocks_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.MapChunkUtil_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15.BlockMaterial_1_15;
-import com.boydti.fawe.util.TaskManager;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -42,16 +39,12 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.Spigot_v1_15_R1;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -64,6 +57,15 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -78,7 +80,6 @@ import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.ItemStack;
 import net.minecraft.server.v1_15_R1.MinecraftKey;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
@@ -101,21 +102,6 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_15_R1 parent;
@@ -172,14 +158,18 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
+        final WorldServer handle = craftWorld.getHandle();
+        Chunk chunk = handle.getChunkAt(x >> 4, z >> 4);
+        final BlockPosition blockPos = new BlockPosition(x, y, z);
         org.bukkit.block.Block bukkitBlock = location.getBlock();
         BlockState state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
         if (state.getBlockType().getMaterial().hasContainer()) {
-            //Read the NBT data
-            TileEntity te = craftWorld.getHandle().getTileEntity(new BlockPosition(x, y, z));
+
+        // Read the NBT data
+            TileEntity te = chunk.a(blockPos, Chunk.EnumTileEntityState.CHECK);
             if (te != null) {
                 NBTTagCompound tag = new NBTTagCompound();
-                te.save(tag); // readTileEntityIntoTag
+                te.save(tag); // readTileEntityIntoTag - load data
                 return state.toBaseBlock((CompoundTag) toNative(tag));
             }
         }
@@ -197,6 +187,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
 
+        BlockPosition blockPos = new BlockPosition(x, y, z);
         IBlockData blockData = ((BlockMaterial_1_15) state.getMaterial()).getState();
         ChunkSection[] sections = nmsChunk.getSections();
         int y4 = y >> 4;
@@ -209,24 +200,23 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
             existing = section.getType(x & 15, y & 15, z & 15);
         }
 
-        BlockPosition pos = new BlockPosition(x, y, z);
 
-        nmsChunk.removeTileEntity(pos); // Force delete the old tile entity
+        nmsChunk.removeTileEntity(blockPos); // Force delete the old tile entity
 
         CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
         if (nativeTag != null || existing instanceof TileEntityBlock) {
-            nmsWorld.setTypeAndData(pos, blockData, 0);
+            nmsWorld.setTypeAndData(blockPos, blockData, 0);
             // remove tile
             if (nativeTag != null) {
                 // We will assume that the tile entity was created for us,
                 // though we do not do this on the Forge version
-                TileEntity tileEntity = nmsWorld.getTileEntity(pos);
+                TileEntity tileEntity = nmsWorld.getTileEntity(blockPos);
                 if (tileEntity != null) {
                     NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
-                    tag.set("x", new NBTTagInt(x));
-                    tag.set("y", new NBTTagInt(y));
-                    tag.set("z", new NBTTagInt(z));
-                    tileEntity.load(tag); // readTagIntoTileEntity
+                    tag.set("x", NBTTagInt.a(x));
+                    tag.set("y", NBTTagInt.a(y));
+                    tag.set("z", NBTTagInt.a(z));
+                    tileEntity.load(tag); // readTagIntoTileEntity - load data
                 }
             }
         } else {
@@ -235,10 +225,10 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
                 if (blockData.isAir()) return true;
                 sections[y4] = section = new ChunkSection(y4 << 4);
             }
-            nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
+            nmsChunk.setType(blockPos, blockData, false);
         }
         if (update) {
-            nmsWorld.getMinecraftWorld().notify(pos, existing, blockData, 0);
+            nmsWorld.getMinecraftWorld().notify(blockPos, existing, blockData, 0);
         }
         return true;
     }

@@ -65,21 +65,14 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
 
-            {
-                Field tmp;
-                try {
-                    tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
-                } catch (NoSuchFieldException paper) {
-                    tmp = DataPaletteBlock.class.getDeclaredField("j");
-                }
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                int modifiers = modifiersField.getInt(tmp);
-                int newModifiers = modifiers & (~Modifier.FINAL);
-                if (newModifiers != modifiers) modifiersField.setInt(tmp, newModifiers);
-                fieldLock = tmp;
-                fieldLock.setAccessible(true);
-            }
+            Field tmp = DataPaletteBlock.class.getDeclaredField("j");
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            int modifiers = modifiersField.getInt(tmp);
+            int newModifiers = modifiers & (~Modifier.FINAL);
+            if (newModifiers != modifiers) modifiersField.setInt(tmp, newModifiers);
+            fieldLock = tmp;
+            fieldLock.setAccessible(true);
 
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);

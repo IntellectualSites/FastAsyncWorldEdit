@@ -389,9 +389,9 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                                 if (tileEntity != null) {
                                     BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
                                     final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
-                                    tag.set("x", new NBTTagInt(x));
-                                    tag.set("y", new NBTTagInt(y));
-                                    tag.set("z", new NBTTagInt(z));
+                                    tag.set("x", NBTTagInt.a(x));
+                                    tag.set("y", NBTTagInt.a(y));
+                                    tag.set("z", NBTTagInt.a(z));
                                     tileEntity.load(tag);
                                 }
                             }
