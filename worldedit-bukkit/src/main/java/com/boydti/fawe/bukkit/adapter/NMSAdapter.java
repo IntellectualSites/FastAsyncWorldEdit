@@ -1,8 +1,6 @@
 package com.boydti.fawe.bukkit.adapter;
 
 import com.sk89q.worldedit.world.block.BlockID;
-import net.minecraft.server.v1_14_R1.ChunkSection;
-
 import java.util.function.Function;
 
 public class NMSAdapter<T> {
