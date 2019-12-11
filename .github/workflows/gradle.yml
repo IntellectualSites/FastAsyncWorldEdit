@@ -5,10 +5,12 @@ on:
     branches:
     - master
     - merge
+    - 1.15
   pull_request:
     branches:
     - master
     - merge
+    - 1.15
  
 jobs:
   test:
