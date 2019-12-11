@@ -43,6 +43,7 @@ dependencies {
         isTransitive = false
     }
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
+    "compileOnly"("org.spigotmc:spigot:1.15-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.2")
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")

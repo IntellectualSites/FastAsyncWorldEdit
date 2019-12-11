@@ -1,15 +1,12 @@
 package com.boydti.fawe.bukkit.adapter;
 
-import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import net.minecraft.server.v1_14_R1.WorldServer;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class MapChunkUtil<T> {
