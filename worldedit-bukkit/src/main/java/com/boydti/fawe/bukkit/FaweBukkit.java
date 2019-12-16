@@ -290,15 +290,6 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
 
-        final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
-        if (aSkyBlock != null && aSkyBlock.isEnabled()) {
-            try {
-                managers.add(new ASkyBlockHook(aSkyBlock));
-                log.debug("Attempting to use plugin 'ASkyBlock' found. Using it now.");
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
             try {
                 managers.add(new FreeBuildRegion());

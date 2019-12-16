@@ -19,12 +19,15 @@
 
 package com.sk89q.worldedit.function.operation;
 
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +37,11 @@ import java.util.stream.Collectors;
  * successions.
  */
 public interface Operation {
+
+    /**
+     * This is an internal field, and should not be touched.
+     */
+    Set<String> warnedDeprecatedClasses = new HashSet<>();
 
     /**
      * Complete the next step. If this method returns true, then the method may
@@ -76,6 +84,13 @@ public interface Operation {
         // TODO Remove legacy code WorldEdit 8.0.0
         List<String> oldMessages = new ArrayList<>();
         addStatusMessages(oldMessages);
+        if (oldMessages.size() > 0) {
+            String className = getClass().getName();
+            if (!warnedDeprecatedClasses.contains(className)) {
+                WorldEdit.logger.warn("An operation is using the old status message API. This will be removed in further versions. Class: " + className);
+                warnedDeprecatedClasses.add(className);
+            }
+        }
         return oldMessages.stream().map(TextComponent::of).collect(Collectors.toList());
     }
 }

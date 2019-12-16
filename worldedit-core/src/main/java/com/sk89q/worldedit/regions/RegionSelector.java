@@ -20,21 +20,20 @@
 package com.sk89q.worldedit.regions;
 
 import com.google.common.collect.Lists;
-
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 /**
  * Region selectors create {@link Region}s from a series of "selected points."
@@ -77,8 +76,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her primary selection.
      *
-     * @param actor the actor
-     * @param session the session
+     * @param actor    the actor
+     * @param session  the session
      * @param position position
      */
     void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -86,8 +85,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her secondary selection.
      *
-     * @param actor the actor
-     * @param session the session
+     * @param actor    the actor
+     * @param session  the session
      * @param position position
      */
     void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -96,7 +95,7 @@ public interface RegionSelector {
      * The the player information about the region's changes. This may resend
      * all the defining region information if needed.
      *
-     * @param actor the actor
+     * @param actor   the actor
      * @param session the session
      */
     void explainRegionAdjust(Actor actor, LocalSession session);
@@ -157,13 +156,13 @@ public interface RegionSelector {
 
     /**
      * Get lines of information about the selection.
-     * 
+     *
      * @return a list of lines describing the region
      */
     @Deprecated
     default List<String> getInformationLines() {
         return Lists.newArrayList();
-    };
+    }
 
     /**
      * Get lines of information about the selection.
@@ -172,12 +171,13 @@ public interface RegionSelector {
      */
     default List<Component> getSelectionInfoLines() {
         return getInformationLines().stream()
-                .map(TextComponent::of)
+                .map(line -> TextComponent.of(line, TextColor.LIGHT_PURPLE))
                 .collect(Collectors.toList());
     }
 
     /**
      * Get the vertices
+     *
      * @return
      * @throws IncompleteRegionException
      */

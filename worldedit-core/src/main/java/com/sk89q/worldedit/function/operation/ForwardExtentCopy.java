@@ -19,53 +19,48 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
 import com.boydti.fawe.object.function.block.BiomeCopy;
 import com.boydti.fawe.object.function.block.CombinedBlockCopy;
 import com.boydti.fawe.object.function.block.SimpleBlockCopy;
 import com.boydti.fawe.util.MaskTraverser;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
-import com.sk89q.worldedit.function.FlatRegionFunction;
-import com.sk89q.worldedit.function.FlatRegionMaskingFilter;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
-import com.sk89q.worldedit.function.biome.ExtentBiomeCopy;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
+import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.entity.EntityTypes;
-import java.util.Collections;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import java.util.List;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a copy of a portion of one extent to another extent or another point.
@@ -428,15 +423,14 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        List<Component> messages = new ArrayList<>();
-        messages.add(TranslatableComponent.of("worldedit.operation.affected.block",
-                TextComponent.of(affectedBlocks)).color(TextColor.GRAY));
-        messages.add(TranslatableComponent.of("worldedit.operation.affected.biome",
-                TextComponent.of(affectedBiomeCols)).color(TextColor.GRAY));
-        messages.add(TranslatableComponent.of("worldedit.operation.affected.entity",
-                TextComponent.of(affectedEntities)).color(TextColor.GRAY));
-
-        return messages;
+        return ImmutableList.of(
+                TranslatableComponent.of("worldedit.operation.affected.block",
+                        TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE),
+                TranslatableComponent.of("worldedit.operation.affected.biome",
+                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
+                TranslatableComponent.of("worldedit.operation.affected.entity",
+                        TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE)
+        );
     }
 
 }

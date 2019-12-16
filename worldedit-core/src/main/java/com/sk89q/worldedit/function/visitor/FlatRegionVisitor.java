@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import com.google.common.collect.Lists;
@@ -83,7 +84,7 @@ public class FlatRegionVisitor implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        return Lists.newArrayList(TranslatableComponent.of(
+        return ImmutableList.of(TranslatableComponent.of(
                 "worldedit.operation.affected.column",
                 TextComponent.of(getAffected())
         ).color(TextColor.GRAY));
