@@ -138,9 +138,8 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
-    public void test(Player player, EditSession editSession, @Arg(desc = "test") String worldName, BlockVector2 mcaFile) throws WorldEditException {
-//        file = new File(world, "region" + File.separator)
-
+    public void test(Player player, EditSession editSession, @Arg(desc = "test") double testValue) throws WorldEditException {
+        player.print("" + testValue);
     }
 
     @Command(

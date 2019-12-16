@@ -42,7 +42,7 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
+    public CompoundTag getTile(int x, int y, int z) {
         return extent.getFullBlock(bx + x, y, bz + z).getNbtData();
     }
 

@@ -90,7 +90,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     BaseBlock getFullBlock(int x, int y, int z);
 
     @Override
-    CompoundTag getTag(int x, int y, int z);
+    CompoundTag getTile(int x, int y, int z);
 
     @Override
     default IChunk reset() {

@@ -51,7 +51,7 @@ public class CombinedBlocks implements IBlocks {
     public char[] load(int layer) {
         if (primary.hasSection(layer)) {
             char[] blocks = primary.load(layer);
-            if (secondary.hasSection(layer)) {
+            if (secondary.hasSection(layer) && primary != secondary) {
                 int i = 0;
                 for (; i < 4096; i++) {
                     if (blocks[i] == 0) {
@@ -75,42 +75,55 @@ public class CombinedBlocks implements IBlocks {
     @Override
     public BlockState getBlock(int x, int y, int z) {
         BlockState block = primary.getBlock(x, y, z);
-        if (block == null) {
+        if (block.getBlockType() == BlockTypes.__RESERVED__) {
             return secondary.getBlock(x, y, z);
         }
-        return BlockTypes.__RESERVED__.getDefaultState();
+        return block;
     }
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         Map<BlockVector3, CompoundTag> tiles = primary.getTiles();
-        if (tiles.isEmpty()) {
-            return secondary.getTiles();
-        }
-        Map<BlockVector3, CompoundTag> otherTiles = secondary.getTiles();
-        if (!otherTiles.isEmpty()) {
-            HashMap<BlockVector3, CompoundTag> copy = null;
-            for (Map.Entry<BlockVector3, CompoundTag> entry : otherTiles.entrySet()) {
-                BlockVector3 pos = entry.getKey();
-                BlockState block = primary.getBlock(pos.getX(), pos.getY(), pos.getZ());
-                if (block.getBlockType() == BlockTypes.__RESERVED__) {
-                    if (copy == null) copy = new HashMap<>(tiles);
-                    copy.put(pos, entry.getValue());
-                }
+        if (primary != secondary) {
+            if (tiles.isEmpty()) {
+                return secondary.getTiles();
             }
-            if (copy != null) return copy;
+            Map<BlockVector3, CompoundTag> otherTiles = secondary.getTiles();
+            if (!otherTiles.isEmpty()) {
+                HashMap<BlockVector3, CompoundTag> copy = null;
+                for (Map.Entry<BlockVector3, CompoundTag> entry : otherTiles.entrySet()) {
+                    BlockVector3 pos = entry.getKey();
+                    BlockState block = primary.getBlock(pos.getX(), pos.getY(), pos.getZ());
+                    if (block.getBlockType() == BlockTypes.__RESERVED__) {
+                        if (copy == null) copy = new HashMap<>(tiles);
+                        copy.put(pos, entry.getValue());
+                    }
+                }
+                if (copy != null) return copy;
+            }
         }
         return tiles;
     }
 
     @Override
+    public CompoundTag getTile(int x, int y, int z) {
+        CompoundTag tile = primary.getTile(x, y, z);
+        if (tile != null) {
+            return tile;
+        }
+        return secondary.getTile(x, y, z);
+    }
+
+    @Override
     public Set<CompoundTag> getEntities() {
-        Set<CompoundTag> ents1 = primary.getEntities();
-        Set<CompoundTag> ents2 = secondary.getEntities();
-        if (ents1.isEmpty()) return ents2;
-        if (ents2.isEmpty()) return ents1;
-        HashSet<CompoundTag> joined = new HashSet<>(ents1);
-        joined.addAll(ents2);
+        Set<CompoundTag> joined = primary.getEntities();
+        if (primary != secondary) {
+            Set<CompoundTag> ents2 = secondary.getEntities();
+            if (joined.isEmpty()) return ents2;
+            if (ents2.isEmpty()) return joined;
+            joined = new HashSet<>(joined);
+            joined.addAll(ents2);
+        }
         return joined;
     }
 

@@ -23,6 +23,7 @@ import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 /**
  * Tests whether a given vector meets a criteria.
@@ -92,12 +93,12 @@ public interface Mask {
         return new InverseMask(this);
     }
 
-    default Filter toFilter(Runnable run) {
+    default Filter toFilter(Consumer<FilterBlock> run) {
         return new Filter() {
             @Override
             public void applyBlock(FilterBlock block) {
                 if (test(block)) {
-                    run.run();
+                    run.accept(block);
                 }
             }
         };

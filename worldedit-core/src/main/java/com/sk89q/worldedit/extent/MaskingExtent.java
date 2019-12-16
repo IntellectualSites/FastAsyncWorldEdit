@@ -21,6 +21,20 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.boydti.fawe.util.ExtentTraverser;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -28,12 +42,16 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Requires that all mutating methods pass a given {@link Mask}.
  */
-public class MaskingExtent extends AbstractDelegateExtent {
+public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     private Mask mask;
+    private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
 
     /**
      * Create a new instance.
@@ -81,6 +99,23 @@ public class MaskingExtent extends AbstractDelegateExtent {
         return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 
+    @Override
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        ChunkFilterBlock filter = threadIdToFilter.getUnchecked(Thread.currentThread().getId());
+        return filter.filter(chunk, get, set, this);
+    }
 
+    @Override
+    public void applyBlock(FilterBlock block) {
+        int ordinal = block.getOrdinal();
+        if (ordinal != 0 && !mask.test(block)) {
+            block.setOrdinal(0);
+        }
+    }
 
+    @Override
+    public Extent construct(Extent child) {
+        if (child == getExtent()) return this;
+        return new MaskingExtent(child, mask);
+    }
 }

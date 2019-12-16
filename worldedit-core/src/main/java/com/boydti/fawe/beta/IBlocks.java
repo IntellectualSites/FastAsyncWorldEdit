@@ -31,6 +31,8 @@ public interface IBlocks extends Trimable {
 
     Map<BlockVector3, CompoundTag> getTiles();
 
+    CompoundTag getTile(int x, int y, int z);
+
     Set<CompoundTag> getEntities();
 
     BiomeType getBiomeType(int x, int z);

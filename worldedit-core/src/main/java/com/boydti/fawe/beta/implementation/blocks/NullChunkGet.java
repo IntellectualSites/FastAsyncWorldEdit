@@ -37,13 +37,13 @@ public enum NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
-        return null;
+    public Map<BlockVector3, CompoundTag> getTiles() {
+        return Collections.emptyMap();
     }
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
-        return Collections.emptyMap();
+    public CompoundTag getTile(int x, int y, int z) {
+        return null;
     }
 
     @Override

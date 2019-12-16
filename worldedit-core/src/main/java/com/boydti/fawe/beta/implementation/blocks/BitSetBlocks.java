@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -24,6 +25,11 @@ public class BitSetBlocks implements IChunkSet {
     public BitSetBlocks(BlockState blockState) {
         this.row = new MemBlockSet.RowZ();
         this.blockState = blockState;
+    }
+
+    @Override
+    public boolean hasSection(int layer) {
+        return row.rows[layer] != MemBlockSet.NULL_ROW_Y;
     }
 
 
@@ -122,22 +128,22 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public CompoundTag getTile(int x, int y, int z) {
         return null;
     }
 
     @Override
     public Set<CompoundTag> getEntities() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public Set<UUID> getEntityRemoves() {
         return null;
-    }
-
-    @Override
-    public boolean hasSection(int layer) {
-        return false;
     }
 
     @Override

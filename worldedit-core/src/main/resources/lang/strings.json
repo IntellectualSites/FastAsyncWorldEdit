@@ -3,13 +3,7 @@
 	"fawe.error": "&c{0}",
 	"fawe.info": "&7{0}",
 	"fawe.debug": "&3{0}",
-	
-	"piston.style.help.text": "Help: {0}",
-	"piston.style.text.modifier": "TODO modifier: {0}, {1}, {2}",
-	"piston.style.main.text": "{0}",
-	"piston.style.part.wrapping": "&8{0}&e{1}&8{2}",
-	"piston.text.command.prefix": "TODO prefix",
-	
+
 	"fawe.worldedit.history.find.element": "&8 - &2{0}: {1} &7ago &3{2}m &6{3} &c/{4}",
 	"fawe.worldedit.history.find.hover": "{0} blocks changed, click for more info",
 	
@@ -265,7 +259,7 @@
 	"fawe.cancel.worldedit.cancel.reason.low.memory": "Low memory",
 	"fawe.cancel.worldedit.cancel.reason.max.changes": "Too many blocks changed",
 	"fawe.cancel.worldedit.cancel.reason.max.checks": "Too many block checks",
-	"fawe.cancel.worldedit.cancel.reason.max.tiles": "Too many blockstates",
+	"fawe.cancel.worldedit.cancel.reason.max.tiles": "Too many block entities",
 	"fawe.cancel.worldedit.cancel.reason.max.entities": "Too many entities",
 	"fawe.cancel.worldedit.cancel.reason.max.iterations": "Max iterations",
 	"fawe.cancel.worldedit.cancel.reason.outside.level": "Outside world",

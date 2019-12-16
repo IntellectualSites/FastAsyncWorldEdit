@@ -303,6 +303,11 @@ public class EllipsoidRegion extends AbstractRegion {
         int sectionStart = y1 >> 4;
         int sectionEnd = y2 >> 4;
 
+        for (int layer = sectionStart; layer < sectionEnd; layer++) {
+            int yStart = Math.max(layer << 4, y1);
+            int yEnd = Math.min((layer << 4) + 15, y2);
+            filterSpherePartial(layer, yStart, yEnd, bx, bz, filter, block, get, set);
+        }
     }
 
     private void filterSpherePartial(int layer, int y1, int y2, int bx, int bz, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
@@ -310,7 +315,7 @@ public class EllipsoidRegion extends AbstractRegion {
         int cy = center.getBlockY();
         int cz = center.getBlockZ();
 
-        block.init(get, set, layer);
+        block.initLayer(get, set, layer);
 
         int by = layer << 4;
         int diffY;

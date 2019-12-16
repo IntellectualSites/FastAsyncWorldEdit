@@ -94,7 +94,7 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
+    public CompoundTag getTile(int x, int y, int z) {
         TileEntity tileEntity = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
         if (tileEntity == null) {
             return null;
