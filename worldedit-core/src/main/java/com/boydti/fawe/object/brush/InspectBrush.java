@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -8,7 +9,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.change.MutableFullBlockChange;
-import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -62,11 +62,11 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
-            player.print(TranslatableComponent.of("", "worldedit.tool.inspect"));
+            player.print(Caption.of("", "worldedit.tool.inspect"));
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(TranslatableComponent.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
+            player.print(Caption.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
             return false;
         }
         try {
@@ -95,7 +95,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                     String ageFormatted = MainUtil.secToTime(age / 1000);
                     BlockState blockFrom = BlockState.getFromOrdinal(from);
                     BlockState blockTo = BlockState.getFromOrdinal(to);
-                    TranslatableComponent msg = TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info", name, blockFrom, blockTo, ageFormatted);
+                    TranslatableComponent msg = Caption.of("fawe.worldedit.tool.tool.inspect.info", name, blockFrom, blockTo, ageFormatted);
 
                     String cmd = edit.getCommand();
                     TextComponent hover = TextComponent.of(cmd, TextColor.GOLD);
@@ -105,7 +105,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                     player.print(msg);
                 }
             }
-            player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+            player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

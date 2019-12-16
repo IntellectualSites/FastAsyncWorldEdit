@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Strings;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
@@ -683,7 +684,7 @@ public class SelectionCommands {
                 newSelector = new PolyhedralRegionSelector(world);
                 actor.print(TranslatableComponent.of("fawe.selection.sel.convex.polyhedral"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> actor.print(TranslatableComponent.of("fawe.selection.sel.max", (integer))));
+                limit.ifPresent(integer -> actor.print(Caption.of("fawe.selection.sel.max", (integer))));
                 actor.print(TranslatableComponent.of("fawe.selection.sel.list"));
                 break;
             case FUZZY:

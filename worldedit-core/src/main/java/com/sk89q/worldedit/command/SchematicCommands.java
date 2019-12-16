@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.boydti.fawe.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -131,14 +132,14 @@ public class SchematicCommands {
                         boolean randomRotate) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
+            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
             return;
         }
         try {
             MultiClipboardHolder all = ClipboardFormats.loadAllFromInput(player, filename, null, true);
             if (all != null) {
                 session.addClipboard(all);
-                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , filename));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded" , filename));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -186,7 +187,7 @@ public class SchematicCommands {
                 return;
             }
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.uri.not.found" , fileName));
+        player.print(Caption.of("fawe.worldedit.clipboard.clipboard.uri.not.found" , fileName));
     }
 
     @Command(
@@ -222,7 +223,7 @@ public class SchematicCommands {
             URI uri;
             if (filename.startsWith("url:")) {
                 if (!actor.hasPermission("worldedit.schematic.load.web")) {
-                    actor.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.web"));
+                    actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.load.web"));
                     return;
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
@@ -249,7 +250,7 @@ public class SchematicCommands {
                     }
                 } else {
                     if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !actor.hasPermission("worldedit.schematic.load.other") && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find()) {
-                        actor.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.load.other"));
+                        actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.load.other"));
                         return;
                     }
                     if (format == null && filename.matches(".*\\.[\\w].*")) {
@@ -279,7 +280,7 @@ public class SchematicCommands {
                 uri = file.toURI();
             }
             format.hold(actor, uri, in);
-            actor.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , filename));
+            actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded" , filename));
         } catch (IllegalArgumentException e) {
             actor.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
@@ -328,7 +329,7 @@ public class SchematicCommands {
         if (filename.contains("../")) {
             other = true;
             if (!actor.hasPermission("worldedit.schematic.save.other")) {
-                actor.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.save.other"));
+                actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.save.other"));
                 return;
             }
             if (filename.startsWith("../")) {
@@ -346,7 +347,7 @@ public class SchematicCommands {
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
-                    actor.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
+                    actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
                     return;
                 }
             }
@@ -392,7 +393,7 @@ public class SchematicCommands {
             return;
         }
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, destDir) && !player.hasPermission("worldedit.schematic.move.other")) {
-            player.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.move.other"));
+            player.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.move.other"));
             return;
         }
         ClipboardHolder clipboard = session.getClipboard();
@@ -408,19 +409,19 @@ public class SchematicCommands {
         for (File source : sources) {
             File destFile = new File(destDir, source.getName());
             if (destFile.exists()) {
-                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.move.exists" , destFile));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.exists" , destFile));
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && (!MainUtil.isInSubDirectory(dir, destFile) || !MainUtil.isInSubDirectory(dir, source)) && !player.hasPermission("worldedit.schematic.delete.other")) {
-                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.move.failed", destFile,
-                    TranslatableComponent.of("fawe.error.no.perm", ("worldedit.schematic.move.other"))));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.failed", destFile,
+                    Caption.of("fawe.error.no.perm", ("worldedit.schematic.move.other"))));
                 continue;
             }
             try {
                 File cached = new File(source.getParentFile(), "." + source.getName() + ".cached");
                 Files.move(source.toPath(), destFile.toPath());
                 if (cached.exists()) Files.move(cached.toPath(), destFile.toPath());
-                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.move.success" , source, destFile));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.success" , source, destFile));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -712,7 +713,7 @@ public class SchematicCommands {
                         writer.write(target);
                     }
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
-                    actor.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.saved" , file.getName()));
+                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved" , file.getName()));
                 } else {
                     actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
                 }
@@ -828,14 +829,14 @@ public class SchematicCommands {
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
-                actor.print(TranslatableComponent.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
+                actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
                 continue;
             }
             if (!deleteFile(f)) {
                 actor.printError(TranslatableComponent.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
                 continue;
             }
-            actor.print(TranslatableComponent.of("worldedit.schematic.delete.deleted" , filename));
+            actor.print(Caption.of("worldedit.schematic.delete.deleted" , filename));
         }
     }
 

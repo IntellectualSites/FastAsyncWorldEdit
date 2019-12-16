@@ -22,8 +22,6 @@ package com.sk89q.worldedit.extension.factory.parser;
 import com.boydti.fawe.config.Caption;
 import com.google.common.collect.Maps;
 
-import com.sk89q.worldedit.util.formatting.WorldEditText;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
@@ -423,7 +421,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(Caption.toString(TranslatableComponent.of("fawe.error.block.not.allowed", holder)));
+                throw new DisallowedUsageException(Caption.toString(Caption.of("fawe.error.block.not.allowed", holder)));
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.Lists;
 
 import com.boydti.fawe.FaweAPI;
@@ -182,7 +183,7 @@ public class ClipboardCommands {
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
-        actor.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy" , region.getArea()));
+        actor.print(Caption.of("fawe.worldedit.copy.command.copy" , region.getArea()));
         if (!actor.hasPermission("fawe.tips")) {
             System.out.println("TODO FIXME tips");
 //            TranslatableComponent.of("fawe.tips.tip.paste").or(TranslatableComponent.of("fawe.tips.tip.lazycopy"), TranslatableComponent.of("fawe.tips.tip.download"), TranslatableComponent.of("fawe.tips.tip.rotate"), TranslatableComponent.of("fawe.tips.tip.copypaste"), TranslatableComponent.of("fawe.tips.tip.replace.marker"), TranslatableComponent.of("fawe.tips.tip.copy.pattern")).send(actor);
@@ -287,11 +288,11 @@ public class ClipboardCommands {
     public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "schem") final String formatName) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
+            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
             return;
         }
 
-        player.print(TranslatableComponent.of("fawe.web.generating.link" , formatName));
+        player.print(Caption.of("fawe.web.generating.link" , formatName));
         ClipboardHolder holder = session.getClipboard();
 
         URL url;
@@ -360,7 +361,7 @@ public class ClipboardCommands {
                 }
             } else {
                 if (Settings.IMP.WEB.URL.isEmpty()) {
-                    player.print(TranslatableComponent.of("fawe.error.setting.disable", "web.url"));
+                    player.print(Caption.of("fawe.error.setting.disable", "web.url"));
                     return;
                 }
                 url = FaweAPI.upload(target, format);
@@ -377,7 +378,7 @@ public class ClipboardCommands {
                     e.printStackTrace();
                 }
             }
-            player.print(TranslatableComponent.of("fawe.web.download.link" , urlText));
+            player.print(Caption.of("fawe.web.download.link" , urlText));
         }
     }
 
@@ -401,16 +402,16 @@ public class ClipboardCommands {
         } else {
             target = clipboard;
         }
-        player.print(TranslatableComponent.of("fawe.web.generating.link" , format.getName()));
+        player.print(Caption.of("fawe.web.generating.link" , format.getName()));
         if (Settings.IMP.WEB.ASSETS.isEmpty()) {
-            player.print(TranslatableComponent.of("fawe.error.setting.disable", "web.assets"));
+            player.print(Caption.of("fawe.error.setting.disable", "web.assets"));
             return;
         }
         URL url = format.uploadPublic(target, category.replaceAll("[/|\\\\]", "."), player.getName());
         if (url == null) {
             player.printError(TranslatableComponent.of("fawe.web.generating.link.failed"));
         } else {
-            player.print(TranslatableComponent.of("fawe.web.download.link" , Settings.IMP.WEB.ASSETS));
+            player.print(Caption.of("fawe.web.download.link" , Settings.IMP.WEB.ASSETS));
         }
     }
 
@@ -528,7 +529,7 @@ public class ClipboardCommands {
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
-        actor.print(TranslatableComponent.of("fawe.worldedit.paste.command.paste" , to));
+        actor.print(Caption.of("fawe.worldedit.paste.command.paste" , to));
 
         if (!actor.hasPermission("fawe.tips")) {
             actor.print(TranslatableComponent.of("fawe.tips.tip.copypaste"));

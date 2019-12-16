@@ -24,8 +24,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -35,11 +33,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
-import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.converter.ConversionResult;
-import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
-import org.enginehub.piston.inject.Key;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -129,7 +123,7 @@ public class ConsumeBindings extends Bindings {
             uuid = Fawe.imp().getUUID(argument);
         }
         if (uuid == null) {
-            throw new InputParseException(Caption.toString(TranslatableComponent.of("fawe.error.player.not.found" , argument)));
+            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found" , argument)));
         }
         return uuid;
     }

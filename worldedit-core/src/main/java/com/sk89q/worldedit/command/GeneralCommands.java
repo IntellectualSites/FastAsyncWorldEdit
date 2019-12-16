@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.CachedTextureUtil;
@@ -398,7 +399,7 @@ public class GeneralCommands {
             }
             if (!(util instanceof CachedTextureUtil)) util = new CachedTextureUtil(util);
             session.setTextureUtil(util);
-            player.print(TranslatableComponent.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
+            player.print(Caption.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
         }
     }
 

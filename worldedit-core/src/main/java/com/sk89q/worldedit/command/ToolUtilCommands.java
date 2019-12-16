@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
@@ -263,7 +264,7 @@ public class ToolUtilCommands {
         VisualMode[] modes = VisualMode.values();
         VisualMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
         tool.setVisualMode(player, newMode);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.visual.mode.set" , newMode));
+        player.print(Caption.of("fawe.worldedit.brush.brush.visual.mode.set" , newMode));
     }
 
     @Command(
@@ -282,7 +283,7 @@ public class ToolUtilCommands {
         TargetMode[] modes = TargetMode.values();
         TargetMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
         tool.setTargetMode(newMode);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.target.mode.set" , newMode));
+        player.print(Caption.of("fawe.worldedit.brush.brush.target.mode.set" , newMode));
     }
 
     @Command(
@@ -299,7 +300,7 @@ public class ToolUtilCommands {
             return;
         }
         tool.setTargetOffset(offset);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.target.offset.set" , offset));
+        player.print(Caption.of("fawe.worldedit.brush.brush.target.offset.set" , offset));
     }
 
     @Command(
@@ -328,7 +329,7 @@ public class ToolUtilCommands {
         } else if (action != null) {
             String full = (mode.name().toLowerCase() + " " + StringMan.join(commandStr, " ")).trim();
             settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, full);
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.scroll.action.set" , mode));
+            player.print(Caption.of("fawe.worldedit.brush.brush.scroll.action.set" , mode));
         }
         bt.update();
     }

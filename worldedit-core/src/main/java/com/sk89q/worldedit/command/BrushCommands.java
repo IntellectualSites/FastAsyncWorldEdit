@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -270,7 +271,7 @@ public class BrushCommands {
         @Arg(desc = "The radius to sample for blending", def = "25")
             Expression radius) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline", (radius)));
+        player.print(Caption.of("fawe.worldedit.brush.brush.spline", (radius)));
         set(context,
             new SplineBrush(player))
                 .setSize(radius)
@@ -331,7 +332,7 @@ public class BrushCommands {
         @Arg(desc = "double", def = "0") double bias,
         @Arg(desc = "double", def = "0") double continuity,
         @Arg(desc = "double", def = "10") double quality) throws WorldEditException {
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline", (radius)));
+        player.print(Caption.of("fawe.worldedit.brush.brush.spline", (radius)));
         worldEdit.checkMaxBrushRadius(radius);
         set(context,
             new SurfaceSpline(tension, bias, continuity, quality))
@@ -537,12 +538,12 @@ public class BrushCommands {
         try {
             MultiClipboardHolder clipboards = ClipboardFormats.loadAllFromInput(player, clipboardStr, null, true);
             if (clipboards == null) {
-                player.print(TranslatableComponent.of("fawe.error.schematic.not.found" , clipboardStr));
+                player.print(Caption.of("fawe.error.schematic.not.found" , clipboardStr));
                 return;
             }
             List<ClipboardHolder> holders = clipboards.getHolders();
             if (holders == null) {
-                player.print(TranslatableComponent.of("fawe.error.schematic.not.found" , clipboardStr));
+                player.print(Caption.of("fawe.error.schematic.not.found" , clipboardStr));
                 return;
             }
 
@@ -843,7 +844,7 @@ public class BrushCommands {
         @Switch(name = 'r', desc = "Apply random rotation on paste") boolean randomRotate,
         @Switch(name = 'a', desc = "Apply auto view based rotation on paste") boolean autoRotate) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.copy", (radius)));
+        player.print(Caption.of("fawe.worldedit.brush.brush.copy", (radius)));
 
         set(context,
             new CopyPastaBrush(player, session, randomRotate, autoRotate))
@@ -918,7 +919,7 @@ public class BrushCommands {
             tool.setPrimary(settings);
             tool.setSecondary(settings);
 
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.equipped" , arguments.get().split(" ")[1]));
+            player.print(Caption.of("fawe.worldedit.brush.brush.equipped" , arguments.get().split(" ")[1]));
         }
         return settings;
     }
@@ -981,7 +982,7 @@ public class BrushCommands {
             } catch (Throwable e) {
                 e.printStackTrace();
             }
-            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.saved" , name));
+            player.print(Caption.of("fawe.worldedit.schematic.schematic.saved" , name));
         } else {
             player.printError(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
         }
@@ -1004,7 +1005,7 @@ public class BrushCommands {
         }
         if (!file.exists()) {
             File[] files = folder.listFiles(pathname -> false);
-            player.print(TranslatableComponent.of("fawe.error.brush.not.found" , name));
+            player.print(Caption.of("fawe.error.brush.not.found" , name));
             return;
         }
         try (DataInputStream in = new DataInputStream(
@@ -1013,7 +1014,7 @@ public class BrushCommands {
             BrushTool tool = BrushTool.fromString(player, session, json);
             BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
             session.setTool(item, tool, player);
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.equipped" , name));
+            player.print(Caption.of("fawe.worldedit.brush.brush.equipped" , name));
         } catch (Throwable e) {
             e.printStackTrace();
             player.printError(TranslatableComponent.of("fawe.error.brush.incompatible"));

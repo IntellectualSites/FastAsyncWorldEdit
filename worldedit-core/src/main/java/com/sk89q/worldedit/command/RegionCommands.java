@@ -29,6 +29,7 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -153,7 +154,7 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-        player.print(TranslatableComponent.of("fawe.info.lighting.propagate.selection" , count));
+        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
     }
 
     @Command(
@@ -181,7 +182,7 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
-        player.print(TranslatableComponent.of("fawe.info.updated.lighting.selection" , count));
+        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
     }
 
     @Command(
@@ -338,7 +339,7 @@ public class RegionCommands {
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , affected));
+        player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
     }
 
     @Command(
@@ -532,7 +533,7 @@ public class RegionCommands {
                      @Arg(desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
                      @Switch(name = 'm', desc = "TODO") boolean notFullHeight) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
-        player.print(TranslatableComponent.of("fawe.worldedit.visitor.visitor.block" , affected));
+        player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
     }
 
     @Command(

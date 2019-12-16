@@ -20,7 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -138,7 +138,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -685,7 +684,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     }
                 }
 
-                player.print(TranslatableComponent.of("fawe.error.worldedit.some.fails.blockbag", str.toString()));
+                player.print(Caption.of("fawe.error.worldedit.some.fails.blockbag", str.toString()));
             }
         }
         return Collections.emptyMap();
@@ -1005,7 +1004,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         FaweLimit used = getLimitUsed();
         if (used.MAX_FAILS > 0) {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
-                player.print(TranslatableComponent.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
+                player.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null){
                 player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
             } else {

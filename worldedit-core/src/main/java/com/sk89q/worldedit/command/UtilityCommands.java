@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
@@ -188,7 +189,7 @@ public class UtilityCommands {
     @SkipQueue
     public void cancel(Player player) {
         int cancelled = player.cancel(false);
-        player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.count" , cancelled));
+        player.print(Caption.of("fawe.cancel.worldedit.cancel.count" , cancelled));
     }
 
     @Command(

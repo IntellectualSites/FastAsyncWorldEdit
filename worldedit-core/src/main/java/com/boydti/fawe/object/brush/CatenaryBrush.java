@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
@@ -35,14 +36,14 @@ public class CatenaryBrush implements Brush, ResettableTool {
         if (pos1 == null || pos2.equals(pos1)) {
             if (!visual) {
                 pos1 = pos2;
-                editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.primary", pos2));
+                editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));
             }
             return;
         }
         if (this.vertex == null) {
             vertex = getVertex(pos1.toVector3(), pos2.toVector3(), slack);
             if (this.direction) {
-                editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.catenary.direction", 2));
+                editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.catenary.direction", 2));
                 return;
             }
         } else if (this.direction) {

@@ -4,12 +4,19 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
+import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Caption {
     public static String toString(Component component) {
@@ -74,4 +81,15 @@ public class Caption {
         return parent;
     }
 
+    public static TranslatableComponent of(@Nonnull final String key, @Nullable final TextColor color, @Nonnull final List<? extends Component> args) {
+        return TranslatableComponent.of(key, color, Collections.emptySet(), args);
+    }
+
+    @Nonnull
+    public static TranslatableComponent of(@Nonnull final String key, final Object... args) {
+        List<Component> components = Arrays.stream(args)
+                .map(arg -> arg instanceof Component ? (Component) arg : TextComponent.of(Objects.toString(arg)))
+                .collect(Collectors.toList());
+        return TranslatableComponent.of(key, components);
+    }
 }

@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
@@ -25,7 +26,7 @@ public class LineBrush implements Brush, ResettableTool {
         if (pos1 == null) {
             if (!visual) {
                 pos1 = position;
-                editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.primary", position));
+                editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
             }
             return;
         }

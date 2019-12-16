@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.brush.scroll;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -46,7 +46,7 @@ public abstract class Scroll implements ScrollTool {
                 return null;
             case CLIPBOARD:
                 if (arguments.size() != 2) {
-                    if (message) player.print(TranslatableComponent.of("fawe.error.command.syntax" , "clipboard [file]"));
+                    if (message) player.print(Caption.of("fawe.error.command.syntax" , "clipboard [file]"));
                     return null;
                 }
                 String filename = arguments.get(1);
@@ -61,7 +61,7 @@ public abstract class Scroll implements ScrollTool {
                 }
             case MASK:
                 if (arguments.size() < 2) {
-                    if (message) player.print(TranslatableComponent.of("fawe.error.command.syntax" , "mask [mask 1] [mask 2] [mask 3]..."));
+                    if (message) player.print(Caption.of("fawe.error.command.syntax" , "mask [mask 1] [mask 2] [mask 3]..."));
                     return null;
                 }
                 Mask[] masks = new Mask[arguments.size() - 1];
@@ -72,7 +72,7 @@ public abstract class Scroll implements ScrollTool {
                 return (new ScrollMask(tool, masks));
             case PATTERN:
                 if (arguments.size() < 2) {
-                    if (message) player.print(TranslatableComponent.of("fawe.error.command.syntax" , "pattern [pattern 1] [pattern 2] [pattern 3]..."));
+                    if (message) player.print(Caption.of("fawe.error.command.syntax" , "pattern [pattern 1] [pattern 2] [pattern 3]..."));
                     return null;
                 }
                 Pattern[] patterns = new Pattern[arguments.size() - 1];

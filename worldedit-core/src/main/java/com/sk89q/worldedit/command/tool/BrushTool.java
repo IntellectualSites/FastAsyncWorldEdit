@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import static com.boydti.fawe.object.brush.BrushSettings.SettingType.BRUSH;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,6 +26,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.processors.NullProcessor;
 import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.MovableTool;
@@ -79,8 +79,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
@@ -493,7 +491,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (brush == null) return false;
 
         if (current.setWorld(player.getWorld().getName()) && !current.canUse(player)) {
-            player.print(TranslatableComponent.of("fawe.error.no.perm" , StringMan.join(current.getPermissions(), ",")));
+            player.print(Caption.of("fawe.error.no.perm" , StringMan.join(current.getPermissions(), ",")));
             return false;
         }
         try (EditSession editSession = session.createEditSession(player, current.toString())) {

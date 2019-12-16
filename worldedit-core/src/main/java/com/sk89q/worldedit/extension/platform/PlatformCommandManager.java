@@ -24,6 +24,7 @@ import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.command.HistorySubCommands;
 import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
@@ -34,7 +35,6 @@ import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -106,7 +106,6 @@ import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
-import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
@@ -133,7 +132,6 @@ import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.session.request.Request;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -168,14 +166,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.FileHandler;
@@ -704,7 +699,7 @@ public final class PlatformCommandManager {
             }
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
-                actor.printError(TranslatableComponent.of("fawe.error.no.perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
+                actor.printError(Caption.of("fawe.error.no.perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
             } else {
                 actor.print(e.getRichMessage());
             }

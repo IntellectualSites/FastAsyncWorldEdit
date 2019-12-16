@@ -2,6 +2,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
@@ -9,9 +10,7 @@ import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.MathMan;
 import com.google.common.base.Function;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
@@ -21,15 +20,10 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Time;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
@@ -54,13 +48,10 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 
@@ -109,7 +100,7 @@ public class HistorySubCommands {
                                       @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0") @Time long timeDiff,
                                       @Switch(name = 'f', desc = "Restore instead of rollback") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(TranslatableComponent.of("fawe.error.setting.disable" , "history.use-database (Import with /history import )"));
+            player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with /history import )"));
             return;
         }
         checkCommandArgument(radius > 0, "Radius must be >= 0");
@@ -140,9 +131,9 @@ public class HistorySubCommands {
             RollbackOptimizedHistory edit = supplier.get();
             edit.undo(player, allowedRegions);
             String path = edit.getWorld().getName() + "/" + finalOther + "-" + edit.getIndex();
-            player.print(TranslatableComponent.of("fawe.worldedit.rollback.rollback.element", path));
+            player.print(Caption.of("fawe.worldedit.rollback.rollback.element", path));
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+        player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
     }
 
     @Command(
@@ -292,7 +283,7 @@ public class HistorySubCommands {
                                   @Time long timeDiff,
                                   @ArgFlag(name = 'p', desc = "Page to view.", def = "1") int page) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(TranslatableComponent.of("fawe.error.setting.disable" , "history.use-database (Import with //history import )"));
+            player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with //history import )"));
             return;
         }
         checkCommandArgument(radius > 0, "Radius must be >= 0");
@@ -355,10 +346,10 @@ public class HistorySubCommands {
 
                 int size = edit.size();
 
-                TranslatableComponent elem = TranslatableComponent.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
+                TranslatableComponent elem = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
 
                 String infoCmd = "//history summary " + uuid + " " + index;
-                TranslatableComponent hover = TranslatableComponent.of("fawe.worldedit.history.find.hover", size);
+                TranslatableComponent hover = Caption.of("fawe.worldedit.history.find.hover", size);
                 elem = elem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
                 elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
 

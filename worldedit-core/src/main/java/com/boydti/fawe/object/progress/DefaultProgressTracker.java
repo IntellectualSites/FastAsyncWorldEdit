@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.progress;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -114,7 +115,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
         String speedStr = StringMan.padRight("" + speed, 3);
         String percent = StringMan.padRight("" + (amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
         int remaining = speed != 0 ? amountQueue / speed : -1;
-        sendTile(TextComponent.empty(), TranslatableComponent.of("fawe.progress.progress.message", queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
+        sendTile(TextComponent.empty(), Caption.of("fawe.progress.progress.message", queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
     }
 
     public void sendTile(Component title, Component sub) {
