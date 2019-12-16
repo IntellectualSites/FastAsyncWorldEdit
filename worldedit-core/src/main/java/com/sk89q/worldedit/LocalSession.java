@@ -77,8 +77,10 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.snapshot.Snapshot;
+import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -140,7 +142,8 @@ public class LocalSession implements TextureHolder {
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
     private transient com.sk89q.worldedit.world.snapshot.Snapshot snapshot;
-    private transient com.sk89q.worldedit.world.snapshot.experimental.Snapshot snapshotExperimental;    private transient boolean hasCUISupport = false;
+    private transient Snapshot snapshotExperimental;
+    private transient boolean hasCUISupport = false;
     private transient int cuiVersion = -1;
     private transient boolean fastMode = false;
     private transient Mask mask;
@@ -977,8 +980,7 @@ public class LocalSession implements TextureHolder {
      *
      * @return the snapshot
      */
-    public @Nullable
-    com.sk89q.worldedit.world.snapshot.experimental.Snapshot getSnapshotExperimental() {
+    public @Nullable Snapshot getSnapshotExperimental() {
         return snapshotExperimental;
     }
 
@@ -987,7 +989,7 @@ public class LocalSession implements TextureHolder {
      *
      * @param snapshotExperimental a snapshot
      */
-    public void setSnapshotExperimental(@Nullable com.sk89q.worldedit.world.snapshot.experimental.Snapshot snapshotExperimental) {
+    public void setSnapshotExperimental(@Nullable Snapshot snapshotExperimental) {
         this.snapshotExperimental = snapshotExperimental;
     }
 

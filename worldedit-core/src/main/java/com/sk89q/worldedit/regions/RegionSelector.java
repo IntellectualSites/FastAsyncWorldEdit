@@ -76,8 +76,13 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her primary selection.
      *
+<<<<<<< HEAD
      * @param actor    the actor
      * @param session  the session
+=======
+     * @param actor the actor
+     * @param session the session
+>>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
      * @param position position
      */
     void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position);

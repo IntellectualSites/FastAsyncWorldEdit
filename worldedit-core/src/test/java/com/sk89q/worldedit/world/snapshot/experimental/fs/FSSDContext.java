@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.world.snapshot.experimental.fs;
 
-import com.sk89q.worldedit.util.io.Closer;
-import com.sk89q.worldedit.util.io.file.ArchiveDir;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupport;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 
@@ -30,7 +28,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
@@ -70,34 +67,19 @@ class FSSDContext {
         String worldName = Paths.get(name).getFileName().toString();
         // Without an extension
         worldName = worldName.split("\\.")[0];
-        List<Snapshot> snapshots;
-        try (Stream<Snapshot> snapshotStream = db.getSnapshots(worldName)) {
-            snapshots = snapshotStream.collect(toList());
-        }
-        try {
-            assertTrue(snapshots.size() <= 1,
-                "Too many snapshots matched for " + worldName);
-            return requireSnapshot(name, snapshots.stream().findAny().orElse(null));
-        } catch (Throwable t) {
-            Closer closer = Closer.create();
-            snapshots.forEach(closer::register);
-            throw closer.rethrowAndClose(t);
-        }
+        List<Snapshot> snapshots = db.getSnapshots(worldName).collect(toList());
+        assertTrue(1 >= snapshots.size(),
+            "Too many snapshots matched for " + worldName);
+        return requireSnapshot(name, snapshots.stream().findAny().orElse(null));
     }
 
-    Snapshot requireSnapshot(String name, @Nullable Snapshot snapshot) throws IOException {
+    Snapshot requireSnapshot(String name, @Nullable Snapshot snapshot) {
         assertNotNull(snapshot, "No snapshot for " + name);
-        try {
-            assertEquals(name, snapshot.getInfo().getDisplayName());
-        } catch (Throwable t) {
-            Closer closer = Closer.create();
-            closer.register(snapshot);
-            throw closer.rethrowAndClose(t);
-        }
+        assertEquals(name, snapshot.getInfo().getDisplayName());
         return snapshot;
     }
 
-    ArchiveDir getRootOfArchive(Path archive) throws IOException {
+    Path getRootOfArchive(Path archive) throws IOException {
         return archiveNioSupport.tryOpenAsDir(archive)
             .orElseThrow(() -> new AssertionError("No archive opener for " + archive));
     }

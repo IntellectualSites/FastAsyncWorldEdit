@@ -21,33 +21,20 @@ package com.sk89q.worldedit.util.io.file;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public final class ZipArchiveNioSupport implements ArchiveNioSupport {
+/**
+ * Something that can provide access to an archive file as a file system.
+ */
+public interface ArchiveNioSupport {
 
-    private static final ZipArchiveNioSupport INSTANCE = new ZipArchiveNioSupport();
-
-    public static ZipArchiveNioSupport getInstance() {
-        return INSTANCE;
-    }
-
-    private ZipArchiveNioSupport() {
-    }
-
-    @Override
-    public Optional<Path> tryOpenAsDir(Path archive) throws IOException {
-        if (!archive.getFileName().toString().endsWith(".zip")) {
-            return Optional.empty();
-        }
-        FileSystem zipFs = FileSystems.newFileSystem(
-            archive, getClass().getClassLoader()
-        );
-        return Optional.of(ArchiveNioSupports.skipRootSameName(
-            zipFs.getPath("/"), archive.getFileName().toString()
-                .replaceFirst("\\.zip$", "")
-        ));
-    }
+    /**
+     * Try to open the given archive as a file system.
+     *
+     * @param archive the archive to open
+     * @return the path for the root of the archive, if available
+     */
+    Optional<Path> tryOpenAsDir(Path archive) throws IOException;
 
 }

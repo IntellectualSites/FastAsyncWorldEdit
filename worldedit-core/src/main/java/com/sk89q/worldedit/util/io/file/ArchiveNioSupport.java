@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.util.io.file;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -35,6 +34,6 @@ public interface ArchiveNioSupport {
      * @param archive the archive to open
      * @return the path for the root of the archive, if available
      */
-    Optional<ArchiveDir> tryOpenAsDir(Path archive) throws IOException;
+    Optional<Path> tryOpenAsDir(Path archive) throws IOException;
 
 }

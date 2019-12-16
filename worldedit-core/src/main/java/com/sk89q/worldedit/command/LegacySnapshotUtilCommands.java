@@ -48,7 +48,7 @@ class LegacySnapshotUtilCommands {
     }
 
     void restore(Actor actor, World world, LocalSession session, EditSession editSession,
-        String snapshotName) throws WorldEditException {
+                 String snapshotName) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
         Region region = session.getSelection(world);

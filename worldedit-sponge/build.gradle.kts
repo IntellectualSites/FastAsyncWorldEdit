@@ -25,7 +25,16 @@ sponge {
     }
 }
 
+<<<<<<< HEAD
 addJarManifest(includeClasspath = true)
+=======
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes("Class-Path" to CLASSPATH,
+                "WorldEdit-Version" to project.version)
+    }
+}
+>>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {

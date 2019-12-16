@@ -21,31 +21,34 @@ package com.sk89q.worldedit.world.snapshot.experimental.fs;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.UrlEscapers;
-import com.sk89q.worldedit.util.function.IOFunction;
 import com.sk89q.worldedit.util.function.IORunnable;
 import com.sk89q.worldedit.util.io.Closer;
-import com.sk89q.worldedit.util.io.file.ArchiveDir;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupport;
 import com.sk89q.worldedit.util.io.file.MorePaths;
-import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.util.time.FileNameDateTimeParser;
 import com.sk89q.worldedit.util.time.ModificationDateTimeParser;
 import com.sk89q.worldedit.util.time.SnapshotDateTimeParser;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotDatabase;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -54,6 +57,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Implements a snapshot database based on a filesystem.
  */
 public class FileSystemSnapshotDatabase implements SnapshotDatabase {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileSystemSnapshotDatabase.class);
 
     private static final String SCHEME = "snapfs";
 
@@ -97,24 +102,15 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
         this.archiveNioSupport = archiveNioSupport;
     }
 
-    /*
-     * When this code says "idPath" it is the path that uniquely identifies that snapshot.
-     * A snapshot can be looked up by its idPath.
-     *
-     * When the code says "ioPath" it is the path that holds the world data, and can actually
-     * be read from proper. The "idPath" may not even exist, it is purely for the path components
-     * and not for IO.
-     */
-
-    private SnapshotInfo createSnapshotInfo(Path idPath, Path ioPath) {
-        // Try ID for parsing out of file name, IO for parsing mod time.
-        ZonedDateTime date = tryParseDateInternal(idPath).orElseGet(() -> tryParseDate(ioPath));
-        return SnapshotInfo.create(createUri(idPath.toString()), date);
+    private SnapshotInfo createSnapshotInfo(Path fullPath, Path realPath) {
+        // Try full for parsing out of file name, real for parsing mod time.
+        ZonedDateTime date = tryParseDateInternal(fullPath).orElseGet(() -> tryParseDate(realPath));
+        return SnapshotInfo.create(createUri(fullPath.toString()), date);
     }
 
-    private Snapshot createSnapshot(Path idPath, Path ioPath, @Nullable Closer closeCallback) {
+    private Snapshot createSnapshot(Path fullPath, Path realPath, @Nullable IORunnable closeCallback) {
         return new FolderSnapshot(
-            createSnapshotInfo(idPath, ioPath), ioPath, closeCallback
+            createSnapshotInfo(fullPath, realPath), realPath, closeCallback
         );
     }
 
@@ -132,31 +128,27 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
         if (!name.getScheme().equals(SCHEME)) {
             return Optional.empty();
         }
-        return getSnapshot(name.getSchemeSpecificPart());
-    }
-
-    private Optional<Snapshot> getSnapshot(String id) throws IOException {
-        Path rawResolved = root.resolve(id);
+        // drop the / in the path to make it absolute
+        Path rawResolved = root.resolve(name.getSchemeSpecificPart());
         // Catch trickery with paths:
-        Path ioPath = rawResolved.normalize();
-        if (!ioPath.startsWith(root)) {
+        Path realPath = rawResolved.normalize();
+        if (!realPath.startsWith(root)) {
             return Optional.empty();
         }
-        Path idPath = root.relativize(ioPath);
-        Optional<Snapshot> result = tryRegularFileSnapshot(idPath);
+        Optional<Snapshot> result = tryRegularFileSnapshot(root.relativize(realPath), realPath);
         if (result.isPresent()) {
             return result;
         }
-        if (!Files.isDirectory(ioPath)) {
+        if (!Files.isDirectory(realPath)) {
             return Optional.empty();
         }
-        return Optional.of(createSnapshot(idPath, ioPath, null));
+        return Optional.of(createSnapshot(root.relativize(realPath), realPath, null));
     }
 
-    private Optional<Snapshot> tryRegularFileSnapshot(Path idPath) throws IOException {
+    private Optional<Snapshot> tryRegularFileSnapshot(Path fullPath, Path realPath) throws IOException {
         Closer closer = Closer.create();
         Path root = this.root;
-        Path relative = idPath;
+        Path relative = root.relativize(realPath);
         Iterator<Path> iterator = null;
         try {
             while (true) {
@@ -164,7 +156,6 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
                     iterator = MorePaths.iterPaths(relative).iterator();
                 }
                 if (!iterator.hasNext()) {
-                    closer.close();
                     return Optional.empty();
                 }
                 Path relativeNext = iterator.next();
@@ -173,17 +164,18 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
                     // This will never be it.
                     continue;
                 }
-                Optional<ArchiveDir> newRootOpt = archiveNioSupport.tryOpenAsDir(next);
+                Optional<Path> newRootOpt = archiveNioSupport.tryOpenAsDir(next);
                 if (newRootOpt.isPresent()) {
-                    ArchiveDir archiveDir = newRootOpt.get();
-                    root = archiveDir.getPath();
-                    closer.register(archiveDir);
+                    root = newRootOpt.get();
+                    if (root.getFileSystem() != FileSystems.getDefault()) {
+                        closer.register(root.getFileSystem());
+                    }
                     // Switch path to path inside the archive
                     relative = root.resolve(relativeNext.relativize(relative).toString());
                     iterator = null;
                     // Check if it exists, if so open snapshot
                     if (Files.exists(relative)) {
-                        return Optional.of(createSnapshot(idPath, relative, closer));
+                        return Optional.of(createSnapshot(fullPath, relative, closer::close));
                     }
                     // Otherwise, we may have more archives to open.
                     // Keep searching!
@@ -199,97 +191,119 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
         /*
          There are a few possible snapshot formats we accept:
            - a world directory, identified by <worldName>/level.dat
+<<<<<<< HEAD
            - a directory with the world name, but no level.dat
              - inside must be a timestamped directory/archive, which then has one of the two world
                formats inside of it!
+=======
+>>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
            - a world archive, identified by <worldName>.ext
              * does not need to have level.dat inside
            - a timestamped directory, identified by <stamp>, that can have
              - the two world formats described above, inside the directory
            - a timestamped archive, identified by <stamp>.ext, that can have
              - the same as timestamped directory, but inside the archive.
+<<<<<<< HEAD
+=======
+           - a directory with the world name, but no level.dat
+             - inside must be timestamped directory/archive, with the world inside that
+>>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
 
            All archives may have a root directory with the same name as the archive,
            minus the extensions. Due to extension detection methods, this won't work properly
            with some files, e.g. world.qux.zip/world.qux is invalid, but world.qux.zip/world isn't.
          */
-        return SafeFiles.noLeakFileList(root)
-            .flatMap(IOFunction.unchecked(entry -> {
-                String worldEntry = getWorldEntry(worldName, entry);
-                if (worldEntry != null) {
-                    return Stream.of(worldEntry);
+        return Stream.of(
+            listWorldEntries(Paths.get(""), root, worldName),
+            listTimestampedEntries(Paths.get(""), root, worldName)
+        ).flatMap(Function.identity());
+    }
+
+    private Stream<Snapshot> listWorldEntries(Path fullPath, Path root, String worldName) throws IOException {
+        logger.debug("World check in: {}", root);
+        return Files.list(root)
+            .flatMap(candidate -> {
+                logger.debug("World trying: {}", candidate);
+                // Try world directory
+                String fileName = candidate.getFileName().toString();
+                if (isSameDirectoryName(fileName, worldName)) {
+                    // Direct
+                    if (Files.exists(candidate.resolve("level.dat"))) {
+                        logger.debug("Direct!");
+                        return Stream.of(createSnapshot(
+                            fullPath.resolve(fileName), candidate, null
+                        ));
+                    }
+                    // Container for time-stamped entries
+                    try {
+                        return listTimestampedEntries(
+                            fullPath.resolve(fileName), candidate, worldName
+                        );
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
                 }
-                String fileName = SafeFiles.canonicalFileName(entry);
-                if (fileName.equals(worldName)
-                    && Files.isDirectory(entry)
-                    && !Files.exists(entry.resolve("level.dat"))) {
-                    // world dir with timestamp entries
-                    return listTimestampedEntries(worldName, entry)
-                        .map(id -> worldName + "/" + id);
+                // Try world archive
+                if (Files.isRegularFile(candidate)
+                    && fileName.startsWith(worldName + ".")) {
+                    logger.debug("Archive!");
+                    try {
+                        return tryRegularFileSnapshot(
+                            fullPath.resolve(fileName), candidate
+                        ).map(Stream::of).orElse(null);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
                 }
-                return getTimestampedEntries(worldName, entry);
-            }))
-            .map(IOFunction.unchecked(id ->
-                getSnapshot(id)
-                    .orElseThrow(() ->
-                        new AssertionError("Could not find discovered snapshot: " + id)
-                    )
-            ));
+                logger.debug("Nothing!");
+                return null;
+            });
     }
 
-    private Stream<String> listTimestampedEntries(String worldName, Path directory) throws IOException {
-        return SafeFiles.noLeakFileList(directory)
-            .flatMap(IOFunction.unchecked(entry -> getTimestampedEntries(worldName, entry)));
+    private boolean isSameDirectoryName(String fileName, String worldName) {
+        if (fileName.lastIndexOf('/') == fileName.length() - 1) {
+            fileName = fileName.substring(0, fileName.length() - 1);
+        }
+        return fileName.equalsIgnoreCase(worldName);
     }
 
-    private Stream<String> getTimestampedEntries(String worldName, Path entry) throws IOException {
-        ZonedDateTime dateTime = FileNameDateTimeParser.getInstance().detectDateTime(entry);
-        if (dateTime == null) {
-            // nothing available at this path
-            return Stream.of();
-        }
-        String fileName = SafeFiles.canonicalFileName(entry);
-        if (Files.isDirectory(entry)) {
-            // timestamped directory, find worlds inside
-            return listWorldEntries(worldName, entry)
-                .map(id -> fileName + "/" + id);
-        }
-        if (!Files.isRegularFile(entry)) {
-            // not an archive either?
-            return Stream.of();
-        }
-        Optional<ArchiveDir> asArchive = archiveNioSupport.tryOpenAsDir(entry);
-        if (asArchive.isPresent()) {
-            // timestamped archive
-            ArchiveDir dir = asArchive.get();
-            return listWorldEntries(worldName, dir.getPath())
-                .map(id -> fileName + "/" + id)
-                .onClose(IORunnable.unchecked(dir::close));
-        }
-        return Stream.of();
-    }
-
-    private Stream<String> listWorldEntries(String worldName, Path directory) throws IOException {
-        return SafeFiles.noLeakFileList(directory)
-            .map(IOFunction.unchecked(entry -> getWorldEntry(worldName, entry)))
-            .filter(Objects::nonNull);
-    }
-
-    private String getWorldEntry(String worldName, Path entry) throws IOException {
-        String fileName = SafeFiles.canonicalFileName(entry);
-        if (fileName.equals(worldName) && Files.exists(entry.resolve("level.dat"))) {
-            // world directory
-            return worldName;
-        }
-        if (fileName.startsWith(worldName + ".") && Files.isRegularFile(entry)) {
-            Optional<ArchiveDir> asArchive = archiveNioSupport.tryOpenAsDir(entry);
-            if (asArchive.isPresent()) {
-                // world archive
-                asArchive.get().close();
-                return fileName;
-            }
-        }
-        return null;
+    private Stream<Snapshot> listTimestampedEntries(Path fullPath, Path root, String worldName) throws IOException {
+        logger.debug("Timestamp check in: {}", root);
+        return Files.list(root)
+            .filter(candidate -> {
+                ZonedDateTime date = FileNameDateTimeParser.getInstance().detectDateTime(candidate);
+                return date != null;
+            })
+            .flatMap(candidate -> {
+                logger.debug("Timestamp trying: {}", candidate);
+                // Try timestamped directory
+                if (Files.isDirectory(candidate)) {
+                    logger.debug("Timestamped directory");
+                    try {
+                        return listWorldEntries(
+                            fullPath.resolve(candidate.getFileName().toString()), candidate, worldName
+                        );
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }
+                // Otherwise archive, get it as a directory & unpack it
+                try {
+                    Optional<Path> newRoot = archiveNioSupport.tryOpenAsDir(candidate);
+                    if (!newRoot.isPresent()) {
+                        logger.debug("Nothing!");
+                        return null;
+                    }
+                    logger.debug("Timestamped archive!");
+                    return listWorldEntries(
+                        fullPath.resolve(candidate.getFileName().toString()),
+                        newRoot.get(),
+                        worldName
+                    );
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
     }
 
 }
