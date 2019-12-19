@@ -312,7 +312,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
     public void setExtent(AbstractDelegateExtent extent) {
-        new ExtentTraverser<>(getExtent()).setNext(extent);
+        new ExtentTraverser(this).setNext(extent);
     }
 
     /**
@@ -483,7 +483,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(transform);
         wrapped = true;
         transform.setExtent(getExtent());
-        new ExtentTraverser<>(getExtent()).setNext(transform);
+        new ExtentTraverser(this).setNext(transform);
     }
 
     public @Nullable ResettableExtent getTransform() {
@@ -514,7 +514,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             maskingExtent.get().setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
             SourceMaskExtent next = new SourceMaskExtent(getExtent(), mask);
-            new ExtentTraverser<>(getExtent()).setNext(next);
+            new ExtentTraverser(this).setNext(next);
         }
     }
 
@@ -553,8 +553,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             maskingExtent.get().setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
-            MaskingExtent next = new MaskingExtent(getExtent(), mask);
-            new ExtentTraverser<>(getExtent()).setNext(next);
+            addProcessor(new MaskingExtent(getExtent(), mask));
         }
     }
 

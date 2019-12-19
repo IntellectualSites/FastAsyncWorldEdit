@@ -55,6 +55,11 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
 //    }
 
     @Override
+    default CompoundTag getTile(int x, int y, int z) {
+        return getParent().getTile(x, y, z);
+    }
+
+    @Override
     default boolean setTile(int x, int y, int z, CompoundTag tag) {
         return getParent().setTile(x, y, z, tag);
     }

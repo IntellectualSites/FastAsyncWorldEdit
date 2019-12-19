@@ -56,6 +56,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public CompoundTag getTile(int x, int y, int z) {
+        return tiles == null ? null : tiles.get(x, y, z);
+    }
+
+    @Override
     public Set<CompoundTag> getEntities() {
         return entities == null ? Collections.emptySet() : entities;
     }

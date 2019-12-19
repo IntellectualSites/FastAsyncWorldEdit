@@ -824,7 +824,7 @@ public final class MemBlockSet extends BlockSet {
     }
 
     public static final class RowZ implements IRow {
-        private final IRow[] rows;
+        public final IRow[] rows;
 
         public RowZ() {
             this.rows = new IRow[FaweCache.IMP.CHUNK_LAYERS];

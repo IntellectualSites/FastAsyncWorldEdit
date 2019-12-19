@@ -4,6 +4,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
@@ -48,6 +52,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum FaweCache implements Trimable {
@@ -192,6 +197,24 @@ public enum FaweCache implements Trimable {
             throw new IllegalStateException("Previous key");
         }
         return pool;
+    }
+
+    public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
+        return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
+            @Override
+            public V load(T key) {
+                return withInitial.get();
+            }
+        });
+    }
+
+    public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
+        return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
+            @Override
+            public V load(T key) {
+                return withInitial.apply(key);
+            }
+        });
     }
 
     /*

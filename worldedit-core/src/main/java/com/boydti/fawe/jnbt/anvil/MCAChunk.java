@@ -501,12 +501,8 @@ public class MCAChunk implements IChunk {
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return null;
-    }
-
-    @Override
-    public CompoundTag getTag(int x, int y, int z) {
-        return null;
+        BlockState block = getBlock(x, y, z);
+        return block.toBaseBlock(this, x, y, z);
     }
 
     @Override
@@ -570,18 +566,7 @@ public class MCAChunk implements IChunk {
     @Override
     public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         try {
-            if (region != null) {
-                region.filter(this, filter, block, this, this, full);
-            } else {
-                block = block.init(chunkX, chunkZ, this);
-                for (int layer = 0; layer < 16; layer++) {
-                    if ((!full && !this.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
-                        continue;
-                    }
-                    block.init(this, this, layer);
-                    block.filter(filter);
-                }
-            }
+            block.filter(this, this, this, filter, region, full);
         } finally {
             filter.finishChunk(this);
         }

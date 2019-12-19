@@ -123,6 +123,11 @@ public enum NullChunk implements IQueueChunk {
     }
 
     @Override
+    public CompoundTag getTile(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
     public Set<CompoundTag> getEntities() {
         return Collections.emptySet();
     }

@@ -27,9 +27,6 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     BlockState getBlock(int x, int y, int z);
 
     @Override
-    CompoundTag getTag(int x, int y, int z);
-
-    @Override
     Map<BlockVector3, CompoundTag> getTiles();
 
     @Override

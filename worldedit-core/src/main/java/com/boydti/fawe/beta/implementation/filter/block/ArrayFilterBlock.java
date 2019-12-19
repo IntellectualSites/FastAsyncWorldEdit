@@ -8,12 +8,11 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 
-public class ArrayFilterBlock extends SimpleFilterBlock {
+public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     private final char[] blocks;
     private final byte[] heights;
@@ -22,6 +21,7 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     private int x, z, index;
     private char ordinal;
 
+    // TODO use in CFI
     public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length,
         int yOffset) {
         super(extent);

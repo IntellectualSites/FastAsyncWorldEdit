@@ -1,8 +1,6 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.CombinedBlocks;
-import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
@@ -63,6 +61,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
         return delegate.set(this).setTile(x, y, z, tag);
+    }
+
+    @Override
+    public CompoundTag getTile(int x, int y, int z) {
+        return delegate.set(this).getTile(x, y, z);
     }
 
     @Override
@@ -316,18 +319,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {
-            block = block.init(chunkX, chunkZ, get);
-            if (region != null) {
-                region.filter(this, filter, block, get, set, full);
-            } else {
-                for (int layer = 0; layer < 16; layer++) {
-                    if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(this, layer)) {
-                        continue;
-                    }
-                    block.init(get, set, layer);
-                    block.filter(filter);
-                }
-            }
+            block.filter(this, get, set, filter, region, full);
         } finally {
             filter.finishChunk(this);
         }

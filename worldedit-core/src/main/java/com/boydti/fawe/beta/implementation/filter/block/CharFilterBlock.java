@@ -6,9 +6,9 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
 import com.boydti.fawe.beta.Flood;
+import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,6 +38,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
             block.initSet().set(block, value);
         }
     };
+
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
@@ -47,13 +48,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
     // local
     private int layer, index, x, y, z, xx, yy, zz, chunkX, chunkZ;
 
-    public CharFilterBlock(IQueueExtent queueExtent) {
-        super(queueExtent);
+    public CharFilterBlock(Extent extent) {
+        super(extent);
     }
 
     @Override
-    public final ChunkFilterBlock init(int chunkX, int chunkZ, IChunkGet chunk) {
-        this.get = (CharGetBlocks) chunk;
+    public final ChunkFilterBlock initChunk(int chunkX, int chunkZ) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.xx = chunkX << 4;
@@ -62,11 +62,33 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
+    public final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
+        this.get = (CharGetBlocks) iget;
+        this.layer = layer;
+        final IBlocks get = (CharGetBlocks) iget;
+        if (!get.hasSection(layer)) {
+            getArr = FaweCache.IMP.EMPTY_CHAR_4096;
+        } else {
+            getArr = get.load(layer);
+        }
+        this.set = iset;
+        if (set.hasSection(layer)) {
+            setArr = set.load(layer);
+            delegate = FULL;
+        } else {
+            delegate = NULL;
+            setArr = null;
+        }
+        this.yy = layer << 4;
+        return this;
+    }
+
+    @Override
     public void flood(IChunkGet iget, IChunkSet iset, int layer, Flood flood,
         FilterBlockMask mask) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
-        if (init(iget, iset, layer) != null) { // TODO replace with hasSection
+        if (initLayer(iget, iset, layer) != null) { // TODO replace with hasSection
             while ((index = flood.poll()) != -1) {
                 x = index & 15;
                 z = index >> 4 & 15;
@@ -83,27 +105,6 @@ public class CharFilterBlock extends ChunkFilterBlock {
                 }
             }
         }
-    }
-
-    @Override
-    public final ChunkFilterBlock init(IChunkGet iget, IChunkSet iset, int layer) {
-        this.layer = layer;
-        final CharGetBlocks get = (CharGetBlocks) iget;
-        if (!get.hasSection(layer)) {
-            getArr = FaweCache.IMP.EMPTY_CHAR_4096;
-        } else {
-            getArr = get.sections[layer].get(get, layer);
-        }
-        this.set = iset;
-        if (set.hasSection(layer)) {
-            setArr = set.load(layer);
-            delegate = FULL;
-        } else {
-            delegate = NULL;
-            setArr = null;
-        }
-        this.yy = layer << 4;
-        return this;
     }
 
     @Override
@@ -247,7 +248,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final BlockState state = getBlock();
         final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
-            final CompoundTag tag = get.getTag(x, y + yy, z);
+            final CompoundTag tag = get.getTile(x, y + yy, z);
             return state.toBaseBlock(tag);
         }
         return state.toBaseBlock();
@@ -264,7 +265,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public final CompoundTag getNbtData() {
-        return get.getTag(x, y + yy, z);
+        return get.getTile(x, y + yy, z);
     }
     /*
     NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),

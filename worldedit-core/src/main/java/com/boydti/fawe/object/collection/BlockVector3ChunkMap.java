@@ -47,6 +47,12 @@ public class BlockVector3ChunkMap<T> implements Map<BlockVector3, T>, IAdaptedMa
         return map.put(key, value);
     }
 
+
+    public T get(int x, int y, int z) {
+        short key = MathMan.tripleBlockCoord(x, y, z);
+        return map.get(key);
+    }
+
     public T remove(int x, int y, int z) {
         short key = MathMan.tripleBlockCoord(x, y, z);
         return map.remove(key);
