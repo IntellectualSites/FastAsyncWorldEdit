@@ -264,7 +264,7 @@
 	"fawe.cancel.worldedit.cancel.reason.low.memory": "Low memory",
 	"fawe.cancel.worldedit.cancel.reason.max.changes": "Too many blocks changed",
 	"fawe.cancel.worldedit.cancel.reason.max.checks": "Too many block checks",
-	"fawe.cancel.worldedit.cancel.reason.max.tiles": "Too many blockstates",
+	"fawe.cancel.worldedit.cancel.reason.max.tiles": "Too many entities",
 	"fawe.cancel.worldedit.cancel.reason.max.entities": "Too many entities",
 	"fawe.cancel.worldedit.cancel.reason.max.iterations": "Max iterations",
 	"fawe.cancel.worldedit.cancel.reason.outside.level": "Outside world",
