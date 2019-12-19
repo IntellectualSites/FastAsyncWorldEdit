@@ -142,9 +142,11 @@ public final class LegacyMapper {
                     stringToBlockMap.put(id, blockState);
                 }
             }
-            blockArr[combinedId] = blockState.getInternalId();
-            blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
-            blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
+            if (blockState != null) {
+                blockArr[combinedId] = blockState.getInternalId();
+                blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
+            }
         }
         for (int id = 0; id < 256; id++) {
             int combinedId = id << 4;
