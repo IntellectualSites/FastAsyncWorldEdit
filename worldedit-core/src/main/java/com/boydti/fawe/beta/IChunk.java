@@ -81,7 +81,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
     @Override
-    BiomeType getBiomeType(int x, int z);
+    BiomeType getBiomeType(int x, int y, int z);
 
     @Override
     BlockState getBlock(int x, int y, int z);

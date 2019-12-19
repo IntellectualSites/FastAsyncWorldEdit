@@ -105,11 +105,6 @@ public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExten
     }
 
     @Override
-    default BiomeType getBiome(int x, int z) {
-        return getParent().getBiome(x, z);
-    }
-
-    @Override
     default BlockVector3 getMinimumPoint() {
         return getParent().getMinimumPoint();
     }
@@ -358,8 +353,8 @@ public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExten
     }
 
     @Override
-    default BiomeType getBiomeType(int x, int z) {
-        return getParent().getBiomeType(x, z);
+    default BiomeType getBiomeType(int x, int y, int z) {
+        return getParent().getBiomeType(x, y, z);
     }
 
     @Override

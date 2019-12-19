@@ -203,7 +203,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
                 for (int x = 0; x < 16; x++, index++) {
                     BiomeType newBiome = biomes[index];
                     if (newBiome != null) {
-                        BiomeType oldBiome = get.getBiomeType(x, z);
+                        BiomeType oldBiome = get.getBiomeType(x, 0, z);
                         if (oldBiome != newBiome) {
                             addBiomeChange(bx + x, bz + z, oldBiome, newBiome);
                         }

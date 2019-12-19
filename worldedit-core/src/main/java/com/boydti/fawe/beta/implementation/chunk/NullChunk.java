@@ -93,7 +93,7 @@ public enum NullChunk implements IQueueChunk {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return null;
     }
 

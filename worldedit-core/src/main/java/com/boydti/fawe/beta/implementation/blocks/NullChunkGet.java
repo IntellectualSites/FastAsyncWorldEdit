@@ -27,7 +27,7 @@ public enum NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return BiomeTypes.FOREST;
     }
 

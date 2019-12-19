@@ -246,7 +246,7 @@ public class AsyncBlock implements Block {
 
     @NotNull @Override
     public Biome getBiome() {
-        return world.getAdapter().adapt(world.getBiomeType(x, z));
+        return world.getAdapter().adapt(world.getBiomeType(x, y, z));
     }
 
     @Override

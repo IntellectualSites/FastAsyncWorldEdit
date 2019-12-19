@@ -115,10 +115,10 @@ public class CombinedBlocks implements IBlocks {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        BiomeType biome = primary.getBiomeType(x, z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        BiomeType biome = primary.getBiomeType(x, y, z);
         if (biome == null) {
-            return secondary.getBiomeType(x, z);
+            return secondary.getBiomeType(x, y, z);
         }
         return biome;
     }

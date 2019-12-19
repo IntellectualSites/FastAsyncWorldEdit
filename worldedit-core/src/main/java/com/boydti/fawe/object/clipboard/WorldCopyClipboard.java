@@ -50,8 +50,8 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return getExtent().getBiomeType(x, z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return getExtent().getBiomeType(x, y, z);
     }
 
     @Override

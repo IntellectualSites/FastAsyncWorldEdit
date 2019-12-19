@@ -563,10 +563,10 @@ public class LimitExtent extends PassthroughExtent {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getBiomeType(x, z);
+            return getExtent().getBiomeType(x, y, z);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;

@@ -827,7 +827,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.adapt(getExtent().getBiome(BlockVector2.at(x, z)));
+        return adapter.adapt(getExtent().getBiomeType(x, 0, z));
     }
 
     @Override

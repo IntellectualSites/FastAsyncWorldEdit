@@ -32,8 +32,8 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return extent.getBiomeType(bx + x, bz + z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return extent.getBiomeType(bx + x, y, bz + z);
     }
 
     @Override

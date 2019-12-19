@@ -124,8 +124,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            return chunk.chunkExisting.getBiomeType(x, z);
+        public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
+            return chunk.chunkExisting.getBiomeType(x, y, z);
         }
 
         @Override
@@ -169,8 +169,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
-            return chunk.chunkExisting.getBiomeType(x, z);
+        public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
+            return chunk.chunkExisting.getBiomeType(x, y, z);
         }
 
         @Override
@@ -210,10 +210,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
+        public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
-            return chunk.getBiomeType(x, z);
+            return chunk.getBiomeType(x, y, z);
         }
 
         @Override
@@ -263,10 +263,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public BiomeType getBiome(ChunkHolder chunk, int x, int z) {
+        public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
-            return chunk.getBiomeType(x, z);
+            return chunk.getBiomeType(x, y, z);
         }
 
         @Override
@@ -467,8 +467,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return delegate.getBiome(this, x, z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return delegate.getBiome(this, x, y, z);
     }
 
     @Override
@@ -491,7 +491,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         boolean setBlock(ChunkHolder chunk, int x, int y, int z,
             BlockStateHolder holder);
 
-        BiomeType getBiome(ChunkHolder chunk, int x, int z);
+        BiomeType getBiome(ChunkHolder chunk, int x, int y, int z);
 
         BlockState getBlock(ChunkHolder chunk, int x, int y, int z);
 

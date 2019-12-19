@@ -168,8 +168,8 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return extent.getBiomeType(x, z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return extent.getBiomeType(x, y, z);
     }
 
     @Override

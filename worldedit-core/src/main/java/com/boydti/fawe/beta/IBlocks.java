@@ -33,7 +33,7 @@ public interface IBlocks extends Trimable {
 
     Set<CompoundTag> getEntities();
 
-    BiomeType getBiomeType(int x, int z);
+    BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
         int mask = 0;
@@ -126,7 +126,7 @@ public interface IBlocks extends Trimable {
             if (full) {
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
-                        BiomeType biome = getBiomeType(x, z);
+                        BiomeType biome = getBiomeType(x, 0, z);
                         if (biome != null) {
                             sectionWriter.writeInt(biome.getLegacyId());
                         } else {

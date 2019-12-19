@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("An ordered block map")
 class BlockMapTest {
-
+/*
     private static Platform mockedPlatform = mock(Platform.class);
 
     @BeforeAll
@@ -584,5 +584,5 @@ class BlockMapTest {
             assertEquals(air, entry.getValue());
         }
     }
-
+*/
 }

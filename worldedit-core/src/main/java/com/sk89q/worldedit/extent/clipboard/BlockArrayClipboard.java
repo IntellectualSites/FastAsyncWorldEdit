@@ -177,7 +177,7 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
     @Override
     public BiomeType getBiome(BlockVector2 position) {
         BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
-        return getParent().getBiomeType(v.getX(), v.getZ());
+        return getParent().getBiomeType(v.getX(), 0, v.getZ());
     }
 
     @Override
@@ -234,10 +234,10 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         x -= offset.getX();
         z -= offset.getZ();
-        return getParent().getBiomeType(x, z);
+        return getParent().getBiomeType(x, y, z);
     }
 
     @Override

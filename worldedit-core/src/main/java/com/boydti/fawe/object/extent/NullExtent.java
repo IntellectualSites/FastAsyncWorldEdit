@@ -68,7 +68,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
         }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         throw reason;
     }
 

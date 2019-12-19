@@ -13,8 +13,8 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     /**
      * Get the IChunk at a position (and cache it if it's not already)
      *
-     * @param x
-     * @param z
+     * @param chunkX
+     * @param chunkZ
      * @return IChunk
      */
     T getOrCreateChunk(int chunkX, int chunkZ);
@@ -49,8 +49,9 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         return chunk.getFullBlock(x & 15, y, z & 15);
     }
 
-    default BiomeType getBiome(int x, int z) {
+    @Override
+    default BiomeType getBiomeType(int x, int y, int z) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.getBiomeType(x & 15, z & 15);
+        return chunk.getBiomeType(x & 15, y, z & 15);
     }
 }

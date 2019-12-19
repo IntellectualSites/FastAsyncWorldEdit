@@ -416,11 +416,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         if (x >> 4 == chunkX && z >> 4 == chunkZ) {
-            return get.getBiomeType(x & 15, z & 15);
+            return get.getBiomeType(x & 15, y, z & 15);
         }
-        return getExtent().getBiomeType(x, z);
+        return getExtent().getBiomeType(x, y, z);
     }
 
     @Override

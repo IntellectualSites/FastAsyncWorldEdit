@@ -547,7 +547,7 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 //    public void sendChunk(int x, int z, int bitMask) { /* do nothing - never used*/ }
 //
 //    @Override
-//    public BiomeType getBiomeType(int x, int z) throws FaweCache.CHUNK {
+//    public BiomeType getBiomeType(int x, int y, int z) throws FaweCache.CHUNK {
 //        // TODO later (currently not used)
 //        return BiomeTypes.FOREST;
 //    }

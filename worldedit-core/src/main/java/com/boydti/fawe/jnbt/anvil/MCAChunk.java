@@ -446,7 +446,7 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return this.biomes[(z << 4) | x];
     }
 

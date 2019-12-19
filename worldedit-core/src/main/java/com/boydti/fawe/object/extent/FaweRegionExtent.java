@@ -101,14 +101,14 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         if (!contains(x, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return null;
         }
-        return super.getBiomeType(x, z);
+        return super.getBiomeType(x, y, z);
     }
 
     @Override

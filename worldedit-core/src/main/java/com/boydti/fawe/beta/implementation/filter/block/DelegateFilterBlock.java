@@ -781,8 +781,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
-        return parent.getBiomeType(x, z);
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return parent.getBiomeType(x, y, z);
     }
 
     @Deprecated

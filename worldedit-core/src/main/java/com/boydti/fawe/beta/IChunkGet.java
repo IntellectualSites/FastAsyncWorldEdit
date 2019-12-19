@@ -21,7 +21,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     BaseBlock getFullBlock(int x, int y, int z);
 
     @Override
-    BiomeType getBiomeType(int x, int z);
+    BiomeType getBiomeType(int x, int y, int z);
 
     @Override
     BlockState getBlock(int x, int y, int z);

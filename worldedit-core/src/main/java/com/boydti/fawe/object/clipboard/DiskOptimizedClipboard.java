@@ -215,7 +215,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 

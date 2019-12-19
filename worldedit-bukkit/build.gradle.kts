@@ -37,6 +37,8 @@ dependencies {
     "api"(project(":worldedit-libs:bukkit"))
     "compile"(":worldedit-adapters:")
     "compile"("org.spigotmcv1_13_r2:spigotmcv1_13_r2:1_13_r2")
+    "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
+    "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT") {
         exclude("junit", "junit")

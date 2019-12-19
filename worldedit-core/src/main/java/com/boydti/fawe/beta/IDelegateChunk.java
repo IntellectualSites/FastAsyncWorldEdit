@@ -70,8 +70,8 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
     }
 
     @Override
-    default BiomeType getBiomeType(int x, int z) {
-        return getParent().getBiomeType(x, z);
+    default BiomeType getBiomeType(int x, int y, int z) {
+        return getParent().getBiomeType(x, y, z);
     }
 
     @Override

@@ -89,7 +89,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 
