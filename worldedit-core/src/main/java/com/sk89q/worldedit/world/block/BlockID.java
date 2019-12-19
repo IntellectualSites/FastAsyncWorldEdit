@@ -37,6 +37,8 @@ public class BlockID {
     public static final int BARRIER = 24;
     public static final int BEACON = 25;
     public static final int BEDROCK = 26;
+    public static final int BEE_NEST= 677;
+    public static final int BEEHIVE = 678; // highest
     public static final int BEETROOTS = 27;
     public static final int BELL = 605;
     public static final int BIRCH_BUTTON = 28;

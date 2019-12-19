@@ -179,7 +179,7 @@ public class BlockTypesCache {
             Collection<String> blocks = blockReg.values();
             Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
 
-            int size = blockMap.size();
+            int size = blockMap.size() + 1;
             Field[] idFields = BlockID.class.getDeclaredFields();
             for (Field field : idFields) size = Math.max(field.getInt(null) + 1, size);
             BIT_OFFSET = MathMan.log2nlz(size);
