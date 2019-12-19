@@ -2,7 +2,7 @@ name: WorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
-api-version: 1.14
+api-version: 1.13
 website: https://github.com/IntellectualSites
 description: Blazingly fast world manipulation for builders, large networks and developers.
 authors: [Empire92, MattBDev]
