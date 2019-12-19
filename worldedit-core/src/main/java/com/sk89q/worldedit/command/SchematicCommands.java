@@ -373,7 +373,7 @@ public class SchematicCommands {
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
                 .sendMessageAfterDelay(TranslatableComponent.of("worldedit.schematic.save.saving"))
                 .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
-                .onFailure("Failed to load schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+                .onFailure("Failed to save schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
                 .buildAndExec(worldEdit.getExecutorService());
     }
 
