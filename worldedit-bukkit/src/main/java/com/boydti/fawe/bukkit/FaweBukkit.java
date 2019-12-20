@@ -12,7 +12,6 @@ import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
 import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;

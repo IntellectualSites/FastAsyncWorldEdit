@@ -294,12 +294,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
 //    }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
-        return delegate.getFullBlock(this, x, y, z)
-            .getNbtData(); // TODO NOT IMPLEMENTED (add getTag delegate)
-    }
-
-    @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         return delegate.get(this).getTiles();
     }

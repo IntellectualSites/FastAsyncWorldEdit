@@ -40,8 +40,8 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
     }
 
     @Override
-    default CompoundTag getTag(int x, int y, int z) {
-        return getParent().getTag(x, y, z);
+    default CompoundTag getTile(int x, int y, int z) {
+        return getParent().getTile(x, y, z);
     }
 
     @Override
@@ -53,11 +53,6 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
 //    default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
 //        getParent().flood(flood, mask, block);
 //    }
-
-    @Override
-    default CompoundTag getTile(int x, int y, int z) {
-        return getParent().getTile(x, y, z);
-    }
 
     @Override
     default boolean setTile(int x, int y, int z, CompoundTag tag) {

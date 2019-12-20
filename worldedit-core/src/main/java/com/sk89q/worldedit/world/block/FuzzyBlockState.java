@@ -91,7 +91,7 @@ public class FuzzyBlockState extends BlockState {
 
     @Override
     public BaseBlock toBaseBlock() {
-        return new BaseBlock();
+        return new BaseBlock(this);
     }
 
     @Override

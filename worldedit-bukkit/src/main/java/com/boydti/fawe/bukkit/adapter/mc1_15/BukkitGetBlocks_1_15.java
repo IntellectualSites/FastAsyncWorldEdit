@@ -80,7 +80,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
+    public CompoundTag getTile(int x, int y, int z) {
         TileEntity tileEntity = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
         return new LazyCompoundTag_1_15(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }

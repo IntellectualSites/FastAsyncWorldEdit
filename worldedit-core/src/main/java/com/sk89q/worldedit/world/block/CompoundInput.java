@@ -7,7 +7,7 @@ public enum CompoundInput {
     CONTAINER() {
         @Override
         public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
-            return state.toBaseBlock(input.getTag(x, y, z));
+            return state.toBaseBlock(input.getTile(x, y, z));
         }
     }
 

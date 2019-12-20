@@ -346,23 +346,23 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
-                if (context.isPreferringWildcard()) {
-                    if (stateString.isEmpty()) {
-                        state = new FuzzyBlockState(state);
-                    } else {
-                        BlockType type = state.getBlockType();
-                        FuzzyBlockState.Builder fuzzyBuilder = FuzzyBlockState.builder();
-                        fuzzyBuilder.type(type);
-                        String[] entries = stateString.split(",");
-                        for (String entry : entries) {
-                            String[] split = entry.split("=");
-                            String key = split[0];
-                            String val = split[1];
-                            Property<Object> prop = type.getProperty(key);
-                            fuzzyBuilder.withProperty(prop, prop.getValueFor(val));
-                        }
-                        state = fuzzyBuilder.build();
+            }
+            if (context.isPreferringWildcard()) {
+                if (stateString == null || stateString.isEmpty()) {
+                    state = new FuzzyBlockState(state);
+                } else {
+                    BlockType type = state.getBlockType();
+                    FuzzyBlockState.Builder fuzzyBuilder = FuzzyBlockState.builder();
+                    fuzzyBuilder.type(type);
+                    String[] entries = stateString.split(",");
+                    for (String entry : entries) {
+                        String[] split = entry.split("=");
+                        String key = split[0];
+                        String val = split[1];
+                        Property<Object> prop = type.getProperty(key);
+                        fuzzyBuilder.withProperty(prop, prop.getValueFor(val));
                     }
+                    state = fuzzyBuilder.build();
                 }
             }
         }

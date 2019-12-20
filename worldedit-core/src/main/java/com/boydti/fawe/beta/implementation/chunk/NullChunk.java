@@ -113,11 +113,6 @@ public enum NullChunk implements IQueueChunk {
     }
 
     @Override
-    public CompoundTag getTag(int x, int y, int z) {
-        return null;
-    }
-
-    @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
         return Collections.emptyMap();
     }
