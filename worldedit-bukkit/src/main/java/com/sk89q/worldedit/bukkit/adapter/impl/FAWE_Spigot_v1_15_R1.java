@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.bekvon.bukkit.residence.commands.server;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
@@ -61,6 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -80,6 +82,7 @@ import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.ItemStack;
 import net.minecraft.server.v1_15_R1.MinecraftKey;
+import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
@@ -87,6 +90,7 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.World;
+import net.minecraft.server.v1_15_R1.WorldData;
 import net.minecraft.server.v1_15_R1.WorldNBTStorage;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.Bukkit;
@@ -391,10 +395,12 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
         // normally it should be deleted at the end of this method
         saveFolder.deleteOnExit();
         try {
-            CraftServer server = originalWorld.getServer();
+            MinecraftServer server = originalWorld.getServer().getServer();
             WorldNBTStorage originalDataManager = originalWorld.getDataManager();
-            WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server.getServer(), originalDataManager.getDataFixer());
-            ChunkGenerator originalGen = world.getGenerator();
+            WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server, originalDataManager.getDataFixer());
+            WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound) null),
+                    server.dataConverterManager, getDataVersion(), null);
+            newWorldData.setName(UUID.randomUUID().toString());
 
             ChunkGenerator generator = world.getGenerator();
             org.bukkit.World.Environment environment = world.getEnvironment();
@@ -408,12 +414,12 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
                 }
                 generator = null;
             }
-            try (WorldServer freshWorld = new WorldServer(server.getServer(),
-                    server.getServer().executorService, saveHandler,
-                    originalWorld.worldData,
+            try (WorldServer freshWorld = new WorldServer(server,
+                    server.executorService, saveHandler,
+                    newWorldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.getMethodProfiler(),
-                    server.getServer().worldLoadListenerFactory.create(11),
+                    server.worldLoadListenerFactory.create(11),
                     environment,
                     generator)) {
 

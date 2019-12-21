@@ -85,6 +85,7 @@ import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.World;
+import net.minecraft.server.v1_14_R1.WorldData;
 import net.minecraft.server.v1_14_R1.WorldNBTStorage;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
@@ -400,10 +401,11 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
         // normally it should be deleted at the end of this method
         saveFolder.deleteOnExit();
         try {
-            CraftServer server = originalWorld.getServer();
+            MinecraftServer server = originalWorld.getServer().getServer();
             WorldNBTStorage originalDataManager = originalWorld.getDataManager();
-            WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server.getServer(), originalDataManager.getDataFixer());
-            ChunkGenerator originalGen = world.getGenerator();
+            WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server, originalDataManager.getDataFixer());
+            WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound) null),
+                    server.dataConverterManager, getDataVersion(), null);
 
             ChunkGenerator generator = world.getGenerator();
             org.bukkit.World.Environment environment = world.getEnvironment();
@@ -417,12 +419,12 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                 }
                 generator = null;
             }
-            try (WorldServer freshWorld = new WorldServer(server.getServer(),
-                    server.getServer().executorService, saveHandler,
-                    originalWorld.worldData,
+            try (WorldServer freshWorld = new WorldServer(server,
+                    server.executorService, saveHandler,
+                    newWorldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.getMethodProfiler(),
-                    server.getServer().worldLoadListenerFactory.create(11),
+                    server.worldLoadListenerFactory.create(11),
                     environment,
                     generator)) {
 

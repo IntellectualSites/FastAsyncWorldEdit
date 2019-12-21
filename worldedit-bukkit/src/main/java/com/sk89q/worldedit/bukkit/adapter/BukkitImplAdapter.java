@@ -231,6 +231,17 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("Cannot send fake chunks");
     }
 
+    /**
+     * Regenerate a region in the given world, so it appears "as new".
+     * @param world the world to regen in
+     * @param region the region to regen
+     * @param session the session to use for setting blocks
+     * @return true on success, false on failure
+     */
+    default boolean regenerate(org.bukkit.World world, Region region, EditSession session) {
+        return regenerate(world, region, null, null, session);
+    }
+
     default boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
         return editSession.regenerate(region);
     }

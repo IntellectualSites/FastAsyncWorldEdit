@@ -218,6 +218,9 @@ public class BlockTypesCache {
                     values[internalId] = type;
                 }
             }
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] == null) values[i] = values[0];
+            }
 
             states = stateList.toArray(new BlockState[stateList.size()]);
 

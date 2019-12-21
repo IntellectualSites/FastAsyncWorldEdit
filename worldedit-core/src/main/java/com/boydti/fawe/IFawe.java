@@ -2,7 +2,6 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
-import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
