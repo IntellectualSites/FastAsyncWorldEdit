@@ -141,7 +141,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
 
     @Override
     public Object[] toArray() {
-        return toArray(null);
+        return toArray((Object[]) null);
     }
 
     @Override

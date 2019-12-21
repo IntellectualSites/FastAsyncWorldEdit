@@ -7,6 +7,7 @@ import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -18,7 +19,6 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
@@ -66,11 +66,7 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             fieldDirtyBits.setAccessible(true);
 
             Field tmp = DataPaletteBlock.class.getDeclaredField("j");
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            int modifiers = modifiersField.getInt(tmp);
-            int newModifiers = modifiers & (~Modifier.FINAL);
-            if (newModifiers != modifiers) modifiersField.setInt(tmp, newModifiers);
+            ReflectionUtils.setAccessibleNonFinal(tmp);
             fieldLock = tmp;
             fieldLock.setAccessible(true);
 
