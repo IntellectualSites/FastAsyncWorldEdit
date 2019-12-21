@@ -1928,6 +1928,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int ceilRadiusY = (int) Math.ceil(radiusY);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
+        int yy;
+
         double nextXn = invRadiusX;
         forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
@@ -1962,19 +1964,21 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                             continue;
                         }
                     }
-
-                    this.setBlock(px + x, py + y, pz + z, block);
-                    if (x != 0) this.setBlock(px - x, py + y, pz + z, block);
-                    if (z != 0) {
-                        this.setBlock(px + x, py + y, pz - z, block);
-                        if (x != 0) this.setBlock(px - x, py + y, pz - z, block);
-                    }
-                    if (y != 0) {
-                        this.setBlock(px + x, py - y, pz + z, block);
-                        if (x != 0) this.setBlock(px - x, py - y, pz + z, block);
+                    yy = py + y;
+                    if (yy <= maxY) {
+                        this.setBlock(px + x, py + y, pz + z, block);
+                        if (x != 0) this.setBlock(px - x, py + y, pz + z, block);
                         if (z != 0) {
-                            this.setBlock(px + x, py - y, pz - z, block);
-                            if (x != 0) this.setBlock(px - x, py - y, pz - z, block);
+                            this.setBlock(px + x, py + y, pz - z, block);
+                            if (x != 0) this.setBlock(px - x, py + y, pz - z, block);
+                        }
+                    }
+                    if (y != 0 && (yy = py - y) >= 0) {
+                        this.setBlock(px + x, yy, pz + z, block);
+                        if (x != 0) this.setBlock(px - x, yy, pz + z, block);
+                        if (z != 0) {
+                            this.setBlock(px + x, yy, pz - z, block);
+                            if (x != 0) this.setBlock(px - x, yy, pz - z, block);
                         }
                     }
                 }
