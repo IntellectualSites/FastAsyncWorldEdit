@@ -78,7 +78,7 @@ public class ReflectionUtils {
     }
 
     public static Object makeEnum(Class<?> enumClass, String value, int ordinal,
-                                   Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
+                                  Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
         Object[] parms = new Object[additionalValues.length + 2];
         parms[0] = value;
         parms[1] = ordinal;
@@ -96,9 +96,8 @@ public class ReflectionUtils {
         return ReflectionFactory.getReflectionFactory().newConstructorAccessor(enumClass.getDeclaredConstructor(parameterTypes));
     }
 
-    public static void setFailsafeFieldValue(Field field, Object target, Object value)
-            throws NoSuchFieldException, IllegalAccessException {
-
+    public static void setAccessibleNonFinal(Field field)
+            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -106,15 +105,35 @@ public class ReflectionUtils {
         // not be final anymore, thus tricking reflection into
         // letting us modify the static final field
         if (Modifier.isFinal(field.getModifiers())) {
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            int modifiers = modifiersField.getInt(field);
+            try {
+                Field modifiersField = Field.class.getDeclaredField("modifiers");
+                modifiersField.setAccessible(true);
+                int modifiers = modifiersField.getInt(field);
 
-            // blank out the final bit in the modifiers int
-            modifiers &= ~Modifier.FINAL;
-            modifiersField.setInt(field, modifiers);
+                // blank out the final bit in the modifiers int
+                modifiers &= ~Modifier.FINAL;
+                modifiersField.setInt(field, modifiers);
+            } catch (NoSuchFieldException e) {
+                // Java 12+ compatibility - search fields with hidden method for modifiers
+                // same concept as above, just with a more hacky way of getting to the modifiers
+                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
+                getDeclaredFields0.setAccessible(true);
+                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
+                for (Field classField : fields) {
+                    if ("modifiers".equals(classField.getName())) {
+                        classField.setAccessible(true);
+                        classField.set(field, field.getModifiers() & ~Modifier.FINAL);
+                        break;
+                    }
+                }
+            }
         }
+    }
 
+    public static void setFailsafeFieldValue(Field field, Object target, Object value)
+            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+        setAccessibleNonFinal(field);
         try {
             FieldAccessor fa = ReflectionFactory.getReflectionFactory().newFieldAccessor(field, false);
             fa.set(target, value);
@@ -124,7 +143,7 @@ public class ReflectionUtils {
     }
 
     private static void blankField(Class<?> enumClass, String fieldName)
-            throws NoSuchFieldException, IllegalAccessException {
+            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         for (Field field : Class.class.getDeclaredFields()) {
             if (field.getName().contains(fieldName)) {
                 AccessibleObject.setAccessible(new Field[]{field}, true);
@@ -134,8 +153,8 @@ public class ReflectionUtils {
         }
     }
 
-    private static void cleanEnumCache(Class<?> enumClass)
-            throws NoSuchFieldException, IllegalAccessException {
+    static void cleanEnumCache(Class<?> enumClass)
+            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         blankField(enumClass, "enumConstantDirectory"); // Sun (Oracle?!?) JDK 1.5/6
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
