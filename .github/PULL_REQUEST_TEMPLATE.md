@@ -15,4 +15,4 @@ You can do so here: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13
 - [] I included all information required in the sections above
 - [] I tested my changes and approved their functionality
 - [] I ensured my changes do not break other parts of the code
-- [] I read and followed the [contribution guidelines](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/blob/breaking/CONTRIBUTING.md)
+- [] I read and followed the [contribution guidelines](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/blob/1.15/CONTRIBUTING.md)
