@@ -19,23 +19,77 @@
 
 package com.sk89q.worldedit.util.formatting;
 
+import com.boydti.fawe.util.StringMan;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import org.enginehub.piston.config.Config;
 import org.enginehub.piston.config.ConfigHolder;
 import org.enginehub.piston.config.TextConfig;
 import org.enginehub.piston.util.TextHelper;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 public class WorldEditText {
     public static final ConfigHolder CONFIG_HOLDER = ConfigHolder.create();
+    private static final Method METHOD_APPLY;
 
     static {
         CONFIG_HOLDER.getConfig(TextConfig.commandPrefix()).setValue("/");
+        try {
+            METHOD_APPLY = Config.class.getDeclaredMethod("apply", List.class);
+            METHOD_APPLY.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     public static Component format(Component component, Locale locale) {
-        return WorldEdit.getInstance().getTranslationManager().convertText(CONFIG_HOLDER.replace(component), locale);
+        return CONFIG_HOLDER.replace(WorldEdit.getInstance().getTranslationManager().convertText(recursiveReplace(component), locale));
+    }
+
+    private static Component recursiveReplace(Component input) {
+        if (input instanceof TranslatableComponent) {
+            TranslatableComponent tc = (TranslatableComponent)input;
+            List<Component> args = tc.args();
+            if (args != (args = replaceChildren(args))) {
+                input = tc = tc.args(args);
+            }
+            if (CONFIG_HOLDER.getConfigs().containsKey(tc.key())) {
+                Config config = CONFIG_HOLDER.getConfigs().get(tc.key());
+                try {
+                    return (Component) METHOD_APPLY.invoke(config, replaceChildren(tc.args()));
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        List<Component> original = input.children();
+        List<Component> replacement = replaceChildren(original);
+        return original == replacement ? input : input.children(replacement);
+    }
+
+    private static List<Component> replaceChildren(List<Component> input) {
+        if (input.isEmpty()) {
+            return input;
+        }
+        ImmutableList.Builder<Component> copy = ImmutableList.builder();
+        boolean modified = false;
+        for (Component component : input) {
+            Component replacement = recursiveReplace(component);
+            if (replacement != component) {
+                modified = true;
+            }
+            copy.add(replacement);
+        }
+        return modified ? copy.build() : input;
     }
 
     public static String reduceToText(Component component, Locale locale) {

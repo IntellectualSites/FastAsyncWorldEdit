@@ -66,6 +66,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.Blocks;
 import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkProviderServer;
@@ -149,7 +150,8 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
-        return new BlockMaterial_1_14(getBlock(blockType));
+        Block block = getBlock(blockType);
+        return new BlockMaterial_1_14(block);
     }
 
     @Override

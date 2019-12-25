@@ -170,9 +170,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
-        Component prefix = TranslatableComponent.of("fawe.prefix");
-        component = TextComponent.builder().append(prefix).append(component).build();
-        component = Caption.color(component, getLocale());
+        component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
         TextAdapter.sendComponent(player, component);
     }
 

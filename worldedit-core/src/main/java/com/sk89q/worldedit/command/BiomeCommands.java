@@ -80,7 +80,7 @@ public class BiomeCommands {
 
     @Command(
         name = "biomelist",
-        aliases = { "biomels" },
+        aliases = { "biomels", "/biomelist", "/listbiomes" },
         desc = "Gets all biomes available."
     )
     @CommandPermissions("worldedit.biome.list")

@@ -552,11 +552,11 @@ public class SchematicCommands {
         if (oldFirst && newFirst) {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
-        String pageCommand = arguments.get();
+        String pageCommand = "/" + arguments.get();
         LocalConfiguration config = worldEdit.getConfiguration();
         File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
 
-        String schemCmd = "/schematic";
+        String schemCmd = "//schematic";
         String loadSingle = schemCmd + " load";
         String loadMulti = schemCmd + " loadall";
         String unload = schemCmd + " unload";

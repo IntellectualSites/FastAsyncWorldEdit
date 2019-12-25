@@ -1,5 +1,5 @@
 {
-	"fawe.prefix": "&8(&4&lFAWE&8)&7 ",
+	"prefix": "&8(&4&lFAWE&8)&7 {0}",
 	"fawe.error": "&c{0}",
 	"fawe.info": "&7{0}",
 	"fawe.debug": "&3{0}",

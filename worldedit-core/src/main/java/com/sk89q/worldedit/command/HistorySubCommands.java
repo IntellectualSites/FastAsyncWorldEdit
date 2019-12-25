@@ -227,7 +227,7 @@ public class HistorySubCommands {
 
         int size = edit.size();
 
-        String pageCommand = arguments.get().replaceAll("-p [0-9]+", "").trim();
+        String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
         List<Countable<BlockState>> list = null;
         Reference<List<Countable<BlockState>>> cached = player.getMeta(pageCommand);
         if (cached != null) {
@@ -290,7 +290,7 @@ public class HistorySubCommands {
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
         Location origin = player.getLocation();
-        String pageCommand = arguments.get().replaceAll("-p [0-9]+", "").trim();
+        String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
 
         List<Supplier<RollbackOptimizedHistory>> list = null;
         Reference<List<Supplier<RollbackOptimizedHistory>>> cached = player.getMeta(pageCommand);

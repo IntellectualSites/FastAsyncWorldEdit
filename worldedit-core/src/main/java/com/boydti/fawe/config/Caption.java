@@ -37,46 +37,67 @@ public class Caption {
         return color(WorldEditText.format(component, locale));
     }
 
-    public static Component color(Component parent) {
-        if (parent instanceof TextComponent) {
-            TextComponent text = (TextComponent) parent;
-            String content = text.content();
-            if (content.indexOf('&') != -1) {
-                Component legacy = LegacyComponentSerializer.legacy().deserialize(content, '&');
-                legacy = legacy.style(parent.style());
-                if (!parent.children().isEmpty()) {
-                    parent = TextComponent.builder().append(legacy).append(parent.children()).build();
-                } else {
-                    parent = legacy;
-                }
+    private static Component color(TextComponent text) {
+        String content = text.content();
+        if (content.indexOf('&') != -1) {
+            TextComponent legacy = LegacyComponentSerializer.legacy().deserialize(content, '&');
+            legacy = (TextComponent) legacy.style(text.style());
+            if (!text.children().isEmpty()) {
+                text = TextComponent.builder().append(legacy).append(text.children()).build();
+            } else {
+                text = legacy;
             }
         }
-        TextColor lastColor = parent.color();
-        List<Component> children = parent.children();
-        if (!children.isEmpty()) {
-            for (int i = 0; i < children.size(); i++) {
-                Component original = children.get(i);
+        return text;
+    }
+
+    private static List<Component> color(Component input, List<Component> components) {
+        TextColor lastColor = input.color();
+        if (!components.isEmpty()) {
+            for (int i = 0; i < components.size(); i++) {
+                Component original = components.get(i);
                 Component child = original;
                 if (child.color() == null && lastColor != null) {
                     child = child.color(lastColor);
                 }
                 child = color(child);
                 if (original != child) {
-                    if (!(children instanceof ArrayList)) {
-                        children = new ArrayList<>(children);
+                    if (!(components instanceof ArrayList)) {
+                        components = new ArrayList<>(components);
                     }
-                    children.set(i, child);
+                    components.set(i, child);
                 }
                 if (child.color() != null) {
                     lastColor = child.color();
                 }
             }
-            if (children instanceof ArrayList) {
-                parent = parent.children(children);
+        }
+        return components;
+    }
+
+    public static Component color(Component parent) {
+        if (parent instanceof TextComponent) {
+            parent = color((TextComponent) parent);
+        }
+        TextColor lastColor = parent.color();
+        List<Component> children = parent.children();
+        if (children != (children = color(parent, children))) {
+            parent = parent.children(children);
+        }
+        if (parent instanceof TranslatableComponent) {
+            TranslatableComponent tc = (TranslatableComponent) parent;
+            List<Component> args = tc.args();
+            if (args != (args = color(parent, args))) {
+                parent = tc.args(args);
             }
         }
-        if (parent.color() == null && lastColor != null) {
-            parent = parent.color(lastColor);
+        if (parent.color() == null) {
+            if (!children.isEmpty()) {
+                lastColor = children.get(children.size() - 1).color();
+            }
+            if (lastColor != null) {
+                parent = parent.color(lastColor);
+            }
         }
         return parent;
     }

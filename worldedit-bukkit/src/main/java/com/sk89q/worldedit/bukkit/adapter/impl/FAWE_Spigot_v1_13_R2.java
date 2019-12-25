@@ -60,6 +60,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.Blocks;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkProviderServer;
 import net.minecraft.server.v1_13_R2.ChunkSection;
@@ -148,13 +149,13 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
         Block block = getBlock(blockType);
-        return block != null ? new BlockMaterial_1_13(block) : null;
+        return block != null ? new BlockMaterial_1_13(block) : new BlockMaterial_1_13(Blocks.AIR);
     }
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
-        return bs != null ? new BlockMaterial_1_13(bs.getBlock(), bs) : null;
+        return bs != null ? new BlockMaterial_1_13(bs.getBlock(), bs) : new BlockMaterial_1_13(Blocks.AIR);
     }
 
     public Block getBlock(BlockType blockType) {
@@ -314,8 +315,13 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
 
     @Override
     public BlockData adapt(BlockStateHolder state) {
-        BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
-        return material.getCraftBlockData();
+        try {
+            BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
+            return material.getCraftBlockData();
+        } catch (ClassCastException ignore) {
+            System.out.println(state.getAsString() + " cast");
+            throw ignore;
+        }
     }
 
     @Override

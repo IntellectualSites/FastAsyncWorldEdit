@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util.translation;
 
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -28,14 +27,19 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.renderer.FriendlyComponentRenderer;
 import com.sk89q.worldedit.util.io.ResourceLoader;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.stream.Collectors.toMap;
-
 
 /**
  * Handles translations for the plugin.
@@ -72,10 +76,8 @@ public class TranslationManager {
     }
 
     private Map<String, String> filterTranslations(Map<String, String> translations) {
-        return translations.entrySet().stream()
-                .filter(e -> !e.getValue().isEmpty())
-                .map(e -> Maps.immutableEntry(e.getKey(), e.getValue().replace("'", "''")))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        translations.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+        return translations;
     }
 
     private Map<String, String> parseTranslationFile(InputStream inputStream) {

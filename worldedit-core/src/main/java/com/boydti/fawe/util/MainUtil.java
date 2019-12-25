@@ -835,7 +835,7 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                Component msg = WorldEditText.format(TranslatableComponent.of("worldedit.schematic.delete.deleted"), Locale.ROOT);
+                Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
                 if (printDebug) Fawe.debug(msg);
             }
         });

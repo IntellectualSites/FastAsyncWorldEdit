@@ -27,6 +27,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BlockMaterial_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitAdapter_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitGetBlocks_1_15;
@@ -68,9 +69,11 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_15_R1.ChunkProviderServer;
@@ -139,7 +142,8 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
-        return new BlockMaterial_1_15(getBlock(blockType));
+        Block block = getBlock(blockType);
+        return new BlockMaterial_1_15(block);
     }
 
     @Override
