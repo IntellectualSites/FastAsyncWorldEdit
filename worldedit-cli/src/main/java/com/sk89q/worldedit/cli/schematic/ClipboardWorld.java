@@ -109,24 +109,24 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return clipboard.getEntities(region);
-    }
-
-    @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position)
             throws MaxChangedBlocksException {
         return false;
     }
 
     @Override
-    public List<? extends Entity> getEntities() {
-        return clipboard.getEntities();
+    public BlockVector3 getSpawnPosition() {
+        return clipboard.getOrigin();
     }
 
     @Override
-    public BlockVector3 getSpawnPosition() {
-        return clipboard.getOrigin();
+    public List<? extends Entity> getEntities(Region region) {
+        return clipboard.getEntities(region);
+    }
+
+    @Override
+    public List<? extends Entity> getEntities() {
+        return clipboard.getEntities();
     }
 
     @Nullable

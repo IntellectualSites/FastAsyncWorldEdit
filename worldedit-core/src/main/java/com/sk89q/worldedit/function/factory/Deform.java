@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.function.factory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -38,9 +41,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
 public class Deform implements Contextual<Operation> {
 
@@ -157,12 +157,6 @@ public class Deform implements Contextual<Operation> {
                 session == null ? WorldEdit.getInstance().getConfiguration().calculationTimeout : session.getTimeout());
     }
 
-    public enum Mode {
-        RAW_COORD,
-        OFFSET,
-        UNIT_CUBE
-    }
-
     private static final class DeformOperation implements Operation {
         private final Extent destination;
         private final Region region;
@@ -199,9 +193,15 @@ public class Deform implements Contextual<Operation> {
         @Override
         public Iterable<Component> getStatusMessages() {
             return ImmutableList.of(TranslatableComponent.of("worldedit.operation.deform.expression",
-                    TextComponent.of(expression).color(TextColor.GRAY)));
+                    TextComponent.of(expression).color(TextColor.LIGHT_PURPLE)));
         }
 
+    }
+
+    public enum Mode {
+        RAW_COORD,
+        OFFSET,
+        UNIT_CUBE
     }
 
 }

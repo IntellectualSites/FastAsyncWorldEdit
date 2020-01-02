@@ -39,11 +39,6 @@ import java.util.stream.Collectors;
 public interface Operation {
 
     /**
-     * This is an internal field, and should not be touched.
-     */
-    Set<String> warnedDeprecatedClasses = new HashSet<>();
-
-    /**
      * Complete the next step. If this method returns true, then the method may
      * be called again in the future, or possibly never. If this method
      * returns false, then this method should not be called again.
@@ -75,6 +70,11 @@ public interface Operation {
     }
 
     /**
+     * This is an internal field, and should not be touched.
+     */
+    Set<String> warnedDeprecatedClasses = new HashSet<>();
+
+    /**
      * Gets an iterable of messages that describe the current status of the
      * operation.
      *
@@ -87,7 +87,7 @@ public interface Operation {
         if (oldMessages.size() > 0) {
             String className = getClass().getName();
             if (!warnedDeprecatedClasses.contains(className)) {
-                WorldEdit.logger.warn("An operation is using the old status message API. This will be removed in further versions. Class: " + className);
+                WorldEdit.logger.warn("An operation is using the old status message API. This will be removed in WorldEdit 8. Class: " + className);
                 warnedDeprecatedClasses.add(className);
             }
         }

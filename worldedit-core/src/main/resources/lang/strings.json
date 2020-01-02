@@ -6,11 +6,11 @@
 
 	"fawe.worldedit.history.find.element": "&8 - &2{0}: {1} &7ago &3{2}m &6{3} &c/{4}",
 	"fawe.worldedit.history.find.hover": "{0} blocks changed, click for more info",
-	
+
 	"fawe.info.lighting.propagate.selection": "Lighting has been propogated in {0} chunks. (Note: To remove light use //removelight)",
 	"fawe.info.updated.lighting.selection": "Lighting has been updated in {0} chunks. (It may take a second for the packets to send)",
 	"fawe.info.set.region": "Selection set to your current allowed region",
-	
+
 	"fawe.info.worldedit.command.limit": "Please wait until your current action completes",
 	"fawe.info.worldedit.delayed": "Please wait while we process your FAWE action...",
 	"fawe.info.worldedit.run": "Apologies for the delay. Now executing: {0}",
@@ -331,7 +331,7 @@
 	"fawe.tips.tip.regen.1": "Tip: Use a seed with /regen [biome] [seed]",
 	"fawe.tips.tip.biome.pattern": "Tip: The #biome[forest] pattern can be used in any command",
 	"fawe.tips.tip.biome.mask": "Tip: Restrict to a biome with the `$jungle` mask",
-	
+
     "worldedit.expand.description.vert": "Vertically expand the selection to world limits.",
     "worldedit.expand.expanded": "Region expanded {0} blocks",
     "worldedit.expand.expanded.vert": "Region expanded {0} blocks (top-to-bottom).",
@@ -408,6 +408,7 @@
     "worldedit.restore.failed": "Failed to load snapshot: {0}",
     "worldedit.restore.loaded": "Snapshot '{0}' loaded; now restoring...",
     "worldedit.restore.restored": "Restored; {0} missing chunks and {1} other errors.",
+    "worldedit.restore.none-for-specific-world": "No snapshots were found for world '{0}'.",
     "worldedit.restore.none-for-world": "No snapshots were found for this world.",
     "worldedit.restore.none-found": "No snapshots were found.",
     "worldedit.restore.none-found-console": "No snapshots were found. See console for details.",
@@ -502,7 +503,7 @@
 
     "worldedit.paste.pasted": "The clipboard has been pasted at {0}",
     "worldedit.paste.selected": "Selected clipboard paste region.",
-	
+
     "worldedit.rotate.no-interpolation": "Note: Interpolation is not yet supported, so angles that are multiples of 90 is recommended.",
     "worldedit.rotate.rotated": "The clipboard copy has been rotated.",
     "worldedit.flip.flipped": "The clipboard copy has been flipped.",
@@ -517,6 +518,7 @@
     "worldedit.replace.replaced": "{0} blocks have been replaced.",
     "worldedit.stack.changed": "{0} blocks changed. Undo with //undo",
     "worldedit.regen.regenerated": "Region regenerated.",
+    "worldedit.regen.failed": "Unable to regenerate chunks. Check console for details.",
     "worldedit.walls.changed": "{0} blocks have been changed.",
     "worldedit.faces.changed": "{0} blocks have been changed.",
     "worldedit.overlay.overlaid": "{0} blocks have been overlaid.",
