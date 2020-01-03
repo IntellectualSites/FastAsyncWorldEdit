@@ -277,7 +277,8 @@ public class HistorySubCommands {
     @CommandPermissions("worldedit.history.find")
     public synchronized void find(Player player, World world, RollbackDatabase database, Arguments arguments,
                                   @ArgFlag(name = 'u', desc = "String user") UUID other,
-                                  @ArgFlag(name = 'r', def = "0", desc = "radius") int radius,
+                                  @ArgFlag(name = 'r', def = "0", desc = "radius")
+                                  @Range(from = 0, to = Integer.MAX_VALUE) int radius,
                                   @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
                                   @Time long timeDiff,
                                   @ArgFlag(name = 'p', desc = "Page to view.", def = "1") int page) throws WorldEditException {

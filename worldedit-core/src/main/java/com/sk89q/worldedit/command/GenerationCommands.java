@@ -94,17 +94,17 @@ public class GenerationCommands {
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
     public void caves(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
-                      @Arg(name = "size", desc = "TODO", def = "8") int size,
-                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequency,
-                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarity,
-                      @Arg(name = "minY", desc = "TODO", def = "8") int minY,
-                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxY,
-                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequency,
-                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarity,
-                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChance,
-                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMin,
-                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMax) throws WorldEditException {
-        CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
+                      @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
+                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
+                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
+                      @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
+                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
+                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
+                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
+                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
+                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
+                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
+        CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
         editSession.generate(region, gen);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block" , editSession.getBlockChangeCount()));
     }
