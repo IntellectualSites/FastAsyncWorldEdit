@@ -19,23 +19,18 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
-import com.boydti.fawe.object.collection.AdaptedSetCollection;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-
-import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 public abstract class PaginationBox extends MessageBox {
 

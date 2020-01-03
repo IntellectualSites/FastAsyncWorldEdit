@@ -52,7 +52,7 @@ public class ReflectionUtils {
 
             // 2. Copy it
             T[] previousValues = (T[]) valuesField.get(enumType);
-            List values = new ArrayList(Arrays.asList(previousValues));
+            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
 
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class
@@ -176,7 +176,7 @@ public class ReflectionUtils {
 
     public static <T> List<T> getList(List<T> list) {
         try {
-            Class<? extends List> clazz = (Class<? extends List>) Class.forName("java.util.Collections$UnmodifiableList");
+            Class<? extends List<T>> clazz = (Class<? extends List<T>>) Class.forName("java.util.Collections$UnmodifiableList");
             if (!clazz.isInstance(list)) return list;
             Field m = clazz.getDeclaredField("list");
             m.setAccessible(true);
@@ -566,10 +566,10 @@ public class ReflectionUtils {
          * @throws RuntimeException if constructor not found
          */
         public RefConstructor findConstructor(int number) {
-            final List<Constructor> constructors = new ArrayList<>();
+            final List<Constructor<?>> constructors = new ArrayList<>();
             Collections.addAll(constructors, this.clazz.getConstructors());
             Collections.addAll(constructors, this.clazz.getDeclaredConstructors());
-            for (Constructor m : constructors) {
+            for (Constructor<?> m : constructors) {
                 if (m.getParameterTypes().length == number) {
                     return new RefConstructor(m);
                 }

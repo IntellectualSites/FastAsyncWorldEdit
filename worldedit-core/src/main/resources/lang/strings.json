@@ -7,7 +7,7 @@
 	"fawe.worldedit.history.find.element": "&8 - &2{0}: {1} &7ago &3{2}m &6{3} &c/{4}",
 	"fawe.worldedit.history.find.hover": "{0} blocks changed, click for more info",
 
-	"fawe.info.lighting.propagate.selection": "Lighting has been propogated in {0} chunks. (Note: To remove light use //removelight)",
+	"fawe.info.lighting.propagate.selection": "Lighting has been propagated in {0} chunks. (Note: To remove light use //removelight)",
 	"fawe.info.updated.lighting.selection": "Lighting has been updated in {0} chunks. (It may take a second for the packets to send)",
 	"fawe.info.set.region": "Selection set to your current allowed region",
 
@@ -216,7 +216,7 @@
 
 	"fawe.worldedit.cycler.block.cycler.cannot.cycle": "That block's data cannot be cycled!",
 	"fawe.worldedit.cycler.block.cycler.limit": "Max blocks change limit reached.",
-	"fawe.worldedit.cycler.block.cycler.no.perm": "You are not permitted to cycle the data value of that block.",
+	"fawe.worldedit.cycler.block.cycler.no-perm": "You are not permitted to cycle the data value of that block.",
 
 	"fawe.worldedit.command.command.invalid.syntax": "The command was not used properly (no more help available).",
 
@@ -236,7 +236,7 @@
 	"fawe.progress.progress.finished": "[ Done! ]",
 
 	"fawe.error.command.syntax": "Usage: {0}",
-	"fawe.error.no.perm": "You are lacking the permission node: {0}",
+	"fawe.error.no-perm": "You are lacking the permission node: {0}",
 	"fawe.error.block.not.allowed": "You are not allowed to use",
 	"fawe.error.setting.disable": "Lacking setting: {0}",
 	"fawe.error.brush.not.found": "Available brushes: {0}",
@@ -291,9 +291,9 @@
 	"fawe.selection.sel.list": "For a list of selection types use: //sel list",
 	"fawe.selection.sel.modes": "Select one of the modes below:",
 
-	"fawe.worldedit.scripting.scripting.no.perm": "You do not have permission to execute this craft script",
+	"fawe.worldedit.scripting.scripting.no-perm": "You do not have permission to execute this craft script",
 	"fawe.worldedit.scripting.scripting.cs": "Use /cs with a script name first.",
-	"fawe.worldedit.scripting.scripting.error": "An error occured while executing a craft script",
+	"fawe.worldedit.scripting.scripting.error": "An error occurred while executing a craft script",
 
 	"fawe.tips.tip.sel.list": "Tip: See the different selection modes with //sel list",
 	"fawe.tips.tip.select.connected": "Tip: Select all connected blocks with //sel fuzzy",

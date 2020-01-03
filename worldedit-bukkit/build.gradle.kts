@@ -40,17 +40,17 @@ dependencies {
     "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
     "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
     "compile"("it.unimi.dsi:fastutil:8.2.1")
-    "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT") {
+    "api"("com.destroystokyo.paper:paper-api:1.15.1-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
     }
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
-    "compileOnly"("org.spigotmc:spigot:1.15-R0.1-SNAPSHOT")
+    "compileOnly"("org.spigotmc:spigot:1.15.1-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.2")
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
     "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
-    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.0") {
+    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.1") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")

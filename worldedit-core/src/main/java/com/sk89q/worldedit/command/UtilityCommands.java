@@ -23,14 +23,11 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
 import com.boydti.fawe.object.function.QuadFunction;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -45,6 +42,7 @@ import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -52,19 +50,16 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
-
-import java.text.DecimalFormat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
@@ -72,6 +67,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -81,8 +77,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -91,7 +88,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -713,11 +712,12 @@ public class UtilityCommands {
     }
 
     public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
-        return Lists.transform(files, input -> { // Keep this functional, as transform is evaluated lazily
-            URI uri = input.toURI();
-            String path = getPath(root, input, uuid);
-            return new AbstractMap.SimpleEntry<>(uri, path);
-        });
+        return files.stream()
+            .map(input -> { // Keep this functional, as transform is evaluated lazily
+                URI uri = input.toURI();
+                String path = getPath(root, input, uuid);
+                return new SimpleEntry<>(uri, path);
+            }).collect(Collectors.toList());
     }
 
     public static enum URIType {
@@ -728,7 +728,7 @@ public class UtilityCommands {
     }
 
     public static List<Component> entryToComponent(File root, List<Map.Entry<URI, String>> entries, Function<URI, Boolean> isLoaded, QuadFunction<String, String, URIType, Boolean, Component> adapter) {
-        return Lists.transform(entries, input -> {
+        return entries.stream().map(input -> {
             URI uri = input.getKey();
             String path = input.getValue();
 
@@ -745,11 +745,13 @@ public class UtilityCommands {
                 if (file.isDirectory()) {
                     type = URIType.DIRECTORY;
                 } else {
-                    if (name.indexOf('.') != -1) name = name.substring(0, name.lastIndexOf('.'));
+                    if (name.indexOf('.') != -1)
+                        name = name.substring(0, name.lastIndexOf('.'));
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new RuntimeException(new StopExecutionException(TextComponent.of("Invalid path")));
+                        throw new RuntimeException(
+                            new StopExecutionException(TextComponent.of("Invalid path")));
                     }
                 } catch (IOException ignore) {
                 }
@@ -760,7 +762,7 @@ public class UtilityCommands {
             }
 
             return adapter.apply(name, path, type, loaded);
-        });
+        }).collect(Collectors.toList());
     }
 
     public static List<File> getFiles(File dir, Actor actor, List<String> args, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst) {
@@ -810,8 +812,7 @@ public class UtilityCommands {
         boolean listMine = false;
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
-            for (int i = 0; i < len; i++) {
-                String arg = args.get(i);
+            for (String arg : args) {
                 switch (arg.toLowerCase()) {
                     case "me":
                     case "mine":
@@ -831,7 +832,10 @@ public class UtilityCommands {
                         if (arg.endsWith("/") || arg.endsWith(File.separator)) {
                             arg = arg.replace("/", File.separator);
                             String newDirFilter = dirFilter + arg;
-                            boolean exists = new File(dir, newDirFilter).exists() || playerFolder && MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + newDirFilter)).exists();
+                            boolean exists =
+                                new File(dir, newDirFilter).exists() || playerFolder && MainUtil
+                                    .resolveRelative(
+                                        new File(dir, actor.getUniqueId() + newDirFilter)).exists();
                             if (!exists) {
                                 arg = arg.substring(0, arg.length() - File.separator.length());
                                 if (arg.length() > 3 && arg.length() <= 16) {
@@ -843,8 +847,7 @@ public class UtilityCommands {
                                 }
                             }
                             dirFilter = newDirFilter;
-                        }
-                        else {
+                        } else {
                             filters.add(arg);
                         }
                         break;

@@ -483,6 +483,7 @@ public class ClipboardCommands {
         } else {
             actor.printInfo(TranslatableComponent.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
+		messages.forEach(actor::print);
     }
 
     private void checkPaste(Actor player, EditSession editSession, BlockVector3 to, ClipboardHolder holder, Clipboard clipboard) {

@@ -51,7 +51,7 @@ public class MCAChunk implements IChunk {
 
     public final char[] blocks = new char[65536];
 
-    public final BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<CompoundTag>();
+    public final BlockVector3ChunkMap<CompoundTag> tiles = new BlockVector3ChunkMap<>();
     public final Map<UUID, CompoundTag> entities = new HashMap<>();
     public long inhabitedTime = System.currentTimeMillis();
     public long lastUpdate;

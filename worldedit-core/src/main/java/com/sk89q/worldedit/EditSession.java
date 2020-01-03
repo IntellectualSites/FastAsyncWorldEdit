@@ -19,9 +19,14 @@
 
 package com.sk89q.worldedit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RegionWrapper;
@@ -87,11 +92,11 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.internal.expression.ExpressionTimeoutException;
+import com.sk89q.worldedit.internal.expression.LocalSlot.Variable;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.internal.expression.ExpressionTimeoutException;
-import com.sk89q.worldedit.internal.expression.LocalSlot.Variable;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector2;
@@ -114,6 +119,7 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -124,11 +130,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,12 +139,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -192,21 +191,23 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
     }
 
-    private final World world;
+    @SuppressWarnings("ProtectedField")
+    protected final World world;
     private final String worldName;
     private boolean wrapped;
-    private Extent bypassHistory;
-    private Extent bypassAll;
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
     private final Player player;
-    private FaweChangeSet changeTask;
+    private FaweChangeSet changeSet;
     private boolean history;
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
     private int changes = -1;
     private final BlockBag blockBag;
+
+    private Extent bypassHistory;
+    private Extent bypassAll;
 
     private final int maxY;
 
@@ -229,10 +230,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.originalLimit = builder.getLimit();
         this.limit = builder.getLimit().copy();
         this.player = builder.getPlayer();
-        this.changeTask = builder.getChangeTask();
+        this.changeSet = builder.getChangeTask();
         this.maxY = builder.getMaxY();
         this.blockBag = builder.getBlockBag();
-        this.history = changeTask != null;
+        this.history = changeSet != null;
     }
 
     /**
@@ -244,7 +245,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param blockBag an optional {@link BlockBag} to use, otherwise null
      * @param event the event to call with the extent
      */
-    public EditSession(EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
+    public EditSession(EventBus eventBus, @NotNull World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
         this(world, null, null, null, null, true, null, null, null, blockBag, eventBus, event);
     }
 
@@ -384,15 +385,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return the change set
      */
     public ChangeSet getChangeSet() {
-        return changeTask;
-    }
-
-    /**
-     * Will be removed very soon. Use getChangeSet()
-     */
-    @Deprecated
-    public FaweChangeSet getChangeTask() {
-        return changeTask;
+        return changeSet;
     }
 
     /**
@@ -401,7 +394,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param set
      */
     public void setRawChangeSet(@Nullable FaweChangeSet set) {
-        changeTask = set;
+        changeSet = set;
         changes++;
     }
 
@@ -432,7 +425,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the queue is enabled
      * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
      */
-    @Override
     @Deprecated
     public boolean isQueueEnabled() {
         return true;
@@ -444,7 +436,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Uses {@link ReorderMode#MULTI_STAGE}
      * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
      */
-    @Override
     @Deprecated
     public void enableQueue() {
         super.enableQueue();
@@ -453,7 +444,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     /**
      * Disable the queue. This will close the queue.
      */
-    @Override
     @Deprecated
     public void disableQueue() {
         super.disableQueue();
@@ -599,10 +589,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
         } else {
             if (this.history) {
-                if (this.changeTask == null) {
+                if (this.changeSet == null) {
                     throw new IllegalArgumentException("History was never provided, cannot enable");
                 }
-                enableHistory(this.changeTask);
+                enableHistory(this.changeSet);
             }
         }
     }
@@ -634,6 +624,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param blockBag the block bag to set, or null to use none
      */
     public void setBlockBag(BlockBag blockBag) {
+        //Not Supported in FAWE
         throw new UnsupportedOperationException("TODO - this is never called anyway");
     }
 
@@ -728,21 +719,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return {@code true} if any watchdog extent is enabled
      */
     public boolean isTickingWatchdog() {
-        /*
         return watchdogExtents.stream().anyMatch(WatchdogTickingExtent::isEnabled);
-        */
-        return false;
     }
 
     /**
      * Set all watchdog extents to the given mode.
      */
     public void setTickingWatchdog(boolean active) {
-        /*
         for (WatchdogTickingExtent extent : watchdogExtents) {
             extent.setEnabled(active);
         }
-        */
     }
 
     /**
@@ -777,7 +763,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param maxY maximal height
      * @return height of highest block found or 'minY'
      */
-    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
         for (int y = maxY; y >= minY; --y) {
             if (getBlock(x, y, z).getBlockType().getMaterial().isMovementBlocker()) {
@@ -797,7 +782,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
      * @return height of highest block found or 'minY'
      */
-    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
             if (filter.test(mutablebv.setComponents(x, y, z))) {

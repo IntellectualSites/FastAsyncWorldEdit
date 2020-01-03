@@ -223,7 +223,7 @@ public class SchematicCommands {
             URI uri;
             if (filename.startsWith("url:")) {
                 if (!actor.hasPermission("worldedit.schematic.load.web")) {
-                    actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.load.web"));
+                    actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.web"));
                     return;
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
@@ -250,7 +250,7 @@ public class SchematicCommands {
                     }
                 } else {
                     if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !actor.hasPermission("worldedit.schematic.load.other") && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find()) {
-                        actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.load.other"));
+                        actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
                         return;
                     }
                     if (format == null && filename.matches(".*\\.[\\w].*")) {
@@ -329,7 +329,7 @@ public class SchematicCommands {
         if (filename.contains("../")) {
             other = true;
             if (!actor.hasPermission("worldedit.schematic.save.other")) {
-                actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.save.other"));
+                actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.save.other"));
                 return;
             }
             if (filename.startsWith("../")) {
@@ -347,7 +347,7 @@ public class SchematicCommands {
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
-                    actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
+                    actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.delete.other"));
                     return;
                 }
             }
@@ -393,7 +393,7 @@ public class SchematicCommands {
             return;
         }
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, destDir) && !player.hasPermission("worldedit.schematic.move.other")) {
-            player.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.move.other"));
+            player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.move.other"));
             return;
         }
         ClipboardHolder clipboard = session.getClipboard();
@@ -414,7 +414,7 @@ public class SchematicCommands {
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && (!MainUtil.isInSubDirectory(dir, destFile) || !MainUtil.isInSubDirectory(dir, source)) && !player.hasPermission("worldedit.schematic.delete.other")) {
                 player.print(Caption.of("fawe.worldedit.schematic.schematic.move.failed", destFile,
-                    Caption.of("fawe.error.no.perm", ("worldedit.schematic.move.other"))));
+                    Caption.of("fawe.error.no-perm", ("worldedit.schematic.move.other"))));
                 continue;
             }
             try {
@@ -829,7 +829,7 @@ public class SchematicCommands {
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
-                actor.print(Caption.of("fawe.error.no.perm", "worldedit.schematic.delete.other"));
+                actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.delete.other"));
                 continue;
             }
             if (!deleteFile(f)) {

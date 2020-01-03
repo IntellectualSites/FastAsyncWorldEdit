@@ -1,13 +1,9 @@
 package com.boydti.fawe.object.task;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.util.TaskManager;
-
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;

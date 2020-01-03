@@ -48,7 +48,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     private @Language("SQLite") String GET_EDITS_USER = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
     private @Language("SQLite") String GET_EDITS_USER_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
     private @Language("SQLite") String GET_EDITS = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
-    private @Language("SQLite") String GET_EDITS_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` ASC, `id` ASC";
+    private @Language("SQLite") String GET_EDITS_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id` ";
     private @Language("SQLite") String GET_EDIT_USER = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
     private @Language("SQLite") String DELETE_EDITS_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";

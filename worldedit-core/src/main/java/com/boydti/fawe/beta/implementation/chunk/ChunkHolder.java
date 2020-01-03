@@ -207,8 +207,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 

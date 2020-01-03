@@ -1,5 +1,7 @@
 package com.boydti.fawe.bukkit.adapter.mc1_13;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
@@ -24,6 +26,19 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.Chunk;
@@ -46,22 +61,6 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.function.Function;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BukkitGetBlocks_1_13 extends CharGetBlocks {
     public ChunkSection[] sections;
@@ -102,19 +101,9 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
         return new LazyCompoundTag_1_13(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
-    private static final Function<BlockPosition, BlockVector3> posNms2We = new Function<BlockPosition, BlockVector3>() {
-        @Override
-        public BlockVector3 apply(BlockPosition v) {
-            return BlockVector3.at(v.getX(), v.getY(), v.getZ());
-        }
-    };
+    private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
 
-    private final static Function<TileEntity, CompoundTag> nmsTile2We = new Function<TileEntity, CompoundTag>() {
-        @Override
-        public CompoundTag apply(TileEntity tileEntity) {
-            return new LazyCompoundTag_1_13(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
-        }
-    };
+    private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_13(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
@@ -243,9 +232,7 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
             {
                 Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
                 if (!tiles.isEmpty()) {
-                    final Iterator<Map.Entry<BlockPosition, TileEntity>> iterator = tiles.entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        final Map.Entry<BlockPosition, TileEntity> entry = iterator.next();
+                    for (Map.Entry<BlockPosition, TileEntity> entry : tiles.entrySet()) {
                         final BlockPosition pos = entry.getKey();
                         final int lx = pos.getX() & 15;
                         final int ly = pos.getY();
@@ -345,8 +332,7 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
                         public void run() {
                             final List<Entity>[] entities = nmsChunk.getEntitySlices();
 
-                            for (int i = 0; i < entities.length; i++) {
-                                final Collection<Entity> ents = entities[i];
+                            for (final Collection<Entity> ents : entities) {
                                 if (!ents.isEmpty()) {
                                     final Iterator<Entity> iter = ents.iterator();
                                     while (iter.hasNext()) {
@@ -366,43 +352,40 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
                 if (entities != null && !entities.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[2];
 
-                    syncTasks[1] = new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final CompoundTag nativeTag : entities) {
-                                final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
-                                final StringTag idTag = (StringTag) entityTagMap.get("Id");
-                                final ListTag posTag = (ListTag) entityTagMap.get("Pos");
-                                final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
-                                if (idTag == null || posTag == null || rotTag == null) {
-                                    getLogger(BukkitGetBlocks_1_13.class).debug("Unknown entity tag: " + nativeTag);
-                                    continue;
-                                }
-                                final double x = posTag.getDouble(0);
-                                final double y = posTag.getDouble(1);
-                                final double z = posTag.getDouble(2);
-                                final float yaw = rotTag.getFloat(0);
-                                final float pitch = rotTag.getFloat(1);
-                                final String id = idTag.getValue();
+                    syncTasks[1] = () -> {
+                        for (final CompoundTag nativeTag : entities) {
+                            final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
+                            final StringTag idTag = (StringTag) entityTagMap.get("Id");
+                            final ListTag posTag = (ListTag) entityTagMap.get("Pos");
+                            final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
+                            if (idTag == null || posTag == null || rotTag == null) {
+                                getLogger(BukkitGetBlocks_1_13.class).debug("Unknown entity tag: " + nativeTag);
+                                continue;
+                            }
+                            final double x = posTag.getDouble(0);
+                            final double y = posTag.getDouble(1);
+                            final double z = posTag.getDouble(2);
+                            final float yaw = rotTag.getFloat(0);
+                            final float pitch = rotTag.getFloat(1);
+                            final String id = idTag.getValue();
 
-                                EntityTypes<?> type = EntityTypes.a(id);
-                                if (type != null) {
-                                    Entity entity = type.a(nmsWorld);
-                                    if (entity != null) {
-                                        UUID uuid = entity.getUniqueID();
-                                        entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
-                                        entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
-                                        if (nativeTag != null) {
-                                            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-                                            final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
-                                            for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                                tag.remove(name);
-                                            }
-                                            entity.f(tag);
+                            EntityTypes<?> type = EntityTypes.a(id);
+                            if (type != null) {
+                                Entity entity = type.a(nmsWorld);
+                                if (entity != null) {
+                                    UUID uuid = entity.getUniqueID();
+                                    entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
+                                    entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+                                    if (nativeTag != null) {
+                                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+                                        final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
+                                        for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                            tag.remove(name);
                                         }
-                                        entity.setLocation(x, y, z, yaw, pitch);
-                                        nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                        entity.f(tag);
                                     }
+                                    entity.setLocation(x, y, z, yaw, pitch);
+                                    nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
                         }
@@ -415,31 +398,28 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
                 if (tiles != null && !tiles.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[1];
 
-                    syncTasks[0] = new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
-                                final CompoundTag nativeTag = entry.getValue();
-                                final BlockVector3 blockHash = entry.getKey();
-                                final int x = blockHash.getX() + bx;
-                                final int y = blockHash.getY();
-                                final int z = blockHash.getZ() + bz;
-                                final BlockPosition pos = new BlockPosition(x, y, z);
+                    syncTasks[0] = () -> {
+                        for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
+                            final CompoundTag nativeTag = entry.getValue();
+                            final BlockVector3 blockHash = entry.getKey();
+                            final int x = blockHash.getX() + bx;
+                            final int y = blockHash.getY();
+                            final int z = blockHash.getZ() + bz;
+                            final BlockPosition pos = new BlockPosition(x, y, z);
 
-                                synchronized (nmsWorld) {
-                                    TileEntity tileEntity = nmsWorld.getTileEntity(pos);
-                                    if (tileEntity == null || tileEntity.x()) {
-                                        nmsWorld.n(pos);
-                                        tileEntity = nmsWorld.getTileEntity(pos);
-                                    }
-                                    if (tileEntity != null) {
-                                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-                                        final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
-                                        tag.set("x", new NBTTagInt(x));
-                                        tag.set("y", new NBTTagInt(y));
-                                        tag.set("z", new NBTTagInt(z));
-                                        tileEntity.load(tag);
-                                    }
+                            synchronized (nmsWorld) {
+                                TileEntity tileEntity = nmsWorld.getTileEntity(pos);
+                                if (tileEntity == null || tileEntity.x()) {
+                                    nmsWorld.n(pos);
+                                    tileEntity = nmsWorld.getTileEntity(pos);
+                                }
+                                if (tileEntity != null) {
+                                    BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+                                    final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
+                                    tag.set("x", new NBTTagInt(x));
+                                    tag.set("y", new NBTTagInt(y));
+                                    tag.set("z", new NBTTagInt(z));
+                                    tileEntity.load(tag);
                                 }
                             }
                         }
@@ -473,27 +453,23 @@ public class BukkitGetBlocks_1_13 extends CharGetBlocks {
                     Runnable[] finalSyncTasks = syncTasks;
 
                     // Chain the sync tasks and the callback
-                    Callable<Future> chain = new Callable<Future>() {
-                        @Override
-                        public Future call() {
-                            try {
-                                // Run the sync tasks
-                                for (int i = 0; i < finalSyncTasks.length; i++) {
-                                    Runnable task = finalSyncTasks[i];
-                                    if (task != null) {
-                                        task.run();
-                                    }
+                    Callable<Future> chain = () -> {
+                        try {
+                            // Run the sync tasks
+                            for (Runnable task : finalSyncTasks) {
+                                if (task != null) {
+                                    task.run();
                                 }
-                                if (callback == null) {
-                                    if (finalizer != null) finalizer.run();
-                                    return null;
-                                } else {
-                                    return queueHandler.async(callback, null);
-                                }
-                            } catch (Throwable e) {
-                                e.printStackTrace();
-                                throw e;
                             }
+                            if (callback == null) {
+                                if (finalizer != null) finalizer.run();
+                                return null;
+                            } else {
+                                return queueHandler.async(callback, null);
+                            }
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                            throw e;
                         }
                     };
                     return (T) (Future) queueHandler.sync(chain);
