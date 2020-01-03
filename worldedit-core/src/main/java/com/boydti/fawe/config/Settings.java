@@ -15,7 +15,7 @@ public class Settings extends Config {
     @Ignore
     public boolean PROTOCOL_SUPPORT_FIX = false;
     @Ignore
-    public boolean PLOTSQUARED_HOOK = true;
+    public boolean PLOTSQUARED_HOOK = false;
 
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable

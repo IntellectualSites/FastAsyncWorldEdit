@@ -10,7 +10,6 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.io.File;
@@ -76,7 +75,8 @@ import org.jetbrains.annotations.Nullable;
  *  @see #wrap(World)
  *  @see #create(WorldCreator)
  */
-public class AsyncWorld extends PassthroughExtent implements World {
+public class AsyncWorld
+    extends PassthroughExtent implements World {
 
     private World parent;
     private BukkitImplAdapter adapter;
@@ -181,13 +181,13 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public <T> void spawnParticle(Particle particle, double v, double v1, double v2, int i, T t) {
-        parent.spawnParticle(particle, v, v1, v2, i, t);
+    public <T> void spawnParticle(Particle particle, double x, double y, double z, int count, T data) {
+        parent.spawnParticle(particle, x, y, z, count, data);
     }
 
     @Override
-    public void spawnParticle(Particle particle, Location location, int i, double v, double v1, double v2) {
-        parent.spawnParticle(particle, location, i, v, v1, v2);
+    public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ) {
+        parent.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ);
     }
 
     @Override
@@ -831,9 +831,20 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public @NotNull Biome getBiome(int x, int y, int z) {
+        return adapter.adapt(getExtent().getBiomeType(x,y,z));
+    }
+
+    @Override
     public void setBiome(int x, int z, Biome bio) {
         BiomeType biome = adapter.adapt(bio);
         getExtent().setBiome(x, 0, z, biome);
+    }
+
+    @Override
+    public void setBiome(int x, int y, int z, @NotNull Biome bio) {
+        BiomeType biome = adapter.adapt(bio);
+        getExtent().setBiome(x, y, z, biome);
     }
 
     @Override
@@ -842,8 +853,18 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public double getTemperature(int x, int y, int z) {
+        return parent.getTemperature(x, y, z);
+    }
+
+    @Override
     public double getHumidity(int x, int z) {
         return parent.getHumidity(x, z);
+    }
+
+    @Override
+    public double getHumidity(int x, int y, int z) {
+        return parent.getHumidity(x, y, z);
     }
 
     @Override
@@ -1143,19 +1164,19 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public RayTraceResult rayTraceBlocks(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3) {
-        return parent.rayTraceBlocks(arg0, arg1, arg2, arg3);
+    public RayTraceResult rayTraceBlocks(Location start, Vector direction, double maxDistance, FluidCollisionMode fluidCollisionMode) {
+        return parent.rayTraceBlocks(start, direction, maxDistance, fluidCollisionMode);
     }
 
     @Override
-    public RayTraceResult rayTraceBlocks(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3,
-            boolean arg4) {
-        return parent.rayTraceBlocks(arg0, arg1, arg2, arg3, arg4);
+    public RayTraceResult rayTraceBlocks(Location start, Vector direction, double arg2, FluidCollisionMode fluidCollisionMode,
+            boolean ignorePassableBlocks) {
+        return parent.rayTraceBlocks(start, direction, arg2, fluidCollisionMode, ignorePassableBlocks);
     }
 
     @Override
-    public RayTraceResult rayTraceEntities(Location arg0, Vector arg1, double arg2) {
-        return parent.rayTraceEntities(arg0, arg1, arg2);
+    public RayTraceResult rayTraceEntities(Location start, Vector direction, double maxDistance) {
+        return parent.rayTraceEntities(start, direction, maxDistance);
     }
 
     @Override
@@ -1174,16 +1195,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
         return parent.rayTraceEntities(arg0, arg1, arg2, arg3, arg4);
     }
 
-    @Override
-    public <T> void spawnParticle(Particle arg0, Location arg1, int arg2, double arg3, double arg4, double arg5,
-            double arg6, T arg7, boolean arg8) {
-        parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-    }
 
     @Override
-    public <T> void spawnParticle(Particle arg0, double arg1, double arg2, double arg3, int arg4, double arg5,
-            double arg6, double arg7, double arg8, T arg9, boolean arg10) {
-        parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    public <T> void spawnParticle(@NotNull Particle particle, double x, double y, double z,
+        int count, double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data,
+        boolean force) {
 
     }
 
@@ -1339,5 +1355,12 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public <T> void spawnParticle(Particle particle, List<Player> list, Player player, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t, boolean b) {
         parent.spawnParticle(particle, list, player, v, v1, v2, i, v3, v4, v5, v6, t, b);
+    }
+
+    @Override
+    public <T> void spawnParticle(@NotNull Particle particle, @NotNull Location location, int count,
+        double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data,
+        boolean force) {
+
     }
 }

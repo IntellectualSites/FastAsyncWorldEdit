@@ -12,6 +12,7 @@ import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
@@ -31,6 +32,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -46,11 +48,13 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
@@ -313,40 +317,44 @@ public class HistorySubCommands {
             player.setMeta(pageCommand, new SoftReference<>(list));
         }
 
-        PaginationBox pages = PaginationBox.fromStrings("Edits:", pageCommand, list, input -> {
-            RollbackOptimizedHistory edit = input.get();
-            UUID uuid = edit.getUUID();
-            int index = edit.getIndex();
-            if (!edit.isEmpty()) {
-                database.delete(uuid, index);
-                return TextComponent.empty();
+        PaginationBox pages = PaginationBox.fromStrings("Edits:", pageCommand, list, new Function<Supplier<RollbackOptimizedHistory>, Component>() {
+            @NotNull
+            @Override
+            public Component apply(@Nullable Supplier<RollbackOptimizedHistory> input) {
+                RollbackOptimizedHistory edit = input.get();
+                UUID uuid = edit.getUUID();
+                int index = edit.getIndex();
+                if (!edit.isEmpty()) {
+                    database.delete(uuid, index);
+                    return TextComponent.empty();
+                }
+                String name = Fawe.imp().getName(edit.getUUID());
+
+                String cmd = edit.getCommand();
+                BlockVector3 pos1 = edit.getMinimumPoint();
+                BlockVector3 pos2 = edit.getMaximumPoint();
+
+                double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
+                double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
+                int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+
+                BlockVector2 dirVec = BlockVector2.at(edit.getOriginX() - origin.getX(), edit.getOriginZ() - origin.getZ());
+                Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
+
+                long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
+                String timeStr = MainUtil.secToTime(seconds);
+
+                int size = edit.size();
+
+                TranslatableComponent elem = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
+
+                String infoCmd = "//history summary " + uuid + " " + index;
+                TranslatableComponent hover = Caption.of("fawe.worldedit.history.find.hover", size);
+                elem = elem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
+                elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
+
+                return elem;
             }
-            String name = Fawe.imp().getName(edit.getUUID());
-
-            String cmd = edit.getCommand();
-            BlockVector3 pos1 = edit.getMinimumPoint();
-            BlockVector3 pos2 = edit.getMaximumPoint();
-
-            double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
-            double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
-            int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
-
-            BlockVector2 dirVec = BlockVector2.at(edit.getOriginX() - origin.getX(), edit.getOriginZ() - origin.getZ());
-            Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
-
-            long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
-            String timeStr = MainUtil.secToTime(seconds);
-
-            int size = edit.size();
-
-            TranslatableComponent elem = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
-
-            String infoCmd = "//history summary " + uuid + " " + index;
-            TranslatableComponent hover = Caption.of("fawe.worldedit.history.find.hover", size);
-            elem = elem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
-            elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
-
-            return elem;
         });
         player.print(pages.create(page));
     }
