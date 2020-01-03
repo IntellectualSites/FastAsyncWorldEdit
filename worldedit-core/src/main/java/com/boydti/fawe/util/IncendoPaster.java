@@ -215,9 +215,8 @@ public final class IncendoPaster implements Paster {
             "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
                 + "problem\n");
         b.append("\n# Server Information\n");
-        b.append("Server Platform: ").append(Fawe.imp().getPlatform()).append('\n');
-        b.append(Fawe.imp().getDebugInfo()).append('\n');
-        b.append("\n\n# YAY! Now, let's see what we can find in your JVM\n");
+        b.append(Fawe.imp().getDebugInfo());
+        b.append("\n# YAY! Now, let's see what we can find in your JVM\n");
         Runtime runtime = Runtime.getRuntime();
         RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
         b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS) + " minutes").append('\n');
