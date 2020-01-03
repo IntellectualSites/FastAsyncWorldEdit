@@ -1,9 +1,11 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.jetbrains.annotations.Range;
 
 public abstract class CharBlocks implements IBlocks {
 
@@ -66,7 +68,7 @@ public abstract class CharBlocks implements IBlocks {
         return null;
     }
 
-    public void reset(int layer) {
+    public void reset(@Range(from = 0, to = 15) int layer) {
         sections[layer] = EMPTY;
     }
 
@@ -81,12 +83,12 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public boolean hasSection(int layer) {
+    public boolean hasSection(@Range(from = 0, to = 15) int layer) {
         return sections[layer] == FULL;
     }
 
     @Override
-    public char[] load(int layer) {
+    public char[] load(@Range(from = 0, to = 15) int layer) {
         return sections[layer].get(this, layer);
     }
 
@@ -102,6 +104,7 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     public void set(int x, int y, int z, char value) {
+        Fawe.imp().debug("Setting Block at x:" + x + ", y:" + y + " , z:" + z);
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         set(layer, index, value);
@@ -111,11 +114,11 @@ public abstract class CharBlocks implements IBlocks {
         Section
      */
 
-    public final char get(int layer, int index) {
+    public final char get(@Range(from = 0, to = 15)int layer, int index) {
         return sections[layer].get(this, layer, index);
     }
 
-    public final void set(int layer, int index, char value) {
+    public final void set(@Range(from = 0, to = 15) int layer, int index, char value) {
         sections[layer].set(this, layer, index, value);
     }
 

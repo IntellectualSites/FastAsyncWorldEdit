@@ -1,9 +1,6 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
@@ -68,10 +65,12 @@ public interface IBatchProcessor {
                 }
             }
         }
-        for (int layer = (minY - 15) >> 4; layer < (maxY + 15) >> 4; layer++) {
+        int layer = (minY - 15) >> 4;
+        while (layer < (maxY + 15) >> 4) {
             if (set.hasSection(layer)) {
                 return true;
             }
+            layer++;
         }
         return false;
     }

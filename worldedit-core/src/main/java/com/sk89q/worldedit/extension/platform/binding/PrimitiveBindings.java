@@ -18,13 +18,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
-import org.enginehub.piston.CommandManager;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.inject.InjectedValueStore;
-
-import javax.annotation.Nullable;
-import java.lang.annotation.Annotation;
 import java.util.Locale;
+import javax.annotation.Nullable;
 
 public class PrimitiveBindings extends Bindings {
     public PrimitiveBindings(WorldEdit worldEdit) {
@@ -50,9 +45,9 @@ public class PrimitiveBindings extends Bindings {
     }
 
     /**
-     * Gets an {@link com.sk89q.worldedit.extent.Extent} from a {@link ArgumentStack}.
+     * Gets an {@link Extent} from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return an extent
      * @throws InputParseException on other error
      */
@@ -74,9 +69,9 @@ public class PrimitiveBindings extends Bindings {
     }
 
     /**
-     * Gets a type from a {@link ArgumentStack}.
+     * Gets a type from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -105,16 +100,15 @@ public class PrimitiveBindings extends Bindings {
     }
 
     /**
-     * Gets a type from a {@link ArgumentStack}.
+     * Gets a type from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
     @Binding
     public Vector3 getVector3(String argument) {
-        String radiusString = argument;
-        String[] radii = radiusString.split(",");
+        String[] radii = argument.split(",");
         final double radiusX, radiusY, radiusZ;
         switch (radii.length) {
             case 1:
@@ -135,9 +129,9 @@ public class PrimitiveBindings extends Bindings {
 
 
     /**
-     * Gets a type from a {@link ArgumentStack}.
+     * Gets a type from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -163,9 +157,9 @@ public class PrimitiveBindings extends Bindings {
     }
 
     /**
-     * Gets a type from a {@link ArgumentStack}.
+     * Gets a type from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
@@ -193,16 +187,15 @@ public class PrimitiveBindings extends Bindings {
 
 
     /**
-     * Gets a type from a {@link ArgumentStack}.
+     * Gets a type from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return the requested type
      * @throws InputParseException on error
      */
     @Binding
     public BlockVector2 getBlockVector2(String argument) {
-        String radiusString = argument;
-        String[] radii = radiusString.split(",");
+        String[] radii = argument.split(",");
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:

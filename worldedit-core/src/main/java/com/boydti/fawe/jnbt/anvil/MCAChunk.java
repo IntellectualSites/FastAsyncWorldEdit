@@ -142,7 +142,7 @@ public class MCAChunk implements IChunk {
                 for (Map.Entry<String, String> entry : properties.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    Property property = type.getProperty(key);
+                    Property<Object> property = type.getProperty(key);
                     state = state.with(property, property.getValueFor(value));
                 }
             }
@@ -246,8 +246,8 @@ public class MCAChunk implements IChunk {
                 int type = NBTConstants.TYPE_BYTE_ARRAY;
                 out.writeNamedTagName("Biomes", type);
                 out.writeInt(biomes.length);
-                for (int i = 0; i < biomes.length; i++) {
-                    out.write(biomes[i].getLegacyId());
+                for (BiomeType biome : biomes) {
+                    out.write(biome.getLegacyId());
                 }
             }
             int len = 0;
@@ -430,9 +430,7 @@ public class MCAChunk implements IChunk {
         if (tile != null) {
             tiles.put(x, y, z, tile);
         } else {
-            if (tiles.remove(x, y, z) == null) {
-                return false;
-            }
+            return tiles.remove(x, y, z) != null;
         }
         return true;
     }
@@ -520,18 +518,14 @@ public class MCAChunk implements IChunk {
     @Override
     public void setBlocks(int layer, char[] data) {
         int offset = layer << 12;
-        for (int i = 0; i < 4096; i++) {
-            blocks[offset + i] = data[i];
-        }
+        System.arraycopy(data, 0, blocks, offset, 4096);
     }
 
     @Override
     public char[] load(int layer) {
         char[] tmp = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         int offset = layer << 12;
-        for (int i = 0; i < 4096; i++) {
-            tmp[i] = blocks[offset + i];
-        }
+        System.arraycopy(blocks, offset, tmp, 0, 4096);
         return tmp;
     }
 

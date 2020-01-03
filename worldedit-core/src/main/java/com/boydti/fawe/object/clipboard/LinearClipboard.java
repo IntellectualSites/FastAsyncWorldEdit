@@ -41,7 +41,6 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
      * The locations provided are relative to the clipboard min
      *
      * @param task
-     * @param air
      */
     public abstract void streamBiomes(IntValueReader task);
 

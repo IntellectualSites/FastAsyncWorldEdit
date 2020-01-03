@@ -520,33 +520,6 @@ public class UtilityCommands {
         return affected;
     }
 
-    private int killMatchingEntities(Integer radius, Actor actor, Supplier<EntityFunction> func) throws IncompleteRegionException,
-            MaxChangedBlocksException {
-        List<EntityVisitor> visitors = new ArrayList<>();
-
-        LocalSession session = we.getSessionManager().get(actor);
-        BlockVector3 center = session.getPlacementPosition(actor);
-        EditSession editSession = session.createEditSession(actor);
-        List<? extends Entity> entities;
-        if (radius >= 0) {
-            CylinderRegion region = CylinderRegion.createRadius(editSession, center, radius);
-            entities = editSession.getEntities(region);
-        } else {
-            entities = editSession.getEntities();
-        }
-        visitors.add(new EntityVisitor(entities.iterator(), func.get()));
-
-        int killed = 0;
-        for (EntityVisitor visitor : visitors) {
-            Operations.completeLegacy(visitor);
-            killed += visitor.getAffected();
-        }
-
-        session.remember(editSession);
-        editSession.flushSession();
-        return killed;
-    }
-
     @Command(
         name = "extinguish",
         aliases = { "/ex", "/ext", "/extinguish", "ex", "ext" },
@@ -633,6 +606,55 @@ public class UtilityCommands {
     }
 
     @Command(
+        name = "remove",
+        aliases = { "rem", "rement" },
+        desc = "Remove all entities of a type"
+    )
+    @CommandPermissions("worldedit.remove")
+    @Logging(PLACEMENT)
+    public int remove(Actor actor,
+        @Arg(desc = "The type of entity to remove")
+            EntityRemover remover,
+        @Arg(desc = "The radius of the cuboid to remove from")
+            int radius) throws WorldEditException {
+        if (radius < -1) {
+            actor.printError(TranslatableComponent.of("worldedit.remove.explain-all"));
+            return 0;
+        }
+
+        int removed = killMatchingEntities(radius, actor, remover::createFunction);
+        actor.printInfo(TranslatableComponent.of("worldedit.remove.removed", TextComponent.of(removed)));
+        return removed;
+    }
+
+    private int killMatchingEntities(Integer radius, Actor actor, Supplier<EntityFunction> func) throws IncompleteRegionException,
+        MaxChangedBlocksException {
+        List<EntityVisitor> visitors = new ArrayList<>();
+
+        LocalSession session = we.getSessionManager().get(actor);
+        BlockVector3 center = session.getPlacementPosition(actor);
+        EditSession editSession = session.createEditSession(actor);
+        List<? extends Entity> entities;
+        if (radius >= 0) {
+            CylinderRegion region = CylinderRegion.createRadius(editSession, center, radius);
+            entities = editSession.getEntities(region);
+        } else {
+            entities = editSession.getEntities();
+        }
+        visitors.add(new EntityVisitor(entities.iterator(), func.get()));
+
+        int killed = 0;
+        for (EntityVisitor visitor : visitors) {
+            Operations.completeLegacy(visitor);
+            killed += visitor.getAffected();
+        }
+
+        session.remember(editSession);
+        editSession.flushSession();
+        return killed;
+    }
+
+    @Command(
         name = "/help",
         desc = "Displays help for WorldEdit commands"
     )
@@ -646,28 +668,6 @@ public class UtilityCommands {
                          List<String> command) throws WorldEditException {
         PrintCommandHelp.help(command, page, listSubCommands,
                 we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
-    }
-
-    @Command(
-        name = "remove",
-        aliases = { "rem", "rement" },
-        desc = "Remove all entities of a type"
-    )
-    @CommandPermissions("worldedit.remove")
-    @Logging(PLACEMENT)
-    public int remove(Actor actor,
-                      @Arg(desc = "The type of entity to remove")
-                          EntityRemover remover,
-                      @Arg(desc = "The radius of the cuboid to remove from")
-                          int radius) throws WorldEditException {
-        if (radius < -1) {
-            actor.printError(TranslatableComponent.of("worldedit.remove.explain-all"));
-            return 0;
-        }
-
-        int removed = killMatchingEntities(radius, actor, remover::createFunction);
-        actor.printInfo(TranslatableComponent.of("worldedit.remove.removed", TextComponent.of(removed)));
-        return removed;
     }
 
     private DecimalFormat formatForLocale(Locale locale) {
@@ -696,7 +696,7 @@ public class UtilityCommands {
             double result = expression.evaluate(
                     new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
             String formatted = Double.isNaN(result) ? "NaN" : formatForLocale(actor.getLocale()).format(result);
-            return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.GRAY));
+            return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
         }, (Component) null);
     }
 

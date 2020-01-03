@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import javax.annotation.Nullable;
 
 public class PolyhedralRegion extends AbstractRegion {
@@ -69,7 +68,7 @@ public class PolyhedralRegion extends AbstractRegion {
     private BlockVector3 centerAccum = BlockVector3.ZERO;
 
     /**
-     * The last triangle that caused a {@link #contains(Vector)} to classify a point as "outside". Used for optimization.
+     * The last triangle that caused a {@link #contains(BlockVector3)} to classify a point as "outside". Used for optimization.
      */
     private Triangle lastTriangle;
 

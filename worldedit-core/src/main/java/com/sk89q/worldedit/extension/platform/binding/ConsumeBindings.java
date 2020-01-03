@@ -24,6 +24,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -168,11 +169,10 @@ public class ConsumeBindings extends Bindings {
     }
 
     /**
-     * Gets an {@link TreeType} from a {@link ArgumentStack}.
+     * Gets an {@link TreeType} from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return a TreeType
-     * @throws ParameterException on error
      * @throws WorldEditException on error
      */
     @Binding
@@ -192,11 +192,10 @@ public class ConsumeBindings extends Bindings {
     }
 
     /**
-     * Gets an {@link BiomeType} from a {@link ArgumentStack}.
+     * Gets an {@link BiomeType} from a {@link Binding}.
      *
-     * @param context the context
+     * @param argument the context
      * @return a BiomeType
-     * @throws ParameterException on error
      * @throws WorldEditException on error
      */
     @Binding

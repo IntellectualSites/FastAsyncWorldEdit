@@ -33,8 +33,8 @@ import java.util.concurrent.Future;
  */
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
-//    // Pool discarded chunks for reuse (can safely be cleared by another thread)
-//    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
+    // Pool discarded chunks for reuse (can safely be cleared by another thread)
+    // private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
 

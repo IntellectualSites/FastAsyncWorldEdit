@@ -4,11 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.Trimable;
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
@@ -18,6 +13,9 @@ import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,6 +32,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -192,7 +191,7 @@ public enum FaweCache implements Trimable {
         } else {
             pool = cache::get;
         }
-        Pool previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
+        Pool<T> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
         if (previous != null) {
             throw new IllegalStateException("Previous key");
         }
