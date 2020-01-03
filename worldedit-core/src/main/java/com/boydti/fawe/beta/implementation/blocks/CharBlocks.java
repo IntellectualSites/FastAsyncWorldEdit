@@ -104,10 +104,15 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     public void set(int x, int y, int z, char value) {
-        Fawe.imp().debug("Setting Block at x:" + x + ", y:" + y + " , z:" + z);
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
-        set(layer, index, value);
+        try {
+            set(layer, index, value);
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            Fawe.imp().debug("Tried Setting Block at x:" + x + ", y:" + y + " , z:" + z);
+            Fawe.imp().debug("Layer variable was = " + layer);
+            exception.printStackTrace();
+        }
     }
 
     /*
@@ -118,7 +123,7 @@ public abstract class CharBlocks implements IBlocks {
         return sections[layer].get(this, layer, index);
     }
 
-    public final void set(@Range(from = 0, to = 15) int layer, int index, char value) {
+    public final void set(@Range(from = 0, to = 15) int layer, int index, char value) throws ArrayIndexOutOfBoundsException {
         sections[layer].set(this, layer, index, value);
     }
 

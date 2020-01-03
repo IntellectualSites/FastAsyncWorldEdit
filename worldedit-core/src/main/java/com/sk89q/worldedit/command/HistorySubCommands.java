@@ -1,5 +1,7 @@
 package com.sk89q.worldedit.command;
 
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Caption;
@@ -37,14 +39,6 @@ import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.Range;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -54,8 +48,14 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
-
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import javax.annotation.Nullable;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class HistorySubCommands {
@@ -79,7 +79,7 @@ public class HistorySubCommands {
                                    @AllowedRegion Region[] allowedRegions,
                                    @ArgFlag(name = 'u', desc = "String user", def="me") UUID other,
                                    @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                   @Range(from = 0, to=Integer.MAX_VALUE) int radius,
+                                   @Range(from = 0, to = Integer.MAX_VALUE) int radius,
                                    @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
                                    @Time long timeDiff) throws WorldEditException {
         rollback(player, world, database, allowedRegions, other, radius, timeDiff, true);
@@ -96,7 +96,7 @@ public class HistorySubCommands {
                                       @AllowedRegion Region[] allowedRegions,
                                       @ArgFlag(name = 'u', desc = "String user", def = "") UUID other,
                                       @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                      @Range(from = 0, to=Integer.MAX_VALUE) int radius,
+                                      @Range(from = 0, to = Integer.MAX_VALUE) int radius,
                                       @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0") @Time long timeDiff,
                                       @Switch(name = 'f', desc = "Restore instead of rollback") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
@@ -277,8 +277,7 @@ public class HistorySubCommands {
     @CommandPermissions("worldedit.history.find")
     public synchronized void find(Player player, World world, RollbackDatabase database, Arguments arguments,
                                   @ArgFlag(name = 'u', desc = "String user") UUID other,
-                                  @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                  @Range(from = 0, to=Integer.MAX_VALUE) int radius,
+                                  @ArgFlag(name = 'r', def = "0", desc = "radius") int radius,
                                   @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
                                   @Time long timeDiff,
                                   @ArgFlag(name = 'p', desc = "Page to view.", def = "1") int page) throws WorldEditException {
@@ -318,7 +317,7 @@ public class HistorySubCommands {
         }
 
         PaginationBox pages = PaginationBox.fromStrings("Edits:", pageCommand, list, new Function<Supplier<RollbackOptimizedHistory>, Component>() {
-            @Nullable
+            @NotNull
             @Override
             public Component apply(@Nullable Supplier<RollbackOptimizedHistory> input) {
                 RollbackOptimizedHistory edit = input.get();
