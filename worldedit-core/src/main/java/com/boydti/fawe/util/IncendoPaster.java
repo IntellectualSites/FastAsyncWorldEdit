@@ -7,12 +7,15 @@ import com.google.gson.JsonParser;
 import com.sk89q.worldedit.util.paste.Paster;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Single class paster for the Incendo paste service
@@ -212,18 +215,20 @@ public final class IncendoPaster implements Paster {
             "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
                 + "problem\n");
         b.append("\n# Server Information\n");
-        b.append("server.platform: ").append(Fawe.imp().getPlatform()).append('\n');
+        b.append("Server Platform: ").append(Fawe.imp().getPlatform()).append('\n');
         b.append(Fawe.imp().getDebugInfo()).append('\n');
         b.append("\n\n# YAY! Now, let's see what we can find in your JVM\n");
         Runtime runtime = Runtime.getRuntime();
-        b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
-        b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
-        b.append("java.specification.version: '").append(System.getProperty("java.specification.version")).append("'\n");
-        b.append("java.vendor: '").append(System.getProperty("java.vendor")).append("'\n");
-        b.append("java.version: '").append(System.getProperty("java.version")).append("'\n");
-        b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
-        b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
-        b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
+        RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
+        b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS) + " minutes").append('\n');
+        b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024 + " MB").append('\n');
+        b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024 + " MB").append('\n');
+        b.append("Java Name: ").append(rb.getVmName()).append('\n');
+        b.append("Java Version: '").append(System.getProperty("java.version")).append("'\n");
+        b.append("Java Vendor: '").append(System.getProperty("java.vendor")).append("'\n");
+        b.append("Operating System: '").append(System.getProperty("os.name")).append("'\n");
+        b.append("OS Version: ").append(System.getProperty("os.version")).append('\n');
+        b.append("OS Arch: ").append(System.getProperty("os.arch")).append('\n');
         b.append("# Okay :D Great. You are now ready to create your bug report!");
         b.append("\n# You can do so at https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues");
         b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
