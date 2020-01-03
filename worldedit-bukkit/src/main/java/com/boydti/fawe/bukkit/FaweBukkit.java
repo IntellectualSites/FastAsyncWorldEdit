@@ -214,7 +214,7 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        msg.append("server.version: ").append(Bukkit.getVersion()).append("\n");
+        msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - ").append(p.getName()).append(": ")
