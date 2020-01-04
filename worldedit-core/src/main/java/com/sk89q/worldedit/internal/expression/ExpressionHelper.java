@@ -33,33 +33,51 @@ import java.util.stream.Collectors;
 
 import static com.sk89q.worldedit.antlr.ExpressionLexer.ID;
 
-class ExpressionHelper {
+public class ExpressionHelper {
 
-    static void check(boolean condition, ParserRuleContext ctx, String message) {
+    /**
+     * The argument should be wrapped in a {@link LocalSlot.Constant} before being passed.
+     */
+    public static final String WRAPPED_CONSTANT = "<wrapped constant>";
+
+    private ExpressionHelper() {
+    }
+
+    public static void check(boolean condition, ParserRuleContext ctx, String message) {
         if (!condition) {
             throw evalException(ctx, message);
         }
     }
 
-    static EvaluationException evalException(ParserRuleContext ctx, String message) {
+    public static int getErrorPosition(Token token) {
+        return token.getCharPositionInLine();
+    }
+
+    public static EvaluationException evalException(ParserRuleContext ctx, String message) {
+        return evalException(ctx.start, message);
+    }
+
+    public static EvaluationException evalException(Token token, String message) {
         return new EvaluationException(
-            ctx.getStart().getCharPositionInLine(),
-            message
+                getErrorPosition(token),
+                message
         );
     }
 
-    static void checkIterations(int iterations, ParserRuleContext ctx) {
+    public static void checkIterations(int iterations, ParserRuleContext ctx) {
         check(iterations <= 256, ctx, "Loop exceeded 256 iterations");
     }
 
-    static void checkTimeout() {
+    // Special argument handle names
+
+    public static void checkTimeout() {
         if (Thread.interrupted()) {
             throw new ExpressionTimeoutException("Calculations exceeded time limit.");
         }
     }
 
-    static MethodHandle resolveFunction(SetMultimap<String, MethodHandle> functions,
-                                        ExpressionParser.FunctionCallContext ctx) {
+    public static MethodHandle resolveFunction(SetMultimap<String, MethodHandle> functions,
+                                               ExpressionParser.FunctionCallContext ctx) {
         String fnName = ctx.name.getText();
         Set<MethodHandle> matchingFns = functions.get(fnName);
         check(!matchingFns.isEmpty(), ctx, "Unknown function '" + fnName + "'");
@@ -79,34 +97,28 @@ class ExpressionHelper {
         }
         // We matched no function, fail with appropriate message.
         String possibleCounts = matchingFns.stream()
-            .map(mh -> mh.isVarargsCollector()
-                ? (mh.type().parameterCount() - 1) + "+"
-                : String.valueOf(mh.type().parameterCount()))
-            .collect(Collectors.joining("/"));
+                .map(mh -> mh.isVarargsCollector()
+                        ? (mh.type().parameterCount() - 1) + "+"
+                        : String.valueOf(mh.type().parameterCount()))
+                .collect(Collectors.joining("/"));
         throw evalException(ctx, "Incorrect number of arguments for function '" + fnName + "', " +
-            "expected " + possibleCounts + ", " +
-            "got " + ctx.args.size());
+                "expected " + possibleCounts + ", " +
+                "got " + ctx.args.size());
     }
-
-    // Special argument handle names
-    /**
-     * The argument should be wrapped in a {@link LocalSlot.Constant} before being passed.
-     */
-    static final String WRAPPED_CONSTANT = "<wrapped constant>";
 
     /**
      * If this argument needs a handle, returns the name of the handle needed. Otherwise, returns
      * {@code null}. If {@code arg} isn't a valid handle reference, throws.
      */
-    static String getArgumentHandleName(String fnName, MethodType type, int i,
-                                        ParserRuleContext arg) {
+    public static String getArgumentHandleName(String fnName, MethodType type, int i,
+                                               ParserRuleContext arg) {
         // Pass variable handle in for modification?
         Class<?> pType = type.parameterType(i);
         Optional<String> id = tryResolveId(arg);
         if (pType == LocalSlot.Variable.class) {
             // MUST be an id
             check(id.isPresent(), arg,
-                "Function '" + fnName + "' requires a variable in parameter " + i);
+                    "Function '" + fnName + "' requires a variable in parameter " + i);
             return id.get();
         } else if (pType == LocalSlot.class) {
             return id.orElse(WRAPPED_CONSTANT);
@@ -116,7 +128,7 @@ class ExpressionHelper {
 
     private static Optional<String> tryResolveId(ParserRuleContext arg) {
         Optional<ExpressionParser.WrappedExprContext> wrappedExprContext =
-            tryAs(arg, ExpressionParser.WrappedExprContext.class);
+                tryAs(arg, ExpressionParser.WrappedExprContext.class);
         if (wrappedExprContext.isPresent()) {
             return tryResolveId(wrappedExprContext.get().expression());
         }
@@ -127,8 +139,8 @@ class ExpressionHelper {
     }
 
     private static <T extends ParserRuleContext> Optional<T> tryAs(
-        ParserRuleContext ctx,
-        Class<T> rule
+            ParserRuleContext ctx,
+            Class<T> rule
     ) {
         if (rule.isInstance(ctx)) {
             return Optional.of(rule.cast(ctx));
@@ -141,9 +153,6 @@ class ExpressionHelper {
             return Optional.empty();
         }
         return tryAs(ctxs.get(0), rule);
-    }
-
-    private ExpressionHelper() {
     }
 
 }

@@ -131,7 +131,7 @@ public class HistoryCommands {
             }
         }
         if (timesRedone > 0) {
-            actor.printInfo(TranslatableComponent.of("worldedit.redo.undone", TextComponent.of(timesRedone)));
+            actor.printInfo(TranslatableComponent.of("worldedit.redo.redone", TextComponent.of(timesRedone)));
         } else {
             actor.printError(TranslatableComponent.of("worldedit.redo.none"));
         }

@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.world.block;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
@@ -33,20 +32,21 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
 
@@ -54,7 +54,8 @@ public class BlockType implements FawePattern, Keyed {
 
     private final String id;
     private final BlockTypesCache.Settings settings;
-
+    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
+    private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
     private boolean initItemType;
     private ItemType itemType;
 
@@ -103,6 +104,7 @@ public class BlockType implements FawePattern, Keyed {
             return name;
         }
     }
+
     /*
     private BlockState computeDefaultState() {
 
@@ -212,7 +214,7 @@ public class BlockType implements FawePattern, Keyed {
              */
             AbstractProperty btp = this.settings.propertiesMap.get(prop.getName());
             checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
-            id = btp.modify(id, btp.getValueFor((String)value));
+            id = btp.modify(id, btp.getValueFor((String) value));
         }
         return withStateId(id);
     }
@@ -233,7 +235,7 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Nullable
     public ItemType getItemType() {
-        if(!initItemType) {
+        if (!initItemType) {
             initItemType = true;
             itemType = ItemTypes.get(this.id);
         }
@@ -251,7 +253,7 @@ public class BlockType implements FawePattern, Keyed {
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
-     *
+     * <p>
      * DO NOT USE THIS.
      *
      * @return legacy id or 0, if unknown
@@ -264,7 +266,7 @@ public class BlockType implements FawePattern, Keyed {
 
     /**
      * The internal index of this type.
-     *
+     * <p>
      * This number is not necessarily consistent across restarts.
      *
      * @return internal id
@@ -288,7 +290,6 @@ public class BlockType implements FawePattern, Keyed {
         return obj == this; // stop changing this to a shitty string comparison
     }
 
-
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setBlock(extent, getDefaultState());
@@ -307,14 +308,25 @@ public class BlockType implements FawePattern, Keyed {
         return new SingleBlockTypeMask(extent, this);
     }
 
-
     @Deprecated
     public int getLegacyId() {
-        Integer id = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
-        if (id != null) {
-            return id >> 4;
-        } else {
-            return 0;
-        }
+        return legacyId.getValue();
+    }
+
+    /**
+     * Gets the legacy data. Needed for legacy reasons.
+     * <p>
+     * DO NOT USE THIS.
+     *
+     * @return legacy data or 0, if unknown
+     */
+    @Deprecated
+    public int getLegacyData() {
+        return legacyData.getValue();
+    }
+
+    private int computeLegacy(int index) {
+        int[] legacy = LegacyMapper.getInstance().getLegacyFromBlock(this.getDefaultState());
+        return legacy != null ? legacy[index] : 0;
     }
 }

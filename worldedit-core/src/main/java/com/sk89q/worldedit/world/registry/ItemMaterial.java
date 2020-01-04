@@ -17,9 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This package contains the old command system. It is no longer in use. Please switch
- * to Piston, Intake, ACF, or similar systems.
- */
-@Deprecated
-package com.sk89q.minecraft.util.commands;
+package com.sk89q.worldedit.world.registry;
+
+public interface ItemMaterial {
+    /**
+     * Gets the the maximum quantity of this item that can be in a single stack.
+     *
+     * @return the maximum quantity
+     */
+    int getMaxStackSize();
+
+    /**
+     * Gets the the maximum damage this item can take before being broken.
+     *
+     * @return the maximum damage, or 0 if not applicable
+     */
+    int getMaxDamage();
+}
