@@ -1,8 +1,5 @@
 package com.boydti.fawe.object.collection;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public class VariableThreadLocal extends CleanableThreadLocal<byte[]> {
     public VariableThreadLocal() {
         super(() -> null);

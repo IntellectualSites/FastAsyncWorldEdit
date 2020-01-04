@@ -34,6 +34,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
@@ -397,10 +398,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     public List<MCAChunk> getCachedChunks() {
-        int size = 0;
-        for (int i = 0; i < chunks.length; i++) {
-            if (chunks[i] != null && this.chunkInitialized[i]) size++;
-        }
+        int size = (int) IntStream.range(0, chunks.length)
+            .filter(i -> chunks[i] != null && this.chunkInitialized[i]).count();
         ArrayList<MCAChunk> list = new ArrayList<>(size);
         for (int i = 0; i < chunks.length; i++) {
             MCAChunk chunk = chunks[i];

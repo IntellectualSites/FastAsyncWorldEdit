@@ -1,7 +1,6 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
-import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;

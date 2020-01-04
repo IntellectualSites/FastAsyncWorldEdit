@@ -18,6 +18,7 @@
  */
 
 package com.sk89q.worldedit.command;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
@@ -25,7 +26,6 @@ import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgum
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
@@ -41,8 +41,6 @@ import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.generator.CavesGen;
-
-import java.util.List;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -53,23 +51,21 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
-
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.jetbrains.annotations.Range;
 
 /**

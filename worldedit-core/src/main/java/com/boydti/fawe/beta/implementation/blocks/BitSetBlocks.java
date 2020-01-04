@@ -4,13 +4,10 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;

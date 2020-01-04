@@ -19,21 +19,20 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.command.HistorySubCommands;
-import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
+import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -61,6 +60,8 @@ import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.GenerationCommandsRegistration;
 import com.sk89q.worldedit.command.HistoryCommands;
 import com.sk89q.worldedit.command.HistoryCommandsRegistration;
+import com.sk89q.worldedit.command.HistorySubCommands;
+import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
 import com.sk89q.worldedit.command.MaskCommands;
 import com.sk89q.worldedit.command.MaskCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
@@ -135,10 +136,26 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
@@ -160,26 +177,9 @@ import org.enginehub.piston.part.SubCommandPart;
 import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -333,15 +333,41 @@ public final class PlatformCommandManager {
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandManager commandManager,
-        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance) {
-        registerSubCommands(name, aliases, desc, commandManager, handlerInstance, m -> {});
+        CommandRegistration<CI> registration, CI instance) {
+        registerSubCommands(name, aliases, desc, registration, instance, m -> {});
+    }
+
+    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+        CommandRegistration<CI> registration, CI instance,
+        Consumer<CommandManager> additionalConfig) {
+        commandManager.register(name, cmd -> {
+            cmd.aliases(aliases);
+            cmd.description(TextComponent.of(desc));
+            cmd.action(Command.Action.NULL_ACTION);
+
+            CommandManager manager = commandManagerService.newCommandManager();
+            this.registration.register(
+                manager,
+                registration,
+                instance
+            );
+            additionalConfig.accept(manager);
+
+            final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
+            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+                TextComponent.of("Sub-command to run."))
+                .withCommands(subCommands)
+                .required()
+                .build());
+
+            cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
+        });
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
         CommandManager commandManager,
         Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
-        Consumer<CommandManager> additionalConfig) {
+        @NotNull Consumer<CommandManager> additionalConfig) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -356,7 +382,7 @@ public final class PlatformCommandManager {
                         instance
                 );
             });
-            if (additionalConfig != null) additionalConfig.accept(manager);
+            additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
@@ -369,26 +395,21 @@ public final class PlatformCommandManager {
         });
     }
 
-    public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                         CommandRegistration<CI> registration, CI instance) {
-        registerSubCommands(name, aliases, desc, commandManager, c -> c.accept(registration, instance));
-    }
-
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             registerSubCommands(
-                    "patterns",
-                    ImmutableList.of(),
-                    "Patterns determine what blocks are placed",
-                    PatternCommandsRegistration.builder(),
-                    new PatternCommands()
+                "patterns",
+                ImmutableList.of(),
+                "Patterns determine what blocks are placed",
+                PatternCommandsRegistration.builder(),
+                new PatternCommands()
             );
             registerSubCommands(
-                    "masks",
-                    ImmutableList.of(),
-                    "Masks determine which blocks are placed",
-                    MaskCommandsRegistration.builder(),
-                    new MaskCommands(worldEdit)
+                "masks",
+                ImmutableList.of(),
+                "Masks determine which blocks are placed",
+                MaskCommandsRegistration.builder(),
+                new MaskCommands(worldEdit)
             );
             registerSubCommands(
                 "transforms",
@@ -486,11 +507,11 @@ public final class PlatformCommandManager {
                     history
             );
             registerSubCommands(
-                    "/history",
-                    ImmutableList.of("/frb"),
-                    "Manage your history",
-                    HistorySubCommandsRegistration.builder(),
-                    new HistorySubCommands(history)
+                "/history",
+                ImmutableList.of("/frb"),
+                "Manage your history",
+                HistorySubCommandsRegistration.builder(),
+                new HistorySubCommands(history)
             );
             this.registration.register(
                 commandManager,
@@ -718,7 +739,7 @@ public final class PlatformCommandManager {
             if (msg != TextComponent.empty()) {
                 actor.print(TextComponent.builder("")
                         .color(TextColor.RED)
-                        .append(msg)
+                        .append(e.getRichMessage())
                         .build());
                 List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
                 printUsage(actor, argList);
@@ -736,13 +757,16 @@ public final class PlatformCommandManager {
                 editSession.flushQueue();
                 session.remember(editSession);
 
-                long timems = System.currentTimeMillis() - start;
-                if (timems > 1000) {
+                long time = System.currentTimeMillis() - start;
+                double timeS = (time / 1000.0);
+                int changed = editSession.getBlockChangeCount();
+                double throughput = timeS == 0 ? changed : changed / timeS;
+                if (time > 1000) {
                     actor.printDebug(TranslatableComponent.of(
                             "worldedit.command.time-elapsed",
-                            TextComponent.of(timems + "m"),
-                            TextComponent.of(-1),
-                            TextComponent.of(Math.round(-1))
+                            TextComponent.of(timeS),
+                            TextComponent.of(changed),
+                            TextComponent.of(Math.round(throughput))
                     ));
                 }
 

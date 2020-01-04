@@ -20,12 +20,9 @@
 package com.sk89q.worldedit.world.storage;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,18 +75,9 @@ public abstract class LegacyChunkStore extends ChunkStore {
         String filename = "c." + Integer.toString(x, 36)
                 + "." + Integer.toString(z, 36) + ".dat";
 
-        InputStream stream = getInputStream(folder1, folder2, filename);
-        Tag tag;
-
-        try (NBTInputStream nbt = new NBTInputStream(new GZIPInputStream(stream))) {
-            tag = nbt.readNamedTag().getTag();
-            if (!(tag instanceof CompoundTag)) {
-                throw new ChunkStoreException("CompoundTag expected for chunk; got "
-                        + tag.getClass().getName());
-            }
-
-            return (CompoundTag) tag;
-        }
+        return ChunkStoreHelper.readCompoundTag(() ->
+            new GZIPInputStream(getInputStream(folder1, folder2, filename))
+        );
     }
 
     private static int divisorMod(int a, int n) {

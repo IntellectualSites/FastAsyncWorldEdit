@@ -207,8 +207,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -250,16 +249,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
+        public boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             return chunk.setBiome(x, y, z, biome);
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             return chunk.setBlock(x, y, z, block);
@@ -471,11 +468,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         IChunkGet get(ChunkHolder chunk);
         IChunkSet set(ChunkHolder chunk);
 
-        boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome);
+        boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome);
 
-        boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder holder);
+        boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder holder);
 
         BiomeType getBiome(ChunkHolder chunk, int x, int y, int z);
 

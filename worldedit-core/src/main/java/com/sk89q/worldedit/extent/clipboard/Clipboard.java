@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
@@ -29,20 +31,16 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
-import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.Order;
-import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
@@ -52,9 +50,6 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,19 +58,20 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
 public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
+
     static Clipboard create(Region region) {
         checkNotNull(region);
         checkNotNull(region.getWorld(),
-                "World cannot be null (use the other constructor for the region)");
+            "World cannot be null (use the other constructor for the region)");
         EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
-                .autoQueue(false).build();
+            .autoQueue(false).build();
         return ReadOnlyClipboard.of(session, region);
     }
 
@@ -120,10 +116,11 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     void setOrigin(BlockVector3 origin);
 
     /**
-     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
-     * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null}
-     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
-     * to ocean, instead of having biomes explicitly set.
+     * Returns true if the clipboard has biome data. This can be checked since {@link
+     * Extent#getBiome(BlockVector2)} strongly suggests returning {@link
+     * com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null} if biomes aren't
+     * present. However, it might not be desired to set areas to ocean if the clipboard is
+     * defaulting to ocean, instead of having biomes explicitly set.
      *
      * @return true if the clipboard has biome data set
      */
@@ -133,7 +130,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     /**
      * Remove entity from clipboard
-     * @param entity
      */
     void removeEntity(Entity entity);
 
@@ -161,6 +157,8 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return order.create(getRegion());
     }
 
+    @Override
+    @NotNull
     default Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }
@@ -173,35 +171,20 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return null;
     }
 
-//    default void paste(Extent other, BlockVector3 to) {
-//      TODO FIXME
-//    }
-
     @Override
     default <T extends Filter> T apply(Region region, T filter, boolean full) {
         if (region.equals(getRegion())) {
             return apply(this, filter);
-        } else {
-            return apply((Iterable<BlockVector3>) region, filter);
         }
+        return apply(region, filter);
     }
 
     @Override
     default void close() {
-
     }
-
-
-    /*
-    Utility methods
-     */
 
     /**
      * Forwards to paste(world, to, true, true, null)
-     *
-     * @param world
-     * @param to
-     * @return
      */
     default EditSession paste(World world, BlockVector3 to) {
         return paste(world, to, true, true, null);
@@ -222,10 +205,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     /**
      * Save this schematic to a stream
-     *
-     * @param stream
-     * @param format
-     * @throws IOException
      */
     default void save(OutputStream stream, ClipboardFormat format) throws IOException {
         checkNotNull(stream);
@@ -236,22 +215,15 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
-                             @Nullable Transform transform) {
+        @Nullable Transform transform) {
         return paste(world, to, allowUndo, pasteAir, true, transform);
     }
 
     /**
      * Paste this schematic in a world
-     *
-     * @param world
-     * @param to
-     * @param allowUndo
-     * @param pasteAir
-     * @param transform
-     * @return
      */
     default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
-                             boolean copyEntities, @Nullable Transform transform) {
+        boolean copyEntities, @Nullable Transform transform) {
         checkNotNull(world);
         checkNotNull(to);
         EditSession editSession;
@@ -259,7 +231,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             editSession = (EditSession) world;
         } else {
             EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
-                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {
@@ -276,7 +248,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             return editSession;
         }
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, this.getRegion(),
-                this.getOrigin(), editSession, to);
+            this.getOrigin(), editSession, to);
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
@@ -298,12 +270,14 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return editSession;
     }
 
-    default void paste(Extent extent, BlockVector3 to, boolean pasteAir, @Nullable Transform transform) {
+    default void paste(Extent extent, BlockVector3 to, boolean pasteAir,
+        @Nullable Transform transform) {
         Extent source = this;
         if (transform != null && !transform.isIdentity()) {
             source = new BlockTransformExtent(this, transform);
         }
-        ForwardExtentCopy copy = new ForwardExtentCopy(source, this.getRegion(), this.getOrigin(), extent, to);
+        ForwardExtentCopy copy = new ForwardExtentCopy(source, this.getRegion(), this.getOrigin(),
+            extent, to);
         if (transform != null) {
             copy.setTransform(transform);
         }
@@ -345,6 +319,9 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
             }
+            if (pos.getY() < 0) {
+                throw new RuntimeException("Y-Position cannot be less than 0!");
+            }
             extent.setBlock(xx, pos.getY() + rely, zz, block);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
@@ -355,13 +332,13 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         for (Entity entity : this.getEntities()) {
             // skip players on pasting schematic
             if (entity.getState() != null && entity.getState().getType().getId()
-                    .equals("minecraft:player")) {
+                .equals("minecraft:player")) {
                 continue;
             }
             Location pos = entity.getLocation();
             Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                    pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
-                    pos.getPitch());
+                pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                pos.getPitch());
             extent.createEntity(newPos, entity.getState());
         }
     }

@@ -49,10 +49,7 @@ import org.jetbrains.annotations.NotNull;
 public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
 
-    private boolean useOldIterator;
     private int minX, minY, minZ, maxX, maxY, maxZ;
-    private BlockVector3 min;
-    private BlockVector3 max;
     private BlockVector3 pos1;
     private BlockVector3 pos2;
 
@@ -80,10 +77,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         this.pos1 = pos1;
         this.pos2 = pos2;
         recalculate();
-    }
-
-    public void setUseOldIterator(boolean useOldIterator) {
-        this.useOldIterator = useOldIterator;
     }
 
     /**
@@ -139,8 +132,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         maxX = Math.max(pos1.getX(), pos2.getX());
         maxY = Math.max(pos1.getY(), pos2.getY());
         maxZ = Math.max(pos1.getZ(), pos2.getZ());
-        this.min = BlockVector3.at(minX, minY, minZ);
-        this.max = BlockVector3.at(maxX, maxY, maxZ);
     }
 
     /**
@@ -188,12 +179,22 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return min;
+        return pos1.getMinimum(pos2);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return max;
+        return pos1.getMaximum(pos2);
+    }
+
+    @Override
+    public int getMinimumY() {
+        return minY;
+    }
+
+    @Override
+    public int getMaximumY() {
+        return maxY;
     }
 
     @Override
@@ -448,7 +449,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9 || useOldIterator) {
+        if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9) {
             return iterator_old();
         }
         return new Iterator<BlockVector3>() {
@@ -644,16 +645,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new CuboidRegion(origin.subtract(size), origin.add(size));
     }
 
-    @Override
-    public int getMinimumY() {
-        return minY;
-    }
-
-    @Override
-    public int getMaximumY() {
-        return maxY;
-    }
-
     public int getMinimumX() {
         return minX;
     }
@@ -724,7 +715,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             trimNBT(set, this::contains);
             return set;
         }
-        else if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
+        if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
             trimY(set, minY, maxY);
             final int lowerX = Math.max(0, minX - bx);
             final int upperX = Math.min(15, 15 + maxX - tx);
@@ -781,9 +772,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
             trimNBT(set, this::contains);
             return set;
-        } else {
-            return null;
         }
+        return null;
     }
 
 

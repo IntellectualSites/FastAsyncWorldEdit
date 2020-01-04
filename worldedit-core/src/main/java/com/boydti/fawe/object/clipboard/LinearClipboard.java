@@ -18,6 +18,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.Iterator;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Best used when clipboard selections are small, or using legacy formats
@@ -42,12 +43,12 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
      * The locations provided are relative to the clipboard min
      *
      * @param task
-     * @param air
      */
     public abstract void streamBiomes(IntValueReader task);
 
     public abstract Collection<CompoundTag> getTileEntities();
 
+    @Override
     public void close() {}
 
     public void flush() {}
@@ -57,6 +58,7 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
         close();
     }
 
+    @NotNull
     @Override
     public Iterator<BlockVector3> iterator() {
         return iterator(Order.YZX);

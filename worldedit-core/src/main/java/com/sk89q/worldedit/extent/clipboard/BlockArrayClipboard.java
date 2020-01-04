@@ -44,6 +44,7 @@ import java.io.Closeable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -240,6 +241,7 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
         return getParent().getBiomeType(x, y, z);
     }
 
+    @NotNull
     @Override
     public Iterator<BlockVector3> iterator() {
         OffsetBlockVector3 mutable = new OffsetBlockVector3(offset);

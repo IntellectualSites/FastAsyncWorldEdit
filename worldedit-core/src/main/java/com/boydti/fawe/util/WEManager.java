@@ -13,6 +13,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -92,6 +93,7 @@ public class WEManager {
                                 backupRegions.add(region);
                             }
                         } else {
+                            player.printDebug(TextComponent.of("Invalid Mask"));
                             removed = true;
                             iterator.remove();
                         }
@@ -115,6 +117,8 @@ public class WEManager {
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
+            } else {
+                player.printError(TextComponent.of("Missing permission " +  "fawe." + manager.getKey()));
             }
         }
         regions.addAll(backupRegions);

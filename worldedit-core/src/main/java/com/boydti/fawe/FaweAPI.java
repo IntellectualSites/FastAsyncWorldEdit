@@ -1,8 +1,6 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -31,6 +29,7 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
@@ -152,13 +151,12 @@ public class FaweAPI {
      * Remember to commit when you're done!<br>
      *
      * @param world     The name of the world
-     * @param autoqueue If it should start dispatching before you enqueue it.
-     * @return
-     * @see IQueueExtent#enqueue()
+     * @param autoQueue If it should start dispatching before you enqueue it.
+     * @return the queue extent
      */
-    public static IQueueExtent createQueue(World world, boolean autoqueue) {
+    public static IQueueExtent createQueue(World world, boolean autoQueue) {
         IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
-        if (!autoqueue) {
+        if (!autoQueue) {
             queue.disableQueue();
         }
         return queue;
@@ -189,10 +187,9 @@ public class FaweAPI {
     /**
      * Just forwards to ClipboardFormat.SCHEMATIC.load(file)
      *
-     * @param file
-     * @return
+     * @param file the file to load
+     * @return a clipboard containing the schematic
      * @see ClipboardFormat
-     * @see Schematic
      */
     public static Clipboard load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);

@@ -13,6 +13,7 @@ import com.boydti.fawe.beta.implementation.filter.block.MultiFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.blocks.FallbackChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -51,7 +52,6 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.Location;
@@ -66,7 +66,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1548,9 +1547,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void setHeights(int value) {
-        heights.record(() -> {
-            Arrays.fill(heights.get(), (byte) value);
-        });
+        heights.record(() -> Arrays.fill(heights.get(), (byte) value));
     }
 
     @Override

@@ -29,7 +29,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.DataException;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -55,11 +54,10 @@ public class AnvilChunk implements Chunk {
     /**
      * Construct the chunk with a compound tag.
      *
-     * @param world the world to construct the chunk for
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk(World world, CompoundTag tag) throws DataException {
+    public AnvilChunk(CompoundTag tag) throws DataException {
         rootTag = tag;
 
         rootX = NBTUtils.getChildTag(rootTag.getValue(), "xPos", IntTag.class).getValue();
@@ -261,13 +259,11 @@ public class AnvilChunk implements Chunk {
             WorldEdit.logger.warn("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
-        if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
 
             if (tileEntity != null) {
                 return state.toBaseBlock(tileEntity);
             }
-        }
 
         return state.toBaseBlock();
     }

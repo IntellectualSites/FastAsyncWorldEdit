@@ -262,9 +262,7 @@ public class BlockMaskBuilder {
     }
 
     public BlockMaskBuilder addAll() {
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = ALL;
-        }
+        Arrays.fill(bitSets, ALL);
         reset(true);
         return this;
     }
@@ -275,9 +273,7 @@ public class BlockMaskBuilder {
     }
 
     public BlockMaskBuilder clear() {
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = null;
-        }
+        Arrays.fill(bitSets, null);
         reset(true);
         return this;
     }

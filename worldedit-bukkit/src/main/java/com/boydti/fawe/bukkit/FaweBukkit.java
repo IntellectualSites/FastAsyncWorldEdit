@@ -41,7 +41,6 @@ import java.util.function.Supplier;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,7 +49,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,7 +212,7 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        msg.append("server.version: ").append(Bukkit.getVersion()).append("\n");
+        msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - ").append(p.getName()).append(": ")
@@ -353,7 +351,6 @@ public class FaweBukkit implements IFawe, Listener {
             return null;
         }
         return null;
-//        return ((BlocksHubBukkit) blocksHubPlugin).getApi();
     }
 
     @Override

@@ -10,7 +10,7 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
      * @return
      */
     @Override
-    default IQueueChunk reset() {
+    default IQueueChunk<T> reset() {
         init(null, getX(), getZ());
         return this;
     }
