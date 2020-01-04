@@ -22,8 +22,8 @@ public class BiomeMask extends AbstractExtentMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
+    public boolean test(Extent extent, BlockVector3 vector) {
         BlockVector2 pos = mutable.setComponents(vector.getBlockX(), vector.getBlockZ());
-        return getExtent().getBiome(pos).getId() == biome.getId();
+        return extent.getBiome(pos).getId() == biome.getId();
     }
 }

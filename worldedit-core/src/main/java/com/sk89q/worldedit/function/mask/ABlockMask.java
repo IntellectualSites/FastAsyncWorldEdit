@@ -2,6 +2,7 @@ package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -13,6 +14,11 @@ import java.util.List;
 public abstract class ABlockMask extends AbstractExtentMask {
     public ABlockMask(Extent extent) {
         super(extent);
+    }
+
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(vector.getBlock(extent));
     }
 
     public abstract boolean test(BlockState state);

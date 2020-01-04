@@ -22,6 +22,8 @@ package com.sk89q.worldedit.function.mask;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.request.Request;
 
 /**
  * An abstract implementation of {@link Mask} that takes uses an {@link Extent}.
@@ -37,6 +39,11 @@ public abstract class AbstractExtentMask extends AbstractMask {
      */
     protected AbstractExtentMask(Extent extent) {
         setExtent(extent);
+    }
+
+    @Override
+    public boolean test(BlockVector3 vector) {
+        return test(getExtent(), vector);
     }
 
     /**
@@ -58,4 +65,9 @@ public abstract class AbstractExtentMask extends AbstractMask {
         this.extent = extent;
     }
 
+    @Override
+    public Mask withExtent(Extent extent) {
+        setExtent(extent);
+        return this;
+    }
 }

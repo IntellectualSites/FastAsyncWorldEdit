@@ -317,7 +317,7 @@ public class ForwardExtentCopy implements Operation {
                 }
                 if (sourceMask != Masks.alwaysTrue()) {
                     new MaskTraverser(sourceMask).reset(transExt);
-                    copy = new RegionMaskingFilter(sourceMask, copy);
+                    copy = new RegionMaskingFilter(source, sourceMask, copy);
                 }
                 if (copyingBiomes && source.isWorld() || (source instanceof Clipboard && ((Clipboard) source).hasBiomes())) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
@@ -371,7 +371,7 @@ public class ForwardExtentCopy implements Operation {
             }
             if (sourceMask != Masks.alwaysTrue()) {
                 if (maskFunc != null) copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
-                else copy = new RegionMaskingFilter(sourceMask, copy);
+                else copy = new RegionMaskingFilter(source, sourceMask, copy);
             }
             if (copyingBiomes && source.isWorld() || (source instanceof Clipboard && ((Clipboard) source).hasBiomes())) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));

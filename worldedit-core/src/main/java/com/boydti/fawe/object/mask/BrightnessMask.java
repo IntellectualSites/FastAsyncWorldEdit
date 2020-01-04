@@ -16,8 +16,7 @@ public class BrightnessMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        Extent extent = getExtent();
+    public boolean test(Extent extent, BlockVector3 vector) {
         if (extent instanceof LightingExtent) {
             int light = ((LightingExtent) extent).getBrightness(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
             return light >= min && light <= max;

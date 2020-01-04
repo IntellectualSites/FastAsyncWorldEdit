@@ -8,28 +8,28 @@ public class ExtremaMask extends AngleMask {
     }
 
     @Override
-    protected boolean testSlope(int x, int y, int z) {
+    protected boolean testSlope(Extent extent, int x, int y, int z) {
         double slope, tmp;
         boolean aboveMin;
         lastY = y;
 
-        int base = getHeight(x, y, z);
+        int base = getHeight(extent, x, y, z);
 
-        slope = get(base, x, y, z, 1, 0, distance) * ADJACENT_MOD;
+        slope = getHeight(extent, base, x, y, z, 1, 0, distance) * ADJACENT_MOD;
 
-        tmp = get(base, x, y, z, 0, 1, distance) * ADJACENT_MOD;
+        tmp = getHeight(extent, base, x, y, z, 0, 1, distance) * ADJACENT_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
-        tmp = get(base, x, y, z, 1, 1, distance) * DIAGONAL_MOD;
+        tmp = getHeight(extent, base, x, y, z, 1, 1, distance) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
-        tmp = get(base, x, y, z, 1, -1, distance) * DIAGONAL_MOD;
+        tmp = getHeight(extent, base, x, y, z, 1, -1, distance) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
         return lastValue = (slope > min && slope < max);
     }
 
-    private int get(int base, int x, int y, int z, int OX, int OZ, int iterations) {
+    private int getHeight(Extent extent, int base, int x, int y, int z, int OX, int OZ, int iterations) {
         int sign = 0;
         int lastHeight1 = base;
         int lastHeight2 = base;
@@ -40,8 +40,8 @@ public class ExtremaMask extends AngleMask {
             int z1 = z + coz;
             int x2 = x - cox;
             int z2 = z - coz;
-            int height1 = getHeight(x1, y, z1);
-            int height2 = getHeight(x2, y, z2);
+            int height1 = getHeight(extent, x1, y, z1);
+            int height2 = getHeight(extent, x2, y, z2);
             int diff1 = height1 - lastHeight1;
             int diff2 = height2 - lastHeight2;
             int sign1 = Integer.signum(diff1);

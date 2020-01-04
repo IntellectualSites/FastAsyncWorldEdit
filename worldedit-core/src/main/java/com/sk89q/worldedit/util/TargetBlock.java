@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.util;
 
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
@@ -38,7 +39,7 @@ import javax.annotation.Nullable;
  */
 public class TargetBlock {
 
-    private final World world;
+    private final Extent world;
 
     private int maxDistance;
     private double checkDistance, curDistance;
@@ -58,11 +59,7 @@ public class TargetBlock {
      * @param player player to work with
      */
     public TargetBlock(Player player) {
-        this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(),
-                300, 1.65, 0.2);
-        this.stopMask = new ExistingBlockMask(world);
-        this.solidMask = new SolidBlockMask(world);
+        this(player, 300, 0.2);
     }
 
     /**
@@ -73,6 +70,10 @@ public class TargetBlock {
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
+        this(player, player.getWorld(), maxDistance, checkDistance);
+    }
+
+    public TargetBlock(Player player, Extent extent, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
         this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
         this.stopMask = new ExistingBlockMask(world);
@@ -145,7 +146,7 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-            if (stopMask.test(targetPos)) {
+            if (stopMask.test(world, targetPos)) {
                 break;
             } else {
                 if (searchForLastBlock) {
@@ -168,7 +169,7 @@ public class TargetBlock {
      */
     public Location getTargetBlock() {
         //noinspection StatementWithEmptyBody
-        while (getNextBlock() != null && !stopMask.test(targetPos)) ;
+        while (getNextBlock() != null && !stopMask.test(world, targetPos)) ;
         return getCurrentBlock();
     }
 
@@ -180,7 +181,7 @@ public class TargetBlock {
      */
     public Location getSolidTargetBlock() {
         //noinspection StatementWithEmptyBody
-        while (getNextBlock() != null && !solidMask.test(targetPos)) ;
+        while (getNextBlock() != null && !solidMask.test(world, targetPos)) ;
         return getCurrentBlock();
     }
 

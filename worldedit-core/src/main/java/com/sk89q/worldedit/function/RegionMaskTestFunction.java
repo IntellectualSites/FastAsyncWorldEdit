@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -51,7 +52,7 @@ public class RegionMaskTestFunction implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        if (mask.test(position)) {
+        if (mask.test(NullExtent.INSTANCE, position)) {
             return pass.apply(position);
         } else {
             return fail.apply(position);

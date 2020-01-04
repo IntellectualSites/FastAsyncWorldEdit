@@ -456,7 +456,7 @@ public class CFICommands {
                 for (int typeId : tu.getValidBlockIds()) {
                     BlockType type = BlockTypes.get(typeId);
                     extent.init(0, 0, 0, type.getDefaultState().toBaseBlock());
-                    if (mask.test(extent)) {
+                    if (mask.test(extent, extent)) {
                         blocks.add(type);
                     }
                 }

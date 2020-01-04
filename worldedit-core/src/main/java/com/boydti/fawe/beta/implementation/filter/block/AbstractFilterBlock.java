@@ -16,11 +16,8 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     public abstract BaseBlock getFullBlock();
     public abstract void setFullBlock(BaseBlock block);
     public abstract BlockVector3 getPosition();
-
     @Override
-    public Extent getExtent() {
-        return this;
-    }
+    public abstract Extent getExtent();
 
     @Override
     public int getX() {

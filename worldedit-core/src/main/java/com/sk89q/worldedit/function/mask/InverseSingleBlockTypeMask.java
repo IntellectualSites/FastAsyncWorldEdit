@@ -16,8 +16,8 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return test(vector.getBlock(getExtent()));
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(vector.getBlock(extent));
     }
 
     @Override

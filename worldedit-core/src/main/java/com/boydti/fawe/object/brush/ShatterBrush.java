@@ -76,7 +76,7 @@ public class ShatterBrush extends ScatterBrush {
                         int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
                         if (dSqr <= radius2) {
                             BlockVector3 bv = mutable.setComponents(x2, y2, z2);
-                            if (surfaceTest.test(bv) && finalMask.test(bv)) {
+                            if (surfaceTest.test(editSession, bv) && finalMask.test(editSession, bv)) {
                                 // (collision) If it's visited and part of another frontier, set the block
                                 if (!placed.add(x2, y2, z2)) {
                                     if (!frontierVisited.contains(x2, y2, z2)) {

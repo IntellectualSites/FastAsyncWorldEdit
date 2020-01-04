@@ -8,7 +8,11 @@ import com.boydti.fawe.object.mask.SurfaceMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
+import com.sk89q.worldedit.function.mask.DelegateExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -50,7 +54,7 @@ public class ScatterBrush implements Brush {
 
         final int distance = Math.min((int) size, this.distance);
 
-        RecursiveVisitor visitor = new RecursiveVisitor(vector -> radius.test(vector) && surface.test(vector), function -> true);
+        RecursiveVisitor visitor = new RecursiveVisitor(new MaskUnion(radius, surface).withExtent(editSession), function -> true);
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);
@@ -87,11 +91,11 @@ public class ScatterBrush implements Brush {
     }
 
     public boolean canApply(EditSession editSession, BlockVector3 pos) {
-        return mask.test(pos);
+        return mask.test(editSession, pos);
     }
 
-    public BlockVector3 getDirection(BlockVector3 pt) {
-        return surface.direction(pt);
+    public BlockVector3 getDirection(Extent extent, BlockVector3 pt) {
+        return surface.direction(extent, pt);
     }
 
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws MaxChangedBlocksException {

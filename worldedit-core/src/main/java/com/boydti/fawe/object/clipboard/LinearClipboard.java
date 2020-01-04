@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.implementation.filter.block.AbstractFilterBlock;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -110,6 +111,11 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
         @Override
         public BlockVector3 getPosition() {
             return position;
+        }
+
+        @Override
+        public Extent getExtent() {
+            return LinearClipboard.this;
         }
     }
 }

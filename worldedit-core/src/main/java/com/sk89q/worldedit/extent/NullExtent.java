@@ -45,6 +45,7 @@ import javax.annotation.Nullable;
  * pass on any changes.
  */
 public class NullExtent implements Extent {
+    public static final NullExtent INSTANCE = new NullExtent();
 
     @Override
     public BlockVector3 getMinimumPoint() {

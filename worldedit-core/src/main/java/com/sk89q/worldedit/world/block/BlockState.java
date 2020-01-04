@@ -31,7 +31,10 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.OutputExtent;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -225,6 +228,10 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.toBaseBlock();
+    }
+
+    public Mask toMask() {
+        return new SingleBlockStateMask(new NullExtent(), this);
     }
 
     @Override

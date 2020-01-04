@@ -16,7 +16,7 @@ public class ScatterOverlayBrush extends ScatterBrush {
         int x = pt.getBlockX();
         int y = pt.getBlockY();
         int z = pt.getBlockZ();
-        BlockVector3 dir = getDirection(pt);
+        BlockVector3 dir = getDirection(editSession, pt);
         editSession.setBlock(x + dir.getBlockX(), y + dir.getBlockY(), z + dir.getBlockZ(), p);
     }
 }

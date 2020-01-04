@@ -6,7 +6,10 @@ import com.boydti.fawe.object.mask.RadiusMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -34,34 +37,42 @@ public class LayerBrush implements Brush {
         final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockMask(editSession).add(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
-        visitor = new RecursiveVisitor(vector -> solid.test(vector) && radius.test(vector) && adjacent.test(vector), function -> true);
+        visitor = new RecursiveVisitor(new Mask() {
+            @Override
+            public boolean test(Extent extent, BlockVector3 vector) {
+                return solid.test(extent, vector) && radius.test(extent, vector) && adjacent.test(extent, vector);
+            }
+        }, function -> true);
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);
         BlockVectorSet visited = visitor.getVisited();
-        visitor = new RecursiveVisitor(pos -> {
-            int depth = visitor.getDepth() + 1;
-            if (depth > 1) {
-                boolean found = false;
-                BlockState previous = layers[depth - 1];
-                BlockState previous2 = layers[depth - 2];
-                for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
-                    mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
-                    if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
-                        mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2, pos.getBlockZ() + dir.getBlockZ() * 2);
-                        if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
-                            found = true;
-                            break;
-                        } else {
-                            return false;
+        visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
+            @Override
+            public boolean test(Extent extent, BlockVector3 pos) {
+                int depth = visitor.getDepth() + 1;
+                if (depth > 1) {
+                    boolean found = false;
+                    BlockState previous = layers[depth - 1];
+                    BlockState previous2 = layers[depth - 2];
+                    for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
+                        mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
+                        if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
+                            mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2, pos.getBlockZ() + dir.getBlockZ() * 2);
+                            if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
+                                found = true;
+                                break;
+                            } else {
+                                return false;
+                            }
                         }
                     }
+                    if (!found) {
+                        return false;
+                    }
                 }
-                if (!found) {
-                    return false;
-                }
+                return !adjacent.test(extent, pos);
             }
-            return !adjacent.test(pos);
         }, pos -> {
             int depth = visitor.getDepth();
             BlockStateHolder currentPattern = layers[depth];

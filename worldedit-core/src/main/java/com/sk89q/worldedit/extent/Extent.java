@@ -206,7 +206,7 @@ public interface Extent extends InputExtent, OutputExtent {
         maxY = Math.min(maxY, Math.max(0, maxY));
         minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(MutableBlockVector3.get(x, y, z))) {
+            if (filter.test(this, MutableBlockVector3.get(x, y, z))) {
                 return y;
             }
         }
@@ -276,22 +276,22 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        boolean state = !mask.test(MutableBlockVector3.get(x, y, z));
+        boolean state = !mask.test(this, MutableBlockVector3.get(x, y, z));
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
+            if (mask.test(this, MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
             int y2 = y - d;
-            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
+            if (mask.test(this, MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
+                    if (mask.test(this, MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
+                    if (mask.test(this, MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
                 }
             }
         }
@@ -508,7 +508,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return the number of blocks that matched the mask
      */
     default int countBlocks(Region region, Mask searchMask) {
-        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        RegionVisitor visitor = new RegionVisitor(region, position -> searchMask.test(this, position));
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -606,7 +606,7 @@ public interface Extent extends InputExtent, OutputExtent {
         checkNotNull(pattern);
 
         BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionMaskingFilter filter = new RegionMaskingFilter(this, mask, replace);
         RegionVisitor visitor = new RegionVisitor(region, filter);
         Operations.completeLegacy(visitor);
         return visitor.getAffected();

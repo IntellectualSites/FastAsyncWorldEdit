@@ -19,9 +19,7 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     private final int yOffset;
     private final int width, length;
     private int x, z, index;
-    private char ordinal;
 
-    // TODO use in CFI
     public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length,
         int yOffset) {
         super(extent);
@@ -32,18 +30,16 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
         this.yOffset = yOffset;
     }
 
-    public void filter2D(Filter filter) {
-        for (z = 0; z < length; z++) {
-            for (x = 0; x < width; x++, index++) {
-                ordinal = blocks[ordinal];
-                filter.applyBlock(this);
-            }
-        }
+    public void init(int x, int z, int index) {
+        this.x = x;
+        this.z = z;
+        this.index = index;
     }
+
 
     @Override
     public int getOrdinal() {
-        return ordinal;
+        return blocks[index];
     }
 
     @Override
@@ -53,7 +49,7 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     @Override
     public BlockState getBlock() {
-        return BlockTypesCache.states[ordinal];
+        return BlockTypesCache.states[getOrdinal()];
     }
 
     @Override

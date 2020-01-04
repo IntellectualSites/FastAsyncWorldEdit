@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -33,7 +34,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 public class RegionMaskingFilter implements RegionFunction {
 
     private final RegionFunction function;
-    private Mask mask;
+    private final Extent extent;
+    private final Mask mask;
 
     /**
      * Create a new masking filter.
@@ -41,16 +43,18 @@ public class RegionMaskingFilter implements RegionFunction {
      * @param mask the mask
      * @param function the function
      */
-    public RegionMaskingFilter(Mask mask, RegionFunction function) {
+    public RegionMaskingFilter(Extent extent, Mask mask, RegionFunction function) {
         checkNotNull(function);
         checkNotNull(mask);
+        checkNotNull(extent);
+        this.extent = extent;
         this.mask = mask;
         this.function = function;
     }
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        return mask.test(position) && function.apply(position);
+        return mask.test(extent, position) && function.apply(position);
     }
 
 }

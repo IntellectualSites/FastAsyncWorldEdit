@@ -6,6 +6,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.DelegateExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -27,6 +28,8 @@ public class RecurseBrush implements Brush {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = Masks.alwaysTrue();
+        } else {
+            mask = mask.withExtent(editSession);
         }
         final int radius = (int) size;
         BlockStateHolder block = editSession.getBlock(position);
@@ -42,7 +45,7 @@ public class RecurseBrush implements Brush {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
-                    return y < maxY && radMask.test(to) && super.isVisitable(from, to);
+                    return y < maxY && radMask.test(editSession, to) && super.isVisitable(from, to);
                 }
             };
             visitor.visit(position);

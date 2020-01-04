@@ -5,7 +5,9 @@ import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
@@ -61,10 +63,10 @@ public class StencilBrush extends HeightBrush {
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
 
 
-        RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
+        RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
             @Override
-            public boolean test(BlockVector3 vector) {
+            public boolean test(Extent extent, BlockVector3 vector) {
                 if (solid.test(vector)) {
                     int dx = vector.getBlockX() - cx;
                     int dy = vector.getBlockY() - cy;

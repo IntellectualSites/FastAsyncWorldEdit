@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.FaweCache;
+import com.sk89q.worldedit.function.mask.DelegateExtentMask;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.mask.IdMask;
@@ -52,6 +53,7 @@ public class SplineBrush implements Brush, ResettableTool {
         } else {
             mask = new MaskIntersection(mask, new IdMask(editSession));
         }
+        mask = mask.withExtent(editSession);
         boolean visualization = editSession.getExtent() instanceof VisualExtent;
         if (visualization && positionSets.isEmpty()) {
             return;

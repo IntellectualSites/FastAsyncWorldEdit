@@ -19,7 +19,10 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.session.request.Request;
 
 /**
  * Tests whether a given vector meets a criteria.
@@ -32,6 +35,16 @@ public interface Mask2D {
      * @param vector the vector to test
      * @return true if the criteria is met
      */
-    boolean test(BlockVector2 vector);
+    default boolean test(BlockVector2 vector) {
+        Extent extent = Request.request().getExtent();
+        if (extent == null) {
+            extent = NullExtent.INSTANCE;
+        }
+        return test(extent, vector);
+    }
+
+    default boolean test(Extent extent, BlockVector2 vector) {
+        return test(vector);
+    }
 
 }

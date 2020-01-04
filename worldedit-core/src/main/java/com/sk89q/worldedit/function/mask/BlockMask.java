@@ -172,8 +172,8 @@ public class BlockMask extends ABlockMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return ordinals[vector.getOrdinal(getExtent())];
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return ordinals[vector.getOrdinal(extent)];
     }
 
     @Override

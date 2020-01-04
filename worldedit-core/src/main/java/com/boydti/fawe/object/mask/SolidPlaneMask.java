@@ -20,7 +20,7 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
+    public boolean test(Extent extent, BlockVector3 vector) {
         switch (mode) {
             case -1:
                 if (!super.test(vector)) {
@@ -30,7 +30,6 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
                 originY = vector.getBlockY();
                 originZ = vector.getBlockZ();
                 mode = 0;
-                Extent extent = getExtent();
                 if (!extent.getBlock(mutable.setComponents(originX - 1, originY, originZ)).getMaterial().isAir() && !extent.getBlock(mutable.setComponents(originX + 1, originY, originZ)).getMaterial().isAir()) {
                     mode &= 1;
                 }

@@ -86,17 +86,17 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return mask.test(location) && super.setBlock(location, block);
+        return mask.test(getExtent(), location) && super.setBlock(location, block);
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
+        return mask.test(getExtent(), position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
+        return mask.test(getExtent(), BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     @Override
     public void applyBlock(FilterBlock block) {
         int ordinal = block.getOrdinal();
-        if (ordinal != 0 && !mask.test(block)) {
+        if (ordinal != 0 && !mask.test(getExtent(), block)) {
             block.setOrdinal(0);
         }
     }

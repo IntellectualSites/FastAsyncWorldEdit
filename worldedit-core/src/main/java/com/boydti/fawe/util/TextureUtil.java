@@ -375,7 +375,7 @@ public class TextureUtil implements TextureHolder {
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
             extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
-            if (mask.test(extent)) {
+            if (mask.test(extent, extent)) {
                 blocks.add(block);
             }
         }

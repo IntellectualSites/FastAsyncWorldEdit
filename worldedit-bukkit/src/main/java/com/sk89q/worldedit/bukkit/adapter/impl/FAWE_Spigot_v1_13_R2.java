@@ -319,7 +319,6 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
             BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
             return material.getCraftBlockData();
         } catch (ClassCastException ignore) {
-            System.out.println(state.getAsString() + " cast");
             throw ignore;
         }
     }

@@ -58,8 +58,8 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected transient boolean foundY;
     protected transient boolean lastValue;
 
-    public int getHeight(int x, int y, int z) {
-//        return getExtent().getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
+    public int getHeight(Extent extent, int x, int y, int z) {
+//        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
         try {
             int rx = x - cacheBotX + 16;
             int rz = z - cacheBotZ + 16;
@@ -80,7 +80,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             }
             int result = cacheHeights[index] & 0xFF;
             if (y > result) {
-                cacheHeights[index] = (byte) (result = lastY = getExtent().getNearestSurfaceTerrainBlock(x, z, lastY, 0, maxY));
+                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, 0, maxY));
             }
             return result;
         } catch (Throwable e) {
@@ -89,72 +89,72 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         }
     }
 
-    protected boolean testSlope(int x, int y, int z) {
+    protected boolean testSlope(Extent extent, int x, int y, int z) {
         double slope;
         boolean aboveMin;
         lastY = y;
-        slope = Math.abs(getHeight(x + distance, y, z) - getHeight(x -distance, y, z)) * ADJACENT_MOD;
+        slope = Math.abs(getHeight(extent, x + distance, y, z) - getHeight(extent, x -distance, y, z)) * ADJACENT_MOD;
         if (checkFirst) {
             if (slope >= min) {
                 return lastValue = true;
             }
-            slope = Math.max(slope, Math.abs(getHeight(x, y, z + distance) - getHeight(x, y, z - distance)) * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(x + distance, y, z + distance) - getHeight(x - distance, y, z - distance)) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(x - distance, y, z + distance) - getHeight(x + distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x + distance, y, z + distance) - getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x - distance, y, z + distance) - getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD);
             return lastValue = (slope >= min);
         } else {
-            slope = Math.max(slope, Math.abs(getHeight(x, y, z + distance) - getHeight(x, y, z - distance)) * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(x + distance, y, z + distance) - getHeight(x - distance, y, z - distance)) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(x - distance, y, z + distance) - getHeight(x + distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x + distance, y, z + distance) - getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(getHeight(extent, x - distance, y, z + distance) - getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD);
             return lastValue = (slope >= min && slope <= max);
         }
     }
 
-    public boolean adjacentAir(BlockVector3 v) {
+    public boolean adjacentAir(Extent extent, BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
-        if (!mask.test(x + 1, y, z)) {
+        if (!mask.test(extent, x + 1, y, z)) {
             return true;
         }
-        if (!mask.test(x - 1, y, z)) {
+        if (!mask.test(extent, x - 1, y, z)) {
             return true;
         }
-        if (!mask.test(x, y, z + 1)) {
+        if (!mask.test(extent, x, y, z + 1)) {
             return true;
         }
-        if (!mask.test(x, y, z - 1)) {
+        if (!mask.test(extent, x, y, z - 1)) {
             return true;
         }
-        if (y < 255 && !mask.test(x, y + 1, z)) {
+        if (y < 255 && !mask.test(extent, x, y + 1, z)) {
             return true;
         }
-        if (y > 0 && !mask.test(x, y - 1, z)) {
+        if (y > 0 && !mask.test(extent, x, y - 1, z)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
+    public boolean test(Extent extent, BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
-            int height = getHeight(x, y, z);
+            int height = getHeight(extent, x, y, z);
             if (y <= height) return overlay ? (lastValue && y == height) : lastValue;
         }
 
-        if (!mask.test(x, y, z)) {
+        if (!mask.test(extent, x, y, z)) {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !mask.test(x, y + 1, z)) return lastValue = false;
-        } else if (!adjacentAir(vector)) {
+            if (y < 255 && !mask.test(extent, x, y + 1, z)) return lastValue = false;
+        } else if (!adjacentAir(extent, vector)) {
             return false;
         }
-        return testSlope(x, y, z);
+        return testSlope(extent, x, y, z);
     }
 
 }

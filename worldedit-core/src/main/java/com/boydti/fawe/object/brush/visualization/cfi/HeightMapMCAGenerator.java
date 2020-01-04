@@ -7,6 +7,10 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.filter.block.AbstractFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.ArrayFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.MultiFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.blocks.FallbackChunkGet;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
@@ -34,6 +38,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -54,6 +59,7 @@ import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -552,7 +558,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             int y = heights[index] & 0xFF;
                             mutable.mutX(x);
                             mutable.mutY(y);
-                            if (mask.test(mutable)) {
+                            if (mask.test(this, mutable)) {
                                 int newHeight = table.average(x, z, index);
                                 setLayerHeightRaw(index, newHeight);
                             }
@@ -607,7 +613,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (!mask.test(mutable)) {
+                if (!mask.test(this, mutable)) {
                     continue;
                 }
                 if (placed.containsRadius(x, z, distance)) {
@@ -654,7 +660,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (!mask.test(mutable)) {
+                if (!mask.test(this, mutable)) {
                     continue;
                 }
                 if (placed.containsRadius(x, z, distance)) {
@@ -1066,7 +1072,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     if (mask != null) {
                         mutable.mutX(z);
                         mutable.mutY(heights.getByte(index) & 0xFF);
-                        if (!mask.test(mutable)) continue;
+                        if (!mask.test(this, mutable)) continue;
                     }
                     if (imgMask != null) {
                         int height = imgMask.getRGB(x, z) & 0xFF;
@@ -1181,7 +1187,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     mutable.mutX(x);
                     mutable.mutY(heights.getByte(index) & 0xFF);
-                    if (mask.test(mutable)) {
+                    if (mask.test(this, mutable)) {
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
@@ -1254,7 +1260,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(mutable)) {
+                if (mask.test(this, mutable)) {
                     biomes.setByte(index, biomeByte);
                 }
             }
@@ -1274,17 +1280,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             }
 
             overlay.record(() -> {
-                char[] overlayArr = overlay.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, overlay.get(), heights.get(), getWidth(), getLength(), 1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
                                 .nextInt(256) <= height) {
-                            mutable.mutX(x);
-                            mutable.mutY(height);
-                            overlayArr[index] = pattern.apply(mutable).getOrdinalChar();
+                            filter.init(x, z, index);
+                            pattern.apply(this, filter, filter);
                         }
                     }
                 }
@@ -1302,17 +1306,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             primitives.modifiedMain = true;
 
             main.record(() -> {
-                char[] mainArr = main.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
                                 .nextInt(256) <= height) {
-                            mutable.mutX(x);
-                            mutable.mutY(height);
-                            mainArr[index] = pattern.apply(mutable).getOrdinalChar();
+                            filter.init(x, z, index);
+                            pattern.apply(this, filter, filter);
                         }
                     }
                 }
@@ -1328,17 +1330,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
 
             floor.record(() -> {
-                char[] floorArr = floor.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
                                 .nextInt(256) <= height) {
-                            mutable.mutX(x);
-                            mutable.mutY(height);
-                            floorArr[index] = pattern.apply(mutable).getOrdinalChar();
+                            filter.init(x, z, index);
+                            pattern.apply(this, filter, filter);
                         }
                     }
                 }
@@ -1355,20 +1355,20 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             primitives.modifiedMain = true;
 
             main.record(() -> floor.record(() -> {
-                char[] floorArr = floor.get();
-                char[] mainArr = main.get();
+                ArrayFilterBlock filterFloor = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 0);
+                ArrayFilterBlock filterMain = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
+
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
                                 .nextInt(256) <= height) {
-                            mutable.mutX(x);
-                            mutable.mutY(height);
-                            char combined = pattern.apply(mutable).getOrdinalChar();
-                            mainArr[index] = combined;
-                            floorArr[index] = combined;
+                            filterFloor.init(x, z, index);
+                            filterMain.init(x, z, index);
+
+                            pattern.apply(this, filterFloor, filterFloor);
+                            pattern.apply(this, filterMain, filterMain);
                         }
                     }
                 }
@@ -1380,19 +1380,20 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (pattern instanceof BlockStateHolder) {
             setOverlay(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
-            int index = 0;
             if (overlay == null) overlay = new DifferentialArray<>(new char[getArea()]);
-            for (int z = 0; z < getLength(); z++) {
-                mutable.mutZ(z);
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    int y = heights.getByte(index) & 0xFF;
-                    mutable.mutX(x);
-                    mutable.mutY(y);
-                    if (mask.test(mutable)) {
-                        overlay.setInt(index, pattern.apply(mutable).getOrdinalChar());
+            overlay.record(() -> {
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, overlay.get(), heights.get(), getWidth(), getLength(), 1);
+                int index = 0;
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++, index++) {
+                        filter.init(x, z, index);
+                        if (mask.test(this, filter)) {
+                            pattern.apply(this, filter, filter);
+                        }
                     }
                 }
-            }
+            });
+
         }
     }
 
@@ -1400,18 +1401,18 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (pattern instanceof BlockStateHolder) {
             setFloor(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
-            int index = 0;
-            for (int z = 0; z < getLength(); z++) {
-                mutable.mutZ(z);
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    int y = heights.getByte(index) & 0xFF;
-                    mutable.mutX(x);
-                    mutable.mutY(y);
-                    if (mask.test(mutable)) {
-                        floor.setInt(index, pattern.apply(mutable).getOrdinalChar());
+            floor.record(() -> {
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 0);
+                int index = 0;
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++, index++) {
+                        filter.init(x, z, index);
+                        if (mask.test(this, filter)) {
+                            pattern.apply(this, filter, filter);
+                        }
                     }
                 }
-            }
+            });
         }
     }
 
@@ -1419,19 +1420,18 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (pattern instanceof BlockStateHolder) {
             setMain(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
-            primitives.modifiedMain = true;
-            int index = 0;
-            for (int z = 0; z < getLength(); z++) {
-                mutable.mutZ(z);
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    int y = heights.getByte(index) & 0xFF;
-                    mutable.mutX(x);
-                    mutable.mutY(y);
-                    if (mask.test(mutable)) {
-                        main.setInt(index, pattern.apply(mutable).getOrdinalChar());
+            main.record(() -> {
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
+                primitives.modifiedMain = true;
+                int index = 0;
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++, index++) {
+                        if (mask.test(this, filter)) {
+                            pattern.apply(this, filter, filter);
+                        }
                     }
                 }
-            }
+            });
         }
     }
 
@@ -1439,21 +1439,25 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (pattern instanceof BlockStateHolder) {
             setColumn(mask, ((BlockStateHolder) pattern).getOrdinalChar());
         } else {
-            primitives.modifiedMain = true;
-            int index = 0;
-            for (int z = 0; z < getLength(); z++) {
-                mutable.mutZ(z);
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    int y = heights.getByte(index) & 0xFF;
-                    mutable.mutX(x);
-                    mutable.mutY(y);
-                    if (mask.test(mutable)) {
-                        int combined = pattern.apply(mutable).getOrdinalChar();
-                        floor.setInt(index, combined);
-                        main.setInt(index, combined);
+            floor.record(() -> main.record(() -> {
+                ArrayFilterBlock floorFilter = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 0);
+                ArrayFilterBlock mainFilter = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
+                primitives.modifiedMain = true;
+                int index = 0;
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++, index++) {
+                        floorFilter.init(x, z, index);
+                        mainFilter.init(x, z, index);
+                        if (mask.test(this, mainFilter)) {
+                            pattern.apply(this, mainFilter, mainFilter);
+                        }
+                        if (mask.test(this, floorFilter)) {
+                            pattern.apply(this, floorFilter, floorFilter);
+                        }
                     }
                 }
-            }
+            }));
+
         }
     }
 
@@ -1466,15 +1470,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             setFloor(((BlockStateHolder) value).getOrdinalChar());
         } else {
             floor.record(() -> {
-                char[] floorArr = floor.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 0);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
-                        int y = heights.getByte(index) & 0xFF;
-                        mutable.mutX(x);
-                        mutable.mutY(y);
-                        floorArr[index] = value.apply(mutable).getOrdinalChar();
+                        filter.init(x, z, index);
+                        value.apply(this, filter, filter);
                     }
                 }
             });
@@ -1486,18 +1487,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             setColumn(((BlockStateHolder) value).getOrdinalChar());
         } else {
             main.record(() -> floor.record(() -> {
-                char[] floorArr = floor.get();
-                char[] mainArr = main.get();
+                ArrayFilterBlock floorFilter = new ArrayFilterBlock(this, floor.get(), heights.get(), getWidth(), getLength(), 0);
+                ArrayFilterBlock mainFilter = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
-                        int y = heights.getByte(index) & 0xFF;
-                        mutable.mutX(x);
-                        mutable.mutY(y);
-                        char combined = value.apply(mutable).getOrdinalChar();
-                        mainArr[index] = combined;
-                        floorArr[index] = combined;
+                        floorFilter.init(x, z, index);
+                        mainFilter.init(x, z, index);
+                        value.apply(this, floorFilter, floorFilter);
+                        value.apply(this, mainFilter, mainFilter);
                     }
                 }
             }));
@@ -1509,15 +1507,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             setMain(((BlockStateHolder) value).getOrdinalChar());
         } else {
             main.record(() -> {
-                char[] mainArr = main.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, main.get(), heights.get(), getWidth(), getLength(), -1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
-                        int y = heights.getByte(index) & 0xFF;
-                        mutable.mutX(x);
-                        mutable.mutY(y);
-                        mainArr[index] = value.apply(mutable).getOrdinalChar();
+                        filter.init(x, z, index);
+                        value.apply(this, filter, filter);
                     }
                 }
             });
@@ -1530,15 +1525,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             setOverlay(((BlockStateHolder) value).getOrdinalChar());
         } else {
             overlay.record(() -> {
-                char[] overlayArr = overlay.get();
+                ArrayFilterBlock filter = new ArrayFilterBlock(this, overlay.get(), heights.get(), getWidth(), getLength(), 1);
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
-                    mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
-                        int y = heights.getByte(index) & 0xFF;
-                        mutable.mutX(x);
-                        mutable.mutY(y);
-                        overlayArr[index] = value.apply(mutable).getOrdinalChar();
+                        filter.init(x, z, index);
+                        value.apply(this, filter, filter);
                     }
                 }
             });
@@ -1758,7 +1750,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(mutable)) {
+                if (mask.test(this, mutable)) {
                     overlay.setInt(index, combined);
                 }
             }
@@ -1773,7 +1765,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(mutable)) {
+                if (mask.test(this, mutable)) {
                     floor.setInt(index, combined);
                 }
             }
@@ -1789,7 +1781,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(mutable)) {
+                if (mask.test(this, mutable)) {
                     main.setInt(index, combined);
                 }
             }
@@ -1805,7 +1797,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(mutable)) {
+                if (mask.test(this, mutable)) {
                     floor.setInt(index, combined);
                     main.setInt(index, combined);
                 }
