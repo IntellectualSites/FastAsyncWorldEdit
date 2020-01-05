@@ -29,8 +29,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.annotation.SkipQueue;
-import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
@@ -58,7 +56,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
+@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
 public class WorldEditCommands {
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
@@ -73,7 +71,7 @@ public class WorldEditCommands {
         aliases = { "ver" },
         desc = "Get WorldEdit/FAWE version"
     )
-    @SkipQueue
+    @CommandPermissions(queued = false)
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
@@ -136,8 +134,7 @@ public class WorldEditCommands {
         aliases = { "debugpaste" },
         desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
-    @SkipQueue
-    @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
+    @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException, IOException {
 		String dest = IncendoPaster.debugPaste();
 		actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
@@ -147,8 +144,7 @@ public class WorldEditCommands {
         name = "threads",
         desc = "Print all thread stacks"
     )
-    @SkipQueue
-    @CommandPermissions("worldedit.threads")
+    @CommandPermissions(value = "worldedit.threads", queued = false)
     public void threads(Actor actor) throws WorldEditException {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
@@ -168,6 +164,7 @@ public class WorldEditCommands {
         name = "cui",
         desc = "Complete CUI handshake (internal usage)"
     )
+    @CommandPermissions({})
     public void cui(Player player, LocalSession session) {
         session.setCUISupport(true);
         session.dispatchCUISetup(player);
@@ -197,8 +194,7 @@ public class WorldEditCommands {
         name = "help",
         desc = "Displays help for WorldEdit commands"
     )
-    @SkipQueue
-    @CommandPermissions("worldedit.help")
+    @CommandPermissions(value = "worldedit.help", queued = false)
     public void help(Actor actor,
                      @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
                          boolean listSubCommands,

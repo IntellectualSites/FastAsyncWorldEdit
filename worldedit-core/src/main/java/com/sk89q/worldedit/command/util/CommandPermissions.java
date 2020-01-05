@@ -34,6 +34,7 @@ public @interface CommandPermissions {
      *
      * @return a list of permissions strings
      */
-    String[] value();
+    String[] value() default {};
 
+    boolean queued() default true;
 }

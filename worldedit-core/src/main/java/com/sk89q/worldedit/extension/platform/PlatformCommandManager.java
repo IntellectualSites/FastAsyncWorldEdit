@@ -107,7 +107,6 @@ import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
-import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
@@ -652,7 +651,7 @@ public final class PlatformCommandManager {
                 return;
             }
             Command cmd = optional.get();
-            CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
+            PermissionCondition queued = cmd.getCondition().as(PermissionCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
                 handleCommandOnCurrentThread(event);
                 return;
