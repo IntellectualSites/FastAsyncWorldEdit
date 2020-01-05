@@ -9,8 +9,6 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -43,7 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Closeable {
+public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor, Closeable {
 
     private World world;
     private final String worldName;
@@ -51,11 +49,11 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
     protected boolean closed;
 
-    public FaweChangeSet(String world) {
+    public AbstractChangeSet(String world) {
         this.worldName = world;
     }
 
-    public FaweChangeSet(World world) {
+    public AbstractChangeSet(World world) {
         this.world = world;
         this.worldName = world.getName();
     }
@@ -270,7 +268,7 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
         } else if (change.getClass() == EntityRemove.class) {
             add((EntityRemove) change);
         } else {
-            getLogger(FaweChangeSet.class).debug("Unknown change: " + change.getClass());
+            getLogger(AbstractChangeSet.class).debug("Unknown change: " + change.getClass());
         }
     }
 
@@ -340,17 +338,17 @@ public abstract class FaweChangeSet implements ChangeSet, IBatchProcessor, Close
     }
 
     public Future<?> addWriteTask(Runnable writeTask, boolean completeNow) {
-        FaweChangeSet.this.waitingCombined.incrementAndGet();
+        AbstractChangeSet.this.waitingCombined.incrementAndGet();
         Runnable wrappedTask = () -> {
             try {
                 writeTask.run();
             } finally {
-                if (FaweChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
-                    synchronized (FaweChangeSet.this.waitingAsync) {
-                        FaweChangeSet.this.waitingAsync.notifyAll();
+                if (AbstractChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
+                    synchronized (AbstractChangeSet.this.waitingAsync) {
+                        AbstractChangeSet.this.waitingAsync.notifyAll();
                     }
-                    synchronized (FaweChangeSet.this.waitingCombined) {
-                        FaweChangeSet.this.waitingCombined.notifyAll();
+                    synchronized (AbstractChangeSet.this.waitingCombined) {
+                        AbstractChangeSet.this.waitingCombined.notifyAll();
                     }
                 }
             }
