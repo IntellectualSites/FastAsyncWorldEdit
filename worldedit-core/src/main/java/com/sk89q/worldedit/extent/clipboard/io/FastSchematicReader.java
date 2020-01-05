@@ -145,7 +145,7 @@ public class FastSchematicReader extends NBTSchematicReader {
             blocksOut = new FastByteArrayOutputStream();
             blocks = new FaweOutputStream(new LZ4BlockOutputStream(blocksOut));
         });
-        blockData.withInt((index, value) -> blocks.writeVarInt(value));
+        blockData.withInt((index, value) -> blocks.write(value));
         StreamDelegate tilesDelegate = schematic.add("TileEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
