@@ -54,8 +54,11 @@ public class BlockType implements FawePattern, Keyed {
 
     private final String id;
     private final BlockTypesCache.Settings settings;
-    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
+    /*
+    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLgacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
+    */
+    private Integer legacyCombinedId;
     private boolean initItemType;
     private ItemType itemType;
 
@@ -310,7 +313,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Deprecated
     public int getLegacyId() {
-        return legacyId.getValue();
+        return computeLegacy(0);
     }
 
     /**
@@ -322,11 +325,13 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Deprecated
     public int getLegacyData() {
-        return legacyData.getValue();
+        return computeLegacy(1);
     }
 
     private int computeLegacy(int index) {
-        int[] legacy = LegacyMapper.getInstance().getLegacyFromBlock(this.getDefaultState());
-        return legacy != null ? legacy[index] : 0;
+        if (this.legacyCombinedId == null) {
+            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
+        }
+        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 }
