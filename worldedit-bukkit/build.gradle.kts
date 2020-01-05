@@ -2,6 +2,9 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
+    maven
+    java
+    `maven-publish`
 }
 
 applyPlatformAndCoreConfiguration()
@@ -81,6 +84,44 @@ tasks.named<Jar>("jar") {
     }
 }
 
+val jar: Jar by tasks
+jar.archiveName = "FAWE-Bukkit-API-${project.version}.jar"
+jar.destinationDir = file("../mvn/com/boydti/FAWE-Bukkit-API/" + project.version)
+
+task("writeNewPom") {
+    doLast {
+        maven.pom {
+            withGroovyBuilder {
+                "project" {
+                    groupId = "com.boydti"
+                    artifactId = "FAWE-Bukkit-API"
+                    version = "project.version"
+                }
+            }
+        }.writeTo("../mvn/com/boydti/FAWE-Bukkit-API/${project.version}/FAWE-Bukkit-API-${project.version}.pom")
+        maven.pom {
+            withGroovyBuilder {
+                "project" {
+                    groupId = "com.boydti"
+                    artifactId = "FAWE-Bukkit-API"
+                    version = "latest"
+                }
+            }
+        }.writeTo("../mvn/com/boydti/FAWE-Bukkit-API/latest/FAWE-Bukkit-API-latest.pom")
+    }
+}
+
+task("dataContent") {
+    doLast {
+        copySpec {
+            from("../mvn/com/boydti/FAWE-Bukkit-API/${project.version}/")
+            into("../mvn/com/boydti/FAWE-Bukkit-API/latest/")
+            include("*.jar")
+            rename("FAWE-Bukkit-API-${project.version}.jar", "FAWE-Bukkit-API-latest.jar")
+        }
+    }
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
@@ -106,4 +147,8 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("assemble").configure {
     dependsOn("shadowJar")
+}
+
+tasks.named("dataContent").configure {
+    dependsOn("writeNewPom")
 }
