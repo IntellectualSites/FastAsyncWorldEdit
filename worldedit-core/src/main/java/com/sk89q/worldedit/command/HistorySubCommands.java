@@ -10,8 +10,8 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.LocalSession;
@@ -22,6 +22,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Time;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -32,6 +33,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -46,7 +48,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.enginehub.piston.annotation.Command;
@@ -168,7 +169,7 @@ public class HistorySubCommands {
                                             world, uuid,
                                             Integer.parseInt(
                                                     name.substring(0, name.length() - 3)));
-                                    DiskStorageHistory.DiskStorageSummary summary = rollback
+                                    SimpleChangeSetSummary summary = rollback
                                             .summarize(RegionWrapper.GLOBAL(), false);
                                     if (summary != null) {
                                         rollback.setDimensions(
@@ -194,15 +195,14 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "summary",
-            aliases = {"info", "summarize"},
+            name = "info",
+            aliases = {"summary", "summarize"},
             desc = "Summarize an edit"
     )
-    @CommandPermissions("worldedit.history.find")
+    @CommandPermissions("worldedit.history.info")
     public synchronized void summary(Player player, RollbackDatabase database, Arguments arguments,
                                      @Arg(desc = "Player uuid/name") UUID other,
-                                     @Arg(desc = "edit index") Integer index,
-                                     @ArgFlag(name = 'p', desc = "Page to view.", def = "-1") int page) throws WorldEditException, ExecutionException, InterruptedException {
+                                     @Arg(desc = "edit index") Integer index) throws WorldEditException, ExecutionException, InterruptedException {
         RollbackOptimizedHistory edit = database.getEdit(other, index).get();
         if (edit == null) {
             player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"));
@@ -226,47 +226,75 @@ public class HistorySubCommands {
         String timeStr = MainUtil.secToTime(seconds);
 
         int size = edit.size();
-
-        String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
-        List<Countable<BlockState>> list = null;
-        Reference<List<Countable<BlockState>>> cached = player.getMeta(pageCommand);
-        if (cached != null) {
-            list = cached.get();
-        }
-        if (list == null) {
-            DiskStorageHistory.DiskStorageSummary summary = edit.summarize(null, false);
-            if (summary != null) {
-                list = summary.getBlockDistributionWithData();
-                player.setMeta(pageCommand, new SoftReference<>(list));
-            }
-        }
         boolean biomes = edit.getBioFile().exists();
         boolean createdEnts = edit.getEnttFile().exists();
         boolean removedEnts = edit.getEntfFile().exists();
         boolean createdTiles = edit.getNbttFile().exists();
         boolean removedTiles = edit.getNbtfFile().exists();
-        System.out.println("TODO FIXME move to translations");
-        if (page == -1) {
-            player.print("name: " + name
-                    + ", cmd: " + edit.getCommand()
-                    + ", dist: " + distance + "m " + direction.name()
-                    + ", time: " + timeStr + " ago"
-                    + ", size: " + size + " blocks"
-                    + ", biomes: " + biomes
-                    + ", +entity: " + createdEnts
-                    + ", -entity: " + removedEnts
-                    + ", +tile: " + createdTiles
-                    + ", -tile: " + removedTiles
-                    + ", disk: " + (edit.getSizeOnDisk() / 1000) + "mb"
-                    + ", min " + edit.getMinimumPoint()
-                    + ", max " + edit.getMaximumPoint()
-            );
-        }
-        page = 1;
-        if (list != null) {
-            SelectionCommands.BlockDistributionResult pages = new SelectionCommands.BlockDistributionResult((List) list, true, pageCommand);
-            player.print(pages.create(page));
-        }
+
+        TranslatableComponent header = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
+
+        String sizeStr = StringMan.humanReadableByteCountBin(edit.getSizeOnDisk());
+        String extra = "";
+        if (biomes) extra += "biomes, ";
+        if (createdEnts) extra += "+entity, ";
+        if (removedEnts) extra += "-entity, ";
+        if (createdTiles) extra += "+tile, ";
+        if (removedTiles) extra += "-tile, ";
+
+        TranslatableComponent body = Caption.of("fawe.worldedit.history.find.element.more", size, edit.getMinimumPoint(), edit.getMaximumPoint(), extra.trim(), sizeStr);
+        Component distr = TextComponent.of("/history distr").clickEvent(ClickEvent.suggestCommand("//history distr " + other + " " + index));
+        TextComponentProducer content = new TextComponentProducer().append(header).newline().append(body).newline().append(distr);
+        player.print(content.create());
+    }
+
+    private void list(RollbackDatabase database, String pageCommand, List<? extends ChangeSet> histories, BlockVector3 origin) {
+        return PaginationBox.fromStrings("Edits:", pageCommand, histories, new Function<Supplier<? extends ChangeSet>, Component>() {
+            @NotNull
+            @Override
+            public Component apply(@Nullable Supplier<? extends ChangeSet> input) {
+                ChangeSet edit = input.get();
+
+                if (edit instanceof RollbackOptimizedHistory) {
+                    RollbackOptimizedHistory rollback = (RollbackOptimizedHistory) edit;
+
+                    UUID uuid = rollback.getUUID();
+                    int index = rollback.getIndex();
+                    String name = Fawe.imp().getName(rollback.getUUID());
+
+                    String cmd = rollback.getCommand();
+                    BlockVector3 pos1 = rollback.getMinimumPoint();
+                    BlockVector3 pos2 = rollback.getMaximumPoint();
+
+                    double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
+                    double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
+                    int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+
+                    BlockVector2 dirVec = BlockVector2.at(rollback.getOriginX() - origin.getX(), rollback.getOriginZ() - origin.getZ());
+                    Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
+
+                    long seconds = (System.currentTimeMillis() - rollback.getBDFile().lastModified()) / 1000;
+                    String timeStr = MainUtil.secToTime(seconds);
+
+                    int size = edit.size();
+
+                    TranslatableComponent elem = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
+
+                    String infoCmd = "//history summary " + uuid + " " + index;
+                    TranslatableComponent hover = Caption.of("fawe.worldedit.history.find.hover", size);
+                    elem = elem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
+                    elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
+                    return elem;
+                } else {
+
+                }
+
+
+
+                System.out.println(" - return elem");
+                return elem;
+            }
+        });
     }
 
     @Command(
@@ -276,28 +304,26 @@ public class HistorySubCommands {
     )
     @CommandPermissions("worldedit.history.find")
     public synchronized void find(Player player, World world, RollbackDatabase database, Arguments arguments,
-                                  @ArgFlag(name = 'u', desc = "String user") UUID other,
+                                  @ArgFlag(name = 'u', def="", desc = "String user") UUID other,
                                   @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                  @Range(from = 0, to = Integer.MAX_VALUE) int radius,
+                                  @Range(from = 0, to = Integer.MAX_VALUE) Integer radius,
                                   @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
-                                  @Time long timeDiff,
-                                  @ArgFlag(name = 'p', desc = "Page to view.", def = "1") int page) throws WorldEditException {
+                                  @Time Long timeDiff,
+                                  @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with //history import )"));
             return;
         }
+        if (other == null && radius == 0 && timeDiff == 0) throw new InsufficientArgumentsException("User must be provided");
         checkCommandArgument(radius > 0, "Radius must be >= 0");
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
         Location origin = player.getLocation();
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
+        Reference<List<Supplier<? extends ChangeSet>>> cached = player.getMeta(pageCommand);
+        List<Supplier<? extends ChangeSet>> history = cached == null ? null : cached.get();
 
-        List<Supplier<RollbackOptimizedHistory>> list = null;
-        Reference<List<Supplier<RollbackOptimizedHistory>>> cached = player.getMeta(pageCommand);
-        if (cached != null) {
-            list = cached.get();
-        }
-        if (list == null) {
+        if (page == null || history == null) {
             if (other == null) other = player.getUniqueId();
             if (!other.equals(player.getUniqueId())) {
                 player.checkPermission("worldedit.history.undo.other");
@@ -309,54 +335,57 @@ public class HistorySubCommands {
             bot = bot.clampY(0, world.getMaxY());
             top = top.clampY(0, world.getMaxY());
 
-            LongAdder total = new LongAdder();
-
             long minTime = System.currentTimeMillis() - timeDiff;
             Iterable<Supplier<RollbackOptimizedHistory>> edits = database.getEdits(other, minTime, bot, top, false, false);
-            list = Lists.newArrayList(edits);
-            player.setMeta(pageCommand, new SoftReference<>(list));
+            history = Lists.newArrayList(edits);
+            player.setMeta(pageCommand, new SoftReference<>(history));
+            page = 1;
         }
 
-        PaginationBox pages = PaginationBox.fromStrings("Edits:", pageCommand, list, new Function<Supplier<RollbackOptimizedHistory>, Component>() {
-            @NotNull
-            @Override
-            public Component apply(@Nullable Supplier<RollbackOptimizedHistory> input) {
-                RollbackOptimizedHistory edit = input.get();
-                UUID uuid = edit.getUUID();
-                int index = edit.getIndex();
-                if (!edit.isEmpty()) {
-                    database.delete(uuid, index);
-                    return TextComponent.empty();
-                }
-                String name = Fawe.imp().getName(edit.getUUID());
 
-                String cmd = edit.getCommand();
-                BlockVector3 pos1 = edit.getMinimumPoint();
-                BlockVector3 pos2 = edit.getMaximumPoint();
-
-                double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
-                double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
-                int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
-
-                BlockVector2 dirVec = BlockVector2.at(edit.getOriginX() - origin.getX(), edit.getOriginZ() - origin.getZ());
-                Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
-
-                long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
-                String timeStr = MainUtil.secToTime(seconds);
-
-                int size = edit.size();
-
-                TranslatableComponent elem = Caption.of("fawe.worldedit.history.find.element", name, timeStr, distance, direction.name(), cmd);
-
-                String infoCmd = "//history summary " + uuid + " " + index;
-                TranslatableComponent hover = Caption.of("fawe.worldedit.history.find.hover", size);
-                elem = elem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
-                elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
-
-                return elem;
-            }
-        });
         player.print(pages.create(page));
+    }
+
+    @Command(
+            name = "distr",
+            aliases = {"distribution"},
+            desc = "View block distribution for an edit"
+    )
+    @CommandPermissions("worldedit.history.distr")
+    public void distr(Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
+                      @Arg(desc = "Player uuid/name") UUID other,
+                      @Arg(desc = "edit index") Integer index,
+                      @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) throws ExecutionException, InterruptedException {
+        String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
+        Reference<PaginationBox> cached = player.getMeta(pageCommand);
+        PaginationBox pages = cached == null ? null : cached.get();
+        if (page == null || pages == null) {
+            RollbackOptimizedHistory edit = database.getEdit(other, index).get();
+            SimpleChangeSetSummary summary = edit.summarize(null, false);
+            if (summary != null) {
+                List<Countable<BlockState>> distr = summary.getBlockDistributionWithData();
+                SelectionCommands.BlockDistributionResult distrPages = new SelectionCommands.BlockDistributionResult((List) distr, true, pageCommand);
+                pages = new PaginationBox.MergedPaginationBox("Block Distribution", pageCommand, pages, distrPages);
+                player.setMeta(pageCommand, new SoftReference<>(pages));
+            }
+            page = 1;
+        }
+        player.print(pages.create(page));
+    }
+
+    @Command(
+            name = "list",
+            desc = "List your history"
+    )
+    @CommandPermissions("worldedit.history.list")
+    public void list(Actor actor, LocalSession session,
+                     @Arg(desc = "Player uuid/name") UUID other,
+                     @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) {
+        int index = session.getHistoryIndex();
+        List<ChangeSet> history = session.getHistory();
+
+        // index
+
     }
 
     @Command(

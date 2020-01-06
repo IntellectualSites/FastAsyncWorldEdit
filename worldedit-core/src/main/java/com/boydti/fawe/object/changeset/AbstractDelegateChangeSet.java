@@ -16,13 +16,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
-public class AbstractDelegateChangeSet extends FaweChangeSet {
-    public final FaweChangeSet parent;
+public class AbstractDelegateChangeSet extends AbstractChangeSet {
+    public final AbstractChangeSet parent;
 
-    public AbstractDelegateChangeSet(FaweChangeSet parent) {
+    public AbstractDelegateChangeSet(AbstractChangeSet parent) {
         super(parent.getWorld());
         this.parent = parent;
         this.waitingCombined = parent.waitingCombined;
@@ -44,7 +43,7 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
         parent.close();
     }
 
-    public final FaweChangeSet getParent() {
+    public final AbstractChangeSet getParent() {
         return parent;
     }
 

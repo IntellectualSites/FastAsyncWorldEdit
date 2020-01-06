@@ -25,7 +25,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
@@ -34,7 +34,6 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
@@ -659,7 +658,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return processor.construct(this);
     }
 
-    default Extent enableHistory(FaweChangeSet changeSet) {
+    default Extent enableHistory(AbstractChangeSet changeSet) {
         return addProcessor(changeSet);
     }
 

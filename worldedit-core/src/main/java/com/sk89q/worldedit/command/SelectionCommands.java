@@ -25,6 +25,10 @@ import com.google.common.base.Strings;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.block.BlockDistributionCounter;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
@@ -530,25 +534,34 @@ public class SelectionCommands {
                               boolean clipboardDistr,
                       @Switch(name = 'd', desc = "Separate blocks by state")
                               boolean separateStates,
-                      @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.", def = "1")
+                      @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.", def = "")
                               Integer page) throws WorldEditException {
         List<Countable> distribution;
 
         Region region;
-        if (clipboardDistr) {
-            // TODO multi clipboard distribution
-            Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
-            region = clipboard.getRegion();
-            new ExtentTraverser<AbstractDelegateExtent>(editSession).setNext(new AbstractDelegateExtent(clipboard));
+        if (page == null) {
+            Extent extent;
+            if (clipboardDistr) {
+                Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
+                extent = clipboard;
+                region = clipboard.getRegion();
+            } else {
+                extent = editSession;
+                region = session.getSelection(world);
+            }
+            if (separateStates)
+                distribution = (List) extent.getBlockDistributionWithData(region);
+            else
+                distribution = (List) extent.getBlockDistribution(region);
+            session.setLastDistribution(distribution);
+            page = 1;
         } else {
-            region = session.getSelection(world);
+            distribution = (List) session.getLastDistribution();
+            if (distribution == null) {
+                actor.printError(TranslatableComponent.of("worldedit.distr.no-previous"));
+                return;
+            }
         }
-        if (separateStates)
-            distribution = (List) editSession.getBlockDistributionWithData(region);
-        else
-            distribution = (List) editSession.getBlockDistribution(region);
-
-
         if (distribution.isEmpty()) {  // *Should* always be false
             actor.printError(TranslatableComponent.of("worldedit.distr.no-blocks"));
             return;

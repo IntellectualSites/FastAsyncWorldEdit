@@ -21,7 +21,7 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
@@ -49,7 +49,7 @@ public class EditSessionBuilder {
     private String worldName;
     private Player player;
     private FaweLimit limit;
-    private FaweChangeSet changeSet;
+    private AbstractChangeSet changeSet;
     private Region[] allowedRegions;
     private Boolean autoQueue;
     private Boolean fastmode;
@@ -116,7 +116,7 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
-    public EditSessionBuilder changeSet(@Nullable FaweChangeSet changeSet) {
+    public EditSessionBuilder changeSet(@Nullable AbstractChangeSet changeSet) {
         this.changeSet = changeSet;
         return setDirty();
     }
@@ -265,7 +265,7 @@ public class EditSessionBuilder {
         return extent;
     }
 
-    private FaweChangeSet changeTask;
+    private AbstractChangeSet changeTask;
     private int maxY;
     private Extent bypassHistory;
     private Extent bypassAll;
@@ -493,7 +493,7 @@ public class EditSessionBuilder {
         return player;
     }
 
-    public FaweChangeSet getChangeTask() {
+    public AbstractChangeSet getChangeTask() {
         return changeTask;
     }
 

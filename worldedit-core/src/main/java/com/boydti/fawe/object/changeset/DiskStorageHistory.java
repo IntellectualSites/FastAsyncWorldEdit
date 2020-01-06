@@ -7,30 +7,20 @@ import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.IntegerPair;
-import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -405,15 +395,15 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbtfFile)));
     }
 
-    protected DiskStorageSummary summarizeShallow() {
-        return new DiskStorageSummary(getOriginX(), getOriginZ());
+    protected SimpleChangeSetSummary summarizeShallow() {
+        return new SimpleChangeSetSummary(getOriginX(), getOriginZ());
     }
 
-    public DiskStorageSummary summarize(Region region, boolean shallow) {
+    public SimpleChangeSetSummary summarize(Region region, boolean shallow) {
         if (bdFile.exists()) {
             int ox = getOriginX();
             int oz = getOriginZ();
-            DiskStorageSummary summary = summarizeShallow();
+            SimpleChangeSetSummary summary = summarizeShallow();
             if (region != null && !region.contains(ox, oz)) {
                 return summary;
             }
@@ -457,79 +447,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
         }
         return new IntegerPair(ox, oz);
-    }
-
-    public static class DiskStorageSummary {
-
-        public int[] blocks;
-
-        public int minX;
-        public int minZ;
-
-        public int maxX;
-        public int maxZ;
-
-        public DiskStorageSummary(int x, int z) {
-            blocks = new int[BlockTypesCache.states.length];
-            minX = x;
-            maxX = x;
-            minZ = z;
-            maxZ = z;
-        }
-
-        public void add(int x, int z, int id) {
-            blocks[id]++;
-            if (x < minX) {
-                minX = x;
-            } else if (x > maxX) {
-                maxX = x;
-            }
-            if (z < minZ) {
-                minZ = z;
-            } else if (z > maxZ) {
-                maxZ = z;
-            }
-        }
-
-        public Map<BlockState, Integer> getBlocks() {
-            HashMap<BlockState, Integer> map = new HashMap<>();
-            for (int i = 0; i < blocks.length; i++) {
-                if (blocks[i] != 0) {
-                    BlockState state = BlockTypesCache.states[i];
-                    map.put(state, blocks[i]);
-                }
-            }
-            return map;
-        }
-
-        public List<Countable<BlockState>> getBlockDistributionWithData() {
-            ArrayList<Countable<BlockState>> list = new ArrayList<>();
-            for (Map.Entry<BlockState, Integer> entry : getBlocks().entrySet()) {
-                list.add(new Countable<>(entry.getKey(), entry.getValue()));
-            }
-            return list;
-        }
-
-        public Map<BlockState, Double> getPercents() {
-            Map<BlockState, Integer> map = getBlocks();
-            int count = getSize();
-            Map<BlockState, Double> newMap = new HashMap<>();
-            for (Map.Entry<BlockState, Integer> entry : map.entrySet()) {
-                BlockState id = entry.getKey();
-                int changes = entry.getValue();
-                double percent = (changes * 1000L / count) / 10d;
-                newMap.put(id, percent);
-            }
-            return newMap;
-        }
-
-        public int getSize() {
-            int count = 0;
-            for (int block : blocks) {
-                count += block;
-            }
-            return count;
-        }
     }
 
     @Override

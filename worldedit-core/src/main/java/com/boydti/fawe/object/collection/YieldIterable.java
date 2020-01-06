@@ -40,11 +40,13 @@ public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
                         buffer = queue.poll(50, TimeUnit.MILLISECONDS);
                         if (buffer == END_MARKER) {
                             interrupted = true;
+                            buffer = null;
                             return false;
                         }
                     }
                 } catch (InterruptedException e) {
                     interrupted = true;
+                    buffer = null;
                 }
                 return buffer != null;
             }

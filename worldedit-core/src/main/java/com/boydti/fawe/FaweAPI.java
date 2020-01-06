@@ -343,7 +343,7 @@ public class FaweAPI {
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());
             DiskStorageHistory dsh = new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
-            DiskStorageHistory.DiskStorageSummary summary = dsh.summarize(boundsPlus, shallow);
+            SimpleChangeSetSummary summary = dsh.summarize(boundsPlus, shallow);
             RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
             boolean encompassed = false;
             boolean isIn = false;

@@ -32,7 +32,7 @@ import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.ProcessedWEExtent;
@@ -198,7 +198,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
     private final Player player;
-    private FaweChangeSet changeSet;
+    private AbstractChangeSet changeSet;
     private boolean history;
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
@@ -212,11 +212,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final int maxY;
 
     @Deprecated
-    public EditSession(@NotNull World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@NotNull World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         this(null, world, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
     }
 
-    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable Player player, @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         this(new EditSessionBuilder(world, worldName).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
 
@@ -393,7 +393,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Used internally to set the ChangeSet during completion to record custom changes which aren't normally recorded
      * @param set
      */
-    public void setRawChangeSet(@Nullable FaweChangeSet set) {
+    public void setRawChangeSet(@Nullable AbstractChangeSet set) {
         changeSet = set;
         changes++;
     }
@@ -999,10 +999,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Enqueue it
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
-                ((FaweChangeSet) getChangeSet()).closeAsync();
+                ((AbstractChangeSet) getChangeSet()).closeAsync();
             } else {
                 try {
-                    ((FaweChangeSet) getChangeSet()).close();
+                    ((AbstractChangeSet) getChangeSet()).close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -2794,7 +2794,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public boolean regenerate(Region region, BiomeType biome, Long seed) {
         //TODO Optimize - avoid Vector2D creation (make mutable)
-        final FaweChangeSet fcs = (FaweChangeSet) this.getChangeSet();
+        final AbstractChangeSet fcs = (AbstractChangeSet) this.getChangeSet();
         this.setChangeSet(null);
         final FaweRegionExtent fe = this.getRegionExtent();
         final boolean cuboid = region instanceof CuboidRegion;

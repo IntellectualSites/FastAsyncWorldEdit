@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
-public class CFIChangeSet extends FaweChangeSet {
+public class CFIChangeSet extends AbstractChangeSet {
 
     private final File file;
 

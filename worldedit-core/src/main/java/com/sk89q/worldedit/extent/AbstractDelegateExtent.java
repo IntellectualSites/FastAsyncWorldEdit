@@ -24,11 +24,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.HistoryExtent;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
-import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -116,7 +115,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     /*
      History
      */
-    public void setChangeSet(FaweChangeSet changeSet) {
+    public void setChangeSet(AbstractChangeSet changeSet) {
         if (extent instanceof HistoryExtent) {
             HistoryExtent history = ((HistoryExtent) extent);
             if (changeSet == null) {
