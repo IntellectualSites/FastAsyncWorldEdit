@@ -97,19 +97,13 @@ public interface ChangeSet extends Closeable {
      */
     default void delete() {}
 
-    ChangeSetSummary summarize(Region region, boolean shallow) {
-        return new ChangeSetSummary() {
-            @Override
-            public Map<BlockState, Integer> getBlocks() {
-                return Collections.emptyMap();
-            }
-
-            @Override
-            public int getSize() {
-                return size();
-            }
-        };
-    }
+    /**
+     * Get a summary of this changeset
+     * @param region
+     * @param shallow
+     * @return
+     */
+    ChangeSetSummary summarize(Region region, boolean shallow);
 
     /**
      * Get if the changeset is empty (i.e. size == 0)

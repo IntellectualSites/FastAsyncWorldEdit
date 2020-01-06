@@ -1,3 +1,5 @@
+package com.boydti.fawe.object.changeset;
+
 import com.sk89q.worldedit.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -13,6 +15,14 @@ public class SimpleChangeSetSummary implements ChangeSetSummary {
 
     public int maxX;
     public int maxZ;
+
+    public SimpleChangeSetSummary() {
+        blocks = new int[BlockTypesCache.states.length];
+        this.minX = Integer.MAX_VALUE;
+        this.minZ = Integer.MAX_VALUE;
+        this.maxX = Integer.MIN_VALUE;
+        this.maxZ = Integer.MIN_VALUE;
+    }
 
     public SimpleChangeSetSummary(int x, int z) {
         blocks = new int[BlockTypesCache.states.length];

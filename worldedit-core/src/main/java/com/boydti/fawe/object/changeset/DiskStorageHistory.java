@@ -399,6 +399,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return new SimpleChangeSetSummary(getOriginX(), getOriginZ());
     }
 
+    @Override
     public SimpleChangeSetSummary summarize(Region region, boolean shallow) {
         if (bdFile.exists()) {
             int ox = getOriginX();
