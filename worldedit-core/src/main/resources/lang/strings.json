@@ -397,7 +397,7 @@
 
     "worldedit.undo.undone": "Undid {0} available edits.",
     "worldedit.undo.none": "Nothing left to undo.",
-    "worldedit.redo.undone": "Redid {0} available edits.",
+    "worldedit.redo.redone": "Redid {0} available edits.",
     "worldedit.redo.none": "Nothing left to redo.",
     "worldedit.clearhistory.cleared": "History cleared.",
 
@@ -590,6 +590,7 @@
 	"worldedit.tool.inspect.equip": "Inspect tool bound to {0}.",
     "worldedit.tool.info.blockstate.hover": "Block state",
     "worldedit.tool.info.internalid.hover": "Internal ID",
+	"worldedit.tool.info.legacy.hover": "Legacy id:data",
     "worldedit.tool.info.light.hover": "Block Light/Light Above",
     "worldedit.tool.none.equip": "Tool unbound from your current item.",
     "worldedit.tool.selwand.equip": "Selection wand bound to {0}.",

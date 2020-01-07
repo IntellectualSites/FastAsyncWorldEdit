@@ -26,6 +26,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.antlr.ExpressionLexer;
 import com.sk89q.worldedit.antlr.ExpressionParser;
+import com.sk89q.worldedit.internal.expression.invoke.ExpressionCompiler;
 import com.sk89q.worldedit.session.request.Request;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -37,13 +38,7 @@ import java.lang.invoke.MethodHandle;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * Compiles and evaluates expressions.
@@ -83,13 +78,10 @@ public class Expression {
 
     private final SlotTable slots = new SlotTable();
     private final List<String> providedSlots;
-    private ExpressionParser.AllStatementsContext root;
+    private final ExpressionParser.AllStatementsContext root;
     private final SetMultimap<String, MethodHandle> functions = Functions.getFunctionMap();
+    private final CompiledExpression compiledExpression;
     private ExpressionEnvironment environment;
-
-    public static Expression compile(String expression, String... variableNames) throws ExpressionException {
-        return new Expression(expression, variableNames);
-    }
 
     private Expression(String expression, String... variableNames) throws ExpressionException {
         slots.putSlot("e", new LocalSlot.Constant(Math.E));
@@ -119,6 +111,15 @@ public class Expression {
             throw new ParserException(parser.getState(), e);
         }
         ParseTreeWalker.DEFAULT.walk(new ExpressionValidator(slots.keySet(), functions), root);
+        this.compiledExpression = new ExpressionCompiler().compileExpression(root, functions);
+    }
+
+    public static Expression compile(String expression, String... variableNames) throws ExpressionException {
+        return new Expression(expression, variableNames);
+    }
+
+    public static Expression getInstance() {
+        return instance.get().peek();
     }
 
     public double evaluate(double... values) throws EvaluationException {
@@ -177,7 +178,7 @@ public class Expression {
     private Double evaluateRoot() throws EvaluationException {
         pushInstance();
         try {
-            return root.accept(new EvaluatingVisitor(slots, functions));
+            return compiledExpression.execute(new ExecutionData(slots, functions));
         } finally {
             popInstance();
         }
@@ -194,10 +195,6 @@ public class Expression {
 
     public SlotTable getSlots() {
         return slots;
-    }
-
-    public static Expression getInstance() {
-        return instance.get().peek();
     }
 
     private void pushInstance() {

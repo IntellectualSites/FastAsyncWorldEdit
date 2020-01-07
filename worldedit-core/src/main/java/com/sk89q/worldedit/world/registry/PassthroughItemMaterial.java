@@ -17,9 +17,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This package contains the old command system. It is no longer in use. Please switch
- * to Piston, Intake, ACF, or similar systems.
- */
-@Deprecated
-package com.sk89q.minecraft.util.commands;
+package com.sk89q.worldedit.world.registry;
+
+import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
+
+import javax.annotation.Nullable;
+
+public class PassthroughItemMaterial implements ItemMaterial {
+
+    private static final ItemMaterial DEFAULT_MATERIAL = new SimpleItemMaterial(0, 0);
+
+    private final ItemMaterial itemMaterial;
+
+    public PassthroughItemMaterial(@Nullable ItemMaterial material) {
+        this.itemMaterial = firstNonNull(material, DEFAULT_MATERIAL);
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return itemMaterial.getMaxStackSize();
+    }
+
+    @Override
+    public int getMaxDamage() {
+        return itemMaterial.getMaxDamage();
+    }
+}

@@ -17,9 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.sk89q.worldedit.internal.expression;
+
 /**
- * This package contains the old command system. It is no longer in use. Please switch
- * to Piston, Intake, ACF, or similar systems.
+ * Represents a "compiled" expression.
  */
-@Deprecated
-package com.sk89q.minecraft.util.commands;
+public interface CompiledExpression {
+
+    Double execute(ExecutionData executionData);
+
+}

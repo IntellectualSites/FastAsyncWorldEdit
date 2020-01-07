@@ -13,11 +13,11 @@ public enum Jars {
 
     MM_v1_7_3(
         "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.3-SNAPSHOT/MapManager_v1.7.3-SNAPSHOT.jar",
-        "M3YLUQZZ66K2DMVDCYLEU38U3ZKRKHRAXQGGPVKFO6G=", 554831),
+        "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 554831),
 
     PL_v3_7_3(
         "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.3-SNAPSHOT/PacketListenerAPI_v3.7.3-SNAPSHOT.jar",
-        "ETDBRZLN5PRVDFR/MSQDPM6JJER3WQOKHCN8FUXO5ZM=", 167205),
+        "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 167205),
 
     ;
 
@@ -27,12 +27,12 @@ public enum Jars {
 
     /**
      * @param url Where this jar can be found and downloaded
-     * @param digest The SHA-256 hexadecimal digest
+     * @param digest The Base64-encoded SHA-256 digest
      * @param fileSize Size of this jar in bytes
      */
     Jars(String url, String digest, int fileSize) {
         this.url = url;
-        this.digest = digest.toUpperCase();
+        this.digest = digest;
         this.fileSize = fileSize;
     }
 
@@ -50,7 +50,7 @@ public enum Jars {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] jarDigestBytes = md.digest(jarBytes);
 
-            String jarDigest = Base64.getEncoder().encodeToString(jarDigestBytes).toUpperCase();
+            String jarDigest = Base64.getEncoder().encodeToString(jarDigestBytes);
 
             if (this.digest.equals(jarDigest)) {
                 getLogger(Jars.class).debug("++++ HASH CHECK ++++");

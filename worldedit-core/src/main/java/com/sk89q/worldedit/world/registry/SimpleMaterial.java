@@ -17,9 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This package contains the old command system. It is no longer in use. Please switch
- * to Piston, Intake, ACF, or similar systems.
- */
-@Deprecated
-package com.sk89q.minecraft.util.commands;
+package com.sk89q.worldedit.world.registry;
+
+class SimpleItemMaterial implements ItemMaterial {
+
+    private int maxStackSize;
+    private int maxDamage;
+
+    public SimpleItemMaterial(int maxStackSize, int maxDamage) {
+        this.maxStackSize = maxStackSize;
+        this.maxDamage = maxDamage;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return maxStackSize;
+    }
+
+    @Override
+    public int getMaxDamage() {
+        return maxDamage;
+    }
+}

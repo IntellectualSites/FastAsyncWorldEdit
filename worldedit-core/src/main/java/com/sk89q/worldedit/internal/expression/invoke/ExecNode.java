@@ -17,9 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * This package contains the old command system. It is no longer in use. Please switch
- * to Piston, Intake, ACF, or similar systems.
- */
-@Deprecated
-package com.sk89q.minecraft.util.commands;
+package com.sk89q.worldedit.internal.expression.invoke;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+
+import java.lang.invoke.MethodHandle;
+
+class ExecNode {
+    final ParserRuleContext ctx;
+    final MethodHandle handle;
+
+    ExecNode(ParserRuleContext ctx, MethodHandle handle) {
+        this.ctx = ctx;
+        this.handle = handle;
+    }
+}
