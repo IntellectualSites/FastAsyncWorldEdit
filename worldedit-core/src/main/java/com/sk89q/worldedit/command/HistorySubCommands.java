@@ -23,6 +23,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Time;
@@ -249,7 +250,7 @@ public class HistorySubCommands {
         player.print(content.create());
     }
 
-    private void list(RollbackDatabase database, String pageCommand, List<? extends ChangeSet> histories, BlockVector3 origin) {
+    private PaginationBox list(RollbackDatabase database, String pageCommand, List<Supplier<? extends ChangeSet>> histories, BlockVector3 origin) {
         return PaginationBox.fromStrings("Edits:", pageCommand, histories, new Function<Supplier<? extends ChangeSet>, Component>() {
             @NotNull
             @Override
@@ -287,13 +288,9 @@ public class HistorySubCommands {
                     elem = elem.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
                     return elem;
                 } else {
-
+                    // TODO
+                    return TextComponent.of("");
                 }
-
-
-
-                System.out.println(" - return elem");
-                return elem;
             }
         });
     }
@@ -343,8 +340,8 @@ public class HistorySubCommands {
             page = 1;
         }
 
-
-        player.print(pages.create(page));
+        PaginationBox box = list(database, pageCommand, history, origin.toBlockPoint());
+        player.print(box.create(page));
     }
 
     @Command(
@@ -379,14 +376,20 @@ public class HistorySubCommands {
             desc = "List your history"
     )
     @CommandPermissions("worldedit.history.list")
-    public void list(Actor actor, LocalSession session,
+    public void list(Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
                      @Arg(desc = "Player uuid/name") UUID other,
                      @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) {
         int index = session.getHistoryIndex();
-        List<ChangeSet> history = session.getHistory();
-
-        // index
-
+        List<Supplier<? extends ChangeSet>> history = Lists.transform(session.getHistory(), (Function<ChangeSet, Supplier<ChangeSet>>) input -> () -> input);
+        Location origin = player.getLocation();
+        String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
+        Reference<PaginationBox> cached = player.getMeta(pageCommand);
+        PaginationBox pages = cached == null ? null : cached.get();
+        if (page == null || pages == null) {
+            pages = list(database, pageCommand, history, origin.toBlockPoint());
+            page = 1;
+        }
+        player.print(pages.create(page));
     }
 
     @Command(
