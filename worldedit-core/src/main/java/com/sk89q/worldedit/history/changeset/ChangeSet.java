@@ -98,12 +98,14 @@ public interface ChangeSet extends Closeable {
     default void delete() {}
 
     /**
-     * Get a summary of this changeset
+     * Get a summary of this changeset (or null)
      * @param region
      * @param shallow
      * @return
      */
-    ChangeSetSummary summarize(Region region, boolean shallow);
+    default ChangeSetSummary summarize(Region region, boolean shallow) {
+        return null;
+    }
 
     /**
      * Get if the changeset is empty (i.e. size == 0)

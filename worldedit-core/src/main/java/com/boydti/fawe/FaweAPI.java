@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
+import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
