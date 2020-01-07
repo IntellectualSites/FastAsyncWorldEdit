@@ -7,6 +7,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.CoreJavadocOptions
+import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
@@ -53,7 +54,19 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     // Java 8 turns on doclint which we fail
     tasks.withType<Javadoc>().configureEach {
+        delete("docs/javadoc")
+        setDestinationDir(file("docs/javadoc"))
+        title = "${project.name} ${project.version} API"
+        (options as StandardJavadocDocletOptions).addStringOption("author", "true")
         (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
+        subprojects.forEach { proj ->
+            proj.tasks.withType<Javadoc>().forEach { javadocTask ->
+                source += javadocTask.source
+                classpath += javadocTask.classpath
+                excludes += javadocTask.excludes
+                includes += javadocTask.includes
+            }
+        }
     }
 
     tasks.register<Jar>("javadocJar") {
