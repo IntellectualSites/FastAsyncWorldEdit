@@ -15,6 +15,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -728,5 +729,36 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     @Override
     public Iterator<Change> forwardIterator() {
         return getIterator(true);
+    }
+
+    protected SimpleChangeSetSummary summarizeShallow() {
+        return new SimpleChangeSetSummary(getOriginX(), getOriginZ());
+    }
+
+    @Override
+    public SimpleChangeSetSummary summarize(Region region, boolean shallow) {
+        int ox = getOriginX();
+        int oz = getOriginZ();
+        SimpleChangeSetSummary summary = summarizeShallow();
+        if (region != null && !region.contains(ox, oz)) {
+            return summary;
+        }
+        try (FaweInputStream fis = getBlockIS()) {
+            if (!shallow) {
+                int amount = (Settings.IMP.HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
+                MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
+                for (int i = 0; i < amount; i++) {
+                    int x = posDel.readX(fis) + ox;
+                    int y = posDel.readY(fis);
+                    int z = posDel.readZ(fis) + ox;
+                    idDel.readCombined(fis, change);
+                    summary.add(x, z, change.to);
+                }
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return summary;
     }
 }

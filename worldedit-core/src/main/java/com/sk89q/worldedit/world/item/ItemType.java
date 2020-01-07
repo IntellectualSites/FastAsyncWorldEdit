@@ -26,8 +26,11 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.RegistryItem;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldedit.world.registry.ItemMaterial;
 
 import javax.annotation.Nullable;
 
@@ -37,6 +40,9 @@ public class ItemType implements RegistryItem, Keyed {
 
     private String id;
     private String name;
+    private final LazyReference<ItemMaterial> itemMaterial
+            = LazyReference.from(() -> WorldEdit.getInstance().getPlatformManager()
+            .queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().getMaterial(this));
     private BlockType blockType;
     private boolean initBlockType;
     private BaseItem defaultState;
@@ -111,6 +117,15 @@ public class ItemType implements RegistryItem, Keyed {
             this.defaultState = new BaseItemStack(this);
         }
         return this.defaultState;
+    }
+
+    /**
+     * Get the material for this ItemType.
+     *
+     * @return The material
+     */
+    public ItemMaterial getMaterial() {
+        return itemMaterial.getValue();
     }
 
     @Override

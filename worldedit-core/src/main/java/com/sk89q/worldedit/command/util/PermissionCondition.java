@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.util;
 
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.platform.Actor;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.inject.InjectedValueAccess;
@@ -31,9 +32,15 @@ public class PermissionCondition implements Command.Condition {
     private static final Key<Actor> ACTOR_KEY = Key.of(Actor.class);
 
     private final Set<String> permissions;
+    private final boolean queued;
 
     public PermissionCondition(Set<String> permissions) {
+        this(permissions, true);
+    }
+
+    public PermissionCondition(Set<String> permissions, boolean queued) {
         this.permissions = permissions;
+        this.queued = queued;
     }
 
     public Set<String> getPermissions() {
@@ -46,5 +53,9 @@ public class PermissionCondition implements Command.Condition {
             context.injectedValue(ACTOR_KEY)
             .map(actor -> permissions.stream().anyMatch(actor::hasPermission))
             .orElse(false);
+    }
+
+    public boolean isQueued() {
+        return queued;
     }
 }

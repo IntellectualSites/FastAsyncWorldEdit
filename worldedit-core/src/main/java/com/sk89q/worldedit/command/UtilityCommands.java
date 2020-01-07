@@ -40,12 +40,10 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
-import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -104,7 +102,7 @@ import org.jetbrains.annotations.Range;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
+@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -185,8 +183,7 @@ public class UtilityCommands {
             aliases= {"fcancel"},
             desc = "Cancel your current command"
     )
-    @CommandPermissions("fawe.cancel")
-    @SkipQueue
+    @CommandPermissions(value = "fawe.cancel", queued = false)
     public void cancel(Player player) {
         int cancelled = player.cancel(false);
         player.print(Caption.of("fawe.cancel.worldedit.cancel.count" , cancelled));
@@ -704,8 +701,7 @@ public class UtilityCommands {
             name = "/confirm",
             desc = "Confirm a command"
     )
-    @SkipQueue
-    @CommandPermissions("fawe.confirm")
+    @CommandPermissions(value = "fawe.confirm", queued = false)
     public void confirm(Player fp) throws WorldEditException {
         if (!fp.confirm()) {
             fp.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));

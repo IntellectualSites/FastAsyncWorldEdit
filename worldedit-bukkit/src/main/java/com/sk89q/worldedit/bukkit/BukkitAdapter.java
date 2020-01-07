@@ -28,6 +28,7 @@ import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +111,16 @@ public enum BukkitAdapter {
     }
 
     /**
+     * Create a WorldEdit Actor from a Bukkit CommandSender
+     *
+     * @param sender The Bukkit CommandSender
+     * @return The WorldEdit Actor
+     */
+    public static Actor adapt(CommandSender sender) {
+        return WorldEditPlugin.getInstance().wrapCommandSender(sender);
+    }
+
+    /**
      * Create a WorldEdit Player from a Bukkit Player.
      *
      * @param player The Bukkit player
@@ -116,6 +128,21 @@ public enum BukkitAdapter {
      */
     public static BukkitPlayer adapt(Player player) {
         return WorldEditPlugin.getInstance().wrapPlayer(player);
+    }
+
+    /**
+     * Create a Bukkit CommandSender from a WorldEdit Actor.
+     *
+     * @param actor The WorldEdit actor
+     * @return The Bukkit command sender
+     */
+    public static CommandSender adapt(Actor actor) {
+        if (actor instanceof com.sk89q.worldedit.entity.Player) {
+            return adapt((com.sk89q.worldedit.entity.Player) actor);
+        } else if (actor instanceof BukkitBlockCommandSender) {
+            return ((BukkitBlockCommandSender) actor).getSender();
+        }
+        return ((BukkitCommandSender) actor).getSender();
     }
 
     /**

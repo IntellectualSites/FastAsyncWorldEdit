@@ -34,7 +34,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -127,7 +126,10 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
 
     @Override
     public void setPermission(String permission, boolean value) {
+    }
 
+    public BlockCommandSender getSender() {
+        return this.sender;
     }
 
     @Override
