@@ -10,7 +10,7 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.changeset.DiskStorageHistory;
+import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
