@@ -75,8 +75,7 @@ import org.jetbrains.annotations.Nullable;
  *  @see #wrap(World)
  *  @see #create(WorldCreator)
  */
-public class AsyncWorld
-    extends PassthroughExtent implements World {
+public class AsyncWorld extends PassthroughExtent implements World {
 
     private World parent;
     private BukkitImplAdapter adapter;
@@ -925,6 +924,16 @@ public class AsyncWorld
     @Override
     public boolean canGenerateStructures() {
         return parent.canGenerateStructures();
+    }
+
+    @Override
+    public void setHardcore(boolean hardcore) {
+        parent.setHardcore(hardcore);
+    }
+
+    @Override
+    public boolean isHardcore() {
+        return parent.isHardcore();
     }
 
     @Override
