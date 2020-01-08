@@ -156,6 +156,7 @@ public class LocalSession implements TextureHolder {
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
+    private transient boolean hasBeenToldVersion;
 
     // Saved properties
     private String lastScript;
@@ -1199,6 +1200,9 @@ public class LocalSession implements TextureHolder {
      * @param actor the actor
      */
     public void tellVersion(Actor actor) {
+        if (hasBeenToldVersion) return;
+        hasBeenToldVersion = true;
+        actor.sendAnnouncements();
     }
 
     public boolean shouldUseServerCUI() {

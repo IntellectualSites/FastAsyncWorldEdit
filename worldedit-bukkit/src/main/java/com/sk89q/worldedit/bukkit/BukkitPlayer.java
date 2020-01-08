@@ -44,7 +44,10 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -280,6 +283,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public Locale getLocale() {
         return TextUtils.getLocaleByMinecraftTag(player.getLocale());
+    }
+
+    @Override
+    public void sendAnnouncements() {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
+            printError(TranslatableComponent.of("worldedit.version.bukkit.unsupported-adapter",
+                    TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
+                            .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
+        }
     }
 
     @Nullable
