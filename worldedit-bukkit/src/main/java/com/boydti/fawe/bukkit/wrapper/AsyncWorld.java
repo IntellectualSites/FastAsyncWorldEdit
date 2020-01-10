@@ -75,8 +75,7 @@ import org.jetbrains.annotations.Nullable;
  *  @see #wrap(World)
  *  @see #create(WorldCreator)
  */
-public class AsyncWorld
-    extends PassthroughExtent implements World {
+public class AsyncWorld extends PassthroughExtent implements World {
 
     private World parent;
     private BukkitImplAdapter adapter;
@@ -1361,6 +1360,15 @@ public class AsyncWorld
     public <T> void spawnParticle(@NotNull Particle particle, @NotNull Location location, int count,
         double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data,
         boolean force) {
+        parent.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, extra, data, force);
+    }
 
+    public void setHardcore(boolean hardcore) {
+        //todo
+    }
+
+    public boolean isHardcore() {
+        //todo
+        return false;
     }
 }
