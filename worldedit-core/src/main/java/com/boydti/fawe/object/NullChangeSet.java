@@ -1,6 +1,6 @@
 package com.boydti.fawe.object;
 
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
@@ -9,7 +9,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class NullChangeSet extends FaweChangeSet {
+public class NullChangeSet extends AbstractChangeSet {
     public NullChangeSet(World world) {
         super(world);
     }

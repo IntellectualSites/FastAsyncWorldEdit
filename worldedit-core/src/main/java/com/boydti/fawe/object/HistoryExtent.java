@@ -2,7 +2,7 @@ package com.boydti.fawe.object;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  */
 public class HistoryExtent extends AbstractDelegateExtent {
 
-    private FaweChangeSet changeSet;
+    private AbstractChangeSet changeSet;
 
     /**
      * Create a new instance.
@@ -33,18 +33,18 @@ public class HistoryExtent extends AbstractDelegateExtent {
      * @param extent    the extent
      * @param changeSet the change set
      */
-    public HistoryExtent(Extent extent, FaweChangeSet changeSet) {
+    public HistoryExtent(Extent extent, AbstractChangeSet changeSet) {
         super(extent);
         checkNotNull(changeSet);
         this.changeSet = changeSet;
     }
 
-    public FaweChangeSet getChangeSet() {
+    public AbstractChangeSet getChangeSet() {
         return changeSet;
     }
 
     @Override
-    public void setChangeSet(FaweChangeSet fcs) {
+    public void setChangeSet(AbstractChangeSet fcs) {
         this.changeSet = fcs;
     }
 

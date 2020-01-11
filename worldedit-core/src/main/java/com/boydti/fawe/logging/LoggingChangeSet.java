@@ -1,7 +1,7 @@
 package com.boydti.fawe.logging;
 
 import com.boydti.fawe.object.changeset.AbstractDelegateChangeSet;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.worldedit.entity.Player;
 //import org.primesoft.blockshub.IBlocksHubApi;
 //import org.primesoft.blockshub.api.IPlayer;
@@ -11,7 +11,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 
     private static boolean initialized = false;
 
-    public static FaweChangeSet wrap(Player player, FaweChangeSet parent) {
+    public static AbstractChangeSet wrap(Player player, AbstractChangeSet parent) {
         if (!initialized) {
             initialized = true;
 //            api = (IBlocksHubApi) Fawe.imp().getBlocksHubApi();
@@ -30,7 +30,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 //    private final MutableBlockData oldBlock;
 //    private final MutableBlockData newBlock;
 
-    private LoggingChangeSet(Player player, FaweChangeSet parent) {
+    private LoggingChangeSet(Player player, AbstractChangeSet parent) {
         super(parent);
 //        String world = player.getLocation().world;
 //        try {

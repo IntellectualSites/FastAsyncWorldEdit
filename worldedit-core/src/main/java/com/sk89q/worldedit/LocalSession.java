@@ -28,7 +28,6 @@ import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -39,6 +38,8 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
@@ -153,7 +154,7 @@ public class LocalSession implements TextureHolder {
 
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
-    private transient List<Countable<BlockState>> lastDistribution;
+    private transient List<Countable> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
     private transient boolean hasBeenToldVersion;
@@ -332,6 +333,10 @@ public class LocalSession implements TextureHolder {
         return (historyNegativeIndex == null ? historyNegativeIndex = 0 : historyNegativeIndex);
     }
 
+    public List<ChangeSet> getHistory() {
+        return Lists.transform(history, this::getChangeSet);
+    }
+
     public boolean save() {
         saveHistoryNegativeIndex(uuid, currentWorld);
         if (defaultSelector == RegionSelectorType.CUBOID) {
@@ -396,9 +401,9 @@ public class LocalSession implements TextureHolder {
         remember(editSession, true, limit);
     }
 
-    private FaweChangeSet getChangeSet(Object o) {
-        if (o instanceof FaweChangeSet) {
-            FaweChangeSet cs = (FaweChangeSet) o;
+    private ChangeSet getChangeSet(Object o) {
+        if (o instanceof ChangeSet) {
+            ChangeSet cs = (ChangeSet) o;
             try {
                 cs.close();
             } catch (IOException e) {
@@ -428,16 +433,16 @@ public class LocalSession implements TextureHolder {
             return;
         }
         loadSessionHistoryFromDisk(player.getUniqueId(), world);
-        if (changeSet instanceof FaweChangeSet) {
+        if (changeSet instanceof ChangeSet) {
             ListIterator<Object> iter = history.listIterator();
             int i = 0;
             int cutoffIndex = history.size() - getHistoryNegativeIndex();
             while (iter.hasNext()) {
                 Object item = iter.next();
                 if (++i > cutoffIndex) {
-                    FaweChangeSet oldChangeSet;
-                    if (item instanceof FaweChangeSet) {
-                        oldChangeSet = (FaweChangeSet) item;
+                    ChangeSet oldChangeSet;
+                    if (item instanceof ChangeSet) {
+                        oldChangeSet = (ChangeSet) item;
                     } else {
                         oldChangeSet = getChangeSet(item);
                     }
@@ -455,7 +460,7 @@ public class LocalSession implements TextureHolder {
         if (limit != null) {
             int limitMb = limit.MAX_HISTORY;
             while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
-                FaweChangeSet item = (FaweChangeSet) history.remove(0);
+                ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
                 long size = MainUtil.getSize(item);
                 historySize -= size;
@@ -479,7 +484,7 @@ public class LocalSession implements TextureHolder {
         }
         */
 
-        FaweChangeSet changeSet = (FaweChangeSet) editSession.getChangeSet();
+        ChangeSet changeSet = editSession.getChangeSet();
         if (changeSet.isEmpty()) {
             return;
         }
@@ -496,9 +501,9 @@ public class LocalSession implements TextureHolder {
             while (iter.hasNext()) {
                 Object item = iter.next();
                 if (++i > cutoffIndex) {
-                    FaweChangeSet oldChangeSet;
-                    if (item instanceof FaweChangeSet) {
-                        oldChangeSet = (FaweChangeSet) item;
+                    ChangeSet oldChangeSet;
+                    if (item instanceof ChangeSet) {
+                        oldChangeSet = (ChangeSet) item;
                     } else {
                         oldChangeSet = getChangeSet(item);
                     }
@@ -519,7 +524,7 @@ public class LocalSession implements TextureHolder {
             history.add(0, changeSet);
         }
         while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
-            FaweChangeSet item = (FaweChangeSet) history.remove(0);
+            ChangeSet item = (ChangeSet) history.remove(0);
             item.delete();
             long size = MainUtil.getSize(item);
             historySize -= size;
@@ -535,10 +540,11 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player) actor).getWorldForEditing());
+        World world = ((Player) actor).getWorldForEditing();
+        loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
-            FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
+            ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
+            try (EditSession newEditSession = new EditSessionBuilder(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -571,12 +577,13 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player)actor).getWorldForEditing());
+        World world = ((Player) actor).getWorldForEditing();
+        loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
-            FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
+            ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
+            try (EditSession newEditSession = new EditSessionBuilder(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -1594,14 +1601,14 @@ public class LocalSession implements TextureHolder {
      *
      * @return block distribution or {@code null}
      */
-    public List<Countable<BlockState>> getLastDistribution() {
+    public List<Countable> getLastDistribution() {
         return lastDistribution == null ? null : Collections.unmodifiableList(lastDistribution);
     }
 
     /**
      * Store a block distribution in this session.
      */
-    public void setLastDistribution(List<Countable<BlockState>> dist) {
+    public void setLastDistribution(List<Countable> dist) {
         lastDistribution = dist;
     }
 

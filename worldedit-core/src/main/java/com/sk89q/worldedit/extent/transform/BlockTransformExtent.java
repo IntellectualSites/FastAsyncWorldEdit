@@ -105,16 +105,27 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     private static long combine(Direction... directions) {
-        return Arrays.stream(directions).mapToLong(dir -> (1L << dir.ordinal()))
-            .reduce(0, (a, b) -> a | b);
+        long mask = 0;
+        for (Direction dir : directions) {
+            mask = mask | (1L << dir.ordinal());
+        }
+        return mask;
     }
 
     private static long[] adapt(Direction... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = 1L << dirs[i].ordinal();
+        }
+        return arr;
     }
 
     private static long[] adapt(Long... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = dirs[i];
+        }
+        return arr;
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -228,7 +239,9 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long notIndex(long mask, int... indexes) {
-        mask |= Arrays.stream(indexes).mapToLong(index -> (1L << (index + values().length))).reduce(0, (a, b) -> a | b);
+        for (int index : indexes) {
+            mask = mask | (1L << (index + values().length));
+        }
         return mask;
     }
 

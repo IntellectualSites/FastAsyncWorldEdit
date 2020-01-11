@@ -8,6 +8,7 @@ import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
+import com.sk89q.worldedit.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
@@ -16,13 +17,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.UUID;
 import java.util.concurrent.Future;
 
-public class AbstractDelegateChangeSet extends FaweChangeSet {
-    public final FaweChangeSet parent;
+public class AbstractDelegateChangeSet extends AbstractChangeSet {
+    public final AbstractChangeSet parent;
 
-    public AbstractDelegateChangeSet(FaweChangeSet parent) {
+    public AbstractDelegateChangeSet(AbstractChangeSet parent) {
         super(parent.getWorld());
         this.parent = parent;
         this.waitingCombined = parent.waitingCombined;
@@ -44,7 +44,7 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
         parent.close();
     }
 
-    public final FaweChangeSet getParent() {
+    public final AbstractChangeSet getParent() {
         return parent;
     }
 
@@ -116,6 +116,11 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     @Override
     public void delete() {
         parent.delete();
+    }
+
+    @Override
+    public ChangeSetSummary summarize(Region region, boolean shallow) {
+        return parent.summarize(region, shallow);
     }
 
     @Override

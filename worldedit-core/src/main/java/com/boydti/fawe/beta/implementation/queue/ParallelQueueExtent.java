@@ -9,13 +9,12 @@ import com.boydti.fawe.beta.implementation.filter.CountFilter;
 import com.boydti.fawe.beta.implementation.filter.DistrFilter;
 import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -79,7 +78,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     @Override
-    public Extent enableHistory(FaweChangeSet changeSet) {
+    public Extent enableHistory(AbstractChangeSet changeSet) {
         return super.enableHistory(changeSet);
     }
 

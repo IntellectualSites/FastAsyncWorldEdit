@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -24,7 +23,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     private int[] missingBlocks = new int[BlockTypes.size()];
     private BlockBag blockBag;
 
-    public BlockBagChangeSet(FaweChangeSet parent, BlockBag blockBag, boolean mine) {
+    public BlockBagChangeSet(AbstractChangeSet parent, BlockBag blockBag, boolean mine) {
         super(parent);
         this.blockBag = blockBag;
         this.mine = mine;

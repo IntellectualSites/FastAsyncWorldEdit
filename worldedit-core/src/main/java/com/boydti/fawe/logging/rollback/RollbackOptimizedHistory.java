@@ -1,10 +1,8 @@
 package com.boydti.fawe.logging.rollback;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -56,6 +54,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
+        System.out.println("Size " + size);
     }
 
     public long getTime() {
@@ -63,8 +62,8 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     }
 
     @Override
-    protected DiskStorageSummary summarizeShallow() {
-        DiskStorageSummary summary = super.summarizeShallow();
+    protected SimpleChangeSetSummary summarizeShallow() {
+        SimpleChangeSetSummary summary = super.summarizeShallow();
         summary.minX = this.minX;
         summary.minZ = this.minZ;
         summary.maxX = this.maxX;

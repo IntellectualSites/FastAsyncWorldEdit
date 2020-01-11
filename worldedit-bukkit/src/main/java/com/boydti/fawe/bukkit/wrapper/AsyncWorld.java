@@ -927,6 +927,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public void setHardcore(boolean hardcore) {
+        parent.setHardcore(hardcore);
+    }
+
+    @Override
+    public boolean isHardcore() {
+        return parent.isHardcore();
+    }
+
+    @Override
     public long getTicksPerAnimalSpawns() {
         return parent.getTicksPerAnimalSpawns();
     }

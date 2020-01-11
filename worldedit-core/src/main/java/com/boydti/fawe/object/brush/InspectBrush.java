@@ -63,10 +63,12 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
+            System.out.println("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
+            System.out.println("No db");
             return false;
         }
         try {
@@ -76,14 +78,17 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
             final int z = target.getBlockZ();
             World world = player.getWorld();
             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
+            System.out.println("World " + world.getName());
             int count = 0;
             for (Supplier<RollbackOptimizedHistory> supplier : db.getEdits(target, false)) {
+                System.out.println("History " + db);
                 count++;
                 RollbackOptimizedHistory edit = supplier.get();
                 Iterator<MutableFullBlockChange> iter = edit.getFullBlockIterator(null, 0, false);
                 while (iter.hasNext()) {
                     MutableFullBlockChange change = iter.next();
                     if (change.x != x || change.y != y || change.z != z) {
+                        System.out.println("Not pos " + change.x + "," + change.y + "," + change.z + " | " + x + "," + y + "," + z);
                         continue;
                     }
                     int from = change.from;
@@ -107,7 +112,10 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
             }
             player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
         } catch (IOException e) {
+            System.out.println("IOE");
             throw new RuntimeException(e);
+        } catch (Throwable e) {
+            System.out.println("E throw");
         }
         return true;
     }

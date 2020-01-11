@@ -21,14 +21,13 @@ package com.sk89q.worldedit.function.operation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Performs an undo or redo from a given {@link ChangeSet}.
@@ -71,8 +70,8 @@ public class ChangeSetExecutor implements Operation {
 
         this.type = type;
         this.context = context;
-        if (changeSet instanceof FaweChangeSet) {
-            iterator = ((FaweChangeSet) changeSet).getIterator(blockBag, inventory, type == Type.REDO);
+        if (changeSet instanceof AbstractChangeSet) {
+            iterator = ((AbstractChangeSet) changeSet).getIterator(blockBag, inventory, type == Type.REDO);
         } else if (type == Type.UNDO) {
             iterator = changeSet.backwardIterator();
         } else {
