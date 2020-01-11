@@ -22,8 +22,8 @@ package com.sk89q.worldedit.internal.expression;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.SetMultimap;
 import com.google.common.primitives.Doubles;
 import com.sk89q.worldedit.internal.expression.LocalSlot.Variable;
 import com.sk89q.worldedit.math.Vector3;
@@ -61,7 +61,7 @@ final class Functions {
 
         // clean up all the functions
         return ImmutableSetMultimap.copyOf(
-                Multimaps.transformValues(map, Functions::clean)
+            Multimaps.transformValues(map, Functions::clean)
         );
     }
 
@@ -71,7 +71,7 @@ final class Functions {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             DOUBLE_VALUE = lookup.findVirtual(Number.class, "doubleValue",
-                    methodType(double.class));
+                methodType(double.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
@@ -83,7 +83,7 @@ final class Functions {
         if (handle.type().returnType() != Double.class) {
             // Ensure that the handle returns a Double, even if originally a Number
             checkState(Number.class.isAssignableFrom(handle.type().returnType()),
-                    "Function does not return a number");
+                "Function does not return a number");
             handle = handle.asType(handle.type().changeReturnType(Number.class));
             handle = filterReturnValue(handle, DOUBLE_VALUE);
         }

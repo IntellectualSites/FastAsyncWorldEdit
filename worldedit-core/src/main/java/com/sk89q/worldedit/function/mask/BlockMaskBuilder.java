@@ -37,9 +37,9 @@ public class BlockMaskBuilder {
     }
 
     private boolean filterRegex(BlockType blockType, PropertyKey key, String regex) {
-        Property property = blockType.getProperty(key);
+        Property<Object> property = blockType.getProperty(key);
         if (property == null) return false;
-        List values = property.getValues();
+        List<Object> values = property.getValues();
         boolean result = false;
         for (int i = 0; i < values.size(); i++) {
             Object value = values.get(i);
@@ -52,10 +52,10 @@ public class BlockMaskBuilder {
     }
 
     private boolean filterOperator(BlockType blockType, PropertyKey key, Operator operator, CharSequence value) {
-        Property property = blockType.getProperty(key);
+        Property<Object> property = blockType.getProperty(key);
         if (property == null) return false;
         int index = property.getIndexFor(value);
-        List values = property.getValues();
+        List<Object> values = property.getValues();
         boolean result = false;
         for (int i = 0; i < values.size(); i++) {
             if (!operator.test(index, i) && has(blockType, property, i)) {
@@ -151,7 +151,7 @@ public class BlockMaskBuilder {
                             throw new SuggestInputParseException("No value for " + input, input, () -> {
                                 HashSet<String> values = new HashSet<>();
                                 types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
-                                    Property p = t.getProperty(fKey);
+                                    Property<Object> p = t.getProperty(fKey);
                                     for (int j = 0; j < p.getValues().size(); j++) {
                                         if (has(t, p, j)) {
                                             String o = p.getValues().get(j).toString();
@@ -220,8 +220,8 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    private boolean has(BlockType type, Property property, int index) {
-        AbstractProperty prop = (AbstractProperty) property;
+    private <T> boolean has(BlockType type, Property<T> property, int index) {
+        AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return false;
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
@@ -247,10 +247,7 @@ public class BlockMaskBuilder {
     private boolean optimizedStates = true;
 
     public boolean isEmpty() {
-        for (long[] bitSet : bitSets) {
-            if (bitSet != null) return false;
-        }
-        return true;
+        return Arrays.stream(bitSets).noneMatch(Objects::nonNull);
     }
 
     public BlockMaskBuilder() {
@@ -283,7 +280,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder remove(BlockStateHolder state) {
+    public <T extends BlockStateHolder<T>> BlockMaskBuilder remove(BlockStateHolder<T> state) {
         BlockType type = state.getBlockType();
         int i = type.getInternalId();
         long[] states = bitSets[i];
@@ -308,7 +305,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder filter(BlockStateHolder state) {
+    public <T extends BlockStateHolder<T>> BlockMaskBuilder filter(BlockStateHolder<T> state) {
         filter(state.getBlockType());
         BlockType type = state.getBlockType();
         int i = type.getInternalId();
@@ -351,8 +348,8 @@ public class BlockMaskBuilder {
                 continue;
             }
             List<AbstractProperty<?>> properties = (List<AbstractProperty<?>>) type.getProperties();
-            for (AbstractProperty prop : properties) {
-                List values = prop.getValues();
+            for (AbstractProperty<?> prop : properties) {
+                List<?> values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
                     int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                     if (states == ALL || FastBitSet.get(states, localI)) {
@@ -376,7 +373,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder add(BlockStateHolder state) {
+    public <T extends BlockStateHolder<T>> BlockMaskBuilder add(BlockStateHolder<T> state) {
         BlockType type = state.getBlockType();
         int i = type.getInternalId();
         long[] states = bitSets[i];
@@ -391,8 +388,8 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(Collection<T> blocks) {
-        for (BlockStateHolder block : blocks) add(block);
+    public <T extends BlockStateHolder<T>> BlockMaskBuilder addBlocks(Collection<T> blocks) {
+        for (BlockStateHolder<T> block : blocks) add(block);
         return this;
     }
 
@@ -401,8 +398,8 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(T... blocks) {
-        for (BlockStateHolder block : blocks) add(block);
+    public <T extends BlockStateHolder<T>> BlockMaskBuilder addBlocks(T... blocks) {
+        for (BlockStateHolder<T> block : blocks) add(block);
         return this;
     }
 
@@ -429,8 +426,8 @@ public class BlockMaskBuilder {
             if (!typePredicate.test(type)) {
                 continue;
             }
-            for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
-                List values = prop.getValues();
+            for (AbstractProperty<?> prop : (List<AbstractProperty<?>>) type.getProperties()) {
+                List<?> values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
                     int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                     if (states == null || !FastBitSet.get(states, localI)) {
@@ -448,12 +445,12 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder add(BlockType type, Property property, int index) {
-        AbstractProperty prop = (AbstractProperty) property;
+    public <T> BlockMaskBuilder add(BlockType type, Property<T> property, int index) {
+        AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == ALL) return this;
 
-        List values = property.getValues();
+        List<T> values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         if (states == null || !FastBitSet.get(states, localI)) {
             if (states == null) {
@@ -465,11 +462,11 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder filter(BlockType type, Property property, int index) {
-        AbstractProperty prop = (AbstractProperty) property;
+    public <T> BlockMaskBuilder filter(BlockType type, Property<T> property, int index) {
+        AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
         if (states == null) return this;
-        List values = property.getValues();
+        List<T> values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         if (states == ALL || FastBitSet.get(states, localI)) {
             if (states == ALL) {
@@ -537,8 +534,8 @@ public class BlockMaskBuilder {
                 }
                 int set = 0;
                 int clear = 0;
-                for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
-                    List values = prop.getValues();
+                for (AbstractProperty<?> prop : (List<AbstractProperty<?>>) type.getProperties()) {
+                    List<?> values = prop.getValues();
                     for (int j = 0; j < values.size(); j++) {
                         int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
                         if (FastBitSet.get(bitSet, localI)) set++;

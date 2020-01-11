@@ -19,22 +19,15 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.google.common.base.Strings;
-
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.block.BlockDistributionCounter;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
-import com.boydti.fawe.util.ExtentTraverser;
+import com.google.common.base.Strings;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -50,9 +43,12 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -72,31 +68,32 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.CommandListBox;
+import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
+import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import com.sk89q.worldedit.util.formatting.component.PaginationBox;
-import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import java.util.Optional;
-import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import java.util.stream.Stream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
-import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
 
 /**
@@ -306,9 +303,6 @@ public class SelectionCommands {
             session.setTool(itemType, SelectionWand.INSTANCE);
             player.printInfo(TranslatableComponent.of("worldedit.wand.selwand.info"));
         }
-        if (!player.hasPermission("fawe.tips"))
-            System.out.println("TODO FIXME tips");
-//            TranslatableComponent.of("fawe.tips.tip.sel.list").or(TranslatableComponent.of("fawe.tips.tip.select.connected"), TranslatableComponent.of("fawe.tips.tip.set.pos1"), TranslatableComponent.of("fawe.tips.tip.farwand"), TranslatableComponent.of("fawe.tips.tip.discord")).send(player);
     }
 
     @Command(
@@ -480,8 +474,7 @@ public class SelectionCommands {
 
                 region = clipboard.getRegion();
                 BlockVector3 size = region.getMaximumPoint()
-                        .subtract(region.getMinimumPoint()).
-                                add(1, 1, 1);
+                        .subtract(region.getMinimumPoint()).add(1, 1, 1);
                 BlockVector3 origin = clipboard.getOrigin();
 
                 String sizeStr = size.getBlockX() + "*" + size.getBlockY() + "*" + size.getBlockZ();
@@ -493,14 +486,13 @@ public class SelectionCommands {
             }
             return;
         } else {
-			region = session.getSelection(world);
-			
+            region = session.getSelection(world);
+
             actor.printInfo(TranslatableComponent.of("worldedit.size.type", TextComponent.of(session.getRegionSelector(world).getTypeName())));
 
             for (Component line : session.getRegionSelector(world).getSelectionInfoLines()) {
                 actor.print(line);
             }
-
         }
         BlockVector3 size = region.getMaximumPoint()
                 .subtract(region.getMinimumPoint())
@@ -529,34 +521,34 @@ public class SelectionCommands {
         desc = "Get the distribution of blocks in the selection"
     )
     @CommandPermissions("worldedit.analysis.distr")
-    public void distr(Actor actor, World world, LocalSession session, EditSession editSession,
+    public void distr(Actor actor, World world, LocalSession session,
                       @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
                               boolean clipboardDistr,
                       @Switch(name = 'd', desc = "Separate blocks by state")
                               boolean separateStates,
                       @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.", def = "")
                               Integer page) throws WorldEditException {
-        List<Countable> distribution;
+        List<Countable<BlockState>> distribution;
 
         Region region;
         if (page == null) {
             Extent extent;
             if (clipboardDistr) {
                 Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
-                extent = clipboard;
-                region = clipboard.getRegion();
+                BlockDistributionCounter count = new BlockDistributionCounter(clipboard, separateStates);
+                RegionVisitor visitor = new RegionVisitor(clipboard.getRegion(), count);
+                Operations.completeBlindly(visitor);
+                distribution = count.getDistribution();
             } else {
-                extent = editSession;
-                region = session.getSelection(world);
+                try (EditSession editSession = session.createEditSession(actor)) {
+                    distribution = editSession
+                        .getBlockDistribution(session.getSelection(world), separateStates);
+                }
             }
-            if (separateStates)
-                distribution = (List) extent.getBlockDistributionWithData(region);
-            else
-                distribution = (List) extent.getBlockDistribution(region);
             session.setLastDistribution(distribution);
             page = 1;
         } else {
-            distribution = (List) session.getLastDistribution();
+            distribution = session.getLastDistribution();
             if (distribution == null) {
                 actor.printError(TranslatableComponent.of("worldedit.distr.no-previous"));
                 return;
@@ -570,69 +562,6 @@ public class SelectionCommands {
         BlockDistributionResult res = new BlockDistributionResult(distribution, separateStates);
         if (!actor.isPlayer()) res.formatForConsole();
         actor.print(res.create(page));
-    }
-
-    public static class BlockDistributionResult extends PaginationBox {
-
-        private final List<Countable> distribution;
-        private final int totalBlocks;
-        private final boolean separateStates;
-
-        public BlockDistributionResult(List<Countable> distribution, boolean separateStates) {
-            this(distribution, separateStates, "//distr -p %page%" + (separateStates ? " -d" : ""));
-        }
-
-        public BlockDistributionResult(List<Countable> distribution, boolean separateStates, String pageCommand) {
-            super("Block Distribution", pageCommand);
-            this.distribution = distribution;
-            // note: doing things like region.getArea is inaccurate for non-cuboids.
-            this.totalBlocks = distribution.stream().mapToInt(Countable::getAmount).sum();
-            this.separateStates = separateStates;
-            setComponentsPerPage(7);
-        }
-
-        @Override
-        public Component getComponent(int number) {
-            Countable<BlockState> c = distribution.get(number);
-            TextComponent.Builder line = TextComponent.builder();
-
-            final int count = c.getAmount();
-
-            final double perc = count / (double) totalBlocks * 100;
-            final int maxDigits = (int) (Math.log10(totalBlocks) + 1);
-            final int curDigits = (int) (Math.log10(count) + 1);
-            line.append(String.format("%s%.3f%%  ", perc < 10 ? "  " : "", perc), TextColor.GOLD);
-            final int space = maxDigits - curDigits;
-            String pad = Strings.repeat(" ", space == 0 ? 2 : 2 * space + 1);
-            line.append(String.format("%s%s", count, pad), TextColor.YELLOW);
-
-            final BlockState state = c.getID();
-            final BlockType blockType = state.getBlockType();
-            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.GRAY);
-            TextComponent toolTip;
-            if (separateStates && state != blockType.getDefaultState()) {
-                toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);
-                blockName = blockName.append(TextComponent.of("*", TextColor.GRAY));
-            } else {
-                toolTip = TextComponent.of(blockType.getId(), TextColor.GRAY);
-            }
-            blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
-            line.append(blockName);
-
-            return line.build();
-        }
-
-        @Override
-        public int getComponentsSize() {
-            return distribution.size();
-        }
-
-        @Override
-        public Component create(int page) throws InvalidComponentException {
-            super.getContents().append(TranslatableComponent.of("worldedit.distr.total", TextColor.GRAY, TextComponent.of(totalBlocks)))
-                    .append(TextComponent.newline());
-            return super.create(page);
-        }
     }
 
     @Command(
@@ -724,7 +653,7 @@ public class SelectionCommands {
                 box.appendCommand("sphere", TranslatableComponent.of("worldedit.select.sphere.description"), "//sel sphere");
                 box.appendCommand("cyl", TranslatableComponent.of("worldedit.select.cyl.description"), "//sel cyl");
                 box.appendCommand("convex", TranslatableComponent.of("worldedit.select.convex.description"), "//sel convex");
-				box.appendCommand("polyhedral", "Select a hollow polyhedral", "//sel polyhedral");
+                box.appendCommand("polyhedral", "Select a hollow polyhedral", "//sel polyhedral");
                 box.appendCommand("fuzzy[=<mask>]", "Select all connected blocks (magic wand)", "//sel fuzzy[=<mask>]");
 
                 actor.print(box.create(1));
@@ -750,5 +679,68 @@ public class SelectionCommands {
 
         session.setRegionSelector(world, newSelector);
         session.dispatchCUISelection(actor);
+    }
+
+    public static class BlockDistributionResult extends PaginationBox {
+
+        private final List<Countable<BlockState>> distribution;
+        private final int totalBlocks;
+        private final boolean separateStates;
+
+        public BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates) {
+            this(distribution, separateStates, "//distr -p %page%" + (separateStates ? " -d" : ""));
+        }
+
+        public BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates, String pageCommand) {
+            super("Block Distribution", pageCommand);
+            this.distribution = distribution;
+            // note: doing things like region.getArea is inaccurate for non-cuboids.
+            this.totalBlocks = distribution.stream().mapToInt(Countable::getAmount).sum();
+            this.separateStates = separateStates;
+            setComponentsPerPage(7);
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            Countable<BlockState> c = distribution.get(number);
+            TextComponent.Builder line = TextComponent.builder();
+
+            final int count = c.getAmount();
+
+            final double perc = count / (double) totalBlocks * 100;
+            final int maxDigits = (int) (Math.log10(totalBlocks) + 1);
+            final int curDigits = (int) (Math.log10(count) + 1);
+            line.append(String.format("%s%.3f%%  ", perc < 10 ? "  " : "", perc), TextColor.GOLD);
+            final int space = maxDigits - curDigits;
+            String pad = Strings.repeat(" ", space == 0 ? 2 : 2 * space + 1);
+            line.append(String.format("%s%s", count, pad), TextColor.YELLOW);
+
+            final BlockState state = c.getID();
+            final BlockType blockType = state.getBlockType();
+            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.LIGHT_PURPLE);
+            TextComponent toolTip;
+            if (separateStates && state != blockType.getDefaultState()) {
+                toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);
+                blockName = blockName.append(TextComponent.of("*", TextColor.LIGHT_PURPLE));
+            } else {
+                toolTip = TextComponent.of(blockType.getId(), TextColor.GRAY);
+            }
+            blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
+            line.append(blockName);
+
+            return line.build();
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return distribution.size();
+        }
+
+        @Override
+        public Component create(int page) throws InvalidComponentException {
+            super.getContents().append(TranslatableComponent.of("worldedit.distr.total", TextColor.GRAY, TextComponent.of(totalBlocks)))
+                    .append(TextComponent.newline());
+            return super.create(page);
+        }
     }
 }

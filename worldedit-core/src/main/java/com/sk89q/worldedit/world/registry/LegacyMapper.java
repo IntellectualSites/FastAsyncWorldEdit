@@ -56,15 +56,7 @@ import java.util.Map;
 public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
-    private static LegacyMapper INSTANCE = new LegacyMapper();
-
-    static {
-        try {
-            INSTANCE.loadFromResource();
-        } catch (Throwable e) {
-            log.warn("Failed to load the built-in legacy id registry", e);
-        }
-    }
+    private static LegacyMapper INSTANCE;
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
@@ -80,6 +72,12 @@ public final class LegacyMapper {
      * Create a new instance.
      */
     private LegacyMapper() {
+        try {
+            loadFromResource();
+        } catch (Throwable e) {
+            log.warn("Failed to load the built-in legacy id registry", e);
+        }
+
     }
 
     /**
@@ -95,9 +93,8 @@ public final class LegacyMapper {
         if (url == null) {
             throw new IOException("Could not find legacy.json");
         }
-        String source = Resources.toString(url, Charset.defaultCharset());
-        LegacyDataFile dataFile = gson.fromJson(source, new TypeToken<LegacyDataFile>() {
-        }.getType());
+        String data = Resources.toString(url, Charset.defaultCharset());
+        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {}.getType());
 
         DataFixer fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
         ParserContext parserContext = new ParserContext();
@@ -110,49 +107,51 @@ public final class LegacyMapper {
             Integer combinedId = getCombinedId(blockEntry.getKey());
             final String value = blockEntry.getValue();
             blockEntries.put(id, value);
-            BlockState blockState = null;
+
+            BlockState state = null;
             try {
-                blockState = BlockState.get(null, blockEntry.getValue());
-                BlockType type = blockState.getBlockType();
+                state = BlockState.get(null, blockEntry.getValue());
+                BlockType type = state.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
-                    blockState = blockState.with(PropertyKey.WATERLOGGED, false);
+                    state = state.with(PropertyKey.WATERLOGGED, false);
                 }
-            } catch (InputParseException e) {
+            } catch (InputParseException f) {
                 BlockFactory blockFactory = WorldEdit.getInstance().getBlockFactory();
+                // if fixer is available, try using that first, as some old blocks that were renamed share names with new blocks
                 if (fixer != null) {
                     try {
                         String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
-                        blockState = blockFactory.parseFromInput(newEntry, parserContext).toImmutableState();
-                    } catch (InputParseException f) {
+                        state = blockFactory.parseFromInput(newEntry, parserContext).toImmutableState();
+                    } catch (InputParseException e) {
                     }
                 }
                 // if it's still null, the fixer was unavailable or failed
-                if (blockState == null) {
+                if (state == null) {
                     try {
-                        blockState = blockFactory.parseFromInput(value, parserContext).toImmutableState();
-                    } catch (InputParseException f) {
+                        state = blockFactory.parseFromInput(value, parserContext).toImmutableState();
+                    } catch (InputParseException e) {
                     }
                 }
                 // if it's still null, both fixer and default failed
-                if (blockState == null) {
+                if (state == null) {
                     log.debug("Unknown block: " + value);
                 } else {
                     // it's not null so one of them succeeded, now use it
-                    blockToStringMap.put(blockState, id);
-                    stringToBlockMap.put(id, blockState);
+                    blockToStringMap.put(state, id);
+                    stringToBlockMap.put(id, state);
                 }
             }
-            if (blockState != null) {
-                blockArr[combinedId] = blockState.getInternalId();
-                blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
-                blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
+            if (state != null) {
+                blockArr[combinedId] = state.getInternalId();
+                blockStateToLegacyId4Data.put(state.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.putIfAbsent(state.getInternalBlockTypeId(), combinedId);
             }
         }
         for (int id = 0; id < 256; id++) {
             int combinedId = id << 4;
             int base = blockArr[combinedId];
             if (base != 0) {
-                for (int data = 0; data < 16; data++, combinedId++) {
+                for (int data_ = 0; data_ < 16; data_++, combinedId++) {
                     if (blockArr[combinedId] == 0) blockArr[combinedId] = base;
                 }
             }
@@ -166,14 +165,14 @@ public final class LegacyMapper {
                 value = fixer.fixUp(DataFixer.FixTypes.ITEM_TYPE, value, 1631);
                 type = ItemTypes.get(value);
             }
-            if (type != null) {
+            if (type == null) {
+                log.debug("Unknown item: " + value);
+            } else {
                 try {
                     itemMap.put(getCombinedId(id), type);
-                    continue;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
-            log.debug("Unknown item: " + value);
         }
     }
 
@@ -289,7 +288,10 @@ public final class LegacyMapper {
         return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
 
-    public final static LegacyMapper getInstance() {
+    public static LegacyMapper getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new LegacyMapper();
+        }
         return INSTANCE;
     }
 

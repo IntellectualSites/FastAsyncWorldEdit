@@ -17,25 +17,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.world.registry;
+package com.sk89q.worldedit.world.snapshot.experimental;
 
-class SimpleItemMaterial implements ItemMaterial {
+import java.util.Comparator;
 
-    private int maxStackSize;
-    private int maxDamage;
+public class SnapshotComparator {
 
-    public SimpleItemMaterial(int maxStackSize, int maxDamage) {
-        this.maxStackSize = maxStackSize;
-        this.maxDamage = maxDamage;
+    private static final Comparator<Snapshot> COMPARATOR =
+        Comparator.comparing(Snapshot::getInfo);
+
+    public static Comparator<Snapshot> getInstance() {
+        return COMPARATOR;
     }
 
-    @Override
-    public int getMaxStackSize() {
-        return maxStackSize;
-    }
-
-    @Override
-    public int getMaxDamage() {
-        return maxDamage;
+    private SnapshotComparator() {
     }
 }

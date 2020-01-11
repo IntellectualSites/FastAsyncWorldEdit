@@ -259,7 +259,7 @@ public class SnapshotCommands {
         public Component getComponent(int number) {
             final Snapshot snapshot = snapshots.get(number);
             return TextComponent.of(number + 1 + ". ", TextColor.GOLD)
-                    .append(TextComponent.of(snapshot.getName(), TextColor.GRAY)
+                    .append(TextComponent.of(snapshot.getName(), TextColor.LIGHT_PURPLE)
                             .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to use")))
                             .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/snap use " + snapshot.getName())));
         }

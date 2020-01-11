@@ -35,7 +35,7 @@ public final class Polygons {
     }
 
     /**
-     * Calculates the polygon shape of a cylinder, which can then be used for e.g., intersection detection.
+     * Calculates the polygon shape of a cylinder which can then be used for e.g. intersection detection.
      *
      * @param center the center point of the cylinder
      * @param radius the radius of the cylinder

@@ -37,10 +37,11 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * Creates a {@code CuboidRegion} from a user's selections.
@@ -156,7 +157,6 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(session);
         checkNotNull(pos);
 
-        //TODO Re-add better translation
         if (position1 != null && position2 != null) {
             player.printInfo(TranslatableComponent.of(
                     "worldedit.selection.cuboid.explain.primary-area",
@@ -176,7 +176,6 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(session);
         checkNotNull(pos);
 
-        //TODO Re-add better translation
         if (position1 != null && position2 != null) {
             player.printInfo(TranslatableComponent.of(
                     "worldedit.selection.cuboid.explain.secondary-area",

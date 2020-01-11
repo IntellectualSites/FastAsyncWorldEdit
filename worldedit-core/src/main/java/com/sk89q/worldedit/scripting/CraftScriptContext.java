@@ -111,7 +111,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
 
     /**
      * Print a regular message to the user.
-     * 
+     *
      * @param message a message
      */
     public void print(String message) {
@@ -120,7 +120,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
 
     /**
      * Print an error message to the user.
-     * 
+     *
      * @param message a message
      */
     public void error(String message) {
@@ -129,7 +129,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
 
     /**
      * Print a raw message to the user.
-     * 
+     *
      * @param message a message
      */
     public void printRaw(String message) {

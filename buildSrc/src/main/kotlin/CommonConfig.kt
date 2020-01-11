@@ -21,8 +21,7 @@ fun Project.applyCommonConfiguration() {
     }
     configurations.all {
         resolutionStrategy {
-            cacheChangingModulesFor(10, "minutes")
+            cacheChangingModulesFor(5, "minutes")
         }
     }
-
 }

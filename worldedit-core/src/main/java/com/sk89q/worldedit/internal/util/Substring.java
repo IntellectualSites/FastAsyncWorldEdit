@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.internal.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * An explicit substring. Provides the range from which it was taken.

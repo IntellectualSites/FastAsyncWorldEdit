@@ -47,7 +47,7 @@ public class ChunkStoreHelper {
 
     public static CompoundTag readCompoundTag(ChunkDataInputSupplier input) throws DataException, IOException {
         try (InputStream stream = input.openInputStream();
-            NBTInputStream nbt = new NBTInputStream(stream)) {
+             NBTInputStream nbt = new NBTInputStream(stream)) {
             Tag tag = nbt.readNamedTag().getTag();
             if (!(tag instanceof CompoundTag)) {
                 throw new ChunkStoreException("CompoundTag expected for chunk; got "

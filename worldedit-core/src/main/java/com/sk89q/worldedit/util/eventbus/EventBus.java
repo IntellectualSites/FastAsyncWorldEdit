@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.util.eventbus;
 
 import com.google.common.collect.HashMultimap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import org.slf4j.Logger;
@@ -36,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Dispatches events to listeners, and provides ways for listeners to register

@@ -35,14 +35,6 @@ import static com.sk89q.worldedit.antlr.ExpressionLexer.ID;
 
 public class ExpressionHelper {
 
-    /**
-     * The argument should be wrapped in a {@link LocalSlot.Constant} before being passed.
-     */
-    public static final String WRAPPED_CONSTANT = "<wrapped constant>";
-
-    private ExpressionHelper() {
-    }
-
     public static void check(boolean condition, ParserRuleContext ctx, String message) {
         if (!condition) {
             throw evalException(ctx, message);
@@ -59,16 +51,14 @@ public class ExpressionHelper {
 
     public static EvaluationException evalException(Token token, String message) {
         return new EvaluationException(
-                getErrorPosition(token),
-                message
+            getErrorPosition(token),
+            message
         );
     }
 
     public static void checkIterations(int iterations, ParserRuleContext ctx) {
         check(iterations <= 256, ctx, "Loop exceeded 256 iterations");
     }
-
-    // Special argument handle names
 
     public static void checkTimeout() {
         if (Thread.interrupted()) {
@@ -97,14 +87,20 @@ public class ExpressionHelper {
         }
         // We matched no function, fail with appropriate message.
         String possibleCounts = matchingFns.stream()
-                .map(mh -> mh.isVarargsCollector()
-                        ? (mh.type().parameterCount() - 1) + "+"
-                        : String.valueOf(mh.type().parameterCount()))
-                .collect(Collectors.joining("/"));
+            .map(mh -> mh.isVarargsCollector()
+                ? (mh.type().parameterCount() - 1) + "+"
+                : String.valueOf(mh.type().parameterCount()))
+            .collect(Collectors.joining("/"));
         throw evalException(ctx, "Incorrect number of arguments for function '" + fnName + "', " +
-                "expected " + possibleCounts + ", " +
-                "got " + ctx.args.size());
+            "expected " + possibleCounts + ", " +
+            "got " + ctx.args.size());
     }
+
+    // Special argument handle names
+    /**
+     * The argument should be wrapped in a {@link LocalSlot.Constant} before being passed.
+     */
+    public static final String WRAPPED_CONSTANT = "<wrapped constant>";
 
     /**
      * If this argument needs a handle, returns the name of the handle needed. Otherwise, returns
@@ -118,7 +114,7 @@ public class ExpressionHelper {
         if (pType == LocalSlot.Variable.class) {
             // MUST be an id
             check(id.isPresent(), arg,
-                    "Function '" + fnName + "' requires a variable in parameter " + i);
+                "Function '" + fnName + "' requires a variable in parameter " + i);
             return id.get();
         } else if (pType == LocalSlot.class) {
             return id.orElse(WRAPPED_CONSTANT);
@@ -128,7 +124,7 @@ public class ExpressionHelper {
 
     private static Optional<String> tryResolveId(ParserRuleContext arg) {
         Optional<ExpressionParser.WrappedExprContext> wrappedExprContext =
-                tryAs(arg, ExpressionParser.WrappedExprContext.class);
+            tryAs(arg, ExpressionParser.WrappedExprContext.class);
         if (wrappedExprContext.isPresent()) {
             return tryResolveId(wrappedExprContext.get().expression());
         }
@@ -139,8 +135,8 @@ public class ExpressionHelper {
     }
 
     private static <T extends ParserRuleContext> Optional<T> tryAs(
-            ParserRuleContext ctx,
-            Class<T> rule
+        ParserRuleContext ctx,
+        Class<T> rule
     ) {
         if (rule.isInstance(ctx)) {
             return Optional.of(rule.cast(ctx));
@@ -153,6 +149,9 @@ public class ExpressionHelper {
             return Optional.empty();
         }
         return tryAs(ctxs.get(0), rule);
+    }
+
+    private ExpressionHelper() {
     }
 
 }

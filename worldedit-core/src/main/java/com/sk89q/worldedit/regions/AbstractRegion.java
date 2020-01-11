@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;

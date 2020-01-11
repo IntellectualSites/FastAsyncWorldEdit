@@ -213,11 +213,11 @@ public class SchematicCommands {
     public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "")
+                     @Arg(desc = "Format name.", def = "sponge")
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        ClipboardFormat format = formatName != null ? ClipboardFormats.findByAlias(formatName) : null;
+        ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         InputStream in = null;
         try {
             URI uri;
@@ -537,7 +537,7 @@ public class SchematicCommands {
     )
     @CommandPermissions("worldedit.schematic.list")
     public void list(Actor actor, LocalSession session,
-                     @ArgFlag(name = 'p', desc = "Page to view.", def = "-1")
+                     @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
                          int page,
                      @Switch(name = 'd', desc = "Sort by date, oldest first")
                          boolean oldFirst,
@@ -571,15 +571,6 @@ public class SchematicCommands {
         final boolean hasShow = false;
 
         //If player forgot -p argument
-        if (page == -1) {
-            page = 1;
-            if (args.size() != 0) {
-                String lastArg = args.get(args.size() - 1);
-                if (MathMan.isInteger(lastArg)) {
-                    page = Integer.parseInt(lastArg);
-                }
-            }
-        }
         boolean playerFolder = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         UUID uuid = playerFolder ? actor.getUniqueId() : null;
         List<File> files = UtilityCommands.getFiles(dir, actor, args, formatName, playerFolder, oldFirst, newFirst);

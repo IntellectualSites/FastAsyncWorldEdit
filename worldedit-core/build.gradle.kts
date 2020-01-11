@@ -27,6 +27,7 @@ configurations.all {
 dependencies {
     "compile"(project(":worldedit-libs:core"))
     "compile"("de.schlichtherle:truezip:6.8.3")
+    "compile"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
     "compile"("org.mozilla:rhino:1.7.11")
     "compile"("org.yaml:snakeyaml:1.23")
     "compile"("com.google.guava:guava:21.0")
@@ -46,6 +47,8 @@ dependencies {
     "annotationProcessor"("com.google.guava:guava:21.0")
     "compileOnly"("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
+    "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
+    "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
     "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.4.3-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")

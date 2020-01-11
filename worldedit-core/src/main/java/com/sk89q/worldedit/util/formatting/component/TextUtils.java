@@ -47,6 +47,7 @@ public class TextUtils {
         }
         return builder.build();
     }
+
     /**
      * Gets a Java Locale object by the Minecraft locale tag.
      *

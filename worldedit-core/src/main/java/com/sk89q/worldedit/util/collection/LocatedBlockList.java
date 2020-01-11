@@ -21,8 +21,6 @@ package com.sk89q.worldedit.util.collection;
 
 import com.google.common.collect.Iterators;
 import com.sk89q.worldedit.WorldEdit;
-import com.google.common.collect.Iterators;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.world.block.BaseBlock;

@@ -21,8 +21,8 @@ package com.sk89q.worldedit.regions.shape;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.internal.expression.ExpressionEnvironment;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 

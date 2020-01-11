@@ -84,10 +84,3 @@ if (!project.hasProperty("gitCommitHash")) {
         "no_git_id"
     }
 }
-
-//buildScan {
-//    setTermsOfServiceUrl("https://gradle.com/terms-of-service")
-//    setTermsOfServiceAgree("yes")
-//
-//    publishAlways()
-//}

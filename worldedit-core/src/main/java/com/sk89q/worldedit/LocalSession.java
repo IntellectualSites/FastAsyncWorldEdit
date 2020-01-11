@@ -38,7 +38,6 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
@@ -154,7 +153,7 @@ public class LocalSession implements TextureHolder {
 
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
-    private transient List<Countable> lastDistribution;
+    private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
     private transient boolean hasBeenToldVersion;
@@ -896,7 +895,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the position use for commands that take a center point
-     * (i.e., //forestgen, etc.).
+     * (i.e. //forestgen, etc.).
      *
      * @param actor the actor
      * @return the position to use
@@ -1485,6 +1484,17 @@ public class LocalSession implements TextureHolder {
         return editSession;
     }
 
+    private void prepareEditingExtents(EditSession editSession, Actor actor) {
+        editSession.setFastMode(fastMode);
+        /*
+        editSession.setReorderMode(reorderMode);
+        */
+        if (editSession.getSurvivalExtent() != null) {
+            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
+        }
+        editSession.setTickingWatchdog(tickingWatchdog);
+    }
+
     /**
      * Checks if the session has fast mode enabled.
      *
@@ -1566,7 +1576,6 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the TextureUtil currently being used
-     * @return
      */
     @Override
     public TextureUtil getTextureUtil() {
@@ -1601,14 +1610,14 @@ public class LocalSession implements TextureHolder {
      *
      * @return block distribution or {@code null}
      */
-    public List<Countable> getLastDistribution() {
+    public List<Countable<BlockState>> getLastDistribution() {
         return lastDistribution == null ? null : Collections.unmodifiableList(lastDistribution);
     }
 
     /**
      * Store a block distribution in this session.
      */
-    public void setLastDistribution(List<Countable> dist) {
+    public void setLastDistribution(List<Countable<BlockState>> dist) {
         lastDistribution = dist;
     }
 
@@ -1630,14 +1639,4 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    private void prepareEditingExtents(EditSession editSession, Actor actor) {
-        editSession.setFastMode(fastMode);
-        /*
-        editSession.setReorderMode(reorderMode);
-        */
-        if (editSession.getSurvivalExtent() != null) {
-            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
-        }
-        editSession.setTickingWatchdog(tickingWatchdog);
-    }
 }
