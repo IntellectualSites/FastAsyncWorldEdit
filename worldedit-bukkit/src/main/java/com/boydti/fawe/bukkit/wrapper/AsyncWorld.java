@@ -1372,13 +1372,4 @@ public class AsyncWorld extends PassthroughExtent implements World {
         boolean force) {
         parent.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, extra, data, force);
     }
-
-    public void setHardcore(boolean hardcore) {
-        //todo
-    }
-
-    public boolean isHardcore() {
-        //todo
-        return false;
-    }
 }
