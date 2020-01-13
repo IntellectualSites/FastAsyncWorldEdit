@@ -7,7 +7,3 @@ listOf("bukkit", "core").forEach {
     include("worldedit-$it")
 }
 include("worldedit-libs:core:ap")
-
-plugins {
-    id("com.gradle.enterprise").version("3.1.1")
-}
