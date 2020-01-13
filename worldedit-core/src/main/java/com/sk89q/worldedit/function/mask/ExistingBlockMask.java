@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import javax.annotation.Nullable;
@@ -41,8 +40,6 @@ public class ExistingBlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        Fawe.imp().debug("getExtent(): " + getExtent().getClass() + " extent: " + extent.getClass());
-
         return !vector.getBlock(extent).getMaterial().isAir();
     }
 
