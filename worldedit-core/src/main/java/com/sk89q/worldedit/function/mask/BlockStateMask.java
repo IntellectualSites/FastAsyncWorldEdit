@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.Fawe;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.extent.Extent;
@@ -52,6 +53,7 @@ public class BlockStateMask extends AbstractExtentMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
+        Fawe.imp().debug("getExtent(): " + getExtent().getClass() + " extent: " + extent.getClass());
         return test(vector.getBlock(extent));
     }
 

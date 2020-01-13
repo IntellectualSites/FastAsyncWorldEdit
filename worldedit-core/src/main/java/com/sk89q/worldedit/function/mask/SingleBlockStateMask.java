@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -19,6 +20,8 @@ public class SingleBlockStateMask extends ABlockMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
+        Fawe.imp().debug("getExtent(): " + getExtent().getClass() + " extent: " + extent.getClass());
+
         return ordinal == vector.getOrdinal(extent);
     }
 

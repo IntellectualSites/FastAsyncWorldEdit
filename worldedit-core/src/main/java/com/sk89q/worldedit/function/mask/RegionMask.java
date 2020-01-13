@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -63,6 +64,7 @@ public class RegionMask extends AbstractMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
+        Fawe.imp().debug(" extent: " + extent.getClass());
         return region.contains(vector);
     }
 
