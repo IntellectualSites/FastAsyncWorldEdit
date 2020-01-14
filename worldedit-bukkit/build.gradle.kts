@@ -19,7 +19,6 @@ repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
-    maven { url = uri("http://ci.ender.zone/plugin/repository/everything/") }
     maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
     flatDir {dir(File("src/main/resources"))}
 }
@@ -59,7 +58,6 @@ dependencies {
     "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
     "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
 
-    "implementation"("com.massivecraft:Factions:1.6.9.5-U0.2.1-SNAPSHOT") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }

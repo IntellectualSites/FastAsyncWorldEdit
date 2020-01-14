@@ -12,7 +12,6 @@ import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
@@ -258,14 +257,6 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new TownyFeature(townyPlugin));
                 log.debug("Attempting to use plugin 'Towny'");
-            } catch (Throwable ignored) {
-            }
-        }
-        final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
-        if (factionsPlugin != null && factionsPlugin.isEnabled()) {
-            try {
-                managers.add(new FactionsUUIDFeature(factionsPlugin, this));
-                log.debug("Attempting to use plugin 'FactionsUUID'");
             } catch (Throwable ignored) {
             }
         }
