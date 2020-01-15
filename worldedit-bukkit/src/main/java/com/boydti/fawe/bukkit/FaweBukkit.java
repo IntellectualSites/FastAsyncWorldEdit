@@ -102,6 +102,9 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
         });
+
+        //Start Metrics
+        new Metrics(plugin);
     }
 
     @Override // Please don't delete this again, it's WIP
@@ -178,10 +181,6 @@ public class FaweBukkit implements IFawe, Listener {
             throw new IllegalArgumentException("Unknown player type: " + obj);
         }
         return BukkitAdapter.adapt(player);
-    }
-
-    @Override public void startMetrics() {
-        new Metrics(plugin);
     }
 
     public ItemUtil getItemUtil() {

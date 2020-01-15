@@ -27,8 +27,6 @@ public interface IFawe {
 
     Collection<FaweMaskManager> getMaskManagers();
 
-    void startMetrics();
-
     default ImageViewer getImageViewer(Player player) {
         return null;
     }
