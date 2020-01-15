@@ -109,6 +109,7 @@ public abstract class CharBlocks implements IBlocks {
         try {
             set(layer, index, value);
         } catch (ArrayIndexOutOfBoundsException exception) {
+            assert Fawe.imp() != null;
             Fawe.imp().debug("Tried Setting Block at x:" + x + ", y:" + y + " , z:" + z);
             Fawe.imp().debug("Layer variable was = " + layer);
             exception.printStackTrace();

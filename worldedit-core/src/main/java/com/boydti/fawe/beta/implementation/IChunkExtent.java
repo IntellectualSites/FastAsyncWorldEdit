@@ -20,7 +20,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     T getOrCreateChunk(int chunkX, int chunkZ);
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B state) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }

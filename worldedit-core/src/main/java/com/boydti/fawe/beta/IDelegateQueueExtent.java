@@ -80,7 +80,7 @@ public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExten
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B state) {
         return getParent().setBlock(x, y, z, state);
     }
 
@@ -171,7 +171,6 @@ public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExten
     }
 
     @Override
-    @Nullable
     default void removeEntity(int x, int y, int z, UUID uuid) {
         getParent().removeEntity(x, y, z, uuid);
     }
@@ -359,7 +358,7 @@ public interface IDelegateQueueExtent<T extends IQueueChunk> extends IQueueExten
 
     @Override
     @Deprecated
-    default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return getParent().setBlock(position, block);
     }
 

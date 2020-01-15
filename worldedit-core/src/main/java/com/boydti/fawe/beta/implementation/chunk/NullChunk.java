@@ -83,7 +83,7 @@ public enum NullChunk implements IQueueChunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return false;
     }
 

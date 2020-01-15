@@ -34,6 +34,7 @@ import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents an ellipsoid region.

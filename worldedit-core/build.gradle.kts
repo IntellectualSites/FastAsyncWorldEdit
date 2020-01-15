@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import com.mendhak.gradlecrowdin.DownloadTranslationsTask
 import com.mendhak.gradlecrowdin.UploadSourceFileTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java-library")
@@ -9,10 +10,12 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
+    kotlin("jvm") version "1.3.41"
 }
 
 repositories {
     maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
+    mavenCentral()
 
 }
 
@@ -55,6 +58,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -131,4 +135,12 @@ if (project.hasProperty(crowdinApiKey)) {
     tasks.named("classes").configure {
         dependsOn("crowdinDownload")
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

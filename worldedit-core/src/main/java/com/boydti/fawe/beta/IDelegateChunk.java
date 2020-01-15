@@ -65,7 +65,7 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
         return getParent().setBlock(x, y, z, holder);
     }
 
@@ -85,7 +85,7 @@ public interface IDelegateChunk<U extends IQueueChunk> extends IQueueChunk {
     }
 
     @Override
-    default void init(IQueueExtent extent, int chunkX, int chunkZ) {
+    default <E extends IChunk> void init(IQueueExtent<E> extent, int chunkX, int chunkZ) {
         getParent().init(extent, chunkX, chunkZ);
     }
 

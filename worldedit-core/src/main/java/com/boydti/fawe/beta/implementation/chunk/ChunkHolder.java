@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,9 +27,9 @@ import javax.annotation.Nullable;
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
  */
-public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
+public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static FaweCache.Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+    private static Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
 
     public static ChunkHolder newInstance() {
         return POOL.poll();
@@ -121,8 +122,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
+            B block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -164,8 +165,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
+            T block) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             return chunk.setBlock(x, y, z, block);
@@ -207,7 +208,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -256,7 +257,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T block) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             return chunk.setBlock(x, y, z, block);
@@ -388,7 +389,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
-    public void init(IQueueExtent extent, int chunkX, int chunkZ) {
+    public <V extends IChunk> void init(IQueueExtent<V> extent, int chunkX, int chunkZ) {
         this.extent = extent;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -445,7 +446,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return delegate.setBlock(this, x, y, z, block);
     }
 
@@ -465,12 +466,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     public interface IBlockDelegate {
-        IChunkGet get(ChunkHolder chunk);
+        <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
         IChunkSet set(ChunkHolder chunk);
 
         boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome);
 
-        boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder holder);
+        <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T holder);
 
         BiomeType getBiome(ChunkHolder chunk, int x, int y, int z);
 

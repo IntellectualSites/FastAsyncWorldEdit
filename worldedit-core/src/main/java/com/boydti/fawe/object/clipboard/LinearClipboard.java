@@ -5,6 +5,8 @@ import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -17,7 +19,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Closeable;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,8 +29,12 @@ import org.jetbrains.annotations.NotNull;
  * (Small being < Integer.MAX_VALUE/BLOCK_SIZE_BYTES blocks)
  */
 public abstract class LinearClipboard extends SimpleClipboard implements Clipboard, Closeable {
+
+    protected final HashSet<ClipboardEntity> entities;
+
     public LinearClipboard(BlockVector3 dimensions) {
         super(dimensions);
+        entities = new HashSet<>();
     }
 
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int i, B block);
@@ -89,6 +97,19 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
                 return order.create(region);
         }
 
+    }
+
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        Iterator<ClipboardEntity> iter = this.entities.iterator();
+        while (iter.hasNext()) {
+            ClipboardEntity entity = iter.next();
+            UUID entUUID = entity.getState().getNbtData().getUUID();
+            if (uuid.equals(entUUID)) {
+                iter.remove();
+                return;
+            }
+        }
     }
 
     private class LinearFilter extends AbstractFilterBlock {

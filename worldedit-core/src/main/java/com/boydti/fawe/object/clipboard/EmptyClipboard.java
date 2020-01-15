@@ -71,7 +71,7 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return false;
     }
 

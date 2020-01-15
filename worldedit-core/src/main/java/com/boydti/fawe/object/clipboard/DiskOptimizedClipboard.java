@@ -11,26 +11,20 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
@@ -42,12 +36,11 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -59,7 +52,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private static int HEADER_SIZE = 14;
 
     private final HashMap<IntegerTrio, CompoundTag> nbtMap;
-    private final HashSet<BlockArrayClipboard.ClipboardEntity> entities;
     private final File file;
 
     private RandomAccessFile braf;
@@ -81,9 +73,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (getWidth() > Character.MAX_VALUE || getHeight() > Character.MAX_VALUE || getLength() > Character.MAX_VALUE) {
             throw new IllegalArgumentException("Too large");
         }
+        nbtMap = new HashMap<>();
         try {
-            nbtMap = new HashMap<>();
-            entities = new HashSet<>();
             this.file = file;
             try {
                 if (!file.exists()) {
@@ -127,9 +118,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     public DiskOptimizedClipboard(File file) {
         super(readSize(file));
+        nbtMap = new HashMap<>();
         try {
-            nbtMap = new HashMap<>();
-            entities = new HashSet<>();
             this.file = file;
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
@@ -437,7 +427,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this.entities.remove(entity);
     }
 
-    @Nullable
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();

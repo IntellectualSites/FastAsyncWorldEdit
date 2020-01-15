@@ -60,7 +60,7 @@ public interface OutputExtent {
     }
 
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
-    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         return setBlock(MutableBlockVector3.get(x, y, z), block);
     }
 

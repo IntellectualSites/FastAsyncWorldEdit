@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.mask;
 
-import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -138,8 +137,6 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        Fawe.imp().debug("getExtent(): " + getExtent().getClass() + " extent: " + extent.getClass());
-
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();

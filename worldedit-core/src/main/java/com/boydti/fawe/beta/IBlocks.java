@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.registry.BlockRegistry;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 /**
  * Shared interface for IGetBlocks and ISetBlocks
@@ -35,13 +36,8 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        int mask = 0;
-        for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
-            if (hasSection(layer)) {
-                mask += (1 << layer);
-            }
-        }
-        return mask;
+        return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
+            .map(layer -> (1 << layer)).sum();
     }
 
     IBlocks reset();

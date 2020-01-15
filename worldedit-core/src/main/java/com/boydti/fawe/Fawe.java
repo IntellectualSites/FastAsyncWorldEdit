@@ -284,16 +284,6 @@ public class Fawe {
 
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "de/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/commands.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "tr/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "es/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "es/commands.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "nl/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "fr/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "cn/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "it/message.yml", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
@@ -305,7 +295,7 @@ public class Fawe {
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-commanding-pipeline/" + version.build;
+            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.15/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
         try {

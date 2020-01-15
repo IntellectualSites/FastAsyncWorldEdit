@@ -210,7 +210,6 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
     }
 
     @Override
-    @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         x -= offset.getX();
         y -= offset.getY();

@@ -92,7 +92,6 @@ public class LimitExtent extends PassthroughExtent {
     }
 
     @Override
-    @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         limit.THROW_MAX_CHANGES();
         limit.THROW_MAX_ENTITIES();

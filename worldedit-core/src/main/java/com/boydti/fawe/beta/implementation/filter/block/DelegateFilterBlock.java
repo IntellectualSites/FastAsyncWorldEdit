@@ -575,7 +575,6 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    @Nullable
     public void removeEntity(int x, int y, int z, UUID uuid) {
         parent.removeEntity(x, y, z, uuid);
     }

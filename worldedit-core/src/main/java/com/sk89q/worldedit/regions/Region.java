@@ -319,6 +319,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         }
     }
 
+    @Override
     default Extent construct(Extent child) {
         if (isGlobal()) {
             return child;

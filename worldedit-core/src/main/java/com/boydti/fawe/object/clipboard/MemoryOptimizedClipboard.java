@@ -46,7 +46,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
-    private final HashSet<BlockArrayClipboard.ClipboardEntity> entities;
 
     private int lastCombinedIdsI = -1;
 
@@ -65,7 +64,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         states = new byte[1 + (getVolume() >> BLOCK_SHIFT)][];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
-        entities = new HashSet<>();
         this.compressionLevel = compressionLevel;
     }
 
@@ -315,17 +313,4 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         this.entities.remove(entity);
     }
 
-    @Nullable
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
-        while (iter.hasNext()) {
-            BlockArrayClipboard.ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
-            if (uuid.equals(entUUID)) {
-                iter.remove();
-                return;
-            }
-        }
-    }
 }

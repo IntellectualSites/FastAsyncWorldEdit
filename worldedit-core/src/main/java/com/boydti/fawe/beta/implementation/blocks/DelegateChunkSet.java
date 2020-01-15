@@ -24,7 +24,7 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
         return getParent().setBlock(x, y, z, holder);
     }
 

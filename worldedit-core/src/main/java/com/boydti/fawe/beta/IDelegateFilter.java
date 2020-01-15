@@ -14,7 +14,7 @@ public interface IDelegateFilter extends Filter {
     }
 
     @Override
-    default IChunk applyChunk(IChunk chunk, @Nullable Region region) {
+    default <V extends IChunk> V applyChunk(V chunk, @Nullable Region region) {
         return getParent().applyChunk(chunk, region);
     }
 

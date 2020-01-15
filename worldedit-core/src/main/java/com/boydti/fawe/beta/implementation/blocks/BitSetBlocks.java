@@ -36,7 +36,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
         row.set(null, x, y, z);
         return true;
     }

@@ -7,11 +7,11 @@ import com.boydti.fawe.beta.IQueueExtent;
  * Used by {@link ReferenceChunk} to allow the chunk to be garbage collected. - When the object is
  * finalized, add it to the queue
  */
-public class FinalizedChunk extends DelegateChunk {
+public class FinalizedChunk<T extends IQueueChunk> extends DelegateChunk<T> {
 
     private final IQueueExtent queueExtent;
 
-    public FinalizedChunk(IQueueChunk parent, IQueueExtent queueExtent) {
+    public FinalizedChunk(T parent, IQueueExtent queueExtent) {
         super(parent);
         this.queueExtent = queueExtent;
     }

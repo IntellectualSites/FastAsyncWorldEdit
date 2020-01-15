@@ -8,12 +8,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent} Used for getting and setting blocks / biomes
  * / entities
  */
 public interface IChunk extends Trimable, IChunkGet, IChunkSet {
+
     /**
      * Initialize at the location
      * (allows for reuse)
@@ -22,17 +24,20 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      * @param x
      * @param z
      */
-    default void init(IQueueExtent extent, int x, int z) {}
+    default <V extends IChunk> void init(IQueueExtent<V> extent, int x, int z) {}
+
     /**
      * Get chunkX
-     * @return
+     * @return the x coordinate of the chunk
      */
+    @Range(from = 0, to = 15)
     int getX();
 
     /**
      * Get chunkZ
-     * @return
+     * @return the z coordinate of the chunk
      */
+    @Range(from = 0, to = 15)
     int getZ();
 
     /**
@@ -78,7 +83,7 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     boolean setTile(int x, int y, int z, CompoundTag tag);
 
     @Override
-    boolean setBlock(int x, int y, int z, BlockStateHolder block);
+    <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block);
 
     @Override
     BiomeType getBiomeType(int x, int y, int z);

@@ -45,27 +45,25 @@ public class ChunkCache<T extends Trimable> implements IChunkCache<T> {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
-        if (getCache.size() == 0) {
+        if (getCache.isEmpty()) {
             return true;
         }
         boolean result = true;
-        if (!getCache.isEmpty()) {
-            final ObjectIterator<Long2ObjectMap.Entry<WeakReference<T>>> iter = getCache
-                    .long2ObjectEntrySet().fastIterator();
-            while (iter.hasNext()) {
-                final Long2ObjectMap.Entry<WeakReference<T>> entry = iter.next();
-                final WeakReference<T> value = entry.getValue();
-                final T igb = value.get();
-                if (igb == null) {
-                    iter.remove();
-                } else {
-                    result = false;
-                    if (!aggressive) {
-                        return false;
-                    }
-                    synchronized (igb) {
-                        igb.trim(true);
-                    }
+        final ObjectIterator<Long2ObjectMap.Entry<WeakReference<T>>> iter = getCache
+                .long2ObjectEntrySet().fastIterator();
+        while (iter.hasNext()) {
+            final Long2ObjectMap.Entry<WeakReference<T>> entry = iter.next();
+            final WeakReference<T> value = entry.getValue();
+            final T igb = value.get();
+            if (igb == null) {
+                iter.remove();
+            } else {
+                result = false;
+                if (!aggressive) {
+                    return false;
+                }
+                synchronized (igb) {
+                    igb.trim(true);
                 }
             }
         }

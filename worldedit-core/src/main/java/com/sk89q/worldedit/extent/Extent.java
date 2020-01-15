@@ -151,7 +151,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param z the z coordinate
      * @param uuid the unique identifier of the entity
      */
-    default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
+    default void removeEntity(int x, int y, int z, UUID uuid) {}
 
     /*
     Queue based methods

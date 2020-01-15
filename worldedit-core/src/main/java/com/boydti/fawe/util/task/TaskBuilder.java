@@ -427,7 +427,7 @@ public class TaskBuilder extends Metadatable {
         }
     }
 
-    public static abstract class SplitTask extends RunnableTask {
+    public static abstract class SplitTask<T> extends RunnableTask<T> {
 
         private final long allocation;
         private final QueueHandler queue;
@@ -450,7 +450,7 @@ public class TaskBuilder extends Metadatable {
             this.queue = Fawe.get().getQueueHandler();
         }
 
-        public Object execSplit(final Object previous) {
+        public Object execSplit(final T previous) {
             this.value = previous;
             final Thread thread = new Thread(() -> {
                 try {
@@ -478,7 +478,7 @@ public class TaskBuilder extends Metadatable {
                 e.printStackTrace();
             }
             while (thread.isAlive()) {
-                TaskManager.IMP.syncWhenFree(new RunnableVal() {
+                TaskManager.IMP.syncWhenFree(new RunnableVal<T>() {
                     @Override
                     public void run(Object ignore) {
                         queue.startSet(true);

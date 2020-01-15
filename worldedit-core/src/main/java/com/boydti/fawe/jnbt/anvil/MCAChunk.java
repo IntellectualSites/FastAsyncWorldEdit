@@ -101,7 +101,7 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public void init(IQueueExtent extent, int x, int z) {
+    public <V extends IChunk> void init(IQueueExtent<V> extent, int x, int z) {
         if (x != chunkX || z != chunkZ) {
             throw new UnsupportedOperationException("Not reuse capable");
         }
@@ -414,6 +414,7 @@ public class MCAChunk implements IChunk {
         this.modified++;
     }
 
+    @Override
     public int getBitMask() {
         int bitMask = 0;
         for (int section = 0; section < hasSections.length; section++) {
@@ -509,7 +510,7 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B holder) {
         setBlock(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;

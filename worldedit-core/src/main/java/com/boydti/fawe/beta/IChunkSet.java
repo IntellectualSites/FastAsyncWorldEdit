@@ -21,7 +21,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
     @Override
-    boolean setBlock(int x, int y, int z, BlockStateHolder holder);
+    <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder);
 
     void setBlocks(int layer, char[] data);
 

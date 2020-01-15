@@ -7,6 +7,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -33,7 +34,7 @@ public class AsyncPreloader implements Preloader, Runnable {
         cancelAndGet(player);
     }
 
-    private MutablePair<World, Set<BlockVector2>> cancelAndGet(Player player) {
+    private MutablePair<World, Set<BlockVector2>> cancelAndGet(Actor player) {
         MutablePair<World, Set<BlockVector2>> existing = update.get(player.getUniqueId());
         if (existing != null) {
             existing.setValue(null);
@@ -100,7 +101,6 @@ public class AsyncPreloader implements Preloader, Runnable {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
-            return;
         }
     }
 

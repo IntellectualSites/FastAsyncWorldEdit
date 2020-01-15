@@ -4,6 +4,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.beta.implementation.queue.Pool;
+import com.boydti.fawe.beta.implementation.queue.QueuePool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
@@ -65,43 +67,8 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
-    private final IdentityHashMap<Class, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
-    private final IdentityHashMap<Class, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
-
-    public interface Pool<T> {
-        T poll();
-        default boolean offer(T recycle) {
-            return false;
-        }
-        default void clear() {}
-    }
-
-    public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
-        private final Supplier<T> supplier;
-
-        public QueuePool(Supplier<T> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        public boolean offer(T t) {
-            return super.offer(t);
-        }
-
-        @Override
-        public T poll() {
-            T result = super.poll();
-            if (result == null) {
-                return supplier.get();
-            }
-            return result;
-        }
-
-        @Override
-        public void clear() {
-            if (!isEmpty()) super.clear();
-        }
-    }
+    private final IdentityHashMap<Class<?>, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
+    private final IdentityHashMap<Class<?>, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
 
     /*
     Palette buffers / cache
@@ -125,11 +92,11 @@ public enum FaweCache implements Trimable {
             MUTABLE_VECTOR3.clean();
             MUTABLE_BLOCKVECTOR3.clean();
             SECTION_BITS_TO_CHAR.clean();
-            for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
+            for (Map.Entry<Class<?>, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
                 entry.getValue().clean();
             }
         }
-        for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
+        for (Map.Entry<Class<?>, Pool> entry : REGISTERED_POOLS.entrySet()) {
             Pool pool = entry.getValue();
             pool.clear();
         }
@@ -269,7 +236,7 @@ public enum FaweCache implements Trimable {
     /**
      * Holds data for a palette used in a chunk section
      */
-    public final class Palette {
+    public static final class Palette {
         public int bitsPerEntry;
 
         public int paletteToBlockLength;
@@ -493,7 +460,7 @@ public enum FaweCache implements Trimable {
             System.out.println("Invalid nbt: " + value);
             return null;
         } else {
-            Class<? extends Object> clazz = value.getClass();
+            Class<?> clazz = value.getClass();
             if (clazz.getName().startsWith("com.intellectualcrafters.jnbt")) {
                 try {
                     if (clazz.getName().equals("com.intellectualcrafters.jnbt.EndTag")) {

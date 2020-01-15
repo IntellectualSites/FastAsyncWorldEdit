@@ -10,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import org.jetbrains.annotations.Nullable;
 
 public interface IBatchProcessor {
     /**
@@ -30,6 +31,7 @@ public interface IBatchProcessor {
      * @param child
      * @return
      */
+    @Nullable
     Extent construct(Extent child);
 
     /**

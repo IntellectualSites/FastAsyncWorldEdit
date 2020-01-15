@@ -35,14 +35,12 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
-    private final HashSet<BlockArrayClipboard.ClipboardEntity> entities;
 
     public CPUOptimizedClipboard(BlockVector3 dimensions) {
         super(dimensions);
         this.states = new char[getVolume()];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
-        entities = new HashSet<>();
     }
 
     @Override
@@ -216,7 +214,6 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         this.entities.remove(entity);
     }
 
-    @Nullable
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
