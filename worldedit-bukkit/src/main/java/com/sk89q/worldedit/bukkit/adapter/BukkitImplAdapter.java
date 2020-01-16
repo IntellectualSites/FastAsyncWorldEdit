@@ -102,7 +102,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param notifyAndLight notify and light if set
      * @return true if a block was likely changed
      */
-    boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight);
+    <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight);
 
     /**
      * Notifies the simulation that the block at the given location has

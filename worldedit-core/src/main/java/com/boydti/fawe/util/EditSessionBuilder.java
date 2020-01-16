@@ -6,6 +6,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
@@ -323,7 +324,7 @@ public class EditSessionBuilder {
         this.limit = limit.copy();
 
         if (extent == null) {
-            IQueueExtent queue = null;
+            IQueueExtent<IQueueChunk> queue = null;
             World unwrapped = WorldWrapper.unwrap(world);
             boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
 

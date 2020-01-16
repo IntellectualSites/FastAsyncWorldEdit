@@ -37,12 +37,12 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region) {
-        Fawe.get().getQueueHandler().uncache();
+        Fawe.get().getQueueHandler().unCache();
         return of(() -> extent, region);
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region, boolean copyEntities, boolean copyBiomes) {
-        Fawe.get().getQueueHandler().uncache();
+        Fawe.get().getQueueHandler().unCache();
         return of(() -> extent, region, copyEntities, copyBiomes);
     }
 

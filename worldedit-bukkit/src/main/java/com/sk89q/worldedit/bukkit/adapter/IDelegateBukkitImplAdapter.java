@@ -65,7 +65,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
         return getParent().getBlock(location);
     }
 
-    default boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
+    default <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
         return getParent().setBlock(location, state, notifyAndLight);
     }
 
@@ -227,7 +227,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default BlockData adapt(BlockStateHolder block) {
+    default <B extends BlockStateHolder<B>> BlockData adapt(B block) {
         return getParent().adapt(block);
     }
 

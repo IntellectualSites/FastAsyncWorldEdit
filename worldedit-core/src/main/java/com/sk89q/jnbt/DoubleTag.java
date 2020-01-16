@@ -21,16 +21,12 @@ package com.sk89q.jnbt;
 
 /**
  * The {@code TAG_Double} tag.
- * 
+ *
  */
 public final class DoubleTag extends NumberTag {
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_DOUBLE;
-    }
-    @Override
-    public String getTypeName() {
-        return "TAG_Double";
     }
 
     private final double value;

@@ -190,7 +190,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
         return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
     }
 
@@ -316,7 +316,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public BlockData adapt(BlockStateHolder state) {
+    public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
         return material.getCraftBlockData();
     }

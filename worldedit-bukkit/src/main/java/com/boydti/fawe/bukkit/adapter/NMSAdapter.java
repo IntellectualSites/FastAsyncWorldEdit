@@ -3,7 +3,7 @@ package com.boydti.fawe.bukkit.adapter;
 import com.sk89q.worldedit.world.block.BlockID;
 import java.util.function.Function;
 
-public class NMSAdapter<T> {
+public class NMSAdapter {
     public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, char[] set) {
         int air = 0;
         int num_palette = 0;

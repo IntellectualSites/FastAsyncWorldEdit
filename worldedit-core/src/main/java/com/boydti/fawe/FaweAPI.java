@@ -1,5 +1,6 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
@@ -155,8 +156,8 @@ public class FaweAPI {
      * @param autoQueue If it should start dispatching before you enqueue it.
      * @return the queue extent
      */
-    public static IQueueExtent createQueue(World world, boolean autoQueue) {
-        IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
+    public static IQueueExtent<IQueueChunk> createQueue(World world, boolean autoQueue) {
+        IQueueExtent<IQueueChunk> queue = Fawe.get().getQueueHandler().getQueue(world);
         if (!autoQueue) {
             queue.disableQueue();
         }

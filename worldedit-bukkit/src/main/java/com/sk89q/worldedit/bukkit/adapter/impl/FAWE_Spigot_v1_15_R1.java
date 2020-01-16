@@ -186,11 +186,11 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
         return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
     }
 
-    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, B state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
@@ -312,7 +312,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public BlockData adapt(BlockStateHolder state) {
+    public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         BlockMaterial_1_15 material = (BlockMaterial_1_15) state.getMaterial();
         return material.getCraftBlockData();
     }

@@ -3,7 +3,6 @@ package com.boydti.fawe.beta.implementation.queue;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueChunk;
@@ -46,7 +45,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
     private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
-    private CleanableThreadLocal<IQueueExtent> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
+    private CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
     /**
      * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
      * server
@@ -263,16 +262,16 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
-    public IQueueExtent create() {
+    public IQueueExtent<IQueueChunk> create() {
         return new SingleThreadQueueExtent();
     }
 
-    public void uncache() {
+    public void unCache() {
         queuePool.set(null);
     }
 
-    private IQueueExtent pool() {
-        IQueueExtent queue = queuePool.get();
+    private IQueueExtent<IQueueChunk> pool() {
+        IQueueExtent<IQueueChunk> queue = queuePool.get();
         if (queue == null) {
             queuePool.set(queue = queuePool.init());
         }
@@ -283,12 +282,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     public abstract void endSet(boolean parallel);
 
-    public IQueueExtent getQueue(World world) {
+    public IQueueExtent<IQueueChunk> getQueue(World world) {
         return getQueue(world, null);
     }
 
-    public IQueueExtent getQueue(World world, IBatchProcessor processor) {
-        final IQueueExtent queue = pool();
+    public IQueueExtent<IQueueChunk> getQueue(World world, IBatchProcessor processor) {
+        final IQueueExtent<IQueueChunk> queue = pool();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);

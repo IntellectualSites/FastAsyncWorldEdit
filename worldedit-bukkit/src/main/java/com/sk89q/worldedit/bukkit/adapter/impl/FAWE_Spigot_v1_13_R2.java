@@ -162,7 +162,6 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
         return IRegistry.BLOCK.get(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public BaseBlock getBlock(Location location) {
         checkNotNull(location);
@@ -188,7 +187,7 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
         return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
     }
 
@@ -314,7 +313,7 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public BlockData adapt(BlockStateHolder state) {
+    public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         try {
             BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
             return material.getCraftBlockData();
@@ -397,7 +396,7 @@ public final class FAWE_Spigot_v1_13_R2 extends CachedBukkitAdapter implements I
     public boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
         WorldServer originalWorld = ((CraftWorld) world).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
-        if (!(provider instanceof ChunkProviderServer)) {
+        if (provider == null) {
             return false;
         }
 

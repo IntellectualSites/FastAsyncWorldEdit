@@ -3,6 +3,7 @@ package com.boydti.fawe.regions.general.integrations.plotquared;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
@@ -13,12 +14,11 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 // TODO FIXME
 public class FaweLocalBlockQueue extends LocalBlockQueue {
 
-    public final IQueueExtent IMP;
+    public final IQueueExtent<IQueueChunk> IMP;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
 
@@ -26,7 +26,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
         super(worldName);
         this.world = FaweAPI.getWorld(worldName);
         IMP = Fawe.get().getQueueHandler().getQueue(world);
-        Fawe.get().getQueueHandler().uncache();
+        Fawe.get().getQueueHandler().unCache();
     }
 
     @Override

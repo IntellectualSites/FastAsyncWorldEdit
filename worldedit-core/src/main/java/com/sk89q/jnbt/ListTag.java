@@ -31,10 +31,6 @@ import javax.annotation.Nullable;
  * The {@code TAG_List} tag.
  */
 public class ListTag extends Tag {
-    @Override
-    public String getTypeName() {
-        return "TAG_List";
-    }
 
     @Override
     public int getTypeCode() {
