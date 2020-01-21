@@ -119,7 +119,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getHighestTerrainBlock(x, z, minY, maxY);
         } catch (FaweException e) {
@@ -132,7 +132,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getHighestTerrainBlock(x, z, minY, maxY, filter);
         } catch (FaweException e) {
@@ -145,7 +145,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceLayer(x, z, y, minY, maxY);
         } catch (FaweException e) {
@@ -158,7 +158,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
         } catch (FaweException e) {
@@ -171,7 +171,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
         } catch (FaweException e) {
@@ -184,7 +184,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
         } catch (FaweException e) {
@@ -197,7 +197,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
         } catch (FaweException e) {
@@ -210,7 +210,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(FaweCache.WORLD_HEIGHT);
         try {
             return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
         } catch (FaweException e) {

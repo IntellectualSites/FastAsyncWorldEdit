@@ -1563,12 +1563,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         char[] floor = this.floor.get();
         char[] overlay = this.overlay != null ? this.overlay.get() : null;
         try {
-            int[] indexes = FaweCache.IMP.INDEX_STORE.get();
+            int[] indexes = FaweCache.INSTANCE.getINDEX_STORE().get();
 
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            int[] heightMap = FaweCache.IMP.HEIGHT_STORE.get();
+            int[] heightMap = FaweCache.INSTANCE.getHEIGHT_STORE().get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;

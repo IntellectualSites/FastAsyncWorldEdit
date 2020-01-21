@@ -209,7 +209,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             lastChunk = NullChunk.INSTANCE;
             return NullChunk.INSTANCE;
         }
-
         IQueueChunk chunk = chunks.get(pair);
         if (chunk instanceof ReferenceChunk) {
             chunk = ((ReferenceChunk) chunk).getParent();

@@ -107,10 +107,10 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                 try {
                     blockBag.fetchPlacedBlock(block.toImmutableState());
                 } catch (UnplaceableBlockException e) {
-                    throw FaweCache.BLOCK_BAG;
+                    throw FaweCache.INSTANCE.getBLOCK_BAG();
                 } catch (BlockBagException e) {
                     missingBlocks[block.getBlockType().getInternalId()]++;
-                    throw FaweCache.BLOCK_BAG;
+                    throw FaweCache.INSTANCE.getBLOCK_BAG();
                 }
             }
             if (mine) {

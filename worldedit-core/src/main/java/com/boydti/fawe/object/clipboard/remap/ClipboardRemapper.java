@@ -223,7 +223,7 @@ public class ClipboardRemapper {
 //                String name = entry.getKey();
 //                int id = value.get("id").getAsInt();
 //                int data = value.get("data").getAsInt();
-//                int combined = FaweCache.IMP.getCombined(id, data);
+//                int combined = FaweCache.INSTANCE.getCombined(id, data);
 //                map.putIfAbsent(name, new ArrayList<>());
 //                map.get(name).add(combined);
 //            }
@@ -496,7 +496,7 @@ public class ClipboardRemapper {
 //        int combined = block.getCombined();
 //        if (remap[combined]) {
 //            char value = remapCombined[combined];
-//            BaseBlock newBlock = FaweCache.IMP.CACHE_BLOCK[value];
+//            BaseBlock newBlock = FaweCache.INSTANCE.CACHE_BLOCK[value];
 //            newBlock.setNbtData(block.getNbtData());
 //            return newBlock;
 //        }

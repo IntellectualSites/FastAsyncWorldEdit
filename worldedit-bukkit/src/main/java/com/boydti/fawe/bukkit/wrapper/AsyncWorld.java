@@ -1249,12 +1249,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
-        return TaskManager.IMP.sync(new Supplier<Integer>() {
-            @Override
-            public Integer get() {
-                return parent.getHighestBlockYAt(x, z, heightmap);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getHighestBlockYAt(x, z, heightmap));
     }
 
     @Override

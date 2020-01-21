@@ -40,7 +40,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
-    private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
+    private ThreadPoolExecutor blockingExecutor = FaweCache.INSTANCE.newBlockingExecutor();
     private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
     private ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 

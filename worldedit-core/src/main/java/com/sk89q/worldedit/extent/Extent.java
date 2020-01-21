@@ -457,7 +457,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean cancel() {
         ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
 
-        NullExtent nullExtent = new NullExtent(this, FaweCache.MANUAL);
+        NullExtent nullExtent = new NullExtent(this, FaweCache.INSTANCE.getMANUAL());
 
         ExtentTraverser<Extent> next = traverser.next();
         if (next != null) {
@@ -523,7 +523,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
 
         int changes = 0;
         for (BlockVector3 pos : region) {

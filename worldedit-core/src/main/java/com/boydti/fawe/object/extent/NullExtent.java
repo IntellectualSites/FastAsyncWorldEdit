@@ -54,7 +54,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     public NullExtent() {
-        this(new com.sk89q.worldedit.extent.NullExtent(), FaweCache.MANUAL);
+        this(new com.sk89q.worldedit.extent.NullExtent(), FaweCache.INSTANCE.getMANUAL());
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
-    private static Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+    private static Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }

@@ -87,10 +87,10 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
             try {
                 blockBag.fetchPlacedBlock(typeTo.getDefaultState());
             } catch (UnplaceableBlockException e) {
-                throw FaweCache.BLOCK_BAG;
+                throw FaweCache.INSTANCE.getBLOCK_BAG();
             } catch (BlockBagException e) {
                 missingBlocks[typeTo.getInternalId()]++;
-                throw FaweCache.BLOCK_BAG;
+                throw FaweCache.INSTANCE.getBLOCK_BAG();
             }
         }
         if (mine) {

@@ -93,7 +93,7 @@ public class CFIPacketListener implements Listener {
                             case VOID_AIR:
                                 break;
                             default: {
-                                BlockStateHolder block = BukkitAdapter.asBlockState(hand);
+                                BlockState block = BukkitAdapter.asBlockState(hand);
                                 if (block != null) {
                                     gen.setBlock(pt, block);
                                     return;
@@ -123,7 +123,7 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket() || FaweCache.IMP.CHUNK_FLAG.get().get()) return;
+                if (!event.isServerPacket() || FaweCache.INSTANCE.getCHUNK_FLAG().get().get()) return;
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
                     BlockVector3 origin = gen.getOrigin().toBlockPoint();

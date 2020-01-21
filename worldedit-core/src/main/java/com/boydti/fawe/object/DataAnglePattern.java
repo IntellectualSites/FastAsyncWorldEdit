@@ -48,10 +48,10 @@ public class DataAnglePattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockStateHolder block = extent.getBlock(getPosition);
+        BlockState block = extent.getBlock(getPosition);
         int slope = getSlope(block, getPosition, extent);
         if (slope == -1) return false;
-        int data = (Math.min(slope, 255)) >> 4;
+        int data = Math.min(slope, 255) >> 4;
         return extent.setBlock(setPosition, block.withPropertyId(data));
     }
 }

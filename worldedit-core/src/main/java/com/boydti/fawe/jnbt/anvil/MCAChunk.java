@@ -72,7 +72,7 @@ public class MCAChunk implements IChunk {
 
         int bitsPerEntry = MathMan.log2nlz(section.palette.length - 1);
         BitArray4096 bitArray = new BitArray4096(section.blocks, bitsPerEntry);
-        char[] buffer = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        char[] buffer = FaweCache.INSTANCE.getSECTION_BITS_TO_CHAR().get();
         bitArray.toRaw(buffer);
         int offset = section.layer << 12;
         for (int i = 0; i < buffer.length; i++) {
@@ -152,20 +152,20 @@ public class MCAChunk implements IChunk {
         StreamDelegate blockStates = layer.add("BlockStates");
         blockStates.withInfo((length, type) -> {
             if (section.blocks == null) {
-                section.blocks = FaweCache.IMP.LONG_BUFFER_1024.get();
+                section.blocks = FaweCache.INSTANCE.getLONG_BUFFER_1024().get();
             }
             section.blocksLength = length;
         });
         blockStates.withLong((index, value) -> section.blocks[index] = value);
         level.add("TileEntities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
-            CompoundTag tile = FaweCache.IMP.asTag(value);
+            CompoundTag tile = FaweCache.INSTANCE.asTag(value);
             int x = tile.getInt("x") & 15;
             int y = tile.getInt("y");
             int z = tile.getInt("z") & 15;
             tiles.put(x, y, z, tile);
         });
         level.add("Entities").withElem((ValueReader<Map<String, Object>>) (index, value) -> {
-            CompoundTag entity = FaweCache.IMP.asTag(value);
+            CompoundTag entity = FaweCache.INSTANCE.asTag(value);
             entities.put(entity.getUUID(), entity);
         });
         level.add("Biomes").withInt((index, value) -> biomes[index] = BiomeTypes.getLegacy(value));
@@ -218,10 +218,10 @@ public class MCAChunk implements IChunk {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
-        int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        long[] blockstates = FaweCache.IMP.BLOCK_STATES.get();
-        int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        int[] blockToPalette = FaweCache.INSTANCE.getBLOCK_TO_PALETTE().get();
+        int[] paletteToBlock = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
+        long[] blockstates = FaweCache.INSTANCE.getBLOCK_STATES().get();
+        int[] blocksCopy = FaweCache.INSTANCE.getSECTION_BLOCKS().get();
 
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);
@@ -524,7 +524,7 @@ public class MCAChunk implements IChunk {
 
     @Override
     public char[] load(int layer) {
-        char[] tmp = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        char[] tmp = FaweCache.INSTANCE.getSECTION_BITS_TO_CHAR().get();
         int offset = layer << 12;
         System.arraycopy(blocks, offset, tmp, 0, 4096);
         return tmp;

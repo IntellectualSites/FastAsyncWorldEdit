@@ -38,7 +38,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
             return null;
         }
         if (!limit.MAX_ENTITIES()) {
-            WEManager.IMP.cancelEditSafe(this, FaweCache.MAX_ENTITIES);
+            WEManager.IMP.cancelEditSafe(this, FaweCache.INSTANCE.getMAX_ENTITIES());
             return null;
         }
         return super.createEntity(location, entity);
@@ -47,7 +47,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     @Override
     public BlockState getBlock(int x, int y, int z) {
         if (!limit.MAX_CHECKS()) {
-            WEManager.IMP.cancelEditSafe(this, FaweCache.MAX_CHECKS);
+            WEManager.IMP.cancelEditSafe(this, FaweCache.INSTANCE.getMAX_CHECKS());
             return BlockTypes.AIR.getDefaultState();
         } else {
             return extent.getBlock(x, y, z);
@@ -57,7 +57,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     @Override
     public BaseBlock getFullBlock(BlockVector3 pos) {
         if (!limit.MAX_CHECKS()) {
-            WEManager.IMP.cancelEditSafe(this, FaweCache.MAX_CHECKS);
+            WEManager.IMP.cancelEditSafe(this, FaweCache.INSTANCE.getMAX_CHECKS());
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         } else {
             return extent.getFullBlock(pos);
@@ -79,18 +79,18 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {
-                WEManager.IMP.cancelEdit(this, FaweCache.MAX_TILES);
+                WEManager.IMP.cancelEdit(this, FaweCache.INSTANCE.getMAX_TILES());
                 return false;
             } else {
                 if (!limit.MAX_CHANGES()) {
-                    WEManager.IMP.cancelEdit(this, FaweCache.MAX_CHANGES);
+                    WEManager.IMP.cancelEdit(this, FaweCache.INSTANCE.getMAX_CHANGES());
                     return false;
                 }
                 return extent.setBlock(x, y, z, block);
             }
         }
         if (!limit.MAX_CHANGES()) {
-            WEManager.IMP.cancelEdit(this, FaweCache.MAX_CHANGES);
+            WEManager.IMP.cancelEdit(this, FaweCache.INSTANCE.getMAX_CHANGES());
             return false;
         } else {
             return extent.setBlock(x, y, z, block);
@@ -100,7 +100,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (!limit.MAX_CHANGES()) {
-            WEManager.IMP.cancelEditSafe(this, FaweCache.MAX_CHANGES);
+            WEManager.IMP.cancelEditSafe(this, FaweCache.INSTANCE.getMAX_CHANGES());
             return false;
         }
         return super.setBiome(position, biome);

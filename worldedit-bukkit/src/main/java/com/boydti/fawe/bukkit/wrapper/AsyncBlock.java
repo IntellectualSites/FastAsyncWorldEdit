@@ -312,9 +312,10 @@ public class AsyncBlock implements Block {
         return this.getWorld().getHumidity(this.getX(), this.getZ());
     }
 
+    @NotNull
     @Override
     public PistonMoveReaction getPistonMoveReaction() {
-        return null;
+        return PistonMoveReaction.IGNORE;
     }
 
     @Deprecated
@@ -332,6 +333,10 @@ public class AsyncBlock implements Block {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
     }
 
+    public boolean breakNaturally(@NotNull ItemStack tool, boolean value) {
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
+    }
+    
     @NotNull @Override
     public Collection<ItemStack> getDrops() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops());

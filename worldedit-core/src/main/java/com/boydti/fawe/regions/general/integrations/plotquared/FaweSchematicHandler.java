@@ -108,7 +108,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             com.github.intellectualsites.plotsquared.plot.util.TaskManager.runTask(whenDone);
             return;
         }
-        CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
+        CompoundTag weTag = (CompoundTag) FaweCache.INSTANCE.asTag(tag);
         if (weTag instanceof CompressedSchematicTag) {
             Clipboard clipboard = ((CompressedSchematicTag) weTag).getSource();
             URL url = FaweAPI.upload(clipboard, BuiltInClipboardFormat.SPONGE_SCHEMATIC);

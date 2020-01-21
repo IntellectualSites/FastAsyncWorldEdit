@@ -144,7 +144,6 @@ public class HeightMap {
      * @param filter the filter
      * @param iterations the number of iterations
      * @return number of blocks affected
-     * @throws MaxChangedBlocksException
      */
 
     public int applyFilter(HeightMapFilter filter, int iterations) throws MaxChangedBlocksException {
@@ -173,7 +172,7 @@ public class HeightMap {
 
         int blocksChanged = 0;
 
-        BlockStateHolder tmpBlock = BlockTypes.AIR.getDefaultState();
+        BlockStateHolder<BlockState> tmpBlock = BlockTypes.AIR.getDefaultState();
 
         int maxY4 = maxY << 4;
         int index = 0;
@@ -197,13 +196,13 @@ public class HeightMap {
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-                    BlockStateHolder existing = session.getBlock(xr, curBlock, zr);
+                    BlockStateHolder<BlockState> existing = session.getBlock(xr, curBlock, zr);
 
                     // Skip water/lava
                     if (existing.getBlockType().getMaterial().isMovementBlocker()) {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int setY = newBlock - 1, getY = curBlock; setY >= curBlock; --setY, getY--) {
-                            BlockStateHolder get = session.getBlock(xr, getY, zr);
+                            BlockStateHolder<BlockState> get = session.getBlock(xr, getY, zr);
                             if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
@@ -228,7 +227,7 @@ public class HeightMap {
                     // Set the top block of the column to be the same type
                     // (this could otherwise go wrong with rounding)
                     int setData = newHeight & 15;
-                    BlockStateHolder existing = session.getBlock(xr, curBlock, zr);
+                    BlockStateHolder<BlockState> existing = session.getBlock(xr, curBlock, zr);
                     if (setData != 0) {
                         existing = PropertyGroup.LEVEL.set(existing, setData - 1);
                         session.setBlock(xr, newBlock, zr, existing);
@@ -248,7 +247,6 @@ public class HeightMap {
      *
      * @param data the data
      * @return number of blocks affected
-     * @throws MaxChangedBlocksException
      */
 
     public int apply(int[] data) throws MaxChangedBlocksException {

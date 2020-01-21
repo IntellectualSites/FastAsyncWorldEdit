@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -145,11 +146,11 @@ public class CavesGen extends GenBase {
 
             // Search for water
             boolean waterFound = false;
-            for (int local_x = m; (!waterFound) && (local_x < n); local_x++) {
-                for (int local_z = i3; (!waterFound) && (local_z < i4); local_z++) {
-                    for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--) {
+            for (int local_x = m; !waterFound && (local_x < n); local_x++) {
+                for (int local_z = i3; !waterFound && (local_z < i4); local_z++) {
+                    for (int local_y = i2 + 1; !waterFound && (local_y >= i1 - 1); local_y--) {
                         if (local_y < 255) {
-                            BlockStateHolder material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
+                            BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                             if (material.getBlockType() == BlockTypes.WATER) {
                                 waterFound = true;
                             }
@@ -173,8 +174,8 @@ public class CavesGen extends GenBase {
                         for (int local_y = i2; local_y > i1; local_y--) {
                             double d11 = ((local_y - 1) + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D)) {
-                                BlockStateHolder material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
-                                BlockStateHolder materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
+                                BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
+                                BlockState materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
                                 switch (blockType.getInternalId()) {
                                     case BlockID.MYCELIUM:
@@ -191,7 +192,7 @@ public class CavesGen extends GenBase {
                                         // If grass was just deleted, try to
                                         // move it down
                                         if (grassFound) {
-                                            BlockStateHolder block = chunk.getBlock(bx + local_x, local_y - 1, bz + local_z);
+                                            BlockState block = chunk.getBlock(bx + local_x, local_y - 1, bz + local_z);
                                             if (block.getBlockType() == BlockTypes.DIRT) {
                                                 chunk.setBlock(bx + local_x, local_y - 1, bz + local_z, BlockTypes.STONE.getDefaultState());
                                             }

@@ -58,7 +58,7 @@ public class SchemSync implements Runnable {
 
     private void close(Error error) throws IOException {
         this.clientSocket.getOutputStream().write(error.ordinal());
-        throw FaweCache.MANUAL;
+        throw FaweCache.INSTANCE.getMANUAL();
     }
 
     @Override

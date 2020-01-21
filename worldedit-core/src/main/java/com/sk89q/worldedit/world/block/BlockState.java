@@ -35,7 +35,7 @@ import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
-import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -51,7 +51,7 @@ import java.util.stream.Stream;
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
+public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     private final int internalId;
     private final int ordinal;
     private final char ordinalChar;

@@ -25,6 +25,8 @@ import com.bekvon.bukkit.residence.commands.server;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IQueueChunk;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
@@ -343,10 +345,10 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
                                 packet.setNativePacket(nmsPacket);
                             }
                             try {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(true);
+                                FaweCache.INSTANCE.getCHUNK_FLAG().get().set(true);
                                 entityPlayer.playerConnection.sendPacket(nmsPacket);
                             } finally {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(false);
+                                FaweCache.INSTANCE.getCHUNK_FLAG().get().set(false);
                             }
                         }
                     });
@@ -431,7 +433,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
                 // We need to also pull one more chunk in every direction
                 Fawe.get().getQueueHandler().startSet(true);
                 try {
-                    SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
+                    IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
                     extent.init(null, (x, z) -> new BukkitGetBlocks_1_15(freshWorld, x, z) {
                         @Override
                         public Chunk ensureLoaded(World nmsWorld, int X, int Z) {

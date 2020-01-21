@@ -63,7 +63,7 @@ public class SplineBrush implements Brush, ResettableTool {
         this.position = position;
         if (newPos) {
             if (positionSets.size() >= MAX_POINTS) {
-                throw FaweCache.MAX_CHECKS;
+                throw FaweCache.INSTANCE.getMAX_CHECKS();
             }
             final ArrayList<BlockVector3> points = new ArrayList<>();
             if (size > 0) {

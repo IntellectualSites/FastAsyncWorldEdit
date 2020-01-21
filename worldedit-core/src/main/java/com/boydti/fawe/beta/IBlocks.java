@@ -36,7 +36,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
+        return IntStream.range(0, FaweCache.CHUNK_LAYERS).filter(this::hasSection)
             .map(layer -> (1 << layer)).sum();
     }
 
@@ -56,7 +56,7 @@ public interface IBlocks extends Trimable {
         FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray);
 
         try {
-            for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+            for (int layer = 0; layer < FaweCache.CHUNK_LAYERS; layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) continue;
 
                 char[] ids = this.load(layer);
@@ -92,12 +92,12 @@ public interface IBlocks extends Trimable {
 //                    }
 //                    sectionWriter.write(bits.getData());
 //                } else {
-                    FaweCache.Palette palette = FaweCache.IMP.toPalette(0, ids);
+                    FaweCache.Palette palette = FaweCache.INSTANCE.toPalette(0, ids);
 
-                    sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
-                    sectionWriter.writeVarInt(palette.paletteToBlockLength);
-                    for (int i = 0; i < palette.paletteToBlockLength; i++) {
-                        int ordinal = palette.paletteToBlock[i];
+                    sectionWriter.writeByte(palette.getBitsPerEntry()); // bits per block
+                    sectionWriter.writeVarInt(palette.getPaletteToBlockLength());
+                    for (int i = 0; i < palette.getPaletteToBlockLength(); i++) {
+                        int ordinal = palette.getPaletteToBlock()[i];
                         switch (ordinal) {
                             case BlockID.__RESERVED__:
                             case BlockID.CAVE_AIR:
@@ -112,9 +112,9 @@ public interface IBlocks extends Trimable {
                                 break;
                         }
                     }
-                    sectionWriter.writeVarInt(palette.blockStatesLength);
-                    for (int i = 0; i < palette.blockStatesLength; i++) {
-                        sectionWriter.writeLong(palette.blockStates[i]);
+                    sectionWriter.writeVarInt(palette.getBlockStatesLength());
+                    for (int i = 0; i < palette.getBlockStatesLength(); i++) {
+                        sectionWriter.writeLong(palette.getBlockStates()[i]);
                     }
 //                }
             }

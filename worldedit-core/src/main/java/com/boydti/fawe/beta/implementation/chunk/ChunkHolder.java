@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
  */
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+    private static Pool<ChunkHolder> POOL = FaweCache.INSTANCE.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
 
     public static ChunkHolder newInstance() {
         return POOL.poll();

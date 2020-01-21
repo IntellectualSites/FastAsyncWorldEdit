@@ -75,7 +75,7 @@ public class LayerBrush implements Brush {
             }
         }, pos -> {
             int depth = visitor.getDepth();
-            BlockStateHolder currentPattern = layers[depth];
+            BlockState currentPattern = layers[depth];
             return currentPattern.apply(editSession, pos, pos);
         }, layers.length - 1);
         for (BlockVector3 pos : visited) {

@@ -18,6 +18,7 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -51,7 +52,7 @@ public class ImageBrush implements Brush {
                     case 255:
                         return color;
                     default:
-                        BlockStateHolder block = extent.getBlock(pos);
+                        BlockState block = extent.getBlock(pos);
                         TextureUtil tu = session.getTextureUtil();
                         int existingColor = tu.getColor(block.getBlockType());
                         return tu.combineTransparency(color, existingColor);

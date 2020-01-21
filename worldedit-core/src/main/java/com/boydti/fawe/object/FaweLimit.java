@@ -136,51 +136,51 @@ public class FaweLimit {
     }
 
     public void THROW_MAX_CHANGES() {
-        if (MAX_CHANGES-- <= 0) throw FaweCache.MAX_CHANGES;
+        if (MAX_CHANGES-- <= 0) throw FaweCache.INSTANCE.getMAX_CHANGES();
     }
 
     public void THROW_MAX_FAILS() {
-        if (MAX_FAILS-- <= 0) throw FaweCache.MAX_CHECKS;
+        if (MAX_FAILS-- <= 0) throw FaweCache.INSTANCE.getMAX_CHECKS();
     }
 
     public void THROW_MAX_CHECKS() {
-        if (MAX_CHECKS-- <= 0) throw FaweCache.MAX_CHECKS;
+        if (MAX_CHECKS-- <= 0) throw FaweCache.INSTANCE.getMAX_CHECKS();
     }
 
     public void THROW_MAX_ITERATIONS() {
-        if (MAX_ITERATIONS-- <= 0) throw FaweCache.MAX_ITERATIONS;
+        if (MAX_ITERATIONS-- <= 0) throw FaweCache.INSTANCE.getMAX_ITERATIONS();
     }
 
     public void THROW_MAX_BLOCKSTATES() {
-        if (MAX_BLOCKSTATES-- <= 0) throw FaweCache.MAX_TILES;
+        if (MAX_BLOCKSTATES-- <= 0) throw FaweCache.INSTANCE.getMAX_TILES();
     }
 
     public void THROW_MAX_ENTITIES() {
-        if (MAX_ENTITIES-- <= 0) throw FaweCache.MAX_ENTITIES;
+        if (MAX_ENTITIES-- <= 0) throw FaweCache.INSTANCE.getMAX_ENTITIES();
     }
 
     public void THROW_MAX_CHANGES(int amt) {
-        if ((MAX_CHANGES -= amt) <= 0) throw FaweCache.MAX_CHANGES;
+        if ((MAX_CHANGES -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_CHANGES();
     }
 
     public void THROW_MAX_FAILS(int amt) {
-        if ((MAX_FAILS -= amt) <= 0) throw FaweCache.MAX_CHECKS;
+        if ((MAX_FAILS -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_CHECKS();
     }
 
     public void THROW_MAX_CHECKS(int amt) {
-        if ((MAX_CHECKS -= amt) <= 0) throw FaweCache.MAX_CHECKS;
+        if ((MAX_CHECKS -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_CHECKS();
     }
 
     public void THROW_MAX_ITERATIONS(int amt) {
-        if ((MAX_ITERATIONS -= amt) <= 0) throw FaweCache.MAX_ITERATIONS;
+        if ((MAX_ITERATIONS -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_ITERATIONS();
     }
 
     public void THROW_MAX_BLOCKSTATES(int amt) {
-        if ((MAX_BLOCKSTATES -= amt) <= 0) throw FaweCache.MAX_TILES;
+        if ((MAX_BLOCKSTATES -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_TILES();
     }
 
     public void THROW_MAX_ENTITIES(int amt) {
-        if ((MAX_ENTITIES -= amt) <= 0) throw FaweCache.MAX_ENTITIES;
+        if ((MAX_ENTITIES -= amt) <= 0) throw FaweCache.INSTANCE.getMAX_ENTITIES();
     }
 
     public boolean isUnlimited() {
@@ -193,7 +193,7 @@ public class FaweLimit {
                 MAX_HISTORY == Integer.MAX_VALUE &&
                 INVENTORY_MODE == 0 &&
                 SPEED_REDUCTION == 0 &&
-                FAST_PLACEMENT == true &&
+                FAST_PLACEMENT &&
                 (STRIP_NBT == null || STRIP_NBT.isEmpty());
     }
 

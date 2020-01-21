@@ -34,7 +34,7 @@ public class CombinedBlocks implements IBlocks {
     @Override
     public int getBitMask() {
         int bitMask = addMask;
-        for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+        for (int layer = 0; layer < FaweCache.CHUNK_LAYERS; layer++) {
             if (primary.hasSection(layer)) {
                 bitMask |= (1 << layer);
             }

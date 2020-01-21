@@ -55,7 +55,7 @@ object NullChunkGet : IChunkGet {
     }
 
     override fun load(layer: Int): CharArray {
-        return FaweCache.IMP.EMPTY_CHAR_4096
+        return FaweCache.EMPTY_CHAR_4096
     }
 
     override fun hasSection(layer: Int): Boolean {

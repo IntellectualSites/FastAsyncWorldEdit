@@ -34,6 +34,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -167,7 +168,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                             if (mask == null) {
                                 context.setPreferringWildcard(false);
                                 context.setRestricted(false);
-                                BlockStateHolder block = worldEdit.getBlockFactory().parseFromInput(full, context);
+                                BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
                                 builder.add(block);
                                 mask = builder.build(extent);
                             }

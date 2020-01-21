@@ -322,7 +322,7 @@ public class SchematicReader implements ClipboardReader {
         if (tiles != null && !tiles.isEmpty()) {
             outer:
             for (Map<String, Object> tileRaw : tiles) {
-                CompoundTag tile = FaweCache.IMP.asTag(tileRaw);
+                CompoundTag tile = FaweCache.INSTANCE.asTag(tileRaw);
                 int x = (int) tileRaw.get("x");
                 int y = (int) tileRaw.get("y");
                 int z = (int) tileRaw.get("z");
@@ -350,7 +350,7 @@ public class SchematicReader implements ClipboardReader {
                 entRaw.put("Id", id);
                 EntityType type = EntityTypes.parse(id);
                 if (type != null) {
-                    CompoundTag ent = FaweCache.IMP.asTag(entRaw);
+                    CompoundTag ent = FaweCache.INSTANCE.asTag(entRaw);
                     for (EntityNBTCompatibilityHandler compat : ENTITY_COMPATIBILITY_HANDLERS) {
                         if (compat.isAffectedEntity(type, ent)) {
                             ent = compat.updateNBT(type, ent);

@@ -9,11 +9,9 @@ import com.boydti.fawe.beta.implementation.filter.CountFilter;
 import com.boydti.fawe.beta.implementation.filter.DistrFilter;
 import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -60,7 +58,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public boolean cancel() {
         if (super.cancel()) {
-            processor.setProcessor(new NullExtent(this, FaweCache.MANUAL));
+            processor.setProcessor(new NullExtent(this, FaweCache.INSTANCE.getMANUAL()));
             return true;
         }
         return false;
@@ -75,11 +73,6 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         // TODO wrap
         queue.setProcessor(this.processor);
         return queue;
-    }
-
-    @Override
-    public Extent enableHistory(AbstractChangeSet changeSet) {
-        return super.enableHistory(changeSet);
     }
 
     @Override
@@ -188,10 +181,6 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     /**
-     * To optimize
-     */
-
-    /**
      * Lazily copy a region
      *
      * @param region
@@ -199,7 +188,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      */
     @Override
     public Clipboard lazyCopy(Region region) {
-        WorldCopyClipboard clipboard = new WorldCopyClipboard(() -> this, region);
+        Clipboard clipboard = new WorldCopyClipboard(() -> this, region);
         clipboard.setOrigin(region.getMinimumPoint());
         return clipboard;
     }
@@ -213,7 +202,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      */
     @Override
     public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
-        BlockMask mask = new BlockMask(this, searchBlocks);
+        Mask mask = new BlockMask(this, searchBlocks);
         return countBlocks(region, mask);
     }
 
