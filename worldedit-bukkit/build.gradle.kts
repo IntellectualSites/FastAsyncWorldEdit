@@ -44,7 +44,7 @@ dependencies {
         isTransitive = false
     }
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
-    "compileOnly"("org.spigotmc:spigot:1.15.1-R0.1-SNAPSHOT")
+    "compileOnly"("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.2")
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
@@ -55,7 +55,6 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
     "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
 
     "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
