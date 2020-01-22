@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -99,7 +100,7 @@ public class RenderListener implements Listener {
         player.setViewDistance(value);
     }
 
-    private int getViewDistance(Player player) {
+    private int getViewDistance(Entity player) {
         int[] value = views.get(player.getUniqueId());
         return value == null ? Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
     }

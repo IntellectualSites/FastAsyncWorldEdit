@@ -6,8 +6,6 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.IntegerPair;
-import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -16,12 +14,13 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
+import kotlin.Pair;
 
 /**
  * Store the change on disk
@@ -403,25 +402,23 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return null;
     }
 
-    public IntegerPair readHeader() {
+    public Pair<Integer, Integer> readHeader() {
         int ox = getOriginX();
         int oz = getOriginZ();
         if (ox == 0 && oz == 0 && bdFile.exists()) {
-            try (FileInputStream fis = new FileInputStream(bdFile)) {
-                final FaweInputStream gis = MainUtil.getCompressedIS(fis);
+            try (FileInputStream fis = new FileInputStream(bdFile); FaweInputStream gis = MainUtil
+                .getCompressedIS(fis)) {
                 // skip mode
                 gis.skipFully(1);
                 // origin
                 ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 oz = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());
                 setOrigin(ox, oz);
-                fis.close();
-                gis.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return new IntegerPair(ox, oz);
+        return new Pair<>(ox, oz);
     }
 
     @Override

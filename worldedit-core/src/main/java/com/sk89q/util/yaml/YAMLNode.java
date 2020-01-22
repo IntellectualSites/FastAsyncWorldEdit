@@ -62,7 +62,7 @@ public class YAMLNode {
 
     /**
      * Gets a property at a location. This will either return an Object
-     * or null, with null meaning no configuration value exists at
+     * or null, with null meaning that no configuration value exists at
      * that location. This could potentially return a default value (not yet
      * implemented) as defined by a plugin, if this is a plugin-tied
      * configuration.
@@ -197,7 +197,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a string at a location. This will either return a String
+     * Gets a string at a location. This will either return an String
      * or null, with null meaning that no configuration value exists at
      * that location. If the object at the particular location is not actually
      * a string, it will be converted to its string representation.
@@ -214,7 +214,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a vector at a location. This will either return a Vector
+     * Gets a vector at a location. This will either return an Vector
      * or a null. If the object at the particular location is not
      * actually a string, it will be converted to its string representation.
      *
@@ -239,7 +239,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a 2D vector at a location. This will either return a Vector
+     * Gets a 2D vector at a location. This will either return an Vector
      * or a null. If the object at the particular location is not
      * actually a string, it will be converted to its string representation.
      *
@@ -263,7 +263,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a string at a location. This will either return a Vector
+     * Gets a string at a location. This will either return an Vector
      * or the default value. If the object at the particular location is not
      * actually a string, it will be converted to its string representation.
      *
@@ -281,7 +281,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a string at a location. This will either return a String
+     * Gets a string at a location. This will either return an String
      * or the default value. If the object at the particular location is not
      * actually a string, it will be converted to its string representation.
      *
@@ -337,10 +337,10 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a double at a location. This will either return a double
+     * Gets a double at a location. This will either return an double
      * or null. If the object at the particular location is not
      * actually a double, the default value will be returned. However, other
-     * number types will be casted to a double.
+     * number types will be casted to an double.
      *
      * @param path path to node (dot notation)
      * @return double or null
@@ -355,10 +355,10 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a double at a location. This will either return a double
+     * Gets a double at a location. This will either return an double
      * or the default value. If the object at the particular location is not
      * actually a double, the default value will be returned. However, other
-     * number types will be casted to a double.
+     * number types will be casted to an double.
      *
      * @param path path to node (dot notation)
      * @param def default value
@@ -375,7 +375,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a boolean at a location. This will either return a boolean
+     * Gets a boolean at a location. This will either return an boolean
      * or null. If the object at the particular location is not
      * actually a boolean, the default value will be returned.
      *
@@ -392,7 +392,7 @@ public class YAMLNode {
     }
 
     /**
-     * Gets a boolean at a location. This will either return a boolean
+     * Gets a boolean at a location. This will either return an boolean
      * or the default value. If the object at the particular location is not
      * actually a boolean, the default value will be returned.
      *

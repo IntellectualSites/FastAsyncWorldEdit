@@ -25,11 +25,6 @@ package com.sk89q.jnbt;
 public final class EndTag extends Tag {
 
     @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_END;
-    }
-
-    @Override
     public Object getValue() {
         return null;
     }

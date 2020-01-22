@@ -54,6 +54,7 @@ public abstract class ChunkListener implements Listener {
     public ChunkListener() {
         if (Settings.IMP.TICK_LIMITER.ENABLED) {
             PluginManager plm = Bukkit.getPluginManager();
+            assert Fawe.<FaweBukkit>imp() != null;
             Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
             plm.registerEvents(this, plugin);
             try {
@@ -293,8 +294,8 @@ public abstract class ChunkListener implements Listener {
             if (elem != null) {
                 String methodName = elem.getMethodName();
                 // setAir | setTypeAndData (hacky, but this needs to be efficient)
-                if (methodName.charAt(0) == 's' && methodName.length() == 6
-                    || methodName.length() == 14) {
+                if (methodName.charAt(0) == 's' && (methodName.length() == 6
+                    || methodName.length() == 14)) {
                     return true;
                 }
             }

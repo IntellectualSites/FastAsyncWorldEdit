@@ -172,10 +172,10 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         final BlockVector3 min = getMinimumPoint().divide(16);
         final BlockVector3 max = getMaximumPoint().divide(16);
 
-        for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
-            for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
-                if (containsChunk(X, Z)) {
-                    chunks.add(BlockVector2.at(X, Z));
+        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
+            for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
+                if (containsChunk(x, z)) {
+                    chunks.add(BlockVector2.at(x, z));
                 }
             }
         }

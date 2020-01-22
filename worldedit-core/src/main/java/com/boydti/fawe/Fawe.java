@@ -28,10 +28,15 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
@@ -157,7 +162,7 @@ public class Fawe {
      * The platform specific implementation
      */
     private final IFawe IMP;
-    private Thread thread;
+    private final Thread thread;
 
     private Fawe(final IFawe implementation) {
         INSTANCE = this;
@@ -289,7 +294,11 @@ public class Fawe {
             String dateString = br.readLine();
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
-            Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
+            //noinspection MagicConstant
+            GregorianCalendar gregorianCalendar = new GregorianCalendar(2000 + version.year,
+                version.month - 1, version.day);
+            gregorianCalendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+            Settings.IMP.DATE = DateFormat.getDateInstance().format(gregorianCalendar.getTime());
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.15/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
@@ -412,12 +421,4 @@ public class Fawe {
         return INSTANCE == null || INSTANCE.thread == Thread.currentThread();
     }
 
-    /**
-     * Sets the main thread to the current thread
-     *
-     * @return
-     */
-    public Thread setMainThread() {
-        return this.thread = Thread.currentThread();
-    }
 }

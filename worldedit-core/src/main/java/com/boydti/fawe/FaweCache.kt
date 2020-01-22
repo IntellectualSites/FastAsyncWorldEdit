@@ -31,9 +31,9 @@ import java.util.function.Supplier
 object FaweCache : Trimable {
 
     const val BLOCKS_PER_LAYER = 4096
-    const val CHUNK_LAYERS = 16
-    const val WORLD_HEIGHT = CHUNK_LAYERS shl 4
-    const val WORLD_MAX_Y = WORLD_HEIGHT - 1
+    const val chunkLayers = 16
+    const val worldHeight = chunkLayers shl 4
+    const val worldMaxY = 255
 
     val EMPTY_CHAR_4096 = CharArray(4096)
 
@@ -57,7 +57,7 @@ object FaweCache : Trimable {
         result
     }
 
-    val SECTION_BITS_TO_CHAR = CleanableThreadLocal { CharArray(4096) }
+    val sectionBitsToChar = CleanableThreadLocal { CharArray(4096) }
 
     val PALETTE_TO_BLOCK = CleanableThreadLocal { IntArray(Character.MAX_VALUE.toInt() + 1) }
 
@@ -67,23 +67,23 @@ object FaweCache : Trimable {
             }, fun(a: CharArray): Unit = Arrays.fill(a, Char.MAX_VALUE)
     )
 
-    val BLOCK_STATES = CleanableThreadLocal { LongArray(2048) }
+    val blockStates = CleanableThreadLocal { LongArray(2048) }
 
-    val SECTION_BLOCKS = CleanableThreadLocal { IntArray(4096) }
+    val sectionBlocks = CleanableThreadLocal { IntArray(4096) }
 
-    val INDEX_STORE = CleanableThreadLocal { IntArray(256) }
+    val indexStore = CleanableThreadLocal { IntArray(256) }
 
-    val HEIGHT_STORE = CleanableThreadLocal { IntArray(256) }
+    val heightStore = CleanableThreadLocal { IntArray(256) }
 
-    private val PALETTE_CACHE = CleanableThreadLocal(Supplier { Palette() })
+    private val paletteCache = CleanableThreadLocal(Supplier { Palette() })
 
     /*
      * Vector cache
      */
 
-    var MUTABLE_BLOCKVECTOR3 = CleanableThreadLocal(Supplier { MutableBlockVector3() })
+    var mutableBlockVector3 = CleanableThreadLocal(Supplier { MutableBlockVector3() })
 
-    var MUTABLE_VECTOR3: CleanableThreadLocal<MutableVector3> = object : CleanableThreadLocal<MutableVector3>(Supplier { MutableVector3() }) {
+    var mutableVector3: CleanableThreadLocal<MutableVector3> = object : CleanableThreadLocal<MutableVector3>(Supplier { MutableVector3() }) {
         override fun init(): MutableVector3 {
             return MutableVector3()
         }
@@ -102,15 +102,15 @@ object FaweCache : Trimable {
             BYTE_BUFFER_8192.clean()
             BLOCK_TO_PALETTE.clean()
             PALETTE_TO_BLOCK.clean()
-            BLOCK_STATES.clean()
-            SECTION_BLOCKS.clean()
-            PALETTE_CACHE.clean()
+            blockStates.clean()
+            sectionBlocks.clean()
+            paletteCache.clean()
             PALETTE_TO_BLOCK_CHAR.clean()
-            INDEX_STORE.clean()
+            indexStore.clean()
 
-            MUTABLE_VECTOR3.clean()
-            MUTABLE_BLOCKVECTOR3.clean()
-            SECTION_BITS_TO_CHAR.clean()
+            mutableVector3.clean()
+            mutableBlockVector3.clean()
+            sectionBitsToChar.clean()
             for ((_, value) in REGISTERED_SINGLETONS) {
                 value.clean()
             }
@@ -239,8 +239,8 @@ object FaweCache : Trimable {
     private fun toPalette(layerOffset: Int, blocksInts: IntArray?, blocksChars: CharArray?): Palette {
         val blockToPalette = BLOCK_TO_PALETTE.get()
         val paletteToBlock = PALETTE_TO_BLOCK.get()
-        val blockStates = BLOCK_STATES.get()
-        val blocksCopy = SECTION_BLOCKS.get()
+        val blockStates = blockStates.get()
+        val blocksCopy = sectionBlocks.get()
 
         val blockIndexStart = layerOffset shl 12
         val blockIndexEnd = blockIndexStart + 4096
@@ -305,7 +305,7 @@ object FaweCache : Trimable {
             }
 
             // Construct palette
-            val palette = PALETTE_CACHE.get()
+            val palette = paletteCache.get()
             palette.bitsPerEntry = bitsPerEntry
             palette.paletteToBlockLength = num_palette
             palette.paletteToBlock = paletteToBlock
@@ -419,7 +419,7 @@ object FaweCache : Trimable {
             return asTag((if (value) 1 else 0).toByte())
         } else if (value == null) {
             println("Invalid nbt: " + value!!)
-            return null
+            return value
         } else {
             val clazz = value.javaClass
             if (clazz.name.startsWith("com.intellectualcrafters.jnbt")) {
@@ -507,15 +507,15 @@ object FaweCache : Trimable {
         }
     }
 
-    val CHUNK = FaweChunkLoadException()
-    val BLOCK_BAG = FaweBlockBagException()
-    val MANUAL = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"))
-    val NO_REGION = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.no.region"))
-    val OUTSIDE_REGION = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"))
-    val MAX_CHECKS = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.checks"))
-    val MAX_CHANGES = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.changes"))
-    val LOW_MEMORY = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.low.memory"))
-    val MAX_ENTITIES = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.entities"))
-    val MAX_TILES = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.tiles"))
-    val MAX_ITERATIONS = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.iterations"))
+    val chunk = FaweChunkLoadException()
+    val blockBag = FaweBlockBagException()
+    val manual = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"))
+    val noRegion = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.no.region"))
+    val outsideRegion = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"))
+    val maxChecks = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.checks"))
+    val maxChanges = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.changes"))
+    val lowMemory = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.low.memory"))
+    val maxEntities = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.entities"))
+    val maxTiles = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.tiles"))
+    val maxIterations = FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.iterations"))
 }

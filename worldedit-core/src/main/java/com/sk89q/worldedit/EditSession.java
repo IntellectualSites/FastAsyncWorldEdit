@@ -2802,7 +2802,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             BlockVector3 max = region.getMaximumPoint();
             BlockVector3 min = region.getMinimumPoint();
             if (!fe.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ()) && !fe.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ())) {
-                throw FaweCache.INSTANCE.getOUTSIDE_REGION();
+                throw FaweCache.INSTANCE.getOutsideRegion();
             }
         }
         final Set<BlockVector2> chunks = region.getChunks();

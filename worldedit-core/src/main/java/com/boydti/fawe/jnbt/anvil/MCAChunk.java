@@ -47,7 +47,7 @@ public class MCAChunk implements IChunk {
     public final boolean[] hasSections = new boolean[16];
 
     public boolean hasBiomes = false;
-    public final BiomeType[] biomes = new BiomeType[256];
+    public final BiomeType[] biomes = new BiomeType[1024];
 
     public final char[] blocks = new char[65536];
 
@@ -72,7 +72,7 @@ public class MCAChunk implements IChunk {
 
         int bitsPerEntry = MathMan.log2nlz(section.palette.length - 1);
         BitArray4096 bitArray = new BitArray4096(section.blocks, bitsPerEntry);
-        char[] buffer = FaweCache.INSTANCE.getSECTION_BITS_TO_CHAR().get();
+        char[] buffer = FaweCache.INSTANCE.getSectionBitsToChar().get();
         bitArray.toRaw(buffer);
         int offset = section.layer << 12;
         for (int i = 0; i < buffer.length; i++) {
@@ -220,8 +220,8 @@ public class MCAChunk implements IChunk {
     public void write(NBTOutputStream nbtOut) throws IOException {
         int[] blockToPalette = FaweCache.INSTANCE.getBLOCK_TO_PALETTE().get();
         int[] paletteToBlock = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
-        long[] blockstates = FaweCache.INSTANCE.getBLOCK_STATES().get();
-        int[] blocksCopy = FaweCache.INSTANCE.getSECTION_BLOCKS().get();
+        long[] blockstates = FaweCache.INSTANCE.getBlockStates().get();
+        int[] blocksCopy = FaweCache.INSTANCE.getSectionBlocks().get();
 
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);
@@ -243,7 +243,7 @@ public class MCAChunk implements IChunk {
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
             if (hasBiomes) {
-                int type = NBTConstants.TYPE_BYTE_ARRAY;
+                int type = NBTConstants.TYPE_INT_ARRAY;
                 out.writeNamedTagName("Biomes", type);
                 out.writeInt(biomes.length);
                 for (BiomeType biome : biomes) {
@@ -524,7 +524,7 @@ public class MCAChunk implements IChunk {
 
     @Override
     public char[] load(int layer) {
-        char[] tmp = FaweCache.INSTANCE.getSECTION_BITS_TO_CHAR().get();
+        char[] tmp = FaweCache.INSTANCE.getSectionBitsToChar().get();
         int offset = layer << 12;
         System.arraycopy(blocks, offset, tmp, 0, 4096);
         return tmp;

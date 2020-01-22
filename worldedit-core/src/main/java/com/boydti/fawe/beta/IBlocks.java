@@ -36,7 +36,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, FaweCache.CHUNK_LAYERS).filter(this::hasSection)
+        return IntStream.range(0, FaweCache.chunkLayers).filter(this::hasSection)
             .map(layer -> (1 << layer)).sum();
     }
 
@@ -56,7 +56,7 @@ public interface IBlocks extends Trimable {
         FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray);
 
         try {
-            for (int layer = 0; layer < FaweCache.CHUNK_LAYERS; layer++) {
+            for (int layer = 0; layer < FaweCache.chunkLayers; layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) continue;
 
                 char[] ids = this.load(layer);

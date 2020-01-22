@@ -138,7 +138,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return BlockVector3.at((this.X << 9) + 511, FaweCache.WORLD_MAX_Y, (this.Z << 9) + 511);
+        return BlockVector3.at((this.X << 9) + 511, FaweCache.worldMaxY, (this.Z << 9) + 511);
     }
 
     @Override

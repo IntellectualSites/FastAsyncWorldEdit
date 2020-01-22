@@ -28,11 +28,6 @@ import java.util.Locale;
  */
 public class LongArrayTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LONG_ARRAY;
-    }
-
     private final long[] value;
 
     /**

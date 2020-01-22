@@ -6,6 +6,7 @@ import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import java.util.Iterator;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class BlockSet extends AbstractRegion {
     private final int chunkOffsetX;
@@ -92,6 +93,7 @@ public abstract class BlockSet extends AbstractRegion {
     public abstract void set(int x, int y, int z);
     public abstract void clear(int x, int y, int z);
     public abstract boolean remove(int x, int y, int z);
+    @NotNull
     @Override
     public abstract Iterator<BlockVector3> iterator();
     @Override

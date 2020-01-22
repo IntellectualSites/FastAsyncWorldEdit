@@ -33,11 +33,6 @@ import java.util.UUID;
  */
 public class CompoundTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_COMPOUND;
-    }
-
     private Map<String, Tag> value;
 
     /**

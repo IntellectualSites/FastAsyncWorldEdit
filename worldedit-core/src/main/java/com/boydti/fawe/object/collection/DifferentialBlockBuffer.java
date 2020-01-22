@@ -148,7 +148,7 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<cha
 
             if (changes == null) {
                 changes = new char[t1][][][][];
-            } else if (changes != null && changes.length != 0) {
+            } else if (changes.length != 0) {
                 initialChange(changes, chunkX, chunkZ, localX, localZ, y, (char) -combined);
             }
 

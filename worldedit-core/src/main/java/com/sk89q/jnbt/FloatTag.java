@@ -23,10 +23,6 @@ package com.sk89q.jnbt;
  * The {@code TAG_Float} tag.
  */
 public final class FloatTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_FLOAT;
-    }
 
     private final float value;
 

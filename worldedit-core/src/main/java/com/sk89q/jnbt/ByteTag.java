@@ -23,10 +23,6 @@ package com.sk89q.jnbt;
  * The {@code TAG_Byte} tag.
  */
 public final class ByteTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_BYTE;
-    }
 
     private final byte value;
 

@@ -180,7 +180,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     public boolean retainAll(@NotNull Collection<?> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
-        Iterator it = iterator();
+        Iterator<BlockVector3> it = iterator();
         while (it.hasNext()) {
             if (!c.contains(it.next())) {
                 it.remove();
@@ -192,11 +192,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        boolean result = false;
-        for (Object o : c) {
-            result |= remove(o);
-        }
-        return result;
+        return c.stream().map(this::remove).reduce(false, (a, b) -> a || b);
     }
 
 

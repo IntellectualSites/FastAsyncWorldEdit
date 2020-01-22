@@ -128,7 +128,7 @@ public class ClipboardCommands {
             ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweCache.INSTANCE.getMAX_CHECKS();
+            throw FaweCache.INSTANCE.getMaxChecks();
         }
         session.setClipboard(null);
 
@@ -246,10 +246,10 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweCache.INSTANCE.getMAX_CHECKS();
+            throw FaweCache.INSTANCE.getMaxChecks();
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw FaweCache.INSTANCE.getMAX_CHANGES();
+            throw FaweCache.INSTANCE.getMaxChanges();
         }
         session.setClipboard(null);
 

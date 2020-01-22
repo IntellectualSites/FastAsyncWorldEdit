@@ -7,6 +7,7 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class NullChangeSet extends AbstractChangeSet {
@@ -58,7 +59,7 @@ public class NullChangeSet extends AbstractChangeSet {
 
     @Override
     public final Iterator<Change> getIterator(boolean undo) {
-        return new ArrayList<Change>().iterator();
+        return Collections.emptyIterator();
     }
 
     @Override

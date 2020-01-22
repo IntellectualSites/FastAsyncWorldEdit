@@ -1,13 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;
@@ -34,7 +31,7 @@ public class CombinedBlocks implements IBlocks {
     @Override
     public int getBitMask() {
         int bitMask = addMask;
-        for (int layer = 0; layer < FaweCache.CHUNK_LAYERS; layer++) {
+        for (int layer = 0; layer < FaweCache.chunkLayers; layer++) {
             if (primary.hasSection(layer)) {
                 bitMask |= (1 << layer);
             }

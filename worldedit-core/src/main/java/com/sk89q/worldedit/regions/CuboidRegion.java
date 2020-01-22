@@ -124,8 +124,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         if (pos1 == null || pos2 == null) {
             return;
         }
-        pos1 = pos1.clampY(world == null ? 0 : 0, world == null ? FaweCache.WORLD_MAX_Y : world.getMaxY());
-        pos2 = pos2.clampY(world == null ? 0 : 0, world == null ? FaweCache.WORLD_MAX_Y : world.getMaxY());
+        pos1 = pos1.clampY(world == null ? 0 : 0, world == null ? FaweCache.worldMaxY : world.getMaxY());
+        pos2 = pos2.clampY(world == null ? 0 : 0, world == null ? FaweCache.worldMaxY : world.getMaxY());
         minX = Math.min(pos1.getX(), pos2.getX());
         minY = Math.min(pos1.getY(), pos2.getY());
         minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -730,7 +730,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
             int indexY, index;
-            for (int layer = 0; layer < FaweCache.CHUNK_LAYERS; layer++) {
+            for (int layer = 0; layer < FaweCache.chunkLayers; layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {

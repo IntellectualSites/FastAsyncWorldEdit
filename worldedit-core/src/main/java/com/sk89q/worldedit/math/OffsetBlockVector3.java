@@ -4,6 +4,7 @@ public class OffsetBlockVector3 extends DelegateBlockVector3 {
     private final BlockVector3 offset;
 
     public OffsetBlockVector3(BlockVector3 offset) {
+        super(offset);
         this.offset = offset;
     }
 

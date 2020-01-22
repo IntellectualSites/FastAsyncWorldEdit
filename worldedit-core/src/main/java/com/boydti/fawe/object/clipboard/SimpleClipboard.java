@@ -6,6 +6,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
 import java.io.Closeable;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class SimpleClipboard implements Clipboard, Closeable {
     private final BlockVector3 size;
@@ -44,6 +45,7 @@ public abstract class SimpleClipboard implements Clipboard, Closeable {
         return size.subtract(BlockVector3.ONE);
     }
 
+    @NotNull
     @Override
     public Region getRegion() {
         return new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));

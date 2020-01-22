@@ -20,9 +20,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 
 public class BrushListener implements Listener {
-    public BrushListener(Plugin plugin) {
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerItemHoldEvent(final PlayerItemHeldEvent event) {
@@ -37,7 +34,7 @@ public class BrushListener implements Listener {
             final int slot = event.getNewSlot();
             final int oldSlot = event.getPreviousSlot();
             final int ri;
-            if ((((slot - oldSlot) <= 4) && ((slot - oldSlot) > 0)) || (((slot - oldSlot) < -4))) {
+            if (slot - oldSlot <= 4 && slot - oldSlot > 0 || slot - oldSlot < -4) {
                 ri = 1;
             } else {
                 ri = -1;
@@ -53,7 +50,7 @@ public class BrushListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        if ((from.getYaw() != to.getYaw() &&  from.getPitch() != to.getPitch()) || from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() || from.getBlockY() != to.getBlockY()) {
+        if (from.getYaw() != to.getYaw() &&  from.getPitch() != to.getPitch() || from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() || from.getBlockY() != to.getBlockY()) {
             Player bukkitPlayer = event.getPlayer();
             com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
             LocalSession session = player.getSession();

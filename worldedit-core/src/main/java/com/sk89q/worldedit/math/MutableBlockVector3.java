@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.math;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.util.MathMan;
 
 public class MutableBlockVector3 extends BlockVector3 {
 
@@ -13,25 +14,32 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     public static MutableBlockVector3 get(int x, int y, int z) {
-        return FaweCache.INSTANCE.getMUTABLE_BLOCKVECTOR3().get().setComponents(x, y, z);
+        return FaweCache.INSTANCE.getMutableBlockVector3().get().setComponents(x, y, z);
     }
 
-    public MutableBlockVector3() {}
+    public MutableBlockVector3() {
+        this(0, 0, 0);
+    }
 
-    public MutableBlockVector3(BlockVector3 other) {
-        this(other.getX(), other.getY(), other.getZ());
+    public MutableBlockVector3(BlockVector3 blockVector3) {
+        this(blockVector3.getX(), blockVector3.getY(), blockVector3.getZ());
     }
 
     public MutableBlockVector3 setComponents(BlockVector3 other) {
         return setComponents(other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
-    private int x,y,z;
+    private int x, y, z;
 
     public MutableBlockVector3(int x, int y, int z) {
+        super(0, 0, 0);
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public MutableBlockVector3(double x, double y, double z) {
+        this(MathMan.floor(x), MathMan.floor(y), MathMan.floor(z));
     }
 
     @Override

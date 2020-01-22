@@ -35,7 +35,7 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
 
     public DifferentialArray(T array) {
         checkNotNull(array);
-        Class<? extends Object> clazz = array.getClass();
+        Class<?> clazz = array.getClass();
         checkArgument(clazz.isArray(), "Data must be an array");
         checkArgument(clazz.getComponentType().isPrimitive(), "Data must be a primitive array");
         this.data = array;

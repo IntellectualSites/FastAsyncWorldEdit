@@ -11,6 +11,11 @@ import java.util.Comparator;
 public class DelegateBlockVector3 extends BlockVector3 {
     private BlockVector3 parent;
 
+    public DelegateBlockVector3(BlockVector3 parent) {
+        super(parent.getX(), parent.getY(), parent.getZ());
+        this.parent = parent;
+    }
+
     public DelegateBlockVector3 init(BlockVector3 parent) {
         this.parent = parent;
         return this;

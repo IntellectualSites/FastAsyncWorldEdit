@@ -32,20 +32,22 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.util.Comparator;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable 3-dimensional vector.
  */
-public abstract class BlockVector3 {
+@Immutable
+public class BlockVector3 {
 
-    public static final BlockVector3 ZERO = BlockVector3.at(0, 0, 0);
-    public static final BlockVector3 UNIT_X = BlockVector3.at(1, 0, 0);
-    public static final BlockVector3 UNIT_Y = BlockVector3.at(0, 1, 0);
-    public static final BlockVector3 UNIT_Z = BlockVector3.at(0, 0, 1);
-    public static final BlockVector3 UNIT_MINUS_X = BlockVector3.at(-1, 0, 0);
-    public static final BlockVector3 UNIT_MINUS_Y = BlockVector3.at(0, -1, 0);
-    public static final BlockVector3 UNIT_MINUS_Z = BlockVector3.at(0, 0, -1);
-    public static final BlockVector3 ONE = BlockVector3.at(1, 1, 1);
+    public static final BlockVector3 ZERO = new BlockVector3(0, 0, 0);
+    public static final BlockVector3 UNIT_X = new BlockVector3(1, 0, 0);
+    public static final BlockVector3 UNIT_Y = new BlockVector3(0, 1, 0);
+    public static final BlockVector3 UNIT_Z = new BlockVector3(0, 0, 1);
+    public static final BlockVector3 UNIT_MINUS_X = new BlockVector3(-1, 0, 0);
+    public static final BlockVector3 UNIT_MINUS_Y = new BlockVector3(0, -1, 0);
+    public static final BlockVector3 UNIT_MINUS_Z = new BlockVector3(0, 0, -1);
+    public static final BlockVector3 ONE = new BlockVector3(1, 1, 1);
 
     public static BlockVector3 at(double x, double y, double z) {
         return at((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
@@ -68,7 +70,7 @@ public abstract class BlockVector3 {
                 break;
         }
         */
-        return new BlockVector3Imp(x, y, z);
+        return new BlockVector3(x, y, z);
     }
 
     private static final int WORLD_XZ_MINMAX = 30_000_000;
@@ -114,6 +116,21 @@ public abstract class BlockVector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
+    private final int x, y, z;
+
+    /**
+     * Construct an instance.
+     *
+     * @param x the X coordinate
+     * @param y the Y coordinate
+     * @param z the Z coordinate
+     */
+    public BlockVector3(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    
     public MutableBlockVector3 setComponents(double x, double y, double z) {
         return new MutableBlockVector3((int) x, (int) y, (int) z);
     }
@@ -124,35 +141,35 @@ public abstract class BlockVector3 {
 
     public long toLongPackedForm() {
         checkLongPackable(this);
-        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
+        return (x & BITS_26) | ((z & BITS_26) << 26) | (((y & (long) BITS_12) << (26 + 26)));
     }
 
     public MutableBlockVector3 mutX(double x) {
-        return new MutableBlockVector3((int) x, getY(), getZ());
+        return new MutableBlockVector3((int) x, y, z);
     }
 
     public MutableBlockVector3 mutY(double y) {
-        return new MutableBlockVector3(getX(), (int) y, getZ());
+        return new MutableBlockVector3(x, (int) y, z);
     }
 
     public MutableBlockVector3 mutZ(double z) {
-        return new MutableBlockVector3(getX(), getY(), (int) z);
+        return new MutableBlockVector3(x, y, (int) z);
     }
 
     public MutableBlockVector3 mutX(int x) {
-        return new MutableBlockVector3(x, getY(), getZ());
+        return new MutableBlockVector3(x, y, z);
     }
 
     public MutableBlockVector3 mutY(int y) {
-        return new MutableBlockVector3(getX(), y, getZ());
+        return new MutableBlockVector3(x, y, z);
     }
 
     public MutableBlockVector3 mutZ(int z) {
-        return new MutableBlockVector3(getX(), getY(), z);
+        return new MutableBlockVector3(x, y, z);
     }
 
     public BlockVector3 toImmutable() {
-        return BlockVector3.at(getX(), getY(), getZ());
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -160,7 +177,9 @@ public abstract class BlockVector3 {
      *
      * @return the x coordinate
      */
-    public abstract int getX();
+    public int getX() {
+        return x;
+    }
 
     /**
      * Get the X coordinate.
@@ -168,7 +187,7 @@ public abstract class BlockVector3 {
      * @return the x coordinate
      */
     public int getBlockX() {
-        return getX();
+        return x;
     }
 
     /**
@@ -178,7 +197,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 withX(int x) {
-        return BlockVector3.at(x, getY(), getZ());
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -186,7 +205,9 @@ public abstract class BlockVector3 {
      *
      * @return the y coordinate
      */
-    public abstract int getY();
+    public int getY() {
+        return y;
+    }
 
     /**
      * Get the Y coordinate.
@@ -194,7 +215,7 @@ public abstract class BlockVector3 {
      * @return the y coordinate
      */
     public int getBlockY() {
-        return getY();
+        return y;
     }
 
     /**
@@ -204,7 +225,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 withY(int y) {
-        return BlockVector3.at(getX(), y, getZ());
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -212,7 +233,9 @@ public abstract class BlockVector3 {
      *
      * @return the z coordinate
      */
-    public abstract int getZ();
+    public int getZ() {
+        return z;
+    }
 
     /**
      * Get the Z coordinate.
@@ -220,7 +243,7 @@ public abstract class BlockVector3 {
      * @return the z coordinate
      */
     public int getBlockZ() {
-        return getZ();
+        return z;
     }
 
     /**
@@ -230,7 +253,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 withZ(int z) {
-        return BlockVector3.at(getX(), getY(), z);
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -240,7 +263,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 add(BlockVector3 other) {
-        return add(other.getX(), other.getY(), other.getZ());
+        return add(other.x, other.y, other.z);
     }
 
     /**
@@ -252,7 +275,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 add(int x, int y, int z) {
-        return BlockVector3.at(this.getX() + x, this.getY() + y, this.getZ() + z);
+        return BlockVector3.at(this.x + x, this.y + y, this.z + z);
     }
 
     /**
@@ -263,12 +286,12 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 add(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = x, newY = y, newZ = z;
 
         for (BlockVector3 other : others) {
-            newX += other.getX();
-            newY += other.getY();
-            newZ += other.getZ();
+            newX += other.x;
+            newY += other.y;
+            newZ += other.z;
         }
 
         return BlockVector3.at(newX, newY, newZ);
@@ -282,7 +305,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 subtract(BlockVector3 other) {
-        return subtract(other.getX(), other.getY(), other.getZ());
+        return subtract(other.x, other.y, other.z);
     }
 
     /**
@@ -295,7 +318,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 subtract(int x, int y, int z) {
-        return BlockVector3.at(this.getX() - x, this.getY() - y, this.getZ() - z);
+        return BlockVector3.at(this.x - x, this.y - y, this.z - z);
     }
 
     /**
@@ -306,12 +329,12 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 subtract(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = x, newY = y, newZ = z;
 
         for (BlockVector3 other : others) {
-            newX -= other.getX();
-            newY -= other.getY();
-            newZ -= other.getZ();
+            newX -= other.x;
+            newY -= other.y;
+            newZ -= other.z;
         }
 
         return BlockVector3.at(newX, newY, newZ);
@@ -324,7 +347,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 multiply(BlockVector3 other) {
-        return multiply(other.getX(), other.getY(), other.getZ());
+        return multiply(other.x, other.y, other.z);
     }
 
     /**
@@ -336,7 +359,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 multiply(int x, int y, int z) {
-        return BlockVector3.at(this.getX() * x, this.getY() * y, this.getZ() * z);
+        return BlockVector3.at(this.x * x, this.y * y, this.z * z);
     }
 
     /**
@@ -346,12 +369,12 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 multiply(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = x, newY = y, newZ = z;
 
         for (BlockVector3 other : others) {
-            newX *= other.getX();
-            newY *= other.getY();
-            newZ *= other.getZ();
+            newX *= other.x;
+            newY *= other.y;
+            newZ *= other.z;
         }
 
         return BlockVector3.at(newX, newY, newZ);
@@ -374,7 +397,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 divide(BlockVector3 other) {
-        return divide(other.getX(), other.getY(), other.getZ());
+        return divide(other.x, other.y, other.z);
     }
 
     /**
@@ -386,7 +409,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 divide(int x, int y, int z) {
-        return BlockVector3.at(this.getX() / x, this.getY() / y, this.getZ() / z);
+        return BlockVector3.at(this.x / x, this.y / y, this.z / z);
     }
 
     /**
@@ -408,7 +431,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 shr(int x, int y, int z) {
-        return at(this.getX() >> x, this.getY() >> y, this.getZ() >> z);
+        return at(this.x >> x, this.y >> y, this.z >> z);
     }
 
     /**
@@ -430,7 +453,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 shl(int x, int y, int z) {
-        return at(this.getX() << x, this.getY() << y, this.getZ() << z);
+        return at(this.x << x, this.y << y, this.z << z);
     }
 
     /**
@@ -458,7 +481,7 @@ public abstract class BlockVector3 {
      * @return length, squared
      */
     public int lengthSq() {
-        return getX() * getX() + getY() * getY() + getZ() * getZ();
+        return x * x + y * y + z * z;
     }
 
     /**
@@ -478,9 +501,9 @@ public abstract class BlockVector3 {
      * @return distance
      */
     public int distanceSq(BlockVector3 other) {
-        int dx = other.getX() - getX();
-        int dy = other.getY() - getY();
-        int dz = other.getZ() - getZ();
+        int dx = other.x - x;
+        int dy = other.y - y;
+        int dz = other.z - z;
         return dx * dx + dy * dy + dz * dz;
     }
 
@@ -492,9 +515,9 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 normalize() {
         double len = length();
-        double x = this.getX() / len;
-        double y = this.getY() / len;
-        double z = this.getZ() / len;
+        double x = this.x / len;
+        double y = this.y / len;
+        double z = this.z / len;
         return BlockVector3.at(x, y, z);
     }
 
@@ -505,7 +528,7 @@ public abstract class BlockVector3 {
      * @return the dot product of this and the other vector
      */
     public double dot(BlockVector3 other) {
-        return getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
+        return x * other.x + y * other.y + z * other.z;
     }
 
     /**
@@ -515,10 +538,10 @@ public abstract class BlockVector3 {
      * @return the cross product of this and the other vector
      */
     public BlockVector3 cross(BlockVector3 other) {
-        return new BlockVector3Imp(
-            getY() * other.getZ() - getZ() * other.getY(),
-            getZ() * other.getX() - getX() * other.getZ(),
-            getX() * other.getY() - getY() * other.getX()
+        return new BlockVector3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
         );
     }
 
@@ -530,8 +553,7 @@ public abstract class BlockVector3 {
      * @return true if the vector is contained
      */
     public boolean containedWithin(BlockVector3 min, BlockVector3 max) {
-        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max
-            .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+        return x >= min.x && x <= max.x && y >= min.y && y <= max.y && z >= min.z && z <= max.z;
     }
 
     /**
@@ -543,11 +565,11 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
-        if (getY() < min) {
-            return BlockVector3.at(getX(), min, getZ());
+        if (y < min) {
+            return BlockVector3.at(x, min, z);
         }
-        if (getY() > max) {
-            return BlockVector3.at(getX(), max, getZ());
+        if (y > max) {
+            return BlockVector3.at(x, max, z);
         }
         return this;
     }
@@ -591,7 +613,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 abs() {
-        return BlockVector3.at(Math.abs(getX()), Math.abs(getY()), Math.abs(getZ()));
+        return BlockVector3.at(Math.abs(x), Math.abs(y), Math.abs(z));
     }
 
     /**
@@ -607,8 +629,8 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
         angle = Math.toRadians(angle);
-        double x = this.getX() - aboutX;
-        double z = this.getZ() - aboutZ;
+        double x = this.x - aboutX;
+        double z = this.z - aboutZ;
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
         double x2 = x * cos - z * sin;
@@ -616,7 +638,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(
             x2 + aboutX + translateX,
-            getY(),
+            y,
             z2 + aboutZ + translateZ
         );
     }
@@ -662,10 +684,10 @@ public abstract class BlockVector3 {
      * @return minimum
      */
     public BlockVector3 getMinimum(BlockVector3 v2) {
-        return new BlockVector3Imp(
-                Math.min(getX(), v2.getX()),
-                Math.min(getY(), v2.getY()),
-                Math.min(getZ(), v2.getZ())
+        return new BlockVector3(
+                Math.min(x, v2.x),
+                Math.min(y, v2.y),
+                Math.min(z, v2.z)
         );
     }
 
@@ -676,10 +698,10 @@ public abstract class BlockVector3 {
      * @return maximum
      */
     public BlockVector3 getMaximum(BlockVector3 v2) {
-        return new BlockVector3Imp(
-                Math.max(getX(), v2.getX()),
-                Math.max(getY(), v2.getY()),
-                Math.max(getZ(), v2.getZ())
+        return new BlockVector3(
+                Math.max(x, v2.x),
+                Math.max(y, v2.y),
+                Math.max(z, v2.z)
         );
     }
 
@@ -706,7 +728,7 @@ public abstract class BlockVector3 {
     }
 
     public boolean setBiome(Extent orDefault, BiomeType biome) {
-        return orDefault.setBiome(getX(), getY(), getZ(), biome);
+        return orDefault.setBiome(x, y, z, biome);
     }
 
     public int getOrdinal(Extent orDefault) {
@@ -726,19 +748,19 @@ public abstract class BlockVector3 {
     }
 
     public CompoundTag getNbtData(Extent orDefault) {
-        return orDefault.getFullBlock(getX(), getY(), getZ()).getNbtData();
+        return orDefault.getFullBlock(x, y, z).getNbtData();
     }
 
     public BlockState getOrdinalBelow(Extent orDefault) {
-        return orDefault.getBlock(getX(), getY() - 1, getZ());
+        return orDefault.getBlock(x, y - 1, z);
     }
 
     public BlockState getStateAbove(Extent orDefault) {
-        return orDefault.getBlock(getX(), getY() + 1, getZ());
+        return orDefault.getBlock(x, y + 1, z);
     }
 
     public BlockState getStateRelativeY(Extent orDefault, final int y) {
-        return orDefault.getBlock(getX(), getY() + y, getZ());
+        return orDefault.getBlock(x, this.y + y, z);
     }
 
     /**
@@ -747,11 +769,11 @@ public abstract class BlockVector3 {
      * @return a new {@link BlockVector2}
      */
     public BlockVector2 toBlockVector2() {
-        return BlockVector2.at(getX(), getZ());
+        return BlockVector2.at(x, z);
     }
 
     public Vector3 toVector3() {
-        return Vector3.at(getX(), getY(), getZ());
+        return Vector3.at(x, y, z);
     }
 
     @Override
@@ -761,7 +783,7 @@ public abstract class BlockVector3 {
         }
 
         BlockVector3 other = (BlockVector3) obj;
-        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
+        return other.x == this.x && other.y == this.y && other.z == this.z;
     }
 
     public final boolean equals(BlockVector3 other) {
@@ -771,12 +793,12 @@ public abstract class BlockVector3 {
 
     @Override
     public int hashCode() {
-        return (getX() ^ (getZ() << 12)) ^ (getY() << 24);
+        return (x ^ (z << 12)) ^ (y << 24);
     }
 
     @Override
     public String toString() {
-        return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
+        return "(" + x + ", " + y + ", " + z + ")";
     }
 
     //Used by VS fork

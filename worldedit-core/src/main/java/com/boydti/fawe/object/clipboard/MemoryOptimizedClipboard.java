@@ -2,7 +2,6 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
-import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,17 +19,15 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Map.Entry;
+import javax.annotation.Nullable;
+import kotlin.Triple;
 
 public class MemoryOptimizedClipboard extends LinearClipboard {
 
@@ -43,7 +40,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private byte[] buffer = new byte[MainUtil.getMaxCompressedLength(BLOCK_SIZE)];
     private byte[] biomes = null;
 
-    private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
+    private final HashMap<Triple<Integer,Integer,Integer>, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
 
@@ -71,9 +68,9 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         if (nbtMapLoc.isEmpty()) {
             return;
         }
-        for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMapLoc.entrySet()) {
-            IntegerTrio key = entry.getKey();
-            setTile(getIndex(key.x, key.y, key.z), entry.getValue());
+        for (Entry<Triple<Integer, Integer, Integer>, CompoundTag> entry : nbtMapLoc.entrySet()) {
+            Triple<Integer, Integer, Integer> key = entry.getKey();
+            setTile(getIndex(key.getFirst(), key.getSecond(), key.getThird()), entry.getValue());
         }
         nbtMapLoc.clear();
     }
@@ -266,7 +263,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntegerTrio(x, y, z), tag);
+        nbtMapLoc.put(new Triple<>(x, y, z), tag);
         return true;
     }
 

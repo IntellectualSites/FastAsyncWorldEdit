@@ -28,11 +28,6 @@ import java.util.Locale;
  */
 public final class IntArrayTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_INT_ARRAY;
-    }
-
     private final int[] value;
 
     /**

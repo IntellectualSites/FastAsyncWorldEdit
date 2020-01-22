@@ -10,11 +10,11 @@ public class MutableVector3 extends Vector3 {
     }
 
     public static MutableVector3 get(int x, int y, int z) {
-        return FaweCache.INSTANCE.getMUTABLE_VECTOR3().get().setComponents(x, y, z);
+        return FaweCache.INSTANCE.getMutableVector3().get().setComponents(x, y, z);
     }
 
     public static MutableVector3 get(double x, double y, double z) {
-        return FaweCache.INSTANCE.getMUTABLE_VECTOR3().get().setComponents(x, y, z);
+        return FaweCache.INSTANCE.getMutableVector3().get().setComponents(x, y, z);
     }
 
     public MutableVector3(double x, double y, double z) {

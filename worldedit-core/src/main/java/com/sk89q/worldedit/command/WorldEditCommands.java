@@ -46,6 +46,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.zone.ZoneRulesException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -79,7 +80,9 @@ public class WorldEditCommands {
 		
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();
-            Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
+            //noinspection MagicConstant
+            Date date = new GregorianCalendar(2000 + version.year,
+                version.month - 1, version.day)
                 .getTime();
 						
 			TextComponent dateArg = TextComponent.of(date.toLocaleString());

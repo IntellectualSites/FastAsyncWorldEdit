@@ -15,6 +15,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.List;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public final Region region;
@@ -68,6 +69,8 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
         };
     }
 
+    @NotNull
+    @Override
     public Region getRegion() {
         return region;
     }
@@ -81,7 +84,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public abstract List<? extends Entity> getEntities();
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 

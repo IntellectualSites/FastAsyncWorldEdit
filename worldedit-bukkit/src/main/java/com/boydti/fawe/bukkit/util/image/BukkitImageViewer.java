@@ -15,6 +15,7 @@ import org.bukkit.Rotation;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,12 +33,12 @@ public class BukkitImageViewer implements ImageViewer {
     private ItemFrame[][] frames;
     private boolean reverse;
 
-    public BukkitImageViewer(Player player) {
-        mapManager = ((MapManagerPlugin) Bukkit.getPluginManager().getPlugin("MapManager")).getMapManager();
+    public BukkitImageViewer(Player player, MapManager mapManager) {
+        this.mapManager = mapManager;
         this.player = player;
     }
 
-    public void selectFrame(ItemFrame start) {
+    public void selectFrame(Entity start) {
         Location pos1 = start.getLocation().clone();
         Location pos2 = start.getLocation().clone();
 
@@ -108,7 +109,7 @@ public class BukkitImageViewer implements ImageViewer {
                         Collection<Entity> entities = world.getNearbyEntities(pos, 0.1, 0.1, 0.1);
                         boolean contains = false;
                         for (Entity ent : entities) {
-                            if (ent instanceof ItemFrame && ((ItemFrame) ent).getFacing() == facing) {
+                            if (ent instanceof ItemFrame && ent.getFacing() == facing) {
                                 ItemFrame itemFrame = (ItemFrame) ent;
                                 itemFrame.setRotation(Rotation.NONE);
                                 contains = true;
@@ -137,7 +138,7 @@ public class BukkitImageViewer implements ImageViewer {
         boolean initializing = last == null;
 
         if (this.frames != null) {
-            if (image == null && drawable != null) image = drawable.draw();
+            if (image == null) image = drawable.draw();
             last = image;
             int width = frames.length;
             int height = frames[0].length;
@@ -158,7 +159,7 @@ public class BukkitImageViewer implements ImageViewer {
             } else if (player.getInventory().getHeldItemSlot() != slot) {
                 player.getInventory().setHeldItemSlot(slot);
             }
-            if (image == null && drawable != null) image = drawable.draw();
+            if (image == null) image = drawable.draw();
             last = image;
             BufferedImage scaled = ImageUtil.getScaledInstance(image, 128, 128, RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
             MapWrapper mapWrapper = mapManager.wrapImage(scaled);
@@ -169,7 +170,7 @@ public class BukkitImageViewer implements ImageViewer {
         }
     }
 
-    private int getMapSlot(Player player) {
+    private int getMapSlot(HumanEntity player) {
         PlayerInventory inventory = player.getInventory();
         for (int i = 0; i < 9; i++) {
             ItemStack item = inventory.getItem(i);
