@@ -24,6 +24,10 @@ package com.sk89q.jnbt;
  *
  */
 public final class DoubleTag extends NumberTag {
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_DOUBLE;
+    }
 
     private final double value;
 

@@ -457,7 +457,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean cancel() {
         ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
 
-        NullExtent nullExtent = new NullExtent(this, FaweCache.INSTANCE.getManual());
+        NullExtent nullExtent = new NullExtent(this, FaweCache.INSTANCE.getMANUAL());
 
         ExtentTraverser<Extent> next = traverser.next();
         if (next != null) {

@@ -32,6 +32,11 @@ import javax.annotation.Nullable;
  */
 public class ListTag extends Tag {
 
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LIST;
+    }
+
     private final Class<? extends Tag> type;
     private final List<Tag> value;
 

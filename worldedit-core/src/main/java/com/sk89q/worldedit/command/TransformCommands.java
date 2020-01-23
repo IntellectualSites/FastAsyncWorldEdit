@@ -30,7 +30,7 @@ public class TransformCommands {
             aliases = {"#l"},
             desc = "Sequentially pick from a list of transform"
     )
-    public ResettableExtent linear(Actor actor, LocalSession session, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent linear(Actor actor, LocalSession session, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         if (other instanceof RandomTransform) {
             Set<ResettableExtent> extents = ((RandomTransform) other).getExtents();
             return new LinearTransform(extents.toArray(new ResettableExtent[0]));
@@ -43,7 +43,7 @@ public class TransformCommands {
             aliases = {"#l3d"},
             desc = "Use the x,y,z coordinate to pick a transform from the list"
     )
-    public ResettableExtent linear3d(Actor actor, LocalSession session, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent linear3d(Actor actor, LocalSession session, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         if (other instanceof RandomTransform) {
             Set<ResettableExtent> extents = ((RandomTransform) other).getExtents();
             return new Linear3DTransform(extents.toArray(new ResettableExtent[0]));
@@ -55,7 +55,7 @@ public class TransformCommands {
             name = "#pattern",
             desc = "Always use a specific pattern"
     )
-    public ResettableExtent pattern(Actor actor, LocalSession session, @Arg(desc = "Pattern") Pattern pattern, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent pattern(Actor actor, LocalSession session, @Arg(desc = "Pattern") Pattern pattern, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new PatternTransform(other, pattern);
     }
 
@@ -63,7 +63,7 @@ public class TransformCommands {
             name = "#offset",
             desc = "Offset transform"
     )
-    public ResettableExtent offset(Actor actor, LocalSession session, double x, double y, double z, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent offset(Actor actor, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new OffsetExtent(other, (int) x, (int) y, (int) z);
     }
 
@@ -72,7 +72,7 @@ public class TransformCommands {
             aliases = {"#randomoffset"},
             desc = "Random offset transform"
 )
-    public ResettableExtent randomOffset(Actor actor, LocalSession session, double x, double y, double z, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent randomOffset(Actor actor, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new RandomOffsetTransform(other, (int) x, (int) y, (int) z);
     }
 
@@ -80,7 +80,7 @@ public class TransformCommands {
             name = "#scale",
             desc = "All changes will be scaled"
     )
-    public ResettableExtent scale(Actor actor, LocalSession session, double x, double y, double z, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent scale(Actor actor, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new ScaleTransform(other, x, y, z);
     }
 
@@ -88,7 +88,7 @@ public class TransformCommands {
             name = "#rotate",
             desc = "All changes will be rotate around the initial position"
     )
-    public ResettableExtent rotate(Player player, LocalSession session, double x, double y, double z, @Arg(desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent rotate(Player player, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         ExtentTraverser<TransformExtent> traverser = new ExtentTraverser<>(other).find(TransformExtent.class);
         BlockTransformExtent affine = traverser != null ? traverser.get() : null;
         if (affine == null) {

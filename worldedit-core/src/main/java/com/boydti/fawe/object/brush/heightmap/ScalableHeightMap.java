@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush.heightmap;
 
+import com.boydti.fawe.object.IntegerPair;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -11,7 +12,6 @@ import java.awt.image.Raster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
-import kotlin.Pair;
 
 public class ScalableHeightMap implements HeightMap {
     public int size2;
@@ -65,9 +65,9 @@ public class ScalableHeightMap implements HeightMap {
         int minY = clipboard.getMinimumPoint().getBlockY();
         int maxY = clipboard.getMaximumPoint().getBlockY();
         int clipHeight = maxY - minY + 1;
-        HashSet<Pair<Integer, Integer>> visited = new HashSet<>();
+        HashSet<IntegerPair> visited = new HashSet<>();
         for (BlockVector3 pos : clipboard.getRegion()) {
-            Pair<Integer, Integer> pair = new Pair<>(pos.getBlockX(), pos.getBlockZ());
+            IntegerPair pair = new IntegerPair(pos.getBlockX(), pos.getBlockZ());
             if (visited.contains(pair)) {
                 continue;
             }

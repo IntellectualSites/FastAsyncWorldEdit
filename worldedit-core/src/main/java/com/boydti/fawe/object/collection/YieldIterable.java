@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.collection;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
@@ -13,9 +12,9 @@ import java.util.function.Consumer;
 public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
     private static final Object END_MARKER = new Object();
     private final LinkedBlockingQueue<T> queue;
-    private Future<Integer> future;
+    private Future future;
 
-    public YieldIterable(@Nullable Future<Integer> task) {
+    public YieldIterable(@Nullable Future task) {
         this.queue = new LinkedBlockingQueue<>();
         this.future = task;
     }
@@ -24,11 +23,10 @@ public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
         this(null);
     }
 
-    public void setFuture(Future<Integer> future) {
+    public void setFuture(Future future) {
         this.future = future;
     }
 
-    @NotNull
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {

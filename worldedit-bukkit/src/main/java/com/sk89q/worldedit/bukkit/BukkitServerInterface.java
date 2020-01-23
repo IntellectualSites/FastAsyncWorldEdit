@@ -70,9 +70,6 @@ public class BukkitServerInterface implements MultiUserPlatform {
         dynamicCommands = new CommandRegistration(plugin);
     }
 
-    CommandRegistration getDynamicCommands() {
-        return dynamicCommands;
-    }
     boolean isHookingEvents() {
         return hookingEvents;
     }

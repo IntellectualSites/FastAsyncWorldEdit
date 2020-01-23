@@ -73,12 +73,10 @@ public final class MemBlockSet extends BlockSet {
         return rows[x >> 4].remove(this.rows, x, y, z - getBlockOffsetZ());
     }
 
-    @Override
     public BlockVector3 getMinimumPoint() {
         return BlockVector3.at(getMinX(), getMinimumY(), getMinZ());
     }
 
-    @Override
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.at(getMaxX(), getMaximumY(), getMaxZ());
     }
@@ -175,10 +173,8 @@ public final class MemBlockSet extends BlockSet {
         };
     }
 
-    @Override
     public Set<BlockVector3> getChunkCubes() {
         return new AbstractSet<BlockVector3>() {
-            @NotNull
             @Override
             public Iterator<BlockVector3> iterator() {
                 return new Iterator<BlockVector3>() {
@@ -283,6 +279,7 @@ public final class MemBlockSet extends BlockSet {
         };
     }
 
+    @Override
     public int getMinimumY() {
         int maxY = 15;
         int maxy = 16;
@@ -327,6 +324,7 @@ public final class MemBlockSet extends BlockSet {
         return by;
     }
 
+    @Override
     public int getMaximumY() {
         int maxY = 0;
         int maxy = 0;
@@ -359,8 +357,8 @@ public final class MemBlockSet extends BlockSet {
                                     maxy = y + 1;
                                 }
                                 by = (Y << 4) + y;
-                                if (by == FaweCache.worldMaxY)
-                                    return FaweCache.worldMaxY;
+                                if (by == FaweCache.WORLD_MAX_Y)
+                                    return FaweCache.WORLD_MAX_Y;
                                 break outer;
                             }
                         }
@@ -741,7 +739,6 @@ public final class MemBlockSet extends BlockSet {
         return total;
     }
 
-    @Override
     public void clear() {
         Arrays.fill(rows, NULL_ROW_X);
     }
@@ -830,7 +827,7 @@ public final class MemBlockSet extends BlockSet {
         public final IRow[] rows;
 
         public RowZ() {
-            this.rows = new IRow[FaweCache.chunkLayers];
+            this.rows = new IRow[FaweCache.CHUNK_LAYERS];
             reset();
         }
 
@@ -864,7 +861,12 @@ public final class MemBlockSet extends BlockSet {
         }
 
         public boolean isEmpty() {
-            return Arrays.stream(rows).noneMatch(row -> row instanceof RowY);
+            for (IRow row :rows) {
+                if (row instanceof RowY) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public void reset(int layer) {
@@ -872,7 +874,7 @@ public final class MemBlockSet extends BlockSet {
         }
 
         public void reset() {
-            for (int i = 0; i < FaweCache.chunkLayers; i++) rows[i] = NULL_ROW_Y;
+            for (int i = 0; i < FaweCache.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
         }
     }
 

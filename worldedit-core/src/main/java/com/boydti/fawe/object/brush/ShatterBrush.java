@@ -37,7 +37,7 @@ public class ShatterBrush extends ScatterBrush {
             LocalBlockVectorSet set = new LocalBlockVectorSet();
             set.add(pos);
             frontiers[i] = set;
-            frontiersVisited[i] = new LocalBlockVectorSet(set);
+            frontiersVisited[i] = set.clone();
             i++;
         }
         // Mask

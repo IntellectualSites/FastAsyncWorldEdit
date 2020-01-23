@@ -26,7 +26,7 @@ public class MemoryCheckingExtent extends PassthroughExtent {
                     this.player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
                 }
             }
-            WEManager.IMP.cancelEdit(this, FaweCache.INSTANCE.getLowMemory());
+            WEManager.IMP.cancelEdit(this, FaweCache.INSTANCE.getLOW_MEMORY());
         }
         return super.getExtent();
     }

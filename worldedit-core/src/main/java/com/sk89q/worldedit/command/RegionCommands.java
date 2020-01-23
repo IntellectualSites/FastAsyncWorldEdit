@@ -422,7 +422,7 @@ public class RegionCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw FaweCache.INSTANCE.getMaxChecks();
+            throw FaweCache.INSTANCE.getMAX_CHECKS();
         }
         int affected = 0;
         try {

@@ -311,7 +311,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         int size = tags.size();
         if (!tags.isEmpty()) {
             Tag tag0 = tags.get(0);
-            os.writeByte(NBTUtils.getTypeCode(tag0.getClass()));
+            os.writeByte(tag0.getTypeCode());
         } else {
             os.writeByte(NBTUtils.getTypeCode(clazz));
         }

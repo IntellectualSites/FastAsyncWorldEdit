@@ -58,7 +58,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public boolean cancel() {
         if (super.cancel()) {
-            processor.setProcessor(new NullExtent(this, FaweCache.INSTANCE.getManual()));
+            processor.setProcessor(new NullExtent(this, FaweCache.INSTANCE.getMANUAL()));
             return true;
         }
         return false;

@@ -376,7 +376,7 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static <T extends BlockStateHolder<T>> BlockData adapt(@NotNull T block) {
+    public static BlockData adapt(@NotNull BlockStateHolder block) {
         return getAdapter().adapt(block);
     }
 

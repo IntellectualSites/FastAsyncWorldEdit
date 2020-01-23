@@ -26,6 +26,11 @@ import java.util.Locale;
  */
 public final class ByteArrayTag extends Tag {
 
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_BYTE_ARRAY;
+    }
+
     private final byte[] value;
 
     /**

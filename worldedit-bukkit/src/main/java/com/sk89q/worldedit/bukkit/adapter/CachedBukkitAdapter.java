@@ -79,7 +79,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             Material material = blockData.getMaterial();
             BlockType type = BlockTypes.getFromStateId(blockTypes[material.ordinal()]);
             List<? extends Property> propList = type.getProperties();
-            if (propList.isEmpty()) return type.getDefaultState();
+            if (propList.size() == 0) return type.getDefaultState();
             String properties = blockData.getAsString();
             return BlockState.get(type, properties, type.getDefaultState());
         } catch (NullPointerException e) {

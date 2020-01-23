@@ -1,48 +1,47 @@
 // CHECKSTYLE:OFF
 package com.boydti.fawe.object.collection;
 
-/* This software is the work of Paladin Software International, Incorporated,
+/*- This software is the work of Paladin Software International, Incorporated,
  *  based upon previous work done for and by Sun Microsystems, Inc. */
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  *  This class implements a set of bits that grows as needed. Each bit of the
- *  bit set represents a {@code boolean} value. The values of a
- *  {@code SparseBitSet} are indexed by non-negative integers.
+ *  bit set represents a <code>boolean</code> value. The values of a
+ *  <code>SparseBitSet</code> are indexed by non-negative integers.
  *  Individual indexed values may be examined, set, cleared, or modified by
- *  logical operations. One {@code SparseBitSet} or logical value may be
- *  used to modify the contents of (another) {@code SparseBitSet} through
+ *  logical operations. One <code>SparseBitSet</code> or logical value may be
+ *  used to modify the contents of (another) <code>SparseBitSet</code> through
  *  logical <b>AND</b>, logical <b>inclusive OR</b>, logical <b>exclusive
  *  OR</b>, and <b>And NOT</b> operations over all or part of the bit sets.
  *  <p>
- *  All values in a bit set initially have the value {@code false}.
+ *  All values in a bit set initially have the value <code>false</code>.
  *  <p>
  *  Every bit set has a current size, which is the number of bits of space
  *  <i>nominally</i> in use by the bit set from the first set bit to just after
  *  the last set bit. The length of the bit set effectively tells the position
  *  available after the last bit of the SparseBitSet.
  *  <p>
- *  The maximum cardinality of a {@code SparseBitSet} is
- *  {@link Integer#MAX_VALUE}, which means the bits of a
- *  {@code SparseBitSet} are labelled {@code 0}&nbsp;..&nbsp;
- *  {@code Integer.MAX_VALUE&nbsp;&minus;&nbsp;1}.
- *  After the last set bit of a {@code SparseBitSet}, any attempt to find
+ *  The maximum cardinality of a <code>SparseBitSet</code> is
+ *  <code>Integer.MAX_VALUE</code>, which means the bits of a
+ *  <code>SparseBitSet</code> are labelled <code>
+ *  0</code>&nbsp;..&nbsp;<code>Integer.MAX_VALUE&nbsp;&minus;&nbsp;1</code>.
+ *  After the last set bit of a <code>SparseBitSet</code>, any attempt to find
  *  a subsequent bit (<i>nextSetBit</i>()), will return an value of &minus;1.
  *  If an attempt is made to use <i>nextClearBit</i>(), and all the bits are
  *  set from the starting position of the search to the bit labelled
- *  {@code Integer.MAX_VALUE&nbsp;&minus;&nbsp;1}, then similarly &minus;1
+ *  <code>Integer.MAX_VALUE&nbsp;&minus;&nbsp;1</code>, then similarly &minus;1
  *  will be returned.
  *  <p>
  *  Unless otherwise noted, passing a null parameter to any of the methods in
- *  a {@code SparseBitSet} will result in a
- *  {@link NullPointerException}.
+ *  a <code>SparseBitSet</code> will result in a
+ *  <code>NullPointerException</code>.
  *  <p>
- *  A {@code SparseBitSet} is not safe for multi-threaded use without
+ *  A <code>SparseBitSet</code> is not safe for multi-threaded use without
  *  external synchronization.
  *
  * @author      Bruce K. Haddon
@@ -52,6 +51,7 @@ import java.util.Arrays;
  * @version     1.0, 2009-03-17
  * @since       1.6
  */
+@SuppressWarnings("ALL")
 public class SparseBitSet implements Cloneable, Serializable
 {
     /*  My apologies for listing all the additional authors, but concepts, code,
@@ -123,7 +123,7 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  The storage for this SparseBitSet. The <i>i</i>th bit is stored in a word
-     *  represented by a long value, and is at bit position {@code i % 64}
+     *  represented by a long value, and is at bit position <code>i % 64</code>
      *  within that word (where bit position 0 refers to the least significant bit
      *  and 63 refers to the most significant bit).
      *  <p>
@@ -334,7 +334,7 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Constructor for a new (sparse) bit set. All bits initially are effectively
-     *  {@code false}. This is a internal constructor that collects all the
+     *  <code>false</code>. This is a internal constructor that collects all the
      *  needed actions to initialise the bit set.
      *  <p>
      *  The capacity is taken to be a <i>suggestion</i> for a size of the bit set,
@@ -365,7 +365,7 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Constructs an empty bit set with the default initial size.
-     *  Initially all bits are effectively {@code false}.
+     *  Initially all bits are effectively <code>false</code>.
      *
      * @since       1.6
      */
@@ -377,9 +377,9 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Creates a bit set whose initial size is large enough to efficiently
-     *  represent bits with indices in the range {@code 0} through
-     *  at least {@code nbits-1}. Initially all bits are effectively
-     *  {@code false}.
+     *  represent bits with indices in the range <code>0</code> through
+     *  at least <code>nbits-1</code>. Initially all bits are effectively
+     *  <code>false</code>.
      *  <p>
      *  No guarantees are given for how large or small the actual object will be.
      *  The setting of bits above the given range is permitted (and will perhaps
@@ -399,8 +399,8 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AND</b> of the addressed target bit with the argument
      *  value. This bit set is modified so that the addressed bit has the value
-     *  {@code true} if and only if it both initially had the value
-     *  {@code true} and the argument value is also {@code true}.
+     *  <code>true</code> if and only if it both initially had the value
+     *  <code>true</code> and the argument value is also <code>true</code>.
      *
      * @param       i a bit index
      * @param       value a boolean value to <b>AND</b> with that bit
@@ -419,17 +419,17 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AND</b> of this target bit set with the argument bit
      *  set within the given range of bits. Within the range, this bit set is
-     *  modified so that each bit in it has the value {@code true} if and only
-     *  if it both initially had the value {@code true} and the corresponding
-     *  bit in the bit set argument also had the value {@code true}. Outside
+     *  modified so that each bit in it has the value <code>true</code> if and only
+     *  if it both initially had the value <code>true</code> and the corresponding
+     *  bit in the bit set argument also had the value <code>true</code>. Outside
      *  the range, this set is not changed.
      *
      * @param       i index of the first bit to be included in the operation
      * @param       j index after the last bit to included in the operation
      * @param       b a SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void and(int i, int j, SparseBitSet b) throws IndexOutOfBoundsException
@@ -440,9 +440,9 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AND</b> of this target bit set with the argument bit
      *  set. This bit set is modified so that each bit in it has the value
-     *  {@code true} if and only if it both initially had the value
-     *  {@code true} and the corresponding bit in the bit set argument also
-     *  had the value {@code true}.
+     *  <code>true</code> if and only if it both initially had the value
+     *  <code>true</code> and the corresponding bit in the bit set argument also
+     *  had the value <code>true</code>.
      *
      * @param       b a SparseBitSet
      * @since       1.6
@@ -454,11 +454,11 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Performs a logical <b>AND</b> of the two given {@code SparseBitSet}s.
-     *  The returned {@code SparseBitSet} is created so that each bit in it
-     *  has the value {@code true} if and only if both the given sets
-     *  initially had the corresponding bits {@code true}, otherwise
-     *  {@code false}.
+     *  Performs a logical <b>AND</b> of the two given <code>SparseBitSet</code>s.
+     *  The returned <code>SparseBitSet</code> is created so that each bit in it
+     *  has the value <code>true</code> if and only if both the given sets
+     *  initially had the corresponding bits <code>true</code>, otherwise
+     *  <code>false</code>.
      *
      * @param       a a SparseBitSet
      * @param       b another SparseBitSet
@@ -475,8 +475,8 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AndNOT</b> of the addressed target bit with the
      *  argument value. This bit set is modified so that the addressed bit has the
-     *  value {@code true} if and only if it both initially had the value
-     *  {@code true} and the argument value is {@code false}.
+     *  value <code>true</code> if and only if it both initially had the value
+     *  <code>true</code> and the argument value is <code>false</code>.
      *
      * @param       i a bit index
      * @param       value a boolean value to AndNOT with that bit
@@ -495,17 +495,17 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AndNOT</b> of this target bit set with the argument
      *  bit set within the given range of bits. Within the range, this bit set is
-     *  modified so that each bit in it has the value {@code true} if and only
-     *  if it both initially had the value {@code true} and the corresponding
-     *  bit in the bit set argument has the value {@code false}. Outside
+     *  modified so that each bit in it has the value <code>true</code> if and only
+     *  if it both initially had the value <code>true</code> and the corresponding
+     *  bit in the bit set argument has the value <code>false</code>. Outside
      *  the range, this set is not changed.
      *
      * @param       i index of the first bit to be included in the operation
      * @param       j index after the last bit to included in the operation
      * @param       b the SparseBitSet with which to mask this SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void andNot(int i, int j, SparseBitSet b)
@@ -517,9 +517,9 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>AndNOT</b> of this target bit set with the argument
      *  bit set. This bit set is modified so that each bit in it has the value
-     *  {@code true} if and only if it both initially had the value
-     *  {@code true} and the corresponding bit in the bit set argument has
-     *  the value {@code false}.
+     *  <code>true</code> if and only if it both initially had the value
+     *  <code>true</code> and the corresponding bit in the bit set argument has
+     *  the value <code>false</code>.
      *
      * @param       b the SparseBitSet with which to mask this SparseBitSet
      * @since       1.6
@@ -530,12 +530,12 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Creates a bit set from thie first {@code SparseBitSet} whose
+     *  Creates a bit set from thie first <code>SparseBitSet</code> whose
      *  corresponding bits are cleared by the set bits of the second
-     *  {@code SparseBitSet}. The resulting bit set is created so that a bit
-     *  in it has the value {@code true} if and only if the corresponding bit
-     *  in the {@code SparseBitSet} of the first is set, and that same
-     *  corresponding bit is not set in the {@code SparseBitSet} of the second
+     *  <code>SparseBitSet</code>. The resulting bit set is created so that a bit
+     *  in it has the value <code>true</code> if and only if the corresponding bit
+     *  in the <code>SparseBitSet</code> of the first is set, and that same
+     *  corresponding bit is not set in the <code>SparseBitSet</code> of the second
      *  argument.
      *
      * @param a     a SparseBitSet
@@ -552,8 +552,8 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns the number of bits set to {@code true} in this
-     *  {@code SparseBitSet}.
+     *  Returns the number of bits set to <code>true</code> in this
+     *  <code>SparseBitSet</code>.
      *
      * @return      the number of bits set to true in this SparseBitSet
      * @since       1.6
@@ -565,7 +565,7 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets the bit at the specified index to {@code false}.
+     *  Sets the bit at the specified index to <code>false</code>.
      *
      * @param       i a bit index.
      * @exception   IndexOutOfBoundsException if the specified index is negative
@@ -593,14 +593,14 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets the bits from the specified {@code i} (inclusive) to the
-     *  specified {@code j} (exclusive) to {@code false}.
+     *  Sets the bits from the specified <code>i</code> (inclusive) to the
+     *  specified <code>j</code> (exclusive) to <code>false</code>.
      *
      * @param       i index of the first bit to be cleared
      * @param       j index after the last bit to be cleared
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void clear(int i, int j) throws IndexOutOfBoundsException
@@ -609,8 +609,8 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets all of the bits in this {@code SparseBitSet} to
-     *  {@code false}.
+     *  Sets all of the bits in this <code>SparseBitSet</code> to
+     *  <code>false</code>.
      *
      * @since       1.6
      */
@@ -621,15 +621,15 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Cloning this {@code SparseBitSet} produces a new
-     *  {@code SparseBitSet} that is <i>equal</i>() to it. The clone of the
+     *  Cloning this <code>SparseBitSet</code> produces a new
+     *  <code>SparseBitSet</code> that is <i>equal</i>() to it. The clone of the
      *  bit set is another bit set that has exactly the same bits set to
-     *  {@code true} as this bit set.
+     *  <code>true</code> as this bit set.
      *  <p>
      *  Note: the actual space allocated to the clone tries to minimise the actual
      *  amount of storage allocated to hold the bits, while still trying to
      *  keep access to the bits being a rapid as possible. Since the space
-     *  allocated to a {@code SparseBitSet} is not normally decreased,
+     *  allocated to a <code>SparseBitSet</code> is not normally decreased,
      *  replacing a bit set by its clone may be a way of both managing memory
      *  consumption and improving the rapidity of access.
      *
@@ -667,16 +667,16 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Compares this object against the specified object. The result is
-     *  {@code true} if and only if the argument is not {@code null}
-     *  and is a {@code SparseBitSet} object that has exactly the same bits
-     *  set to {@code true} as this bit set. That is, for every nonnegative
-     *  {@code i} indexing a bit in the set,
+     *  <code>true</code> if and only if the argument is not <code>null</code>
+     *  and is a <code>SparseBitSet</code> object that has exactly the same bits
+     *  set to <code>true</code> as this bit set. That is, for every nonnegative
+     *  <code>i</code> indexing a bit in the set,
      *  <pre>((SparseBitSet)obj).get(i) == this.get(i)</pre>
      *  must be true.
      *
      * @param       obj the Object with which to compare
-     * @return      {@code true} if the objects are equivalent;
-     *              {@code false} otherwise.
+     * @return      <code>true</code> if the objects are equivalent;
+     *              <code>false</code> otherwise.
      * @since       1.6
      */
     @Override
@@ -726,15 +726,15 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets each bit from the specified {@code i} (inclusive) to the
-     *  specified {@code j} (exclusive) to the complement of its current
+     *  Sets each bit from the specified <code>i</code> (inclusive) to the
+     *  specified <code>j</code> (exclusive) to the complement of its current
      *  value.
      *
      * @param       i index of the first bit to flip
      * @param       j index after the last bit to flip
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or is
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative, or
-     *              {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or is
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative, or
+     *              <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void flip(int i, int j) throws IndexOutOfBoundsException
@@ -744,9 +744,9 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Returns the value of the bit with the specified index. The value is
-     *  {@code true} if the bit with the index {@code i} is currently set
-     *  in this {@code SparseBitSet}; otherwise, the result is
-     *  {@code false}.
+     *  <code>true</code> if the bit with the index <code>i</code> is currently set
+     *  in this <code>SparseBitSet</code>; otherwise, the result is
+     *  <code>false</code>.
      *
      * @param       i the bit index
      * @return      the boolean value of the bit with the specified index.
@@ -768,16 +768,16 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns a new {@code SparseBitSet} composed of bits from this
-     *  {@code SparseBitSet} from {@code i} (inclusive) to {@code j}
+     *  Returns a new <code>SparseBitSet</code> composed of bits from this
+     *  <code>SparseBitSet</code> from <code>i</code> (inclusive) to <code>j</code>
      *  (exclusive).
      *
      * @param       i index of the first bit to include
      * @param       j index after the last bit to include
      * @return      a new SparseBitSet from a range of this SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or is
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative, or
-     *              {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or is
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative, or
+     *              <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public SparseBitSet get(int i, int j) throws IndexOutOfBoundsException
@@ -789,17 +789,17 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Returns a hash code value for this bit set. The hash code depends only on
-     *  which bits have been set within this {@code SparseBitSet}. The
+     *  which bits have been set within this <code>SparseBitSet</code>. The
      *  algorithm used to compute it may be described as follows.
      *  <p>
-     *  Suppose the bits in the {@code SparseBitSet} were to be stored in an
-     *  array of {@code long} integers called, say, {@code bits}, in such
-     *  a manner that bit {@code i} is set in the {@code SparseBitSet}
-     *  (for nonnegative values of  {@code i}) if and only if the expression
+     *  Suppose the bits in the <code>SparseBitSet</code> were to be stored in an
+     *  array of <code>long</code> integers called, say, <code>bits</code>, in such
+     *  a manner that bit <code>i</code> is set in the <code>SparseBitSet</code>
+     *  (for nonnegative values of  <code>i</code>) if and only if the expression
      *  <pre>
      *  ((i&gt;&gt;6) &lt; bits.length) &amp;&amp; ((bits[i&gt;&gt;6] &amp; (1L &lt;&lt; (bit &amp; 0x3F))) != 0)
      *  </pre>
-     *  is true. Then the following definition of the {@code hashCode} method
+     *  is true. Then the following definition of the <code>hashCode</code> method
      *  would be a correct implementation of the actual algorithm:
      *  <pre>
      *  public int hashCode()
@@ -824,19 +824,19 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns true if the specified {@code SparseBitSet} has any bits
-     *  within the given range {@code i} (inclusive) to {@code j}
-     *  (exclusive) set to {@code true} that are also set to {@code true}
-     *  in the same range of this {@code SparseBitSet}.
+     *  Returns true if the specified <code>SparseBitSet</code> has any bits
+     *  within the given range <code>i</code> (inclusive) to <code>j</code>
+     *  (exclusive) set to <code>true</code> that are also set to <code>true</code>
+     *  in the same range of this <code>SparseBitSet</code>.
      *
      * @param       i index of the first bit to include
      * @param       j index after the last bit to include
      * @param       b the SparseBitSet with which to intersect
      * @return      the boolean indicating whether this SparseBitSet intersects the
      *              specified SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public boolean intersects(int i, int j, SparseBitSet b)
@@ -847,9 +847,9 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns true if the specified {@code SparseBitSet} has any bits set to
-     *  {@code true} that are also set to {@code true} in this
-     *  {@code SparseBitSet}.
+     *  Returns true if the specified <code>SparseBitSet</code> has any bits set to
+     *  <code>true</code> that are also set to <code>true</code> in this
+     *  <code>SparseBitSet</code>.
      *
      * @param       b a SparseBitSet with which to intersect
      * @return      boolean indicating whether this SparseBitSet intersects the
@@ -863,8 +863,8 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns true if this {@code SparseBitSet} contains no bits that are
-     *  set to {@code true}.
+     *  Returns true if this <code>SparseBitSet</code> contains no bits that are
+     *  set to <code>true</code>.
      *
      * @return      the boolean indicating whether this SparseBitSet is empty
      * @since       1.6
@@ -876,9 +876,9 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns the "logical length" of this {@code SparseBitSet}: the index
-     *  of the highest set bit in the {@code SparseBitSet} plus one. Returns
-     *  zero if the {@code SparseBitSet} contains no set bits.
+     *  Returns the "logical length" of this <code>SparseBitSet</code>: the index
+     *  of the highest set bit in the <code>SparseBitSet</code> plus one. Returns
+     *  zero if the <code>SparseBitSet</code> contains no set bits.
      *
      * @return      the logical length of this SparseBitSet
      * @since       1.6
@@ -890,7 +890,7 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns the index of the first bit that is set to {@code false} that
+     *  Returns the index of the first bit that is set to <code>false</code> that
      *  occurs on or after the specified starting index.
      *
      * @param       i the index to start checking from (inclusive)
@@ -957,12 +957,12 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Returns the index of the first bit that is set to {@code true} that
+     *  Returns the index of the first bit that is set to <code>true</code> that
      *  occurs on or after the specified starting index. If no such it exists then
      *  -1 is returned.
      *  <p>
-     *  To iterate over the {@code true} bits in a {@code SparseBitSet
-     *  sbs}, use the following loop:
+     *  To iterate over the <code>true</code> bits in a <code>SparseBitSet
+     *  sbs</code>, use the following loop:
      *
      *  <pre>
      *  for( int i = sbbits.nextSetBit(0); i &gt;= 0; i = sbbits.nextSetBit(i+1) )
@@ -1168,8 +1168,8 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>OR</b> of the addressed target bit with the
      *  argument value. This bit set is modified so that the addressed bit has the
-     *  value {@code true} if and only if it both initially had the value
-     *  {@code true} or the argument value is {@code true}.
+     *  value <code>true</code> if and only if it both initially had the value
+     *  <code>true</code> or the argument value is <code>true</code>.
      *
      * @param       i a bit index
      * @param       value a boolean value to OR with that bit
@@ -1188,18 +1188,18 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>OR</b> of the addressed target bit with the
      *  argument value within the given range. This bit set is modified so that
-     *  within the range a bit in it has the value {@code true} if and only if
-     *  it either already had the value {@code true} or the corresponding bit
-     *  in the bit set argument has the value {@code true}. Outside the range
+     *  within the range a bit in it has the value <code>true</code> if and only if
+     *  it either already had the value <code>true</code> or the corresponding bit
+     *  in the bit set argument has the value <code>true</code>. Outside the range
      *  this set is not changed.
      *
      * @param       i index of the first bit to be included in the operation
      * @param       j index after the last bit to included in the operation
      * @param       b the SparseBitSet with which to perform the <b>OR</b>
      *              operation with this SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void or(int i, int j, SparseBitSet b) throws IndexOutOfBoundsException
@@ -1209,9 +1209,9 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Performs a logical <b>OR</b> of this bit set with the bit set argument.
-     *  This bit set is modified so that a bit in it has the value {@code true}
-     *  if and only if it either already had the value {@code true} or the
-     *  corresponding bit in the bit set argument has the value {@code true}.
+     *  This bit set is modified so that a bit in it has the value <code>true</code>
+     *  if and only if it either already had the value <code>true</code> or the
+     *  corresponding bit in the bit set argument has the value <code>true</code>.
      *
      * @param       b the SparseBitSet with which to perform the <b>OR</b>
      *              operation with this SparseBitSet
@@ -1223,11 +1223,11 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Performs a logical <b>OR</b> of the two given {@code SparseBitSet}s.
-     *  The returned {@code SparseBitSet} is created so that a bit in it has
-     *  the value {@code true} if and only if it either had the value
-     *  {@code true} in the set given by the first arguemetn or had the value
-     *  {@code true} in the second argument, otherwise {@code false}.
+     *  Performs a logical <b>OR</b> of the two given <code>SparseBitSet</code>s.
+     *  The returned <code>SparseBitSet</code> is created so that a bit in it has
+     *  the value <code>true</code> if and only if it either had the value
+     *  <code>true</code> in the set given by the first arguemetn or had the value
+     *  <code>true</code> in the second argument, otherwise <code>false</code>.
      *
      * @param       a a SparseBitSet
      * @param       b another SparseBitSet
@@ -1287,14 +1287,14 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets the bits from the specified {@code i} (inclusive) to the specified
-     *  {@code j} (exclusive) to {@code true}.
+     *  Sets the bits from the specified <code>i</code> (inclusive) to the specified
+     *  <code>j</code> (exclusive) to <code>true</code>.
      *
      * @param       i index of the first bit to be set
      * @param       j index after the last bit to be se
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or is
-     *              equal to Integer.MAX_INT, or {@code j} is negative, or
-     *              {@code i} is larger than {@code j}.
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or is
+     *              equal to Integer.MAX_INT, or <code>j</code> is negative, or
+     *              <code>i</code> is larger than <code>j</code>.
      * @since       1.6
      */
     public void set(int i, int j) throws IndexOutOfBoundsException
@@ -1303,15 +1303,15 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Sets the bits from the specified {@code i} (inclusive) to the specified
-     *  {@code j} (exclusive) to the specified value.
+     *  Sets the bits from the specified <code>i</code> (inclusive) to the specified
+     *  <code>j</code> (exclusive) to the specified value.
      *
      * @param       i index of the first bit to be set
      * @param       j index after the last bit to be set
      * @param       value to which to set the selected bits
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or is
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative, or
-     *              {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or is
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative, or
+     *              <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void set(int i, int j, boolean value)
@@ -1324,7 +1324,7 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Returns the number of bits of space nominally in use by this
-     *  {@code SparseBitSet} to represent bit values. The count of bits in
+     *  <code>SparseBitSet</code> to represent bit values. The count of bits in
      *  the set is the (label of the last set bit) + 1 - (the label of the first
      *  set bit).
      *
@@ -1360,7 +1360,7 @@ public class SparseBitSet implements Cloneable, Serializable
      *  <p>
      *  This method is intended for diagnostic use (as it is relatively expensive
      *  in time), but can be useful in understanding an application's use of a
-     *  {@code SparseBitSet}.
+     *  <code>SparseBitSet</code>.
      *
      * @param       values an array for the individual results (if not null)
      * @return      a String detailing the statistics of the bit set
@@ -1423,7 +1423,7 @@ public class SparseBitSet implements Cloneable, Serializable
 
     /**
      *  Returns a string representation of this bit set. For every index for which
-     *  this {@code SparseBitSet} contains a bit in the set state, the decimal
+     *  this <code>SparseBitSet</code> contains a bit in the set state, the decimal
      *  representation of that index is included in the result. Such indices are
      *  listed in order from lowest to highest. If there is a subsequence of set
      *  bits longer than the value given by toStringCompaction, the subsequence
@@ -1437,22 +1437,22 @@ public class SparseBitSet implements Cloneable, Serializable
      *  <pre>
      *      SparseBitSet drPepper = new SparseBitSet();
      *  </pre>
-     *  Now {@code drPepper.toString()} returns "{@code {}}".
+     *  Now <code>drPepper.toString()</code> returns "<code>{}</code>".
      *  <br>
      *  <pre>
      *      drPepper.set(2);
      *  </pre>
-     *  Now {@code drPepper.toString()} returns "{@code {2}}".
+     *  Now <code>drPepper.toString()</code> returns "<code>{2}</code>".
      *  <br>
      *  <pre>
      *      drPepper.set(3, 4);
      *      drPepper.set(10);
      *  </pre>
-     *  Now {@code drPepper.toString()} returns "{@code {2..4, 10}}".
+     *  Now <code>drPepper.toString()</code> returns "<code>{2..4, 10}</code>".
      *  <br>
      *  This method is intended for diagnostic use (as it is relatively expensive
      *  in time), but can be useful in interpreting problems in an application's use
-     *  of a {@code SparseBitSet}.
+     *  of a <code>SparseBitSet</code>.
      *
      * @return      a String representation of this SparseBitSet
      * @see         #toStringCompaction(int length)
@@ -1504,18 +1504,18 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /** Sequences of set bits longer than this value are shown by
-     *  {@link #toString()} as a "sub-sequence," in the form {@code a..b}.
+     *  {@link #toString()} as a "sub-sequence," in the form <code>a..b</code>.
      *  Setting this value to zero causes each set bit to be listed individually.
      *  The default default value is 2 (which means sequences of three or more
      *  bits set are shown as a subsequence, and all other set bits are listed
      *  individually).
      *  <p>
-     *  Note: this value will be passed to {@code SparseBitSet}s that
+     *  Note: this value will be passed to <code>SparseBitSet</code>s that
      *  may be created within or as a result of the operations on this bit set,
      *  or, for static methods, from the value belonging to the first parameter.
      *
      * @param       count the maximum count of a run of bits that are shown as
-     *              individual entries in a {@code toString}() conversion.
+     *              individual entries in a <code>toString</code>() conversion.
      *              If 0, all bits are shown individually.
      * @since       1.6
      * @see         #toString()
@@ -1526,9 +1526,9 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  If <i>change</i> is {@code true}, the current value of the
+     *  If <i>change</i> is <code>true</code>, the current value of the
      *  <i>toStringCompaction</i>() value is made the default value for all
-     *  {@code SparseBitSet}s created from this point onward in this JVM.
+     *  <code>SparseBitSet</code>s created from this point onward in this JVM.
      *
      * @param       change if true, change the default value
      * @since       1.6
@@ -1546,17 +1546,17 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>XOR</b> of the addressed target bit with the
      *  argument value. This bit set is modified so that the addressed bit has the
-     *  value {@code true} if and only one of the following statements holds:
+     *  value <code>true</code> if and only one of the following statements holds:
      *  <ul>
-     *  <li>The addressed bit initially had the value {@code true}, and the
-     *      value of the argument is {@code false}.
-     *  <li>The bit initially had the value {@code false}, and the
-     *      value of the argument is {@code true}.
+     *  <li>The addressed bit initially had the value <code>true</code>, and the
+     *      value of the argument is <code>false</code>.
+     *  <li>The bit initially had the value <code>false</code>, and the
+     *      value of the argument is <code>true</code>.
      * </ul>
      *
      * @param       i a bit index
      * @param       value a boolean value to <b>XOR</b> with that bit
-     * @exception   IndexOutOfBoundsException if the specified index
+     * @exception   java.lang.IndexOutOfBoundsException if the specified index
      *              is negative
      *              or equal to Integer.MAX_VALUE
      * @since       1.6
@@ -1572,13 +1572,13 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>XOR</b> of this bit set with the bit set argument
      *  within the given range. This resulting bit set is computed so that a bit
-     *  within the range in it has the value {@code true} if and only if one
+     *  within the range in it has the value <code>true</code> if and only if one
      *  of the following statements holds:
      *  <ul>
-     *  <li>The bit initially had the value {@code true}, and the
-     *      corresponding bit in the argument set has the value {@code false}.
-     *  <li>The bit initially had the value {@code false}, and the
-     *      corresponding bit in the argument set has the value {@code true}.
+     *  <li>The bit initially had the value <code>true</code>, and the
+     *      corresponding bit in the argument set has the value <code>false</code>.
+     *  <li>The bit initially had the value <code>false</code>, and the
+     *      corresponding bit in the argument set has the value <code>true</code>.
      * </ul>
      *  Outside the range this set is not changed.
      *
@@ -1586,9 +1586,9 @@ public class SparseBitSet implements Cloneable, Serializable
      * @param       j index after the last bit to included in the operation
      * @param       b the SparseBitSet with which to perform the <b>XOR</b>
      *              operation with this SparseBitSet
-     * @exception   IndexOutOfBoundsException if {@code i} is negative or
-     *              equal to Integer.MAX_VALUE, or {@code j} is negative,
-     *              or {@code i} is larger than {@code j}
+     * @exception   IndexOutOfBoundsException if <code>i</code> is negative or
+     *              equal to Integer.MAX_VALUE, or <code>j</code> is negative,
+     *              or <code>i</code> is larger than <code>j</code>
      * @since       1.6
      */
     public void xor(int i, int j, SparseBitSet b) throws IndexOutOfBoundsException
@@ -1599,12 +1599,12 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  Performs a logical <b>XOR</b> of this bit set with the bit set argument.
      *  This resulting bit set is computed so that a bit in it has the value
-     *  {@code true} if and only if one of the following statements holds:
+     *  <code>true</code> if and only if one of the following statements holds:
      *  <ul>
-     *  <li>The bit initially had the value {@code true}, and the
-     *      corresponding bit in the argument set has the value {@code false}.
-     *  <li>The bit initially had the value {@code false}, and the
-     *      corresponding bit in the argument set has the value {@code true}.
+     *  <li>The bit initially had the value <code>true</code>, and the
+     *      corresponding bit in the argument set has the value <code>false</code>.
+     *  <li>The bit initially had the value <code>false</code>, and the
+     *      corresponding bit in the argument set has the value <code>true</code>.
      * </ul>
      *
      * @param       b the SparseBitSet with which to perform the <b>XOR</b>
@@ -1617,16 +1617,16 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     * Performs a logical <b>XOR</b> of the two given {@code SparseBitSet}s.
+     * Performs a logical <b>XOR</b> of the two given <code>SparseBitSet</code>s.
      *  The resulting bit set is created so that a bit in it has the value
-     *  {@code true} if and only if one of the following statements holds:
+     *  <code>true</code> if and only if one of the following statements holds:
      *  <ul>
-     *  <li>A bit in the first argument has the value {@code true}, and the
+     *  <li>A bit in the first argument has the value <code>true</code>, and the
      *      corresponding bit in the second argument has the value
-     *      {@code false}.</li>
-     *  <li>A bit in the first argument has the value {@code false}, and the
+     *      <code>false</code>.</li>
+     *  <li>A bit in the first argument has the value <code>false</code>, and the
      *      corresponding bit in the second argument has the value
-     *      {@code true}.</li></ul>
+     *      <code>true</code>.</li></ul>
      *
      * @param       a a SparseBitSet
      * @param       b another SparseBitSet
@@ -1645,7 +1645,7 @@ public class SparseBitSet implements Cloneable, Serializable
     //==============================================================================
 
     /**
-     *  Throw the exception to indicate a range error. The {@code String}
+     *  Throw the exception to indicate a range error. The <code>String</code>
      *  constructed reports all the possible errors in one message.
      *
      * @param       i lower bound for a operation
@@ -1743,7 +1743,7 @@ public class SparseBitSet implements Cloneable, Serializable
      *  Scans over the bit set (and a second bit set if part of the operation) are
      *  all performed by this method. The properties and the operation executed
      *  are defined by a given strategy, which must be derived from the
-     *  {@code AbstractStrategy}. The strategy defines how to operate on a
+     *  <code>AbstractStrategy</code>. The strategy defines how to operate on a
      *  single word, and on whole words that may or may not constitute a full
      *  block of words.
      *
@@ -1993,7 +1993,7 @@ public class SparseBitSet implements Cloneable, Serializable
     //==============================================================================
 
     /**
-     *  Save the state of the {@code SparseBitSet} instance to a stream
+     *  Save the state of the <code>SparseBitSet</code> instance to a stream
      *  (<i>i.e.</i>, serialize it).
      *
      * @param       s the ObjectOutputStream to which to write the serialized object
@@ -2004,10 +2004,10 @@ public class SparseBitSet implements Cloneable, Serializable
      * @serialData  The default data is emitted, followed by the current
      *              <i>compactionCount</i> for the bit set, and then the
      *              <i>length</i> of the set (the position of the last bit),
-     *              followed by the <i>cache.count</i> value (an {@code int},
-     *              the number of {@code int->long} pairs needed to describe
-     *              the set), followed by the index ({@code int}) and word
-     *              ({@code long}) for each {@code int->long} pair.
+     *              followed by the <i>cache.count</i> value (an <code>int</code>,
+     *              the number of <code>int-&gt;long</code> pairs needed to describe
+     *              the set), followed by the index (<code>int</code>) and word
+     *              (<code>long</code>) for each <code>int-&gt;long</code> pair.
      *              The mappings need not be emitted in any particular order. This
      *              is followed by the <i>hashCode</i> for the set that can be used
      *              as an integrity check when the bit set is read back.
@@ -2056,7 +2056,7 @@ public class SparseBitSet implements Cloneable, Serializable
     private static final long serialVersionUID = -6663013367427929992L;
 
     /**
-     *  Reconstitute the {@code SparseBitSet} instance from a stream
+     *  Reconstitute the <code>SparseBitSet</code> instance from a stream
      *  (<i>i.e.</i>, deserialize it).
      *
      * @param       s the ObjectInputStream to use
@@ -2110,12 +2110,12 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  These enumeration values are used as labels for the values in the String
      *  created by the <i>statistics</i>() method. The values of the corresponding
-     *  statistics are {@code int}s, except for the loadFactor and
-     *  Average_chain_length values, which are {@code float}s.
+     *  statistics are <code>int</code>s, except for the loadFactor and
+     *  Average_chain_length values, which are <code>float</code>s.
      *  <p>
-     *  An array of {@code String}s may be obtained containing a
+     *  An array of <code>String</code>s may be obtained containing a
      *  representation of each of these values. An element of such an array, say,
-     *  {@code values}, may be accessed, for example, by:
+     *  <code>values</code>, may be accessed, for example, by:
      *  <pre>
      *      values[SparseBitSet.statistics.Buckets_available.ordinal()]</pre>
      *
@@ -2243,12 +2243,12 @@ public class SparseBitSet implements Cloneable, Serializable
     /**
      *  This strategy class is used by the setScanner to carry out the a variety
      *  of operations on this set, and usually a second set. The
-     *  <i>setScanner</i>() method of the main {@code SparseBitSet} class
+     *  <i>setScanner</i>() method of the main <code>SparseBitSet</code> class
      *  essentially finds matching level3 blocks, and then calls the strategy to
      *  do the appropriate operation on each of the elements of the block.
      *  <p>
      *  The symbolic constants control optimisation paths in the
-     *  <i>setScanner</i>() method of the main {@code SparseBitSet} class.
+     *  <i>setScanner</i>() method of the main <code>SparseBitSet</code> class.
      *
      *  @see SparseBitSet#setScanner(int i, int j,
      *                          SparseBitSet b, AbstractStrategy op)
@@ -2366,7 +2366,10 @@ public class SparseBitSet implements Cloneable, Serializable
          */
         protected final boolean isZeroBlock(long[] a3)
         {
-            return Arrays.stream(a3).noneMatch(word -> word != 0L);
+            for (long word : a3)
+                if (word != 0L)
+                    return false;
+            return true;
         }
     }
 

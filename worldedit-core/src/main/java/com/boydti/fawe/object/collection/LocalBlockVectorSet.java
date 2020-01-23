@@ -22,11 +22,6 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         offsetX = offsetZ = Integer.MAX_VALUE;
         this.set = new SparseBitSet();
     }
-    public LocalBlockVectorSet(LocalBlockVectorSet copy) {
-        this.offsetX = copy.offsetX;
-        this.offsetZ = copy.offsetZ;
-        this.set = copy.set.clone();
-    }
 
     public LocalBlockVectorSet(int x, int z, SparseBitSet set) {
         this.offsetX = x;
@@ -60,7 +55,12 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         }
         return false;
     }
-    
+
+    @Override
+    public LocalBlockVectorSet clone() {
+        return new LocalBlockVectorSet(offsetX, offsetZ, set.clone());
+    }
+
     public boolean containsRadius(int x, int y, int z, int radius) {
         if (radius <= 0) {
             return contains(x, y, z);

@@ -67,7 +67,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      *
      * @return center point
      */
-    Vector3 getCenter();
+    default Vector3 getCenter() {
+        return getMinimumPoint().add(getMaximumPoint()).toVector3().divide(2);
+    }
 
     /**
      * Get the number of blocks in the region.
@@ -193,9 +195,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     List<BlockVector2> polygonize(int maxPoints);
 
+    default int getMinimumY() {
+        return getMinimumPoint().getY();
+    }
+
+    default int getMaximumY() {
+        return getMaximumPoint().getY();
+    }
+
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
-        int minSection = Math.max(0, getMinimumPoint().getBlockY() >> 4);
-        int maxSection = Math.min(15, getMaximumPoint().getBlockY() >> 4);
+        int minSection = Math.max(0, getMinimumY() >> 4);
+        int maxSection = Math.min(15, getMaximumY() >> 4);
         for (int layer = minSection; layer <= maxSection; layer++) {
             if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
             block = block.initLayer(get, set, layer);

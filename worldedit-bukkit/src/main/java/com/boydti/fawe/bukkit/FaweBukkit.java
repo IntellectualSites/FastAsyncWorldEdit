@@ -48,7 +48,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.inventivetalent.mapmanager.MapManagerPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,6 @@ public class FaweBukkit implements IFawe, Listener {
     private static final Logger log = LoggerFactory.getLogger(FaweBukkit.class);
 
     private final Plugin plugin;
-    private final String separator = System.lineSeparator();
     private VaultUtil vault;
     private ItemUtil itemUtil;
 
@@ -75,7 +73,11 @@ public class FaweBukkit implements IFawe, Listener {
             Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
             Fawe.setupInjector();
-            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            try {
+                new BrushListener(plugin);
+            } catch (Throwable e) {
+                log.debug("Brush Listener Failed", e);
+            }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
@@ -140,7 +142,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            ImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(player), ((MapManagerPlugin) manager.getPlugin("MapManager")).getMapManager());
+            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(player));
             if (imageListener == null) {
                 this.imageListener = new BukkitImageListener(plugin);
             }
@@ -208,11 +210,11 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        msg.append("Server Version: ").append(Bukkit.getVersion()).append(separator);
-        msg.append("Plugins: " + separator);
+        msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
+        msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - ").append(p.getName()).append(": ")
-                .append(p.getDescription().getVersion()).append(separator);
+                .append(p.getDescription().getVersion()).append("\n");
         }
         return msg.toString();
     }

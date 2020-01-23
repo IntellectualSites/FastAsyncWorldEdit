@@ -456,7 +456,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public Iterator<MutableBiomeChange> getBiomeIterator(final boolean dir) throws IOException {
         final FaweInputStream is = getBiomeIS();
         if (is == null) {
-            return Collections.emptyIterator();
+            return new ArrayList<MutableBiomeChange>().iterator();
         }
         final MutableBiomeChange change = new MutableBiomeChange();
         return new Iterator<MutableBiomeChange>() {
@@ -570,7 +570,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableEntityChange> getEntityIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return Collections.emptyIterator();
+            return new ArrayList<MutableEntityChange>().iterator();
         }
         final MutableEntityChange change = new MutableEntityChange(null, create);
         try {
@@ -619,7 +619,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableTileChange> getTileIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return Collections.emptyIterator();
+            return new ArrayList<MutableTileChange>().iterator();
         }
         final MutableTileChange change = new MutableTileChange(null, create);
         try {

@@ -30,7 +30,7 @@ public class BukkitReflectionUtils {
         try {
             final Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
             final Object handle = getHandle.invoke(server);
-            final Class<?> handleServerClass = handle.getClass();
+            final Class handleServerClass = handle.getClass();
             pas = handleServerClass.getName().split("\\.");
             if (pas.length == 5) {
                 final String verM = pas[3];

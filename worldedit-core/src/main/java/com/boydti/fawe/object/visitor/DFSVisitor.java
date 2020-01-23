@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.object.IntegerTrio;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -19,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import kotlin.Triple;
 
 public abstract class DFSVisitor implements Operation {
 
@@ -57,11 +57,11 @@ public abstract class DFSVisitor implements Operation {
         return this.directions;
     }
 
-    private Triple[] getIntDirections() {
-        Triple[] array = new Triple[directions.size()];
+    private IntegerTrio[] getIntDirections() {
+        IntegerTrio[] array = new IntegerTrio[directions.size()];
         for (int i = 0; i < array.length; i++) {
             BlockVector3 dir = directions.get(i);
-            array[i] = new Triple<>(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
+            array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
         }
         return array;
     }
@@ -83,7 +83,7 @@ public abstract class DFSVisitor implements Operation {
 //        MutableBlockVector3 mutable = new MutableBlockVector3();
 //        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         int countAdd, countAttempt;
-        Triple[] dirs = getIntDirections();
+        IntegerTrio[] dirs = getIntDirections();
 
         for (int layer = 0; !queue.isEmpty(); layer++) {
             current = queue.poll();
@@ -99,11 +99,11 @@ public abstract class DFSVisitor implements Operation {
             function.apply(bv);
             countAdd = 0;
             countAttempt = 0;
-            for (Triple<Integer,Integer,Integer> direction : dirs) {
+            for (IntegerTrio direction : dirs) {
 //                mutable2.mutX(from.getX() + direction.x);
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
-                BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.getFirst(), from.getY() + direction.getSecond(), from.getZ() + direction.getThird());
+                BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
                 if (isVisitable(bv, bv2)) {
                     adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if ((!adjacent.equals(current.from))) {

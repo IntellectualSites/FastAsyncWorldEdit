@@ -2,7 +2,6 @@ package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.regions.FaweMaskManager;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permissible;
 
 public abstract class BukkitMaskManager extends FaweMaskManager {
 
@@ -10,7 +9,7 @@ public abstract class BukkitMaskManager extends FaweMaskManager {
         super(plugin);
     }
 
-    public boolean hasMemberPermission(Permissible player) {
+    public boolean hasMemberPermission(Player player) {
         return player.hasPermission("fawe." + getKey() + ".member");
     }
 }

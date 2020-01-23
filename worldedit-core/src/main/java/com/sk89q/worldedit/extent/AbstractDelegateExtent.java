@@ -129,7 +129,12 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
             new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
         }
     }
-    
+
+    @Override
+    public int getMaxY() {
+        return extent.getMaxY();
+    }
+
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return extent.getBlock(x, y, z);
@@ -172,12 +177,14 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
         return extent.setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }
 

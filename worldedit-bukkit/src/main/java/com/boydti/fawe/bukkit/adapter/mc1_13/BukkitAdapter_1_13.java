@@ -15,6 +15,7 @@ import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.Chunk;
+import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_13_R2.ChunkSection;
 import net.minecraft.server.v1_13_R2.DataBits;
 import net.minecraft.server.v1_13_R2.DataPalette;
@@ -29,6 +30,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
@@ -208,8 +210,8 @@ public final class BukkitAdapter_1_13 extends NMSAdapter {
         }
         final int[] blockToPalette = FaweCache.INSTANCE.getBLOCK_TO_PALETTE().get();
         final int[] paletteToBlock = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
-        final long[] blockStates = FaweCache.INSTANCE.getBlockStates().get();
-        final int[] blocksCopy = FaweCache.INSTANCE.getSectionBlocks().get();
+        final long[] blockStates = FaweCache.INSTANCE.getBLOCK_STATES().get();
+        final int[] blocksCopy = FaweCache.INSTANCE.getSECTION_BLOCKS().get();
         try {
             int[] num_palette_buffer = new int[1];
             int air;

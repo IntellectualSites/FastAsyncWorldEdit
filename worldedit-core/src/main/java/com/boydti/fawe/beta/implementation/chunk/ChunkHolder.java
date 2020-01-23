@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.Range;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
@@ -40,9 +39,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
     private IQueueExtent extent; // the parent queue extent which has this chunk
-    @Range(from = 0, to = 15)
     private int chunkX;
-    @Range(from = 0, to = 15)
     private int chunkZ;
 
     public ChunkHolder() {

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.inventory;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -106,10 +107,10 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                 try {
                     blockBag.fetchPlacedBlock(block.toImmutableState());
                 } catch (UnplaceableBlockException e) {
-                    throw FaweCache.INSTANCE.getBlockBag();
+                    throw FaweCache.INSTANCE.getBLOCK_BAG();
                 } catch (BlockBagException e) {
                     missingBlocks[block.getBlockType().getInternalId()]++;
-                    throw FaweCache.INSTANCE.getBlockBag();
+                    throw FaweCache.INSTANCE.getBLOCK_BAG();
                 }
             }
             if (mine) {

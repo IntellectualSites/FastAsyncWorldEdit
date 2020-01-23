@@ -78,7 +78,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(30000000, FaweCache.worldMaxY, 30000000);
+        return BlockVector3.at(30000000, FaweCache.WORLD_MAX_Y, 30000000);
     }
 
     /**

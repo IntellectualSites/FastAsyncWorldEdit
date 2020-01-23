@@ -286,7 +286,7 @@ public class BukkitImageListener implements Listener {
                         EditSession es = new EditSessionBuilder(bukkitPlayer.getWorld()).player(bukkitPlayer)
                             .combineStages(false).autoQueue(false).blockBag(null).limitUnlimited()
                             .build();
-                        ExtentTraverser<Extent> last = new ExtentTraverser<>(es.getExtent()).last();
+                        ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
                         Extent extent = last.get();
                         if (extent instanceof IQueueExtent) {
                             last = last.previous();

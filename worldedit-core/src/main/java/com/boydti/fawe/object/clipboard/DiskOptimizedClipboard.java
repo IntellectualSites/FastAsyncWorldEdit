@@ -3,6 +3,7 @@ package com.boydti.fawe.object.clipboard;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
+import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -38,10 +39,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import kotlin.Triple;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -52,7 +51,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static int HEADER_SIZE = 14;
 
-    private final HashMap<Triple<Integer,Integer,Integer>, CompoundTag> nbtMap;
+    private final HashMap<IntegerTrio, CompoundTag> nbtMap;
     private final File file;
 
     private RandomAccessFile braf;
@@ -61,41 +60,45 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private FileChannel fileChannel;
     private boolean hasBiomes;
 
-    public DiskOptimizedClipboard(BlockVector3 dimensions, UUID uuid) throws IOException {
+    public DiskOptimizedClipboard(BlockVector3 dimensions, UUID uuid) {
         this(dimensions, MainUtil.getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
     }
 
-    public DiskOptimizedClipboard(BlockVector3 dimensions) throws IOException {
+    public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(dimensions, MainUtil.getFile(Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"));
     }
 
-    public DiskOptimizedClipboard(BlockVector3 dimensions, File file) throws IOException {
+    public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
         if (getWidth() > Character.MAX_VALUE || getHeight() > Character.MAX_VALUE || getLength() > Character.MAX_VALUE) {
             throw new IllegalArgumentException("Too large");
         }
         nbtMap = new HashMap<>();
-        this.file = file;
         try {
-            if (!file.exists()) {
-                File parent = file.getParentFile();
-                if (parent != null) {
-                    file.getParentFile().mkdirs();
+            this.file = file;
+            try {
+                if (!file.exists()) {
+                    File parent = file.getParentFile();
+                    if (parent != null) {
+                        file.getParentFile().mkdirs();
+                    }
+                    file.createNewFile();
                 }
-                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            this.braf = new RandomAccessFile(file, "rw");
+            long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
+            braf.setLength(0);
+            braf.setLength(fileLength);
+            init();
+            // write getLength() etc
+            byteBuffer.putChar(2, (char) getWidth());
+            byteBuffer.putChar(4, (char) getHeight());
+            byteBuffer.putChar(6, (char) getLength());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        this.braf = new RandomAccessFile(file, "rw");
-        long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
-        braf.setLength(0);
-        braf.setLength(fileLength);
-        init();
-        // write getLength() etc
-        byteBuffer.putChar(2, (char) getWidth());
-        byteBuffer.putChar(4, (char) getHeight());
-        byteBuffer.putChar(6, (char) getLength());
     }
 
     @Override
@@ -307,9 +310,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             CompoundTag nbt;
             if (nbtMap.size() < 4) {
                 nbt = null;
-                for (Entry<Triple<Integer, Integer, Integer>, CompoundTag> entry : nbtMap.entrySet()) {
-                    Triple<Integer, Integer, Integer> key = entry.getKey();
-                    int index = getIndex(key.getFirst(), key.getSecond(), key.getThird());
+                for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
+                    IntegerTrio key = entry.getKey();
+                    int index = getIndex(key.x, key.y, key.z);
                     if (index == i) {
                         nbt = entry.getValue();
                         break;
@@ -320,7 +323,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 int newI = i - y * getArea();
                 int z = newI / getWidth();
                 int x = newI - z * getWidth();
-                nbt = nbtMap.get(new Triple<>(x, y, z));
+                nbt = nbtMap.get(new IntegerTrio(x, y, z));
             }
             return state.toBaseBlock(nbt);
         }
@@ -329,7 +332,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private BaseBlock toBaseBlock(BlockState state, int x, int y, int z) {
         if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-            CompoundTag nbt = nbtMap.get(new Triple<>(x, y, z));
+            CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
             return state.toBaseBlock(nbt);
         }
         return state.toBaseBlock();
@@ -360,7 +363,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new Triple<>(x, y, z), tag);
+        nbtMap.put(new IntegerTrio(x, y, z), tag);
         Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
@@ -424,4 +427,16 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this.entities.remove(entity);
     }
 
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
+        while (iter.hasNext()) {
+            BlockArrayClipboard.ClipboardEntity entity = iter.next();
+            UUID entUUID = entity.getState().getNbtData().getUUID();
+            if (uuid.equals(entUUID)) {
+                iter.remove();
+                return;
+            }
+        }
+    }
 }

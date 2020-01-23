@@ -1,7 +1,5 @@
 package com.boydti.fawe.util;
 
-import kotlin.UInt;
-
 public class MathMan {
 
     /**
@@ -416,10 +414,4 @@ public class MathMan {
     public static boolean isPowerOfTwo(int x) {
         return (x & (x - 1)) == 0;
     }
-
-    public static int floor(double value) {
-        int i = (int)value;
-        return value < (double)i ? i - 1 : i;
-    }
-
 }

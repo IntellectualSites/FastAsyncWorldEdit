@@ -30,6 +30,7 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
@@ -202,8 +203,8 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         }
         final int[] blockToPalette = FaweCache.INSTANCE.getBLOCK_TO_PALETTE().get();
         final int[] paletteToBlock = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
-        final long[] blockStates = FaweCache.INSTANCE.getBlockStates().get();
-        final int[] blocksCopy = FaweCache.INSTANCE.getSectionBlocks().get();
+        final long[] blockStates = FaweCache.INSTANCE.getBLOCK_STATES().get();
+        final int[] blocksCopy = FaweCache.INSTANCE.getSECTION_BLOCKS().get();
         try {
             int[] num_palette_buffer = new int[1];
             int air;

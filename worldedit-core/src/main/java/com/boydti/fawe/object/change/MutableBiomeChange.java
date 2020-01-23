@@ -8,7 +8,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 public class MutableBiomeChange implements Change {
 
-    private final MutableBlockVector2 mutable = new MutableBlockVector2();
+    private MutableBlockVector2 mutable = new MutableBlockVector2();
     private int from;
     private int to;
 

@@ -87,7 +87,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.metadata.Metadatable;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -576,7 +575,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         return wePlayer;
     }
 
-    public BukkitPlayer getCachedPlayer(Metadatable player) {
+    public BukkitPlayer getCachedPlayer(Player player) {
         List<MetadataValue> meta = player.getMetadata("WE");
         if (meta == null || meta.isEmpty()) {
             return null;
@@ -649,24 +648,15 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             String buffer = event.getBuffer();
             int firstSpace = buffer.indexOf(' ');
             if (firstSpace < 0) return;
-            String label = buffer.substring(1, firstSpace);
-            Plugin owner = server.getDynamicCommands().getCommandOwner(label);
-            if (owner != WorldEditPlugin.this) {
-                return;
-            }
-            int plSep = label.indexOf(":");
-            if (plSep >= 0 && plSep < label.length() + 1) {
-                label = label.substring(plSep + 1);
-                buffer = "/" + buffer.substring(plSep + 2);
-            }
+            final String label = buffer.substring(0, firstSpace);
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
             if (!command.isPresent()) return;
 
-            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), buffer);
+            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), event.getBuffer());
             getWorldEdit().getEventBus().post(suggestEvent);
 
-            event.setCompletions(CommandUtil.fixSuggestions(buffer, suggestEvent.getSuggestions()));
+            event.setCompletions(CommandUtil.fixSuggestions(event.getBuffer(), suggestEvent.getSuggestions()));
             event.setHandled(true);
         }
     }

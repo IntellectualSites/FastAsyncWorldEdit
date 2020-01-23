@@ -54,7 +54,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BlockArrayClipboard extends DelegateClipboard implements Clipboard, Closeable {
 
-    @NotNull
     private Region region;
     private BlockVector3 offset;
 
@@ -86,7 +85,6 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard,
         setRegion(region);
     }
 
-    @NotNull
     @Override
     public Region getRegion() {
         return region;

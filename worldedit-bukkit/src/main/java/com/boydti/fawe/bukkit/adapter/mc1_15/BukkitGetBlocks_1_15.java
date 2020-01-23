@@ -96,7 +96,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         BiomeStorage index = getChunk().getBiomeIndex();
         BiomeBase base = null;
         if (y == -1) {
-            for (y = 0; y < FaweCache.worldHeight; y++) {
+            for (y = 0; y < FaweCache.WORLD_HEIGHT; y++) {
                 base = index.getBiome(x, y, z);
                 if (base != null) break;
             }
@@ -324,7 +324,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             if (biome != null) {
                                 final Biome craftBiome = BukkitAdapter.adapt(biome);
                                 BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
-                                for (int y = 0; y < FaweCache.worldHeight; y++) {
+                                for (int y = 0; y < FaweCache.WORLD_HEIGHT; y++) {
                                     currentBiomes.setBiome(x, y, z, nmsBiome);
                                 }
                             }

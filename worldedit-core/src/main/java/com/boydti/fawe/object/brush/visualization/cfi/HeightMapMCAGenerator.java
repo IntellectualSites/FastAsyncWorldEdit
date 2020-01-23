@@ -7,9 +7,13 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.filter.block.AbstractFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ArrayFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.MultiFilterBlock;
+import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.blocks.FallbackChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -35,6 +39,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -54,6 +59,7 @@ import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -1557,12 +1563,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         char[] floor = this.floor.get();
         char[] overlay = this.overlay != null ? this.overlay.get() : null;
         try {
-            int[] indexes = FaweCache.INSTANCE.getIndexStore().get();
+            int[] indexes = FaweCache.INSTANCE.getINDEX_STORE().get();
 
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            int[] heightMap = FaweCache.INSTANCE.getHeightStore().get();
+            int[] heightMap = FaweCache.INSTANCE.getHEIGHT_STORE().get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;

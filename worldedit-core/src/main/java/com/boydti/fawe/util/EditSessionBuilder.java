@@ -232,11 +232,11 @@ public class EditSessionBuilder {
         event.setExtent(extent);
         eventBus.post(event);
         if (event.isCancelled()) {
-            return new NullExtent(extent, FaweCache.INSTANCE.getManual());
+            return new NullExtent(extent, FaweCache.INSTANCE.getMANUAL());
         }
         final Extent toReturn = event.getExtent();
         if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
-            return new NullExtent(toReturn, FaweCache.INSTANCE.getManual());
+            return new NullExtent(toReturn, FaweCache.INSTANCE.getMANUAL());
         }
 //        if (!(toReturn instanceof AbstractDelegateExtent)) {
 //            Fawe.debug("Extent " + toReturn + " must be AbstractDelegateExtent");
@@ -316,7 +316,7 @@ public class EditSessionBuilder {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
                     player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
                 }
-                throw FaweCache.INSTANCE.getLowMemory();
+                throw FaweCache.INSTANCE.getLOW_MEMORY();
             }
         }
 //        this.originalLimit = limit;
@@ -420,7 +420,7 @@ public class EditSessionBuilder {
             FaweRegionExtent regionExtent = null;
             if (allowedRegions != null) {
                 if (allowedRegions.length == 0) {
-                    regionExtent = new NullExtent(this.extent, FaweCache.INSTANCE.getNoRegion());
+                    regionExtent = new NullExtent(this.extent, FaweCache.INSTANCE.getNO_REGION());
                 } else {
 //                    this.extent = new ProcessedWEExtent(this.extent, this.limit);
                     if (allowedRegions.length == 1) {

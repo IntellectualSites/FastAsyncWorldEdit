@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.collection;
 
-import com.google.common.base.Functions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -16,7 +15,7 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
     private final Function<V, V2> value;
     private final Function<K, K2> key;
 
-    private static final Function SAME = Functions.identity();
+    private static final Function SAME = o -> o;
 
     private static final Function IMMUTABLE = o -> { throw new UnsupportedOperationException("Immutable"); };
 

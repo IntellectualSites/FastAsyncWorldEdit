@@ -26,6 +26,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class StringTag extends Tag {
 
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_STRING;
+    }
+
     private final String value;
 
     /**
