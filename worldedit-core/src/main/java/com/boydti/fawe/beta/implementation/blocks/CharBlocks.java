@@ -97,13 +97,13 @@ public abstract class CharBlocks implements IBlocks {
         return BlockTypesCache.states[get(x, y, z)];
     }
 
-    public char get(int x, int y, int z) {
+    public char get(int x, @Range(from = 0, to = 255) int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         return sections[layer].get(this, layer, index);
     }
 
-    public void set(int x, int y, int z, char value) {
+    public void set(int x, @Range(from = 0, to = 255) int y, int z, char value) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         try {
@@ -130,13 +130,13 @@ public abstract class CharBlocks implements IBlocks {
 
     public static abstract class Section {
 
-        public abstract char[] get(CharBlocks blocks, int layer);
+        public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
 
-        public final char get(CharBlocks blocks, int layer, int index) {
+        public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
             return get(blocks, layer)[index];
         }
 
-        public final void set(CharBlocks blocks, int layer, int index, char value) {
+        public final void set(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index, char value) {
             get(blocks, layer)[index] = value;
         }
     }

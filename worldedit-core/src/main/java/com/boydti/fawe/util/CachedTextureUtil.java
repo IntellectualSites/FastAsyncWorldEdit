@@ -6,9 +6,9 @@ import java.io.FileNotFoundException;
 
 public class CachedTextureUtil extends DelegateTextureUtil {
     private final TextureUtil parent;
-    private transient Int2ObjectOpenHashMap<BlockType> colorBlockMap;
-    private transient Int2ObjectOpenHashMap<Integer> colorBiomeMap;
-    private transient Int2ObjectOpenHashMap<BlockType[]> colorLayerMap;
+    private final transient Int2ObjectOpenHashMap<BlockType> colorBlockMap;
+    private final transient Int2ObjectOpenHashMap<Integer> colorBiomeMap;
+    private final transient Int2ObjectOpenHashMap<BlockType[]> colorLayerMap;
 
     public CachedTextureUtil(TextureUtil parent) throws FileNotFoundException {
         super(parent);
@@ -39,7 +39,7 @@ public class CachedTextureUtil extends DelegateTextureUtil {
         }
         BiomeColor result = parent.getNearestBiome(color);
         if (result != null) {
-            colorBiomeMap.put((int) color, (Integer) result.id);
+            colorBiomeMap.put(color, (Integer) result.id);
         }
         return result;
     }
@@ -52,7 +52,7 @@ public class CachedTextureUtil extends DelegateTextureUtil {
         }
         BlockType result = parent.getNearestBlock(color);
         if (result != null) {
-            colorBlockMap.put((int) color, result);
+            colorBlockMap.put(color, result);
         }
         return result;
     }

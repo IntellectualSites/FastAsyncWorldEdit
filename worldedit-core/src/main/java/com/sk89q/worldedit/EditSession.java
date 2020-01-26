@@ -141,6 +141,7 @@ import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -865,7 +866,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, B block) {
         this.changes++;
         try {
             return this.getExtent().setBlock(x, y, z, block);

@@ -8,6 +8,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.jetbrains.annotations.Range;
 
 public interface IChunkExtent<T extends IChunk> extends Extent {
     /**
@@ -20,7 +21,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     T getOrCreateChunk(int chunkX, int chunkZ);
 
     @Override
-    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B state) {
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, B state) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }

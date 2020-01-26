@@ -1,11 +1,6 @@
 package com.boydti.fawe.util;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -24,80 +19,11 @@ public class ReflectionUtils {
     }
 
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName) {
-        try {
-            return addEnum(enumType, enumName, new Class<?>[]{}, new Object[]{});
-        } catch (Throwable ignore) {
-            return ReflectionUtils9.addEnum(enumType, enumName);
-        }
-    }
-
-    public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName, Class<?>[] additionalTypes, Object[] additionalValues) {
-
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-
-        try {
-
-            // 2. Copy it
-            T[] previousValues = (T[]) valuesField.get(enumType);
-            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
-
-            // 3. build new enum
-            T newValue = (T) makeEnum(enumType, // The target enum class
-                    enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
-                    values.size(),
-                    additionalTypes, // can be used to pass values to the enum constructor
-                    additionalValues); // can be used to pass values to the enum constructor
-
-            // 4. add new value
-            values.add(newValue);
-
-            // 5. Set new values field
-            setFailsafeFieldValue(valuesField, null,
-                    values.toArray((T[]) Array.newInstance(enumType, 0)));
-
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
-            return newValue;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static Object makeEnum(Class<?> enumClass, String value, int ordinal,
-                                  Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
-        Object[] parms = new Object[additionalValues.length + 2];
-        parms[0] = value;
-        parms[1] = ordinal;
-        System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
-        return enumClass.cast(getConstructorAccessor(enumClass, additionalTypes).newInstance(parms));
-    }
-
-    private static ConstructorAccessor getConstructorAccessor(Class<?> enumClass,
-                                                              Class<?>[] additionalParameterTypes) throws NoSuchMethodException {
-        Class<?>[] parameterTypes = new Class[additionalParameterTypes.length + 2];
-        parameterTypes[0] = String.class;
-        parameterTypes[1] = int.class;
-        System.arraycopy(additionalParameterTypes, 0,
-                parameterTypes, 2, additionalParameterTypes.length);
-        return ReflectionFactory.getReflectionFactory().newConstructorAccessor(enumClass.getDeclaredConstructor(parameterTypes));
+        return ReflectionUtils9.addEnum(enumType, enumName);
     }
 
     public static void setAccessibleNonFinal(Field field)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -134,12 +60,7 @@ public class ReflectionUtils {
             throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         setAccessibleNonFinal(field);
-        try {
-            FieldAccessor fa = ReflectionFactory.getReflectionFactory().newFieldAccessor(field, false);
-            fa.set(target, value);
-        } catch (NoSuchMethodError error) {
-            field.set(target, value);
-        }
+        field.set(target,value);
     }
 
     private static void blankField(Class<?> enumClass, String fieldName)

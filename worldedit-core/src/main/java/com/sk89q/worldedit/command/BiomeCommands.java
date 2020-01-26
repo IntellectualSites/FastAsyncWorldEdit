@@ -202,10 +202,6 @@ public class BiomeCommands {
                 "worldedit.setbiome.changed",
                 TextComponent.of(visitor.getAffected())
         ));
-        if (!player.hasPermission("fawe.tips")) {
-            System.out.println("TODO FIXME tips");
-//            TranslatableComponent.of("fawe.tips.tip.biome.pattern").or(TranslatableComponent.of("fawe.tips.tip.biome.mask")).send(player);
-        }
     }
 
 }

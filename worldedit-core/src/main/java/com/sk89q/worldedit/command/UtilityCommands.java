@@ -81,6 +81,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -90,6 +91,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -702,18 +704,19 @@ public class UtilityCommands {
             desc = "Confirm a command"
     )
     @CommandPermissions(value = "fawe.confirm", queued = false)
-    public void confirm(Player fp) throws WorldEditException {
-        if (!fp.confirm()) {
-            fp.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));
+    public void confirm(Player player) throws WorldEditException {
+        if (!player.confirm()) {
+            player.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
 
     public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
-        return Lists.transform(files, input -> { // Keep this functional, as transform is evaluated lazily
-            URI uri = input.toURI();
-            String path = getPath(root, input, uuid);
-            return new AbstractMap.SimpleEntry<>(uri, path);
-        });
+        return files.stream()
+            .map(input -> { // Keep this functional, as transform is evaluated lazily
+                URI uri = input.toURI();
+                String path = getPath(root, input, uuid);
+                return new SimpleEntry<>(uri, path);
+            }).collect(Collectors.toList());
     }
 
     public static enum URIType {
@@ -724,7 +727,7 @@ public class UtilityCommands {
     }
 
     public static List<Component> entryToComponent(File root, List<Map.Entry<URI, String>> entries, Function<URI, Boolean> isLoaded, QuadFunction<String, String, URIType, Boolean, Component> adapter) {
-        return Lists.transform(entries, input -> {
+        return entries.stream().map(input -> {
             URI uri = input.getKey();
             String path = input.getValue();
 
@@ -741,11 +744,13 @@ public class UtilityCommands {
                 if (file.isDirectory()) {
                     type = URIType.DIRECTORY;
                 } else {
-                    if (name.indexOf('.') != -1) name = name.substring(0, name.lastIndexOf('.'));
+                    if (name.indexOf('.') != -1)
+                        name = name.substring(0, name.lastIndexOf('.'));
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new RuntimeException(new StopExecutionException(TextComponent.of("Invalid path")));
+                        throw new RuntimeException(
+                            new StopExecutionException(TextComponent.of("Invalid path")));
                     }
                 } catch (IOException ignore) {
                 }
@@ -756,7 +761,7 @@ public class UtilityCommands {
             }
 
             return adapter.apply(name, path, type, loaded);
-        });
+        }).collect(Collectors.toList());
     }
 
     public static List<File> getFiles(File dir, Actor actor, List<String> args, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst) {
@@ -806,8 +811,7 @@ public class UtilityCommands {
         boolean listMine = false;
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
-            for (int i = 0; i < len; i++) {
-                String arg = args.get(i);
+            for (String arg : args) {
                 switch (arg.toLowerCase()) {
                     case "me":
                     case "mine":
@@ -827,7 +831,10 @@ public class UtilityCommands {
                         if (arg.endsWith("/") || arg.endsWith(File.separator)) {
                             arg = arg.replace("/", File.separator);
                             String newDirFilter = dirFilter + arg;
-                            boolean exists = new File(dir, newDirFilter).exists() || playerFolder && MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + newDirFilter)).exists();
+                            boolean exists =
+                                new File(dir, newDirFilter).exists() || playerFolder && MainUtil
+                                    .resolveRelative(
+                                        new File(dir, actor.getUniqueId() + newDirFilter)).exists();
                             if (!exists) {
                                 arg = arg.substring(0, arg.length() - File.separator.length());
                                 if (arg.length() > 3 && arg.length() <= 16) {
@@ -839,8 +846,7 @@ public class UtilityCommands {
                                 }
                             }
                             dirFilter = newDirFilter;
-                        }
-                        else {
+                        } else {
                             filters.add(arg);
                         }
                         break;

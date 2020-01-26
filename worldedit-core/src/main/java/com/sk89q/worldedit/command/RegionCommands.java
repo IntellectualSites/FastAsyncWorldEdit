@@ -224,8 +224,8 @@ public class RegionCommands {
 
     @Command(
         name = "/line",
-        desc = "Draws a line segment between cuboid selection corners",
-        descFooter = "Can only be used with a cuboid selection"
+        desc = "Draws line segments between cuboid selection corners or convex polyhedral selection vertices",
+        descFooter = "Can only be used with a cuboid selection or a convex polyhedral selection"
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
@@ -490,8 +490,8 @@ public class RegionCommands {
                             boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
                             boolean ignoreAirBlocks,
-                    @Switch(name = 'e', desc = "Skip copy entities")
-                            boolean skipEntities,
+                    @Switch(name = 'e', desc = "Also copy entities")
+                        boolean copyEntities,
                     @Switch(name = 'b', desc = "Also copy biomes")
                             boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
@@ -509,7 +509,7 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.moveRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask, replace);
+        int affected = editSession.moveRegion(region, direction, count, copyEntities, copyBiomes, combinedMask, replace);
 
         if (moveSelection) {
             try {
@@ -561,8 +561,8 @@ public class RegionCommands {
                          boolean moveSelection,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name = 'e', desc = "Skip entities")
-                         boolean skipEntities,
+                     @Switch(name = 'e', desc = "Also copy entities")
+                         boolean copyEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
@@ -579,7 +579,7 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.stackCuboidRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask);
+        int affected = editSession.stackCuboidRegion(region, direction, count, copyEntities, copyBiomes, combinedMask);
 
         if (moveSelection) {
             try {
@@ -695,7 +695,7 @@ public class RegionCommands {
     @Confirm(Confirm.Processor.REGION)
     public int hollow(Actor actor, EditSession editSession,
                       @Selection Region region,
-                      @Range(from = 0, to = Integer.MAX_VALUE) @Arg(desc = "Thickness of the shell to leave", def = "0")
+                      @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,

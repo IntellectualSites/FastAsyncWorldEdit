@@ -14,9 +14,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
     }
 
     private int index;
-    private int[] biomeMixBuffer = new int[3];
-    private Int2ObjectOpenHashMap<Integer> offsets = new Int2ObjectOpenHashMap<>();
-    private Int2ObjectOpenHashMap<int[]> biomeMixes = new Int2ObjectOpenHashMap<>();
+    private final int[] biomeMixBuffer = new int[3];
+    private final Int2ObjectOpenHashMap<Integer> offsets = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectOpenHashMap<int[]> biomeMixes = new Int2ObjectOpenHashMap<>();
 
     protected int addRandomColor(int c1, int c2) {
         int red1 = (c1 >> 16) & 0xFF;
@@ -81,7 +81,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     @Override
     public BlockType getNearestBlock(int color) {
-        int offsetColor = offsets.getOrDefault((Object) color, 0);
+        int offsetColor = offsets.getOrDefault((Object)color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {

@@ -153,6 +153,8 @@ public class LocalSession implements TextureHolder {
 
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
+    @SuppressWarnings("unused")
+    private transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
@@ -395,6 +397,9 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
+        // Don't store anything if no changes were made
+        if (editSession.size() == 0) return;
+        
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
@@ -940,9 +945,9 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Get the snapshot that has been selected.
+     * Get the legacy snapshot that has been selected.
      *
-     * @return the snapshot
+     * @return the legacy snapshot
      */
     @Nullable
     public Snapshot getSnapshot() {

@@ -66,7 +66,6 @@ public class ToolUtilCommands {
 
     @Command(
             name = "mask",
-            aliases = {"/mask"},
             desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
@@ -83,16 +82,18 @@ public class ToolUtilCommands {
             return;
         }
         if (maskOpt == null) {
-            player.print(TranslatableComponent.of("worldedit.tool.mask.disabled"));
+            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
             return;
-    }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-        settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
-        settings.setMask(maskOpt);
-        tool.update();
-        player.print(TranslatableComponent.of("worldedit.tool.mask.set"));
+        } else {
+            BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+            String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get()))
+                .getSubstring();
+            settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
+            settings.setMask(maskOpt);
+            tool.update();
+            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.set"));
+        }
     }
 
     @Command(
@@ -109,7 +110,7 @@ public class ToolUtilCommands {
                          Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.printInfo(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
     }
         if (pattern == null) {
@@ -121,7 +122,7 @@ public class ToolUtilCommands {
 	        settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
 	        tool.update();
 		}
-		player.print(TranslatableComponent.of("worldedit.tool.material.set"));
+		player.printInfo(TranslatableComponent.of("worldedit.tool.material.set"));
     }
 
     @Command(

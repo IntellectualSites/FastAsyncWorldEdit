@@ -167,13 +167,14 @@ public class ChunkCommands {
             actor.printDebug(String.format("%d chunks total marked for deletion. (May have overlaps).",
                     currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum()));
         }
-        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.GRAY)
+        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.LIGHT_PURPLE)
                 .append(TextComponent.of("/stop", TextColor.AQUA)
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/stop"))));
     }
 
     private static class ChunkListPaginationBox extends PaginationBox.ListPaginationBox {
         //private final Region region;
+        private final List<BlockVector2> chunks = null;
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%", region.getChunks());

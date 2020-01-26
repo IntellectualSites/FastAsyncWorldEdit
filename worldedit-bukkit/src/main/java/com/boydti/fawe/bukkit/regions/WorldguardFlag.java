@@ -23,18 +23,18 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
 
     private WorldGuardPlugin worldguard;
 
-    public WorldguardFlag(Plugin p2) {
+    public WorldguardFlag(Plugin plugin) {
         super("worldguardflag");
-        this.worldguard = (WorldGuardPlugin) p2; // this.getWorldGuard();
+        this.worldguard = (WorldGuardPlugin) plugin; // this.getWorldGuard();
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp);
+    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+        final Player player = BukkitAdapter.adapt(wePlayer);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final RegionContainer container = WorldGuard.getInstance().getPlatform()
             .getRegionContainer();
-        final RegionManager manager = container.get(fp.getWorld());
+        final RegionManager manager = container.get(wePlayer.getWorld());
 
         return new FaweMask(new ManagerRegion(manager, localplayer)) {
             @Override

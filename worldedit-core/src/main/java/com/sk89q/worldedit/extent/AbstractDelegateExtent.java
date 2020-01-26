@@ -45,6 +45,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -183,7 +184,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T block)
         throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }

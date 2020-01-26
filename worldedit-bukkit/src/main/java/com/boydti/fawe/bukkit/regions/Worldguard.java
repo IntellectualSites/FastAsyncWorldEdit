@@ -89,8 +89,8 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp);
+    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+        final Player player = BukkitAdapter.adapt(wePlayer);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final Location location = player.getLocation();
         final ProtectedRegion myregion = this.getRegion(localplayer, location);

@@ -572,7 +572,7 @@ public class SelectionCommands {
     public void select(Actor actor, World world, LocalSession session,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
-                       @Arg(desc = "Selector mask", def = "") Mask maskOpt,
+                       @Arg(desc = "Selector mask") Mask maskOpt,
                        @Switch(name = 'd', desc = "Set default selector")
                            boolean setDefaultSelector) throws WorldEditException {
         if (selector == null) {

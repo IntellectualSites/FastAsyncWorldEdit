@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import org.jetbrains.annotations.Range;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private static Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
@@ -82,7 +83,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T holder) {
         set(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;

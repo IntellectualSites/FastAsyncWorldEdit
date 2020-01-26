@@ -116,11 +116,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     void setOrigin(BlockVector3 origin);
 
     /**
-     * Returns true if the clipboard has biome data. This can be checked since {@link
-     * Extent#getBiome(BlockVector2)} strongly suggests returning {@link
-     * com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null} if biomes aren't
-     * present. However, it might not be desired to set areas to ocean if the clipboard is
-     * defaulting to ocean, instead of having biomes explicitly set.
+     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
+     * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes#OCEAN} instead of {@code null}
+     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
+     * to ocean, instead of having biomes explicitly set.
      *
      * @return true if the clipboard has biome data set
      */
@@ -298,9 +297,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
+        paste(extent, to, pasteAir, false, false);
+    }
+
+    default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         final BlockVector3 origin = this.getOrigin();
 
-        final boolean copyBiomes = this.hasBiomes();
         // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)
         final int relx = to.getBlockX() - origin.getBlockX();
         final int rely = to.getBlockY() - origin.getBlockY();
@@ -312,9 +314,11 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             BaseBlock block = pos.getFullBlock(this);
             int xx = pos.getX() + relx;
             int zz = pos.getZ() + relz;
-            if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
-                mpos2d.setComponents(xx, zz);
-                extent.setBiome(mpos2d, Clipboard.this.getBiome(pos.toBlockVector2()));
+            if (hasBiomes()) {
+                if (pasteBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
+                    mpos2d.setComponents(xx, zz);
+                    extent.setBiome(mpos2d, Clipboard.this.getBiome(pos.toBlockVector2()));
+                }
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
@@ -329,17 +333,19 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         final int entityOffsetY = to.getBlockY() - origin.getBlockY();
         final int entityOffsetZ = to.getBlockZ() - origin.getBlockZ();
         // entities
-        for (Entity entity : this.getEntities()) {
-            // skip players on pasting schematic
-            if (entity.getState() != null && entity.getState().getType().getId()
-                .equals("minecraft:player")) {
-                continue;
+        if (pasteEntities) {
+            for (Entity entity : this.getEntities()) {
+                // skip players on pasting schematic
+                if (entity.getState() != null && entity.getState().getType().getId()
+                    .equals("minecraft:player")) {
+                    continue;
+                }
+                Location pos = entity.getLocation();
+                Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
+                    pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                    pos.getPitch());
+                extent.createEntity(newPos, entity.getState());
             }
-            Location pos = entity.getLocation();
-            Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
-                pos.getPitch());
-            extent.createEntity(newPos, entity.getState());
         }
     }
 }

@@ -2,12 +2,10 @@ package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -65,8 +63,4 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         return hasBiomes;
     }
 
-    @Override
-    public void close() {
-
-    }
 }

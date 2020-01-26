@@ -10,7 +10,6 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BlockTypesCache {
@@ -127,10 +127,7 @@ public class BlockTypesCache {
         int[] result = new int[maxStateId];
         Arrays.fill(result, -1);
         int[] state = new int[props.size()];
-        int[] sizes = new int[props.size()];
-        for (int i = 0; i < props.size(); i++) {
-            sizes[i] = props.get(i).getValues().size();
-        }
+        int[] sizes = props.stream().mapToInt(prop -> prop.getValues().size()).toArray();
         int index = 0;
         outer:
         while (true) {
@@ -177,7 +174,11 @@ public class BlockTypesCache {
             Registries registries = platform.getRegistries();
             BlockRegistry blockReg = registries.getBlockRegistry();
             Collection<String> blocks = blockReg.values();
-            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
+            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> {
+                    return item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('['))
+                        : item;
+                },
+                Function.identity()));
 
             int size = blockMap.size() + 1;
             Field[] idFields = BlockID.class.getDeclaredFields();
@@ -208,21 +209,22 @@ public class BlockTypesCache {
                 }
             }
 
-            { // Register new blocks
-                int internalId = 1;
-                for (Map.Entry<String, String> entry : blockMap.entrySet()) {
-                    String defaultState = entry.getValue();
-                    // Skip already registered ids
-                    for (; values[internalId] != null; internalId++);
-                    BlockType type = register(defaultState, internalId, stateList);
-                    values[internalId] = type;
+            // Register new blocks
+            int internalId = 1;
+            for (Map.Entry<String, String> entry : blockMap.entrySet()) {
+                String defaultState = entry.getValue();
+                // Skip already registered ids
+                while (values[internalId] != null) {
+                    internalId++;
                 }
+                BlockType type = register(defaultState, internalId, stateList);
+                values[internalId] = type;
             }
             for (int i = 0; i < values.length; i++) {
                 if (values[i] == null) values[i] = values[0];
             }
 
-            states = stateList.toArray(new BlockState[stateList.size()]);
+            states = stateList.toArray(new BlockState[0]);
 
 
         } catch (Throwable e) {

@@ -12,7 +12,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -81,7 +80,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public abstract List<? extends Entity> getEntities();
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 

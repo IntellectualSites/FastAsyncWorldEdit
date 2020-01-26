@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -32,7 +32,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
-
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -80,9 +79,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return (max.getX() - min.getX() + 1) *
-                (max.getY() - min.getY() + 1) *
-                (max.getZ() - min.getZ() + 1);
+        return (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
     }
 
     /**

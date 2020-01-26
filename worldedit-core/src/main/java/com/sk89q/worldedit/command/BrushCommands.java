@@ -506,11 +506,11 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.scatter")
     public void scatterBrush(InjectedValueAccess context, @Arg(desc = "Pattern") Pattern fill,
-        @Arg(desc = "Expression", def = "5")
+        @Arg(desc = "radius", def = "5")
             Expression radius,
-        @Arg(desc = "double", def = "5")
+        @Arg(desc = "points", def = "5")
             double points,
-        @Arg(desc = "double", def = "1")
+        @Arg(desc = "distance", def = "1")
             double distance,
         @Switch(name = 'o', desc = "Overlay the block") boolean overlay) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -640,7 +640,7 @@ public class BrushCommands {
     @Command(
             name = "clipboard",
             desc = "@Deprecated use instead: `/br copypaste`)",
-            descFooter = "Chooses the clipboard brush.\n" +
+            descFooter = "Choose the clipboard brush.\n" +
                    "Without the -p flag, the paste will appear centered at the target location. " +
                    "With the flag, then the paste will appear relative to where you had " +
                    "stood relative to the copied area when you copied it."
@@ -652,8 +652,8 @@ public class BrushCommands {
                                    boolean ignoreAir,
                                @Switch(name = 'o', desc = "Paste starting at the target location, instead of centering on it")
                                    boolean usingOrigin,
-                               @Switch(name = 'e', desc = "Skip paste entities if available")
-                                   boolean skipEntities,
+                               @Switch(name = 'e', desc = "Paste entities if available")
+                                   boolean pasteEntities,
                                @Switch(name = 'b', desc = "Paste biomes if available")
                                    boolean pasteBiomes,
                                @ArgFlag(name = 'm', desc = "Skip blocks matching this mask in the clipboard", def = "")
@@ -673,7 +673,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(size.getBlockZ() / 2D - 1);
 
         set(context,
-            new ClipboardBrush(newHolder, ignoreAir, usingOrigin, !skipEntities, pasteBiomes, sourceMask));
+            new ClipboardBrush(newHolder, ignoreAir, usingOrigin, pasteEntities, pasteBiomes, sourceMask));
     }
 
     @Command(
@@ -695,9 +695,7 @@ public class BrushCommands {
         FaweLimit limit = Settings.IMP.getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
 
-        set(context,
-            new SmoothBrush(iterations, maskOpt))
-                .setSize(radius);
+        set(context, new SmoothBrush(iterations, maskOpt)).setSize(radius);
     }
 
     @Command(
@@ -865,9 +863,7 @@ public class BrushCommands {
         @Arg(desc = "Command to run") List<String> input) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         String cmd = StringMan.join(input, " ");
-        set(context,
-            new CommandBrush(cmd))
-                .setSize(radius);
+        set(context, new CommandBrush(cmd)).setSize(radius);
     }
 
     @Command(

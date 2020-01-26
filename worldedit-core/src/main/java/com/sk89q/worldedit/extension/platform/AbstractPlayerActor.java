@@ -178,8 +178,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             if (free == 2) {
                 final BlockVector3 pos = mutablePos.setComponents(x, y - 2, z);
                 final BlockState state = world.getBlock(pos);
-                setPosition(new Location(world,
-                    Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
+                setPosition(Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5));
                 return;
             }
 
@@ -198,8 +197,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             final BlockVector3 pos = BlockVector3.at(x, y, z);
             final BlockState id = world.getBlock(pos);
             if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(new Location(world,
-                    Vector3.at(x + 0.5, y + +BlockTypeUtil.centralTopLimit(id), z + 0.5)));
+                setPosition(Vector3.at(x + 0.5, y + +BlockTypeUtil.centralTopLimit(id), z + 0.5));
                 return;
             }
 
@@ -274,7 +272,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean descendLevel() {
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY());
+        int y = Math.max(0, pos.getBlockY() - 1);
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
@@ -472,22 +470,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return getBlockTrace(range, false);
     }
 
-    /**
-     * Advances the block target block until the current block is a free
-     * @return true if a free spot is found
-     */
-    private boolean advanceToFree(TargetBlock hitBlox) {
-        Location curBlock;
-        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
-            if (canPassThroughBlock(curBlock)) {
-                return true;
-            }
-
-            hitBlox.getNextBlock();
-        }
-
-        return false;
-    }
 
     @Override
     public Location getSolidBlockTrace(int range) {
@@ -554,6 +536,22 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return false;
     }
 
+    /**
+     * Advances the block target block until the current block is a free
+     * @return true if a free spot is found
+     */
+    private boolean advanceToFree(TargetBlock hitBlox) {
+        Location curBlock;
+        while ((curBlock = hitBlox.getCurrentBlock()) != null) {
+            if (canPassThroughBlock(curBlock)) {
+                return true;
+            }
+
+            hitBlox.getNextBlock();
+        }
+
+        return false;
+    }
     @Override
     public boolean passThroughForwardWall(int range) {
         TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
@@ -619,7 +617,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     @Override
     public void checkPermission(String permission) throws AuthorizationException {
         if (!hasPermission(permission)) {
-            throw new AuthorizationException(Caption.toString(Caption.of("fawe.error.no-perm", permission)));
+            throw new AuthorizationException();
         }
     }
 
