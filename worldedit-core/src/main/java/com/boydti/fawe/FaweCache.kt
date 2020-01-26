@@ -422,19 +422,6 @@ object FaweCache : Trimable {
             return null
         } else {
             val clazz = value.javaClass
-            if (clazz.name.startsWith("com.intellectualcrafters.jnbt")) {
-                try {
-                    if (clazz.name == "com.intellectualcrafters.jnbt.EndTag") {
-                        return EndTag()
-                    }
-                    val field = clazz.getDeclaredField("value")
-                    field.isAccessible = true
-                    return asTag(field.get(value))
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
-
-            }
             println("Invalid nbt: $value")
             return null
         }
@@ -477,12 +464,11 @@ object FaweCache : Trimable {
         val nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS
         val queue = ArrayBlockingQueue<Runnable>(nThreads)
         return object : ThreadPoolExecutor(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS, queue, Executors.defaultThreadFactory(),
-                ThreadPoolExecutor.CallerRunsPolicy()) {
+                0L, TimeUnit.MILLISECONDS, queue, Executors.defaultThreadFactory(), CallerRunsPolicy()) {
             override fun afterExecute(r: Runnable?, t: Throwable?) {
-                var t = t
+                var throwable = t
                 try {
-                    super.afterExecute(r, t)
+                    super.afterExecute(r, throwable)
                     if (t == null && r is Future<*>) {
                         try {
                             val future = r as Future<*>?
@@ -490,15 +476,15 @@ object FaweCache : Trimable {
                                 future.get()
                             }
                         } catch (ce: CancellationException) {
-                            t = ce
+                            throwable = ce
                         } catch (ee: ExecutionException) {
-                            t = ee.cause
+                            throwable = ee.cause
                         } catch (ie: InterruptedException) {
                             Thread.currentThread().interrupt()
                         }
 
                     }
-                    t?.printStackTrace()
+                    throwable?.printStackTrace()
                 } catch (e: Throwable) {
                     e.printStackTrace()
                 }
