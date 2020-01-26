@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
 import com.sk89q.worldedit.world.registry.PassthroughBlockMaterial;
+import java.util.EnumMap;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
@@ -38,7 +39,7 @@ import java.util.OptionalInt;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
-    private BukkitBlockMaterial[] materialMap;
+    private Map<Material, BukkitBlockMaterial> materialMap = new EnumMap<>(Material.class);
 
     @Nullable
     @Override
@@ -52,15 +53,17 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         if (mat == null) {
             return new PassthroughBlockMaterial(null);
         }
-        if (materialMap == null) {
-            materialMap = new BukkitBlockMaterial[Material.values().length];
+        return materialMap.computeIfAbsent(mat, material -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), material));
+    }
+
+    @Nullable
+    @Override
+    public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.getProperties(blockType);
         }
-        BukkitBlockMaterial result = materialMap[mat.ordinal()];
-        if (result == null) {
-            result = new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), mat);
-            materialMap[mat.ordinal()] = result;
-        }
-        return result;
+        return super.getProperties(blockType);
     }
 
     @Nullable
@@ -73,22 +76,12 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
         return super.getMaterial(state);
     }
-
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
         if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
             return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
         }
         return OptionalInt.empty();
-    }
-    @Nullable
-    @Override
-    public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
-        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (adapter != null) {
-            return adapter.getProperties(blockType);
-        }
-        return super.getProperties(blockType);
     }
 
     public static class BukkitBlockMaterial extends PassthroughBlockMaterial {
