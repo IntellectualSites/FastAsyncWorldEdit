@@ -186,10 +186,10 @@ public class GenerationCommands {
     public int hcyl(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The pattern of blocks to generate")
                         Pattern pattern,
-                     @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
-                     @Radii(2)
-                         List<Double> radii,
-        @Arg(desc = "The height of the cylinder", def = "1")
+                    @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+                    @Radii(2)
+                        List<Double> radii,
+                    @Arg(desc = "The height of the cylinder", def = "1")
                         int height) throws WorldEditException {
        return cyl(actor, session, editSession, pattern, radii, height, true);
     }
@@ -203,7 +203,7 @@ public class GenerationCommands {
     public int cyl(Actor actor, LocalSession session, EditSession editSession,
                    @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                   @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+                   @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
                    @Radii(2)
                        List<Double> radii,
                     @Arg(desc = "The height of the cylinder", def = "1")
@@ -245,7 +245,7 @@ public class GenerationCommands {
     public int hsphere(Actor actor, LocalSession session, EditSession editSession,
                        @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                       @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
                        @Radii(3)
                            List<Double> radii,
                        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
@@ -262,7 +262,7 @@ public class GenerationCommands {
     public int sphere(Actor actor, LocalSession session, EditSession editSession,
         @Arg(desc = "The pattern of blocks to generate")
             Pattern pattern,
-        @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+        @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
         @Radii(3)
             List<Double> radii,
         @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")

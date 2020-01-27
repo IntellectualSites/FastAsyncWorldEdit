@@ -26,7 +26,7 @@ public class ItemUtil {
     private final Field fieldHandle;
     private final BukkitImplAdapter adapter;
 
-    private SoftReference<Int2ObjectOpenHashMap<WeakReference<Tag>>> hashToNMSTag = new SoftReference(new Int2ObjectOpenHashMap<>());
+    private SoftReference<Int2ObjectOpenHashMap<WeakReference<Tag>>> hashToNMSTag = new SoftReference<>(new Int2ObjectOpenHashMap<>());
 
     public ItemUtil() throws Exception {
         this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();

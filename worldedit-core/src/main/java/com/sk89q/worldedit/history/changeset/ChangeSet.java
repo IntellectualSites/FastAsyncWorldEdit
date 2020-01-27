@@ -19,16 +19,12 @@
 
 package com.sk89q.worldedit.history.changeset;
 
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockState;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Tracks a set of undoable operations and allows their undo and redo. The

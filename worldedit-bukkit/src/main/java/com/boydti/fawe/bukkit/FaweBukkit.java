@@ -102,9 +102,6 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
         });
-
-        //Start Metrics
-        new Metrics(plugin);
     }
 
     @Override // Please don't delete this again, it's WIP

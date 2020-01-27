@@ -48,8 +48,8 @@ public class CavesGen extends GenBase {
     }
 
     protected void generateCaveNode(long seed, BlockVector2 chunkPos, Extent chunk, double x, double y, double z, double paramdouble1, double paramdouble2, double paramdouble3, int angle, int maxAngle, double paramDouble4) throws WorldEditException {
-        int bx = (chunkPos.getBlockX() << 4);
-        int bz = (chunkPos.getBlockZ() << 4);
+        int bx = chunkPos.getBlockX() << 4;
+        int bz = chunkPos.getBlockZ() << 4;
         double real_x = bx + 7;
         double real_z = bz + 7;
 
@@ -57,7 +57,7 @@ public class CavesGen extends GenBase {
         double f2 = 0.0F;
 
         if (maxAngle <= 0) {
-            int checkAreaSize = (this.getCheckAreaSize() * 16) - 16;
+            int checkAreaSize = this.getCheckAreaSize() * 16 - 16;
             maxAngle = checkAreaSize - ThreadLocalRandom.current().nextInt(checkAreaSize / 4);
         }
         boolean isLargeCave = false;
@@ -95,14 +95,14 @@ public class CavesGen extends GenBase {
             f1 += (ThreadLocalRandom.current().nextDouble() - ThreadLocalRandom.current()
                 .nextDouble()) * ThreadLocalRandom.current().nextDouble() * 4.0F;
 
-            if ((!isLargeCave) && (angle == j) && (paramdouble1 > 1.0F) && (maxAngle > 0)) {
+            if (!isLargeCave && angle == j && paramdouble1 > 1.0F && maxAngle > 0) {
                 generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
                     .current().nextDouble() * 0.5F + 0.5F, paramdouble2 - 1.570796F, paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
                 generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
                     .current().nextDouble() * 0.5F + 0.5F, paramdouble2 + 1.570796F, paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
                 return;
             }
-            if ((!isLargeCave) && (ThreadLocalRandom.current().nextInt(4) == 0)) {
+            if (!isLargeCave && ThreadLocalRandom.current().nextInt(4) == 0) {
                 continue;
             }
 
@@ -116,7 +116,8 @@ public class CavesGen extends GenBase {
             }
 
             //Boundaries check.
-            if ((x < real_x - 16.0D - d3 * 2.0D) || (z < real_z - 16.0D - d3 * 2.0D) || (x > real_x + 16.0D + d3 * 2.0D) || (z > real_z + 16.0D + d3 * 2.0D))
+            if (x < real_x - 16.0D - d3 * 2.0D || z < real_z - 16.0D - d3 * 2.0D
+                || x > real_x + 16.0D + d3 * 2.0D || z > real_z + 16.0D + d3 * 2.0D)
                 continue;
 
 
@@ -146,15 +147,16 @@ public class CavesGen extends GenBase {
 
             // Search for water
             boolean waterFound = false;
-            for (int local_x = m; !waterFound && (local_x < n); local_x++) {
-                for (int local_z = i3; !waterFound && (local_z < i4); local_z++) {
-                    for (int local_y = i2 + 1; !waterFound && (local_y >= i1 - 1); local_y--) {
+            for (int local_x = m; !waterFound && local_x < n; local_x++) {
+                for (int local_z = i3; !waterFound && local_z < i4; local_z++) {
+                    for (int local_y = i2 + 1; !waterFound && local_y >= i1 - 1; local_y--) {
                         if (local_y < 255) {
                             BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                             if (material.getBlockType() == BlockTypes.WATER) {
                                 waterFound = true;
                             }
-                            if ((local_y != i1 - 1) && (local_x != m) && (local_x != n - 1) && (local_z != i3) && (local_z != i4 - 1))
+                            if (local_y != i1 - 1 && local_x != m && local_x != n - 1 && local_z != i3
+                                && local_z != i4 - 1)
                                 local_y = i1;
                         }
                     }
@@ -173,7 +175,7 @@ public class CavesGen extends GenBase {
                     if (d9 * d9 + d10 * d10 < 1.0D) {
                         for (int local_y = i2; local_y > i1; local_y--) {
                             double d11 = ((local_y - 1) + 0.5D - y) / d4;
-                            if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D)) {
+                            if (d11 > -0.7D && d9 * d9 + d11 * d11 + d10 * d10 < 1.0D) {
                                 BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                                 BlockState materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
@@ -254,8 +256,8 @@ public class CavesGen extends GenBase {
                 largeCaveSpawned = true;
             }
 
-            if ((largeCaveSpawned) || (ThreadLocalRandom.current().nextInt(100)
-                <= this.caveSystemPocketChance - 1)) {
+            if (largeCaveSpawned || ThreadLocalRandom.current().nextInt(100)
+                <= this.caveSystemPocketChance - 1) {
                 count += ThreadLocalRandom.current()
                     .nextInt(this.caveSystemPocketMinSize, this.caveSystemPocketMaxSize);
             }

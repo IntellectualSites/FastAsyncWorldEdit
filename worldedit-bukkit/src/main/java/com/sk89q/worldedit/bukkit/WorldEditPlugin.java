@@ -24,7 +24,6 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_13_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
@@ -371,7 +370,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
-            adapterLoader.addClass(FAWE_Spigot_v1_13_R2.class);
             adapterLoader.addClass(FAWE_Spigot_v1_14_R4.class);
             adapterLoader.addClass(FAWE_Spigot_v1_15_R1.class);
         } catch (Throwable throwable) {
