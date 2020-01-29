@@ -15,13 +15,14 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
+import org.jetbrains.annotations.Range;
 
 /**
  * Shared interface for IGetBlocks and ISetBlocks
  */
 public interface IBlocks extends Trimable {
 
-    boolean hasSection(int layer);
+    boolean hasSection(@Range(from = 0, to = 15) int layer);
 
     char[] load(int layer);
 

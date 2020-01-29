@@ -576,7 +576,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     public BukkitPlayer getCachedPlayer(Player player) {
         List<MetadataValue> meta = player.getMetadata("WE");
-        if (meta == null || meta.isEmpty()) {
+        if (meta.isEmpty()) {
             return null;
         }
         return (BukkitPlayer) meta.get(0).value();

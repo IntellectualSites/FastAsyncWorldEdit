@@ -66,7 +66,6 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
-    private final IdentityHashMap<Class<?>, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
     private final IdentityHashMap<Class<?>, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
 
     /*
@@ -91,9 +90,6 @@ public enum FaweCache implements Trimable {
             MUTABLE_VECTOR3.clean();
             MUTABLE_BLOCKVECTOR3.clean();
             SECTION_BITS_TO_CHAR.clean();
-            for (Map.Entry<Class<?>, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
-                entry.getValue().clean();
-            }
         }
         for (Map.Entry<Class<?>, Pool> entry : REGISTERED_POOLS.entrySet()) {
             Pool pool = entry.getValue();
