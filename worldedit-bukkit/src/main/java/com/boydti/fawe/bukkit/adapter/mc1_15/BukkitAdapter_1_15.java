@@ -179,10 +179,10 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
         if (set == null) {
             return newChunkSection(layer);
         }
-        final int[] blockToPalette = FaweCache.INSTANCE.getBLOCK_TO_PALETTE().get();
-        final int[] paletteToBlock = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
-        final long[] blockStates = FaweCache.INSTANCE.getBLOCK_STATES().get();
-        final int[] blocksCopy = FaweCache.INSTANCE.getSECTION_BLOCKS().get();
+        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
             int air;

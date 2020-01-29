@@ -138,7 +138,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return BlockVector3.at((this.X << 9) + 511, FaweCache.WORLD_MAX_Y, (this.Z << 9) + 511);
+        return BlockVector3.at((this.X << 9) + 511, FaweCache.IMP.WORLD_MAX_Y, (this.Z << 9) + 511);
     }
 
     @Override
@@ -361,7 +361,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
             raf.seek(offset);
             int size = raf.readInt();
             int compression = raf.read();
-            byte[] data = FaweCache.INSTANCE.getBYTE_BUFFER_VAR().get(size);
+            byte[] data = FaweCache.IMP.BYTE_BUFFER_VAR.get(size);
             raf.readFully(data, 0, size);
             FastByteArrayInputStream result = new FastByteArrayInputStream(data, 0, size);
             return result;
@@ -379,7 +379,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
 
     private NBTInputStream getChunkIS(InputStream is) throws IllegalAccessException {
         InflaterInputStream iis = new InflaterInputStream(is, new Inflater(), 1);
-        fieldBuf2.set(iis, FaweCache.INSTANCE.getBYTE_BUFFER_8192().get());
+        fieldBuf2.set(iis, FaweCache.IMP.BYTE_BUFFER_8192.get());
         BufferedInputStream bis = new BufferedInputStream(iis);
         NBTInputStream nis = new NBTInputStream(bis);
         return nis;
@@ -414,13 +414,13 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         if (chunk.isDeleted()) {
             return null;
         }
-        byte[] writeBuffer = FaweCache.INSTANCE.getBYTE_BUFFER_VAR().get(4096);
+        byte[] writeBuffer = FaweCache.IMP.BYTE_BUFFER_VAR.get(4096);
         FastByteArrayOutputStream uncompressed = chunk.toBytes(writeBuffer);
         if (uncompressed.array.length > writeBuffer.length) {
-            FaweCache.INSTANCE.getBYTE_BUFFER_VAR().set(uncompressed.array);
+            FaweCache.IMP.BYTE_BUFFER_VAR.set(uncompressed.array);
         }
         writeBuffer = uncompressed.array;
-        byte[] buffer = FaweCache.INSTANCE.getBYTE_BUFFER_8192().get();
+        byte[] buffer = FaweCache.IMP.BYTE_BUFFER_8192.get();
         int length = uncompressed.length;
         uncompressed.reset();
         // cheat, reusing the same buffer to read/write

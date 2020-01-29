@@ -490,9 +490,9 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
-            return FaweCache.INSTANCE.getEMPTY_CHAR_4096();
+            return FaweCache.IMP.EMPTY_CHAR_4096;
         }
-        if (data == null || data == FaweCache.INSTANCE.getEMPTY_CHAR_4096()) {
+        if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
             data = new char[4096];
         }
         DelegateLock lock = BukkitAdapter_1_14.applyLock(section);
@@ -519,8 +519,8 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     num_palette = ((DataPaletteHash<IBlockData>) palette).b();
                 } else {
                     num_palette = 0;
-                    int[] paletteToBlockInts = FaweCache.INSTANCE.getPALETTE_TO_BLOCK().get();
-                    char[] paletteToBlockChars = FaweCache.INSTANCE.getPALETTE_TO_BLOCK_CHAR().get();
+                    int[] paletteToBlockInts = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+                    char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
                     try {
                         for (int i = 0; i < 4096; i++) {
                             char paletteVal = data[i];
@@ -546,7 +546,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     return data;
                 }
 
-                char[] paletteToOrdinal = FaweCache.INSTANCE.getPALETTE_TO_BLOCK_CHAR().get();
+                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {

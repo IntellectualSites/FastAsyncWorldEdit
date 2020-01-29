@@ -347,10 +347,10 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                         packet.setNativePacket(nmsPacket);
                     }
                     try {
-                        FaweCache.INSTANCE.getCHUNK_FLAG().get().set(true);
+                        FaweCache.IMP.CHUNK_FLAG.get().set(true);
                         entityPlayer.playerConnection.sendPacket(nmsPacket);
                     } finally {
-                        FaweCache.INSTANCE.getCHUNK_FLAG().get().set(false);
+                        FaweCache.IMP.CHUNK_FLAG.get().set(false);
                     }
                 }
             });

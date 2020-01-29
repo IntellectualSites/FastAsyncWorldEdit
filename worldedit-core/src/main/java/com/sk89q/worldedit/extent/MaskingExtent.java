@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     private Mask mask;
-    private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.INSTANCE.createCache(() -> new CharFilterBlock(getExtent()));
+    private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
 
     /**
      * Create a new instance.

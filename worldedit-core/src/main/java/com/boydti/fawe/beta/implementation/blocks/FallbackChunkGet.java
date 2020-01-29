@@ -142,7 +142,7 @@ public class FallbackChunkGet implements IChunkGet {
 
     @Override
     public char[] load(int layer) {
-        char[] arr = FaweCache.INSTANCE.getSECTION_BITS_TO_CHAR().get();
+        char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         int by = layer << 4;
         for (int y = 0, i = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {

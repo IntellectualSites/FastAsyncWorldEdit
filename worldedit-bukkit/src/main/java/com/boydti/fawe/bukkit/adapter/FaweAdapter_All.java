@@ -382,7 +382,7 @@
 //            int z = location.getBlockZ();
 //
 //            org.bukkit.block.Block bukkitBlock = location.getBlock();
-//            BaseBlock block = FaweCache.INSTANCE.getBlock(bukkitBlock.getTypeId(), bukkitBlock.getData());
+//            BaseBlock block = FaweCache.IMP.getBlock(bukkitBlock.getTypeId(), bukkitBlock.getData());
 //
 //            // Read the NBT data
 //            Object nmsWorld = getHandleWorld.invoke(craftWorld);

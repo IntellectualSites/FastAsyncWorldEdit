@@ -124,7 +124,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        IMP.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.INSTANCE.asTag(tag));
+        IMP.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
         return true;
     }
 }
