@@ -129,7 +129,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position.equals(position1)) {
+        if (position1 != null && position.equals(position1)) {
             return false;
         }
 
@@ -142,7 +142,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position.equals(position2)) {
+        if (position2 != null && position.equals(position2)) {
             return false;
         }
 

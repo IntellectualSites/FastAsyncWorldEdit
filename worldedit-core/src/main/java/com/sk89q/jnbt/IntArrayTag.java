@@ -19,9 +19,9 @@
 
 package com.sk89q.jnbt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The {@code TAG_Int_Array} tag.

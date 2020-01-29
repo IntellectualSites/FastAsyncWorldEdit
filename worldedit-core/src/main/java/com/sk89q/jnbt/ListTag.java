@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 /**
  * The {@code TAG_List} tag.
  */
-public class ListTag extends Tag {
+public final class ListTag extends Tag {
 
     @Override
     public int getTypeCode() {
@@ -79,7 +79,7 @@ public class ListTag extends Tag {
 
     /**
      * Get the tag if it exists at the given index.
-     *
+     * 
      * @param index the index
      * @return the tag or null
      */
@@ -437,7 +437,7 @@ public class ListTag extends Tag {
     @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_List").append(": ").append(value.size()).append(" entries of type ").append(type.getTypeName()).append("\r\n{\r\n");
+        bldr.append("TAG_List").append(": ").append(value.size()).append(" entries of type ").append(NBTUtils.getTypeName(type)).append("\r\n{\r\n");
         for (Tag t : value) {
             bldr.append("   ").append(t.toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }

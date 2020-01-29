@@ -53,7 +53,7 @@ public class CommandException extends Exception {
 
     /**
      * Gets the command that was called, which will include the sub-command
-     * (i.e., "/br sphere").
+     * (i.e. "/br sphere").
      *
      * @param prefix the command shebang character (such as "/") -- may be empty
      * @param spacedSuffix a suffix to put at the end (optional) -- may be null
