@@ -44,6 +44,10 @@
     <allow pkg="com.google.auto"/>
     <allow pkg="it.unimi.dsi.fastutil"/>
 
+    <subpackage name="util.io.file">
+      <allow pkg="net.java.truevfs"/>
+    </subpackage>
+
     <subpackage name="internal.expression">
       <allow pkg="org.antlr.v4"/>
     </subpackage>

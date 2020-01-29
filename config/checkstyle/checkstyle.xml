@@ -18,7 +18,7 @@
     -->
 <!--
     <module name="ImportControl">
-      <property name="file" value="import-control.xml"/>
+      <property name="file" value="${config_loc}/import-control.xml"/>
     </module>
 -->
 

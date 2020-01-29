@@ -25,7 +25,6 @@ repositories {
 
 configurations.all {
     resolutionStrategy {
-        force()
         force("com.google.guava:guava:21.0")
     }
 }
@@ -69,6 +68,10 @@ tasks.named<Copy>("processResources") {
     filesMatching("plugin.yml") {
         expand("internalVersion" to project.ext["internalVersion"])
     }
+    from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
+        exclude("META-INF/")
+    })
+    exclude("**/worldedit-adapters.jar")
 }
 
 tasks.named<Jar>("jar") {
