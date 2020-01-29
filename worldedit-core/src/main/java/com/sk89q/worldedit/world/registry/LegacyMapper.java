@@ -77,7 +77,6 @@ public final class LegacyMapper {
         } catch (Throwable e) {
             log.warn("Failed to load the built-in legacy id registry", e);
         }
-
     }
 
     /**
@@ -104,7 +103,7 @@ public final class LegacyMapper {
 
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             String id = blockEntry.getKey();
-            int combinedId = getCombinedId(blockEntry.getKey());
+            Integer combinedId = getCombinedId(blockEntry.getKey());
             final String value = blockEntry.getValue();
             blockEntries.put(id, value);
 
@@ -117,6 +116,7 @@ public final class LegacyMapper {
                 }
             } catch (InputParseException f) {
                 BlockFactory blockFactory = WorldEdit.getInstance().getBlockFactory();
+
                 // if fixer is available, try using that first, as some old blocks that were renamed share names with new blocks
                 if (fixer != null) {
                     try {
@@ -125,6 +125,7 @@ public final class LegacyMapper {
                     } catch (InputParseException e) {
                     }
                 }
+
                 // if it's still null, the fixer was unavailable or failed
                 if (state == null) {
                     try {
@@ -132,6 +133,7 @@ public final class LegacyMapper {
                     } catch (InputParseException e) {
                     }
                 }
+
                 // if it's still null, both fixer and default failed
                 if (state == null) {
                     log.debug("Unknown block: " + value);
@@ -143,8 +145,8 @@ public final class LegacyMapper {
             }
             if (state != null) {
                 blockArr[combinedId] = state.getInternalId();
-                blockStateToLegacyId4Data.put(state.getInternalId(), Integer.valueOf(combinedId));
-                blockStateToLegacyId4Data.putIfAbsent(state.getInternalBlockTypeId(), Integer.valueOf(combinedId));
+                blockStateToLegacyId4Data.put(state.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.putIfAbsent(state.getInternalBlockTypeId(), combinedId);
             }
         }
         for (int id = 0; id < 256; id++) {
@@ -168,8 +170,6 @@ public final class LegacyMapper {
             if (type == null) {
                 log.debug("Unknown item: " + value);
             } else {
-                itemToStringMap.put(type, id);
-                stringToItemMap.put(id, type);
                 try {
                     itemMap.put(getCombinedId(id), type);
                 } catch (Exception ignored) {
@@ -216,10 +216,10 @@ public final class LegacyMapper {
     @Nullable
     public int[] getLegacyFromItem(ItemType itemType) {
         Integer combinedId = getLegacyCombined(itemType);
-        if (combinedId != null) {
-            return new int[]{combinedId >> 4, combinedId & 0xF};
-        } else {
+        if (combinedId == null) {
             return null;
+        } else {
+            return new int[]{combinedId >> 4, combinedId & 0xF};
         }
     }
 
