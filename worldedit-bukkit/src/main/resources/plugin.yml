@@ -3,6 +3,7 @@ main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
 api-version: 1.13
+softdepend: [Vault]
 website: https://intellectualsites.github.io/download/fawe.html
 description: Blazingly fast world manipulation for builders, large networks and developers.
 authors: [Empire92, MattBDev, IronApollo, dordsor21, NotMyFault]
