@@ -22,8 +22,6 @@ package com.sk89q.worldedit.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.component.TextUtils;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
@@ -42,6 +40,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
+import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -51,8 +50,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.util.Locale;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
@@ -65,11 +62,13 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import javax.annotation.Nullable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -214,7 +213,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public boolean hasPermission(String perm) {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
                 || plugin.getPermissionsResolver().hasPermission(
-                player.getWorld().getName(), player, perm);
+                    player.getWorld().getName(), player, perm);
     }
 
     @Override
@@ -247,6 +246,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
         player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     @Override
@@ -290,7 +293,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
             printError(TranslatableComponent.of("worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
-                            .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
+                        .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
         }
     }
 
@@ -374,13 +377,4 @@ public class BukkitPlayer extends AbstractPlayerActor {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
     }
 
-    public Player getPlayer() {
-        if (!player.isValid()) {
-            Player tmp = Bukkit.getPlayer(getUniqueId());
-            if (tmp != null) {
-                player = tmp;
-            }
-        }
-        return player;
-    }
 }

@@ -57,7 +57,7 @@ public class ReflectionUtils {
     }
 
     public static void setFailsafeFieldValue(Field field, Object target, Object value)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         setAccessibleNonFinal(field);
         field.set(target,value);
@@ -635,9 +635,9 @@ public class ReflectionUtils {
      * Constructor wrapper
      */
     public static class RefConstructor {
-        private final Constructor constructor;
+        private final Constructor<?> constructor;
 
-        private RefConstructor(Constructor constructor) {
+        private RefConstructor(Constructor<?> constructor) {
             this.constructor = constructor;
             constructor.setAccessible(true);
         }
@@ -645,7 +645,7 @@ public class ReflectionUtils {
         /**
          * @return passed constructor
          */
-        public Constructor getRealConstructor() {
+        public Constructor<?> getRealConstructor() {
             return this.constructor;
         }
 
@@ -702,7 +702,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * apply fiend for object
+         * Apply field for object
          *
          * @param e applied object
          * @return RefExecutor with getter and setter
@@ -719,7 +719,7 @@ public class ReflectionUtils {
             }
 
             /**
-             * set field value for applied object
+             * Set field value for applied object
              *
              * @param param value
              */
@@ -732,7 +732,7 @@ public class ReflectionUtils {
             }
 
             /**
-             * get field value for applied object
+             * Get field value for the applied object..
              *
              * @return value of field
              */

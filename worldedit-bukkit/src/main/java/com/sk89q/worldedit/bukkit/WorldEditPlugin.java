@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
@@ -43,8 +41,8 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -52,25 +50,9 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import javax.annotation.Nullable;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -95,6 +77,26 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.zip.ZipEntry;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
+
 /**
  * Plugin for Bukkit.
  */
@@ -103,6 +105,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
+    ///The BSTATS_ID needs to be modified for FAWE to prevent contaminating WorldEdit stats
     private static final int BSTATS_ID = 1403;
 
     private BukkitImplAdapter bukkitAdapter;
@@ -125,8 +128,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 public boolean add(Plugin plugin) {
                     if (plugin.getName().startsWith("AsyncWorldEdit")) {
                         log.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-                    } else if (plugin.getName().startsWith("BetterShutdown")) {
-                        log.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
                     } else {
                         return super.add(plugin);
                     }
@@ -136,7 +137,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
                 @Override
                 public Plugin put(@NotNull String key, @NotNull Plugin plugin) {
-                    if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
+                    if (plugin.getName().startsWith("AsyncWorldEdit")) {
                         return null;
                     }
                     return super.put(key, plugin);
@@ -420,22 +421,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         this.getServer().getScheduler().cancelTasks(this);
     }
 
-    /*
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        // Add the command to the array because the underlying command handling
-        // code of WorldEdit expects it
-        String[] split = new String[args.length + 1];
-        System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = commandLabel;
-
-        String arguments = Joiner.on(" ").join(split);
-        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
-        getWorldEdit().getEventBus().post(event);
-        return CommandUtil.fixSuggestions(arguments, event.getSuggestions());
-    }
-    */
-
     /**
      * Loads and reloads all configuration.
      */
@@ -490,6 +475,25 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         return true;
     }
+
+    /*
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        int plSep = commandLabel.indexOf(":");
+        if (plSep >= 0 && plSep < commandLabel.length() + 1) {
+            commandLabel = commandLabel.substring(plSep + 1);
+        }
+
+        StringBuilder sb = new StringBuilder("/").append(commandLabel);
+        if (args.length > 0) {
+            sb.append(" ");
+        }
+        String arguments = Joiner.on(" ").appendTo(sb, args).toString();
+        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
+        getWorldEdit().getEventBus().post(event);
+        return CommandUtil.fixSuggestions(arguments, event.getSuggestions());
+    }
+    */
 
     /**
      * Gets the session for the player.
@@ -647,7 +651,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             String buffer = event.getBuffer();
             int firstSpace = buffer.indexOf(' ');
             if (firstSpace < 0) return;
-            final String label = buffer.substring(0, firstSpace);
+            String label = buffer.substring(0, firstSpace);
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
             if (!command.isPresent()) return;
