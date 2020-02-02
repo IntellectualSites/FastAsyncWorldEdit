@@ -189,9 +189,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             if (this.sections == null) {
                 this.sections = sections.clone();
             }
-            if (this.sections[layer] != section) {
-                this.sections[layer] = section;
-            }
+            //TODO: Understand why this causes #329, what the purpose of this is, and what may or may not break after commenting this out.
+//            if (this.sections[layer] != section) {
+//                this.sections[layer] = section;
+//            }
             this.blocks[layer] = arr;
         }
     }
