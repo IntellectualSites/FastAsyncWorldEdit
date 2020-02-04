@@ -64,7 +64,6 @@ public class RegionMask extends AbstractMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        Fawe.imp().debug(" extent: " + extent.getClass());
         return region.contains(vector);
     }
 

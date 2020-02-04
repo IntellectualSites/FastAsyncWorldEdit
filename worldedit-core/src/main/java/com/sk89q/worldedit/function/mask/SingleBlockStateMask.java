@@ -20,8 +20,6 @@ public class SingleBlockStateMask extends ABlockMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        Fawe.imp().debug("getExtent(): " + getExtent().getClass() + " extent: " + extent.getClass());
-
         return ordinal == vector.getOrdinal(extent);
     }
 
