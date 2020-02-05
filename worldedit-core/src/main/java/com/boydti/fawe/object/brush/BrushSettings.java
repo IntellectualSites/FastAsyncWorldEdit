@@ -51,7 +51,6 @@ public class BrushSettings {
     private Expression size = DEFAULT_SIZE;
     private Set<String> permissions;
     private Scroll scrollAction;
-    private String lastWorld;
 
     public BrushSettings() {
         this.permissions = new HashSet<>();
@@ -211,20 +210,6 @@ public class BrushSettings {
     public BrushSettings addPermissions(String... perms) {
         Collections.addAll(permissions, perms);
         return this;
-    }
-
-    /**
-     * Set the world the brush is being used in
-     * @param world
-     * @return true if the world differs from the last used world
-     */
-    public boolean setWorld(String world) {
-        boolean result = false;
-        if (this.lastWorld != null && !this.lastWorld.equalsIgnoreCase(world)) {
-            result = true;
-        }
-        this.lastWorld = world;
-        return result;
     }
 
     public Brush getBrush() {

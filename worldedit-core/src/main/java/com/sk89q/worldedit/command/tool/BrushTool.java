@@ -491,7 +491,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         Brush brush = current.getBrush();
         if (brush == null) return false;
 
-        if (current.setWorld(player.getWorld().getName()) && !current.canUse(player)) {
+        if (!current.canUse(player)) {
             player.print(Caption.of("fawe.error.no-perm" , StringMan.join(current.getPermissions(), ",")));
             return false;
         }
