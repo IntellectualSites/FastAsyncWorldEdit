@@ -25,7 +25,7 @@ var buildNumber = ""
 var date: String = ""
 ext {
     val git: Grgit = Grgit.open {
-        dir = File(rootDir.toString() + "/.git");
+        dir = File("$rootDir/.git");
     }
     ext["date"] = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
     ext["revision"] = "-${git.head().abbreviatedId}";
@@ -35,7 +35,7 @@ ext {
     } else {
         var index = -2109;  // Offset to match CI
         while (parents != null && parents.isNotEmpty()) {
-            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+            parents = git.resolve.toCommit(parents[0]).parentIds
             index++;
         }
         buildNumber = index.toString();
@@ -49,28 +49,6 @@ allprojects {
         }
     }
 }
-
-//def rootVersion = "1.13"
-//def revision = ""
-//def buildNumber = ""
-//def date = ""
-//ext {
-//    git = Grgit.open(dir: new File(rootDir.toString()+"/.git"))
-//    date = git.head().getDate().format("yy.MM.dd")
-//    revision = "-${git.head().abbreviatedId}"
-//    parents = git.head().parentIds;
-//    if (project.hasProperty("buildnumber")) {
-//        buildNumber = "$buildnumber"
-//    } else {
-//        index = -2109;  // Offset to match CI
-//        for (; parents != null && !parents.isEmpty(); index++) {
-//            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
-//        }
-//        buildNumber = "${index}"
-//    }
-//}
-//
-//version = String.format("%s.%s", rootVersion, buildNumber)
 
 version = String.format("%s-%s", rootVersion, buildNumber)
 

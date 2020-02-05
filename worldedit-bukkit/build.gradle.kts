@@ -16,7 +16,10 @@ repositories {
     maven { url = uri("http://ci.frostcast.net/plugin/repository/everything") }
     maven { url = uri("http://dl.bintray.com/tastybento/maven-repo") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
-    maven { url = uri("https://jitpack.io") }
+    maven(fun MavenArtifactRepository.() {
+        this.name = "JitPack"
+        this.url = uri("https://jitpack.io")
+    })
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
     maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
     maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
@@ -30,9 +33,9 @@ configurations.all {
 }
 
 dependencies {
-    "compile"("net.milkbowl.vault:VaultAPI:1.7") { isTransitive = false }
+    compile("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     "api"(project(":worldedit-core"))
-    "api"(project(":worldedit-libs:core"))
+    api(project(":worldedit-libs:core"))
     "api"(project(":worldedit-libs:bukkit"))
     "compile"(":worldedit-adapters:")
     "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
@@ -48,7 +51,7 @@ dependencies {
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
     "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
-    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.1") {
+    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.+") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
@@ -56,7 +59,7 @@ dependencies {
     }
     "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
 
-    "implementation"("com.github.TechFortress:GriefPrevention:16.12.0") { isTransitive = false }
+    "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
@@ -93,7 +96,7 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
         relocate("org.bstats", "com.sk89q.worldedit.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.5"))
+            include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib:1.0.2"))
