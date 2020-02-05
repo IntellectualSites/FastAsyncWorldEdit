@@ -53,7 +53,7 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
         if (newPos) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.primary.2"));
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
             positions.add(position);
             return;
         }
@@ -122,7 +122,7 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary"));
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
         reset();
     }
 

@@ -94,7 +94,7 @@ public class SplineBrush implements Brush, ResettableTool {
                 points.add(position);
             }
             this.positionSets.add(points);
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.primary.2"));
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
             if (!visualization) {
                 return;
             }
@@ -132,7 +132,7 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary"));
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
         if (visualization) {
             numSplines = originalSize;
             positionSets.remove(positionSets.size() - 1);
