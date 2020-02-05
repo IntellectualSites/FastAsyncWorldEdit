@@ -89,22 +89,6 @@
 //    }
 //
 //    @Command(
-//            name = "#false",
-//            desc = "Always false"
-//    )
-//    public Mask falseMask(Extent extent) {
-//        return Masks.alwaysFalse();
-//    }
-//
-//    @Command(
-//            name = "#true",
-//            desc = "Always true"
-//    )
-//    public Mask trueMask(Extent extent) {
-//        return Masks.alwaysTrue();
-//    }
-//
-//    @Command(
 //            name = "#skylight",
 //            desc = "Restrict to specific sky light levels"
 //    )
@@ -159,22 +143,6 @@
 //    )
 //    public Mask nolight(Extent extent) {
 //        return new LightMask(extent, 0, 0);
-//    }
-//
-//    @Command(
-//            name = "#existing",
-//            desc = "If there is a non air block"
-//    )
-//    public Mask existing(Extent extent) {
-//        return new ExistingBlockMask(extent);
-//    }
-//
-//    @Command(
-//            name = "#solid",
-//            desc = "If there is a solid block"
-//    )
-//    public Mask solid(Extent extent) {
-//        return new SolidBlockMask(extent);
 //    }
 //
 //    @Command(
@@ -386,64 +354,4 @@
 //        return new AdjacentMask(mask, (int) min, (int) max);
 //    }
 //
-//    @Command(
-//            name = "<",
-//            aliases = {"#<", "#below"},
-//            desc = "below a specific block"
-//)
-//    public Mask below(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
-//        OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, 1, 0));
-//        return new MaskIntersection(offsetMask, Masks.negate(mask));
-//    }
-//
-//    @Command(
-//            name = ">",
-//            aliases = {"#>", "#above"},
-//            desc = "above a specific block"
-//)
-//    public Mask above(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
-//        OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, -1, 0));
-//        return new MaskIntersection(offsetMask, Masks.negate(mask));
-//    }
-//
-//    @Command(
-//            name = "$",
-//            aliases = {"#biome", "#$"},
-//            desc = "in a specific biome",
-//            descFooter = "in a specific biome. For a list of biomes use //biomelist"
-//)
-//    public Mask biome(Extent extent, @Arg(desc = "BiomeType") BiomeType biome) throws ExpressionException {
-//        return new BiomeMask(extent, biome);
-//    }
-//
-//    @Command(
-//            name = "%",
-//            aliases = {"#%", "#percent"},
-//            desc = "percentage chance"
-//)
-//    public Mask random(@Arg(desc = "double chance") double chance) throws ExpressionException {
-//        chance = chance / 100;
-//        return new RandomMask(chance);
-//    }
-//
-//    @Command(
-//            name = "=",
-//            aliases = {"#=", "#expression"},
-//            desc = "expression mask"
-//)
-//    public Mask expression(Extent extent, @Arg(desc = "String expression") String input) throws ExpressionException {
-//        Expression exp = Expression.compile(input, "x", "y", "z");
-//        ExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
-//        exp.setEnvironment(env);
-//        return new ExpressionMask(exp);
-//    }
-//
-//    @Command(
-//            name = "!",
-//            aliases = {"#not", "#negate", "#!"},
-//            desc = "Negate another mask"
-//)
-//    public Mask negate(@Arg(desc = "Mask") Mask mask) throws ExpressionException {
-//        return Masks.negate(mask);
-//    }
 //}
