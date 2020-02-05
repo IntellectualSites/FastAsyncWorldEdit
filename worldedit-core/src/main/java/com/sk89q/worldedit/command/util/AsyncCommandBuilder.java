@@ -103,7 +103,7 @@ public final class AsyncCommandBuilder<T> {
 
     public AsyncCommandBuilder<T> onSuccess(@Nullable String message, @Nullable Consumer<T> consumer) {
         checkArgument(message != null || consumer != null, "Can't have null message AND consumer");
-        this.successMessage = message == null ? null : TextComponent.of(message, TextColor.GRAY);
+        this.successMessage = message == null ? null : TextComponent.of(message, TextColor.LIGHT_PURPLE);
         this.consumer = consumer;
         return this;
     }

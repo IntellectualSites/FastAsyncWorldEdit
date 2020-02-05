@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.ImmutableSet;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.gen.CommandConditionGenerator;

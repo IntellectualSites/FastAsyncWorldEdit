@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.platform.Actor;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.inject.InjectedValueAccess;

@@ -125,38 +125,39 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     public BrushTool() {
     }
 
-    public static BrushTool fromString(Player player, LocalSession session, String json) throws CommandException, InputParseException {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, Object>>() {
-        }.getType();
-        Map<String, Object> root = gson.fromJson(json, type);
-        if (root == null) {
-            getLogger(BrushTool.class).debug("Failed to load " + json);
-            return new BrushTool();
-        }
-        Map<String, Object> primary = (Map<String, Object>) root.get("primary");
-        Map<String, Object> secondary = (Map<String, Object>) root.getOrDefault("secondary", primary);
-
-        VisualMode visual = VisualMode.valueOf((String) root.getOrDefault("visual", "NONE"));
-        TargetMode target = TargetMode.valueOf((String) root.getOrDefault("target", "TARGET_BLOCK_RANGE"));
-        int range = ((Number) root.getOrDefault("range", -1)).intValue();
-        int offset = ((Number) root.getOrDefault("offset", 0)).intValue();
-
-        BrushTool tool = new BrushTool();
-        tool.visualMode = visual;
-        tool.targetMode = target;
-        tool.range = range;
-        tool.targetOffset = offset;
-
-        BrushSettings primarySettings = BrushSettings.get(tool, player, session, primary);
-        tool.setPrimary(primarySettings);
-        if (primary != secondary) {
-            BrushSettings secondarySettings = BrushSettings.get(tool, player, session, secondary);
-            tool.setSecondary(secondarySettings);
-        }
-
-        return tool;
-    }
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    public static BrushTool fromString(Player player, LocalSession session, String json) throws CommandException, InputParseException {
+//        Gson gson = new Gson();
+//        Type type = new TypeToken<Map<String, Object>>() {
+//        }.getType();
+//        Map<String, Object> root = gson.fromJson(json, type);
+//        if (root == null) {
+//            getLogger(BrushTool.class).debug("Failed to load " + json);
+//            return new BrushTool();
+//        }
+//        Map<String, Object> primary = (Map<String, Object>) root.get("primary");
+//        Map<String, Object> secondary = (Map<String, Object>) root.getOrDefault("secondary", primary);
+//
+//        VisualMode visual = VisualMode.valueOf((String) root.getOrDefault("visual", "NONE"));
+//        TargetMode target = TargetMode.valueOf((String) root.getOrDefault("target", "TARGET_BLOCK_RANGE"));
+//        int range = ((Number) root.getOrDefault("range", -1)).intValue();
+//        int offset = ((Number) root.getOrDefault("offset", 0)).intValue();
+//
+//        BrushTool tool = new BrushTool();
+//        tool.visualMode = visual;
+//        tool.targetMode = target;
+//        tool.range = range;
+//        tool.targetOffset = offset;
+//
+//        BrushSettings primarySettings = BrushSettings.get(tool, player, session, primary);
+//        tool.setPrimary(primarySettings);
+//        if (primary != secondary) {
+//            BrushSettings secondarySettings = BrushSettings.get(tool, player, session, secondary);
+//            tool.setSecondary(secondarySettings);
+//        }
+//
+//        return tool;
+//    }
 
     public void setHolder(BaseItem holder) {
         this.holder = holder;

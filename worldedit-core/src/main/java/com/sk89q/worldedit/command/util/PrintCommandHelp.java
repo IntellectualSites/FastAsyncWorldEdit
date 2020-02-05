@@ -32,14 +32,15 @@ import com.sk89q.worldedit.util.formatting.component.CommandUsageBox;
 import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import org.enginehub.piston.Command;
+import org.enginehub.piston.CommandManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.enginehub.piston.Command;
-import org.enginehub.piston.CommandManager;
 
 /**
  * Implementation of the //help command.

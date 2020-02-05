@@ -15,7 +15,6 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
 import java.io.BufferedReader;
@@ -92,7 +91,8 @@ public class Fawe {
     private FaweVersion version;
     private VisualQueue visualQueue;
     private TextureUtil textures;
-    private DefaultTransformParser transformParser;
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    private DefaultTransformParser transformParser;
 
     private QueueHandler queueHandler;
 
@@ -184,7 +184,8 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                transformParser = new DefaultTransformParser(getWorldEdit());
+                // TODO: Ping @MattBDev to reimplement 2020-02-04
+//                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
                 WEManager.IMP.managers.add(new PlotSquaredFeature());
@@ -208,10 +209,11 @@ public class Fawe {
         }
         return queueHandler;
     }
-
-    public DefaultTransformParser getTransformParser() {
-        return transformParser;
-    }
+    
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    public DefaultTransformParser getTransformParser() {
+//        return transformParser;
+//    }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
         // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util

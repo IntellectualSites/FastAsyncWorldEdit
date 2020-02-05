@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.command.util;
 
-import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
-import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
-
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
@@ -39,6 +36,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
 /**
  * Internal class for generating common command suggestions.

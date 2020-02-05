@@ -24,12 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
-import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
-import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
@@ -62,13 +58,9 @@ import com.sk89q.worldedit.command.HistoryCommands;
 import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.HistorySubCommands;
 import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
-import com.sk89q.worldedit.command.MaskCommands;
-import com.sk89q.worldedit.command.MaskCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
-import com.sk89q.worldedit.command.PatternCommands;
-import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.RegionCommandsRegistration;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -87,8 +79,6 @@ import com.sk89q.worldedit.command.ToolCommands;
 import com.sk89q.worldedit.command.ToolCommandsRegistration;
 import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
-import com.sk89q.worldedit.command.TransformCommands;
-import com.sk89q.worldedit.command.TransformCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.UtilityCommandsRegistration;
 import com.sk89q.worldedit.command.WorldEditCommands;
@@ -304,9 +294,10 @@ public final class PlatformCommandManager {
                             });
                 });
         */
-        globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
-                context -> context.injectedValue(Key.of(Actor.class))
-                        .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
+        // TODO: Ping @MattBDev to reimplement 2020-02-04
+//        globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
+//                context -> context.injectedValue(Key.of(Actor.class))
+//                        .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
         globalInjectedValues.injectValue(Key.of(World.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
@@ -321,7 +312,6 @@ public final class PlatformCommandManager {
                                     } else {
                                         throw new MissingWorldException();
                                     }
-
                                 } catch (MissingWorldException e) {
                                     exceptionConverter.convert(e);
                                     throw new AssertionError("Should have thrown a new exception.", e);
@@ -332,13 +322,13 @@ public final class PlatformCommandManager {
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandRegistration<CI> registration, CI instance) {
+                                      CommandRegistration<CI> registration, CI instance) {
         registerSubCommands(name, aliases, desc, registration, instance, m -> {});
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandRegistration<CI> registration, CI instance,
-        Consumer<CommandManager> additionalConfig) {
+                                          CommandRegistration<CI> registration, CI instance,
+                                          Consumer<CommandManager> additionalConfig) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -396,27 +386,28 @@ public final class PlatformCommandManager {
 
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
-            registerSubCommands(
-                "patterns",
-                ImmutableList.of(),
-                "Patterns determine what blocks are placed",
-                PatternCommandsRegistration.builder(),
-                new PatternCommands()
-            );
-            registerSubCommands(
-                "masks",
-                ImmutableList.of(),
-                "Masks determine which blocks are placed",
-                MaskCommandsRegistration.builder(),
-                new MaskCommands(worldEdit)
-            );
-            registerSubCommands(
-                "transforms",
-                ImmutableList.of(),
-                "Transforms modify how a block is placed",
-                TransformCommandsRegistration.builder(),
-                new TransformCommands()
-            );
+            // TODO: Ping @MattBDev to reimplement (or remove) 2020-02-04
+//            registerSubCommands(
+//                "patterns",
+//                ImmutableList.of(),
+//                "Patterns determine what blocks are placed",
+//                PatternCommandsRegistration.builder(),
+//                new PatternCommands()
+//            );
+//            registerSubCommands(
+//                "masks",
+//                ImmutableList.of(),
+//                "Masks determine which blocks are placed",
+//                MaskCommandsRegistration.builder(),
+//                new MaskCommands(worldEdit)
+//            );
+//            registerSubCommands(
+//                "transforms",
+//                ImmutableList.of(),
+//                "Transforms modify how a block is placed",
+//                TransformCommandsRegistration.builder(),
+//                new TransformCommands()
+//            );
             registerSubCommands(
                 "schematic",
                 ImmutableList.of("schem", "/schematic", "/schem"),
@@ -460,13 +451,14 @@ public final class PlatformCommandManager {
                 WorldEditCommandsRegistration.builder(),
                 new WorldEditCommands(worldEdit)
             );
-            registerSubCommands(
-                "cfi",
-                ImmutableList.of("/cfi"),
-                "CFI commands",
-                CFICommandsRegistration.builder(),
-                new CFICommands(worldEdit)
-            );
+            // TODO: Ping @MattBDev to reimplement 2020-02-04
+//            registerSubCommands(
+//                "cfi",
+//                ImmutableList.of("/cfi"),
+//                "CFI commands",
+//                CFICommandsRegistration.builder(),
+//                new CFICommands(worldEdit)
+//            );
             registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
@@ -608,16 +600,6 @@ public final class PlatformCommandManager {
         return CommandArgParser.forArgString(input).parseArgs();
     }
 
-    public <T> T parseCommand(String args, Actor actor) {
-        InjectedValueAccess context;
-        if (actor == null) {
-            context = globalInjectedValues;
-        } else {
-            context = initializeInjectedValues(args::toString, actor, null);
-        }
-        return parseCommand(args, context);
-    }
-
     public <T> T parseConverter(String args, InjectedValueAccess access, Class<T> clazz) {
         ArgumentConverter<T> converter = commandManager.getConverter(Key.of(clazz)).orElse(null);
         if (converter != null) {
@@ -628,14 +610,6 @@ public final class PlatformCommandManager {
             }
         }
         return null;
-    }
-
-    public <T> T parseCommand(String args, InjectedValueAccess access) {
-        if (args.isEmpty()) return null;
-        String[] split = parseArgs(args)
-                .map(Substring::getSubstring)
-                .toArray(String[]::new);
-        return (T) commandManager.execute(access, ImmutableList.copyOf(split));
     }
 
     @Subscribe
@@ -771,19 +745,20 @@ public final class PlatformCommandManager {
 
                 worldEdit.flushBlockBag(actor, editSession);
             }
-            CFICommands.CFISettings cfi = actor.getMeta("CFISettings");
-            if (cfi != null) {
-                HeightMapMCAGenerator gen = cfi.getGenerator();
-                if (gen != null && gen.isModified()) {
-                    try {
-                        gen.update();
-                        CFIChangeSet set = new CFIChangeSet(gen, actor.getUniqueId());
-                        session.remember(actor, gen, set, actor.getLimit());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            // TODO: Ping @MattBDev to reimplement 2020-02-04
+//            CFICommands.CFISettings cfi = actor.getMeta("CFISettings");
+//            if (cfi != null) {
+//                HeightMapMCAGenerator gen = cfi.getGenerator();
+//                if (gen != null && gen.isModified()) {
+//                    try {
+//                        gen.update();
+//                        CFIChangeSet set = new CFIChangeSet(gen, actor.getUniqueId());
+//                        session.remember(actor, gen, set, actor.getLimit());
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
             Request.reset();
         }
 

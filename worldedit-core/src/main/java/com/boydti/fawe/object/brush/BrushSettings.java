@@ -58,65 +58,66 @@ public class BrushSettings {
         this.constructor.put(SettingType.PERMISSIONS, permissions);
     }
 
-    public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws InputParseException {
-        PlatformCommandManager manager = PlatformCommandManager.getInstance();
-        String constructor = (String) settings.get(SettingType.BRUSH.name());
-        if (constructor == null) {
-            return new BrushSettings();
-        }
-        BrushSettings bs = manager.parseCommand(constructor, player);
-        bs.constructor.put(SettingType.BRUSH, constructor);
-        if (settings.containsKey(SettingType.PERMISSIONS.name())) {
-            bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));
-        }
-        if (settings.containsKey(SettingType.SIZE.name())) {
-            try {
-                bs.size = Expression.compile((String) settings.getOrDefault(SettingType.SIZE.name(), -1));
-                bs.size.optimize();
-            } catch (ExpressionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        ParserContext parserContext = new ParserContext();
-        parserContext.setActor(player);
-        parserContext.setWorld(player.getWorld());
-        parserContext.setSession(session);
-
-        if (settings.containsKey(SettingType.MASK.name())) {
-            String maskArgs = (String) settings.get(SettingType.MASK.name());
-            Mask mask = WorldEdit.getInstance().getMaskFactory().parseFromInput(maskArgs, parserContext);
-            bs.setMask(mask);
-            bs.constructor.put(SettingType.MASK, maskArgs);
-        }
-        if (settings.containsKey(SettingType.SOURCE_MASK.name())) {
-            String maskArgs = (String) settings.get(SettingType.SOURCE_MASK.name());
-            Mask mask = WorldEdit.getInstance().getMaskFactory().parseFromInput(maskArgs, parserContext);
-            bs.setSourceMask(mask);
-            bs.constructor.put(SettingType.SOURCE_MASK, maskArgs);
-        }
-        if (settings.containsKey(SettingType.TRANSFORM.name())) {
-            String transformArgs = (String) settings.get(SettingType.TRANSFORM.name());
-            ResettableExtent extent = Fawe.get().getTransformParser().parseFromInput(transformArgs, parserContext);
-            bs.setTransform(extent);
-            bs.constructor.put(SettingType.TRANSFORM, transformArgs);
-        }
-        if (settings.containsKey(SettingType.FILL.name())) {
-            String fillArgs = (String) settings.get(SettingType.FILL.name());
-            Pattern pattern = WorldEdit.getInstance().getPatternFactory().parseFromInput(fillArgs, parserContext);
-            bs.setFill(pattern);
-            bs.constructor.put(SettingType.FILL, fillArgs);
-        }
-        if (settings.containsKey(SettingType.SCROLL_ACTION.name())) {
-            String actionArgs = (String) settings.get(SettingType.SCROLL_ACTION.name());
-            Scroll action = Scroll.fromArguments(tool, player, session, actionArgs, false);
-            if (action != null) {
-                bs.setScrollAction(action);
-                bs.constructor.put(SettingType.SCROLL_ACTION, actionArgs);
-            }
-        }
-        return bs;
-    }
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws InputParseException {
+//        PlatformCommandManager manager = PlatformCommandManager.getInstance();
+//        String constructor = (String) settings.get(SettingType.BRUSH.name());
+//        if (constructor == null) {
+//            return new BrushSettings();
+//        }
+//        BrushSettings bs = manager.parseCommand(constructor, player);
+//        bs.constructor.put(SettingType.BRUSH, constructor);
+//        if (settings.containsKey(SettingType.PERMISSIONS.name())) {
+//            bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));
+//        }
+//        if (settings.containsKey(SettingType.SIZE.name())) {
+//            try {
+//                bs.size = Expression.compile((String) settings.getOrDefault(SettingType.SIZE.name(), -1));
+//                bs.size.optimize();
+//            } catch (ExpressionException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//
+//        ParserContext parserContext = new ParserContext();
+//        parserContext.setActor(player);
+//        parserContext.setWorld(player.getWorld());
+//        parserContext.setSession(session);
+//
+//        if (settings.containsKey(SettingType.MASK.name())) {
+//            String maskArgs = (String) settings.get(SettingType.MASK.name());
+//            Mask mask = WorldEdit.getInstance().getMaskFactory().parseFromInput(maskArgs, parserContext);
+//            bs.setMask(mask);
+//            bs.constructor.put(SettingType.MASK, maskArgs);
+//        }
+//        if (settings.containsKey(SettingType.SOURCE_MASK.name())) {
+//            String maskArgs = (String) settings.get(SettingType.SOURCE_MASK.name());
+//            Mask mask = WorldEdit.getInstance().getMaskFactory().parseFromInput(maskArgs, parserContext);
+//            bs.setSourceMask(mask);
+//            bs.constructor.put(SettingType.SOURCE_MASK, maskArgs);
+//        }
+//        if (settings.containsKey(SettingType.TRANSFORM.name())) {
+//            String transformArgs = (String) settings.get(SettingType.TRANSFORM.name());
+//            ResettableExtent extent = Fawe.get().getTransformParser().parseFromInput(transformArgs, parserContext);
+//            bs.setTransform(extent);
+//            bs.constructor.put(SettingType.TRANSFORM, transformArgs);
+//        }
+//        if (settings.containsKey(SettingType.FILL.name())) {
+//            String fillArgs = (String) settings.get(SettingType.FILL.name());
+//            Pattern pattern = WorldEdit.getInstance().getPatternFactory().parseFromInput(fillArgs, parserContext);
+//            bs.setFill(pattern);
+//            bs.constructor.put(SettingType.FILL, fillArgs);
+//        }
+//        if (settings.containsKey(SettingType.SCROLL_ACTION.name())) {
+//            String actionArgs = (String) settings.get(SettingType.SCROLL_ACTION.name());
+//            Scroll action = Scroll.fromArguments(tool, player, session, actionArgs, false);
+//            if (action != null) {
+//                bs.setScrollAction(action);
+//                bs.constructor.put(SettingType.SCROLL_ACTION, actionArgs);
+//            }
+//        }
+//        return bs;
+//    }
 
     public BrushSettings setBrush(Brush brush) {
         Brush tmp = this.brush;

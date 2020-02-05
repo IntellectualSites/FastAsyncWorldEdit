@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.internal.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -39,6 +38,8 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logs called commands to a logger.

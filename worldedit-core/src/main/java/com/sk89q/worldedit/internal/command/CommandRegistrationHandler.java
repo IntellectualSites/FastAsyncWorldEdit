@@ -31,7 +31,6 @@ public class CommandRegistrationHandler {
 
     private static final CommandPermissionsConditionGenerator PERM_GEN = new CommandPermissionsConditionGenerator();
 
-
     private final List<CommandCallListener> callListeners;
 
     public CommandRegistrationHandler(List<CommandCallListener> callListeners) {

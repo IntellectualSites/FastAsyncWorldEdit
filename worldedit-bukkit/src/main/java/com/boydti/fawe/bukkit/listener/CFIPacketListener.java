@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.comphenix.protocol.PacketType;
@@ -262,10 +261,10 @@ public class CFIPacketListener implements Listener {
         BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
         VirtualWorld vw = bukkitPlayer.getSession().getVirtualWorld();
         if (vw != null) return vw;
-        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
-        if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
-            return settings.getGenerator();
-        }
+        //        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
+//        if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
+//            return settings.getGenerator();
+//        }
         return null;
     }
 

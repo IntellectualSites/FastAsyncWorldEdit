@@ -1,15 +1,7 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.extent.NullExtent;
-import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -17,7 +9,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.world.World;
 import java.util.Locale;
 import javax.annotation.Nullable;
 
@@ -44,29 +35,31 @@ public class PrimitiveBindings extends Bindings {
         }
     }
 
-    /**
-     * Gets an {@link Extent} from a {@link Binding}.
-     *
-     * @param argument the context
-     * @return an extent
-     * @throws InputParseException on other error
-     */
-    @Binding
-    public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
-        if (argument.equalsIgnoreCase("#null")) {
-            return new NullExtent();
-        }
-        DefaultTransformParser parser = Fawe.get().getTransformParser();
-        ParserContext parserContext = new ParserContext();
-        if (actor instanceof Entity) {
-            Extent extent = ((Entity) actor).getExtent();
-            if (extent instanceof World) {
-                parserContext.setWorld((World) extent);
-            }
-        }
-        parserContext.setSession(WorldEdit.getInstance().getSessionManager().get(actor));
-        return parser.parseFromInput(argument, parserContext);
-    }
+// TODO: Ping @MattBDev to reimplement 2020-02-04
+//
+//    /**
+//     * Gets an {@link Extent} from a {@link Binding}.
+//     *
+//     * @param argument the context
+//     * @return an extent
+//     * @throws InputParseException on other error
+//     */
+//    @Binding
+//    public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
+//        if (argument.equalsIgnoreCase("#null")) {
+//            return new NullExtent();
+//        }
+//        DefaultTransformParser parser = Fawe.get().getTransformParser();
+//        ParserContext parserContext = new ParserContext();
+//        if (actor instanceof Entity) {
+//            Extent extent = ((Entity) actor).getExtent();
+//            if (extent instanceof World) {
+//                parserContext.setWorld((World) extent);
+//            }
+//        }
+//        parserContext.setSession(WorldEdit.getInstance().getSessionManager().get(actor));
+//        return parser.parseFromInput(argument, parserContext);
+//    }
 
     /**
      * Gets a type from a {@link Binding}.

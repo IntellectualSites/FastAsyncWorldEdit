@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;

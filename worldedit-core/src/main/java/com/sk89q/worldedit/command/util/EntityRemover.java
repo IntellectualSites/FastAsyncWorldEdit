@@ -24,9 +24,9 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.function.EntityFunction;
 
 import javax.annotation.Nullable;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.util.regex.Pattern;
 
 /**
  * The implementation of /remove.

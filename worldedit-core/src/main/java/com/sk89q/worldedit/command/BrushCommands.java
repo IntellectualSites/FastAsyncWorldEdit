@@ -156,6 +156,15 @@ public class BrushCommands {
     }
 
     @Command(
+        name = "none",
+        aliases = "unbind",
+        desc = "Unbind a bound brush from your current item"
+    )
+    void none(Player player, LocalSession session) throws WorldEditException {
+        ToolCommands.setToolNone(player, session, true);
+    }
+
+    @Command(
             name = "blendball",
             aliases = {"bb", "blend"},
             desc = "Smooths and blends terrain",
@@ -984,38 +993,39 @@ public class BrushCommands {
         }
     }
 
-    @Command(
-            name = "loadbrush",
-            aliases = {"load"},
-            desc = "Load a brush"
-    )
-    @CommandPermissions("worldedit.brush.load")
-    public void loadBrush(Player player, LocalSession session, @Arg(desc = "String name") String name)
-            throws WorldEditException, IOException {
-        name = FileSystems.getDefault().getPath(name).getFileName().toString();
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
-        name = name.endsWith(".jsgz") ? name : name + ".jsgz";
-        File file = new File(folder, player.getUniqueId() + File.separator + name);
-        if (!file.exists()) {
-            file = new File(folder, name);
-        }
-        if (!file.exists()) {
-            File[] files = folder.listFiles(pathname -> false);
-            player.print(Caption.of("fawe.error.brush.not.found" , name));
-            return;
-        }
-        try (DataInputStream in = new DataInputStream(
-                new GZIPInputStream(new FileInputStream(file)))) {
-            String json = in.readUTF();
-            BrushTool tool = BrushTool.fromString(player, session, json);
-            BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
-            session.setTool(item, tool, player);
-            player.print(Caption.of("fawe.worldedit.brush.brush.equipped" , name));
-        } catch (Throwable e) {
-            e.printStackTrace();
-            player.printError(TranslatableComponent.of("fawe.error.brush.incompatible"));
-        }
-    }
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    @Command(
+//            name = "loadbrush",
+//            aliases = {"load"},
+//            desc = "Load a brush"
+//    )
+//    @CommandPermissions("worldedit.brush.load")
+//    public void loadBrush(Player player, LocalSession session, @Arg(desc = "String name") String name)
+//            throws WorldEditException, IOException {
+//        name = FileSystems.getDefault().getPath(name).getFileName().toString();
+//        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+//        name = name.endsWith(".jsgz") ? name : name + ".jsgz";
+//        File file = new File(folder, player.getUniqueId() + File.separator + name);
+//        if (!file.exists()) {
+//            file = new File(folder, name);
+//        }
+//        if (!file.exists()) {
+//            File[] files = folder.listFiles(pathname -> false);
+//            player.print(Caption.of("fawe.error.brush.not.found" , name));
+//            return;
+//        }
+//        try (DataInputStream in = new DataInputStream(
+//                new GZIPInputStream(new FileInputStream(file)))) {
+//            String json = in.readUTF();
+//            BrushTool tool = BrushTool.fromString(player, session, json);
+//            BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
+//            session.setTool(item, tool, player);
+//            player.print(Caption.of("fawe.worldedit.brush.brush.equipped" , name));
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            player.printError(TranslatableComponent.of("fawe.error.brush.incompatible"));
+//        }
+//    }
 
     @Command(
             name = "/listbrush",
