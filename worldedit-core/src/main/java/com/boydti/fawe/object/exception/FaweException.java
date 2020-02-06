@@ -9,19 +9,9 @@ import java.util.Locale;
 
 public class FaweException extends RuntimeException {
     // DEBUG
-    public static final FaweException _enableQueue;
-    public static final FaweException _disableQueue;
-
-    static {
-        try {
-            _enableQueue = new FaweException(Extent.class.getDeclaredMethod("enableQueue").toString());
-            _disableQueue = new FaweException(Extent.class.getDeclaredMethod("disableQueue").toString());
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
+    public static final FaweException _enableQueue = new FaweException("enableQueue");
+    public static final FaweException _disableQueue = new FaweException("disableQueue");
+    
     private final Component message;
 
     public FaweException(String reason) {

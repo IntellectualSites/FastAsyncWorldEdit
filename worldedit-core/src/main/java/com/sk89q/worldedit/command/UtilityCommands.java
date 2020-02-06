@@ -128,7 +128,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.admin")
     public void heightmapInterface(Player player, @Arg(name = "min", desc = "int", def = "100") int min, @Arg(name = "max", desc = "int", def = "200") int max) throws IOException {
-        player.print("Please wait while we generate the minified heightmaps.");
+        player.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
@@ -150,7 +150,7 @@ public class UtilityCommands {
                 BufferedImage img = MainUtil.readImage(file);
                 BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                player.print("Writing " + name);
+                player.print(TextComponent.of(String.format("Writing %s", name)));
                 File minFile = new File(minImages, name);
                 File maxFile = new File(maxImages, name);
                 minFile.getParentFile().mkdirs();
@@ -175,9 +175,9 @@ public class UtilityCommands {
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
         File configFile = new File(webSrc, "config.js");
-        player.print("Writing " + configFile);
+        player.print(TextComponent.of(String.format("Writing %s",configFile)));
         Files.write(configFile.toPath(), config.toString().getBytes());
-        player.print("Done! See: `FastAsyncWorldEdit/web/heightmap`");
+        player.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
     }
 
     @Command(
@@ -201,9 +201,9 @@ public class UtilityCommands {
     public int fill(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
-                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The radius to fill in")
+                    @Arg(desc = "The radius to fill in")
                         Expression radiusExp,
-                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The depth to fill", def = "1")
+                    @Arg(desc = "The depth to fill", def = "1")
                         int depth,
                     @Arg(desc = "The direction to move", def = "down")
                         @Direction BlockVector3 direction) throws WorldEditException, EvaluationException {
@@ -612,10 +612,10 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.remove")
     @Logging(PLACEMENT)
     public int remove(Actor actor,
-        @Arg(desc = "The type of entity to remove")
-            EntityRemover remover,
-        @Arg(desc = "The radius of the cuboid to remove from")
-            int radius) throws WorldEditException {
+                      @Arg(desc = "The type of entity to remove")
+                          EntityRemover remover,
+                      @Arg(desc = "The radius of the cuboid to remove from")
+                          int radius) throws WorldEditException {
         if (radius < -1) {
             actor.printError(TranslatableComponent.of("worldedit.remove.explain-all"));
             return 0;
@@ -627,7 +627,7 @@ public class UtilityCommands {
     }
 
     private int killMatchingEntities(Integer radius, Actor actor, Supplier<EntityFunction> func) throws IncompleteRegionException,
-        MaxChangedBlocksException {
+            MaxChangedBlocksException {
         List<EntityVisitor> visitors = new ArrayList<>();
 
         LocalSession session = we.getSessionManager().get(actor);
@@ -651,22 +651,6 @@ public class UtilityCommands {
         session.remember(editSession);
         editSession.flushSession();
         return killed;
-    }
-
-    @Command(
-        name = "/help",
-        desc = "Displays help for WorldEdit commands"
-    )
-    @CommandPermissions("worldedit.help")
-    public void help(Actor actor,
-                     @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
-                         boolean listSubCommands,
-                     @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
-                         int page,
-                     @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
-        PrintCommandHelp.help(command, page, listSubCommands,
-                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
     }
 
     private DecimalFormat formatForLocale(Locale locale) {
@@ -698,6 +682,23 @@ public class UtilityCommands {
             return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
         }, (Component) null);
     }
+
+    @Command(
+        name = "/help",
+        desc = "Displays help for WorldEdit commands"
+    )
+    @CommandPermissions("worldedit.help")
+    public void help(Actor actor,
+                     @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
+                         boolean listSubCommands,
+                     @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
+                         int page,
+                     @Arg(desc = "The command to retrieve help for", def = "", variable = true)
+                         List<String> command) throws WorldEditException {
+        PrintCommandHelp.help(command, page, listSubCommands,
+                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
+    }
+
 
     @Command(
             name = "/confirm",

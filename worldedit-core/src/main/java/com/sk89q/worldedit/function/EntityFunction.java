@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
+import java.util.function.Predicate;
 
 /**
  * Applies a function to entities.

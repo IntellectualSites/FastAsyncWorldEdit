@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
@@ -98,6 +96,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores session information.
@@ -919,6 +919,14 @@ public class LocalSession implements TextureHolder {
         return selector.getPrimaryPosition();
     }
 
+    public void setPlaceAtPos1(boolean placeAtPos1) {
+        this.placeAtPos1 = placeAtPos1;
+    }
+
+    public boolean isPlaceAtPos1() {
+        return placeAtPos1;
+    }
+
     /**
      * Toggle placement position.
      *
@@ -1086,7 +1094,8 @@ public class LocalSession implements TextureHolder {
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.hasBlockType()) {
             throw new InvalidToolBindException(item, "Blocks can't be used");
-        } else if (tool instanceof SelectionWand) {
+        }
+        if (tool instanceof SelectionWand) {
             changeTool(this.wandItem, this.wandItem = item, tool);
             setDirty();
             return;
@@ -1116,14 +1125,6 @@ public class LocalSession implements TextureHolder {
                 this.tools.put(newType.getInternalId(), newTool);
             }
         }
-    }
-
-    public void setPlaceAtPos1(boolean placeAtPos1) {
-        this.placeAtPos1 = placeAtPos1;
-    }
-
-    public boolean isPlaceAtPos1() {
-        return placeAtPos1;
     }
 
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {

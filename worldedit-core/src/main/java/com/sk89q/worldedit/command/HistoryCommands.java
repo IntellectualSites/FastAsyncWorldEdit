@@ -28,7 +28,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
@@ -58,14 +57,14 @@ public class HistoryCommands {
     @Command(
         name = "undo",
         aliases = { "/undo" },
-            desc = "Undoes the last action (from history)"
+        desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
     public void undo(Player player, LocalSession session,
                      @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
-                             int times,
+                         int times,
                      @Arg(name = "player", desc = "Undo this player's operations", def = "")
-                             String playerName) throws WorldEditException {
+                         String playerName) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
         if (session.hasFastMode()) {
@@ -136,13 +135,14 @@ public class HistoryCommands {
     }
 
     @Command(
-            name = "clearhistory",
-            aliases = { "/clearhistory" },
-            desc = "Clear your history"
+        name = "clearhistory",
+        aliases = { "/clearhistory" },
+        desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
         actor.printInfo(TranslatableComponent.of("worldedit.clearhistory.cleared"));
     }
+
 }
