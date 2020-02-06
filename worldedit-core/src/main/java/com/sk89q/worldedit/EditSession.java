@@ -19,6 +19,12 @@
 
 package com.sk89q.worldedit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
@@ -124,10 +130,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.jetbrains.annotations.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -136,15 +139,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -1447,17 +1446,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return this.changes = copy.getAffected();
     }
 
-    /**
-     * Move the blocks in a region a certain direction.
-     *
-     * @param region the region to move
-     * @param dir the direction
-     * @param distance the distance to move
-     * @param copyAir true to copy air blocks
-     * @param replacement the replacement pattern to fill in after moving, or null to use air
-     * @return number of blocks moved
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
     public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir,
                           boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
         Mask mask = null;
@@ -1613,7 +1601,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         MaskIntersection blockMask = new MaskUnion(liquidMask, Masks.negate(new ExistingBlockMask(this)));
 
         // There are boundaries that the routine needs to stay in
-        MaskIntersection mask = new MaskIntersection(
+        Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
@@ -2302,15 +2290,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException
      */
     public int makeShape(final Region region, final Vector3 zero, final Vector3 unit,
-                        final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
+                         final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
             throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z", "type", "data");
         expression.optimize();
 
         final Variable typeVariable = expression.getSlots().getVariable("type")
-            .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalStateException::new);
         final Variable dataVariable = expression.getSlots().getVariable("data")
-            .orElseThrow(IllegalStateException::new);
+                .orElseThrow(IllegalStateException::new);
 
         final WorldEditExpressionEnvironment environment = new WorldEditExpressionEnvironment(this, unit, zero);
         expression.setEnvironment(environment);
@@ -2368,7 +2356,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString,
-                            final int timeout) throws ExpressionException, MaxChangedBlocksException {
+                           final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
 
