@@ -12,6 +12,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -115,7 +116,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         try {
             synchronized (section) {
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                Lock currentLock = (Lock) fieldLock.get(blocks);
+                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }

@@ -342,13 +342,7 @@ public class BukkitWorld extends AbstractWorld {
 	        if (Fawe.isMainThread()) {
 	            world.getChunkAt(X, Z);
 	        } else if (!world.isChunkLoaded(X, Z)) {
-	            if (PaperLib.isPaper()) {
-	                world.getChunkAtAsync(X, Z, true);
-	            } else {
-	                Fawe.get().getQueueHandler().sync(() -> {
-	                    world.getChunkAt(X, Z);
-	                });
-	            }
+	            PaperLib.getChunkAtAsync(world,X, Z, true);
 	        }
 		}
     }

@@ -7,19 +7,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.jetbrains.annotations.NotNull;
 
 public class DelegateLock extends ReentrantLockWithGetOwner {
-    private final Lock parent;
+    private final ReentrantLock parent;
     private volatile boolean modified;
     private final AtomicInteger count;
 
-    public DelegateLock(Lock parent) {
+    public DelegateLock(@NotNull ReentrantLock parent) {
         this.parent = parent;
-        if (!(parent instanceof ReentrantLock)) {
-            count = new AtomicInteger();
-        } else {
-            count = null;
-        }
+        this.count = null;
     }
 
     public boolean isModified() {
@@ -86,22 +83,15 @@ public class DelegateLock extends ReentrantLockWithGetOwner {
 
     @Override
     public synchronized boolean isLocked() {
-        if (parent instanceof ReentrantLock) {
-            return ((ReentrantLock) parent).isLocked();
-        }
-        return count.get() > 0;
+        return parent.isLocked();
     }
 
     public void untilFree() {
-        if (parent instanceof ReentrantLock) {
-            ReentrantLock rl = (ReentrantLock) parent;
-            if (rl.isLocked()) {
-                rl.lock();
-                rl.unlock();
-            }
-            return;
+        ReentrantLock rl = parent;
+        if (rl.isLocked()) {
+            rl.lock();
+            rl.unlock();
         }
-        while (count.get() > 0);
     }
 
     @Override
