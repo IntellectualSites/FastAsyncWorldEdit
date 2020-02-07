@@ -600,6 +600,16 @@ public final class PlatformCommandManager {
         return CommandArgParser.forArgString(input).parseArgs();
     }
 
+    public int parseCommand(String args, Actor actor) {
+        InjectedValueAccess context;
+        if (actor == null) {
+            context = globalInjectedValues;
+        } else {
+            context = initializeInjectedValues(args::toString, actor, null);
+        }
+        return parseCommand(args, context);
+    }
+
     public <T> T parseConverter(String args, InjectedValueAccess access, Class<T> clazz) {
         ArgumentConverter<T> converter = commandManager.getConverter(Key.of(clazz)).orElse(null);
         if (converter != null) {
@@ -612,16 +622,19 @@ public final class PlatformCommandManager {
         return null;
     }
 
+    public int parseCommand(String args, InjectedValueAccess access) {
+        if (args.isEmpty()) return 0;
+        String[] split = parseArgs(args)
+                .map(Substring::getSubstring)
+                .toArray(String[]::new);
+        return commandManager.execute(access, ImmutableList.copyOf(split));
+    }
+
     @Subscribe
     public void handleCommand(CommandEvent event) {
         Request.reset();
         Actor actor = event.getActor();
-        String args;
-        if (event.getArguments().length() > 1) {
-            args = event.getArguments().substring(1);
-        } else {
-            args = event.getArguments();
-        }
+        String args = event.getArguments();
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
@@ -694,12 +707,11 @@ public final class PlatformCommandManager {
                     exceptionConverter.convert(next);
                     next = next.getCause();
                 } while (next != null);
-
                 throw t;
             }
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
-                actor.printError(TranslatableComponent.of("worldedit.command.permissions"));
+                actor.printError(Caption.of("fawe.error.no.perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
             } else {
                 actor.print(e.getRichMessage());
             }
@@ -825,7 +837,6 @@ public final class PlatformCommandManager {
                 }
                 throw t;
             }
-
             event.setSuggestions(suggestions.stream()
                 .map(suggestion -> {
                     int noSlashLength = arguments.length() - 1;
