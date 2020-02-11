@@ -77,11 +77,7 @@ tasks.named<Copy>("processResources") {
     }
 }
 
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("WorldEdit-Version" to project.version)
-    }
-}
+addJarManifest(includeClasspath = false)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {

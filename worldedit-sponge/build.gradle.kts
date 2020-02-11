@@ -25,12 +25,7 @@ sponge {
     }
 }
 
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("Class-Path" to "truezip.jar WorldEdit/truezip.jar js.jar WorldEdit/js.jar",
-                "WorldEdit-Version" to project.version)
-    }
-}
+addJarManifest(includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
