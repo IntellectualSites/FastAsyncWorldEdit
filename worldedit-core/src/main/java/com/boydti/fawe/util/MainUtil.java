@@ -89,6 +89,7 @@ import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
 import net.jpountz.lz4.LZ4Utils;
+import org.jetbrains.annotations.NotNull;
 
 public class MainUtil {
 
@@ -371,15 +372,11 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(UUID uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
         return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
-    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
-        if (writeTask == null) {
-            getLogger(MainUtil.class).debug("Write task cannot be null");
-            return null;
-        }
+    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
         final String website;

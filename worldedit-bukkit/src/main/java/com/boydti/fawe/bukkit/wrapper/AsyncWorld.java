@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -156,12 +155,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public WorldBorder getWorldBorder() {
-        return TaskManager.IMP.sync(new RunnableVal<WorldBorder>() {
-            @Override
-            public void run(WorldBorder value) {
-                this.value = parent.getWorldBorder();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getWorldBorder());
     }
 
     @Override
@@ -340,12 +334,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean loadChunk(final int x, final int z, final boolean generate) {
         if (!isChunkLoaded(x, z)) {
-            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-                @Override
-                public void run(Boolean value) {
-                    this.value = parent.loadChunk(x, z, generate);
-                }
-            });
+            return TaskManager.IMP.sync(() -> parent.loadChunk(x, z, generate));
         }
         return true;
     }
@@ -353,12 +342,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean unloadChunk(final Chunk chunk) {
         if (chunk.isLoaded()) {
-            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-                @Override
-                public void run(Boolean value) {
-                    this.value = parent.unloadChunk(chunk);
-                }
-            });
+            return TaskManager.IMP.sync(() -> parent.unloadChunk(chunk));
         }
         return true;
     }
@@ -371,12 +355,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean unloadChunk(int x, int z, boolean save) {
         if (isChunkLoaded(x, z)) {
-            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-                @Override
-                public void run(Boolean value) {
-                    this.value = parent.unloadChunk(x, z, save);
-                }
-            });
+            return TaskManager.IMP.sync(() -> parent.unloadChunk(x, z, save));
         }
         return true;
     }
@@ -384,24 +363,14 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean unloadChunkRequest(int x, int z) {
         if (isChunkLoaded(x, z)) {
-            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-                @Override
-                public void run(Boolean value) {
-                    this.value = parent.unloadChunkRequest(x, z);
-                }
-            });
+            return TaskManager.IMP.sync(() -> parent.unloadChunkRequest(x, z));
         }
         return true;
     }
 
     @Override
     public boolean regenerateChunk(final int x, final int z) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-               this.value = parent.regenerateChunk(x, z);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.regenerateChunk(x, z));
     }
 
     @Override
@@ -412,32 +381,17 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public Item dropItem(final Location location, final ItemStack item) {
-        return TaskManager.IMP.sync(new RunnableVal<Item>() {
-            @Override
-            public void run(Item value) {
-                this.value = parent.dropItem(location, item);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.dropItem(location, item));
     }
 
     @Override
     public Item dropItemNaturally(final Location location, final ItemStack item) {
-        return TaskManager.IMP.sync(new RunnableVal<Item>() {
-            @Override
-            public void run(Item value) {
-                this.value = parent.dropItemNaturally(location, item);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.dropItemNaturally(location, item));
     }
 
     @Override
     public Arrow spawnArrow(final Location location, final Vector direction, final float speed, final float spread) {
-        return TaskManager.IMP.sync(new RunnableVal<Arrow>() {
-            @Override
-            public void run(Arrow value) {
-                this.value = parent.spawnArrow(location, direction, speed, spread);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnArrow(location, direction, speed, spread));
     }
 
     @Override
@@ -447,22 +401,12 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public boolean generateTree(final Location location, final TreeType type) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = parent.generateTree(location, type);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.generateTree(location, type));
     }
 
     @Override
     public boolean generateTree(final Location loc, final TreeType type, final BlockChangeDelegate delegate) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = parent.generateTree(loc, type, delegate);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.generateTree(loc, type, delegate));
     }
 
     @Override
@@ -472,93 +416,48 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public LightningStrike strikeLightning(final Location loc) {
-        return TaskManager.IMP.sync(new RunnableVal<LightningStrike>() {
-            @Override
-            public void run(LightningStrike value) {
-                this.value = parent.strikeLightning(loc);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.strikeLightning(loc));
     }
 
     @Override
     public LightningStrike strikeLightningEffect(final Location loc) {
-        return TaskManager.IMP.sync(new RunnableVal<LightningStrike>() {
-            @Override
-            public void run(LightningStrike value) {
-                this.value = parent.strikeLightningEffect(loc);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.strikeLightningEffect(loc));
     }
 
     @Override
     public List getEntities() {
-        return TaskManager.IMP.sync(new RunnableVal<List<Entity>>() {
-            @Override
-            public void run(List<Entity> value) {
-                this.value = parent.getEntities();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getEntities());
     }
 
     @Override
     public List<LivingEntity> getLivingEntities() {
-        return TaskManager.IMP.sync(new RunnableVal<List<LivingEntity>>() {
-            @Override
-            public void run(List<LivingEntity> value) {
-                this.value = parent.getLivingEntities();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getLivingEntities());
     }
 
     @Override
     @Deprecated
     public <T extends Entity> Collection<T> getEntitiesByClass(final Class<T>... classes) {
-        return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
-            @Override
-            public void run(Collection<T> value) {
-                this.value = parent.getEntitiesByClass(classes);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getEntitiesByClass(classes));
     }
 
     @Override
     public <T extends Entity> Collection<T> getEntitiesByClass(final Class<T> cls) {
-        return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
-            @Override
-            public void run(Collection<T> value) {
-                this.value = parent.getEntitiesByClass(cls);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getEntitiesByClass(cls));
     }
 
     @Override
     public Collection<Entity> getEntitiesByClasses(final Class<?>... classes) {
-        return TaskManager.IMP.sync(new RunnableVal<Collection<Entity>>() {
-            @Override
-            public void run(Collection<Entity> value) {
-                this.value = parent.getEntitiesByClasses(classes);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getEntitiesByClasses(classes));
     }
 
     @Override
     public List<Player> getPlayers() {
-        return TaskManager.IMP.sync(new RunnableVal<List<Player>>() {
-            @Override
-            public void run(List<Player> value) {
-                this.value = parent.getPlayers();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getPlayers());
     }
 
     @Override
     public Collection<Entity> getNearbyEntities(final Location location, final double x, final double y, final double z) {
-        return TaskManager.IMP.sync(new RunnableVal<Collection<Entity>>() {
-            @Override
-            public void run(Collection<Entity> value) {
-                this.value = parent.getNearbyEntities(location, x, y, z);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getNearbyEntities(location, x, y, z));
     }
 
     @Override
@@ -578,12 +477,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public boolean setSpawnLocation(final int x, final int y, final int z) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = parent.setSpawnLocation(x, y, z);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.setSpawnLocation(x, y, z));
     }
 
     @Override
@@ -658,23 +552,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public boolean createExplosion(final double x, final double y, final double z, final float power, final boolean setFire, final boolean breakBlocks) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = parent.createExplosion(x, y, z, power, setFire, breakBlocks);
-            }
-        });
+        return TaskManager.IMP.sync(
+            () ->
+                parent.createExplosion(x, y, z, power, setFire, breakBlocks));
     }
 
     @Override
     public boolean createExplosion(double x, double y, double z, float power, boolean setFire,
         boolean breakBlocks, @Nullable Entity source) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = parent.createExplosion(x, y, z, power, setFire, breakBlocks, source);
-            }
-        });
+        return TaskManager.IMP.sync(
+            () -> parent.createExplosion(x, y, z, power, setFire, breakBlocks, source));
     }
 
     @Override
@@ -730,32 +617,17 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public <T extends Entity> T spawn(final Location location, final Class<T> clazz) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new RunnableVal<T>() {
-            @Override
-            public void run(T value) {
-                this.value = parent.spawn(location, clazz);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawn(location, clazz));
     }
 
     @Override
     public <T extends Entity> T spawn(Location location, Class<T> clazz, Consumer<T> function) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new RunnableVal<T>() {
-            @Override
-            public void run(T value) {
-                this.value = parent.spawn(location, clazz, function);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawn(location, clazz, function));
     }
 
     @Override
     public FallingBlock spawnFallingBlock(Location location, MaterialData data) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new RunnableVal<FallingBlock>() {
-            @Override
-            public void run(FallingBlock value) {
-                this.value = parent.spawnFallingBlock(location, data);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, data));
     }
 
     @Override
@@ -801,12 +673,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public ChunkSnapshot getEmptyChunkSnapshot(final int x, final int z, final boolean includeBiome, final boolean includeBiomeTempRain) {
-        return TaskManager.IMP.sync(new RunnableVal<ChunkSnapshot>() {
-            @Override
-            public void run(ChunkSnapshot value) {
-                this.value = parent.getEmptyChunkSnapshot(x, z, includeBiome, includeBiomeTempRain);
-            }
-        });
+        return TaskManager.IMP.sync(
+            () -> parent.getEmptyChunkSnapshot(x, z, includeBiome, includeBiomeTempRain));
     }
 
     @Override
@@ -1254,52 +1122,27 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     public int getEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getEntityCount();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getEntityCount());
     }
 
     @Override
     public int getTileEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getTileEntityCount();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getTileEntityCount());
     }
 
     @Override
     public int getTickableTileEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getTickableTileEntityCount();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getTickableTileEntityCount());
     }
 
     @Override
     public int getChunkCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getChunkCount();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getChunkCount());
     }
 
     @Override
     public int getPlayerCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getPlayerCount();
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.getPlayerCount());
     }
 
     @Override

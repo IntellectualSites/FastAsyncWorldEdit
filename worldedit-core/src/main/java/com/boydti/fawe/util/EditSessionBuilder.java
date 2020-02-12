@@ -13,7 +13,6 @@ import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.logging.LoggingChangeSet;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.HistoryExtent;
@@ -80,7 +79,7 @@ public class EditSessionBuilder {
     public EditSessionBuilder(@Nonnull World world) {
         checkNotNull(world);
         this.world = world;
-        this.worldName = Fawe.imp().getWorldName(world);
+        this.worldName = world.getName();
     }
 
     public EditSessionBuilder(World world, String worldName) {
@@ -389,13 +388,7 @@ public class EditSessionBuilder {
                 if (command != null && changeSet instanceof RollbackOptimizedHistory) {
                     ((RollbackOptimizedHistory) changeSet).setCommand(this.command);
                 }
-                if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
-                    changeSet = LoggingChangeSet.wrap(player, changeSet);
-                }
                 if (!(changeSet instanceof NullChangeSet)) {
-                    if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
-                        changeSet = LoggingChangeSet.wrap(player, changeSet);
-                    }
                     if (this.blockBag != null) {
                         System.out.println("TODO implement block bag as IBatchProcessor");
                         changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);

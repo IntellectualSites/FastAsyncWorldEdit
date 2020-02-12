@@ -66,22 +66,12 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public boolean ascendLevel() {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = getBasePlayer().ascendLevel();
-            }
-        });
+        return TaskManager.IMP.sync(() -> getBasePlayer().ascendLevel());
     }
 
     @Override
     public boolean descendLevel() {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = getBasePlayer().descendLevel();
-            }
-        });
+        return TaskManager.IMP.sync(() -> getBasePlayer().descendLevel());
     }
 
     @Override
@@ -175,34 +165,25 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public Location getBlockTrace(int range, boolean useLastBlock) {
-        return TaskManager.IMP.sync(new RunnableVal<Location>() {
-            @Override
-            public void run(Location value) {
+        return TaskManager.IMP.sync(() -> {
                 TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
-                this.value = useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
-            }
-        });
+                return useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
+            });
     }
 
     @Override
     public Location getBlockTraceFace(int range, boolean useLastBlock) {
-        return TaskManager.IMP.sync(new RunnableVal<Location>() {
-            @Override
-            public void run(Location value) {
+        return TaskManager.IMP.sync(() -> {
                 TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
-                this.value = useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
-            }
-        });
+                return useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
+            });
     }
 
     @Override
     public Location getSolidBlockTrace(int range) {
-        return TaskManager.IMP.sync(new RunnableVal<Location>() {
-            @Override
-            public void run(Location value) {
-                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
-                this.value = tb.getSolidTargetBlock();
-            }
+        return TaskManager.IMP.sync(() -> {
+            TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
+            return tb.getSolidTargetBlock();
         });
     }
 

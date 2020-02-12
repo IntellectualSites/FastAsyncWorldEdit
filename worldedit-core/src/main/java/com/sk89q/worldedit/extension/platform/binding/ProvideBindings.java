@@ -3,7 +3,6 @@ package com.sk89q.worldedit.extension.platform.binding;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
-import com.boydti.fawe.logging.LoggingChangeSet;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;

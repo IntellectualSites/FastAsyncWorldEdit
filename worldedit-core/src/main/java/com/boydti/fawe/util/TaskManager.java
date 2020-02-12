@@ -22,7 +22,7 @@ public abstract class TaskManager {
 
     public static TaskManager IMP;
 
-    private ForkJoinPool pool = new ForkJoinPool();
+    private final ForkJoinPool pool = new ForkJoinPool();
 
     /**
      * Run a repeating task on the main thread
@@ -303,6 +303,22 @@ public abstract class TaskManager {
         }
         try {
             return Fawe.get().getQueueHandler().sync((Supplier<T>) function).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish:<br>
+     * - Useful if you need to access something from the Bukkit API from another thread<br>
+     * - Usually wait time is around 25ms<br>
+     */
+    public <T> T syncWhenFree(@NotNull final Supplier<T> supplier) {
+        if (Fawe.isMainThread()) {
+            return supplier.get();
+        }
+        try {
+            return Fawe.get().getQueueHandler().sync(supplier).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
