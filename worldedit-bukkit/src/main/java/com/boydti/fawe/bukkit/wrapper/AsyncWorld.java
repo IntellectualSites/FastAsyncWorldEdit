@@ -1223,4 +1223,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
         throws UnsupportedOperationException {
         return parent.getHighestBlockAt(x, z, heightmap);
     }
+
+    @Override
+    public @NotNull Block getHighestBlockAt(@NotNull Location location,
+        @NotNull HeightmapType heightmap) throws UnsupportedOperationException {
+        return parent.getHighestBlockAt(location, heightmap);
+    }
 }
