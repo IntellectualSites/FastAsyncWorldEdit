@@ -4,6 +4,7 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
+import com.destroystokyo.paper.HeightmapType;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -1209,5 +1210,17 @@ public class AsyncWorld extends PassthroughExtent implements World {
         double offsetX, double offsetY, double offsetZ, double extra, @Nullable T data,
         boolean force) {
         parent.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, extra, data, force);
+    }
+
+    @Override
+    public int getHighestBlockYAt(@NotNull Location location, @NotNull HeightmapType heightmap)
+        throws UnsupportedOperationException {
+        return parent.getHighestBlockYAt(location, heightmap);
+    }
+
+    @Override
+    public @NotNull Block getHighestBlockAt(int x, int z, @NotNull HeightmapType heightmap)
+        throws UnsupportedOperationException {
+        return parent.getHighestBlockAt(x, z, heightmap);
     }
 }
