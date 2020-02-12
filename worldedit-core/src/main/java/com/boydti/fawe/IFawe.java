@@ -23,8 +23,6 @@ public interface IFawe {
 
     TaskManager getTaskManager();
 
-    String getWorldName(World world);
-
     Collection<FaweMaskManager> getMaskManagers();
 
     default ImageViewer getImageViewer(Player player) {
@@ -49,4 +47,5 @@ public interface IFawe {
 
     Preloader getPreloader();
 
+    void setupPlotSquared();
 }

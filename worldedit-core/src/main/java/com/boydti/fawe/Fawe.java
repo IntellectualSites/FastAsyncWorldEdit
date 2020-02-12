@@ -3,7 +3,6 @@ package com.boydti.fawe;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
-import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -188,8 +187,7 @@ public class Fawe {
 //                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                WEManager.IMP.managers.add(new PlotSquaredFeature());
-                log.debug("Plugin 'PlotSquared' found. Using it now.");
+                IMP.setupPlotSquared();
             } catch (Throwable ignored) {}
         }, 0);
 

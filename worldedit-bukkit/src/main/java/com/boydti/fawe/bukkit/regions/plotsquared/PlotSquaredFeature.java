@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.integrations.plotquared;
+package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RegionWrapper;

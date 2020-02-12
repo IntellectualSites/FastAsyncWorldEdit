@@ -1,4 +1,4 @@
-package com.boydti.fawe.regions.general.integrations.plotquared;
+package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
@@ -17,7 +17,6 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
-import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;

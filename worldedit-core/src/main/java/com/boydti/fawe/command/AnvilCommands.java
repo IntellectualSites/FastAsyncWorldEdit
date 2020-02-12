@@ -627,7 +627,7 @@ public class AnvilCommands {
 //        int oX = offset.getBlockX();
 //        int oZ = offset.getBlockZ();
 //        RegionWrapper pasteRegion = new RegionWrapper(copyRegion.minX + oX, copyRegion.maxX + oX, copyRegion.minZ + oZ, copyRegion.maxZ + oZ);
-//        String pasteWorldName = Fawe.imp().getWorldName(editSession.getWorld());
+//        String pasteWorldName = editSession.getWorld().getName();
 //        IQueueExtent tmpTo = SetQueue.IMP.getNewQueue(pasteWorldName, true, false);
 //        MCAQueue copyQueue = clipboard.getQueue();
 //        MCAQueue pasteQueue = new MCAQueue(tmpTo);

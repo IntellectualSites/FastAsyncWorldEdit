@@ -115,7 +115,7 @@ public class RegionCommands {
                 System.out.println("TODO FIXME TIPS");
 //                TranslatableComponent.of("fawe.tips.tip.fast").or(TranslatableComponent.of("fawe.tips.tip.cancel"), TranslatableComponent.of("fawe.tips.tip.mask"), TranslatableComponent.of("fawe.tips.tip.mask.angle"), TranslatableComponent.of("fawe.tips.tip.set.linear"), TranslatableComponent.of("fawe.tips.tip.surface.spread"), TranslatableComponent.of("fawe.tips.tip.set.hand")).send(actor);
         }
-        return 0;
+        return affected;
     }
 
     @Command(
@@ -313,7 +313,7 @@ public class RegionCommands {
     @Confirm(Confirm.Processor.REGION)
     public int overlay(Actor actor, EditSession editSession, @Selection Region region,
                        @Arg(desc = "The pattern of blocks to overlay")
-                            Pattern pattern) throws WorldEditException {
+                           Pattern pattern) throws WorldEditException {
         int affected = editSession.overlayCuboidBlocks(region, pattern);
         actor.printInfo(TranslatableComponent.of("worldedit.overlay.overlaid", TextComponent.of(affected)));
         return affected;
@@ -470,9 +470,9 @@ public class RegionCommands {
 
 
     @Command(
-            name = "/move",
-            aliases = {"/mv"},
-            desc = "Move the contents of the selection"
+        name = "/move",
+        aliases = {"/mv"},
+        desc = "Move the contents of the selection"
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
@@ -480,25 +480,25 @@ public class RegionCommands {
     public int move(Actor actor, World world, EditSession editSession, LocalSession session,
                     @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
-                            int count,
+                        int count,
                     @Arg(desc = "The direction to move", def = Direction.AIM)
                     @Direction(includeDiagonals = true)
-                            BlockVector3 direction,
+                        BlockVector3 direction,
                     @Arg(desc = "The pattern of blocks to leave", def = "air")
-                            Pattern replace,
+                        Pattern replace,
                     @Switch(name = 's', desc = "Shift the selection to the target location")
-                            boolean moveSelection,
+                        boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
-                            boolean ignoreAirBlocks,
+                        boolean ignoreAirBlocks,
                     @Switch(name = 'e', desc = "Also copy entities")
                         boolean copyEntities,
                     @Switch(name = 'b', desc = "Also copy biomes")
-                            boolean copyBiomes,
+                        boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
-                            Mask mask) throws WorldEditException {
+                        Mask mask) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
 
-		Mask combinedMask;
+        Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
                 combinedMask = new ExistingBlockMask(editSession);
@@ -568,7 +568,7 @@ public class RegionCommands {
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                          Mask mask) throws WorldEditException {
 
-		Mask combinedMask;
+        Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
                 combinedMask = new ExistingBlockMask(editSession);
@@ -583,9 +583,9 @@ public class RegionCommands {
 
         if (moveSelection) {
             try {
-            final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+                final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
 
-            final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
+                final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
                 region.shift(shiftVector);
 
                 session.getRegionSelector(world).learnChanges();
@@ -623,7 +623,7 @@ public class RegionCommands {
             session.setSourceMask(mask);
         }
         if (success) {
-        actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
+            actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
         } else {
             actor.printError(TranslatableComponent.of("worldedit.regen.failed"));
         }

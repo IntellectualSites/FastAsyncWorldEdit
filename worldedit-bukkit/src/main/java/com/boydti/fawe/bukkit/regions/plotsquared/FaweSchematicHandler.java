@@ -1,4 +1,6 @@
-package com.boydti.fawe.regions.general.integrations.plotquared;
+package com.boydti.fawe.bukkit.regions.plotsquared;
+
+import static org.bukkit.Bukkit.getWorld;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
@@ -19,12 +21,14 @@ import com.sk89q.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.World;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,8 +57,9 @@ public class FaweSchematicHandler extends SchematicHandler {
             Location[] corners = MainUtil.getCorners(world, regions);
             Location pos1 = corners[0];
             Location pos2 = corners[1];
+            World adaptedWorld = BukkitAdapter.adapt(getWorld(world));
             final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-            final EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+            final EditSession editSession = new EditSessionBuilder(adaptedWorld).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
 

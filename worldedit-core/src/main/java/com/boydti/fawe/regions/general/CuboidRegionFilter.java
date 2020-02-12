@@ -43,9 +43,9 @@ public abstract class CuboidRegionFilter implements RegionFilter {
         int cz1 = pos1.getBlockZ() >> 4;
         int cx2 = pos2.getBlockX() >> 4;
         int cz2 = pos2.getBlockZ() >> 4;
-        for (int cz = cz1; cz <= cz2; cz++) {
-            for (int cx = cx1; cx <= cx2; cx++) {
-                unoccupiedChunks.remove(cx, cz);
+        for (int chunkZ = cz1; chunkZ <= cz2; chunkZ++) {
+            for (int chunkX = cx1; chunkX <= cx2; chunkX++) {
+                unoccupiedChunks.remove(chunkX, chunkZ);
             }
         }
     }

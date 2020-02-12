@@ -5,6 +5,7 @@ import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
 import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
@@ -26,6 +27,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
@@ -37,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -228,11 +229,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin;
     }
 
-    @Override
-    public String getWorldName(World world) {
-        return world.getName();
-    }
-
     /**
      * A mask manager handles region restrictions e.g., PlotSquared plots / WorldGuard regions
      */
@@ -346,5 +342,11 @@ public class FaweBukkit implements IFawe, Listener {
             return new AsyncPreloader();
         }
         return null;
+    }
+
+    @Override
+    public void setupPlotSquared() {
+        WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
+        log.debug("Plugin 'PlotSquared' found. Using it now.");
     }
 }
