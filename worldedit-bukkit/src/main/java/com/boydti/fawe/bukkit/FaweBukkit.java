@@ -5,7 +5,6 @@ import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
 import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
-import com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
@@ -31,7 +30,6 @@ import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
-import com.sk89q.worldedit.world.World;
 import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -166,12 +164,10 @@ public class FaweBukkit implements IFawe, Listener {
         Player player = null;
         if (obj.getClass() == Player.class) {
             player = (Player) obj;
-        }
-        else if (obj.getClass() == String.class) {
+        } else if (obj.getClass() == String.class) {
             String name = (String) obj;
             player = Bukkit.getPlayer(name);
-        }
-        else if (obj.getClass() == UUID.class) {
+        } else if (obj.getClass() == UUID.class) {
             UUID uuid = (UUID) obj;
             player = Bukkit.getPlayer(uuid);
         }
@@ -319,21 +315,6 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getName(UUID uuid) {
         return Bukkit.getOfflinePlayer(uuid).getName();
-    }
-
-    private boolean enabledBlocksHub = true;
-
-    @Override
-    public Object getBlocksHubApi() {
-        if (!enabledBlocksHub) {
-            return null;
-        }
-        Plugin blocksHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
-        if (blocksHubPlugin == null) {
-            enabledBlocksHub = false;
-            return null;
-        }
-        return null;
     }
 
     @Override
