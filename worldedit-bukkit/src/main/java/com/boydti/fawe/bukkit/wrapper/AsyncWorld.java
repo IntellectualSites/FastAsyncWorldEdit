@@ -254,7 +254,28 @@ public class AsyncWorld extends PassthroughExtent implements World {
     public AsyncBlock getHighestBlockAt(Location loc) {
         return getHighestBlockAt(loc.getBlockX(), loc.getBlockZ());
     }
-    
+
+    @Override
+    public int getHighestBlockYAt(int i, int i1, @NotNull HeightMap heightMap) {
+        return parent.getHighestBlockYAt(i,i1, heightMap);
+    }
+
+    @Override
+    public int getHighestBlockYAt(@NotNull Location location, @NotNull HeightMap heightMap) {
+        return parent.getHighestBlockYAt(location, heightMap);
+    }
+
+    @Override
+    public @NotNull Block getHighestBlockAt(int i, int i1, @NotNull HeightMap heightMap) {
+        return parent.getHighestBlockAt(i, i1, heightMap);
+    }
+
+    @Override
+    public @NotNull Block getHighestBlockAt(@NotNull Location location,
+        @NotNull HeightMap heightMap) {
+        return parent.getHighestBlockAt(location, heightMap);
+    }
+
     @Override
     public AsyncChunk getChunkAt(int x, int z) {
         return new AsyncChunk(this, x, z);
