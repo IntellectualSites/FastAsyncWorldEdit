@@ -9,7 +9,6 @@ import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
-import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
@@ -94,12 +93,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
-            try {
-                Class.forName("sun.misc.SharedSecrets");
-                new ChunkListener_8();
-            } catch (ClassNotFoundException e) {
                 new ChunkListener_9();
-            }
         });
     }
 

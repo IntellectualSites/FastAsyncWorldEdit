@@ -29,6 +29,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.Effect;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameRule;
+import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -253,7 +254,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     public AsyncBlock getHighestBlockAt(Location loc) {
         return getHighestBlockAt(loc.getBlockX(), loc.getBlockZ());
     }
-
+    
     @Override
     public AsyncChunk getChunkAt(int x, int z) {
         return new AsyncChunk(this, x, z);
