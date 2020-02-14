@@ -142,15 +142,16 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
-        final Location loc = player.getLocation();
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = loc.getBlockX() >> 4;
-            final int cz = loc.getBlockZ() >> 4;
-            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
+        player.print("Temporarily not working");
+//        final Location loc = player.getLocation();
+//        Region selection = player.getSelection();
+//        if (selection == null) {
+//            final int cx = loc.getBlockX() >> 4;
+//            final int cz = loc.getBlockZ() >> 4;
+//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+//        }
+//        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
+//        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
     }
 
     @Command(
@@ -171,14 +172,15 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.remove")
     public void removeLighting(Player player) {
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = player.getLocation().getBlockX() >> 4;
-            final int cz = player.getLocation().getBlockZ() >> 4;
-            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
-        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
+        player.print("Temporarily not working");
+//        Region selection = player.getSelection();
+//        if (selection == null) {
+//            final int cx = player.getLocation().getBlockX() >> 4;
+//            final int cz = player.getLocation().getBlockZ() >> 4;
+//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+//        }
+//        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
+//        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
     }
 
     @Command(
@@ -207,7 +209,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(from = 0, to = 15) int value) {
-        // TODO NOT IMPLEMENTED
+        player.print("Temporarily not working");
     }
 
     @Command(
@@ -216,7 +218,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(from = 0, to= 15) int value) {
-        // TODO NOT IMPLEMENTED
+        player.print("Temporarily not working");
     }
 
     @Command(

@@ -135,18 +135,6 @@ public class FaweAPI {
     }
 
     /**
-     * Create a command with the provided aliases and register all methods of the class as sub commands.<br>
-     * - You should try to register commands during startup
-     * - If no aliases are specified, all methods become root commands
-     *
-     * @param clazz   The class containing all the sub command methods
-     * @param aliases The aliases to give the command (or none)
-     */
-    public static void registerCommands(Object clazz, String... aliases) {
-//        PlatformCommandManager.getInstance().registerCommands(clazz, aliases); TODO NOT IMPLEMENTED
-    }
-
-    /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
@@ -255,11 +243,11 @@ public class FaweAPI {
         if (!file.exists() || file.isDirectory()) {
             throw new IllegalArgumentException("Not a file!");
         }
-        if (!file.getName().toLowerCase().endsWith(".bd")) {
-            throw new IllegalArgumentException("Not a BD file!");
-        }
         if (Settings.IMP.HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
+        }
+        if (!file.getName().toLowerCase().endsWith(".bd")) {
+            throw new IllegalArgumentException("Not a BD file!");
         }
         String[] path = file.getPath().split(File.separator);
         if (path.length < 3) {
@@ -277,8 +265,7 @@ public class FaweAPI {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid UUID from file path: " + uuidString);
         }
-        DiskStorageHistory history = new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
-        return history;
+        return new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
     }
 
     /**
@@ -291,7 +278,7 @@ public class FaweAPI {
      * @param timediff - The max age of the file in milliseconds
      * @param shallow  - If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
      *                 Reading only part of the file will result in unreliable bounds info for large edits
-     * @return
+     * @return a list of DiskStorageHistory Objects
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
         Extent extent = origin.getExtent();
