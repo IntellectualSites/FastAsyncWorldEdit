@@ -12,8 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class ResidenceFeature extends BukkitMaskManager implements Listener {
-    FaweBukkit plugin;
-    Plugin residence;
+    private FaweBukkit plugin;
+    private Plugin residence;
 
     public ResidenceFeature(final Plugin residencePlugin, final FaweBukkit p3) {
         super(residencePlugin.getName());

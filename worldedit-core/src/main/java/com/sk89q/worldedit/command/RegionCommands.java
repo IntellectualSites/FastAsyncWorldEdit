@@ -111,9 +111,6 @@ public class RegionCommands {
         int affected = editSession.setBlocks(region, pattern);
         if (affected != 0) {
             actor.printInfo(TranslatableComponent.of("worldedit.set.done"));
-            if (!actor.hasPermission("fawe.tips"))
-                System.out.println("TODO FIXME TIPS");
-//                TranslatableComponent.of("fawe.tips.tip.fast").or(TranslatableComponent.of("fawe.tips.tip.cancel"), TranslatableComponent.of("fawe.tips.tip.mask"), TranslatableComponent.of("fawe.tips.tip.mask.angle"), TranslatableComponent.of("fawe.tips.tip.set.linear"), TranslatableComponent.of("fawe.tips.tip.surface.spread"), TranslatableComponent.of("fawe.tips.tip.set.hand")).send(actor);
         }
         return affected;
     }
@@ -424,7 +421,7 @@ public class RegionCommands {
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
         }
-        int affected = 0;
+        int affected;
         try {
             HeightMap heightMap = new HeightMap(editSession, region, mask, snow);
             HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
@@ -609,9 +606,7 @@ public class RegionCommands {
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
     public void regenerateChunk(Actor actor, World world, LocalSession session,
-            EditSession editSession, @Selection Region region,
-        @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
-        @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
+            EditSession editSession, @Selection Region region) throws WorldEditException {
         Mask mask = session.getMask();
         boolean success;
         try {
@@ -702,6 +697,7 @@ public class RegionCommands {
                       @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
+
         int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
         actor.printInfo(TranslatableComponent.of("worldedit.hollow.changed", TextComponent.of(affected)));
         return affected;

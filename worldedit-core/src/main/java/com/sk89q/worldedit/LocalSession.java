@@ -94,6 +94,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -335,7 +336,7 @@ public class LocalSession implements TextureHolder {
     }
 
     public List<ChangeSet> getHistory() {
-        return Lists.transform(history, this::getChangeSet);
+        return history.stream().map(this::getChangeSet).collect(Collectors.toList());
     }
 
     public boolean save() {

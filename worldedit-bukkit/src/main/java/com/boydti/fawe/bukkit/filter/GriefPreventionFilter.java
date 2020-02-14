@@ -20,12 +20,8 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
 
     public GriefPreventionFilter(World world) {
         checkNotNull(world);
-        this.claims = TaskManager.IMP.sync(new Supplier<Collection<Claim>>() {
-            @Override
-            public Collection<Claim> get() {
-                return new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims());
-            }
-        });
+        this.claims = TaskManager.IMP.sync(
+            (Supplier<Collection<Claim>>) () -> new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims()));
         this.world = world;
     }
 

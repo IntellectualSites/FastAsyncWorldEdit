@@ -8,6 +8,7 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -28,7 +29,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     @Override
     public void calculateRegions() {
         Fawe.get().getQueueHandler().sync(() -> {
-            WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(FaweAPI.getWorld(world.getName()));
+            WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
+                BukkitAdapter.adapt(world));
             for (ProtectedRegion region : manager.getRegions().values()) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();

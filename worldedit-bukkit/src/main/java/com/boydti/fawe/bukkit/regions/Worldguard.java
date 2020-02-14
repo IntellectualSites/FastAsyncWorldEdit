@@ -27,7 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
-    private WorldGuardPlugin worldguard;
+    private final WorldGuardPlugin worldguard;
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");

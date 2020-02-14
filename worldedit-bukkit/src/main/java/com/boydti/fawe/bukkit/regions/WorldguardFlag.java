@@ -21,7 +21,7 @@ import org.bukkit.plugin.Plugin;
 
 public class WorldguardFlag extends BukkitMaskManager implements Listener {
 
-    private WorldGuardPlugin worldguard;
+    private final WorldGuardPlugin worldguard;
 
     public WorldguardFlag(Plugin plugin) {
         super("worldguardflag");

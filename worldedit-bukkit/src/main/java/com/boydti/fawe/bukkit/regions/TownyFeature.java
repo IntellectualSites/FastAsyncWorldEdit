@@ -19,7 +19,7 @@ import org.bukkit.plugin.Plugin;
 
 public class TownyFeature extends BukkitMaskManager implements Listener {
 
-    private Plugin towny;
+    private final Plugin towny;
 
     public TownyFeature(Plugin townyPlugin) {
         super(townyPlugin.getName());

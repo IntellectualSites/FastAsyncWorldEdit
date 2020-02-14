@@ -45,7 +45,7 @@ public class AsyncSign extends AsyncBlockState implements Sign {
 
     private String toJson(String oldInput) {
         if (oldInput == null || oldInput.isEmpty()) return "";
-        return LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of(oldInput));
+        return LegacyComponentSerializer.legacy().serialize(TextComponent.of(oldInput));
     }
 
     @Override

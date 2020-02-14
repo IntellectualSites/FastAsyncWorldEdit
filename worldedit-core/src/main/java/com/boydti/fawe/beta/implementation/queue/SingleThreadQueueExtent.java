@@ -72,13 +72,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public IChunkGet getCachedGet(int x, int z) {
-        return cacheGet.get(x, z);
+    public IChunkGet getCachedGet(int chunkX, int chunkZ) {
+        return cacheGet.get(chunkX, chunkZ);
     }
 
     @Override
-    public IChunkSet getCachedSet(int x, int z) {
-        return cacheSet.get(x, z);
+    public IChunkSet getCachedSet(int chunkX, int chunkZ) {
+        return cacheSet.get(chunkX, chunkZ);
     }
 
     /**

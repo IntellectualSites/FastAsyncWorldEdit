@@ -105,7 +105,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.get(this).getEntity(uuid);
     }
 
-    public static final IBlockDelegate BOTH = new IBlockDelegate() {
+    private static final IBlockDelegate BOTH = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             return chunk.chunkExisting;
@@ -144,7 +144,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate GET = new IBlockDelegate() {
+    
+    private static final IBlockDelegate GET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             return chunk.chunkExisting;
@@ -189,7 +190,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate SET = new IBlockDelegate() {
+    
+    private static final IBlockDelegate SET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
@@ -235,7 +237,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate NULL = new IBlockDelegate() {
+    
+    private static final IBlockDelegate NULL = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
@@ -286,11 +289,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.getFullBlock(x, y, z);
         }
     };
-
-//    @Override
-//    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
-////        block.flood(get, set, mask, block, );
-//    }
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {

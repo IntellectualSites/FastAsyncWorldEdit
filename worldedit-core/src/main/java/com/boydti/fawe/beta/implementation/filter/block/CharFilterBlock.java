@@ -23,27 +23,17 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class CharFilterBlock extends ChunkFilterBlock {
 
-    private static final SetDelegate FULL = new SetDelegate() {
-        @Override
-        public final void set(CharFilterBlock block, char value) {
-            block.setArr[block.index] = value;
-        }
-    };
-    private static final SetDelegate NULL = new SetDelegate() {
-        @Override
-        public void set(CharFilterBlock block, char value) {
-            block.initSet().set(block, value);
-        }
-    };
+    private static final SetDelegate FULL = (block, value) -> block.setArr[block.index] = value;
+    private static final SetDelegate NULL = (block, value) -> block.initSet().set(block, value);
 
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
-    private @Nullable
-    char[] setArr;
+    private @Nullable char[] setArr;
     private SetDelegate delegate;
     // local
     private int layer, index, x, y, z, xx, yy, zz, chunkX, chunkZ;
@@ -65,11 +55,10 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
         this.get = (CharGetBlocks) iget;
         this.layer = layer;
-        final IBlocks get = (CharGetBlocks) iget;
-        if (!get.hasSection(layer)) {
+        if (!iget.hasSection(layer)) {
             getArr = FaweCache.IMP.EMPTY_CHAR_4096;
         } else {
-            getArr = get.load(layer);
+            getArr = iget.load(layer);
         }
         this.set = iset;
         if (set.hasSection(layer)) {
@@ -445,6 +434,6 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     private interface SetDelegate {
 
-        void set(CharFilterBlock block, char value);
+        void set(@NotNull CharFilterBlock block, char value);
     }
 }
