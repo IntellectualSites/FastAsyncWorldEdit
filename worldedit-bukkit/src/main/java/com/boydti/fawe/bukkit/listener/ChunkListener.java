@@ -43,9 +43,11 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
+import org.slf4j.Logger;
 
 public abstract class ChunkListener implements Listener {
 
+    private final Logger logger = getLogger(ChunkListener.class);
     protected int rateLimit = 0;
     protected Location lastCancelPos;
     private int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
@@ -63,7 +65,7 @@ public abstract class ChunkListener implements Listener {
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
-                    getLogger(ChunkListener.class).debug("[FAWE `tick-limiter`] Detected and cancelled physics lag source at "
+                    logger.debug("[FAWE Tick Limiter] Detected and cancelled physics lag source at "
                         + tmpLoc);
                 }
                 rateLimit--;
@@ -185,15 +187,6 @@ public abstract class ChunkListener implements Listener {
     public void event(BlockPlaceEvent event) {
         reset();
     }
-
-//    @EventHandler(priority = EventPriority.LOWEST)
-//    public void event(BrewEvent event) { reset(); }
-//
-//    @EventHandler(priority = EventPriority.LOWEST)
-//    public void event(BrewingStandFuelEvent event) { reset(); }
-//
-//    @EventHandler(priority = EventPriority.LOWEST)
-//    public void event(CauldronLevelChangeEvent event ) { reset(); }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void event(FurnaceBurnEvent event) {
@@ -392,7 +385,7 @@ public abstract class ChunkListener implements Listener {
                             double vertical = Math.abs(velocity.getY());
                             if (Math.abs(velocity.getX()) > vertical
                                 || Math.abs(velocity.getZ()) > vertical) {
-                                getLogger(ChunkListener.class).warn(
+                                logger.warn(
                                     "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
                                         + ent.getLocation());
                                 ent.remove();
@@ -423,7 +416,7 @@ public abstract class ChunkListener implements Listener {
             cancelNearby(cx, cz);
             if (rateLimit <= 0) {
                 rateLimit = 20;
-                getLogger(ChunkListener.class).warn(
+                logger.warn(
                     "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
             }
             event.setCancelled(true);

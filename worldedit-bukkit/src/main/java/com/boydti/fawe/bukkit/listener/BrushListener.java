@@ -37,7 +37,7 @@ public class BrushListener implements Listener {
             final int slot = event.getNewSlot();
             final int oldSlot = event.getPreviousSlot();
             final int ri;
-            if ((((slot - oldSlot) <= 4) && ((slot - oldSlot) > 0)) || (((slot - oldSlot) < -4))) {
+            if ((((slot - oldSlot) <= 4) && ((slot - oldSlot) > 0)) || ((slot - oldSlot) < -4)) {
                 ri = 1;
             } else {
                 ri = -1;
