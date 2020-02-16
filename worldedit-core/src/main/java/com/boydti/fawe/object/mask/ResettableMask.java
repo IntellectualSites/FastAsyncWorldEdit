@@ -1,5 +1,9 @@
 package com.boydti.fawe.object.mask;
 
-public interface ResettableMask {
+import com.boydti.fawe.Resettable;
+
+public interface ResettableMask extends Resettable {
+
+    @Override
     void reset();
 }

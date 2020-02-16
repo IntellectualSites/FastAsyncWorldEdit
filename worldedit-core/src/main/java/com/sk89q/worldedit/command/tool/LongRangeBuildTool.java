@@ -62,11 +62,11 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
                 editSession.disableBuffering();
-            BlockVector3 blockPoint = pos.toVector().toBlockPoint();
-            BaseBlock applied = secondary.apply(blockPoint);
-            if (applied.getBlockType().getMaterial().isAir()) {
+                BlockVector3 blockPoint = pos.toVector().toBlockPoint();
+                BaseBlock applied = secondary.apply(blockPoint);
+                if (applied.getBlockType().getMaterial().isAir()) {
                     editSession.setBlock(blockPoint, secondary);
-            } else {
+                } else {
                     editSession.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), secondary);
                 }
             } catch (MaxChangedBlocksException ignored) {
@@ -76,8 +76,8 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         } finally {
             if (bag != null) {
                 bag.flushChanges();
+            }
         }
-    }
         return true;
     }
 
@@ -90,11 +90,11 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
                 editSession.disableBuffering();
-            BlockVector3 blockPoint = pos.toVector().toBlockPoint();
-            BaseBlock applied = primary.apply(blockPoint);
-            if (applied.getBlockType().getMaterial().isAir()) {
+                BlockVector3 blockPoint = pos.toVector().toBlockPoint();
+                BaseBlock applied = primary.apply(blockPoint);
+                if (applied.getBlockType().getMaterial().isAir()) {
                     editSession.setBlock(blockPoint, primary);
-            } else {
+                } else {
                     editSession.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), primary);
                 }
             } catch (MaxChangedBlocksException ignored) {
@@ -104,8 +104,8 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         } finally {
             if (bag != null) {
                 bag.flushChanges();
+            }
         }
-    }
         return true;
     }
 

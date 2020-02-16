@@ -328,12 +328,12 @@ public class PlatformManager {
         if (!(actor instanceof Player)) {
             return;
         }
-            Player player = (Player) actor;
-            LocalSession session = worldEdit.getSessionManager().get(actor);
+        Player player = (Player) actor;
+        LocalSession session = worldEdit.getSessionManager().get(actor);
 
-            Request.reset();
-            Request.request().setSession(session);
-            Request.request().setWorld(player.getWorld());
+        Request.reset();
+        Request.request().setSession(session);
+        Request.request().setWorld(player.getWorld());
 
             try {
             Vector3 vector = location.toVector();
@@ -348,19 +348,19 @@ public class PlatformManager {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
                 // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
                 if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
-                        final BlockTool superPickaxe = session.getSuperPickaxe();
-                        if (superPickaxe != null && superPickaxe.canUse(player)) {
+                    final BlockTool superPickaxe = session.getSuperPickaxe();
+                    if (superPickaxe != null && superPickaxe.canUse(player)) {
                         player.runAction(() -> reset(superPickaxe)
                             .actPrimary(queryCapability(Capability.WORLD_EDITING),
                                 getConfiguration(), player, session, location), false, true);
-                        event.setCancelled(true);
-                            return;
-                        }
+                            event.setCancelled(true);
+                        return;
                     }
+                }
 
                 Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
-                    player.runAction(() -> reset(((DoubleActionBlockTool) tool))
+                    player.runAction(() -> reset((DoubleActionBlockTool) tool)
                         .actSecondary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session, location), false, true);
                             event.setCancelled(true);
@@ -384,10 +384,10 @@ public class PlatformManager {
                     }
         } catch (Throwable e) {
             handleThrowable(e, actor);
-            } finally {
-                Request.reset();
-            }
+        } finally {
+            Request.reset();
         }
+    }
 
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);

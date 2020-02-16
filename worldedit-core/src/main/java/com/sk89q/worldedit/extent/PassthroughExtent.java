@@ -1,8 +1,6 @@
 package com.sk89q.worldedit.extent;
 
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -207,21 +205,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
-    }
-
-    // special
-    @Override
-    public Extent disableHistory() {
-        return super.disableHistory();
-    }
-
-    @Override
-    public Extent addProcessor(IBatchProcessor processor) {
-        return super.addProcessor(processor);
-    }
-
-    public Extent enableHistory(AbstractChangeSet changeSet) {
-        return super.enableHistory(changeSet);
     }
 
     @Override

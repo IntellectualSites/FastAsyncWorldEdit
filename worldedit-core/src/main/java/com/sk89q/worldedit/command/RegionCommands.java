@@ -97,9 +97,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/set",
-            aliases = {"/"},
-            desc = "Sets all the blocks in the region"
+        name = "/set",
+        desc = "Sets all the blocks in the region"
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)

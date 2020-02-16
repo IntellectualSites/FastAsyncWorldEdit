@@ -4,16 +4,17 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 
 import java.lang.reflect.Field;
+import org.jetbrains.annotations.NotNull;
 
 public class ExtentTraverser<T extends Extent> {
-    private T root;
-    private ExtentTraverser<T> parent;
+    private final T root;
+    private final ExtentTraverser<T> parent;
 
-    public ExtentTraverser(T root) {
+    public ExtentTraverser(@NotNull T root) {
         this(root, null);
     }
 
-    public ExtentTraverser(T root, ExtentTraverser<T> parent) {
+    public ExtentTraverser(@NotNull T root, ExtentTraverser<T> parent) {
         this.root = root;
         this.parent = parent;
     }
@@ -61,7 +62,7 @@ public class ExtentTraverser<T extends Extent> {
     }
 
     public <U> U findAndGet(Class<U> clazz) {
-        ExtentTraverser<Extent> traverser = find((Class) clazz);
+        ExtentTraverser<Extent> traverser = find( clazz);
         return (traverser != null) ? (U) traverser.get() : null;
     }
 
@@ -104,9 +105,8 @@ public class ExtentTraverser<T extends Extent> {
     public ExtentTraverser<T> next() {
         try {
             if (root instanceof AbstractDelegateExtent) {
-                Field field = AbstractDelegateExtent.class.getDeclaredField("extent");
-                field.setAccessible(true);
-                T value = (T) field.get(root);
+                AbstractDelegateExtent root = (AbstractDelegateExtent) this.root;
+                T value = (T) root.getExtent();
                 if (value == null) {
                     return null;
                 }

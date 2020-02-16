@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation.queue;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueWrapper;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
@@ -64,12 +65,12 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         return false;
     }
 
-    private IQueueExtent getNewQueue() {
+    private IQueueExtent<IQueueChunk> getNewQueue() {
         return wrapQueue(handler.getQueue(this.world, this.processor));
     }
 
     @Override
-    public IQueueExtent wrapQueue(IQueueExtent queue) {
+    public IQueueExtent<IQueueChunk> wrapQueue(IQueueExtent<IQueueChunk> queue) {
         // TODO wrap
         queue.setProcessor(this.processor);
         return queue;
@@ -91,22 +92,22 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                 try {
                     final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
-                    final IQueueExtent queue = getNewQueue();
+                    final IQueueExtent<IQueueChunk> queue = getNewQueue();
                     synchronized (queue) {
                         ChunkFilterBlock block = null;
 
                         while (true) {
                             // Get the next chunk posWeakChunk
-                            final int X, Z;
+                            final int chunkX, chunkZ;
                             synchronized (chunksIter) {
                                 if (!chunksIter.hasNext()) {
                                     break;
                                 }
                                 final BlockVector2 pos = chunksIter.next();
-                                X = pos.getX();
-                                Z = pos.getZ();
+                                chunkX = pos.getX();
+                                chunkZ = pos.getZ();
                             }
-                            block = queue.apply(block, newFilter, region, X, Z, full);
+                            block = queue.apply(block, newFilter, region, chunkX, chunkZ, full);
                         }
                         queue.flush();
                     }

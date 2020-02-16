@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command.tool;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
@@ -45,8 +44,6 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.StringMan;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -56,7 +53,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -74,11 +70,9 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
@@ -114,7 +108,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Construct the tool.
-     *
+     * 
      * @param permission the permission to check before use is allowed
      */
     public BrushTool(String permission) {
@@ -125,40 +119,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     public BrushTool() {
     }
 
-    // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    public static BrushTool fromString(Player player, LocalSession session, String json) throws CommandException, InputParseException {
-//        Gson gson = new Gson();
-//        Type type = new TypeToken<Map<String, Object>>() {
-//        }.getType();
-//        Map<String, Object> root = gson.fromJson(json, type);
-//        if (root == null) {
-//            getLogger(BrushTool.class).debug("Failed to load " + json);
-//            return new BrushTool();
-//        }
-//        Map<String, Object> primary = (Map<String, Object>) root.get("primary");
-//        Map<String, Object> secondary = (Map<String, Object>) root.getOrDefault("secondary", primary);
-//
-//        VisualMode visual = VisualMode.valueOf((String) root.getOrDefault("visual", "NONE"));
-//        TargetMode target = TargetMode.valueOf((String) root.getOrDefault("target", "TARGET_BLOCK_RANGE"));
-//        int range = ((Number) root.getOrDefault("range", -1)).intValue();
-//        int offset = ((Number) root.getOrDefault("offset", 0)).intValue();
-//
-//        BrushTool tool = new BrushTool();
-//        tool.visualMode = visual;
-//        tool.targetMode = target;
-//        tool.range = range;
-//        tool.targetOffset = offset;
-//
-//        BrushSettings primarySettings = BrushSettings.get(tool, player, session, primary);
-//        tool.setPrimary(primarySettings);
-//        if (primary != secondary) {
-//            BrushSettings secondarySettings = BrushSettings.get(tool, player, session, secondary);
-//            tool.setSecondary(secondarySettings);
-//        }
-//
-//        return tool;
-//    }
-
     public void setHolder(BaseItem holder) {
         this.holder = holder;
     }
@@ -166,33 +126,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     public boolean isSet() {
         return primary.getBrush() != null || secondary.getBrush() != null;
     }
-
-    @Override
-    public String toString() {
-        return toString(new Gson());
-    }
-
-    public String toString(Gson gson) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("primary", primary.getSettings());
-        if (primary != secondary) {
-            map.put("secondary", secondary.getSettings());
-        }
-        if (visualMode != null && visualMode != VisualMode.NONE) {
-            map.put("visual", visualMode);
-        }
-        if (targetMode != TargetMode.TARGET_BLOCK_RANGE) {
-            map.put("target", targetMode);
-        }
-        if (range != -1 && range != DEFAULT_RANGE) {
-            map.put("range", range);
-        }
-        if (targetOffset != 0) {
-            map.put("offset", targetOffset);
-        }
-        return gson.toJson(map);
-    }
-
+    
     public void update() {
         if (holder != null) {
             BrushCache.setTool(holder, this);
@@ -276,7 +210,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Get the filter.
-     *
+     * 
      * @return the filter
      */
     public Mask getMask() {
@@ -304,7 +238,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Set the block filter used for identifying blocks to replace.
-     *
+     * 
      * @param filter the filter to set
      */
     public void setMask(Mask filter) {
@@ -343,7 +277,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Set the brush.
-     *
+     * 
      * @param brush tbe brush
      * @param permission the permission
      */
@@ -357,7 +291,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Get the current brush.
-     *
+      
      * @return the current brush
      */
     public Brush getBrush() {
@@ -366,7 +300,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Set the material.
-     *
+     * 
      * @param material the material
      */
     public void setFill(@Nullable Pattern material) {
@@ -384,7 +318,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Get the set brush size.
-     *
+     * 
      * @return a radius
      */
     public double getSize() {
@@ -393,7 +327,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Set the set brush size.
-     *
+     * 
      * @param radius a radius
      */
     public void setSize(double radius) {
@@ -411,7 +345,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Get the set brush range.
-     *
+     * 
      * @return the range of the brush in blocks
      */
     public int getRange() {
@@ -420,7 +354,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     /**
      * Set the set brush range.
-     *
+     * 
      * @param range the range of the brush in blocks
      */
     public void setRange(int range) {

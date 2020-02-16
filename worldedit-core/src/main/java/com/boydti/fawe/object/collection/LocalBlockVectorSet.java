@@ -29,10 +29,6 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         this.set = set;
     }
 
-    public SparseBitSet getBitSet() {
-        return set;
-    }
-
     @Override
     public int size() {
         return set.cardinality();
@@ -69,10 +65,10 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         if (size() < length * length * length) {
             int index = -1;
             while ((index = set.nextSetBit(index + 1)) != -1) {
-                int b1 = (index & 0xFF);
-                int b2 = ((byte) (index >> 8)) & 0x7F;
-                int b3 = ((byte) (index >> 15)) & 0xFF;
-                int b4 = ((byte) (index >> 23)) & 0xFF;
+                int b1 = (byte) (index >> 0) & 0xFF;
+                int b2 = (byte) (index >> 8) & 0x7F;
+                int b3 = (byte) (index >> 15) & 0xFF;
+                int b4 = (byte) (index >> 23) & 0xFF;
                 if (Math.abs((offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21)) - x) <= radius && Math.abs((offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21)) - z) <= radius && Math.abs((b1) - y) <= radius) {
                     return true;
                 }
@@ -111,12 +107,12 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             index = set.nextSetBit(index + 1);
         }
         if (index != -1) {
-            int b1 = (index & 0xFF);
-            int b2 = ((byte) (index >> 8)) & 0x7F;
-            int b3 = ((byte) (index >> 15)) & 0xFF;
-            int b4 = ((byte) (index >> 23)) & 0xFF;
-            int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
-            int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
+            int b1 = (byte) (index >> 0) & 0xFF;
+            int b2 = (byte) (index >> 8) & 0x7F;
+            int b3 = (byte) (index >> 15) & 0xFF;
+            int b4 = (byte) (index >> 23) & 0xFF;
+            int x = offsetX + (((b3 + (MathMan.unpair8x(b2) << 8)) << 21) >> 21);
+            int z = offsetZ + (((b4 + (MathMan.unpair8y(b2) << 8)) << 21) >> 21);
             return MutableBlockVector3.get(x, b1, z);
         }
         return null;
@@ -146,9 +142,9 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
                     int b2 = ((byte) (index >> 8)) & 0x7F;
                     int b3 = ((byte) (index >> 15)) & 0xFF;
                     int b4 = ((byte) (index >> 23)) & 0xFF;
-                    mutable.mutX(offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21));
+                    mutable.mutX(offsetX + (((b3 + (MathMan.unpair8x(b2) << 8)) << 21) >> 21));
                     mutable.mutY(b1);
-                    mutable.mutZ(offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21));
+                    mutable.mutZ(offsetZ + (((b4 + (MathMan.unpair8y(b2) << 8)) << 21) >> 21));
                     previous = index;
                     index = set.nextSetBit(index + 1);
                     return mutable;
@@ -193,10 +189,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
             return false;
         }
-        if (y < 0 || y > 256) {
-            return false;
-        }
-        return true;
+        return y >= 0 && y <= 256;
     }
 
     public boolean add(int x, int y, int z) {

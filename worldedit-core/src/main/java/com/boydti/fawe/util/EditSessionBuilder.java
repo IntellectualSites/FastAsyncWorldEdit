@@ -266,7 +266,6 @@ public class EditSessionBuilder {
     }
 
     private AbstractChangeSet changeTask;
-    private int maxY;
     private Extent bypassHistory;
     private Extent bypassAll;
     private Extent extent;
@@ -409,7 +408,6 @@ public class EditSessionBuilder {
                     allowedRegions = player.getCurrentRegions();
                 }
             }
-            this.maxY = world == null ? 255 : world.getMaxY();
             FaweRegionExtent regionExtent = null;
             if (allowedRegions != null) {
                 if (allowedRegions.length == 0) {
@@ -423,7 +421,7 @@ public class EditSessionBuilder {
                     }
                 }
             } else {
-//                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, maxY);
+//                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
             IBatchProcessor limitProcessor = regionExtent;
             if (limit != null && !limit.isUnlimited()) {
@@ -495,7 +493,4 @@ public class EditSessionBuilder {
         return blockBag;
     }
 
-    public int getMaxY() {
-        return maxY;
-    }
 }

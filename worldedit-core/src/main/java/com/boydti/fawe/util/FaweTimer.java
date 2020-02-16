@@ -5,12 +5,12 @@ import java.util.Arrays;
 public class FaweTimer implements Runnable {
 
     private final double[] history = new double[]{20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d};
-    private int historyIndex = 0;
+    private int historyIndex;
     private long lastPoll = System.currentTimeMillis();
     private long tickStart = System.currentTimeMillis();
     private final long tickInterval = 5;
-    private long tick = 0;
-    private long tickMod = 0;
+    private long tick;
+    private long tickMod;
 
     @Override
     public void run() {
@@ -21,7 +21,7 @@ public class FaweTimer implements Runnable {
         } else {
             return;
         }
-        long timeSpent = (tickStart - lastPoll);
+        long timeSpent = tickStart - lastPoll;
         if (timeSpent == 0) {
             timeSpent = 1;
         }
@@ -34,15 +34,14 @@ public class FaweTimer implements Runnable {
         lastPoll = tickStart;
     }
 
-    private long lastGetTPSTick = 0;
+    private long lastGetTPSTick;
     private double lastGetTPSValue = 20d;
 
     public double getTPS() {
         if (tick < lastGetTPSTick + tickInterval) {
             return lastGetTPSValue;
         }
-        double total = 0;
-        for (double v : history) total += v;
+        double total = Arrays.stream(history).sum();
         lastGetTPSValue = total / history.length;
         lastGetTPSTick = tick;
         return lastGetTPSValue;

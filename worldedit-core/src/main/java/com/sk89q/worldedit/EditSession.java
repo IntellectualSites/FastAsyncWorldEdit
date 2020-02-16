@@ -255,7 +255,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.limit = builder.getLimit().copy();
         this.player = builder.getPlayer();
         this.changeSet = builder.getChangeTask();
-        this.maxY = builder.getMaxY();
+        this.maxY = world.getMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
     }
