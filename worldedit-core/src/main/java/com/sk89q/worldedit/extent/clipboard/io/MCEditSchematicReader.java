@@ -210,9 +210,6 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
             if (values.isEmpty()) {
                 t = null;
-            }
-            if (values.isEmpty()) {
-                t = null;
             } else {
                 t = new CompoundTag(values);
             }
@@ -248,8 +245,13 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                                 clipboard.setBlock(region.getMinimumPoint().add(pt), state);
                             }
                         } else {
-                            log.warn("Unknown block when pasting schematic: "
-                                             + blocks[index] + ":" + blockData[index] + ". Please report this issue.");
+                            short block = blocks[index];
+                            byte data = blockData[index];
+                            int combined = block << 8 | data;
+                            if (unknownBlocks.add(combined)) {
+                                log.warn("Unknown block when loading schematic: "
+                                        + block + ":" + data + ". This is most likely a bad schematic.");
+                            }
                         }
                     } catch (WorldEditException ignored) { // BlockArrayClipboard won't throw this
                     }
