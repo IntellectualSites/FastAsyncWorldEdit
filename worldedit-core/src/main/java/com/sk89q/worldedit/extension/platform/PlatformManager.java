@@ -406,7 +406,6 @@ public class PlatformManager {
         // making changes to the world
         Player player = createProxyActor(event.getPlayer());
         LocalSession session = worldEdit.getSessionManager().get(player);
-
         VirtualWorld virtual = session.getVirtualWorld();
         if (virtual != null) {
             virtual.handlePlayerInput(player,  event);
@@ -416,7 +415,6 @@ public class PlatformManager {
         try {
             switch (event.getInputType()) {
                 case PRIMARY: {
-
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),

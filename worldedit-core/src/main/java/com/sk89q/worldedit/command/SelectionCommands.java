@@ -120,9 +120,9 @@ public class SelectionCommands {
                          BlockVector3 coordinates) throws WorldEditException {
         Location pos;
         if (coordinates != null) {
-            pos = new Location(world, coordinates.toVector3());
+            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation();
+            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
         } else {
             actor.printError(TranslatableComponent.of("worldedit.pos.console-require-coords"));
             return;
@@ -149,9 +149,9 @@ public class SelectionCommands {
                          BlockVector3 coordinates) throws WorldEditException {
         Location pos;
         if (coordinates != null) {
-            pos = new Location(world, coordinates.toVector3());
+            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation();
+            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
         } else {
             actor.printError(TranslatableComponent.of("worldedit.pos.console-require-coords"));
             return;
@@ -523,16 +523,14 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.analysis.distr")
     public void distr(Actor actor, World world, LocalSession session,
                       @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
-                              boolean clipboardDistr,
+                          boolean clipboardDistr,
                       @Switch(name = 'd', desc = "Separate blocks by state")
-                              boolean separateStates,
+                          boolean separateStates,
                       @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.", def = "")
-                              Integer page) throws WorldEditException {
+                          Integer page) throws WorldEditException {
         List<Countable<BlockState>> distribution;
 
-        Region region;
         if (page == null) {
-            Extent extent;
             if (clipboardDistr) {
                 Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
                 BlockDistributionCounter count = new BlockDistributionCounter(clipboard, separateStates);
@@ -541,8 +539,7 @@ public class SelectionCommands {
                 distribution = count.getDistribution();
             } else {
                 try (EditSession editSession = session.createEditSession(actor)) {
-                    distribution = editSession
-                        .getBlockDistribution(session.getSelection(world), separateStates);
+                    distribution = editSession.getBlockDistribution(session.getSelection(world), separateStates);
                 }
             }
             session.setLastDistribution(distribution);
@@ -554,6 +551,7 @@ public class SelectionCommands {
                 return;
             }
         }
+
         if (distribution.isEmpty()) {  // *Should* always be false
             actor.printError(TranslatableComponent.of("worldedit.distr.no-blocks"));
             return;

@@ -37,7 +37,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
@@ -72,7 +72,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 pt, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pt, B block) throws WorldEditException {
         return unsupported();
     }
 

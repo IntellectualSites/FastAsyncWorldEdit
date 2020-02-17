@@ -718,7 +718,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
@@ -951,7 +951,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         return this.setBlock(x, y, z, block.getOrdinalChar());
     }
 
@@ -979,7 +979,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return heights.getByte(index) & 0xFF;
     }
 
-    public void setFloor(int x, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> void setFloor(int x, int z, B block) {
         int index = z * getWidth() + x;
         floor.setInt(index, block.getOrdinalChar());
     }
@@ -1914,7 +1914,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
