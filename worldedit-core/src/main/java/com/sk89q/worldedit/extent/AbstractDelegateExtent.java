@@ -26,7 +26,6 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -52,7 +51,7 @@ import org.jetbrains.annotations.Range;
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
-public class AbstractDelegateExtent implements Extent, LightingExtent {
+public class AbstractDelegateExtent implements Extent {
 
     private final Extent extent;
 
@@ -200,55 +199,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return extent.setBiome(position.getX(), 0, position.getZ(), biome);
     }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getSkyLight(x, y, z);
-        }
-        return 0;
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBlockLight(x, y, z);
-        }
-        return getBrightness(x, y, z);
-    }
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getOpacity(x, y, z);
-        }
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
-    }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getLight(x, y, z);
-        }
-        return 0;
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBrightness(x, y, z);
-        }
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
-    }
-
-    @Override
-    public void relightChunk(int chunkX, int chunkZ) {
-        if (extent instanceof LightingExtent) {
-            ((LightingExtent) extent).relightChunk(chunkX, chunkZ);
-        } else {
-            throw new UnsupportedOperationException("Cannot relight");
-        }
-    }
-
+    
     @Override
     public String toString() {
         return super.toString() + ":" + (extent == this ? "" : extent.toString());

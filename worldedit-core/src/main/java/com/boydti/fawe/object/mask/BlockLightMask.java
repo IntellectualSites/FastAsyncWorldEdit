@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.mask;
 
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -17,10 +16,10 @@ public class BlockLightMask extends AbstractExtentMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        if (extent instanceof LightingExtent) {
-            int light = ((LightingExtent) extent).getBlockLight(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-            return light >= min && light <= max;
-        }
+//        if (extent instanceof LightingExtent) {
+//            int light = ((LightingExtent) extent).getBlockLight(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
+//            return light >= min && light <= max;
+//        }
         return false;
     }
 

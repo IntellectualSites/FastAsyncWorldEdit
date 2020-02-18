@@ -12,6 +12,6 @@ public class ChatProgressTracker extends DefaultProgressTracker {
 
     @Override
     public void sendTile(Component title, Component sub) {
-        getPlayer().print(TextComponent.builder().append(title).append("\n").append(sub).build());
+        getPlayer().print(TextComponent.builder().append(title).append(TextComponent.newline()).append(sub).build());
     }
 }

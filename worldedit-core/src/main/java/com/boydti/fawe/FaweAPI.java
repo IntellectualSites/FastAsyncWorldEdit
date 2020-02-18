@@ -7,7 +7,6 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -113,28 +112,7 @@ public class FaweAPI {
 //        if (parser != null) parser.register(methods);
 //        return parser != null;
 //    }
-
-    public static <T> T getParser(Class<T> parserClass) {
-        try {
-            Field field = AbstractFactory.class.getDeclaredField("parsers");
-            field.setAccessible(true);
-            ArrayList<InputParser> parsers = new ArrayList<>();
-            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getMaskFactory()));
-            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getBlockFactory()));
-            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getItemFactory()));
-            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getPatternFactory()));
-            for (InputParser parser : parsers) {
-                if (parserClass.isAssignableFrom(parser.getClass())) {
-                    return (T) parser;
-                }
-            }
-            return null;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
+    
     /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
@@ -399,30 +377,30 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
-        final BlockVector3 bot = selection.getMinimumPoint();
-        final BlockVector3 top = selection.getMaximumPoint();
-
-        final int minX = bot.getBlockX() >> 4;
-        final int minZ = bot.getBlockZ() >> 4;
-
-        final int maxX = top.getBlockX() >> 4;
-        final int maxZ = top.getBlockZ() >> 4;
-
-        int count = 0;
-        if (queue == null) queue = createQueue(world, false);
-        // Remove existing lighting first
-        if (queue instanceof LightingExtent) {
-            LightingExtent relighter = (LightingExtent) queue;
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.relightChunk(x, z);
-                    count++;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
-        }
-        return count;
+//        final BlockVector3 bot = selection.getMinimumPoint();
+//        final BlockVector3 top = selection.getMaximumPoint();
+//
+//        final int minX = bot.getBlockX() >> 4;
+//        final int minZ = bot.getBlockZ() >> 4;
+//
+//        final int maxX = top.getBlockX() >> 4;
+//        final int maxZ = top.getBlockZ() >> 4;
+//
+//        int count = 0;
+//        if (queue == null) queue = createQueue(world, false);
+//        // Remove existing lighting first
+//        if (queue instanceof LightingExtent) {
+//            LightingExtent relighter = (LightingExtent) queue;
+//            for (int x = minX; x <= maxX; x++) {
+//                for (int z = minZ; z <= maxZ; z++) {
+//                    relighter.relightChunk(x, z);
+//                    count++;
+//                }
+//            }
+//        } else {
+//            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
+//        }
+        return 0;
     }
 
     /**
