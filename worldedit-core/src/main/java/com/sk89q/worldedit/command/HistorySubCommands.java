@@ -179,7 +179,7 @@ public class HistorySubCommands {
                                                 BlockVector3
                                                         .at(summary.maxX, 255, summary.maxZ));
                                         rollback.setTime(historyFile.lastModified());
-                                        RollbackDatabase db = DBHandler.INSTANCE
+                                        RollbackDatabase db = DBHandler.IMP
                                                 .getDatabase(world);
                                         db.logEdit(rollback);
                                         actor.print("Logging: " + historyFile);

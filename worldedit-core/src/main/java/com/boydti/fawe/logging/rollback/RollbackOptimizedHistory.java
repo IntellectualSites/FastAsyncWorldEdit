@@ -96,7 +96,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     public void close() throws IOException {
         super.close();
         // Save to DB
-        RollbackDatabase db = DBHandler.INSTANCE.getDatabase(getWorld());
+        RollbackDatabase db = DBHandler.IMP.getDatabase(getWorld());
         if (db != null) {
             db.logEdit(this);
         }

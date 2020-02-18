@@ -15,12 +15,11 @@ import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
 import java.util.Iterator;
-import org.jetbrains.annotations.NotNull;
 
 public class FuzzyRegion extends AbstractRegion {
 
     private final Mask mask;
-    private final BlockVectorSet set = new BlockVectorSet();
+    private BlockVectorSet set = new BlockVectorSet();
     private int minX, minY, minZ, maxX, maxY, maxZ;
     private Extent extent;
 
@@ -45,22 +44,24 @@ public class FuzzyRegion extends AbstractRegion {
     }
 
     public void select(int x, int y, int z) {
-        RecursiveVisitor search = new RecursiveVisitor(mask.withExtent(extent), p -> {
-            setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
-            return true;
+        RecursiveVisitor search = new RecursiveVisitor(mask.withExtent(extent), new RegionFunction() {
+            @Override
+            public boolean apply(BlockVector3 p) throws WorldEditException {
+                setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
+                return true;
+            }
         }, 256);
         search.setVisited(set);
         search.visit(BlockVector3.at(x, y, z));
         Operations.completeBlindly(search);
     }
 
-    @NotNull
     @Override
     public Iterator<BlockVector3> iterator() {
         return set.iterator();
     }
 
-    private void setMinMax(int x, int y, int z) {
+    private final void setMinMax(int x, int y, int z) {
         if (x > maxX) {
             maxX = x;
         }
