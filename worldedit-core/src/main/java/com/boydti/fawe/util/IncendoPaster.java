@@ -16,8 +16,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Single class paster for the Incendo paste service
@@ -62,7 +60,7 @@ public final class IncendoPaster implements Paster {
         return new PasteTask(content);
     }
 
-    private static final class PasteTask implements Callable<URL> {
+    private final class PasteTask implements Callable<URL> {
 
         private PasteTask(String content) {}
 
@@ -155,11 +153,14 @@ public final class IncendoPaster implements Paster {
             throw new IllegalStateException(String.format("Server returned status: %d %s",
                 httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
         }
-        final String input;
+        final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
-            input = inputStream.lines().map(line -> line + "\n").collect(Collectors.joining());
+            String line;
+            while ((line = inputStream.readLine()) != null) {
+                input.append(line).append("\n");
+            }
         }
-        return input;
+        return input.toString();
     }
 
     /**
@@ -214,15 +215,13 @@ public final class IncendoPaster implements Paster {
             "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
                 + "problem\n");
         b.append("\n# Server Information\n");
-        assert Fawe.imp() != null;
         b.append(Fawe.imp().getDebugInfo());
         b.append("\n# YAY! Now, let's see what we can find in your JVM\n");
         Runtime runtime = Runtime.getRuntime();
         RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
-        b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS))
-            .append(" minutes").append('\n');
-        b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024).append(" MB").append('\n');
-        b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024).append(" MB").append('\n');
+        b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS) + " minutes").append('\n');
+        b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024 + " MB").append('\n');
+        b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024 + " MB").append('\n');
         b.append("Java Name: ").append(rb.getVmName()).append('\n');
         b.append("Java Version: '").append(System.getProperty("java.version")).append("'\n");
         b.append("Java Vendor: '").append(System.getProperty("java.vendor")).append("'\n");
@@ -268,14 +267,18 @@ public final class IncendoPaster implements Paster {
     }
 
     private static String readFile(final File file) throws IOException {
-        final String content;
-        final List<String> lines;
+        final StringBuilder content = new StringBuilder();
+        final List<String> lines = new ArrayList<>();
         try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            lines = reader.lines().collect(Collectors.toList());
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
         }
-        content = IntStream.range(Math.max(0, lines.size() - 1000), lines.size())
-            .mapToObj(i -> lines.get(i) + "\n").collect(Collectors.joining());
-        return content;
+        for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
+            content.append(lines.get(i)).append("\n");
+        }
+        return content.toString();
     }
 
 }

@@ -18,7 +18,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
@@ -98,7 +97,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
-        if (!Objects.equals(oldBiome.getId(), newBiome.getId())) {
+        if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockZ(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
         } else {
@@ -109,7 +108,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(BlockVector2.at(x, z));
-        if (!Objects.equals(oldBiome.getId(), newBiome.getId())) {
+        if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(x, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);
         } else {

@@ -31,6 +31,8 @@ public interface IFawe {
 
     public default void registerPacketListener() {}
 
+    String getPlatform();
+
     UUID getUUID(String name);
 
     String getName(UUID uuid);
