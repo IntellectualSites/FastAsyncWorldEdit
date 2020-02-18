@@ -151,7 +151,7 @@ public class MathMan {
     }
 
     public static long pairInt(int x, int y) {
-        return (((long) x) << 32) | (y & 0xffffffffL);
+        return ((long) x << 32) | (y & 0xffffffffL);
     }
 
     public static long tripleWorldCoord(int x, int y, int z) {

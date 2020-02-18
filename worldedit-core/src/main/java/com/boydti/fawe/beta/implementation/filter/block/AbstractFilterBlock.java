@@ -8,14 +8,18 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import javax.annotation.Nullable;
 
 public abstract class AbstractFilterBlock extends FilterBlock {
 
+    @Override
     public abstract BaseBlock getFullBlock();
+
+    @Override
     public abstract void setFullBlock(BaseBlock block);
+
     public abstract BlockVector3 getPosition();
+
     @Override
     public abstract Extent getExtent();
 
@@ -76,16 +80,16 @@ public abstract class AbstractFilterBlock extends FilterBlock {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-            throws WorldEditException {
+        throws WorldEditException {
         if (x == this.getX() && y == this.getY() && z == this.getZ()) {
             setFullBlock(block.toBaseBlock());
             return true;
         }
-        return getExtent().setBlock(x,y, z, block);
+        return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x, y, z,biome);
+        return getExtent().setBiome(x, y, z, biome);
     }
 }

@@ -396,10 +396,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public char getOrdinalChar(Extent orDefault) {
         return getOrdinalChar();
     }
-
-    /*
-    Set delegate
-     */
+    
+    //Set delegate
     private SetDelegate initSet() {
         setArr = set.load(layer);
         return delegate = FULL;

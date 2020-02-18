@@ -17,12 +17,12 @@ public class Flood {
     private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
     private int[] queue;
     private long[] visit;
-    private int[][] queues;
-    private long[][] visits;
+    private final int[][] queues;
+    private final long[][] visits;
     private int chunkX;
     private int chunkYLayer;
     private int chunkZ;
-    private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
 
     public Flood(int maxBranch, int maxDepth, Direction[] directions) {
         this.maxBranch = maxBranch;

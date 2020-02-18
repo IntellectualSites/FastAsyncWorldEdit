@@ -54,19 +54,19 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     // Java 8 turns on doclint which we fail
     tasks.withType<Javadoc>().configureEach {
-        delete("docs/javadoc")
-        setDestinationDir(file("docs/javadoc"))
-        title = "${project.name} ${project.version} API"
-        (options as StandardJavadocDocletOptions).addStringOption("author", "true")
+        //delete("docs/javadoc")
+        //setDestinationDir(file("docs/javadoc"))
+        //title = "${project.name} ${project.version} API"
+        //(options as StandardJavadocDocletOptions).addStringOption("author", "true")
         (options as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
-        subprojects.forEach { proj ->
-            proj.tasks.withType<Javadoc>().forEach { javadocTask ->
-                source += javadocTask.source
-                classpath += javadocTask.classpath
-                excludes += javadocTask.excludes
-                includes += javadocTask.includes
-            }
-        }
+//        subprojects.forEach { proj ->
+//            proj.tasks.withType<Javadoc>().forEach { javadocTask ->
+//                source += javadocTask.source
+//                classpath += javadocTask.classpath
+//                excludes += javadocTask.excludes
+//                includes += javadocTask.includes
+//            }
+//        }
     }
 
     tasks.register<Jar>("javadocJar") {

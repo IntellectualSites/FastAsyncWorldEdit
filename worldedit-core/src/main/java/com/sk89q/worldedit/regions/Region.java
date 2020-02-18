@@ -289,22 +289,18 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     continue;
                 } else {
-                    boolean changed = true;
                     processExtra = true;
                     char[] arr = set.load(layer);
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
                                 if (arr[index] != 0 && !contains(x, y, z)) {
-                                    changed = true;
                                     arr[index] = 0;
                                 }
                             }
                         }
                     }
-                    if (changed) {
-                        set.setBlocks(layer, arr);
-                    }
+                    set.setBlocks(layer, arr);
                 }
             }
             if (processExtra) {
