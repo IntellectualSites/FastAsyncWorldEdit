@@ -87,7 +87,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
         return list;
     }
 
-    public static void iterate(ThreadLocal instance, Consumer<Object> withMap) {
+    public static <L> void iterate(ThreadLocal<L> instance, Consumer<Object> withMap) {
         try {
             Thread[] threads = MainUtil.getThreads();
             Field tl = Thread.class.getDeclaredField("threadLocals");
@@ -105,7 +105,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
         }
     }
 
-    public static void clean(ThreadLocal instance) {
+    public static <L> void clean(ThreadLocal<L> instance) {
         iterate(instance, new Consumer<Object>() {
             Method methodRemove;
             @Override

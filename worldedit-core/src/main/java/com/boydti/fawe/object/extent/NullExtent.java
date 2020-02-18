@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
@@ -26,11 +27,14 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -58,69 +62,92 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
+    public BlockVector3 getMinimumPoint() {
+        return BlockVector3.ZERO;
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return BlockVector3.ZERO;
+    }
+
+    @Override
+    public List<Entity> getEntities(Region region) {
+        throw reason;
+    }
+
+    @Override
+    public List<Entity> getEntities() {
+        return Collections.emptyList();
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location arg0, BaseEntity arg1) {
+        return null;
+    }
+
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
+        return BlockTypes.AIR.getDefaultState();
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return BlockTypes.AIR.getDefaultState();
+    }
+
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return getBlock(position).toBaseBlock();
+    }
+
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return getBlock(x, y, z).toBaseBlock();
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector2 position) {
+        return BiomeTypes.THE_VOID;
+    }
+
+    @Override
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return BiomeTypes.THE_VOID;
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return false;
+    }
+
+    @Override
     public ResettableExtent setExtent(Extent extent) {
         return this;
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 arg0) {
-            throw reason;
-        }
-
-    @Override
-    public BiomeType getBiomeType(int x, int y, int z) {
-        throw reason;
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return false;
     }
 
     @Override
-    public BlockState getBlock(BlockVector3 arg0) {
-            throw reason;
-        }
-
-    @Override
-    public BlockState getBlock(int x, int y, int z) {
-            throw reason;
-        }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        throw reason;
-    }
-
-    @Override
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        if(reason != null) {
-            throw reason;
-        }
-        return null;
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 arg0, BiomeType arg1) {
-        throw reason;
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return false;
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-            throw reason;
-        }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 arg0, B arg1) throws WorldEditException {
-            throw reason;
-        }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-            throw reason;
-        }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location arg0, BaseEntity arg1) {
-        throw reason;
+        return false;
     }
-
+        
     @Override
     public boolean isQueueEnabled() {
         throw reason;
@@ -157,26 +184,6 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
         }
 
     @Override
-    public List<? extends Entity> getEntities() {
-        throw reason;
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region arg0) {
-        throw reason;
-    }
-
-    @Override
-    public BlockVector3 getMaximumPoint() {
-        return BlockVector3.ZERO;
-    }
-
-    @Override
-    public BlockVector3 getMinimumPoint() {
-        return BlockVector3.ZERO;
-    }
-
-    @Override
     public boolean contains(int x, int z) {
             throw reason;
         }
@@ -194,7 +201,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     @Nullable
     @Override
     public Operation commit() {
-        throw reason;
+        return null;
     }
 
     @Override

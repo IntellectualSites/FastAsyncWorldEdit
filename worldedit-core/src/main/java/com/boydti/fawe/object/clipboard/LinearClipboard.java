@@ -5,9 +5,7 @@ import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -16,8 +14,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.io.Closeable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * Best used when clipboard selections are small, or using legacy formats
  * (Small being < Integer.MAX_VALUE/BLOCK_SIZE_BYTES blocks)
  */
-public abstract class LinearClipboard extends SimpleClipboard implements Clipboard, Closeable {
+public abstract class LinearClipboard extends SimpleClipboard {
 
     protected final HashSet<ClipboardEntity> entities;
 
@@ -55,9 +51,6 @@ public abstract class LinearClipboard extends SimpleClipboard implements Clipboa
     public abstract void streamBiomes(IntValueReader task);
 
     public abstract Collection<CompoundTag> getTileEntities();
-
-    @Override
-    public void close() {}
 
     public void flush() {}
 

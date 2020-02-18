@@ -1,24 +1,16 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RegionWrapper;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-public class HeightBoundExtent extends FaweRegionExtent implements IBatchProcessor {
+public class HeightBoundExtent extends FaweRegionExtent {
 
     private final int min, max;
     private int lastY = -1;

@@ -22,6 +22,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -222,7 +223,7 @@ public class FaweAPI {
      * @param reason
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
-    public static void cancelEdit(Extent extent, Component reason) {
+    public static void cancelEdit(AbstractDelegateExtent extent, Component reason) {
         try {
             WEManager.IMP.cancelEdit(extent, new FaweException(reason));
         } catch (WorldEditException ignore) {

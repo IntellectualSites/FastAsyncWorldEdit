@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor, Closeable {
+public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     private World world;
     private final String worldName;

@@ -5,9 +5,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
-import java.io.Closeable;
-
-public abstract class SimpleClipboard implements Clipboard, Closeable {
+public abstract class SimpleClipboard implements Clipboard {
     private final BlockVector3 size;
     private final int area;
     private final int volume;

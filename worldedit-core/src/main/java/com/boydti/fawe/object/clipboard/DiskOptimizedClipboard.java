@@ -21,7 +21,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +35,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,7 +45,7 @@ import javax.annotation.Nullable;
  * - Uses an auto closable RandomAccessFile for getting / setting id / data
  * - I don't know how to reduce nbt / entities to O(2) complexity, so it is stored in memory.
  */
-public class DiskOptimizedClipboard extends LinearClipboard implements Closeable {
+public class DiskOptimizedClipboard extends LinearClipboard {
 
     private static int HEADER_SIZE = 14;
 
@@ -427,16 +425,4 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this.entities.remove(entity);
     }
 
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
-        while (iter.hasNext()) {
-            BlockArrayClipboard.ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
-            if (uuid.equals(entUUID)) {
-                iter.remove();
-                return;
-            }
-        }
-    }
 }

@@ -4,14 +4,9 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
-public class BlockVector3ChunkMap<T> implements Map<BlockVector3, T>, IAdaptedMap<BlockVector3, T, Short, T> {
+public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Short, T> {
     private final Short2ObjectArrayMap<T> map = new Short2ObjectArrayMap<>();
 
     @Override
