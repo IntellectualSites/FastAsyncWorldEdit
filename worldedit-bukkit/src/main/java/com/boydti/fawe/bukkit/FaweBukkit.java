@@ -297,11 +297,6 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public String getPlatform() {
-        return "bukkit";
-    }
-
-    @Override
     public UUID getUUID(String name) {
         return Bukkit.getOfflinePlayer(name).getUniqueId();
     }

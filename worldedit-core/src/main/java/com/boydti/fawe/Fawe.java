@@ -15,6 +15,7 @@ import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.session.request.Request;
 import java.io.BufferedReader;
 import java.io.File;
@@ -281,7 +282,7 @@ public class Fawe {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
-        Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
+        Settings.IMP.PLATFORM = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getPlatformName();
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();

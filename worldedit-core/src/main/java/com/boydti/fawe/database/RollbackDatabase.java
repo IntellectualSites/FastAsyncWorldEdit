@@ -53,7 +53,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     private @Language("SQLite") String DELETE_EDITS_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
     private @Language("SQLite") String DELETE_EDIT_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
-    private ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
 
     public RollbackDatabase(World world) throws SQLException, ClassNotFoundException {
         super((t, e) -> e.printStackTrace());
