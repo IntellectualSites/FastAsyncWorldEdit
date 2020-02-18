@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
@@ -455,6 +456,8 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default boolean cancel() {
+        Fawe.debug("If you see this message please report it on our discord and tag @MattBDev");
+        Thread.dumpStack();
         ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
 
         NullExtent nullExtent = new NullExtent(this, FaweCache.MANUAL);
