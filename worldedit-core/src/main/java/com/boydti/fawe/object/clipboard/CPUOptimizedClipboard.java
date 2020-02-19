@@ -214,16 +214,4 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         this.entities.remove(entity);
     }
 
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
-        while (iter.hasNext()) {
-            BlockArrayClipboard.ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
-            if (uuid.equals(entUUID)) {
-                iter.remove();
-                return;
-            }
-        }
-    }
 }
