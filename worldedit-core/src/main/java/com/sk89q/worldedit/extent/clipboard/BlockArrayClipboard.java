@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.boydti.fawe.object.clipboard.DelegateClipboard;
 import com.google.common.collect.Iterators;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -51,17 +50,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
  * other data as lists or maps.
  */
-public class BlockArrayClipboard extends DelegateClipboard implements Clipboard {
+public class BlockArrayClipboard implements Clipboard {
 
     private final Region region;
     private final BlockVector3 origin;
+    private final Clipboard parent;
 
     public BlockArrayClipboard(Region region) {
         this(region, UUID.randomUUID());
     }
 
     public BlockArrayClipboard(Clipboard clipboard, BlockVector3 offset) {
-        super(clipboard);
+        this.parent = clipboard;
         Region shifted = clipboard.getRegion();
         shifted.shift(offset);
         this.region = shifted;
@@ -80,8 +80,9 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard 
     }
 
     public BlockArrayClipboard(Region region, Clipboard clipboard) {
-        super(clipboard);
+        checkNotNull(clipboard);
         checkNotNull(region);
+        this.parent = clipboard;
         this.region = region;
         this.origin = region.getMinimumPoint();
     }
@@ -163,7 +164,7 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard 
         x -= origin.getX();
         y -= origin.getY();
         z -= origin.getZ();
-        return getParent().setBlock(x, y, z, block);
+        return parent.setBlock(x, y, z, block);
     }
 
     @Override
@@ -254,6 +255,20 @@ public class BlockArrayClipboard extends DelegateClipboard implements Clipboard 
     public Iterator<BlockVector3> iterator(Order order) {
         OffsetBlockVector3 mutable = new OffsetBlockVector3(origin);
         return Iterators.transform(getParent().iterator(order), mutable::init);
+    }
+
+    @Override
+    public BlockVector3 getDimensions() {
+        return this.parent.getDimensions();
+    }
+
+    @Override
+    public void removeEntity(Entity entity) {
+        this.parent.removeEntity(entity);
+    }
+
+    public Clipboard getParent() {
+        return parent;
     }
 
     /**
