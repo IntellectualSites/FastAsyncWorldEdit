@@ -27,6 +27,7 @@ import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.boydti.fawe.util.task.Task;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import io.papermc.lib.PaperLib;
@@ -83,7 +84,13 @@ public class FaweBukkit implements IFawe, Listener {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
-
+        
+        //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
+        setupVault();
+        
+        //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
+        TaskManager.IMP.later(this::setupPlotSquared, 0);
+        
         // Registered delayed Event Listeners
         TaskManager.IMP.task(() -> {
             // Fix for ProtocolSupport
@@ -93,7 +100,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
-                new ChunkListener_9();
+            new ChunkListener_9();
         });
     }
 
@@ -143,8 +150,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public void debug(final String message) {
-        ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(message);
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
     @Override
@@ -187,8 +193,7 @@ public class FaweBukkit implements IFawe, Listener {
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
      */
-    @Override
-    public void setupVault() {
+    private void setupVault() {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable ignored) {
@@ -298,7 +303,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public String getPlatform() {
-        return "bukkit";
+        return "Bukkit";
     }
 
     @Override
@@ -319,8 +324,7 @@ public class FaweBukkit implements IFawe, Listener {
         return null;
     }
 
-    @Override
-    public void setupPlotSquared() {
+    private void setupPlotSquared() {
         WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
         log.debug("Plugin 'PlotSquared' found. Using it now.");
     }

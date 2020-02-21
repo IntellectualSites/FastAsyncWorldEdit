@@ -4,7 +4,6 @@ import static java.lang.System.arraycopy;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
-import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
@@ -30,7 +29,6 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,7 +60,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
@@ -727,7 +724,7 @@ public class MainUtil {
     public static Object copyNd(Object arr) {
         if (arr.getClass().isArray()) {
             int innerArrayLength = Array.getLength(arr);
-            Class component = arr.getClass().getComponentType();
+            Class<?> component = arr.getClass().getComponentType();
             Object newInnerArray = Array.newInstance(component, innerArrayLength);
             if (component.isPrimitive()) {
                 arraycopy(arr, 0, newInnerArray, 0, innerArrayLength);
@@ -740,7 +737,7 @@ public class MainUtil {
             }
             return newInnerArray;
         } else {
-            return arr;//cant deep copy an opac object??
+            return arr;//can't deep copy an opac object??
         }
     }
 

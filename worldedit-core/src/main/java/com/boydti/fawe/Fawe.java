@@ -16,6 +16,8 @@ import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -151,6 +153,20 @@ public class Fawe {
         }
         debugPlain((String) s);
     }
+    
+    /**
+     * Write something to the console
+     *
+     * @param c The Component to be printed
+     */
+    public static void debug(Component c) {
+        Actor actor = Request.request().getActor();
+        if (actor != null && actor.isPlayer()) {
+            actor.printDebug(c);
+            return;
+        }
+        debugPlain(c.toString());
+    }
 
     /**
      * The platform specific implementation
@@ -178,7 +194,6 @@ public class Fawe {
          */
         this.setupMemoryListener();
         this.timer = new FaweTimer();
-        Fawe.this.IMP.setupVault();
 
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
@@ -187,7 +202,6 @@ public class Fawe {
 //                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                IMP.setupPlotSquared();
             } catch (Throwable ignored) {}
         }, 0);
 
@@ -303,7 +317,6 @@ public class Fawe {
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");
-            debug("====================================");
             e.printStackTrace();
             debug("====================================");
         }
@@ -328,8 +341,7 @@ public class Fawe {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
                     debug("====== ZSTD COMPRESSION BINDING NOT FOUND ======");
-                    debug(e);
-                    debug("===============================================");
+                    debug(e.getMessage());
                     debug("FAWE will work but won't compress data as much");
                     debug("===============================================");
                 }
@@ -339,25 +351,22 @@ public class Fawe {
             } catch (Throwable e) {
                 e.printStackTrace();
                 debug("====== LZ4 COMPRESSION BINDING NOT FOUND ======");
-                debug(e);
-                debug("===============================================");
+                debug(e.getMessage());
                 debug("FAWE will work but compression will be slower");
                 debug(" - Try updating your JVM / OS");
                 debug(" - Report this issue if you cannot resolve it");
                 debug("===============================================");
             }
         }
-        try {
-            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-            boolean x86OS = !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
-            boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
-            if (x86OS != x86JVM) {
-                debug("====== UPGRADE TO 64-BIT JAVA ======");
-                debug("You are running 32-bit Java on a 64-bit machine");
-                debug("====================================");
-            }
-        } catch (Throwable ignore) {}
+        String arch = System.getenv("PROCESSOR_ARCHITECTURE");
+        String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
+        boolean x86OS = !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
+        boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
+        if (x86OS != x86JVM) {
+            debug("====== UPGRADE TO 64-BIT JAVA ======");
+            debug("You are running 32-bit Java on a 64-bit machine");
+            debug("====================================");
+        }
     }
 
     private void setupMemoryListener() {
@@ -391,7 +400,6 @@ public class Fawe {
             }
         } catch (Throwable ignored) {
             debug("====== MEMORY LISTENER ERROR ======");
-            debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");
             debug(" - Disable this with `max-memory-percent: -1`");

@@ -18,9 +18,7 @@ public interface IFawe {
     File getDirectory();
 
     Player wrap(final Object obj);
-
-    void setupVault();
-
+    
     TaskManager getTaskManager();
 
     Collection<FaweMaskManager> getMaskManagers();
@@ -45,5 +43,4 @@ public interface IFawe {
 
     Preloader getPreloader();
 
-    void setupPlotSquared();
 }

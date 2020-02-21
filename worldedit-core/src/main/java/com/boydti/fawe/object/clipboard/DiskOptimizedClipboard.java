@@ -41,9 +41,9 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
- * A clipboard with disk backed storage. (lower memory + loads on crash)
- * - Uses an auto closable RandomAccessFile for getting / setting id / data
- * - I don't know how to reduce nbt / entities to O(2) complexity, so it is stored in memory.
+ * A clipboard with disk backed storage. (lower memory + loads on crash) - Uses an auto closable
+ * RandomAccessFile for getting / setting id / data - I don't know how to reduce nbt / entities to
+ * O(2) complexity, so it is stored in memory.
  */
 public class DiskOptimizedClipboard extends LinearClipboard {
 
@@ -57,18 +57,27 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     private FileChannel fileChannel;
     private boolean hasBiomes;
+    private int ylast;
+    private int ylasti;
+    private int zlast;
+    private int zlasti;
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, UUID uuid) {
-        this(dimensions, MainUtil.getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
+        this(dimensions, MainUtil
+            .getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."),
+                Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
-        this(dimensions, MainUtil.getFile(Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"));
+        this(dimensions, MainUtil
+            .getFile(Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."),
+                Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"));
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
-        if (getWidth() > Character.MAX_VALUE || getHeight() > Character.MAX_VALUE || getLength() > Character.MAX_VALUE) {
+        if (getWidth() > Character.MAX_VALUE || getHeight() > Character.MAX_VALUE
+            || getLength() > Character.MAX_VALUE) {
             throw new IllegalArgumentException("Too large");
         }
         nbtMap = new HashMap<>();
@@ -99,21 +108,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         }
     }
 
-    @Override
-    public URI getURI() {
-        return file.toURI();
-    }
-
-    private static BlockVector3 readSize(File file) {
-        try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
-            is.skipBytes(2);
-            return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
     public DiskOptimizedClipboard(File file) {
         super(readSize(file));
         nbtMap = new HashMap<>();
@@ -128,6 +122,21 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static BlockVector3 readSize(File file) {
+        try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
+            is.skipBytes(2);
+            return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public URI getURI() {
+        return file.toURI();
     }
 
     public File getFile() {
@@ -186,7 +195,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     @Override
     public void streamBiomes(IntValueReader task) {
-        if (!hasBiomes()) return;
+        if (!hasBiomes()) {
+            return;
+        }
         int index = 0;
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
         try {
@@ -209,7 +220,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     public BlockArrayClipboard toClipboard() {
         try {
-            CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
+            CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0),
+                BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
             int ox = byteBuffer.getShort(8);
             int oy = byteBuffer.getShort(10);
             int oz = byteBuffer.getShort(12);
@@ -240,7 +252,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     }
 
     private void closeDirectBuffer(ByteBuffer cb) {
-        if (cb == null || !cb.isDirect()) return;
+        if (cb == null || !cb.isDirect()) {
+            return;
+        }
         // we could use this type cast and call functions without reflection code,
         // but static import from sun.* package is risky for non-SUN virtual machine.
         //try { ((sun.nio.ch.DirectBuffer)cb).cleaner().clean(); } catch (Exception ex) { }
@@ -256,7 +270,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 final Field theUnsafeField = unsafeClass.getDeclaredField("theUnsafe");
                 theUnsafeField.setAccessible(true);
                 final Object theUnsafe = theUnsafeField.get(null);
-                final Method invokeCleanerMethod = unsafeClass.getMethod("invokeCleaner", ByteBuffer.class);
+                final Method invokeCleanerMethod = unsafeClass
+                    .getMethod("invokeCleaner", ByteBuffer.class);
                 invokeCleanerMethod.invoke(theUnsafe, cb);
             } catch (Exception e) {
                 System.gc();
@@ -282,11 +297,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             e.printStackTrace();
         }
     }
-
-    private int ylast;
-    private int ylasti;
-    private int zlast;
-    private int zlasti;
 
     @Override
     public Collection<CompoundTag> getTileEntities() {
@@ -410,7 +420,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
-        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location,
+            entity);
         entities.add(ret);
         return ret;
     }
