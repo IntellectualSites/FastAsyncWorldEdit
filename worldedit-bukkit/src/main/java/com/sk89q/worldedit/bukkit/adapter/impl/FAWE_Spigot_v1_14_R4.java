@@ -19,20 +19,16 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.material;
-import com.bekvon.bukkit.residence.commands.server;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BlockMaterial_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitAdapter_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.MapChunkUtil_1_14;
 import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
-import com.boydti.fawe.util.TaskManager;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -41,59 +37,25 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.Spigot_v1_14_R4;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
+import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.minecraft.server.v1_14_R1.BiomeBase;
-import net.minecraft.server.v1_14_R1.Block;
-import net.minecraft.server.v1_14_R1.BlockPosition;
-import net.minecraft.server.v1_14_R1.Blocks;
-import net.minecraft.server.v1_14_R1.Chunk;
-import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_14_R1.ChunkProviderServer;
-import net.minecraft.server.v1_14_R1.ChunkSection;
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EntityTypes;
-import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.IRegistry;
-import net.minecraft.server.v1_14_R1.ItemStack;
-import net.minecraft.server.v1_14_R1.MinecraftKey;
-import net.minecraft.server.v1_14_R1.MinecraftServer;
-import net.minecraft.server.v1_14_R1.NBTBase;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.NBTTagInt;
-import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_14_R1.PlayerChunk;
-import net.minecraft.server.v1_14_R1.TileEntity;
-import net.minecraft.server.v1_14_R1.World;
-import net.minecraft.server.v1_14_R1.WorldData;
-import net.minecraft.server.v1_14_R1.WorldNBTStorage;
-import net.minecraft.server.v1_14_R1.WorldServer;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
@@ -102,13 +64,10 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.concurrent.ExecutionException;
@@ -428,7 +387,13 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                     originalWorld.getMethodProfiler(),
                     server.worldLoadListenerFactory.create(11),
                     environment,
-                    generator)) {
+                    generator){
+                @Override
+                public boolean addEntityChunk(net.minecraft.server.v1_14_R1.Entity entity) {
+                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously
+                    return false;
+                }
+            }) {
 
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction

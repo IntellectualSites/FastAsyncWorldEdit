@@ -397,7 +397,13 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
                     originalWorld.getMethodProfiler(),
                     server.worldLoadListenerFactory.create(11),
                     environment,
-                    generator)) {
+                    generator){
+                @Override
+                public boolean addEntityChunk(net.minecraft.server.v1_15_R1.Entity entity) {
+                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously
+                    return false;
+                }
+            }) {
 
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction
