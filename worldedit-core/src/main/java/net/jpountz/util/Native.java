@@ -60,9 +60,7 @@ public enum Native {
 
     private static String resourceName() {
         OS os = os();
-        String packagePrefix = Native.class.getPackage().getName().replace('.', '/');
-
-        return "/" + packagePrefix + "/" + os.name + "/" + arch() + "/liblz4-java." + os.libExtension;
+        return "/" + os.name + "/" + arch() + "/liblz4-java." + os.libExtension;
     }
 
     private static boolean loaded = false;
