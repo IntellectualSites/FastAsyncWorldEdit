@@ -26,11 +26,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class LinearClipboard extends SimpleClipboard {
 
-    protected final HashSet<ClipboardEntity> entities;
+    protected final HashSet<ClipboardEntity> entities = new HashSet<>();
 
     public LinearClipboard(BlockVector3 dimensions) {
         super(dimensions);
-        entities = new HashSet<>();
     }
 
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int i, B block);
