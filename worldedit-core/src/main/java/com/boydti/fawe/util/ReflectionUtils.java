@@ -80,7 +80,7 @@ public class ReflectionUtils {
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
 
-    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
+    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.emptyMap()).getClass();
 
     public static <T, V> Map<T, V> getMap(Map<T, V> map) {
         try {

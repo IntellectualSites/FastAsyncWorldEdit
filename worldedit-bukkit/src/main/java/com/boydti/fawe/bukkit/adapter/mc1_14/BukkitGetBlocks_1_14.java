@@ -39,6 +39,8 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -183,15 +185,13 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             @NotNull
             @Override
             public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = Iterables.transform(Iterables.concat(slices), new com.google.common.base.Function<Entity, CompoundTag>() {
-                    @Nullable
-                    @Override
-                    public CompoundTag apply(@Nullable Entity input) {
-                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+                Iterable<CompoundTag> result = StreamSupport
+                    .stream(Iterables.concat(slices).spliterator(), false).map(input -> {
+                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance()
+                            .getBukkitImplAdapter();
                         NBTTagCompound tag = new NBTTagCompound();
                         return (CompoundTag) adapter.toNative(input.save(tag));
-                    }
-                });
+                    }).collect(Collectors.toList());
                 return result.iterator();
             }
         };

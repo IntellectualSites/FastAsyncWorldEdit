@@ -4,6 +4,7 @@ import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -54,7 +55,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
         BlockVector3 pos2 = BlockVector3.ZERO;
 
         AsyncBlock block = new AsyncBlock(asyncWorld, 0, 0, 0);
-        BlockBreakEvent event = new BlockBreakEvent(block, BukkitAdapter.adapt(player));
+        BlockBreakEvent event = new BlockBreakEvent(block, ((BukkitPlayer) player).getPlayer());
 
         return new FaweMask(pos1, pos2) {
 
