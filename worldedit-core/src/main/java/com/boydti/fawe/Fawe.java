@@ -292,11 +292,11 @@ public class Fawe {
     }
 
     public void setupConfigs() {
-        MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
+        MainUtil.copyFile(MainUtil.getJarFile(), "lang" + File.separator + "strings.json", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
-        try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
+        try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
             String commitString = br.readLine();

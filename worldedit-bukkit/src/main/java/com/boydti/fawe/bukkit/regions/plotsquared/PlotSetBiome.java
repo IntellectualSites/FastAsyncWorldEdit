@@ -19,6 +19,7 @@ import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import org.bukkit.Bukkit;
 
 @CommandDeclaration(
         command = "generatebiome",
@@ -71,11 +73,11 @@ public class PlotSetBiome extends Command {
             }
             plot.addRunning();
             TaskManager.IMP.async(() -> {
-                EditSession session = new EditSessionBuilder(FaweAPI.getWorld(plot.getArea().worldname))
+                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
                         .autoQueue(false)
                         .checkMemory(false)
                         .allowedRegionsEverywhere()
-                        .player(Fawe.imp().wrap(player.getUUID()))
+                        .player(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
                         .limitUnlimited()
                         .build();
                 long seed = ThreadLocalRandom.current().nextLong();

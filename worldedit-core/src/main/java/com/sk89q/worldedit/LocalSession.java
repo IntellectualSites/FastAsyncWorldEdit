@@ -1493,9 +1493,7 @@ public class LocalSession implements TextureHolder {
 
     private void prepareEditingExtents(EditSession editSession, Actor actor) {
         editSession.setFastMode(fastMode);
-        /*
         editSession.setReorderMode(reorderMode);
-        */
         if (editSession.getSurvivalExtent() != null) {
             editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
         }
@@ -1526,7 +1524,6 @@ public class LocalSession implements TextureHolder {
      * @return The reorder mode
      */
     public EditSession.ReorderMode getReorderMode() {
-//        return reorderMode;
         return EditSession.ReorderMode.FAST;
     }
 
@@ -1536,7 +1533,6 @@ public class LocalSession implements TextureHolder {
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(EditSession.ReorderMode reorderMode) {
-//        this.reorderMode = reorderMode;
     }
 
     /**

@@ -93,7 +93,7 @@ public class Settings extends Config {
                 " - Use a shared directory or NFS/Samba"
         })
         public String CLIPBOARD = "clipboard";
-        @Comment("Each player has their own sub directory for schematics")
+        @Comment("Each player has his or her own sub directory for schematics")
         public boolean PER_PLAYER_SCHEMATICS = true;
         public String COMMANDS = "commands";
     }
@@ -288,7 +288,7 @@ public class Settings extends Config {
                 "Increase or decrease queue intensity (ms) [-50,50]:",
                 "    0 = balance of performance / stability",
                 "    -10 = Allocate 10ms less for chunk placement",
-                "Too high will can cause lag spikes (you might be okay with this)",
+                "Too high can cause lag spikes (you might be okay with this)",
                 "Too low will result in slow edits",
         })
         public int EXTRA_TIME_MS = 0;

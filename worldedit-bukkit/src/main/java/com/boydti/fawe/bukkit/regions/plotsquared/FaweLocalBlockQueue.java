@@ -18,21 +18,21 @@ import com.sk89q.worldedit.world.block.BlockState;
 // TODO FIXME
 public class FaweLocalBlockQueue extends LocalBlockQueue {
 
-    public final IQueueExtent<IQueueChunk> IMP;
+    public final IQueueExtent<IQueueChunk> instance;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
 
     public FaweLocalBlockQueue(String worldName) {
         super(worldName);
         this.world = FaweAPI.getWorld(worldName);
-        IMP = Fawe.get().getQueueHandler().getQueue(world);
+        instance = Fawe.get().getQueueHandler().getQueue(world);
         Fawe.get().getQueueHandler().unCache();
     }
 
     @Override
     public boolean next() {
-        if (!IMP.isEmpty()) {
-            IMP.flush();
+        if (!instance.isEmpty()) {
+            instance.flush();
         }
         return false;
     }
@@ -49,7 +49,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public int size() {
-        return IMP.isEmpty() ? 0 : 1;
+        return instance.isEmpty() ? 0 : 1;
     }
 
     @Override
@@ -62,33 +62,33 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public long getModified() {
-        return IMP.size();
+        return instance.size();
     }
 
     @Override
     public boolean setBlock(final int x, final int y, final int z, final BlockState id) {
-        return IMP.setBlock(x, y, z, id);
+        return instance.setBlock(x, y, z, id);
     }
 
     @Override
     public boolean setBlock(int x, int y, int z, Pattern pattern) {
         mutable.setComponents(x, y, z);
-        return pattern.apply(IMP, mutable, mutable);
+        return pattern.apply(instance, mutable, mutable);
     }
 
     @Override
     public boolean setBlock(final int x, final int y, final int z, final BaseBlock id) {
-        return IMP.setBlock(x, y, z, id);
+        return instance.setBlock(x, y, z, id);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return IMP.getBlock(x, y, z);
+        return instance.getBlock(x, y, z);
     }
 
     @Override
     public boolean setBiome(int x, int z, BiomeType biomeType) {
-        return IMP.setBiome(x, 0, z, biomeType);
+        return instance.setBiome(x, 0, z, biomeType);
     }
 
     @Override
@@ -98,13 +98,13 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public void flush() {
-        IMP.flush();
+        instance.flush();
     }
 
     @Override
     public boolean enqueue() {
         boolean val = super.enqueue();
-        IMP.enableQueue();
+        instance.enableQueue();
         return val;
     }
 
@@ -119,12 +119,12 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public void regenChunk(int x, int z) {
-        IMP.regenerateChunk(x, z, null, null);
+        instance.regenerateChunk(x, z, null, null);
     }
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        IMP.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
+        instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
         return true;
     }
 }

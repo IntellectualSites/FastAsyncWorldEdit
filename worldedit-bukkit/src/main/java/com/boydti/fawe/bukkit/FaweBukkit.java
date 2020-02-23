@@ -27,7 +27,6 @@ import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.boydti.fawe.util.task.Task;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import io.papermc.lib.PaperLib;
@@ -38,7 +37,6 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -158,24 +156,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin.getDataFolder();
     }
 
-
-    @Override
-    public com.sk89q.worldedit.entity.Player wrap(final Object obj) {
-        Player player = null;
-        if (obj.getClass() == Player.class) {
-            player = (Player) obj;
-        } else if (obj.getClass() == String.class) {
-            String name = (String) obj;
-            player = Bukkit.getPlayer(name);
-        } else if (obj.getClass() == UUID.class) {
-            UUID uuid = (UUID) obj;
-            player = Bukkit.getPlayer(uuid);
-        }
-        if (player == null) {
-            throw new IllegalArgumentException("Unknown player type: " + obj);
-        }
-        return BukkitAdapter.adapt(player);
-    }
 
     public ItemUtil getItemUtil() {
         ItemUtil tmp = itemUtil;
