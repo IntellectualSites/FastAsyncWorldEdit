@@ -325,6 +325,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     private void setupPlotSquared() {
+        if(this.plugin.getServer().getPluginManager().getPlugin("PlotSquared") == null) return;
         WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
         log.debug("Plugin 'PlotSquared' found. Using it now.");
     }
