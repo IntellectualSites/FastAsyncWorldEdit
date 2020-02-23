@@ -12,6 +12,9 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_15_R1.*;
@@ -40,6 +43,8 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
     private final static Field fieldDirtyCount;
     private final static Field fieldDirtyBits;
 
+    private final static MethodHandle methodGetVisibleChunk;
+
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
 
@@ -65,6 +70,10 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
+
+            Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
+            declaredGetVisibleChunk.setAccessible(true);
+            methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
 
             Field tmp = DataPaletteBlock.class.getDeclaredField("j");
             ReflectionUtils.setAccessibleNonFinal(tmp);
@@ -135,8 +144,11 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
 
     public static PlayerChunk getPlayerChunk(net.minecraft.server.v1_15_R1.WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
-        PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
-        return playerChunk;
+        try {
+            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
+        } catch (Throwable thr) {
+            throw new RuntimeException(thr);
+        }
     }
 
     public static void sendChunk(net.minecraft.server.v1_15_R1.WorldServer nmsWorld, int X, int Z, int mask) {
