@@ -36,7 +36,6 @@ configurations.all {
 dependencies {
     compile("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     "api"(project(":worldedit-core"))
-    api(project(":worldedit-libs:core"))
     "api"(project(":worldedit-libs:bukkit"))
     "compile"(":worldedit-adapters:")
     "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
@@ -52,7 +51,7 @@ dependencies {
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
     "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
-    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.+") {
+    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.+") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
@@ -91,7 +90,6 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
         include(dependency(":worldedit-core"))
-        include(dependency(":worldedit-libs:core"))
         include(dependency(":worldedit-libs:bukkit"))
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
