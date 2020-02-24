@@ -678,12 +678,9 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         // MH:oldResult,result = (ExecutionData)Double
 
         // Execute `oldResult` but ignore its return value, then execute result and return that.
-        // If either result is `defaultResult`, it's bogus, so just skip it
+        // If `oldResult` (the old value) is `defaultResult`, it's bogus, so just skip it
         if (oldResult == DEFAULT_RESULT) {
             return result;
-        }
-        if (result == DEFAULT_RESULT) {
-            return oldResult;
         }
         // Add a dummy Double parameter to the end
         // MH:dummyDouble = (ExecutionData, Double)Double
