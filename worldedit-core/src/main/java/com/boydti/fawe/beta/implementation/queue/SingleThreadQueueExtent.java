@@ -188,13 +188,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the
      * coordinates
      *
-     * @param X
-     * @param Z
+     * @param chunkX
+     * @param chunkZ
      * @return IChunk
      */
-    private ChunkHolder poolOrCreate(int X, int Z) {
+    private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {
         ChunkHolder next = create(false);
-        next.init(this, X, Z);
+        next.init(this, chunkX, chunkZ);
         return next;
     }
 

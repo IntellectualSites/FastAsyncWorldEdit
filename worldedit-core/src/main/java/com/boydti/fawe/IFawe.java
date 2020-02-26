@@ -17,8 +17,6 @@ public interface IFawe {
 
     File getDirectory();
 
-    Player wrap(final Object obj);
-    
     TaskManager getTaskManager();
 
     Collection<FaweMaskManager> getMaskManagers();

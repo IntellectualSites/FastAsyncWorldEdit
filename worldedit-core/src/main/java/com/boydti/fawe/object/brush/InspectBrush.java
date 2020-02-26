@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
+public class InspectBrush extends BrushTool {
 
     /**
      * Construct the tool.
@@ -61,13 +61,14 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
     }
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
-        if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
+        if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
             System.out.println("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(Caption.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
+            player.print(Caption.of("fawe.error.setting.disable",
+                "history.use-database (Import with /history import )"));
             System.out.println("No db");
             return false;
         }
