@@ -13,15 +13,16 @@ repositories {
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("http://empcraft.com/maven2") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
-    maven { url = uri("http://ci.frostcast.net/plugin/repository/everything") }
-    maven { url = uri("http://dl.bintray.com/tastybento/maven-repo") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
-    maven(fun MavenArtifactRepository.() {
+    maven {
         this.name = "JitPack"
         this.url = uri("https://jitpack.io")
-    })
-    maven { url = uri("https://repo.destroystokyo.com/repository/maven-public//") }
-    maven { url = uri("http://repo.dmulloy2.net/content/groups/public/") }
+    }
+    maven { url = uri("https://repo.destroystokyo.com/repository/maven-public/") }
+    maven {
+        name = "ProtocolLib Repo"
+        url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
+    }
     maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
     flatDir {dir(File("src/main/resources"))}
 }
@@ -64,7 +65,7 @@ dependencies {
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
-    "implementation"("com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT") { isTransitive = false }
+    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.0") { isTransitive = false }
 }
 
 tasks.named<Copy>("processResources") {
