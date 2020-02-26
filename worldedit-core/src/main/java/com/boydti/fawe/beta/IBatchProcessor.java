@@ -71,12 +71,12 @@ public interface IBatchProcessor {
         try {
             int layer = (minY - 15) >> 4;
             while (layer < (maxY + 15) >> 4) {
-                if (layer >= -1) {
+                if (layer > -1) {
                     if (set.hasSection(layer)) {
                         return true;
                     }
-                    layer++;
                 }
+                layer++;
             }
         } catch (ArrayIndexOutOfBoundsException exception) {
             Fawe.imp().debug("minY = " + minY);
