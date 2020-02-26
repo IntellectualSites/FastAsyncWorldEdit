@@ -57,7 +57,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
         AsyncBlock block = new AsyncBlock(asyncWorld, 0, 0, 0);
         BlockBreakEvent event = new BlockBreakEvent(block, ((BukkitPlayer) player).getPlayer());
 
-        return new FaweMask(pos1, pos2) {
+        return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
         @Override
             public boolean isValid(Player player, MaskType type) {

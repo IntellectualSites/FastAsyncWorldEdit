@@ -11,6 +11,7 @@ import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -37,8 +38,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                 if (block.getResident().equals(resident)) {
                     return true;
                 }
-            } catch (NotRegisteredException ignore) {
-            }
+            } catch (NotRegisteredException ignore) {}
             Town town = block.getTown();
             if (town.isMayor(resident)) {
                 return true;
@@ -54,14 +54,12 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     return true;
                 }
             }
-        } catch (NotRegisteredException e) {
-            return false;
-        }
+        } catch (NotRegisteredException ignore) {}
         return false;
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final Location location = player.getLocation();
         try {
@@ -82,15 +80,14 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                 final BlockVector3 pos2 = BlockVector3.at(
                     chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
                         + 15);
-                return new FaweMask(pos1, pos2) {
+                return new FaweMask(new CuboidRegion(pos1, pos2)) {
                     @Override
                     public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
-                        return isAllowed(BukkitAdapter.adapt(player),myplot);
+                        return isAllowed(BukkitAdapter.adapt(player), myplot);
                     }
                 };
             }
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 }

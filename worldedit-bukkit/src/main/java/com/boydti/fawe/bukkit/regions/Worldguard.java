@@ -113,7 +113,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
                     };
                 }
             }
-            return new FaweMask(pos1, pos2) {
+            return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
             @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
