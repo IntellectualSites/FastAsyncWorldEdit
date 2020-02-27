@@ -388,7 +388,7 @@ public class Settings extends Config {
                 " - Downloads can be deleted by the user",
                 " - Supports clipboard uploads, downloads and saves",
         })
-        public String URL = "https://empcraft.com/fawe/";
+        public String URL = "https://athion.net/fawe/";
         @Comment({
                 "The web interface for assets",
                 " - All schematics are organized and public",
