@@ -36,7 +36,7 @@ public abstract class FaweMaskManager {
         return this.key;
     }
 
-    public abstract FaweMask getMask(final Player player, MaskType type);
+    public FaweMask getMask(final Player player, MaskType type){ return null; }
 
     public boolean isValid(FaweMask mask) {
         return true;
