@@ -14,6 +14,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -50,7 +51,8 @@ import javax.annotation.Nullable;
 public class DiskOptimizedClipboard extends LinearClipboard implements Closeable {
 
     private static int HEADER_SIZE = 14;
-
+    private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
+    
     private final HashMap<IntegerTrio, CompoundTag> nbtMap;
     private final File file;
 
@@ -70,8 +72,14 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
-        if (getWidth() > Character.MAX_VALUE || getHeight() > Character.MAX_VALUE || getLength() > Character.MAX_VALUE) {
-            throw new IllegalArgumentException("Too large");
+        if (getWidth() > MAX_SIZE) {
+            throw new IllegalArgumentException("Width of region too large");
+        }
+        if (getHeight() > MAX_SIZE) {
+            throw new IllegalArgumentException("Height of region too large");
+        }
+        if (getLength() > MAX_SIZE) {
+            throw new IllegalArgumentException("Length of region too large");
         }
         nbtMap = new HashMap<>();
         try {
@@ -99,6 +107,10 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public DiskOptimizedClipboard(Region region, UUID uuid) {
+        this(region.getDimensions(), uuid);
     }
 
     @Override
@@ -166,7 +178,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        setBiome(getIndex(x, 0, z), biome);
+        setBiome(getIndex(x, y, z), biome);
         return true;
     }
 

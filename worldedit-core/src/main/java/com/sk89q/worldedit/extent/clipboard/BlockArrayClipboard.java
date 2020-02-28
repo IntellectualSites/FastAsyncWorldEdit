@@ -76,13 +76,13 @@ public class BlockArrayClipboard implements Clipboard {
      * @param region the bounding region
      */
     public BlockArrayClipboard(Region region, UUID clipboardId) {
-        this(region, Clipboard.create(region.getDimensions(), clipboardId));
+        this(region, Clipboard.create(region, clipboardId));
     }
 
-    public BlockArrayClipboard(Region region, Clipboard clipboard) {
-        checkNotNull(clipboard);
+    public BlockArrayClipboard(Region region, Clipboard parent) {
+        checkNotNull(parent);
         checkNotNull(region);
-        this.parent = clipboard;
+        this.parent = parent;
         this.region = region;
         this.origin = region.getMinimumPoint();
     }

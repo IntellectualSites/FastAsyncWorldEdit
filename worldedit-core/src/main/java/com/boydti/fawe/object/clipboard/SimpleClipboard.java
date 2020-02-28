@@ -11,7 +11,7 @@ public abstract class SimpleClipboard implements Clipboard {
     private final int volume;
     private BlockVector3 origin;
 
-    public SimpleClipboard(BlockVector3 dimensions) {
+    SimpleClipboard(BlockVector3 dimensions) {
         this.size = dimensions;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
         if (longVolume >= Integer.MAX_VALUE >> 2) {
@@ -20,6 +20,10 @@ public abstract class SimpleClipboard implements Clipboard {
         this.area = getWidth() * getLength();
         this.volume = (int) longVolume;
         this.origin = BlockVector3.ZERO;
+    }
+
+    public SimpleClipboard(Region region) {
+        this(region.getDimensions());
     }
 
     @Override
@@ -44,7 +48,7 @@ public abstract class SimpleClipboard implements Clipboard {
 
     @Override
     public Region getRegion() {
-        return new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
+        return new CuboidRegion(BlockVector3.ZERO, BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
     }
 
     @Override

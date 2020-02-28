@@ -75,13 +75,13 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return ReadOnlyClipboard.of(session, region);
     }
 
-    static Clipboard create(BlockVector3 size, UUID uuid) {
+    static Clipboard create(Region region, UUID uuid) {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
-            return new DiskOptimizedClipboard(size, uuid);
+            return new DiskOptimizedClipboard(region, uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
-            return new CPUOptimizedClipboard(size);
+            return new CPUOptimizedClipboard(region);
         } else {
-            return new MemoryOptimizedClipboard(size);
+            return new MemoryOptimizedClipboard(region);
         }
     }
 

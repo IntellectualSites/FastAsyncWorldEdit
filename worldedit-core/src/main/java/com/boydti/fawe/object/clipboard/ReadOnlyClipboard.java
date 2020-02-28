@@ -19,7 +19,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public final Region region;
 
     public ReadOnlyClipboard(Region region) {
-        super(region.getDimensions());
+        super(region);
         this.region = region;
     }
 

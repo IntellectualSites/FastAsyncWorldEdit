@@ -443,8 +443,8 @@ public class SchematicReader implements ClipboardReader {
                 if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(fc, group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
 
                 if (group == 2) {
-                    int ns = ((Boolean) set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
-                    int ew = ((Boolean) set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
+                    int ns = (set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
+                    int ew = (set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
                     if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
                         set = set.with(PropertyKey.UP, true);
                     }

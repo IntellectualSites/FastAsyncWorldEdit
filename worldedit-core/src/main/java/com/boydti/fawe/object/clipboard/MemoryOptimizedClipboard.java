@@ -13,6 +13,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -52,18 +53,18 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     private int compressionLevel;
 
-    public MemoryOptimizedClipboard(BlockVector3 dimensions) {
-        this(dimensions, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
+    public MemoryOptimizedClipboard(Region region) {
+        this(region, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
     }
 
-    public MemoryOptimizedClipboard(BlockVector3 dimensions, int compressionLevel) {
-        super(dimensions);
+    public MemoryOptimizedClipboard(Region region, int compressionLevel) {
+        super(region.getDimensions());
         states = new byte[1 + (getVolume() >> BLOCK_SHIFT)][];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
         this.compressionLevel = compressionLevel;
     }
-
+    
     public void convertTilesToIndex() {
         if (nbtMapLoc.isEmpty()) {
             return;
@@ -97,8 +98,8 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     @Override
     public void streamBiomes(IntValueReader task) {
         if (!hasBiomes()) return;
-        int index = 0;
         try {
+            int index = 0;
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     task.applyInt(index, biomes[index] & 0xFF);
