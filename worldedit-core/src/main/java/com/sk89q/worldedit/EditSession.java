@@ -820,6 +820,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws WorldEditException thrown on a set error
      */
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws WorldEditException {
+        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+            return false;
+        }
+
         this.changes++;
         switch (stage) {
             case BEFORE_HISTORY:
@@ -841,6 +845,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the block changed
      */
     public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
+        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             return bypassAll.setBlock(position, block);
@@ -857,6 +865,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the block changed
      */
     public <B extends BlockStateHolder<B>> boolean smartSetBlock(BlockVector3 position, B block) {
+        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             return setBlock(position, block, Stage.BEFORE_REORDER);
@@ -867,6 +879,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
+        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             return this.getExtent().setBlock(position, block);
@@ -879,7 +895,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, B block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
+        if (y < 0 || y > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             return this.getExtent().setBlock(x, y, z, block);
@@ -899,6 +919,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(int x, int y, int z, Pattern pattern) {
+        if (y < 0 || y > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             BlockVector3 bv = mutablebv.setComponents(x, y, z);
@@ -917,6 +941,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(BlockVector3 position, Pattern pattern) throws MaxChangedBlocksException {
+        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+            return false;
+        }
+
         this.changes++;
         try {
             return pattern.apply(this.getExtent(), position, position);
