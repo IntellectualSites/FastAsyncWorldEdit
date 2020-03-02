@@ -1,5 +1,6 @@
 package com.boydti.fawe.util;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -32,26 +33,15 @@ public class ReflectionUtils {
         // letting us modify the static final field
         if (Modifier.isFinal(field.getModifiers())) {
             try {
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                int modifiers = modifiersField.getInt(field);
+                Field lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+                lookupField.setAccessible(true);
 
                 // blank out the final bit in the modifiers int
-                modifiers &= ~Modifier.FINAL;
-                modifiersField.setInt(field, modifiers);
-            } catch (NoSuchFieldException e) {
-                // Java 12+ compatibility - search fields with hidden method for modifiers
-                // same concept as above, just with a more hacky way of getting to the modifiers
-                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-                getDeclaredFields0.setAccessible(true);
-                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-                for (Field classField : fields) {
-                    if ("modifiers".equals(classField.getName())) {
-                        classField.setAccessible(true);
-                        classField.set(field, field.getModifiers() & ~Modifier.FINAL);
-                        break;
-                    }
-                }
+                ((MethodHandles.Lookup) lookupField.get(null))
+                .findSetter(Field.class, "modifiers", int.class)
+                    .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
     }
