@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.IncendoPaster;
@@ -135,9 +136,14 @@ public class WorldEditCommands {
         desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
-    public void report(Actor actor) throws WorldEditException, IOException {
-		String dest = IncendoPaster.debugPaste();
-		actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
+    public void report(Actor actor) throws WorldEditException {
+        String dest = "";
+        try {
+            dest = IncendoPaster.debugPaste();
+        } catch (IOException e) {
+            actor.printInfo(TextComponent.of(e.getMessage()));
+        }
+        actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
     }
 
     @Command(
