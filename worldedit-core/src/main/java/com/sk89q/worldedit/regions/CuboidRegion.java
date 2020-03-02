@@ -124,8 +124,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         if (pos1 == null || pos2 == null) {
             return;
         }
-        pos1 = pos1.clampY(world == null ? 0 : 0, world == null ? FaweCache.IMP.WORLD_MAX_Y : world.getMaxY());
-        pos2 = pos2.clampY(world == null ? 0 : 0, world == null ? FaweCache.IMP.WORLD_MAX_Y : world.getMaxY());
+        pos1 = pos1.clampY(0, world == null ? 255 : world.getMaxY());
+        pos2 = pos2.clampY(0, world == null ? 255 : world.getMaxY());
         minX = Math.min(pos1.getX(), pos2.getX());
         minY = Math.min(pos1.getY(), pos2.getY());
         minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -397,9 +397,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 if (o instanceof BlockVector2) {
                     BlockVector2 cv = (BlockVector2) o;
                     return cv.getX() >= minX && cv.getX() <= maxX && cv.getZ() >= minZ && cv.getZ() <= maxZ;
-                } else {
-                    return false;
                 }
+                return false;
             }
         };
     }
@@ -422,15 +421,11 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return chunks;
     }
 
-    /* Slow and unnecessary
+
     @Override
     public boolean contains(BlockVector3 position) {
-        BlockVector3 min = getMinimumPoint();
-        BlockVector3 max = getMaximumPoint();
-
-        return position.containedWithin(min, max);
+        return contains(position.getX(), position.getY(), position.getZ());
     }
-    */
 
     @Override
     public boolean contains(int x, int y, int z) {
@@ -440,11 +435,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     @Override
     public boolean contains(int x, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
-    }
-
-    @Override
-    public boolean contains(BlockVector3 position) {
-        return contains(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -543,7 +533,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public boolean hasNext() {
-                return hasNext;
+                return (hasNext);
             }
 
             @Override
@@ -596,10 +586,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 return answer;
             }
 
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
         };
     }
 

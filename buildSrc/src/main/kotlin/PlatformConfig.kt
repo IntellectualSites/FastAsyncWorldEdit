@@ -20,12 +20,10 @@ import org.gradle.kotlin.dsl.withType
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java")
-    apply(plugin = "eclipse")
     apply(plugin = "idea")
     apply(plugin = "maven")
     //apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
-    //apply(plugin = "com.jfrog.artifactory")
 
     ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
 
@@ -44,7 +42,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     }
 
     dependencies {
-        "compileOnly"("org.jetbrains:annotations:18.0.0")
+        "compileOnly"("org.jetbrains:annotations:19.0.0")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")

@@ -36,23 +36,23 @@ public abstract class TaskManager {
     /**
      * Run a repeating task asynchronously
      *
-     * @param runnable
+     * @param runnable the task to run
      * @param interval in ticks
-     * @return
+     * @return the task id number
      */
     public abstract int repeatAsync(@NotNull final Runnable runnable, final int interval);
 
     /**
      * Run a task asynchronously
      *
-     * @param runnable
+     * @param runnable the task to run
      */
     public abstract void async(@NotNull final Runnable runnable);
 
     /**
      * Run a task on the main thread
      *
-     * @param runnable
+     * @param runnable the task to run
      */
     public abstract void task(@NotNull final Runnable runnable);
 
@@ -153,10 +153,10 @@ public abstract class TaskManager {
 
     /**
      * Run a task on the current thread or asynchronously
-     * - If it's already the main thread, it will jst call run()
+     * - If it's already the main thread, it will just call run()
      *
-     * @param runnable
-     * @param async
+     * @param runnable the task to run
+     * @param async whether the task should run on the main thread
      */
     public void taskNow(@NotNull final Runnable runnable, boolean async) {
         if (async) {
@@ -170,7 +170,7 @@ public abstract class TaskManager {
      * Run a task as soon as possible on the main thread
      * - Non blocking if not calling from the main thread
      *
-     * @param runnable
+     * @param runnable the task to run
      */
     public void taskNowMain(@NotNull final Runnable runnable) {
         if (Fawe.isMainThread()) {
@@ -183,8 +183,8 @@ public abstract class TaskManager {
     /**
      * Run a task as soon as possible not on the main thread
      *
-     * @param runnable
-     * @see com.boydti.fawe.Fawe#isMainThread()
+     * @param runnable the task to run
+     * @see Fawe#isMainThread()
      */
     public void taskNowAsync(@NotNull final Runnable runnable) {
         taskNow(runnable, Fawe.isMainThread());
@@ -193,8 +193,8 @@ public abstract class TaskManager {
     /**
      * Run a task on the main thread at the next tick or now async
      *
-     * @param runnable
-     * @param async
+     * @param runnable the task to run. 
+     * @param async whether the task should run on the main thread
      */
     public void taskSoonMain(@NotNull final Runnable runnable, boolean async) {
         if (async) {
@@ -208,7 +208,7 @@ public abstract class TaskManager {
     /**
      * Run a task later on the main thread
      *
-     * @param runnable
+     * @param runnable the task to run
      * @param delay in ticks
      */
     public abstract void later(@NotNull final Runnable runnable, final int delay);
@@ -216,7 +216,7 @@ public abstract class TaskManager {
     /**
      * Run a task later asynchronously
      *
-     * @param runnable
+     * @param runnable the task to run
      * @param delay in ticks
      */
     public abstract void laterAsync(@NotNull final Runnable runnable, final int delay);
@@ -224,7 +224,7 @@ public abstract class TaskManager {
     /**
      * Cancel a task
      *
-     * @param task
+     * @param task the id of the task to cancel
      */
     public abstract void cancel(final int task);
 

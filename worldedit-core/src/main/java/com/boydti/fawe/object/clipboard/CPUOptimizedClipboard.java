@@ -37,17 +37,13 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
 
-    public CPUOptimizedClipboard(BlockVector3 dimensions) {
-        super(dimensions);
+    public CPUOptimizedClipboard(Region region) {
+        super(region.getDimensions());
         this.states = new char[getVolume()];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
     }
-
-    public CPUOptimizedClipboard(Region region) {
-        this(region.getDimensions());
-    }
-
+    
     @Override
     public boolean hasBiomes() {
         return biomes != null;

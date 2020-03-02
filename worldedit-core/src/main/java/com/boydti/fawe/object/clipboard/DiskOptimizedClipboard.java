@@ -62,8 +62,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private FileChannel fileChannel;
     private boolean hasBiomes;
 
-    public DiskOptimizedClipboard(BlockVector3 dimensions, UUID uuid) {
-        this(dimensions, MainUtil.getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
+    public DiskOptimizedClipboard(Region region, UUID uuid) {
+        this(region.getDimensions(), MainUtil.getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
@@ -108,11 +108,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             throw new RuntimeException(e);
         }
     }
-
-    public DiskOptimizedClipboard(Region region, UUID uuid) {
-        this(region.getDimensions(), uuid);
-    }
-
+    
     @Override
     public URI getURI() {
         return file.toURI();
