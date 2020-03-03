@@ -67,6 +67,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
         };
     }
 
+    @Override
     public Region getRegion() {
         return region;
     }

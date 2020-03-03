@@ -22,7 +22,7 @@ public abstract class SimpleClipboard implements Clipboard {
         this.origin = BlockVector3.ZERO;
     }
 
-    public SimpleClipboard(Region region) {
+    SimpleClipboard(Region region) {
         this(region.getDimensions());
     }
 

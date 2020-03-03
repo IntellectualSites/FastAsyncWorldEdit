@@ -1,99 +1,74 @@
-package com.boydti.fawe.object.clipboard;
+package com.boydti.fawe.`object`.clipboard
 
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.jnbt.CompoundTag
+import com.sk89q.worldedit.WorldEditException
+import com.sk89q.worldedit.entity.Entity
+import com.sk89q.worldedit.extent.clipboard.Clipboard
+import com.sk89q.worldedit.math.BlockVector2
+import com.sk89q.worldedit.math.BlockVector3
+import com.sk89q.worldedit.regions.CuboidRegion
+import com.sk89q.worldedit.regions.Region
+import com.sk89q.worldedit.world.biome.BiomeType
+import com.sk89q.worldedit.world.block.BaseBlock
+import com.sk89q.worldedit.world.block.BlockState
+import com.sk89q.worldedit.world.block.BlockStateHolder
+import com.sk89q.worldedit.world.block.BlockTypes
 
-public class EmptyClipboard implements Clipboard {
-
-    public static final EmptyClipboard INSTANCE = new EmptyClipboard();
-
-    private EmptyClipboard() {
+object EmptyClipboard : Clipboard {
+    override fun getRegion(): Region {
+        return CuboidRegion(BlockVector3.ZERO, BlockVector3.ZERO)
     }
 
-    @Override
-    public Region getRegion() {
-        return new CuboidRegion(BlockVector3.ZERO, BlockVector3.ZERO);
+    override fun getDimensions(): BlockVector3 {
+        return BlockVector3.ZERO
     }
 
-    @Override
-    public BlockVector3 getDimensions() {
-        return BlockVector3.ZERO;
+    override fun getOrigin(): BlockVector3 {
+        return BlockVector3.ZERO
     }
 
-    @Override
-    public BlockVector3 getOrigin() {
-        return BlockVector3.ZERO;
+    override fun setOrigin(origin: BlockVector3) {}
+    override fun removeEntity(entity: Entity) {}
+    override fun getMinimumPoint(): BlockVector3 {
+        return BlockVector3.ZERO
     }
 
-    @Override
-    public void setOrigin(BlockVector3 origin) {
+    override fun getMaximumPoint(): BlockVector3 {
+        return BlockVector3.ZERO
     }
 
-    @Override
-    public void removeEntity(Entity entity) {
-
+    override fun getFullBlock(position: BlockVector3): BaseBlock {
+        return BlockTypes.AIR!!.defaultState.toBaseBlock()
     }
 
-    @Override
-    public BlockVector3 getMinimumPoint() {
-        return BlockVector3.ZERO;
+    override fun getBlock(position: BlockVector3): BlockState {
+        return BlockTypes.AIR!!.defaultState
     }
 
-    @Override
-    public BlockVector3 getMaximumPoint() {
-        return BlockVector3.ZERO;
+    override fun getBiome(position: BlockVector2): BiomeType? {
+        return null
     }
 
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return BlockTypes.AIR.getDefaultState().toBaseBlock();
+    @Throws(WorldEditException::class)
+    override fun <T : BlockStateHolder<T>?> setBlock(position: BlockVector3, block: T): Boolean {
+        return false
     }
 
-    @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return BlockTypes.AIR.getDefaultState();
+    @Throws(WorldEditException::class)
+    override fun <T : BlockStateHolder<T>?> setBlock(x: Int, y: Int, z: Int, block: T): Boolean {
+        return false
     }
 
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return null;
+    @Throws(WorldEditException::class)
+    override fun setTile(x: Int, y: Int, z: Int, tile: CompoundTag): Boolean {
+        return false
     }
 
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
-        return false;
+    override fun setBiome(position: BlockVector2, biome: BiomeType): Boolean {
+        return false
     }
 
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return false;
+    override fun setBiome(x: Int, y: Int, z: Int, biome: BiomeType): Boolean {
+        return false
     }
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return false;
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return false;
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return false;
-    }
-
 }
