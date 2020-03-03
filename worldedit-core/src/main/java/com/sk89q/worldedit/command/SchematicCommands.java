@@ -27,7 +27,6 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -189,22 +188,7 @@ public class SchematicCommands {
         }
         player.print(Caption.of("fawe.worldedit.clipboard.clipboard.uri.not.found" , fileName));
     }
-
-    @Command(
-            name = "remap",
-            desc = "Remap a clipboard between MCPE/PC values"
-    )
-    @Deprecated
-    @CommandPermissions({"worldedit.schematic.remap"})
-    public void remap(Player player, LocalSession session) throws WorldEditException {
-        ClipboardRemapper remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PE, ClipboardRemapper.RemapPlatform.PC);
-
-        for (Clipboard clip : session.getClipboard().getClipboards()) {
-            remapper.apply(clip);
-        }
-        player.print("Remapped schematic");
-    }
-
+    
     @Command(
         name = "load",
         desc = "Load a schematic into your clipboard"
