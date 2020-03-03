@@ -38,7 +38,13 @@ import java.lang.invoke.MethodHandle;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Compiles and evaluates expressions.
@@ -70,18 +76,22 @@ public class Expression {
 
     private static final ThreadLocal<Stack<Expression>> instance = new ThreadLocal<>();
     private static final ExecutorService evalThread = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            new ThreadFactoryBuilder()
-                    .setDaemon(true)
-                    .setNameFormat("worldedit-expression-eval-%d")
-                    .build());
+        Runtime.getRuntime().availableProcessors(),
+        new ThreadFactoryBuilder()
+            .setDaemon(true)
+            .setNameFormat("worldedit-expression-eval-%d")
+            .build());
 
     private final SlotTable slots = new SlotTable();
     private final List<String> providedSlots;
     private final ExpressionParser.AllStatementsContext root;
     private final SetMultimap<String, MethodHandle> functions = Functions.getFunctionMap();
-    private final CompiledExpression compiledExpression;
     private ExpressionEnvironment environment;
+    private final CompiledExpression compiledExpression;
+
+    public static Expression compile(String expression, String... variableNames) throws ExpressionException {
+        return new Expression(expression, variableNames);
+    }
 
     private Expression(String expression, String... variableNames) throws ExpressionException {
         slots.putSlot("e", new LocalSlot.Constant(Math.E));
@@ -91,8 +101,8 @@ public class Expression {
 
         for (String variableName : variableNames) {
             slots.initVariable(variableName)
-                    .orElseThrow(() -> new ExpressionException(-1,
-                            "Tried to overwrite identifier '" + variableName + "'"));
+                .orElseThrow(() -> new ExpressionException(-1,
+                    "Tried to overwrite identifier '" + variableName + "'"));
         }
         this.providedSlots = ImmutableList.copyOf(variableNames);
 
@@ -114,14 +124,6 @@ public class Expression {
         this.compiledExpression = new ExpressionCompiler().compileExpression(root, functions);
     }
 
-    public static Expression compile(String expression, String... variableNames) throws ExpressionException {
-        return new Expression(expression, variableNames);
-    }
-
-    public static Expression getInstance() {
-        return instance.get().peek();
-    }
-
     public double evaluate(double... values) throws EvaluationException {
         return evaluate(values, WorldEdit.getInstance().getConfiguration().calculationTimeout);
     }
@@ -130,8 +132,8 @@ public class Expression {
         for (int i = 0; i < values.length; ++i) {
             String slotName = providedSlots.get(i);
             LocalSlot.Variable slot = slots.getVariable(slotName)
-                    .orElseThrow(() -> new EvaluationException(-1,
-                            "Tried to assign to non-variable " + slotName + "."));
+                .orElseThrow(() -> new EvaluationException(-1,
+                    "Tried to assign to non-variable " + slotName + "."));
 
             slot.setValue(values[i]);
         }
@@ -195,6 +197,10 @@ public class Expression {
 
     public SlotTable getSlots() {
         return slots;
+    }
+
+    public static Expression getInstance() {
+        return instance.get().peek();
     }
 
     private void pushInstance() {

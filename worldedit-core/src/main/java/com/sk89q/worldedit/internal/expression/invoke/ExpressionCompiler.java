@@ -29,6 +29,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.COMPILED_EXPRESSION_SIG;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.safeInvoke;
 import static java.lang.invoke.MethodType.methodType;
 
 /**
@@ -43,7 +45,7 @@ public class ExpressionCompiler {
     private static final MethodHandle HANDLE_TO_CE_CONVERTER;
 
     static {
-        MethodHandle handleInvoker = MethodHandles.invoker(ExpressionHandles.COMPILED_EXPRESSION_SIG);
+        MethodHandle handleInvoker = MethodHandles.invoker(COMPILED_EXPRESSION_SIG);
         try {
             HANDLE_TO_CE_CONVERTER = LambdaMetafactory.metafactory(
                 MethodHandles.lookup(),
@@ -52,11 +54,11 @@ public class ExpressionCompiler {
                 // Take a handle, to be converted to CompiledExpression
                 HANDLE_TO_CE,
                 // Raw signature for SAM type
-                ExpressionHandles.COMPILED_EXPRESSION_SIG,
+                COMPILED_EXPRESSION_SIG,
                 // Handle to call the captured handle.
                 handleInvoker,
                 // Actual signature at invoke time
-                ExpressionHandles.COMPILED_EXPRESSION_SIG
+                COMPILED_EXPRESSION_SIG
             ).dynamicInvoker().asType(HANDLE_TO_CE);
         } catch (LambdaConversionException e) {
             throw new IllegalStateException("Failed to load ExpressionCompiler MetaFactory", e);
@@ -66,7 +68,7 @@ public class ExpressionCompiler {
     public CompiledExpression compileExpression(ExpressionParser.AllStatementsContext root,
                                                 SetMultimap<String, MethodHandle> functions) {
         MethodHandle invokable = root.accept(new CompilingVisitor(functions));
-        return (CompiledExpression) ExpressionHandles.safeInvoke(
+        return (CompiledExpression) safeInvoke(
             HANDLE_TO_CE_CONVERTER, h -> h.invoke(invokable)
         );
     }
