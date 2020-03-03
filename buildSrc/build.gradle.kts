@@ -2,7 +2,7 @@ import java.util.Properties
 
 plugins {
     `kotlin-dsl`
-    kotlin("jvm") version embeddedKotlinVersion
+    kotlin("jvm") version "1.3.61"
 }
 
 repositories {

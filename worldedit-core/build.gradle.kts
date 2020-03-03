@@ -10,7 +10,7 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
-    kotlin("jvm") version "1.3.41"
+    kotlin("jvm") version "1.3.61"
 }
 
 repositories {
@@ -58,7 +58,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib-jdk8", "1.3.61"))
 }
 
 tasks.withType<JavaCompile>().configureEach {
