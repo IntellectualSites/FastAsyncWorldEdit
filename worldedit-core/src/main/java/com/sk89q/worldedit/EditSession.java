@@ -42,6 +42,8 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -195,8 +197,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @SuppressWarnings("ProtectedField")
     protected final World world;
-    private final String worldName;
-    private boolean wrapped;
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
     private final Player player;
@@ -212,6 +212,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private Extent bypassAll;
 
     private final int maxY;
+    private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
+
 
     @Deprecated
     public EditSession(EventBus bus, World world, @Nullable Player player,
@@ -247,8 +249,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
-        this.worldName = world.getName();
-        this.wrapped = builder.isWrapped();
         this.bypassHistory = builder.getBypassHistory();
         this.bypassAll = builder.getBypassAll();
         this.originalLimit = builder.getLimit();
@@ -317,11 +317,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public Extent getBypassAll() {
         return bypassAll;
     }
-
     public Extent getBypassHistory() {
         return bypassHistory;
     }
-    private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
     public void setExtent(AbstractDelegateExtent extent) {
         new ExtentTraverser(this).setNext(extent);
@@ -483,7 +481,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public void addTransform(ResettableExtent transform) {
         checkNotNull(transform);
-        wrapped = true;
         transform.setExtent(getExtent());
         new ExtentTraverser(this).setNext(transform);
     }

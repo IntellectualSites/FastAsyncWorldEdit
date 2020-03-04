@@ -228,9 +228,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public abstract Iterator<Change> getIterator(boolean redo);
 
-    public void delete() {
-    }
-
     public EditSession toEditSession(Player player) {
         return toEditSession(player, null);
     }

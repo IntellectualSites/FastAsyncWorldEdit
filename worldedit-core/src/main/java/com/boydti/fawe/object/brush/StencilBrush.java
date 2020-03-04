@@ -46,23 +46,17 @@ public class StencilBrush extends HeightBrush {
         } else {
             add = 0;
         }
-        double scale = (yscale / sizeDouble) * (maxY + 1);
         final HeightMap map = getHeightMap();
         map.setSize(size);
         int cutoff = onlyWhite ? maxY : 0;
         final SolidBlockMask solid = new SolidBlockMask(editSession);
-        final AdjacentAnyMask adjacent = new AdjacentAnyMask(Masks.negate(solid));
-
-        // BlockVector3 pos = player.getLocation();
-
-
-
+        
         Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
 
-
+        double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
             @Override
@@ -95,9 +89,5 @@ public class StencilBrush extends HeightBrush {
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
-    }
-
-    private void apply(double val) {
-
     }
 }

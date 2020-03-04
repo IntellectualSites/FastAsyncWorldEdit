@@ -1,7 +1,6 @@
 package com.boydti.fawe.database;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.collection.YieldIterable;
@@ -36,7 +35,6 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     private final String prefix;
     private final File dbLocation;
-    private final String worldName;
     private final World world;
     private Connection connection;
 
@@ -56,14 +54,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     private ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
 
-    public RollbackDatabase(String world) throws SQLException, ClassNotFoundException {
-        this(FaweAPI.getWorld(world));
-    }
-
-    public RollbackDatabase(World world) throws SQLException, ClassNotFoundException {
+    RollbackDatabase(World world) throws SQLException, ClassNotFoundException {
         super((t, e) -> e.printStackTrace());
         this.prefix = "";
-        this.worldName = world.getName();
         this.world = world;
         this.dbLocation = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db");
         connection = openConnection();
@@ -180,7 +173,6 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 int count = 0;
                 String stmtStr = ascending ? uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC :
                         uuid == null ? GET_EDITS : GET_EDITS_USER;
-                // `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC"
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());
@@ -200,10 +192,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     do {
                         count++;
                         Supplier<RollbackOptimizedHistory> history = create(result);
-//                        if (history.getBDFile().exists())
-                        {
-                            yieldIterable.accept(history);
-                        }
+                        yieldIterable.accept(history);
                     } while (result.next());
                 }
                 if (delete && uuid != null) {

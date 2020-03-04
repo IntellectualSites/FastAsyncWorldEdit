@@ -449,70 +449,7 @@ public class SchematicCommands {
             actor.printInfo(TextComponent.of(builder.toString()));
         }
     }
-
-
-/*
-    @Command(
-            name = "show",
-            desc = "Show a schematic",
-            descFooter = "List all schematics in the schematics directory\n" +
-                    " -f <format> restricts by format\n"
-    )
-    @CommandPermissions("worldedit.schematic.show")
-    public void show(Player player, InjectedValueAccess args, @Switch(name='f', desc = "") String formatName) {
-        FawePlayer fp = FawePlayer.wrap(player);
-        if (args.argsLength() == 0) {
-            if (fp.getSession().getVirtualWorld() != null) fp.setVirtualWorld(null);
-            else {
-                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/" + Commands.getAlias(SchematicCommands.class, "schematic") + " " + getCommand().aliases()[0] + " " + getCommand().usage()));
-            }
-            return;
-        }
-        LocalConfiguration config = worldEdit.getConfiguration();
-        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        try {
-            SchemVis visExtent = new SchemVis(fp);
-            LongAdder count = new LongAdder();
-            UtilityCommands.getFiles(dir, player, args, 0, Character.MAX_VALUE, formatName, Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS, file -> {
-                if (file.isFile()) {
-                    try {
-                        visExtent.add(file);
-                        count.add(1);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-            long total = count.longValue();
-            if (total == 0) {
-                if (args.getJoinedStrings(0).toLowerCase().startsWith("all")) {
-                    player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"))
-                } else {
-                    String joined = args.getJoinedStrings(0);
-                    String cmd = "/" + Commands.getAlias(SchematicCommands.class, "schematic") + " " + getCommand().aliases()[0] + " all " + joined;
-                    player.print(TranslatableComponent.of("fawe.worldedit.help.help.suggest" , joined, cmd));
-                }
-                return;
-            }
-            visExtent.bind();
-            visExtent.update();
-
-            String cmdPrefix = "/" + (config.noDoubleSlash ? "" : "/");
-            String cmdShow = Commands.getAlias(ClipboardCommands.class, "schematic") + " " + Commands.getAlias(ClipboardCommands.class, "show");
-            fp.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.show" , count.longValue(), args.getJoinedStrings(0), cmdShow));
-
-            if (fp.getSession().getExistingClipboard() != null) {
-                String cmd = cmdPrefix + Commands.getAlias(ClipboardCommands.class, "clearclipboard");
-                fp.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.prompt.clear" , cmd));
-            }
-
-        } catch (Throwable e) {
-            fp.setVirtualWorld(null);
-            throw e;
-        }
-    }
-*/
-
+    
     @Command(
         name = "list",
         aliases = {"all", "ls"},

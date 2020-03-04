@@ -37,12 +37,10 @@ public class SurfaceSpline implements Brush {
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
             if (max == -1) return;
-//            pos.mutY(max);
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
+            editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
             if (!vis) return;
         }
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
 
@@ -56,6 +54,7 @@ public class SurfaceSpline implements Brush {
         MutableBlockVector3 mutable = MutableBlockVector3.at(0, 0, 0);
         interpol.setNodes(nodes);
         final double splinelength = interpol.arcLength(0, 1);
+        LocalBlockVectorSet vset = new LocalBlockVectorSet();
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
             final Vector3 tipv = interpol.getPosition(loop);
             final int tipx = MathMan.roundInt(tipv.getX());
@@ -93,6 +92,6 @@ public class SurfaceSpline implements Brush {
             editSession.setBlocks(newSet, pattern);
             if (!vis) path.clear();
         }
-        editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
+        editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
     }
 }
