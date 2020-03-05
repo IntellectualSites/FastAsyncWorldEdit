@@ -108,11 +108,14 @@ public class PlotSquaredFeature extends FaweMaskManager {
     @Override
     public FaweMask getMask(Player player, MaskType type) {
         final PlotPlayer pp = PlotPlayer.wrap(player.getUniqueId());
+        if (pp == null) {
+            return null;
+        }
         final Set<CuboidRegion> regions;
         Plot plot = pp.getCurrentPlot();
         if (isAllowed(player, plot, type)) {
             regions = plot.getRegions();
-        } else {
+        } else {    
             plot = null;
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
