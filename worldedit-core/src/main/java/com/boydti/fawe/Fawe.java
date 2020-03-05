@@ -145,13 +145,13 @@ public class Fawe {
      *
      * @param s
      */
-    public static void debug(Object s) {
+    public static void debug(String s) {
         Actor actor = Request.request().getActor();
         if (actor != null && actor.isPlayer()) {
-            actor.print((String)s);
+            actor.printInfo(TextComponent.of(s));
             return;
         }
-        debugPlain((String) s);
+        debugPlain(s);
     }
     
     /**

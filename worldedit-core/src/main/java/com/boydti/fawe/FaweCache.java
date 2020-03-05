@@ -227,10 +227,10 @@ public enum FaweCache implements Trimable {
         long[] blockStates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
-        int blockIndexStart = layerOffset << 12;
-        int blockIndexEnd = blockIndexStart + 4096;
-        int num_palette = 0;
         try {
+            int num_palette = 0;
+            int blockIndexStart = layerOffset << 12;
+            int blockIndexEnd = blockIndexStart + 4096;
             if (blocksChars != null) {
                 for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
                     int ordinal = blocksChars[i];

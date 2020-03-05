@@ -46,7 +46,7 @@ public class BlendBall implements Brush {
                                     continue;
                                 }
                                 BlockState state = editSession.getBlock(x0 + ox, y0 + oy, z0 + oz);
-                                Integer count = frequency[state.getInternalBlockTypeId()];
+                                int count = frequency[state.getInternalBlockTypeId()];
                                 count++;
                                 if (count > highest) {
                                     highest = count;

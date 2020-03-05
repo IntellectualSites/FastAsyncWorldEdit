@@ -84,10 +84,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        init();
-    }
-
-    private void init() {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -170,6 +166,26 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Override
+    public void print(String msg) {
+        for (String part : msg.split("\n")) {
+            player.sendMessage("\u00A7d" + part);
+        }
+    }
+
+    @Override
+    public void printDebug(String msg) {
+        for (String part : msg.split("\n")) {
+            player.sendMessage("\u00A77" + part);
+        }
+    }
+
+    @Override
+    public void printError(String msg) {
+        for (String part : msg.split("\n")) {
+            player.sendMessage("\u00A7c" + part);
+        }
+    }
     @Override
     public void print(Component component) {
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());

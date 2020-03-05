@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.ABlockMask;
 import com.sk89q.worldedit.util.Countable;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -94,10 +95,10 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
         for (Countable c : getDistribution()) {
             final String name = c.getID().toString();
             final String str = String.format("%-7s (%.3f%%) %s",
-                String.valueOf(c.getAmount()),
+                c.getAmount(),
                 c.getAmount() / (double) size * 100,
                 name);
-            actor.print(str);
+            actor.printInfo(TextComponent.of(str));
         }
     }
 }

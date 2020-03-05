@@ -399,6 +399,7 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
+        //TODO NONE OF THIS CODE WORKS AS OF 2020-03-05
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 

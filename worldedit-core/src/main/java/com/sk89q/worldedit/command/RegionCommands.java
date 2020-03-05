@@ -27,7 +27,6 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.FaweLimit;
@@ -71,7 +70,6 @@ import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
@@ -132,7 +130,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
     public void test(Player player, EditSession editSession, @Arg(desc = "test") double testValue) throws WorldEditException {
-        player.print("" + testValue);
+        player.print(TextComponent.of(testValue));
     }
 
     @Command(
@@ -141,7 +139,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
-        player.print("Temporarily not working");
+        player.print(TextComponent.of("Temporarily not working"));
 //        final Location loc = player.getLocation();
 //        Region selection = player.getSelection();
 //        if (selection == null) {
@@ -162,7 +160,7 @@ public class RegionCommands {
         final Location loc = player.getLocation();
         int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
         int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        player.print("Light: " + block + " | " + sky);
+        player.print(TextComponent.of("Light: " + block + " | " + sky));
     }
 
     @Command(
@@ -171,7 +169,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.remove")
     public void removeLighting(Player player) {
-        player.print("Temporarily not working");
+        player.print(TextComponent.of("Temporarily not working"));
 //        Region selection = player.getSelection();
 //        if (selection == null) {
 //            final int cx = player.getLocation().getBlockX() >> 4;
@@ -196,7 +194,7 @@ public class RegionCommands {
         }
         CompoundTag nbt = editSession.getFullBlock(pos.toBlockPoint()).getNbtData();
         if (nbt != null) {
-            player.print(nbt.getValue().toString());
+            player.print(TextComponent.of(nbt.getValue().toString()));
         } else {
             player.printError(TranslatableComponent.of("fawe.navigation.no.block"));
         }
@@ -208,7 +206,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(from = 0, to = 15) int value) {
-        player.print("Temporarily not working");
+        player.print(TextComponent.of("Temporarily not working"));
     }
 
     @Command(
@@ -217,7 +215,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(from = 0, to= 15) int value) {
-        player.print("Temporarily not working");
+        player.printInfo(TextComponent.of("Temporarily not working"));
     }
 
     @Command(

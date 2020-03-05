@@ -237,10 +237,6 @@ public class EditSessionBuilder {
         if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
             return new NullExtent(toReturn, FaweCache.MANUAL);
         }
-//        if (!(toReturn instanceof AbstractDelegateExtent)) {
-//            Fawe.debug("Extent " + toReturn + " must be AbstractDelegateExtent");
-//            return extent;
-//        }
         if (toReturn != extent) {
             String className = toReturn.getClass().getName().toLowerCase();
             for (String allowed : Settings.IMP.EXTENT.ALLOWED_PLUGINS) {

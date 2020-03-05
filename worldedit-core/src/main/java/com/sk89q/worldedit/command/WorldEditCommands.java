@@ -76,7 +76,7 @@ public class WorldEditCommands {
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print("FastAsyncWorldEdit" + fVerStr + " created by Empire92");
+        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92"));
 		
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();
@@ -170,7 +170,7 @@ public class WorldEditCommands {
         name = "cui",
         desc = "Complete CUI handshake (internal usage)"
     )
-    @CommandPermissions({})
+    @CommandPermissions()
     public void cui(Player player, LocalSession session) {
         session.setCUISupport(true);
         session.dispatchCUISetup(player);

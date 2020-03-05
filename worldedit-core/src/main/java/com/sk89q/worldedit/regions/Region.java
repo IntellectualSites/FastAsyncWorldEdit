@@ -280,9 +280,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        boolean processExtra = false;
         if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
             // contains some
+            boolean processExtra = false;
             for (int layer = 0; layer < 16; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;

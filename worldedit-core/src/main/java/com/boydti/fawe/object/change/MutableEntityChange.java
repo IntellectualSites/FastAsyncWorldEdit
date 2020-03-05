@@ -2,7 +2,6 @@ package com.boydti.fawe.object.change;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
@@ -89,7 +88,4 @@ public class MutableEntityChange implements Change {
         context.getExtent().createEntity(location, entity);
     }
 
-    public void perform(IQueueExtent queue) {
-
-    }
 }

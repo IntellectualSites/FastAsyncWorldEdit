@@ -135,7 +135,4 @@ public class ImageBrush implements Brush {
         Operations.completeBlindly(visitor);
     }
 
-    private void apply(double val) {
-
-    }
 }

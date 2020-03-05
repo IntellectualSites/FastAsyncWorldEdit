@@ -54,7 +54,7 @@ public final class ActorCallbackPaste {
         AsyncCommandBuilder.wrap(task, sender)
                 .registerWithSupervisor(supervisor, "Submitting content to a pastebin service.")
                 .sendMessageAfterDelay("(Please wait... sending output to pastebin...)")
-                .onSuccess((String) null, url -> sender.print(String.format(successMessage, url)))
+                .onSuccess((String) null, url -> sender.print(TextComponent.of(String.format(successMessage, url))))
                 .onFailure("Failed to submit paste", null)
                 .buildAndExec(Pasters.getExecutor());
     }

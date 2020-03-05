@@ -18,6 +18,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class AsyncPlayer extends PlayerProxy {
+
     public AsyncPlayer(Player parent) {
         super(parent);
     }
@@ -81,7 +82,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
-        Location pos = getBlockIn();
+        Location pos = getBlockLocation();
         int x = pos.getBlockX();
         int initialY = Math.max(0, pos.getBlockY());
         int y = Math.max(0, pos.getBlockY() + 2);
@@ -95,7 +96,8 @@ public class AsyncPlayer extends PlayerProxy {
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+                .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
@@ -114,7 +116,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
-        final Location pos = getBlockIn();
+        final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
         final int initialY = Math.max(0, pos.getBlockY());
         int y = Math.max(0, pos.getBlockY() + 1);
@@ -123,7 +125,8 @@ public class AsyncPlayer extends PlayerProxy {
         final Extent world = getLocation().getExtent();
 
         while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+                .isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;
@@ -142,7 +145,8 @@ public class AsyncPlayer extends PlayerProxy {
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
         RuntimeException caught = null;
         try {
-            EditSession edit = new EditSessionBuilder(WorldWrapper.unwrap(getWorld())).player(unwrap(getBasePlayer())).build();
+            EditSession edit = new EditSessionBuilder(WorldWrapper.unwrap(getWorld()))
+                .player(unwrap(getBasePlayer())).build();
             edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
             edit.flushQueue();
             LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
@@ -166,17 +170,17 @@ public class AsyncPlayer extends PlayerProxy {
     @Override
     public Location getBlockTrace(int range, boolean useLastBlock) {
         return TaskManager.IMP.sync(() -> {
-                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
-                return useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
-            });
+            TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
+            return useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
+        });
     }
 
     @Override
     public Location getBlockTraceFace(int range, boolean useLastBlock) {
         return TaskManager.IMP.sync(() -> {
-                TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
-                return useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
-            });
+            TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
+            return useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
+        });
     }
 
     @Override
@@ -204,7 +208,9 @@ public class AsyncPlayer extends PlayerProxy {
             boolean inFree = false;
 
             while ((block = hitBlox.getNextBlock()) != null) {
-                boolean free = !world.getBlock(BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
+                boolean free = !world.getBlock(
+                    BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
+                    .getBlockType().getMaterial().isMovementBlocker();
 
                 if (firstBlock) {
                     firstBlock = false;

@@ -2,17 +2,17 @@ package com.boydti.fawe.object.collection;
 
 public final class BitArray4096 {
 
+    private final long[] data;
     private final int bitsPerEntry;
     private final int maxSeqLocIndex;
     private final int maxEntryValue;
-    private final long[] data;
     private final int longLen;
 
     public BitArray4096(long[] buffer, int bitsPerEntry) {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
         maxEntryValue = (1 << bitsPerEntry) - 1;
-        this.longLen = (this.bitsPerEntry * 4096) >> 6;
+        this.longLen = (this.bitsPerEntry << 12) >> 6;
         if (buffer.length < longLen) {
             this.data = new long[longLen];
         } else {
@@ -32,7 +32,7 @@ public final class BitArray4096 {
         return data;
     }
 
-    public final void setAt(int index, int value) {
+    public final void set(int index, int value) {
         if (longLen == 0) return;
         int bitIndexStart = index * bitsPerEntry;
         int longIndexStart = bitIndexStart >> 6;
@@ -47,7 +47,7 @@ public final class BitArray4096 {
         }
     }
 
-    public final int getAt(int index) {
+    public final int get(int index) {
         if (longLen == 0) return 0;
         int bitIndexStart = index * bitsPerEntry;
 
@@ -68,7 +68,7 @@ public final class BitArray4096 {
 
     public final void fromRawSlow(char[] arr) {
         for (int i = 0; i < arr.length; i++) {
-            setAt(i, arr[i]);
+            set(i, arr[i]);
         }
     }
 
@@ -112,7 +112,7 @@ public final class BitArray4096 {
     public BitArray4096 growSlow(int bitsPerEntry) {
         BitArray4096 newBitArray = new BitArray4096(bitsPerEntry);
         for (int i = 0; i < 4096; i++) {
-            newBitArray.setAt(i, getAt(i));
+            newBitArray.set(i, get(i));
         }
         return newBitArray;
     }
@@ -120,7 +120,7 @@ public final class BitArray4096 {
     public final char[] toRawSlow() {
         char[] arr = new char[4096];
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = (char) getAt(i);
+            arr[i] = (char) get(i);
         }
         return arr;
     }

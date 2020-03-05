@@ -1052,7 +1052,7 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.print("Set brush to " + factory);
+        player.print(TextComponent.of("Set brush to " + factory));
     }
 
     @Command(

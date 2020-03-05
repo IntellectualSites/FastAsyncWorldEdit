@@ -78,9 +78,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printDebug)
      */
     @Deprecated
-    default void printDebug(String msg) {
-        printDebug(TextComponent.of(msg));
-    }
+    void printDebug(String msg);
 
     /**
      * Print a WorldEdit message.
@@ -89,9 +87,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printInfo)
      */
     @Deprecated
-    default void print(String msg) {
-        printInfo(TextComponent.of(msg));
-    }
+    void print(String msg);
 
     /**
      * Print a WorldEdit error.
@@ -100,9 +96,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printError)
      */
     @Deprecated
-    default void printError(String msg) {
-        printError(TextComponent.of(msg));
-    }
+    void printError(String msg);
 
 
     /**

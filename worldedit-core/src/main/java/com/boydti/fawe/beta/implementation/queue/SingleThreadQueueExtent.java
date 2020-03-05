@@ -10,7 +10,6 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.chunk.NullChunk;
-import com.boydti.fawe.beta.implementation.chunk.ReferenceChunk;
 import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
@@ -210,9 +209,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return NullChunk.INSTANCE;
         }
         IQueueChunk chunk = chunks.get(pair);
-        if (chunk instanceof ReferenceChunk) {
-            chunk = ((ReferenceChunk) chunk).getParent();
-        }
         if (chunk != null) {
             lastPair = pair;
             lastChunk = chunk;

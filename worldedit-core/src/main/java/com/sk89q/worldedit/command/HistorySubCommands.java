@@ -182,7 +182,7 @@ public class HistorySubCommands {
                                         RollbackDatabase db = DBHandler.IMP
                                                 .getDatabase(world);
                                         db.logEdit(rollback);
-                                        actor.print("Logging: " + historyFile);
+                                        actor.print(TextComponent.of("Logging: " + historyFile));
                                     }
                                 }
                             } catch (IllegalArgumentException e) {
@@ -192,7 +192,7 @@ public class HistorySubCommands {
                     }
                 }
             }
-            actor.print("Done import!");
+            actor.print(TextComponent.of("Done import!"));
         }
     }
 
@@ -289,7 +289,7 @@ public class HistorySubCommands {
                     return elem;
                 } else {
                     // TODO
-                    return TextComponent.of("");
+                    return TextComponent.empty();
                 }
             }
         });
