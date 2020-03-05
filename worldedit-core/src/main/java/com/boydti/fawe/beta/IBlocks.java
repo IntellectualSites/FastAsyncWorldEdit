@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.Range;
 
 /**
- * Shared interface for IGetBlocks and ISetBlocks
+ * A shared interface for IGetBlocks and ISetBlocks
  */
 public interface IBlocks extends Trimable {
 
