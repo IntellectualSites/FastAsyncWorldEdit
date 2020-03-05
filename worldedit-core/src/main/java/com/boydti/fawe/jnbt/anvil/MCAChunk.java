@@ -476,6 +476,7 @@ public class MCAChunk implements IChunk {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
 
+    @Override
     public CompoundTag getTile(int x, int y, int z) {
         if (tiles == null || tiles.isEmpty()) {
             return null;

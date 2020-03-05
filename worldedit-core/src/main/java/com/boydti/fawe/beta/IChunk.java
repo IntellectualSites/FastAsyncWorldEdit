@@ -3,10 +3,6 @@ package com.boydti.fawe.beta;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
 
@@ -50,14 +46,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     }
 
     /**
-     * Checks if there are any queued changes for this chunk.
-     *
-     * @return true if no changes are queued for this chunk
-     */
-    @Override
-    boolean isEmpty();
-
-    /**
      * Filter through all the blocks in the chunk
      *
      * @param filter the filter
@@ -74,25 +62,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
 //     * @param block
 //     */
 //    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
-
-    /* set - queues a change */
-    @Override
-    boolean setBiome(int x, int y, int z, BiomeType biome);
-
-    @Override
-    boolean setTile(int x, int y, int z, CompoundTag tag);
-
-    @Override
-    <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block);
-
-    @Override
-    BiomeType getBiomeType(int x, int y, int z);
-
-    @Override
-    BlockState getBlock(int x, int y, int z);
-
-    @Override
-    BaseBlock getFullBlock(int x, int y, int z);
 
     @Override
     CompoundTag getTile(int x, int y, int z);
