@@ -361,13 +361,7 @@ public class Settings extends Config {
                 "Might cause client-side FPS lagg in some situations"
         })
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
-
-        @Comment({
-                "[SAFE] Experimental scripting support for Java 9",
-                " - https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki/JavaScript-API"
-        })
-        public boolean MODERN_CRAFTSCRIPTS = false;
-
+        
         @Comment({
                 "[SAFE] Experimental freebuild region restrictions",
                 " - PERM: fawe.freebuild",
