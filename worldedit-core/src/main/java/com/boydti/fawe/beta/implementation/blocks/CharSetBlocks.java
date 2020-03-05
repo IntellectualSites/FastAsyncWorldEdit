@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 import org.jetbrains.annotations.Range;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
-    private static Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }

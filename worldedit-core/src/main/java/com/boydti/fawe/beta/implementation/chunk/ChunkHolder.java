@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Range;
  */
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+    private static final Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
 
     public static ChunkHolder newInstance() {
         return POOL.poll();
@@ -39,11 +39,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
-    private IQueueExtent extent; // the parent queue extent which has this chunk
+    private IQueueExtent<? extends IChunk> extent; // the parent queue extent which has this chunk
     private int chunkX;
     private int chunkZ;
 
-    public ChunkHolder() {
+    private ChunkHolder() {
         this.delegate = NULL;
     }
 
@@ -346,8 +346,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     /**
-     * Get or create the existing part of this chunk
-     * @return
+     * Get or create the existing part of this chunk.
      */
     public final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
@@ -357,8 +356,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     /**
-     * Get or create the settable part of this chunk
-     * @return
+     * Get or create the settable part of this chunk.
      */
     public final IChunkSet getOrCreateSet() {
         if (chunkSet == null) {
@@ -371,7 +369,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * Create a wrapped set object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
-     * @return
      */
     private IChunkSet newWrappedSet() {
         return extent.getCachedSet(chunkX, chunkZ);
@@ -381,7 +378,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * Create a wrapped get object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
-     * @return
      */
     private IChunkGet newWrappedGet() {
         return extent.getCachedGet(chunkX, chunkZ);
@@ -423,9 +419,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     /**
      * Get the extent this chunk is in
-     * @return
      */
-    public IQueueExtent getExtent() {
+    public IQueueExtent<? extends IChunk> getExtent() {
         return extent;
     }
 

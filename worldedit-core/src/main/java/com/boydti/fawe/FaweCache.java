@@ -3,6 +3,7 @@ package com.boydti.fawe;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.beta.implementation.queue.QueuePool;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -52,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 public enum FaweCache implements Trimable {
     IMP
@@ -64,7 +67,7 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
-    private final IdentityHashMap<Class<?>, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
+    private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
 
     /*
     Palette buffers / cache
@@ -89,15 +92,15 @@ public enum FaweCache implements Trimable {
             MUTABLE_BLOCKVECTOR3.clean();
             SECTION_BITS_TO_CHAR.clean();
         }
-        for (Map.Entry<Class<?>, Pool> entry : REGISTERED_POOLS.entrySet()) {
-            Pool pool = entry.getValue();
+        for (Entry<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> entry : REGISTERED_POOLS.entrySet()) {
+            Pool<? extends IChunkSet> pool = entry.getValue();
             pool.clear();
         }
 
         return false;
     }
 
-    public synchronized <T> Pool<T> registerPool(Class<T> clazz, Supplier<T> cache, boolean buffer) {
+    public synchronized <T extends IChunkSet> Pool<T> registerPool(Class<T> clazz, Supplier<T> cache, boolean buffer) {
         checkNotNull(cache);
         Pool<T> pool;
         if (buffer) {
@@ -105,7 +108,7 @@ public enum FaweCache implements Trimable {
         } else {
             pool = cache::get;
         }
-        Pool<T> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
+        Pool<? extends IChunkSet> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
         if (previous != null) {
             throw new IllegalStateException("Previous key");
         }
@@ -115,7 +118,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(T key) {
+            public V load(@NotNull T key) {
                 return withInitial.get();
             }
         });
@@ -124,7 +127,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(T key) {
+            public V load(@NotNull T key) {
                 return withInitial.apply(key);
             }
         });
