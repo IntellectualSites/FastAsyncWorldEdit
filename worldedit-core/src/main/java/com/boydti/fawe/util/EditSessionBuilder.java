@@ -125,7 +125,7 @@ public class EditSessionBuilder {
         return changeSet(world == null ? new NullChangeSet(worldName) : new NullChangeSet(world));
     }
 
-    public EditSessionBuilder world(@Nonnull World world) {
+    public EditSessionBuilder world(@NotNull World world) {
         checkNotNull(world);
         this.world = world;
         this.worldName = world.getName();
@@ -345,20 +345,8 @@ public class EditSessionBuilder {
                                 // If the edit uses items from the inventory we can't use a delayed task
                                 && this.blockBag == null;
             }
-            if (!Settings.IMP.QUEUE.PROGRESS.DISPLAY.equalsIgnoreCase("false") && player != null) {
-                System.out.println("TODO add progress display");
-//                switch (Settings.IMP.QUEUE.PROGRESS.DISPLAY.toLowerCase()) {
-//                    case "chat":
-//                        this.queue.setProgressTask(new ChatProgressTracker(player));
-//                        break;
-//                    case "title":
-//                    case "true":
-//                    default:
-//                        this.queue.setProgressTask(new DefaultProgressTracker(player));
-//                }
-            }
             extent = this.bypassAll = wrapExtent(extent, eventBus, event, EditSession.Stage.BEFORE_CHANGE);
-            this.bypassHistory = (this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER));
+            this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
             if (!this.fastmode || changeSet != null) {
                 if (changeSet == null) {
                     if (Settings.IMP.HISTORY.USE_DISK) {
@@ -392,7 +380,7 @@ public class EditSessionBuilder {
                         changeTask = changeSet;
                         this.extent = extent.enableHistory(changeSet);
                     } else {
-                        this.extent = (new HistoryExtent(extent, changeSet));
+                        this.extent = new HistoryExtent(extent, changeSet);
 //                        if (this.blockBag != null) {
 //                            this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
 //                        }
@@ -409,7 +397,6 @@ public class EditSessionBuilder {
                 if (allowedRegions.length == 0) {
                     regionExtent = new NullExtent(this.extent, FaweCache.NO_REGION);
                 } else {
-//                    this.extent = new ProcessedWEExtent(this.extent, this.limit);
                     if (allowedRegions.length == 1) {
                         regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
                     } else {
