@@ -25,6 +25,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.CompoundTag;
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,6 +39,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -48,12 +51,7 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.Nullable;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
@@ -466,11 +464,11 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
-                return adapter.setBlock(BukkitAdapter.adapt(getWorld(), position), block, notifyAndLight);
+                return adapter.setBlock(BukkitAdapter.adapt(getWorld(), position), block, sideEffects);
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
                     logger.warn("Tried to set a corrupt tile entity at " + position.toString());
@@ -478,12 +476,12 @@ public class BukkitWorld extends AbstractWorld {
                 }
                 e.printStackTrace();
                 Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-                bukkitBlock.setBlockData(BukkitAdapter.adapt(block), notifyAndLight);
+                bukkitBlock.setBlockData(BukkitAdapter.adapt(block), sideEffects.doesApplyAny());
                 return true;
             }
         } else {
             Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-            bukkitBlock.setBlockData(BukkitAdapter.adapt(block), false);
+            bukkitBlock.setBlockData(BukkitAdapter.adapt(block), sideEffects.doesApplyAny());
             return true;
         }
     }
@@ -499,14 +497,20 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType) throws WorldEditException {
+    public Set<SideEffect> applySideEffects(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            adapter.notifyAndLightBlock(BukkitAdapter.adapt(getWorld(), position), previousType);
-            return true;
+            adapter.applySideEffects(BukkitAdapter.adapt(getWorld(), position), previousType, sideEffectSet);
+            return Sets.intersection(
+                    adapter.getSupportedSideEffects(),
+                    sideEffectSet.getSideEffectsToApply()
+            );
         }
 
-        return false;
+        return Sets.intersection(
+                WorldEditPlugin.getInstance().getInternalPlatform().getSupportedSideEffects(),
+                sideEffectSet.getSideEffectsToApply()
+        );
     }
 
     @Override

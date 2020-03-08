@@ -47,6 +47,8 @@ import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
@@ -72,6 +74,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -157,11 +160,26 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
     }
 
     @Override
+    public boolean setBlock(Location location, BlockStateHolder<?> state, SideEffectSet sideEffectSet) {
+        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, sideEffectSet.shouldApply(SideEffect.LIGHTING));
+    }
+
+    @Override
+    public void applySideEffects(Location position, BlockState previousType, SideEffectSet sideEffectSet) {
+        return; //TODO: properly implement SideEffects into FAWE
+    }
+
+    @Override
+    public Set<SideEffect> getSupportedSideEffects() {
+        return SideEffectSet.defaults().getSideEffectsToApply();
+    }
+
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
         return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
     }
 
-    public <B extends BlockStateHolder<B>> boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, B state, boolean update) {
+    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
@@ -298,11 +316,6 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         BlockMaterial_1_16_1 material = (BlockMaterial_1_16_1) state.getMaterial();
         return material.getCraftBlockData();
-    }
-
-    @Override
-    public void notifyAndLightBlock(Location position, BlockState previousType) {
-        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
     }
 
     private MapChunkUtil_1_16_1 mapUtil = new MapChunkUtil_1_16_1();

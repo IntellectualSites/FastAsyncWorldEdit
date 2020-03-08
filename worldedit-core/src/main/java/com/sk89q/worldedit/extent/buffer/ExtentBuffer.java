@@ -21,17 +21,16 @@ package com.sk89q.worldedit.extent.buffer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractBufferingExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Buffers changes to an {@link Extent} and allows retrieval of the changed blocks,
@@ -39,7 +38,7 @@ import java.util.Optional;
  */
 public class ExtentBuffer extends AbstractBufferingExtent {
 
-    private final Map<BlockVector3, BaseBlock> buffer = Maps.newHashMap();
+    private final Map<BlockVector3, BaseBlock> buffer = BlockMap.create();
     private final Mask mask;
 
     /**

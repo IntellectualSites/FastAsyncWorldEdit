@@ -29,10 +29,7 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -48,9 +45,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.util.Identifiable;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.*;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -68,6 +63,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
@@ -751,7 +747,19 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
+        throws WorldEditException{
+        return SideEffectSet.none().getSideEffectsToApply();
+    }
+
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block)
+        throws WorldEditException {
+        return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects)
         throws WorldEditException {
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }

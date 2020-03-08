@@ -13,12 +13,16 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -35,6 +39,11 @@ public class MCAWorld extends AbstractWorld {
         return path.getName();
     }
 
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+        return false;
+    }
+
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
@@ -44,6 +53,11 @@ public class MCAWorld extends AbstractWorld {
     @Override
     public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
         return false;
+    }
+
+    @Override
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException {
+        return SideEffectSet.none().getSideEffectsToApply();
     }
 
     @Override

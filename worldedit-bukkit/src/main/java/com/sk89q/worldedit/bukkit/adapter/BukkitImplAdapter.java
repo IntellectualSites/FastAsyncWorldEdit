@@ -34,6 +34,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -43,6 +45,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -99,19 +102,19 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      *
      * @param location the location
      * @param state the block
-     * @param notifyAndLight notify and light if set
+     * @param sideEffectSet side effects to apply
      * @return true if a block was likely changed
      */
-    <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight);
+    boolean setBlock(Location location, BlockStateHolder<?> state, SideEffectSet sideEffectSet);
 
     /**
-     * Notifies the simulation that the block at the given location has
-     * been changed and it must be re-lighted (and issue other events).
+     * Applies side effects on the given block.
      *
      * @param position position of the block
      * @param previousType the type of the previous block that was there
+     * @param sideEffectSet side effects to apply
      */
-    void notifyAndLightBlock(Location position, BlockState previousType);
+    void applySideEffects(Location position, BlockState previousType, SideEffectSet sideEffectSet);
 
     /**
      * Get the state for the given entity.
@@ -185,6 +188,13 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @return the WorldEdit BaseItemStack
      */
     BaseItemStack adapt(ItemStack itemStack);
+
+    /**
+     * Get the {@link SideEffect}s that this adapter supports.
+     *
+     * @return The side effects that are supported
+     */
+    Set<SideEffect> getSupportedSideEffects();
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
         // return OptionalInt.empty();

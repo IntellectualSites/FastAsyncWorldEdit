@@ -94,6 +94,7 @@ import com.sk89q.worldedit.command.argument.ExpressionConverter;
 import com.sk89q.worldedit.command.argument.FactoryConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
+import com.sk89q.worldedit.command.argument.SideEffectConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
@@ -255,6 +256,7 @@ public final class PlatformCommandManager {
         RegionFactoryConverter.register(commandManager);
         WorldConverter.register(commandManager);
         ExpressionConverter.register(commandManager);
+        SideEffectConverter.register(commandManager);
 
         registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));

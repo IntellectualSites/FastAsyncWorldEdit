@@ -23,6 +23,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.blocks.NullChunkGet;
 import com.sk89q.jnbt.CompoundTag;
+import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -35,6 +36,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -48,6 +51,7 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A null implementation of {@link World} that drops all changes and
@@ -71,13 +75,14 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
         return false;
     }
 
     @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        return false;
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
+            throws WorldEditException {
+        return ImmutableSet.of();
     }
 
     @Override

@@ -24,9 +24,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.*;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -38,6 +36,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 public class WorldWrapper extends AbstractWorld {
 
@@ -89,6 +88,12 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
+            throws WorldEditException{
+        return parent.applySideEffects(position, previousType, sideEffectSet);
+    }
+
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
     }
@@ -97,6 +102,11 @@ public class WorldWrapper extends AbstractWorld {
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
         return parent.setBlock(x, y, z, block);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+        return parent.setBlock(position, block, sideEffects);
     }
 
     @Override
