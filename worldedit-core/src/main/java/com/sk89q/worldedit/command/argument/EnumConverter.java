@@ -23,6 +23,7 @@ import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.command.util.HookMode;
+import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.TreeGenerator;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
@@ -30,6 +31,7 @@ import org.enginehub.piston.converter.MultiKeyConverter;
 import org.enginehub.piston.inject.Key;
 
 import javax.annotation.Nullable;
+
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
@@ -48,6 +50,11 @@ public final class EnumConverter {
             full(EditSession.ReorderMode.class,
                 r -> ImmutableSet.of(r.getDisplayName()),
                 null));
+        commandManager.registerConverter(Key.of(SideEffect.State.class),
+                MultiKeyConverter.from(
+                    EnumSet.of(SideEffect.State.OFF, SideEffect.State.ON),
+                    r -> ImmutableSet.of(r.name().toLowerCase(Locale.US)),
+                    null));
         commandManager.registerConverter(Key.of(HookMode.class),
             basic(HookMode.class));
         commandManager.registerConverter(Key.of(Scroll.Action.class),

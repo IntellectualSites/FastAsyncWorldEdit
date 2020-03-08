@@ -155,11 +155,20 @@ public class BukkitImplLoader {
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
         for (String className : adapterCandidates) {
+            System.out.println("Candidate: " + className);
             try {
                 Class<?> cls = Class.forName(className);
-                if (cls.isSynthetic()) continue;
+                if (cls.isSynthetic()){
+                    System.out.println(className + " is synthetic, continuing");
+                    continue;
+                }else{
+                    System.out.println(className + " is not synthetic");
+                }
                 if (BukkitImplAdapter.class.isAssignableFrom(cls)) {
+                    System.out.println(className + " is assignable from BukkitImplAdapter, returning");
                     return (BukkitImplAdapter) cls.newInstance();
+                }else{
+                    System.out.println(className + " is NOT assignable from BukkitImplAdapter, returning");
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Failed to load the Bukkit adapter class '" + className +
@@ -170,6 +179,8 @@ public class BukkitImplLoader {
             } catch (Throwable e) {
                 if (className.equals(customCandidate)) {
                     log.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
+                }else{
+                    log.warn(className + " is not custom candidate.", e);
                 }
             }
         }

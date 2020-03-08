@@ -12,6 +12,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -66,12 +67,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     default <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
-        return getParent().setBlock(location, state, notifyAndLight);
-    }
-
-    @Override
-    default void notifyAndLightBlock(Location position, BlockState previousType) {
-        getParent().notifyAndLightBlock(position, previousType);
+        return getParent().setBlock(location, state, SideEffectSet.none());
     }
 
     @Override

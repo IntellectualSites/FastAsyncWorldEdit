@@ -45,6 +45,8 @@ import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -71,6 +73,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -146,6 +149,21 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
         }
 
         return state.toBaseBlock();
+    }
+
+    @Override
+    public boolean setBlock(Location location, BlockStateHolder<?> state, SideEffectSet sideEffectSet) {
+        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, sideEffectSet.shouldApply(SideEffect.LIGHTING));
+    }
+
+    @Override
+    public void applySideEffects(Location position, BlockState previousType, SideEffectSet sideEffectSet) {
+        return; //TODO: properly implement SideEffects into FAWE
+    }
+
+    @Override
+    public Set<SideEffect> getSupportedSideEffects() {
+        return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
     @Override
@@ -290,11 +308,6 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
         return material.getCraftBlockData();
-    }
-
-    @Override
-    public void notifyAndLightBlock(Location position, BlockState previousType) {
-        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
     }
 
     private MapChunkUtil_1_14 mapUtil = new MapChunkUtil_1_14();
