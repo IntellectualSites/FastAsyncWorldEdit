@@ -366,7 +366,7 @@ tips:
   tip_biome_pattern: 'Tipp: Das #biome[forest] Muster kann in jedem Befehl genutzt
     werden'
   tip_biome_mask: 'Tipp: Beschränke ein Biom mit der `$jungle` Maske'
-  tip_discord: Du benötigst Hilfe mit FAWE? https://discord.gg/ngZCzbU
+  tip_discord: Du benötigst Hilfe mit FAWE? https://discord.gg/KxkjDVg
   tip_replace_regex: 'Tipp: Ersetze mit regex: //replace .*_log <pattern>'
   tip_replace_regex_2: 'Tipp: Ersetze mit regex: //replace .*stairs[facing=(north|south)]
     <pattern>'
