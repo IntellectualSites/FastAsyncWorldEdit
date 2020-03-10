@@ -34,8 +34,6 @@ public class Settings extends Config {
     @Comment({"Options: cn, de, es, fr, it, nl, ru, tr",
             "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/tree/master/worldedit-core/src/main/resources",})
     public String LANGUAGE = "en";
-    @Comment("@deprecated - use bstats config.yml")
-    public boolean METRICS = true;
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
             "To be allowed to WorldEdit in a region, users need the appropriate",
