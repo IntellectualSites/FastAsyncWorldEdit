@@ -36,10 +36,15 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
+
+    private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_15_2.class);
+
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
     private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_15_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     public ChunkSection[] sections;
@@ -225,7 +230,14 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         if (!set.hasSection(layer)) {
                             continue;
                         }
-                        if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
+
+                        int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
+                        if (log.isInfoEnabled()) {
+                            log.info("ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
+                        } else {
+                            log.error("ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
+                        }
+                        if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
                             tile.hasWorld();
                             tile.invalidateBlockCache();
