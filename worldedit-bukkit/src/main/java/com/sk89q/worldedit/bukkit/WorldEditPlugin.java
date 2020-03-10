@@ -91,9 +91,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.jar.JarFile;
 import java.util.logging.Level;
-import java.util.zip.ZipEntry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
