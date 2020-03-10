@@ -1251,4 +1251,20 @@ public class AsyncWorld extends PassthroughExtent implements World {
         @NotNull HeightmapType heightmap) throws UnsupportedOperationException {
         return parent.getHighestBlockAt(location, heightmap);
     }
+
+    public long getTicksPerWaterSpawns() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setTicksPerWaterSpawns(int ticksPerWaterSpawns) {
+        throw new UnsupportedOperationException();
+    }
+
+    public long getTicksPerAmbientSpawns() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setTicksPerAmbientSpawns(int ticksPerAmbientSpawns) {
+        throw new UnsupportedOperationException();
+    }
 }
