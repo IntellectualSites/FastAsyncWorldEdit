@@ -9,7 +9,7 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 ## Links 
 
 * [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
-* [Discord](https://discord.gg/ngZCzbU)
+* [Discord](https://discord.gg/KxkjDVg)
 * [Wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues)
 
@@ -38,4 +38,4 @@ $ gradlew build
 Have an idea for an optimization, or a cool feature?
  - We will accept most PR's
  - Let us know what you've tested / what may need further testing
- - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/ngZCzbU)
+ - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/KxkjDVg)
