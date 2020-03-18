@@ -6,11 +6,9 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
-import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray4096;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.Tag;
@@ -354,7 +352,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
                     syncTasks[1] = () -> {
                         for (final CompoundTag nativeTag : entities) {
-                            final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
+                            final Map<String, Tag> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");

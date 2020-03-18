@@ -4,7 +4,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -12,7 +11,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -199,7 +197,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
             int index = entry.getKey();
             CompoundTag tag = entry.getValue();
-            Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+            Map<String, Tag> values = tag.getValue();
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -270,7 +268,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     public boolean setTile(int index, CompoundTag tag) {
         nbtMapIndex.put(index, tag);
-        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> values = tag.getValue();
         values.remove("x");
         values.remove("y");
         values.remove("z");

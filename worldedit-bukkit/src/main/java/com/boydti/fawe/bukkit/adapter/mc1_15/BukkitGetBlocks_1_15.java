@@ -11,7 +11,6 @@ import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray4096;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
@@ -41,7 +40,6 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -365,7 +363,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
 
                     syncTasks[1] = () -> {
                         for (final CompoundTag nativeTag : entities) {
-                            final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
+                            final Map<String, Tag> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");

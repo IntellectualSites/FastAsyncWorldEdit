@@ -2,8 +2,6 @@ package com.boydti.fawe.util;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.brush.BrushSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.jnbt.CompoundTag;
@@ -80,7 +78,7 @@ public final class BrushCache {
             }
             nbt = new CompoundTag(map = new HashMap<>());
         } else {
-            map = ReflectionUtils.getMap(nbt.getValue());
+            map = nbt.getValue();
         }
         brushCache.remove(getKey(item));
         CompoundTag display = (CompoundTag) map.get("display");

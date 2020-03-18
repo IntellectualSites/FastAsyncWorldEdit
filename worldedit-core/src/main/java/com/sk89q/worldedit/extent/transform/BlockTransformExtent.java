@@ -37,7 +37,6 @@ import static com.sk89q.worldedit.util.Direction.findClosest;
 import static com.sk89q.worldedit.util.Direction.values;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -67,7 +66,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -335,7 +333,7 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                        Map<String, Tag> values = tag.getValue();
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                     }
                 }

@@ -73,25 +73,6 @@ public class ReflectionUtils {
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
 
-    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.emptyMap())
-        .getClass();
-
-    public static <T, V> Map<T, V> getMap(Map<T, V> map) {
-        try {
-            Class<? extends Map> clazz = map.getClass();
-            if (clazz != UNMODIFIABLE_MAP) {
-                Fawe.debug("getMap is unused. Please report this to MattBDev on Github or Discord");
-                return map;
-            }
-            Field m = clazz.getDeclaredField("m");
-            m.setAccessible(true);
-            return (Map<T, V>) m.get(map);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return map;
-        }
-    }
-
     public static <T> List<T> getList(List<T> list) {
         try {
             Class<? extends List<T>> clazz = (Class<? extends List<T>>) Class

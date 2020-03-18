@@ -432,14 +432,14 @@ public class MainUtil {
     }
 
     public static void setPosition(CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> value = tag.getValue();
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
     }
 
     public static void setEntityInfo(CompoundTag tag, Entity entity) {
-        Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> map = tag.getValue();
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {

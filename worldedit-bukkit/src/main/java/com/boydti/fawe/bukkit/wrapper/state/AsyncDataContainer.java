@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper.state;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import java.util.Collections;
@@ -35,10 +34,10 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Map<String, Tag> raw;
         if (tag == null) {
             if (!create) return Collections.emptyMap();
-            Map<String, Tag> map = ReflectionUtils.getMap(root.getValue());
+            Map<String, Tag> map = root.getValue();
             map.put("PublicBukkitValues", new CompoundTag(raw = new HashMap<>()));
         } else {
-            raw = ReflectionUtils.getMap(tag.getValue());
+            raw = tag.getValue();
         }
         return raw;
     }

@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -114,7 +113,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     @Override
     public void addTileCreate(CompoundTag nbt) {
         if (nbt.containsKey("items")) {
-            Map<String, Tag> map = ReflectionUtils.getMap(nbt.getValue());
+            Map<String, Tag> map = nbt.getValue();
             map.remove("items");
         }
         super.addTileCreate(nbt);

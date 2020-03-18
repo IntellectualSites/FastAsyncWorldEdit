@@ -5,7 +5,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -372,7 +371,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
         nbtMap.put(new IntegerTrio(x, y, z), tag);
-        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> values = tag.getValue();
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
         values.put("z", new IntTag(z));
