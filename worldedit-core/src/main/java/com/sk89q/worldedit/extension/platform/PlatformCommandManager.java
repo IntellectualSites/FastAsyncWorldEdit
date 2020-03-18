@@ -559,12 +559,6 @@ public final class PlatformCommandManager {
     void registerCommandsWith(Platform platform) {
         log.info("Registering commands with " + platform.getClass().getCanonicalName());
 
-        // Delay command registration to allow time for other plugins to hook into FAWE
-        try {
-//            new CommandScriptLoader().load();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
 
         LocalConfiguration config = platform.getConfiguration();
         boolean logging = config.logCommands;

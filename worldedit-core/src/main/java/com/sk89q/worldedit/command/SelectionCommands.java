@@ -570,7 +570,6 @@ public class SelectionCommands {
     public void select(Actor actor, World world, LocalSession session,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
-                       @Arg(desc = "Selector mask") Mask maskOpt,
                        @Switch(name = 'd', desc = "Set default selector")
                            boolean setDefaultSelector) throws WorldEditException {
         if (selector == null) {
@@ -624,14 +623,12 @@ public class SelectionCommands {
                 newSelector = new PolyhedralRegionSelector(world);
                 actor.print(TranslatableComponent.of("fawe.selection.sel.convex.polyhedral"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> actor.print(Caption.of("fawe.selection.sel.max", (integer))));
+                limit.ifPresent(integer -> actor.print(Caption.of("fawe.selection.sel.max", integer)));
                 actor.print(TranslatableComponent.of("fawe.selection.sel.list"));
                 break;
             case FUZZY:
             case MAGIC:
-                if (maskOpt == null) {
-                    maskOpt = new IdMask(world);
-                }
+                Mask maskOpt = new IdMask(world);
                 //TODO Make FuzzyRegionSelector accept actors
                 newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);
                 actor.print(TranslatableComponent.of("fawe.selection.sel.fuzzy"));

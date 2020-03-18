@@ -122,14 +122,6 @@
 //    }
 //
 //    @Command(
-//            name = "#offset",
-//            desc = "Offset a mask"
-//    )
-//    public Mask offset(@Arg(desc = "double x") double x, @Arg(desc = "double y") double y, @Arg(desc = "double z") double z, @Arg(desc = "Mask") Mask mask) {
-//        return new OffsetMask(mask, BlockVector3.at(x, y, z));
-//    }
-//
-//    @Command(
 //            name = "#haslight",
 //            desc = "Restricts to blocks with light (sky or emitted)"
 //    )
@@ -143,23 +135,6 @@
 //    )
 //    public Mask nolight(Extent extent) {
 //        return new LightMask(extent, 0, 0);
-//    }
-//
-//    @Command(
-//            name = "#liquid",
-//            desc = "If there is a solid block"
-//    )
-//    public Mask liquid(Extent extent) {
-//        return new BlockMaskBuilder().addAll(b -> b.getMaterial().isLiquid()).build(extent);
-//    }
-//
-//    @Command(
-//            name = "#dregion",
-//            aliases = {"#dselection", "#dsel"},
-//            desc = "inside the player's selection"
-//    )
-//    public Mask dregion() {
-//        return new RegionMask(new RequestSelection());
 //    }
 //
 //    @Command(
@@ -217,14 +192,6 @@
 //    )
 //    public Mask iddata(Extent extent) {
 //        return new IdDataMask(extent);
-//    }
-//
-//    @Command(
-//            name = "#air",
-//            desc = "Restrict to types of air"
-//    )
-//    public Mask air(Extent extent) {
-//        return new BlockMaskBuilder().addAll(b -> b.getMaterial().isAir()).build(extent);
 //    }
 //
 //    @Command(

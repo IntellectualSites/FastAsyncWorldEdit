@@ -33,39 +33,22 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 /**
  * Utility class to apply region functions to {@link com.sk89q.worldedit.regions.Region}.
- * @deprecated let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
+ * @deprecated Let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
  */
 @Deprecated
 public class RegionVisitor implements Operation {
 
-    public final Region region;
-    public final RegionFunction function;
-    public int affected = 0;
-    public final Iterable<? extends BlockVector3> iterable;
-
+    private final Region region;
+    private final RegionFunction function;
+    private int affected = 0;
 
     /**
-     * Deprecated in favor of the other constructors which will preload chunks during iteration
-     *
-     * @param region
-     * @param function
+     * @deprecated Use other constructors which will preload chunks during iteration
      */
     @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {
-        this((Iterable<BlockVector3>) region, function);
-    }
-
-    /**
-     * Deprecated in favor of the other constructors which will preload chunks during iteration
-     *
-     * @param iterable
-     * @param function
-     */
-    @Deprecated
-    public RegionVisitor(Iterable<BlockVector3> iterable, RegionFunction function) {
-        this.region = iterable instanceof Region ? (Region) iterable : null;
+        this.region = region;
         this.function = function;
-        this.iterable = iterable;
     }
 
     /**
@@ -79,7 +62,7 @@ public class RegionVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        for (BlockVector3 pt : iterable) {
+        for (BlockVector3 pt : region) {
             if (function.apply(pt)) {
                 affected++;
             }
@@ -97,7 +80,7 @@ public class RegionVisitor implements Operation {
         return ImmutableList.of(TranslatableComponent.of(
                 "worldedit.operation.affected.block",
                 TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ).color(TextColor.LIGHT_PURPLE));
     }
 
 }

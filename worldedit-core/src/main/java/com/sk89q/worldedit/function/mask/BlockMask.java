@@ -32,6 +32,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -71,7 +72,7 @@ public class BlockMask extends ABlockMask {
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         this(extent);
         checkNotNull(blocks);
-        add(blocks);
+        this.add(blocks);
     }
 
     /**
@@ -166,6 +167,14 @@ public class BlockMask extends ABlockMask {
         add(Arrays.asList(checkNotNull(block)));
     }
 
+    /**
+     * Get the list of blocks that are tested with.
+     *
+     * @return a list of blocks
+     */
+    public Collection<BaseBlock> getBlocks() {
+        return Collections.emptyList(); //TODO Not supported in FAWE yet
+    }
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()];

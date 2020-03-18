@@ -4,9 +4,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
-/**
- * Restricts the
- */
 public class PlaneMask extends AbstractMask implements ResettableMask {
 
     private transient int mode = -1;

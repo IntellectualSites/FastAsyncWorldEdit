@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
@@ -28,6 +29,7 @@ import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.FalseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.LiquidMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
@@ -77,6 +79,8 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         // Mask Parsers from FAWE
         register(new FalseMaskParser(worldEdit));
         register(new TrueMaskParser(worldEdit));
+        register(new AirMaskParser(worldEdit));
+        register(new LiquidMaskParser(worldEdit));
 
 
     }
