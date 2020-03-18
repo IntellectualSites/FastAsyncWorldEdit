@@ -10,7 +10,6 @@ public class ROCAngleMask extends AngleMask {
 
     @Override
     protected boolean testSlope(Extent extent, int x, int y, int z) {
-        double tmp;
         lastY = y;
 
         int base = getHeight(extent, x, y, z);
@@ -18,7 +17,8 @@ public class ROCAngleMask extends AngleMask {
             (getHeight(extent, x + distance, y, z) - base - (base - getHeight(extent, x - distance, y, z)))
                 * ADJACENT_MOD;
 
-        tmp = (getHeight(extent, x, y, z + distance) - base - (base - getHeight(extent, x, y, z - distance))) * ADJACENT_MOD;
+        double tmp = (getHeight(extent, x, y, z + distance) - base - (base - getHeight(extent, x, y,
+            z - distance))) * ADJACENT_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
         tmp = (getHeight(extent, x + distance, y, z + distance) - base - (base - getHeight(extent, x - distance, y,

@@ -2,12 +2,10 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
-import com.boydti.fawe.object.pattern.BiomePattern;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
@@ -30,13 +28,7 @@ public class SplatterBrush extends ScatterBrush {
     public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
         final Pattern finalPattern;
         if (solid) {
-            Pattern tmp;
-            try {
-                tmp = p.apply(position);
-            } catch (BiomePattern.BiomePatternException e) {
-                tmp = e.getPattern();
-            }
-            finalPattern = tmp;
+            finalPattern = p.apply(position);
         } else {
             finalPattern = p;
         }

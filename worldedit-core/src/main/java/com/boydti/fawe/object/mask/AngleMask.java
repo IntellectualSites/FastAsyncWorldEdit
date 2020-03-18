@@ -37,7 +37,6 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         cacheBotX = Integer.MIN_VALUE;
         cacheBotZ = Integer.MIN_VALUE;
         lastX = Integer.MIN_VALUE;
-        lastX = Integer.MIN_VALUE;
         lastY = Integer.MIN_VALUE;
         if (cacheHeights != null) {
             Arrays.fill(cacheHeights, (byte) 0);

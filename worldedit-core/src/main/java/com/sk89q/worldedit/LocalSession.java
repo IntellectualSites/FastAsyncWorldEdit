@@ -1571,10 +1571,8 @@ public class LocalSession implements TextureHolder {
         this.sourceMask = mask;
     }
 
-    public void setTextureUtil(TextureUtil texture) {
-        synchronized (this) {
-            this.texture = texture;
-        }
+    public synchronized void setTextureUtil(TextureUtil texture) {
+        this.texture = texture;
     }
 
     /**

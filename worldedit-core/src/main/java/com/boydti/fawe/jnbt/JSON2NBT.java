@@ -145,7 +145,7 @@ public class JSON2NBT {
     private static JSON2NBT.Any getTagFromNameValue(String str, boolean isArray) throws NBTException {
         String s = locateName(str, isArray);
         String s1 = locateValue(str, isArray);
-        return joinStrToNBT(new String[]{s, s1});
+        return joinStrToNBT(s, s1);
     }
 
     private static String nextNameValuePair(String str, boolean isCompound) throws NBTException {

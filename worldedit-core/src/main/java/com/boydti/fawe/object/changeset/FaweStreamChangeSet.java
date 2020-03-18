@@ -178,7 +178,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             };
         } else {
             posDel = new FaweStreamPositionDelegate() {
-                byte[] buffer = new byte[5];
+                final byte[] buffer = new byte[5];
                 int lx, ly, lz;
 
                 @Override
@@ -405,7 +405,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public Iterator<MutableBlockChange> getBlockIterator(final boolean dir) throws IOException {
         final FaweInputStream is = getBlockIS();
         if (is == null) {
-            return new ArrayList<MutableBlockChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableBlockChange change = new MutableBlockChange(0, 0, 0, BlockTypes.AIR.getInternalId());
         return new Iterator<MutableBlockChange>() {
@@ -456,7 +456,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public Iterator<MutableBiomeChange> getBiomeIterator(final boolean dir) throws IOException {
         final FaweInputStream is = getBiomeIS();
         if (is == null) {
-            return new ArrayList<MutableBiomeChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableBiomeChange change = new MutableBiomeChange();
         return new Iterator<MutableBiomeChange>() {
@@ -570,7 +570,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableEntityChange> getEntityIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return new ArrayList<MutableEntityChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableEntityChange change = new MutableEntityChange(null, create);
         try {
@@ -619,7 +619,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public Iterator<MutableTileChange> getTileIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return new ArrayList<MutableTileChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableTileChange change = new MutableTileChange(null, create);
         try {

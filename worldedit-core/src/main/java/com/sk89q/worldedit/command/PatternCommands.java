@@ -74,25 +74,6 @@
 //@CommandContainer//(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 //public class PatternCommands {
 //
-//    @Command(
-//            name = "#existing",
-//            aliases = {"#*", "*", ".*"},
-//            desc = "Use the block that is already there"
-//    )
-//    public Pattern existing(Extent extent, @Arg(desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
-//        if (properties == null) return new ExistingPattern(extent);
-//        return new PropertyPattern(extent).addRegex(".*[" + properties + "]");
-//    }
-//
-//    @Command(
-//            name = "#clipboard",
-//            aliases = {"#copy"},
-//            desc = "Use the blocks in your clipboard as the pattern")
-//    public Pattern clipboard(LocalSession session) throws EmptyClipboardException {
-//        ClipboardHolder holder = session.getClipboard();
-//        Clipboard clipboard = holder.getClipboard();
-//        return new ClipboardPattern(clipboard);
-//    }
 //
 //    @Command(
 //            name = "#simplex",
@@ -172,35 +153,6 @@
 //)
 //    public Pattern darken(Extent extent, TextureUtil util) {
 //        return new ShadePattern(extent, true, util);
-//    }
-//
-//    @Command(
-//            name = "#fullcopy",
-//            desc = "Places your full clipboard at each block"
-//)
-//    public Pattern fullcopy(Player player, Extent extent, LocalSession session, @Arg(desc = "String", def = "#copy") String location, @Arg(desc = "boolean", def = "false") boolean rotate, @Arg(desc = "boolean", def = "false") boolean flip) throws EmptyClipboardException, InputParseException, IOException {
-//        List<ClipboardHolder> clipboards;
-//        switch (location.toLowerCase()) {
-//            case "#copy":
-//            case "#clipboard":
-//                ClipboardHolder clipboard = session.getExistingClipboard();
-//                if (clipboard == null) {
-//                    throw new InputParseException("To use #fullcopy, please first copy something to your clipboard");
-//                }
-//                if (!rotate && !flip) {
-//                    return new FullClipboardPattern(extent, clipboard.getClipboard());
-//                }
-//                clipboards = Collections.singletonList(clipboard);
-//                break;
-//            default:
-//                MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player, location, null, true);
-//                clipboards = multi != null ? multi.getHolders() : null;
-//                break;
-//        }
-//        if (clipboards == null) {
-//            throw new InputParseException("#fullcopy:<source>");
-//        }
-//        return new RandomFullClipboardPattern(extent, clipboards, rotate, flip);
 //    }
 //
 //    @Command(
