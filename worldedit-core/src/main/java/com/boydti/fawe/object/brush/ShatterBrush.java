@@ -10,7 +10,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ShatterBrush extends ScatterBrush {

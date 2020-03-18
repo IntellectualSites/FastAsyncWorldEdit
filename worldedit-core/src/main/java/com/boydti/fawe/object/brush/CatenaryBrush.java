@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -11,6 +10,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.util.Arrays;
 import java.util.List;
 

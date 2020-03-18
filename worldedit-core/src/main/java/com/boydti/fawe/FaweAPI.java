@@ -7,7 +7,6 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -29,7 +28,6 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -383,11 +381,6 @@ public class FaweAPI {
     }
 
 
-    @Deprecated
-    public static int fixLighting(World world, Region selection) {
-        return fixLighting(world, selection, null);
-    }
-
     /**
      * Fix the lighting in a selection<br>
      * - First removes all lighting, then relights
@@ -399,31 +392,7 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
-        //TODO NONE OF THIS CODE WORKS AS OF 2020-03-05
-        final BlockVector3 bot = selection.getMinimumPoint();
-        final BlockVector3 top = selection.getMaximumPoint();
-
-        final int minX = bot.getBlockX() >> 4;
-        final int minZ = bot.getBlockZ() >> 4;
-
-        final int maxX = top.getBlockX() >> 4;
-        final int maxZ = top.getBlockZ() >> 4;
-
-        int count = 0;
-        if (queue == null) queue = createQueue(world, false);
-        // Remove existing lighting first
-        if (queue instanceof LightingExtent) {
-            LightingExtent relighter = (LightingExtent) queue;
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.relightChunk(x, z);
-                    count++;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
-        }
-        return count;
+        throw new UnsupportedOperationException();
     }
 
     /**

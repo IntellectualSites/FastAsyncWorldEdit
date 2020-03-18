@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.sweep;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.util.MathMan;
@@ -20,6 +19,7 @@ import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

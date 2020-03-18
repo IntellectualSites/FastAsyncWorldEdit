@@ -17,10 +17,6 @@ public class DelegateExtentMask extends AbstractDelegateMask {
         return super.test(extent, vector);
     }
 
-    public Extent getExtent() {
-        return extent;
-    }
-
     @Override
     public Mask withExtent(Extent extent) {
         return new DelegateExtentMask(extent, getMask());

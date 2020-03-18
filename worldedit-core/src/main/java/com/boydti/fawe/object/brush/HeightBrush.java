@@ -1,10 +1,9 @@
 package com.boydti.fawe.object.brush;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.brush.heightmap.RotatableHeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
@@ -17,7 +16,7 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ThreadLocalRandom;

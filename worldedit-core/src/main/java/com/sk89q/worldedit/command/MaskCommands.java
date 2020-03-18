@@ -20,9 +20,9 @@
 //import com.boydti.fawe.object.mask.SkyLightMask;
 //import com.boydti.fawe.object.mask.SurfaceMask;
 //import com.boydti.fawe.object.mask.WallMask;
-//import com.boydti.fawe.object.mask.XAxisMask;
-//import com.boydti.fawe.object.mask.YAxisMask;
-//import com.boydti.fawe.object.mask.ZAxisMask;
+//import com.boydti.fawe.function.mask.XAxisMask;
+//import com.boydti.fawe.function.mask.YAxisMask;
+//import com.boydti.fawe.function.mask.ZAxisMask;
 //import com.sk89q.worldedit.IncompleteRegionException;
 //import com.sk89q.worldedit.LocalSession;
 //import com.sk89q.worldedit.WorldEdit;

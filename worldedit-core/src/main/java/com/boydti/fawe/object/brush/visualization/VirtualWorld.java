@@ -9,7 +9,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.io.Closeable;
 import java.io.IOException;
 

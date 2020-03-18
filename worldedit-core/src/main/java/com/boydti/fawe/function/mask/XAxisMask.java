@@ -1,5 +1,6 @@
-package com.boydti.fawe.object.mask;
+package com.boydti.fawe.function.mask;
 
+import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
