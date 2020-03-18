@@ -21,14 +21,12 @@ package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
-import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.request.Request;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 /**
@@ -77,6 +75,7 @@ public interface Mask {
      * otherwise a new/same mask
      * @return
      */
+    @Nullable
     default Mask tryOptimize() {
         return null;
     }
