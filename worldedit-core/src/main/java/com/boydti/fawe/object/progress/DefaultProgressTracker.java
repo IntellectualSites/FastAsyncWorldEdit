@@ -108,12 +108,13 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     }
 
     public void sendTask() {
-        String queue = StringMan.padRight("" + totalQueue, 3);
-        String dispatch = StringMan.padLeft("" + amountDispatch, 3);
+        String queue = StringMan.padRight(String.valueOf(totalQueue), 3);
+        String dispatch = StringMan.padLeft(String.valueOf(amountDispatch), 3);
         int total = amountDispatch != 0 ? amountDispatch : amountQueue;
         int speed = total != 0 ? (int) (total / Math.max((System.currentTimeMillis() - start) / 1000d, 1)) : 0;
-        String speedStr = StringMan.padRight("" + speed, 3);
-        String percent = StringMan.padRight("" + (amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
+        String speedStr = StringMan.padRight(String.valueOf(speed), 3);
+        String percent = StringMan.padRight(
+            String.valueOf(amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
         int remaining = speed != 0 ? amountQueue / speed : -1;
         sendTile(TextComponent.empty(), Caption.of("fawe.progress.progress.message", queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
     }

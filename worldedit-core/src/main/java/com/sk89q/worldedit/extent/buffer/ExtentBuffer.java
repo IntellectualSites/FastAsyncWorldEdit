@@ -66,11 +66,11 @@ public class ExtentBuffer extends AbstractBufferingExtent {
     }
 
     @Override
-    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
-        if (mask.test(getExtent(), position)) {
-            return Optional.of(buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos))));
+    protected BaseBlock getBufferedFullBlock(BlockVector3 position) {
+        if (mask.test(position)) {
+            return buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos)));
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override

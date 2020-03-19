@@ -247,11 +247,14 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
     }
 
     @Override
-    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
-        return stages.values().stream()
-            .map(blocks -> blocks.get(position))
-            .filter(Objects::nonNull)
-            .findAny();
+    protected BaseBlock getBufferedFullBlock(BlockVector3 position) {
+        for (BlockMap<BaseBlock> blocks : stages.values()) {
+            BaseBlock baseBlock = blocks.get(position);
+            if (baseBlock != null) {
+                return baseBlock;
+            }
+        }
+        return null;
     }
 
     @Override

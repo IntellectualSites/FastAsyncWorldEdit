@@ -99,6 +99,9 @@ public final class BlockStateIdAccess {
 
     */
     
+    private BlockStateIdAccess() {
+    }
+    
     public static @Nullable BlockState getBlockStateById(int id) {
         return BlockState.getFromOrdinal(id);
     }

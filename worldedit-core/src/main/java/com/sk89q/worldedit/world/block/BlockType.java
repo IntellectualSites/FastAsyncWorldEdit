@@ -32,11 +32,13 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -53,10 +55,12 @@ public class BlockType implements Keyed, Pattern {
 
     private final String id;
     private final BlockTypesCache.Settings settings;
-    /*
-    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLgacy(0));
+    private final LazyReference<FuzzyBlockState> emptyFuzzy
+        = LazyReference.from(() -> new FuzzyBlockState(this));
+    
+    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
-    */
+    
     private Integer legacyCombinedId;
     private boolean initItemType;
     private ItemType itemType;
@@ -67,6 +71,16 @@ public class BlockType implements Keyed, Pattern {
         this.settings = new BlockTypesCache.Settings(this, id, internalId, states);
     }
 
+    public BlockType(String id, Function<BlockState, BlockState> values) {
+        // If it has no namespace, assume minecraft.
+        if (!id.contains(":")) {
+            id = "minecraft:" + id;
+        }
+        this.id = id;
+        //TODO fix the line below
+        this.settings = new BlockTypesCache.Settings(this, id, 0, null);
+    }
+    
     @Deprecated
     public int getMaxStateId() {
         return settings.permutations;
@@ -179,13 +193,12 @@ public class BlockType implements Keyed, Pattern {
      *
      * @return The default state
      */
-    public final BlockState getDefaultState() {
+    public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
-    @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
-        return new FuzzyBlockState(this);
+        return emptyFuzzy.getValue();
     }
 
     /**

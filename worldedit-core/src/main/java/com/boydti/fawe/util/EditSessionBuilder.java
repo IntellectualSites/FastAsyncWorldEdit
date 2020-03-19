@@ -40,7 +40,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,7 +75,7 @@ public class EditSessionBuilder {
      *
      * @param world A world must be provided for all EditSession(s)
      */
-    public EditSessionBuilder(@Nonnull World world) {
+    public EditSessionBuilder(@NotNull World world) {
         checkNotNull(world);
         this.world = world;
         this.worldName = world.getName();
@@ -88,7 +87,7 @@ public class EditSessionBuilder {
         this.worldName = worldName;
     }
 
-    public EditSessionBuilder(@Nonnull String worldName) {
+    public EditSessionBuilder(@NotNull String worldName) {
         checkNotNull(worldName);
         this.worldName = worldName;
         this.world = FaweAPI.getWorld(worldName);
@@ -108,7 +107,7 @@ public class EditSessionBuilder {
         return limit(FaweLimit.MAX.copy());
     }
 
-    public EditSessionBuilder limitUnprocessed(@Nonnull Player player) {
+    public EditSessionBuilder limitUnprocessed(@NotNull Player player) {
         checkNotNull(player);
         limitUnlimited();
         FaweLimit tmp = player.getLimit();

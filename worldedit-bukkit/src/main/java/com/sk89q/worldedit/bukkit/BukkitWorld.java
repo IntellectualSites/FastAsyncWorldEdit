@@ -22,14 +22,8 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IBlocks;
-import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
-import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -39,7 +33,6 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -52,6 +45,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import io.papermc.lib.PaperLib;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -60,10 +54,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
-
-import io.papermc.lib.PaperLib;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -191,8 +182,14 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean regenerate(Region region, EditSession editSession) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (adapter != null) {
-            return adapter.regenerate(getWorld(), region, null, null, editSession);
+        try {
+            if (adapter != null) {
+                return adapter.regenerate(getWorld(), region, null, null, editSession);
+            } else {
+                throw new UnsupportedOperationException("Missing BukkitImplAdapater for this version.");
+            }
+        } catch (Exception e) {
+            logger.warn("Regeneration via adapter failed.", e);
         }
         /*
         BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
@@ -336,15 +333,13 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
-			int X = pt.getBlockX() >> 4;
-	        int Z = pt.getBlockZ() >> 4;
-	        if (Fawe.isMainThread()) {
-	            world.getChunkAt(X, Z);
-	        } else if (!world.isChunkLoaded(X, Z)) {
-	            PaperLib.getChunkAtAsync(world,X, Z, true);
-	        }
-		}
+        int X = pt.getBlockX() >> 4;
+        int Z = pt.getBlockZ() >> 4;
+        if (Fawe.isMainThread()) {
+            world.getChunkAt(X, Z);
+        } else {
+            PaperLib.getChunkAtAsync(world, X, Z, true);
+        }
     }
 
     @Override

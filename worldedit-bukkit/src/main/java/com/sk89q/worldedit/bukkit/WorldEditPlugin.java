@@ -658,10 +658,10 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
             if (!command.isPresent()) return;
 
-            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), event.getBuffer());
+            CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), buffer);
             getWorldEdit().getEventBus().post(suggestEvent);
 
-            event.setCompletions(CommandUtil.fixSuggestions(event.getBuffer(), suggestEvent.getSuggestions()));
+            event.setCompletions(CommandUtil.fixSuggestions(buffer, suggestEvent.getSuggestions()));
             event.setHandled(true);
         }
     }

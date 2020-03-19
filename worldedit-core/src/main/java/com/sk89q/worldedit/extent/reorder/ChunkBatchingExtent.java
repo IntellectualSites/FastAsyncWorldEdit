@@ -77,8 +77,8 @@ public class ChunkBatchingExtent extends AbstractBufferingExtent {
     }
 
     @Override
-    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
-        return Optional.ofNullable(blockMap.get(position));
+    protected BaseBlock getBufferedFullBlock(BlockVector3 position) {
+        return blockMap.get(position);
     }
 
     @Override
@@ -94,8 +94,7 @@ public class ChunkBatchingExtent extends AbstractBufferingExtent {
             @Override
             public Operation resume(RunContext run) throws WorldEditException {
                 if (iterator == null) {
-                    iterator = ImmutableSortedSet.copyOf(RegionOptimizedComparator.INSTANCE,
-                        blockMap.keySet()).iterator();
+                    iterator = blockMap.keySet().parallelStream().sorted(RegionOptimizedComparator.INSTANCE).iterator();
                 }
                 while (iterator.hasNext()) {
                     BlockVector3 position = iterator.next();
