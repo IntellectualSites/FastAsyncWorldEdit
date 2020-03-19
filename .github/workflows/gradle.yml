@@ -20,6 +20,8 @@ jobs:
         java-version: 1.8
     - name: Download BuildTools
       run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+    - name: Run BuildTools
+      run: java -jar BuildTools.jar --rev latest
     - name: Test with Gradle
       run: ./gradlew clean build -x test
       
