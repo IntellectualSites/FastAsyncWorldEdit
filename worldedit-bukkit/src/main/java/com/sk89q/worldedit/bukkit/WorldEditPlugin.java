@@ -654,6 +654,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             int firstSpace = buffer.indexOf(' ');
             if (firstSpace < 0) return;
             String label = buffer.substring(0, firstSpace);
+            // Strip leading slash, if present.
+            label = label.startsWith("/") ? label.substring(1) : label;
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
             if (!command.isPresent()) return;
