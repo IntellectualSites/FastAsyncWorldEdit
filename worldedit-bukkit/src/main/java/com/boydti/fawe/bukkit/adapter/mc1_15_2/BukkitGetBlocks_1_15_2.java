@@ -231,9 +231,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
                         int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
                         if (log.isInfoEnabled()) {
-                            log.info("ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
+                            log.info("The following is not an error. It just a debugging message. There is no need to report this. \n ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
                         } else {
-                            log.error("ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
+                            log.error("The following is not an error. It just a debugging message. There is no need to report this. \n ordinal: " + ordinal + "NBT: " + set.getBlock(lx, ly, lz).hasNbtData());
                         }
                         if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
