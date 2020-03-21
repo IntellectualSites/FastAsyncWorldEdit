@@ -815,7 +815,10 @@ public final class PlatformCommandManager {
     @Subscribe
     public void handleCommandSuggestion(CommandSuggestionEvent event) {
         try {
-            String arguments = event.getArguments();
+            String rawArgs = event.getArguments();
+            // Increase the resulting positions by 1 if we remove a leading `/`
+            final int posOffset = rawArgs.startsWith("/") ? 1 : 0;
+            String arguments = rawArgs.startsWith("/") ? rawArgs.substring(1) : rawArgs;
             List<Substring> split = parseArgs(arguments).collect(Collectors.toList());
             List<String> argStrings = split.stream()
                 .map(Substring::getSubstring)
@@ -837,11 +840,10 @@ public final class PlatformCommandManager {
                     Substring original = suggestion.getReplacedArgument() == split.size()
                         ? Substring.from(arguments, noSlashLength, noSlashLength)
                         : split.get(suggestion.getReplacedArgument());
-                    // increase original points by 1, for removed `/` in `parseArgs`
                     return Substring.wrap(
                         suggestion.getSuggestion(),
-                        original.getStart() + 1,
-                        original.getEnd() + 1
+                        original.getStart() + posOffset,
+                        original.getEnd() + posOffset
                     );
                 }).collect(Collectors.toList()));
         } catch (ConditionFailedException e) {

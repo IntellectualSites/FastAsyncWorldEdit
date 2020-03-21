@@ -105,13 +105,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusY, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusY = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 3:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusY = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[2]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
                 break;
 
             default:
@@ -135,12 +135,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 2:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[1]);
                 break;
 
             default:
@@ -163,13 +163,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusY, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusY = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 3:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusY = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[2]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
                 break;
 
             default:
@@ -192,12 +192,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusZ = Math.max(1, parseNumericInput(radii[0]));
+                radiusX = radiusZ = parseNumericInput(radii[0]);
                 break;
 
             case 2:
-                radiusX = Math.max(1, parseNumericInput(radii[0]));
-                radiusZ = Math.max(1, parseNumericInput(radii[1]));
+                radiusX = parseNumericInput(radii[0]);
+                radiusZ = parseNumericInput(radii[1]);
                 break;
 
             default:
