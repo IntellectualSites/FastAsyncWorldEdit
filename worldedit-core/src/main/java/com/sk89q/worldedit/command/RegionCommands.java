@@ -151,25 +151,25 @@ public class RegionCommands {
 //        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
     }
 
-    @Command(
-            name = "/getlighting",
-            desc = "Get the light at a position"
-    )
-    @CommandPermissions("worldedit.light.fix")
-    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
-        final Location loc = player.getLocation();
-        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        player.print(TextComponent.of("Light: " + block + " | " + sky));
-    }
+//    @Command(
+//            name = "/getlighting",
+//            desc = "Get the light at a position"
+//    )
+//    @CommandPermissions("worldedit.light.fix")
+//    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
+//        final Location loc = player.getLocation();
+//        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+//        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+//        player.print(TextComponent.of("Light: " + block + " | " + sky));
+//    }
 
-    @Command(
-            name = "/removelighting",
-            desc = "Removing lighting in a selection"
-    )
-    @CommandPermissions("worldedit.light.remove")
-    public void removeLighting(Player player) {
-        player.print(TextComponent.of("Temporarily not working"));
+//    @Command(
+//            name = "/removelighting",
+//            desc = "Removing lighting in a selection"
+//    )
+//    @CommandPermissions("worldedit.light.remove")
+//    public void removeLighting(Player player) {
+//        player.print(TextComponent.of("Temporarily not working"));
 //        Region selection = player.getSelection();
 //        if (selection == null) {
 //            final int cx = player.getLocation().getBlockX() >> 4;
@@ -178,7 +178,7 @@ public class RegionCommands {
 //        }
 //        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
 //        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
-    }
+//    }
 
     @Command(
             name = "/nbtinfo",

@@ -19,14 +19,20 @@
 
 package com.sk89q.worldedit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
+import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.ProcessedWEExtent;
@@ -42,8 +48,6 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -126,10 +130,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,14 +139,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-
-import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -1473,10 +1468,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
-        copy.setCopyingEntities(copyEntities);
-        copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(count);
         copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
+        copy.setCopyingEntities(copyEntities);
+        copy.setCopyingBiomes(copyBiomes);
         mask = MaskIntersection.of(getSourceMask(), mask).optimize();
         if (mask != Masks.alwaysTrue()) {
             setSourceMask(null);
@@ -1486,8 +1481,20 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return this.changes = copy.getAffected();
     }
 
-    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir,
-                          boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
+    /**
+     * Move the blocks in a region a certain direction.
+     *
+     * @param region the region to move
+     * @param dir the direction
+     * @param distance the distance to move
+     * @param copyAir true to copy air blocks
+     * @param moveEntities true to move entities
+     * @param copyBiomes true to copy biomes
+     * @param replacement the replacement pattern to fill in after moving, or null to use air
+     * @return number of blocks moved
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
         Mask mask = null;
         if (!copyAir) {
             mask = new ExistingBlockMask(this);
@@ -2330,15 +2337,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException
      */
     public int makeShape(final Region region, final Vector3 zero, final Vector3 unit,
-                         final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
+                        final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
             throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z", "type", "data");
         expression.optimize();
 
         final Variable typeVariable = expression.getSlots().getVariable("type")
-                .orElseThrow(IllegalStateException::new);
+            .orElseThrow(IllegalStateException::new);
         final Variable dataVariable = expression.getSlots().getVariable("data")
-                .orElseThrow(IllegalStateException::new);
+            .orElseThrow(IllegalStateException::new);
 
         final WorldEditExpressionEnvironment environment = new WorldEditExpressionEnvironment(this, unit, zero);
         expression.setEnvironment(environment);
@@ -2396,7 +2403,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString,
-                           final int timeout) throws ExpressionException, MaxChangedBlocksException {
+                            final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
 
@@ -2506,14 +2513,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         outer: for (BlockVector3 position : region) {
             for (BlockVector3 recurseDirection : recurseDirections) {
                 BlockVector3 neighbor = position.add(recurseDirection);
-
                 if (outside.contains(neighbor)) {
                     continue outer;
                 }
             }
             this.changes++;
-            pattern.apply(getExtent(), position, position);
-        }
+                pattern.apply(getExtent(), position, position);
+            }
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -2607,7 +2613,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int drawLine(Pattern pattern, List<BlockVector3> vectors, double radius, boolean filled)
-        throws MaxChangedBlocksException {
+            throws MaxChangedBlocksException {
 
         Set<BlockVector3> vset = new HashSet<>();
 
