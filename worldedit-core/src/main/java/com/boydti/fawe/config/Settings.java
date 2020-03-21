@@ -19,9 +19,9 @@ public class Settings extends Config {
 
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
-    public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues";
+    public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
-    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
@@ -32,7 +32,7 @@ public class Settings extends Config {
     public String PLATFORM; // These values are set from FAWE before loading
 
     @Comment({"Options: cn, de, es, fr, it, nl, ru, tr",
-            "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/tree/master/worldedit-core/src/main/resources",})
+            "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit/tree/master/worldedit-core/src/main/resources",})
     public String LANGUAGE = "en";
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
@@ -338,7 +338,7 @@ public class Settings extends Config {
         public boolean ANVIL_QUEUE_MODE = false;
         @Comment({
                 "[SAFE] Dynamically increase the number of chunks rendered",
-                " - Requires Paper: ci.destroystokyo.com/job/Paper-1.13/",
+                " - Requires Paper",
                 " - Set your server view distance to 1 (spigot.yml, server.properties)",
                 " - Based on tps and player movement",
                 " - Note: If entities become hidden, increase the server view distance to 3",
