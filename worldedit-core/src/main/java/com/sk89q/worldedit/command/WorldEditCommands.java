@@ -37,6 +37,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
@@ -137,13 +138,15 @@ public class WorldEditCommands {
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException {
-        String dest = "";
+        String dest;
         try {
             dest = IncendoPaster.debugPaste();
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
+            return;
         }
-        actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest)));
+        actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
+            ClickEvent.openUrl(dest))));
     }
 
     @Command(
