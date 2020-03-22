@@ -139,8 +139,8 @@ public class LocalSession implements TextureHolder {
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
-    private transient Snapshot snapshot;
-    private transient boolean hasCUISupport = false;
+    private transient com.sk89q.worldedit.world.snapshot.Snapshot snapshot;
+    private transient com.sk89q.worldedit.world.snapshot.experimental.Snapshot snapshotExperimental;    private transient boolean hasCUISupport = false;
     private transient int cuiVersion = -1;
     private transient boolean fastMode = false;
     private transient Mask mask;
@@ -959,17 +959,36 @@ public class LocalSession implements TextureHolder {
      * @return the legacy snapshot
      */
     @Nullable
-    public Snapshot getSnapshot() {
+    public com.sk89q.worldedit.world.snapshot.Snapshot getSnapshot() {
         return snapshot;
+    }
+
+    /**
+     * Select a legacy snapshot.
+     *
+     * @param snapshot a legacy snapshot
+     */
+    public void setSnapshot(@Nullable com.sk89q.worldedit.world.snapshot.Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    /**
+     * Get the snapshot that has been selected.
+     *
+     * @return the snapshot
+     */
+    public @Nullable
+    com.sk89q.worldedit.world.snapshot.experimental.Snapshot getSnapshotExperimental() {
+        return snapshotExperimental;
     }
 
     /**
      * Select a snapshot.
      *
-     * @param snapshot a snapshot
+     * @param snapshotExperimental a snapshot
      */
-    public void setSnapshot(@Nullable Snapshot snapshot) {
-        this.snapshot = snapshot;
+    public void setSnapshotExperimental(@Nullable com.sk89q.worldedit.world.snapshot.experimental.Snapshot snapshotExperimental) {
+        this.snapshotExperimental = snapshotExperimental;
     }
 
     /**
