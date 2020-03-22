@@ -121,17 +121,17 @@ public class AsyncBlock implements Block {
 
     @Override
     public byte getLightLevel() {
-        return (byte) world.getLight(x, y, z);
+        return (byte) 15;
     }
 
     @Override
     public byte getLightFromSky() {
-        return (byte) world.getSkyLight(x, y, z);
+        return (byte) 15;
     }
 
     @Override
     public byte getLightFromBlocks() {
-        return (byte) world.getBlockLight(x, y, z);
+        return (byte) 15;
     }
 
     @NotNull @Override
