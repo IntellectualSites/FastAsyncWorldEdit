@@ -71,9 +71,7 @@ tasks.named<Copy>("processResources") {
     filesMatching("plugin.yml") {
         expand("internalVersion" to project.ext["internalVersion"])
     }
-    from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
-        exclude("META-INF/")
-    })
+    // exclude adapters entirely from this JAR, they should only be in the shadow JAR
     exclude("**/worldedit-adapters.jar")
 }
 
@@ -85,6 +83,9 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
+        exclude("META-INF/")
+    })
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
         relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
