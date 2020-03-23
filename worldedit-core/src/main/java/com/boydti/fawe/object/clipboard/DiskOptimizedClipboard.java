@@ -10,6 +10,7 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -41,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -48,6 +51,8 @@ import javax.annotation.Nullable;
  * - I don't know how to reduce nbt / entities to O(2) complexity, so it is stored in memory.
  */
 public class DiskOptimizedClipboard extends LinearClipboard implements Closeable {
+
+    private static final Logger log = LoggerFactory.getLogger(DiskOptimizedClipboard.class);
 
     private static int HEADER_SIZE = 14;
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
@@ -94,6 +99,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            log.warn("Creating new RandomAccessFile: " + file.getPath());
             this.braf = new RandomAccessFile(file, "rw");
             long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
             braf.setLength(0);
@@ -104,6 +110,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             byteBuffer.putChar(4, (char) getHeight());
             byteBuffer.putChar(6, (char) getLength());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -279,6 +286,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             if (byteBuffer != null) {
                 byteBuffer.force();
                 fileChannel.close();
+                log.warn("Closing the RandomAccessFile: " + file.getPath());
                 braf.close();
                 //noinspection ResultOfMethodCallIgnored
                 file.setWritable(true);
