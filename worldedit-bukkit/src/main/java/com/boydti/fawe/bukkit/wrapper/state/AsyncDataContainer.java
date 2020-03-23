@@ -3,15 +3,15 @@ package com.boydti.fawe.bukkit.wrapper.state;
 import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 public final class AsyncDataContainer implements PersistentDataContainer {
     private final CompoundTag root;
@@ -67,6 +67,20 @@ public final class AsyncDataContainer implements PersistentDataContainer {
     public <T, Z> Z getOrDefault(NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue) {
         Z z = this.get(key, type);
         return z != null ? z : defaultValue;
+    }
+
+    @NotNull
+    @Override
+    public Set<NamespacedKey> getKeys() {
+        Set<NamespacedKey> keys = new HashSet<>();
+        this.get(false).keySet().forEach(key -> {
+            String[] keyData = key.split(":", 2);
+            if (keyData.length == 2) {
+                keys.add(new NamespacedKey(keyData[0], keyData[1]));
+            }
+
+        });
+        return keys;
     }
 
     public void remove(NamespacedKey key) {

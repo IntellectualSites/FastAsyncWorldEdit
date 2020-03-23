@@ -66,10 +66,6 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
         return getParent().getBlock(location);
     }
 
-    default <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
-        return getParent().setBlock(location, state, SideEffectSet.none());
-    }
-
     @Override
     @Nullable
     default BaseEntity getEntity(Entity entity) {
