@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.forge;
 
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.command.util.PermissionCondition;
-
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -36,17 +36,17 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.world.server.ServerWorld;
-
-import javax.annotation.Nullable;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,16 +79,6 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
-    public boolean isValidMobType(String type) {
-        return net.minecraftforge.registries.ForgeRegistries.ENTITIES.containsKey(new ResourceLocation(type));
-    }
-
-    @Override
-    public void reload() {
-        getConfiguration().load();
-    }
-
-    @Override
     public int getDataVersion() {
         return SharedConstants.getVersion().getWorldVersion();
     }
@@ -96,6 +86,16 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     @Override
     public DataFixer getDataFixer() {
         return dataFixer;
+    }
+
+    @Override
+    public boolean isValidMobType(String type) {
+        return net.minecraftforge.registries.ForgeRegistries.ENTITIES.containsKey(new ResourceLocation(type));
+    }
+
+    @Override
+    public void reload() {
+        getConfiguration().load();
     }
 
     @Override

@@ -22,8 +22,8 @@ package com.sk89q.worldedit.forge;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -34,6 +34,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
+import com.sk89q.worldedit.internal.util.BiomeMath;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -41,6 +42,8 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -50,23 +53,25 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import net.minecraft.entity.EntityType;
 import net.minecraft.block.Block;
+import net.minecraft.entity.EntityType;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.IClearable;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeContainer;
+import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.gen.feature.BigBrownMushroomFeature;
@@ -90,25 +95,26 @@ import net.minecraft.world.gen.feature.ShrubFeature;
 import net.minecraft.world.gen.feature.SwampTreeFeature;
 import net.minecraft.world.gen.feature.TallTaigaTreeFeature;
 import net.minecraft.world.gen.feature.TreeFeature;
-import net.minecraft.world.storage.WorldInfo;
 
-import java.lang.ref.WeakReference;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.SaveHandler;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.Random;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.OptionalInt;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -253,7 +259,7 @@ public class ForgeWorld extends AbstractWorld {
     @Override
     public BiomeType getBiome(BlockVector2 position) {
         checkNotNull(position);
-        return ForgeAdapter.adapt(getWorld().getBiomeBody(new BlockPos(position.getBlockX(), 0, position.getBlockZ())));
+        return ForgeAdapter.adapt(getWorld().getBiome(new BlockPos(position.getBlockX(), 0, position.getBlockZ())));
     }
 
     @Override
@@ -262,10 +268,15 @@ public class ForgeWorld extends AbstractWorld {
         checkNotNull(biome);
 
         IChunk chunk = getWorld().getChunk(position.getBlockX() >> 4, position.getBlockZ() >> 4, ChunkStatus.FULL, false);
-        if (chunk == null) {
+        BiomeContainer container = chunk == null ? null : chunk.getBiomes();
+        if (chunk == null || container == null) {
             return false;
         }
-        chunk.getBiomes()[((position.getBlockZ() & 0xF) << 4 | position.getBlockX() & 0xF)] = ForgeAdapter.adapt(biome);
+        // Temporary, while biome setting is 2D only
+        for (int i = 0; i < BiomeMath.VERTICAL_BIT_MASK; i++) {
+            int idx = BiomeMath.computeBiomeIndex(position.getX(), i, position.getZ());
+            container.biomes[idx] = ForgeAdapter.adapt(biome);
+        }
         chunk.setModified(true);
         return true;
     }
@@ -293,8 +304,10 @@ public class ForgeWorld extends AbstractWorld {
         ActionResultType used = stack.onItemUse(itemUseContext);
         if (used != ActionResultType.SUCCESS) {
             // try activating the block
-            if (getWorld().getBlockState(blockPos).onBlockActivated(world, fakePlayer, Hand.MAIN_HAND, rayTraceResult)) {
-                used = ActionResultType.SUCCESS;
+            ActionResultType resultType = getWorld().getBlockState(blockPos)
+                .onBlockActivated(world, fakePlayer, Hand.MAIN_HAND, rayTraceResult);
+            if (resultType.isSuccessOrConsume()) {
+                used = resultType;
             } else {
                 used = stack.getItem().onItemRightClick(world, fakePlayer, Hand.MAIN_HAND).getType();
             }
@@ -372,6 +385,7 @@ public class ForgeWorld extends AbstractWorld {
             case BIG_TREE: return new BigTreeFeature(NoFeatureConfig::deserialize, true);
             case REDWOOD: return new PointyTaigaTreeFeature(NoFeatureConfig::deserialize);
             case TALL_REDWOOD: return new TallTaigaTreeFeature(NoFeatureConfig::deserialize, true);
+            case MEGA_REDWOOD: return new MegaPineTree(NoFeatureConfig::deserialize, true, random.nextBoolean());
             case BIRCH: return new BirchTreeFeature(NoFeatureConfig::deserialize, true, false);
             case JUNGLE: return new MegaJungleFeature(NoFeatureConfig::deserialize, true, 10, 20, JUNGLE_LOG, JUNGLE_LEAF);
             case SMALL_JUNGLE: return new JungleTreeFeature(NoFeatureConfig::deserialize, true, 4 + random.nextInt(7), JUNGLE_LOG, JUNGLE_LEAF, false);
@@ -380,7 +394,6 @@ public class ForgeWorld extends AbstractWorld {
             case SWAMP: return new SwampTreeFeature(NoFeatureConfig::deserialize);
             case ACACIA: return new SavannaTreeFeature(NoFeatureConfig::deserialize, true);
             case DARK_OAK: return new DarkOakTreeFeature(NoFeatureConfig::deserialize, true);
-            case MEGA_REDWOOD: return new MegaPineTree(NoFeatureConfig::deserialize, true, random.nextBoolean());
             case TALL_BIRCH: return new BirchTreeFeature(NoFeatureConfig::deserialize, true, true);
             case RED_MUSHROOM: return new BigRedMushroomFeature(BigMushroomFeatureConfig::deserialize);
             case BROWN_MUSHROOM: return new BigBrownMushroomFeature(BigMushroomFeatureConfig::deserialize);
@@ -403,8 +416,8 @@ public class ForgeWorld extends AbstractWorld {
         @SuppressWarnings("unchecked")
         Feature<IFeatureConfig> generator = (Feature<IFeatureConfig>) createTreeFeatureGenerator(type);
         return generator != null
-                && generator.place(getWorld(), getWorld().getChunkProvider().getChunkGenerator(), random,
-                ForgeAdapter.toBlockPos(position), createFeatureConfig(type));
+            && generator.place(getWorld(), getWorld().getChunkProvider().getChunkGenerator(), random,
+            ForgeAdapter.toBlockPos(position), createFeatureConfig(type));
     }
 
     @Override
@@ -421,7 +434,7 @@ public class ForgeWorld extends AbstractWorld {
     public void fixLighting(Iterable<BlockVector2> chunks) {
         World world = getWorld();
         for (BlockVector2 chunk : chunks) {
-            world.getChunkProvider().getLightManager().func_215571_a(new ChunkPos(chunk.getBlockX(), chunk.getBlockZ()), true);
+            world.getChunkProvider().getLightManager().retainData(new ChunkPos(chunk.getBlockX(), chunk.getBlockZ()), true);
         }
     }
 
@@ -479,8 +492,9 @@ public class ForgeWorld extends AbstractWorld {
     }
 
     @Override
-    public BlockVector3 getSpawnPosition() {
-        return ForgeAdapter.adapt(getWorld().getSpawnPoint());
+    public int getMinY() {
+        // Note: This method exists to be re-written by mods that vary world height
+        return 0;
     }
 
     @Override
@@ -489,15 +503,8 @@ public class ForgeWorld extends AbstractWorld {
     }
 
     @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        BlockPos pos = new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-        TileEntity tile = getWorld().getChunk(pos).getTileEntity(pos);
-
-        if (tile != null) {
-            return getBlock(position).toBaseBlock(NBTConverter.fromNative(TileEntityUtils.copyNbtData(tile)));
-        } else {
-            return getBlock(position).toBaseBlock();
-        }
+    public BlockVector3 getSpawnPosition() {
+        return ForgeAdapter.adapt(getWorld().getSpawnPoint());
     }
 
     @Override
@@ -512,6 +519,18 @@ public class ForgeWorld extends AbstractWorld {
         }
 
         return ForgeAdapter.adapt(mcState);
+    }
+
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        BlockPos pos = new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        TileEntity tile = getWorld().getChunk(pos).getTileEntity(pos);
+
+        if (tile != null) {
+            return getBlock(position).toBaseBlock(NBTConverter.fromNative(TileEntityUtils.copyNbtData(tile)));
+        } else {
+            return getBlock(position).toBaseBlock();
+        }
     }
 
     @Override

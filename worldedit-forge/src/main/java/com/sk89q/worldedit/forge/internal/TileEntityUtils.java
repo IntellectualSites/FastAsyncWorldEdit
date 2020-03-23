@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge;
+package com.sk89q.worldedit.forge.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 /**
  * Utility methods for setting tile entities in the world.
  */
-final class TileEntityUtils {
+public final class TileEntityUtils {
 
     private TileEntityUtils() {
     }
@@ -62,13 +62,15 @@ final class TileEntityUtils {
      * @param position the position
      * @param tag the tag for the tile entity (may be null to do nothing)
      */
-    static void setTileEntity(World world, BlockVector3 position, @Nullable CompoundNBT tag) {
+    static boolean setTileEntity(World world, BlockVector3 position, @Nullable CompoundNBT tag) {
         if (tag != null) {
             updateForSet(tag, position);
             TileEntity tileEntity = TileEntity.create(tag);
-            if (tileEntity != null) {
-                world.setTileEntity(new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ()), tileEntity);
+            if (tileEntity == null) {
+                return false;
             }
+            world.setTileEntity(new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ()), tileEntity);
+            return true;
         }
     }
 
