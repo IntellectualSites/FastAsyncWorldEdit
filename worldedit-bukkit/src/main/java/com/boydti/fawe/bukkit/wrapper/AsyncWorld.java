@@ -885,6 +885,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public int getWaterAmbientSpawnLimit() {
+        return 0;
+    }
+
+    @Override
+    public void setWaterAmbientSpawnLimit(int limit) {
+
+    }
+
+    @Override
     public int getAmbientSpawnLimit() {
         return parent.getAmbientSpawnLimit();
     }
@@ -1285,18 +1295,28 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     public long getTicksPerWaterSpawns() {
-        throw new UnsupportedOperationException();
+        return parent.getTicksPerWaterSpawns();
     }
 
     public void setTicksPerWaterSpawns(int ticksPerWaterSpawns) {
-        throw new UnsupportedOperationException();
+        parent.setTicksPerWaterSpawns(ticksPerWaterSpawns);
+    }
+
+    @Override
+    public long getTicksPerWaterAmbientSpawns() {
+        return parent.getTicksPerWaterAmbientSpawns();
+    }
+
+    @Override
+    public void setTicksPerWaterAmbientSpawns(int ticksPerAmbientSpawns) {
+        parent.setTicksPerWaterAmbientSpawns(ticksPerAmbientSpawns);
     }
 
     public long getTicksPerAmbientSpawns() {
-        throw new UnsupportedOperationException();
+        return parent.getTicksPerAmbientSpawns();
     }
 
     public void setTicksPerAmbientSpawns(int ticksPerAmbientSpawns) {
-        throw new UnsupportedOperationException();
+        parent.setTicksPerAmbientSpawns(ticksPerAmbientSpawns);
     }
 }

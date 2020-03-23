@@ -24,12 +24,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.IntNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
 
 /**
  * Utility methods for setting tile entities in the world.
@@ -40,38 +37,20 @@ public final class TileEntityUtils {
     }
 
     /**
-     * Update the given tag compound with position information.
-     *
-     * @param tag the tag
-     * @param position the position
-     */
-    private static void updateForSet(CompoundNBT tag, BlockVector3 position) {
-        checkNotNull(tag);
-        checkNotNull(position);
-
-        tag.put("x", new IntNBT(position.getBlockX()));
-        tag.put("y", new IntNBT(position.getBlockY()));
-        tag.put("z", new IntNBT(position.getBlockZ()));
-    }
-
-    /**
      * Set a tile entity at the given location using the tile entity ID from
      * the tag.
      *
      * @param world the world
      * @param position the position
-     * @param tag the tag for the tile entity (may be null to do nothing)
+     * @param tag the tag for the tile entity
      */
-    static boolean setTileEntity(World world, BlockVector3 position, @Nullable CompoundNBT tag) {
-        if (tag != null) {
-            updateForSet(tag, position);
-            TileEntity tileEntity = TileEntity.create(tag);
-            if (tileEntity == null) {
-                return false;
-            }
-            world.setTileEntity(new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ()), tileEntity);
-            return true;
+    static boolean setTileEntity(World world, BlockPos position, CompoundNBT tag) {
+        TileEntity tileEntity = TileEntity.create(tag);
+        if (tileEntity == null) {
+            return false;
         }
+        world.setTileEntity(new BlockPos(position.getX(), position.getY(), position.getZ()), tileEntity);
+        return true;
     }
 
     public static CompoundNBT copyNbtData(TileEntity tile) {
