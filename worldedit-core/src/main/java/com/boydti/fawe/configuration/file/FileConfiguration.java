@@ -118,9 +118,9 @@ public abstract class FileConfiguration extends MemoryConfiguration {
             throw new NullPointerException("File cannot be null");
         }
 
-        FileInputStream stream = new FileInputStream(file);
-
-        load(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        try (FileInputStream stream = new FileInputStream(file)) {
+            load(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        }
     }
 
     /**

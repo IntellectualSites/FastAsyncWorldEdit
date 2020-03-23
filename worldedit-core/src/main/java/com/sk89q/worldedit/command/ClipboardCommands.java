@@ -370,40 +370,7 @@ public class ClipboardCommands {
             player.print(Caption.of("fawe.web.download.link" , urlText));
         }
     }
-
-    @Command(
-            name = "asset",
-            desc = "Saves your clipboard to the asset web interface"
-)
-    @CommandPermissions({"worldedit.clipboard.asset"})
-    public void asset(final Player player, final LocalSession session, String category) throws WorldEditException {
-        final ClipboardFormat format = BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
-        ClipboardHolder holder = session.getClipboard();
-        Clipboard clipboard = holder.getClipboard();
-        final Transform transform = holder.getTransform();
-        final Clipboard target;
-        // If we have a transform, bake it into the copy
-        if (!transform.isIdentity()) {
-            final FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-            target = new BlockArrayClipboard(result.getTransformedRegion(), player.getUniqueId());
-            target.setOrigin(clipboard.getOrigin());
-            Operations.completeLegacy(result.copyTo(target));
-        } else {
-            target = clipboard;
-        }
-        player.print(Caption.of("fawe.web.generating.link" , format.getName()));
-        if (Settings.IMP.WEB.ASSETS.isEmpty()) {
-            player.print(Caption.of("fawe.error.setting.disable", "web.assets"));
-            return;
-        }
-        URL url = format.uploadPublic(target, category.replaceAll("[/|\\\\]", "."), player.getName());
-        if (url == null) {
-            player.printError(TranslatableComponent.of("fawe.web.generating.link.failed"));
-        } else {
-            player.print(Caption.of("fawe.web.download.link" , Settings.IMP.WEB.ASSETS));
-        }
-    }
-
+    
     @Command(
         name = "/paste",
         aliases = { "/p", "/pa" },
