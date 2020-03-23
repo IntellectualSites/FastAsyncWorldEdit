@@ -49,7 +49,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import org.enginehub.piston.annotation.Command;
@@ -87,23 +86,19 @@ public class BiomeCommands {
                           @ArgFlag(name = 'p', desc = "Page number.", def = "1")
                               int page) {
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            BiomeRegistry biomeRegistry =
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-                    .getRegistries().getBiomeRegistry();
+            BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
 
-            PaginationBox paginationBox = PaginationBox
-                .fromStrings("Available Biomes", "/biomelist -p %page%",
-                    BiomeType.REGISTRY.values().stream().map(biomeType -> {
-                        String id = biomeType.getId();
-                        final BiomeData data = biomeRegistry.getData(biomeType);
-                        if (data != null) {
-                            String name = data.getName();
-                            return id + " (" + name + ")";
-                        } else {
-                            return id;
-                        }
-                    }).collect(Collectors.toList()));
-            return paginationBox.create(page);
+            PaginationBox paginationBox = PaginationBox.fromComponents("Available Biomes", "/biomelist -p %page%",
+                    BiomeType.REGISTRY.values().stream()
+                            .map(biomeType -> TextComponent.builder()
+                                .append(biomeType.getId())
+                                .append(" (")
+                                .append(biomeRegistry.getRichName(biomeType))
+                                .append(")")
+                                .build())
+                            .collect(Collectors.toList()));
+             return paginationBox.create(page);
         }, (Component) null);
     }
 
@@ -150,14 +145,11 @@ public class BiomeCommands {
             messageKey = "worldedit.biomeinfo.selection";
         }
 
-        List<Component> components = biomes.stream().map(biome -> {
-            BiomeData data = biomeRegistry.getData(biome);
-            if (data != null) {
-                return TextComponent.of(data.getName()).hoverEvent(HoverEvent.showText(TextComponent.of(biome.getId())));
-            } else {
-                return TextComponent.of(biome.getId());
-            }
-        }).collect(Collectors.toList());
+        List<Component> components = biomes.stream().map(biome ->
+            biomeRegistry.getRichName(biome).hoverEvent(
+                HoverEvent.showText(TextComponent.of(biome.getId()))
+            )
+        ).collect(Collectors.toList());
         player.printInfo(TranslatableComponent.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
     }
 

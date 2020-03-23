@@ -36,12 +36,14 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -52,10 +54,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -126,6 +128,30 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     @Nullable
     Entity createEntity(Location location, BaseEntity state);
+
+    /**
+     * Gets the name for the given block.
+     *
+     * @param blockType the block
+     * @return The name
+     */
+    Component getRichBlockName(BlockType blockType);
+
+    /**
+     * Gets the name for the given item.
+     *
+     * @param itemType the item
+     * @return The name
+     */
+    Component getRichItemName(ItemType itemType);
+
+    /**
+     * Gets the name for the given item stack.
+     *
+     * @param itemStack the item stack
+     * @return The name
+     */
+    Component getRichItemName(BaseItemStack itemStack);
 
     /**
      * Get a map of {@code string -> property}.

@@ -19,13 +19,32 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BundledItemRegistry;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BukkitItemRegistry extends BundledItemRegistry {
+class BukkitItemRegistry extends BundledItemRegistry {
+    @Override
+    public Component getRichName(ItemType itemType) {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getRichItemName(itemType);
+        }
+        return super.getRichName(itemType);
+    }
+
+    @Override
+    public Component getRichName(BaseItemStack itemStack) {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getRichItemName(itemStack);
+        }
+        return super.getRichName(itemStack);
+    }
+
     @Override
     public Collection<String> values() {
         ArrayList<String> values = new ArrayList<>();
