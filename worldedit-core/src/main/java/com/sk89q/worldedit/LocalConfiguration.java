@@ -59,6 +59,7 @@ public abstract class LocalConfiguration {
     protected BlockMask disallowedBlocksMask;
     public int defaultChangeLimit = -1;
     public int maxChangeLimit = -1;
+    public int defaultVerticalHeight = 256;
     public int defaultMaxPolygonalPoints = -1;
     public int maxPolygonalPoints = 20;
     public int defaultMaxPolyhedronPoints = -1;

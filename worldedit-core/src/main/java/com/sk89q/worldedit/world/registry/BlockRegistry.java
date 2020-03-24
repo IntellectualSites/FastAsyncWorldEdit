@@ -40,6 +40,7 @@ public interface BlockRegistry {
      * @param blockType the block
      * @return The name, or null if it's unknown
      */
+    @Deprecated
     @Nullable
     String getName(BlockType blockType);
 

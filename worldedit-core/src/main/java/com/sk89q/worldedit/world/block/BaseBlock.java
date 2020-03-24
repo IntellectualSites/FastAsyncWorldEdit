@@ -21,7 +21,6 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
@@ -36,6 +35,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import java.util.Map;
 import java.util.Objects;
+
 import javax.annotation.Nullable;
 
 /**
@@ -197,7 +197,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     /**
      * Checks if the type is the same, and if the matched states are the same.
-     *
+     * 
      * @param o other block
      * @return true if equal
      */

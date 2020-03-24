@@ -177,81 +177,70 @@ public class ClipboardFormats {
             input = new URL(base, "uploads/" + input.substring(4) + "." + format.getPrimaryFileExtension()).toString();
         }
         if (input.startsWith("http")) {
-            if (!player.hasPermission("worldedit.schematic.load.asset")) {
-                if (message) player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.asset"));
+            return null;
+        }
+        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
+            player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
+            return null;
+        }
+        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
+        File f;
+        if (input.startsWith("#")) {
+            String[] extensions;
+            if (format != null) {
+                extensions = format.getFileExtensions().toArray(new String[0]);
+            } else {
+                extensions = ClipboardFormats.getFileExtensionArray();
+            }
+            f = player.openFileOpenDialog(extensions);
+            if (f == null || !f.exists()) {
+                if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
                 return null;
             }
-            URL url = new URL(input);
-            URL webInterface = new URL(Settings.IMP.WEB.ASSETS);
-            if (!url.getHost().equalsIgnoreCase(webInterface.getHost())) {
-                if (message) player.print(Caption.of("fawe.error.web.unauthorized", url));
-                return null;
-            }
-            return loadAllFromUrl(url);
         } else {
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
-                player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
+                if (message) player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
                 return null;
             }
-            File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-            File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
-            File f;
-            if (input.startsWith("#")) {
-                String[] extensions;
-                if (format != null) {
-                    extensions = format.getFileExtensions().toArray(new String[0]);
-                } else {
-                    extensions = ClipboardFormats.getFileExtensionArray();
-                }
-                f = player.openFileOpenDialog(extensions);
-                if (f == null || !f.exists()) {
-                    if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
-                    return null;
-                }
-            } else {
-                if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
-                    if (message) player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
-                    return null;
-                }
-                if (format == null && input.matches(".*\\.[\\w].*")) {
-                    String extension = input.substring(input.lastIndexOf('.') + 1);
-                    format = findByExtension(extension);
-                }
+            if (format == null && input.matches(".*\\.[\\w].*")) {
+                String extension = input.substring(input.lastIndexOf('.') + 1);
+                format = findByExtension(extension);
+            }
+            f = MainUtil.resolve(dir, input, format, true);
+        }
+        if (f == null || !f.exists()) {
+            if (!input.contains("../")) {
+                dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
                 f = MainUtil.resolve(dir, input, format, true);
             }
-            if (f == null || !f.exists()) {
-                if (!input.contains("../")) {
-                    dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
-                    f = MainUtil.resolve(dir, input, format, true);
-                }
-            }
-            if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
-                return null;
-            }
-            if (format == null && f.isFile()) {
-                format = findByFile(f);
-                if (format == null) {
-                    player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , f.getName()));
-                    return null;
-                }
-            }
-            if (!f.exists()) {
-                if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
-                return null;
-            }
-            if (!f.isDirectory()) {
-                ByteSource source = Files.asByteSource(f);
-                URI uri = f.toURI();
-                return new MultiClipboardHolder(uri, new LazyClipboardHolder(f.toURI(), source, format, null));
-            }
-            URIClipboardHolder[] clipboards = loadAllFromDirectory(f);
-            if (clipboards.length < 1) {
-                if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
-                return null;
-            }
-            return new MultiClipboardHolder(f.toURI(), clipboards);
         }
+        if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
+            if (message) player.printError("Schematic " + input + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
+            return null;
+        }
+        if (format == null && f.isFile()) {
+            format = findByFile(f);
+            if (format == null) {
+                player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , f.getName()));
+                return null;
+            }
+        }
+        if (!f.exists()) {
+            if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
+            return null;
+        }
+        if (!f.isDirectory()) {
+            ByteSource source = Files.asByteSource(f);
+            URI uri = f.toURI();
+            return new MultiClipboardHolder(uri, new LazyClipboardHolder(f.toURI(), source, format, null));
+        }
+        URIClipboardHolder[] clipboards = loadAllFromDirectory(f);
+        if (clipboards.length < 1) {
+            if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
+            return null;
+        }
+        return new MultiClipboardHolder(f.toURI(), clipboards);
     }
 
     public static URIClipboardHolder[] loadAllFromDirectory(File dir) {

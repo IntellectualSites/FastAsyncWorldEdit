@@ -135,25 +135,6 @@ public interface ClipboardFormat {
     }
 
 
-    default URL uploadPublic(final Clipboard clipboard, String category, String user) {
-        // summary
-        // blocks
-        HashMap<String, Object> map = new HashMap<>();
-        BlockVector3 dimensions = clipboard.getDimensions();
-        map.put("width", dimensions.getX());
-        map.put("height", dimensions.getY());
-        map.put("length", dimensions.getZ());
-        map.put("creator", user);
-        Gson gson = new Gson();
-        String json = gson.toJson(map);
-        return MainUtil.upload(Settings.IMP.WEB.ASSETS, false, json, category, null, new RunnableVal<OutputStream>() {
-            @Override
-            public void run(OutputStream value) {
-                write(value, clipboard);
-            }
-        });
-    }
-
     default URL uploadAnonymous(final Clipboard clipboard) {
         return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<OutputStream>() {
             @Override

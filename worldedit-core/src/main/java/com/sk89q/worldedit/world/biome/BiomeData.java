@@ -21,7 +21,10 @@ package com.sk89q.worldedit.world.biome;
 
 /**
  * Provides information about a biome.
+ *
+ * @deprecated This no longer returns useful information.
  */
+@Deprecated
 public interface BiomeData {
 
     /**

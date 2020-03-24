@@ -17,39 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.world.registry;
+package com.sk89q.worldedit.internal.annotation;
 
-import com.sk89q.worldedit.world.item.ItemType;
+import org.enginehub.piston.inject.InjectAnnotation;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface ItemRegistry {
-
-    /**
-     * Gets the name for the given item.
-     *
-     * @param itemType the item
-     * @return The name, or null if it's unknown
-     */
-    @Deprecated
-    @Nullable
-    String getName(ItemType itemType);
-
-    /**
-     * Get the material for the given item.
-     *
-     * @param itemType the item
-     * @return the material, or null if the material information is not known
-     */
-    @Nullable
-    ItemMaterial getMaterial(ItemType itemType);
-
-    /**
-     * Register all items
-     */
-    default Collection<String> values() {
-        return Collections.emptyList();
-    }
+/**
+ * Indicates that this value is for 3d-chunk compatibility.
+ *
+ * <p>
+ * For vectors, this means that the vector supports 2D & 3D inputs,
+ * with 2D getting a Y value of 0.
+ * </p>
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+@InjectAnnotation
+public @interface Chunk3d {
 }
