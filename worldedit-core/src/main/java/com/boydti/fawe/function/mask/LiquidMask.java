@@ -21,21 +21,12 @@ package com.boydti.fawe.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.Mask2D;
-import com.sk89q.worldedit.math.BlockVector3;
-
-import javax.annotation.Nullable;
 
 public class LiquidMask extends BlockMask {
+
     public LiquidMask(Extent extent) {
         super(extent);
         add(state -> state.getMaterial().isLiquid());
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

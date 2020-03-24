@@ -21,19 +21,12 @@ package com.boydti.fawe.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.Mask2D;
-import javax.annotation.Nullable;
 
 public class AirMask extends BlockMask {
+
     public AirMask(Extent extent) {
         super(extent);
         add(state -> state.getMaterial().isAir());
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

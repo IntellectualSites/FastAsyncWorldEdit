@@ -41,11 +41,11 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
-    private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
-    private ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
-    private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
-    private CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
+    private final Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
+    private final CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
     /**
      * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
      * server

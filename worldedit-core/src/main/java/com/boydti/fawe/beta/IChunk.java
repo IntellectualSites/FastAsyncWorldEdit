@@ -64,9 +64,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
 //    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
 
     @Override
-    CompoundTag getTile(int x, int y, int z);
-
-    @Override
     default IChunk reset() {
         return this;
     }

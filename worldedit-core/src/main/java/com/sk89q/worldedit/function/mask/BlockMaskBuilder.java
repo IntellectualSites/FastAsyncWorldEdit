@@ -230,7 +230,7 @@ public class BlockMaskBuilder {
 
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
-            Set<PropertyKey> keys = new HashSet<>();
+            Set<PropertyKey> keys = EnumSet.noneOf(PropertyKey.class);
             finalTypes.forEach(t -> t.getProperties().forEach(p -> keys.add(p.getKey())));
             return keys.stream().map(PropertyKey::getId)
                     .filter(p -> StringMan.blockStateMatches(property, p))

@@ -187,6 +187,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     BaseItemStack adapt(ItemStack itemStack);
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
+        // return OptionalInt.empty();
         return getInternalBlockStateId(BukkitAdapter.adapt(data));
     }
 
