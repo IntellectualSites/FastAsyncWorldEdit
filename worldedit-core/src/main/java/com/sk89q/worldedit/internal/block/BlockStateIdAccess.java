@@ -20,8 +20,14 @@
 package com.sk89q.worldedit.internal.block;
 
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.registry.BlockRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import javax.annotation.Nullable;
+import java.util.BitSet;
+import java.util.OptionalInt;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public final class BlockStateIdAccess {
 
@@ -29,7 +35,7 @@ public final class BlockStateIdAccess {
     private static final int EXPECTED_BLOCK_COUNT = 2 << 13;
     private static final Int2ObjectOpenHashMap<BlockState> TO_STATE =
         new Int2ObjectOpenHashMap<>(EXPECTED_BLOCK_COUNT);
-    
+
     static {
         TO_STATE.defaultReturnValue(null);
     }
@@ -38,9 +44,9 @@ public final class BlockStateIdAccess {
         int getInternalId(BlockState blockState);
         void setInternalId(BlockState blockState, int internalId);
     }
-    
+
     private static BlockStateInternalId blockStateInternalId;
-    
+
     public static void setBlockStateInternalId(BlockStateInternalId blockStateInternalId) {
         BlockStateIdAccess.blockStateInternalId = blockStateInternalId;
     }
@@ -55,14 +61,14 @@ public final class BlockStateIdAccess {
     public static boolean isValidInternalId(int internalId) {
         return internalId != INVALID_ID;
     }
+
     public static int getBlockStateId(BlockState holder) {
         return holder.getOrdinal();
         //return blockStateInternalId.getInternalId(holder);
     }
-    /*
 
     public static @Nullable BlockState getBlockStateById(int id) {
-        return TO_STATE.get(id);
+        return BlockState.getFromOrdinal(id);
     }
 
     /**
@@ -70,8 +76,9 @@ public final class BlockStateIdAccess {
      * {@link BlockRegistry#getInternalBlockStateId(BlockState)} will return
      * {@link OptionalInt#empty()}. In those cases, we will use our own ID system,
      * since it's useful for other entries as well.
+     *
      * @return an unused ID in WorldEdit's ID tracker
-     /
+     */
     private static int provideUnusedWorldEditId() {
         return usedIds.nextClearBit(0);
     }
@@ -97,12 +104,7 @@ public final class BlockStateIdAccess {
         usedIds.clear();
     }
 
-    */
-    
     private BlockStateIdAccess() {
     }
-    
-    public static @Nullable BlockState getBlockStateById(int id) {
-        return BlockState.getFromOrdinal(id);
-    }
+
 }

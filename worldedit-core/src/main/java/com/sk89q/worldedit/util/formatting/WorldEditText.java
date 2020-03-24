@@ -19,11 +19,9 @@
 
 package com.sk89q.worldedit.util.formatting;
 
-import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.config.Config;
 import org.enginehub.piston.config.ConfigHolder;
@@ -31,8 +29,6 @@ import org.enginehub.piston.config.TextConfig;
 import org.enginehub.piston.util.TextHelper;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 

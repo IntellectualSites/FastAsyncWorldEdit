@@ -33,9 +33,9 @@ import it.unimi.dsi.fastutil.objects.AbstractObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 
+import javax.annotation.Nonnull;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
-import javax.annotation.Nonnull;
 
 /**
  * Int-to-BaseBlock map, but with optimizations for common cases.
@@ -52,8 +52,7 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
     private static int optimizedInternalId(BaseBlock block) {
         if (block.hasNbtData()) {
             return BlockStateIdAccess.invalidId();
-    }
-
+        }
         return BlockStateIdAccess.getBlockStateId(block.toImmutableState());
     }
 
@@ -68,8 +67,8 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
         return state.toBaseBlock();
     }
 
-    private final Int2IntMap commonMap = new Int2IntOpenHashMap(64, 1f);
-    private final Int2ObjectMap<BaseBlock> uncommonMap = new Int2ObjectOpenHashMap<>(1, 1f);
+    private final Int2IntMap commonMap = new Int2IntOpenHashMap(64, 0.9f);
+    private final Int2ObjectMap<BaseBlock> uncommonMap = new Int2ObjectOpenHashMap<>(1, 0.75f);
 
     {
         commonMap.defaultReturnValue(BlockStateIdAccess.invalidId());
