@@ -135,7 +135,7 @@ public interface ClipboardFormat {
     }
 
 
-    default URL uploadAnonymous(final Clipboard clipboard) {
+    default URL upload(final Clipboard clipboard) {
         return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<OutputStream>() {
             @Override
             public void run(OutputStream value) {

@@ -170,7 +170,7 @@ public class FaweAPI {
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
-        return format.uploadAnonymous(clipboard);
+        return format.upload(clipboard);
     }
 
     /**
