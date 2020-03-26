@@ -45,6 +45,7 @@ import org.bukkit.WorldType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.boss.DragonBattle;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -1198,6 +1199,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
         return TaskManager.IMP.sync(() -> parent.getEntity(uuid));
     }
 
+    @Nullable
+    @Override
+    public DragonBattle getEnderDragonBattle() {
+        return TaskManager.IMP.sync(() -> parent.getEnderDragonBattle());
+    }
 
     @Override
     public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
