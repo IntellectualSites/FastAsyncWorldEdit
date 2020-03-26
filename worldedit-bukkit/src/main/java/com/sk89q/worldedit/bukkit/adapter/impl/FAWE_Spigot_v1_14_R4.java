@@ -79,6 +79,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_14_R4 parent;
+    private char[] ibdToStateOrdinal;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -93,16 +94,14 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
         return parent;
     }
 
-    public char[] idbToStateOrdinal;
-
     private synchronized boolean init() {
-        if (idbToStateOrdinal != null) return false;
-        idbToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
-        for (int i = 0; i < idbToStateOrdinal.length; i++) {
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
+        ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
+        for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
-            idbToStateOrdinal[id] = state.getOrdinalChar();
+            ibdToStateOrdinal[id] = state.getOrdinalChar();
         }
         return true;
     }
@@ -251,26 +250,38 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     public BlockState adapt(IBlockData ibd) {
-        return BlockTypesCache.states[adaptToInt(ibd)];
+        return BlockTypesCache.states[adaptToChar(ibd)];
     }
 
+    /**
+     * @deprecated
+     * Method unused. Use #adaptToChar(IBlockData).
+     */
+    @Deprecated
     public int adaptToInt(IBlockData ibd) {
-        try {
-            int id = Block.REGISTRY_ID.getId(ibd);
-            return idbToStateOrdinal[id];
-        } catch (NullPointerException e) {
-            init();
-            return adaptToInt(ibd);
+        synchronized (this) {
+            try {
+                int id = Block.REGISTRY_ID.getId(ibd);
+                return ibdToStateOrdinal[id];
+            } catch (NullPointerException e) {
+                init();
+                return adaptToInt(ibd);
+            }
         }
     }
 
     public char adaptToChar(IBlockData ibd) {
-        try {
-            int id = Block.REGISTRY_ID.getId(ibd);
-            return idbToStateOrdinal[id];
-        } catch (NullPointerException e) {
-            init();
-            return adaptToChar(ibd);
+        synchronized (this) {
+            try {
+                int id = Block.REGISTRY_ID.getId(ibd);
+                return ibdToStateOrdinal[id];
+            } catch (NullPointerException e) {
+                init();
+                return adaptToChar(ibd);
+            } catch(ArrayIndexOutOfBoundsException e1){
+                Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
+                return 0;
+            }
         }
     }
 
