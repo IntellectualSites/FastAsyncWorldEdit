@@ -43,27 +43,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
-    private World world;
-    private final String worldName;
+    private final World world;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
     protected boolean closed;
-
-    public AbstractChangeSet(String world) {
-        this.worldName = world;
-    }
-
+    
     public AbstractChangeSet(World world) {
         this.world = world;
-        this.worldName = world.getName();
-    }
-
-    public String getWorldName() {
-        return worldName;
     }
 
     public World getWorld() {
-        if (world == null && worldName != null) world = FaweAPI.getWorld(worldName);
         return world;
     }
 

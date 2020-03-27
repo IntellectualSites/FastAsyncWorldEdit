@@ -67,23 +67,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         super(world);
         init(uuid, world.getName());
     }
-
-    public DiskStorageHistory(String world, UUID uuid) {
-        super(world);
-        init(uuid, world);
-    }
-
+    
     private void init(UUID uuid, String worldName) {
         File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
         int max = MainUtil.getMaxFileId(folder);
         init(uuid, max);
     }
-
-    public DiskStorageHistory(String world, UUID uuid, int index) {
-        super(world);
-        init(uuid, index);
-    }
-
+    
     public DiskStorageHistory(World world, UUID uuid, int index) {
         super(world);
         init(uuid, index);
@@ -95,14 +85,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         this.index = i;
         initFiles(folder);
     }
-
-    public DiskStorageHistory(File folder, String world, UUID uuid, int i) {
-        super(world);
-        this.uuid = uuid;
-        this.index = i;
-        initFiles(folder);
-    }
-
+    
     private void initFiles(File folder) {
         nbtfFile = new File(folder, index + ".nbtf");
         nbttFile = new File(folder, index + ".nbtt");

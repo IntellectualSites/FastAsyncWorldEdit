@@ -49,11 +49,6 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public String getWorldName() {
-        return parent.getWorldName();
-    }
-
-    @Override
     public World getWorld() {
         return parent.getWorld();
     }

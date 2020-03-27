@@ -3,16 +3,13 @@ package com.boydti.fawe.object.changeset;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
-import java.io.EOFException;
 import java.io.IOException;
 
 /**
@@ -48,10 +45,6 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     private NBTOutputStream tileRStreamZip;
 
     public MemoryOptimizedHistory(World world) {
-        super(world);
-    }
-
-    public MemoryOptimizedHistory(String world) {
         super(world);
     }
 

@@ -44,8 +44,8 @@ import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 public class EditSessionBuilder {
+    @NotNull
     private World world;
-    private String worldName;
     private Player player;
     private FaweLimit limit;
     private AbstractChangeSet changeSet;
@@ -54,7 +54,8 @@ public class EditSessionBuilder {
     private Boolean fastmode;
     private Boolean checkMemory;
     private Boolean combineStages;
-    private EventBus eventBus;
+    @NotNull
+    private EventBus eventBus = WorldEdit.getInstance().getEventBus();
     private BlockBag blockBag;
     private boolean threaded = true;
     private EditSessionEvent event;
@@ -78,21 +79,8 @@ public class EditSessionBuilder {
     public EditSessionBuilder(@NotNull World world) {
         checkNotNull(world);
         this.world = world;
-        this.worldName = world.getName();
     }
-
-    public EditSessionBuilder(World world, String worldName) {
-        if (world == null && worldName == null) throw new NullPointerException("Both world and worldname cannot be null");
-        this.world = world;
-        this.worldName = worldName;
-    }
-
-    public EditSessionBuilder(@NotNull String worldName) {
-        checkNotNull(worldName);
-        this.worldName = worldName;
-        this.world = FaweAPI.getWorld(worldName);
-    }
-
+    
     public EditSessionBuilder player(@Nullable Player player) {
         this.player = player;
         return setDirty();
@@ -121,13 +109,12 @@ public class EditSessionBuilder {
     }
 
     public EditSessionBuilder changeSetNull() {
-        return changeSet(world == null ? new NullChangeSet(worldName) : new NullChangeSet(world));
+        return changeSet(new NullChangeSet(world));
     }
 
     public EditSessionBuilder world(@NotNull World world) {
         checkNotNull(world);
         this.world = world;
-        this.worldName = world.getName();
         return setDirty();
     }
 
@@ -143,17 +130,7 @@ public class EditSessionBuilder {
      * @return
      */
     public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid, int compression) {
-        if (world == null) {
-            if (disk) {
-                if (Settings.IMP.HISTORY.USE_DATABASE) {
-                    this.changeSet = new RollbackOptimizedHistory(worldName, uuid);
-                } else {
-                    this.changeSet = new DiskStorageHistory(worldName, uuid);
-                }
-            } else {
-                this.changeSet = new MemoryOptimizedHistory(worldName);
-            }
-        } else if (disk) {
+        if (disk) {
             if (Settings.IMP.HISTORY.USE_DATABASE) {
                 this.changeSet = new RollbackOptimizedHistory(world, uuid);
             } else {
@@ -210,7 +187,7 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
-    public EditSessionBuilder eventBus(@Nullable EventBus eventBus) {
+    public EditSessionBuilder eventBus(@NotNull EventBus eventBus) {
         this.eventBus = eventBus;
         return setDirty();
     }
@@ -272,12 +249,6 @@ public class EditSessionBuilder {
 
         compiled = true;
         wrapped = false;
-        if (world == null && !this.worldName.isEmpty()) {
-            world = FaweAPI.getWorld(this.worldName);
-        }
-        if (eventBus == null) {
-            eventBus = WorldEdit.getInstance().getEventBus();
-        }
         if (event == null) {
             event = new EditSessionEvent(world, player, -1, null);
         }
@@ -424,20 +395,14 @@ public class EditSessionBuilder {
     }
 
     public EditSession build() {
-        if (eventBus == null) {
-            eventBus = WorldEdit.getInstance().getEventBus();
-        }
         return new EditSession(this);
     }
 
+    @NotNull
     public World getWorld() {
         return world;
     }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
+    
     public Extent getExtent() {
         return extent != null ? extent : world;
     }
@@ -445,11 +410,7 @@ public class EditSessionBuilder {
     public boolean isWrapped() {
         return wrapped;
     }
-
-    public boolean hasFastMode() {
-        return fastmode;
-    }
-
+    
     public Extent getBypassHistory() {
         return bypassHistory;
     }

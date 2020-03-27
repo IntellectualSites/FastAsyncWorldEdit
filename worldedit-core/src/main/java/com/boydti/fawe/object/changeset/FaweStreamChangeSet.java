@@ -40,17 +40,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public FaweStreamChangeSet(World world) {
         this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
     }
-
-    public FaweStreamChangeSet(String world) {
-        this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
-    }
-
-    public FaweStreamChangeSet(String world, int compression, boolean storeRedo, boolean smallLoc) {
-        super(world);
-        this.compression = compression;
-        init(storeRedo, smallLoc);
-    }
-
+    
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
         super(world);
         this.compression = compression;

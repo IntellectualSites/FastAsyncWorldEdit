@@ -139,6 +139,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,23 +212,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
 
     @Deprecated
-    public EditSession(EventBus bus, World world, @Nullable Player player,
+    public EditSession(@NotNull EventBus bus, World world, @Nullable Player player,
         @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
         @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue,
         @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages,
         @Nullable BlockBag blockBag, @Nullable EditSessionEvent event) {
-        this(bus, world, null, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag,
-            event);
+        this(new EditSessionBuilder(world).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
-
-    public EditSession(EventBus bus, World world, String worldName,
-        @Nullable Player player, @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
-        @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode,
-        @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag,
-        @Nullable EditSessionEvent event) {
-        this(new EditSessionBuilder(world, worldName).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
-    }
-
+    
     /**
      * Construct the object with a maximum number of blocks and a block bag.
      *
@@ -237,7 +229,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param blockBag an optional {@link BlockBag} to use, otherwise null
      * @param event the event to call with the extent
      */
-    public EditSession(EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
+    public EditSession(@NotNull EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
         this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
     }
 
