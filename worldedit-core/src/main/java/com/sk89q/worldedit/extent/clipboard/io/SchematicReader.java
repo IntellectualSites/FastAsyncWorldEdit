@@ -163,20 +163,6 @@ public class SchematicReader implements ClipboardReader {
             }
         });
 
-        StreamDelegate biomesDelegate = schematic.add("Biomes");
-        StreamDelegate aweBiomesDelegate = schematic.add("AWEBiomes");
-
-        InfoReader biomesInfo = (l, t) -> {
-            biomesOut = new FastByteArrayOutputStream();
-            biomes = new FaweOutputStream(new LZ4BlockOutputStream(biomesOut));
-        };
-        biomesDelegate.withInfo(biomesInfo);
-        aweBiomesDelegate.withInfo(biomesInfo);
-
-        IntValueReader biomeReader = (index, value) -> biomes.write(value);
-        biomesDelegate.withInt(biomeReader);
-
-
         StreamDelegate tilesDelegate = schematic.add("TileEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
@@ -292,26 +278,6 @@ public class SchematicReader implements ClipboardReader {
                             for (int x = 0; x < width; x++) {
                                 readwrite(x, y, z, idIn, dataIn, clipboard);
                             }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (biomes != null) {
-            try (InputStream biomesIn = new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays()))) {
-                if (clipboard instanceof LinearClipboard) {
-                    LinearClipboard linear = (LinearClipboard) clipboard;
-                    int volume = width * length;
-                    for (int index = 0; index < volume; index++) {
-                        BiomeType biome = BiomeTypes.getLegacy(biomesIn.read());
-                        if (biome != null) linear.setBiome(index, biome);
-                    }
-                } else {
-                    for (int z = 0; z < length; z++) {
-                        for (int x = 0; x < width; x++) {
-                            BiomeType biome = BiomeTypes.getLegacy(biomesIn.read());
-                            if (biome != null) clipboard.setBiome(x, 0, z, biome);
                         }
                     }
                 }
