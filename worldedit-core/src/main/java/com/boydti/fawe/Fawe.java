@@ -309,11 +309,6 @@ public class Fawe {
         } catch (Throwable ignore) {}
         try {
             Settings.IMP.reload(file);
-            // Setting up message.yml
-            String lang = Objects.toString(Settings.IMP.LANGUAGE);
-            if (!lang.isEmpty()) {
-                getWorldEdit().getTranslationManager().setDefaultLocale(Locale.forLanguageTag(lang));
-            }
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");
