@@ -61,7 +61,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
             final EditSession editSession = new EditSessionBuilder(adaptedWorld).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
-            ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
+            ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);
 
             Clipboard holder = new BlockArrayClipboard(region, clipboard);
             CompressedSchematicTag tag = new CompressedSchematicTag(holder);
@@ -120,7 +120,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             whenDone.run(url);
             return;
         }
-        MainUtil.upload(uuid, file, "schematic", new RunnableVal<OutputStream>() {
+        MainUtil.upload(uuid, file, "schem", new RunnableVal<OutputStream>() {
             @Override
             public void run(OutputStream output) {
                 try {
