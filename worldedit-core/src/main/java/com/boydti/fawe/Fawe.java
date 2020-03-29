@@ -353,10 +353,10 @@ public class Fawe {
                 debug("===============================================");
             }
         }
-        String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-        String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-        boolean x86OS = arch == null ? true : !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
-        boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
+
+        // Check Base OS Arch for Mismatching Architectures
+        boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
+        boolean x86JVM = System.getProperty("os.arch").contains("32");
         if (x86OS != x86JVM) {
             debug("====== UPGRADE TO 64-BIT JAVA ======");
             debug("You are running 32-bit Java on a 64-bit machine");
