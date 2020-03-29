@@ -148,6 +148,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
                             Item
                                 dropped = player.getWorld().dropItem(player.getLocation(), stack);
                             PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
+                            Bukkit.getPluginManager().callEvent(event);
                             if (event.isCancelled()) {
                                 dropped.remove();
                             }
