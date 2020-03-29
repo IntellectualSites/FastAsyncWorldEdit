@@ -219,12 +219,14 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             filter(chunk, filter, block, get, set, minSection, yStart, yEnd, full);
             return;
         }
+        //If the yStart is not 0, the edit is smaller than the height of a ChunkSection, so filter individually and remove section as the minSection layer entry
         if (yStart != 0) {
             filter(chunk, filter, block, get, set, minSection, yStart, 15, full);
             minSection++;
         }
+        //If the yEnd is not 15, the edit is smaller than the height of a ChunkSection, so filter individually and remove section as the maxSection layer entry
         if (yEnd != 15) {
-            filter(chunk, filter, block, get, set, minSection, 0, yEnd, full);
+            filter(chunk, filter, block, get, set, maxSection, 0, yEnd, full);
             maxSection--;
         }
         for (int layer = minSection; layer <= maxSection; layer++) {
