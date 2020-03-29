@@ -705,7 +705,7 @@ public final class PlatformCommandManager {
             }
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
-                actor.printError(Caption.of("fawe.error.no.perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
+                actor.printError(Caption.of("fawe.error.no-perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
             } else {
                 actor.print(e.getRichMessage());
             }
