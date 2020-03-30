@@ -392,6 +392,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        super.unregister();
     }
 
 }
