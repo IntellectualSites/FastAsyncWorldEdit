@@ -126,7 +126,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         if (lastOrdinals == null) {
             return 0;
         }
-        System.out.println(index + " " + (((lastOrdinals[li] & 0xFF) << 8) + (lastOrdinals[li + 1] & 0xFF)) + " " + lastOrdinals[li] + " " + lastOrdinals[li + 1]);
         return (((lastOrdinals[li] & 0xFF) << 8) + (lastOrdinals[li + 1] & 0xFF));
     }
 
@@ -171,7 +170,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         int li = (index & BLOCK_MASK) << 1;
         lastOrdinals[li] = (byte) ((v >>> 8) & 0xFF);
         lastOrdinals[li + 1] = (byte) (v & 0xFF);
-        System.out.println(index + " " + v + " " + lastOrdinals[li] + " " + lastOrdinals[li + 1]);
         saveOrdinals = true;
     }
 
