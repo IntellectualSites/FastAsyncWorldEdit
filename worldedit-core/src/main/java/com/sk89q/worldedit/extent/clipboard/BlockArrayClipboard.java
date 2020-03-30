@@ -271,6 +271,11 @@ public class BlockArrayClipboard implements Clipboard {
         return parent;
     }
 
+    @Override
+    public void close() {
+        this.parent.close();
+    }
+
     /**
      * Stores entity data.
      */

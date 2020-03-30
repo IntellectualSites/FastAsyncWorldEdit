@@ -10,7 +10,6 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -99,7 +98,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            log.warn("Creating new RandomAccessFile: " + file.getPath());
             this.braf = new RandomAccessFile(file, "rw");
             long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
             braf.setLength(0);
@@ -286,7 +284,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             if (byteBuffer != null) {
                 byteBuffer.force();
                 fileChannel.close();
-                log.warn("Closing the RandomAccessFile: " + file.getPath());
                 braf.close();
                 //noinspection ResultOfMethodCallIgnored
                 file.setWritable(true);
