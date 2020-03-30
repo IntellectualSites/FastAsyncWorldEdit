@@ -308,16 +308,18 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         final int rely = to.getBlockY() - origin.getBlockY();
         final int relz = to.getBlockZ() - origin.getBlockZ();
 
+        pasteBiomes &= Clipboard.this.hasBiomes();
+
         MutableBlockVector2 mpos2d = new MutableBlockVector2();
         mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
         for (BlockVector3 pos : this) {
             BaseBlock block = pos.getFullBlock(this);
             int xx = pos.getX() + relx;
             int zz = pos.getZ() + relz;
-            if (hasBiomes()) {
-                if (pasteBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
+            if (hasBiomes() && pos.getBlockY() == 0) {
+                if (pasteBiomes && (xx != mpos2d.getBlockX() || zz != mpos2d.getBlockZ())) {
                     mpos2d.setComponents(xx, zz);
-                    extent.setBiome(mpos2d, Clipboard.this.getBiome(pos.toBlockVector2()));
+                    extent.setBiome(mpos2d, Clipboard.this.getBiome(BlockVector2.at(pos.getX(), pos.getZ())));
                 }
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
