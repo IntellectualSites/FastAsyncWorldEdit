@@ -39,15 +39,14 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private byte[] buffer = new byte[MainUtil.getMaxCompressedLength(BLOCK_SIZE)];
     private byte[] biomes = null;
 
-    private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
-    private final HashMap<Integer, CompoundTag> nbtMapIndex;
+    private final HashMap<IntegerTrio, CompoundTag> nbtMap;
 
 
-    private int lastCombinedIdsI = -1;
+    private int lastOrdinalsI = -1;
 
-    private byte[] lastCombinedIds;
+    private byte[] lastOrdinals;
 
-    private boolean saveCombinedIds = false;
+    private boolean saveOrdinals = false;
 
     private int compressionLevel;
 
@@ -58,21 +57,10 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     public MemoryOptimizedClipboard(Region region, int compressionLevel) {
         super(region.getDimensions());
         states = new byte[1 + (getVolume() >> BLOCK_SHIFT)][];
-        nbtMapLoc = new HashMap<>();
-        nbtMapIndex = new HashMap<>();
+        nbtMap = new HashMap<>();
         this.compressionLevel = compressionLevel;
     }
-    
-    public void convertTilesToIndex() {
-        if (nbtMapLoc.isEmpty()) {
-            return;
-        }
-        for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMapLoc.entrySet()) {
-            IntegerTrio key = entry.getKey();
-            setTile(getIndex(key.x, key.y, key.z), entry.getValue());
-        }
-        nbtMapLoc.clear();
-    }
+
 
     @Override
     public boolean hasBiomes() {
@@ -122,36 +110,31 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         return getBiome(getIndex(x, 0, z));
     }
 
-    private CompoundTag getTag(int index) {
-        convertTilesToIndex();
-        return nbtMapIndex.get(index);
-    }
-
     public int getOrdinal(int index) {
         int i = index >> BLOCK_SHIFT;
         int li = (index & BLOCK_MASK) << 1;
-        if (i != lastCombinedIdsI) {
-            saveCombinedIds();
-            byte[] compressed = states[lastCombinedIdsI = i];
+        if (i != lastOrdinalsI) {
+            saveOrdinals();
+            byte[] compressed = states[lastOrdinalsI = i];
             if (compressed != null) {
-                lastCombinedIds = MainUtil.decompress(compressed, lastCombinedIds, BLOCK_SIZE, compressionLevel);
+                lastOrdinals = MainUtil.decompress(compressed, lastOrdinals, BLOCK_SIZE, compressionLevel);
             } else {
-                lastCombinedIds = null;
+                lastOrdinals = null;
                 return 0;
             }
         }
-        if (lastCombinedIds == null) {
+        if (lastOrdinals == null) {
             return 0;
         }
-        int ordinal = ((lastCombinedIds[li] << 8) + lastCombinedIds[li + 1]);
-        return ordinal;
+        System.out.println(index + " " + (((lastOrdinals[li] & 0xFF) << 8) + (lastOrdinals[li + 1] & 0xFF)) + " " + lastOrdinals[li] + " " + lastOrdinals[li + 1]);
+        return (((lastOrdinals[li] & 0xFF) << 8) + (lastOrdinals[li + 1] & 0xFF));
     }
 
-    private void saveCombinedIds() {
-        if (saveCombinedIds && lastCombinedIds != null) {
-            states[lastCombinedIdsI] = MainUtil.compress(lastCombinedIds, buffer, compressionLevel);
+    private void saveOrdinals() {
+        if (saveOrdinals && lastOrdinals != null) {
+            states[lastOrdinalsI] = MainUtil.compress(lastOrdinals, buffer, compressionLevel);
         }
-        saveCombinedIds = false;
+        saveOrdinals = false;
     }
 
     private int lastI;
@@ -167,48 +150,34 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         return lastI;
     }
 
-    public void setCombinedId(int index, int v) {
+    public void setOrdinal(int index, int v) {
         int i = getLocalIndex(index);
-        if (i != lastCombinedIdsI) {
-            saveCombinedIds();
-            byte[] compressed = states[lastCombinedIdsI = i];
+        if (i != lastOrdinalsI) {
+            saveOrdinals();
+            byte[] compressed = states[lastOrdinalsI = i];
             if (compressed != null) {
-                lastCombinedIds = MainUtil.decompress(compressed, lastCombinedIds, BLOCK_SIZE, compressionLevel);
+                lastOrdinals = MainUtil.decompress(compressed, lastOrdinals, BLOCK_SIZE, compressionLevel);
             } else {
-                lastCombinedIds = null;
+                lastOrdinals = null;
             }
         }
-        if (lastCombinedIds == null) {
-            BlockType bt = BlockTypes.getFromStateId(v);
+        if (lastOrdinals == null) {
+            BlockType bt = BlockTypes.getFromStateOrdinal(v);
             if (bt.getMaterial().isAir()) {
                 return;
             }
-            lastCombinedIds = new byte[BLOCK_SIZE];
+            lastOrdinals = new byte[BLOCK_SIZE];
         }
         int li = (index & BLOCK_MASK) << 1;
-        lastCombinedIds[li] = (byte) ((v >>> 8) & 0xFF);
-        lastCombinedIds[li + 1] = (byte) (v & 0xFF);
-        saveCombinedIds = true;
+        lastOrdinals[li] = (byte) ((v >>> 8) & 0xFF);
+        lastOrdinals[li + 1] = (byte) (v & 0xFF);
+        System.out.println(index + " " + v + " " + lastOrdinals[li] + " " + lastOrdinals[li + 1]);
+        saveOrdinals = true;
     }
 
     @Override
     public Collection<CompoundTag> getTileEntities() {
-        convertTilesToIndex();
-        for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
-            int index = entry.getKey();
-            CompoundTag tag = entry.getValue();
-            Map<String, Tag> values = tag.getValue();
-            if (!values.containsKey("x")) {
-                int y = index / getArea();
-                index -= y * getArea();
-                int z = index / getWidth();
-                int x = index - (z * getWidth());
-                values.put("x", new IntTag(x));
-                values.put("y", new IntTag(y));
-                values.put("z", new IntTag(z));
-            }
-        }
-        return nbtMapIndex.values();
+        return nbtMap.values();
     }
 
     private int ylast;
@@ -226,22 +195,40 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         return getFullBlock(index);
     }
 
+    private BaseBlock toBaseBlock(BlockState state, int i) {
+        if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
+            CompoundTag nbt;
+            if (nbtMap.size() < 4) {
+                nbt = null;
+                for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
+                    IntegerTrio trio = entry.getKey();
+                    int index = getIndex(trio.x, trio.y, trio.z);
+                    if (index == i) {
+                        nbt = entry.getValue();
+                        break;
+                    }
+                }
+            } else {
+                int y = i / getArea();
+                int newI = i - y * getArea();
+                int z = newI / getWidth();
+                int x = newI - z * getWidth();
+                nbt = nbtMap.get(new IntegerTrio(x, y, z));
+            }
+            return state.toBaseBlock(nbt);
+        }
+        return state.toBaseBlock();
+    }
+
     @Override
     public BaseBlock getFullBlock(int index) {
-        BlockState block = getBlock(index);
-        if (block.getMaterial().hasContainer()) {
-            CompoundTag nbt = getTag(index);
-            if (nbt != null) {
-                return block.toBaseBlock(nbt);
-            }
-        }
-        return block.toBaseBlock();
+        return toBaseBlock(getBlock(index), index);
     }
 
     @Override
     public BlockState getBlock(int index) {
-        int ordinal = getOrdinal(index);
-        return BlockState.getFromOrdinal(ordinal);
+        int combinedID = getOrdinal(index);
+        return BlockState.getFromOrdinal(combinedID);
     }
 
     @Override
@@ -250,7 +237,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     }
 
     public int size() {
-        saveCombinedIds();
+        saveOrdinals();
         int total = 0;
         for (byte[] array : states) {
             if (array != null) {
@@ -262,16 +249,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntegerTrio(x, y, z), tag);
-        return true;
-    }
-
-    public boolean setTile(int index, CompoundTag tag) {
-        nbtMapIndex.put(index, tag);
+        nbtMap.put(new IntegerTrio(x, y, z), tag);
         Map<String, Tag> values = tag.getValue();
-        values.remove("x");
-        values.remove("y");
-        values.remove("z");
+        values.put("x", new IntTag(x));
+        values.put("y", new IntTag(y));
+        values.put("z", new IntTag(z));
         return true;
     }
 
@@ -282,11 +264,15 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
-        int combinedId = block.getInternalId();
-        setCombinedId(index, combinedId);
+        int ordinal = block.getOrdinal();
+        setOrdinal(index, ordinal);
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
-            setTile(index, block.getNbtData());
+            int y = index / getArea();
+            int newI = index- y * getArea();
+            int z = newI / getWidth();
+            int x = newI - z * getWidth();
+            setTile(x, y, z, block.getNbtData());
         }
         return true;
     }
