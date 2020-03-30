@@ -365,8 +365,7 @@ public class ForwardExtentCopy implements Operation {
                     };
                 }
                 copy = new CombinedBlockCopy(source, finalDest, copySrcFunc);
-            }
-            else {
+            } else {
                 copy = new SimpleBlockCopy(source, finalDest);
             }
             if (this.filterFunction != null) {

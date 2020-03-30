@@ -337,8 +337,8 @@ public class BlockTransformExtent extends ResettableExtent {
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                     }
                 }
-                return new BaseBlock(transformed, tag);
             }
+            return new BaseBlock(transformed, tag);
         }
         return transformed.toBaseBlock();
     }
