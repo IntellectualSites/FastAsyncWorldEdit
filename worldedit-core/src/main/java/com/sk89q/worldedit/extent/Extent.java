@@ -69,12 +69,14 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
 import javax.annotation.Nullable;
 
 /**
@@ -456,8 +458,6 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default boolean cancel() {
-        Fawe.debug("If you see this message please report it on our discord and tag @MattBDev");
-        Thread.dumpStack();
         ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
 
         NullExtent nullExtent = new NullExtent(this, FaweCache.MANUAL);
