@@ -108,7 +108,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     @Override
     public void applyBlock(FilterBlock block) {
         int ordinal = block.getOrdinal();
-        if (ordinal != 0 && !mask.test(getExtent(), block)) {
+        if (!mask.test(getExtent(), block)) {
             block.setOrdinal(0);
         }
     }
