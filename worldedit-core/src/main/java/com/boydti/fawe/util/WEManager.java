@@ -8,6 +8,7 @@ import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -19,14 +20,19 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WEManager {
+
+    private static final Logger log = LoggerFactory.getLogger(WEManager.class);
 
     public final static WEManager IMP = new WEManager();
 
     public final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
     public void cancelEditSafe(AbstractDelegateExtent parent, FaweException reason) throws FaweException {
+        log.warn("CancelEditSafe was hit. Please ignore this message.");
         try {
             final Field field = AbstractDelegateExtent.class.getDeclaredField("extent");
             field.setAccessible(true);
@@ -121,7 +127,9 @@ public class WEManager {
                 player.printError(TextComponent.of("Missing permission " +  "fawe." + manager.getKey()));
             }
         }
+        log.warn("There are " + backupRegions.size() + " backupRegions being added to Regions. Regions has " + regions.size() + " before backupRegions are added");
         regions.addAll(backupRegions);
+        log.warn("Finished adding regions.");
         if (!masks.isEmpty()) {
             player.setMeta("lastMask", masks);
         } else {

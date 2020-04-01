@@ -36,8 +36,8 @@ public class AsyncNotifyQueue implements Closeable {
         Future[] self = new Future[1];
         Callable<T> wrapped = () -> {
             if (!closed) {
+                lock.lock();
                 try {
-                    lock.lock();
                     if (!closed) {
                         try {
                             return task.call();
