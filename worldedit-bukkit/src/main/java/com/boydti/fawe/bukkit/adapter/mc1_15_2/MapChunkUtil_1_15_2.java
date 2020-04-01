@@ -9,9 +9,9 @@ public class MapChunkUtil_1_15_2 extends MapChunkUtil<PacketPlayOutMapChunk> {
         fieldZ = PacketPlayOutMapChunk.class.getDeclaredField("b");
         fieldBitMask = PacketPlayOutMapChunk.class.getDeclaredField("c");
         fieldHeightMap = PacketPlayOutMapChunk.class.getDeclaredField("d");
-        fieldChunkData = PacketPlayOutMapChunk.class.getDeclaredField("e");
-        fieldBlockEntities = PacketPlayOutMapChunk.class.getDeclaredField("f");
-        fieldFull = PacketPlayOutMapChunk.class.getDeclaredField("g");
+        fieldChunkData = PacketPlayOutMapChunk.class.getDeclaredField("f");
+        fieldBlockEntities = PacketPlayOutMapChunk.class.getDeclaredField("g");
+        fieldFull = PacketPlayOutMapChunk.class.getDeclaredField("h");
         fieldX.setAccessible(true);
         fieldZ.setAccessible(true);
         fieldBitMask.setAccessible(true);
