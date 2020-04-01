@@ -61,6 +61,10 @@ dependencies {
     implementation(kotlin("stdlib-jdk8", "1.3.61"))
 }
 
+tasks.named<Test>("test") {
+    maxHeapSize = "1G"
+}
+
 tasks.withType<JavaCompile>().configureEach {
     dependsOn(":worldedit-libs:build")
     options.compilerArgs.add("-Aarg.name.key.prefix=")
