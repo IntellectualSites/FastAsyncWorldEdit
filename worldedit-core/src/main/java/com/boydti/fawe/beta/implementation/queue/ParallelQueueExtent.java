@@ -84,7 +84,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
         // Get a pool, to operate on the chunks in parallel
         final int size = Math.min(chunks.size(), Settings.IMP.QUEUE.PARALLEL_THREADS);
-        if (size <= 1) {
+        if (size <= 1 && chunksIter.hasNext()) {
             BlockVector2 pos = chunksIter.next();
             getExtent().apply(null, filter, region, pos.getX(), pos.getZ(), full);
         } else {
@@ -237,33 +237,4 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
         return replaceBlocks(region, mask, pattern);
     }
-
-
-    /*
-    Don't need to optimize these
-     */
-
-//    /**
-//     * Sets the blocks at the center of the given region to the given pattern.
-//     * If the center sits between two blocks on a certain axis, then two blocks
-//     * will be placed to mark the center.
-//     *
-//     * @param region the region to find the center of
-//     * @param pattern the replacement pattern
-//     * @return the number of blocks placed
-//     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-//     */
-//    @Override
-//    public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
-//        checkNotNull(region);
-//        checkNotNull(pattern);
-//
-//        Vector3 center = region.getCenter();
-//        Region centerRegion = new CuboidRegion(
-//                this instanceof World ? (World) this : null, // Causes clamping of Y range
-//                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-//                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-//                        center.getY(), MathUtils.roundHalfUp(center.getZ())));
-//        return setBlocks(centerRegion, pattern);
-//    }
 }
