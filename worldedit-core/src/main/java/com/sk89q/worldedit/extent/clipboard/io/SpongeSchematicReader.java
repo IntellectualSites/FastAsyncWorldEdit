@@ -153,6 +153,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     }
 
     private BlockArrayClipboard readVersion1(CompoundTag schematicTag) throws IOException {
+        BlockVector3 origin;
         Region region;
         Map<String, Tag> schematic = schematicTag.getValue();
 
@@ -171,8 +172,22 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             offsetParts = new int[] {0, 0, 0};
         }
 
-        BlockVector3 origin = BlockVector3.at(offsetParts[0], offsetParts[1], offsetParts[2]);
-        region = new CuboidRegion(origin, BlockVector3.ZERO.add(width, height, length).subtract(BlockVector3.ONE));
+        BlockVector3 min = BlockVector3.at(offsetParts[0], offsetParts[1], offsetParts[2]);
+
+        CompoundTag metadataTag = getTag(schematic, "Metadata", CompoundTag.class);
+        if (metadataTag != null && metadataTag.containsKey("WEOffsetX")) {
+            // We appear to have WorldEdit Metadata
+            Map<String, Tag> metadata = metadataTag.getValue();
+            int offsetX = requireTag(metadata, "WEOffsetX", IntTag.class).getValue();
+            int offsetY = requireTag(metadata, "WEOffsetY", IntTag.class).getValue();
+            int offsetZ = requireTag(metadata, "WEOffsetZ", IntTag.class).getValue();
+            BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
+            origin = min.subtract(offset);
+            region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
+        } else {
+            origin = min;
+            region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
+        }
 
         IntTag paletteMaxTag = getTag(schematic, "PaletteMax", IntTag.class);
         Map<String, Tag> paletteObject = requireTag(schematic, "Palette", CompoundTag.class).getValue();
