@@ -34,6 +34,6 @@ public interface ArchiveNioSupport {
      * @param archive the archive to open
      * @return the path for the root of the archive, if available
      */
-    Optional<Path> tryOpenAsDir(Path archive) throws IOException;
+    Optional<ArchiveDir> tryOpenAsDir(Path archive) throws IOException;
 
 }
