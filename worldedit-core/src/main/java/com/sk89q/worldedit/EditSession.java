@@ -1469,7 +1469,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             setSourceMask(null);
             copy.setSourceMask(mask);
         }
-        Operations.completeBlindly(copy);
+        Operations.completeLegacy(copy);
         return this.changes = copy.getAffected();
     }
 
