@@ -102,7 +102,6 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ClipboardCommands {
 
-
     @Command(
         name = "/copy",
         aliases = "/cp",
@@ -115,11 +114,11 @@ public class ClipboardCommands {
                      @Switch(name = 'e', desc = "Also copy entities")
                          boolean copyEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
-                             boolean copyBiomes,
+                         boolean copyBiomes,
                      @Switch(name = 'c', desc = "Set the origin of the clipboard to the center of the copied region")
                         boolean centerClipboard,
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
-                        Mask mask) throws WorldEditException {
+                         Mask mask) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -149,6 +148,7 @@ public class ClipboardCommands {
         }
         Operations.completeLegacy(copy);
         session.setClipboard(new ClipboardHolder(clipboard));
+
         copy.getStatusMessages().forEach(actor::print);
     }
 
@@ -226,7 +226,7 @@ public class ClipboardCommands {
                         boolean copyEntities,
                     @Switch(name = 'b', desc = "Also copy biomes, source biomes are unaffected")
                         boolean copyBiomes,
-                    @ArgFlag(name = 'm', desc = "Set the exclude mask, non-matching blocks become air", def = "")
+                    @ArgFlag(name = 'm', desc = "Set the exclude mask, non-matching blocks become air")
                         Mask mask) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
@@ -243,7 +243,6 @@ public class ClipboardCommands {
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
         clipboard.setOrigin(session.getPlacementPosition(actor));
-
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
         copy.setCopyingEntities(copyEntities);
@@ -371,20 +370,29 @@ public class ClipboardCommands {
         }
     }
 
-    @Command(name = "/paste", aliases = {"/p", "/pa"}, desc = "Paste the clipboard's contents"
-
+    @Command(
+        name = "/paste",
+        aliases = {"/p", "/pa"},
+        desc = "Paste the clipboard's contents"
     )
     @CommandPermissions("worldedit.clipboard.paste")
     @Logging(PLACEMENT)
     public void paste(Actor actor, World world, LocalSession session, EditSession editSession,
-        @Switch(name = 'a', desc = "Skip air blocks") boolean ignoreAirBlocks,
-        @Switch(name = 'o', desc = "Paste at the original position") boolean atOrigin,
-        @Switch(name = 's', desc = "Select the region after pasting") boolean selectPasted,
-        @Switch(name = 'n', desc = "No paste, select only. (Implies -s)") boolean onlySelect,
-        @Switch(name = 'e', desc = "Paste entities if available") boolean pasteEntities,
-        @Switch(name = 'b', desc = "Paste biomes if available") boolean pasteBiomes,
-        @ArgFlag(name = 'm', desc = "Only paste blocks matching this mask", def = "") @ClipboardMask
-            Mask sourceMask) throws WorldEditException {
+                      @Switch(name = 'a', desc = "Skip air blocks")
+                          boolean ignoreAirBlocks,
+                      @Switch(name = 'o', desc = "Paste at the original position")
+                          boolean atOrigin,
+                      @Switch(name = 's', desc = "Select the region after pasting")
+                          boolean selectPasted,
+                      @Switch(name = 'n', desc = "No paste, select only. (Implies -s)")
+                          boolean onlySelect,
+                      @Switch(name = 'e', desc = "Paste entities if available")
+                          boolean pasteEntities,
+                      @Switch(name = 'b', desc = "Paste biomes if available")
+                          boolean pasteBiomes,
+                      @ArgFlag(name = 'm', desc = "Only paste blocks matching this mask")
+                      @ClipboardMask
+                          Mask sourceMask) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
         if (holder.getTransform().isIdentity() && editSession.getSourceMask() == null) {
@@ -409,23 +417,19 @@ public class ClipboardCommands {
         }
 
         if (selectPasted || onlySelect) {
-            BlockVector3 clipboardOffset =
-                clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Vector3 realTo =
-                to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(holder.getTransform()
-                .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-            RegionSelector selector =
-                new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
+            Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+            RegionSelector selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
             session.setRegionSelector(world, selector);
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
+
         if (onlySelect) {
             actor.printInfo(TranslatableComponent.of("worldedit.paste.selected"));
         } else {
-            actor.printInfo(TranslatableComponent
-                .of("worldedit.paste.pasted", TextComponent.of(to.toString())));
+            actor.printInfo(TranslatableComponent.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
         messages.forEach(actor::print);
     }
@@ -517,7 +521,6 @@ public class ClipboardCommands {
     public void flip(Actor actor, LocalSession session,
                      @Arg(desc = "The direction to flip, defaults to look direction.", def = Direction.AIM)
                      @Direction BlockVector3 direction) throws WorldEditException {
-
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());

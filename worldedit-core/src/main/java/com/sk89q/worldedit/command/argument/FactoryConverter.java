@@ -133,7 +133,7 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
     }
 
     @Override
-    public List<String> getSuggestions(String input) {
+    public List<String> getSuggestions(String input, InjectedValueAccess context) {
         return factoryExtractor.apply(worldEdit).getSuggestions(input);
     }
 
