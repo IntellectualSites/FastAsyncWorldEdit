@@ -119,6 +119,8 @@ public class ClipboardCommands {
                          boolean copyEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                              boolean copyBiomes,
+                     @Switch(name = 'c', desc = "Set the origin of the clipboard to the center of the copied region")
+                        boolean centerClipboard,
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                         Mask mask) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
@@ -134,7 +136,7 @@ public class ClipboardCommands {
 
         Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
         
-        clipboard.setOrigin(session.getPlacementPosition(actor));
+        clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint() : session.getPlacementPosition(actor));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes);
