@@ -148,7 +148,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         if (newChunk != null) {
             chunk = newChunk;
             if (block == null) {
-                block = this.initFilterBlock();
+                block = this.initFilterBlock().initChunk(chunkX, chunkZ);
             }
             chunk.filterBlocks(filter, block, region, full);
         }
