@@ -544,6 +544,7 @@ public class UtilityCommands {
 
     @Command(
         name = "butcher",
+        aliases = { "/butcher" },
         desc = "Kill all or nearby mobs"
     )
     @CommandPermissions("worldedit.butcher")
@@ -606,7 +607,7 @@ public class UtilityCommands {
 
     @Command(
         name = "remove",
-        aliases = { "rem", "rement" },
+        aliases = { "rem", "rement", "/remove", "/rem", "/rement" },
         desc = "Remove all entities of a type"
     )
     @CommandPermissions("worldedit.remove")

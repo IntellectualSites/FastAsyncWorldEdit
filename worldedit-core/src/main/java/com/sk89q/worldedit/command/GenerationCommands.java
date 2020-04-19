@@ -304,6 +304,7 @@ public class GenerationCommands {
 
     @Command(
         name = "forestgen",
+        aliases = { "/forestgen" },
         desc = "Generate a forest"
     )
     @CommandPermissions("worldedit.generation.forest")
@@ -325,6 +326,7 @@ public class GenerationCommands {
 
     @Command(
         name = "pumpkins",
+        aliases = { "/pumpkins" },
         desc = "Generate pumpkin patches"
     )
     @CommandPermissions("worldedit.generation.pumpkins")

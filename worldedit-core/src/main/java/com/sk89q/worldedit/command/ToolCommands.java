@@ -161,6 +161,7 @@ public class ToolCommands {
 
     @Command(
         name = "info",
+        aliases = { "/info" },
         desc = "Block information tool"
     )
     @CommandPermissions("worldedit.tool.info")
@@ -173,6 +174,7 @@ public class ToolCommands {
 
     @Command(
             name = "inspect",
+            aliases = { "/inspect" },
             desc = "Inspect edits within a radius"
     )
     @CommandPermissions("worldedit.tool.inspect")
@@ -184,6 +186,7 @@ public class ToolCommands {
 
     @Command(
         name = "tree",
+        aliases = { "/tree" },
         desc = "Tree generator tool"
     )
     @CommandPermissions("worldedit.tool.tree")
@@ -198,6 +201,7 @@ public class ToolCommands {
 
     @Command(
         name = "repl",
+        aliases = { "/repl" },
         desc = "Block replacer tool"
     )
     @CommandPermissions("worldedit.tool.replacer")
@@ -212,6 +216,7 @@ public class ToolCommands {
 
     @Command(
         name = "cycler",
+        aliases = { "/cycler" },
         desc = "Block data cycler tool"
     )
     @CommandPermissions("worldedit.tool.data-cycler")
@@ -224,7 +229,7 @@ public class ToolCommands {
 
     @Command(
         name = "floodfill",
-        aliases = { "flood" },
+        aliases = { "flood", "/flood", "/floodfill" },
         desc = "Flood fill tool"
     )
     @CommandPermissions("worldedit.tool.flood-fill")
@@ -248,6 +253,7 @@ public class ToolCommands {
 
     @Command(
         name = "deltree",
+        aliases = { "/deltree" },
         desc = "Floating tree remover tool"
     )
     @CommandPermissions("worldedit.tool.deltree")
@@ -260,6 +266,7 @@ public class ToolCommands {
 
     @Command(
         name = "farwand",
+        aliases = { "/warwand" },
         desc = "Wand at a distance tool"
     )
     @CommandPermissions("worldedit.tool.farwand")

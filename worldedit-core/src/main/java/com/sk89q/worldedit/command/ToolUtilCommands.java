@@ -192,6 +192,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "primary",
+            aliases = { "/primary" },
             desc = "Set the right click brush",
             descFooter = "Set the right click brush"
     )
@@ -212,6 +213,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "secondary",
+            aliases = { "/secondary" },
             desc = "Set the left click brush",
             descFooter = "Set the left click brush"
     )
@@ -233,7 +235,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "visualize",
-            aliases = {"visual", "vis"},
+            aliases = {"visual", "vis", "/visualize", "/visual", "/vis"},
             desc = "Toggle between different visualization modes",
             descFooter = "Toggle between different visualization modes\n" +
                     "0 = No visualization\n" +
@@ -258,7 +260,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "target",
-            aliases = {"tar"},
+            aliases = {"tar", "/target", "/tar"},
             desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.target")

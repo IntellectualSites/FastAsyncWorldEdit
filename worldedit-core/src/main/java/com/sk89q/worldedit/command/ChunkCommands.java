@@ -77,6 +77,7 @@ public class ChunkCommands {
 
     @Command(
         name = "chunkinfo",
+        aliases = { "/chunkinfo" },
         desc = "Get information about the chunk you're inside"
     )
     @CommandPermissions("worldedit.chunkinfo")
@@ -93,6 +94,7 @@ public class ChunkCommands {
 
     @Command(
         name = "listchunks",
+        aliases = { "/listchunks" },
         desc = "List chunks that your selection includes"
     )
     @CommandPermissions("worldedit.listchunks")
@@ -106,6 +108,7 @@ public class ChunkCommands {
 
     @Command(
         name = "delchunks",
+        aliases = { "/delchunks" },
         desc = "Delete chunks that your selection includes"
     )
     @CommandPermissions("worldedit.delchunks")

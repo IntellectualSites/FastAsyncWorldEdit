@@ -272,6 +272,7 @@ public class ClipboardCommands {
 
     @Command(
             name = "download",
+            aliases = { "/download" },
             desc = "Downloads your clipboard through the configured web interface"
     )
     @Deprecated
@@ -537,6 +538,7 @@ public class ClipboardCommands {
 
     @Command(
         name = "clearclipboard",
+        aliases = { "/clearclipboard", "/cc", "/clearclip" },
         desc = "Clear your clipboard"
     )
     @CommandPermissions("worldedit.clipboard.clear")
