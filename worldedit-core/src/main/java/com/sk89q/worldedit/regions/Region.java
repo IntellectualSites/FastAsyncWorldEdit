@@ -203,6 +203,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
         int minSection = Math.max(0, getMinimumY() >> 4);
         int maxSection = Math.min(15, getMaximumY() >> 4);
+        block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
             if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
             block = block.initLayer(get, set, layer);
