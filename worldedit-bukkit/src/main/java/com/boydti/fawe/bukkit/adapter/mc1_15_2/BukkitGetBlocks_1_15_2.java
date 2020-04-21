@@ -263,7 +263,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
                             nmsChunk.removeTileEntity(tile.getPosition());
-                            nmsChunk.markDirty();
                         }
                     }
                 }
