@@ -9,12 +9,12 @@ import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.TaskManager;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
-import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;
-import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
-import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
-import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.location.Location;
+import com.plotsquared.core.queue.LocalBlockQueue;
+import com.plotsquared.core.util.MainUtil;
+import com.plotsquared.core.util.SchematicHandler;
+import com.plotsquared.core.util.task.RunnableVal;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.CompressedSchematicTag;
@@ -110,7 +110,7 @@ public class FaweSchematicHandler extends SchematicHandler {
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
             PlotSquared.debug("&cCannot save empty tag");
-            com.github.intellectualsites.plotsquared.plot.util.TaskManager.runTask(whenDone);
+            com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
             return;
         }
         CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);

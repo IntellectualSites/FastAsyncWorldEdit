@@ -11,9 +11,9 @@ repositories {
     maven { url = uri("https://hub.spigotmc.org/nexus/content/groups/public") }
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
-    maven { url = uri("http://empcraft.com/maven2") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
+    maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
     maven {
         this.name = "JitPack"
         this.url = uri("https://jitpack.io")

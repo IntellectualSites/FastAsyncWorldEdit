@@ -1,13 +1,13 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.util.TaskManager;
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
-import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
-import com.github.intellectualsites.plotsquared.plot.commands.SubCommand;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
+import com.plotsquared.core.command.CommandCategory;
+import com.plotsquared.core.command.CommandDeclaration;
+import com.plotsquared.core.command.RequiredType;
+import com.plotsquared.core.command.SubCommand;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.util.WorldUtil;
 
 @CommandDeclaration(
         command = "trimchunks",

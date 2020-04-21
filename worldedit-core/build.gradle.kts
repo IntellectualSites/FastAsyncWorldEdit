@@ -14,7 +14,7 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
+    maven { url = uri("https://plotsquared.com/mvn") }
     mavenCentral()
 
 }
@@ -55,7 +55,7 @@ dependencies {
     "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.4.3-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
-    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
+    "compile"("com.plotsquared:PlotSquared:5.1") {
         isTransitive = false
     }
     implementation(kotlin("stdlib-jdk8", "1.3.61"))

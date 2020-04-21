@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
+import com.plotsquared.core.queue.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -21,6 +21,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
+    private boolean setbiome = false;
 
     public FaweLocalBlockQueue(String worldName) {
         super(worldName);
@@ -88,7 +89,13 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setBiome(int x, int z, BiomeType biomeType) {
+        setbiome = true;
         return instance.setBiome(x, 0, z, biomeType);
+    }
+
+    @Override
+    public boolean setBiome() {
+        return setbiome;
     }
 
     @Override

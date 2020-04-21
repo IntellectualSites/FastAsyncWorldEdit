@@ -3,9 +3,9 @@ package com.boydti.fawe.bukkit.regions.plotsquared;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.plotsquared.core.location.Location;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
 import com.sk89q.worldedit.math.BlockVector2;
 import java.util.ArrayList;
 

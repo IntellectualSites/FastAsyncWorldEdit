@@ -1,22 +1,20 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
-import com.github.intellectualsites.plotsquared.commands.Command;
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
-import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
-import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
-import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
-import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
-import com.github.intellectualsites.plotsquared.plot.util.Permissions;
-import com.github.intellectualsites.plotsquared.plot.util.StringMan;
+import com.plotsquared.core.command.Command;
+import com.plotsquared.core.command.CommandCategory;
+import com.plotsquared.core.command.CommandDeclaration;
+import com.plotsquared.core.command.MainCommand;
+import com.plotsquared.core.command.RequiredType;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.util.MainUtil;
+import com.plotsquared.core.util.Permissions;
+import com.plotsquared.core.util.StringMan;
+import com.plotsquared.core.util.task.RunnableVal2;
+import com.plotsquared.core.util.task.RunnableVal3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -49,7 +47,8 @@ public class PlotSetBiome extends Command {
     @Override
     public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
-        checkTrue(plot.isOwner(player.getUUID()) || Permissions.hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
+        checkTrue(plot.isOwner(player.getUUID()) || Permissions
+            .hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
         if (plot.getRunning() != 0) {
             Captions.WAIT_FOR_TIMER.send(player);
             return null;
@@ -73,7 +72,7 @@ public class PlotSetBiome extends Command {
             }
             plot.addRunning();
             TaskManager.IMP.async(() -> {
-                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
+                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().getWorldName())))
                         .autoQueue(false)
                         .checkMemory(false)
                         .allowedRegionsEverywhere()

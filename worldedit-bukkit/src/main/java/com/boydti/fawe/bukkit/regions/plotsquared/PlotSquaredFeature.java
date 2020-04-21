@@ -5,21 +5,20 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
-import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
-import com.github.intellectualsites.plotsquared.plot.config.Settings;
-import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
-import com.github.intellectualsites.plotsquared.plot.flag.Flags;
-import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotManager;
-import com.github.intellectualsites.plotsquared.plot.listener.WEManager;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
-import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
-import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
-import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
-import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.command.MainCommand;
+import com.plotsquared.core.configuration.Settings;
+import com.plotsquared.core.database.DBFunc;
+import com.plotsquared.core.generator.HybridPlotManager;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
+import com.plotsquared.core.plot.flag.implementations.DoneFlag;
+import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
+import com.plotsquared.core.util.ChunkManager;
+import com.plotsquared.core.util.SchematicHandler;
+import com.plotsquared.core.util.WEManager;
+import com.plotsquared.core.util.uuid.UUIDHandler;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -97,7 +96,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return false;
         }
         UUID uid = player.getUniqueId();
-        return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid)
+        return !plot.getFlag(NoWorldeditFlag.class) && (plot.isOwner(uid)
             || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
             .contains(DBFunc.EVERYONE)
             || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
@@ -129,8 +128,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return null;
         }
         PlotArea area = pp.getApplicablePlotArea();
-        int min = area != null ? area.MIN_BUILD_HEIGHT : 0;
-        int max = area != null ? Math.min(255, area.MAX_BUILD_HEIGHT) : 255;
+        int min = area != null ? area.getMinBuildHeight() : 0;
+        int max = area != null ? Math.min(255, area.getMaxBuildHeight()) : 255;
         final HashSet<RegionWrapper> faweRegions = new HashSet<>();
         for (CuboidRegion current : regions) {
             faweRegions.add(new RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
@@ -139,7 +138,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());
         final BlockVector3 pos2 = BlockVector3.at(region.getMaximumX(), max, region.getMaximumZ());
         final Plot finalPlot = plot;
-        if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot) || regions.isEmpty()) {
+        if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(finalPlot) || regions.isEmpty()) {
             return null;
         }
 
@@ -147,7 +146,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (regions.size() == 1) {
             maskedRegion = new CuboidRegion(pos1, pos2);
         } else {
-            World world = FaweAPI.getWorld(area.worldname);
+            World world = FaweAPI.getWorld(area.getWorldName());
             List<Region> weRegions = regions.stream()
                     .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
                     .collect(Collectors.toList());
@@ -157,7 +156,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         return new FaweMask(maskedRegion) {
             @Override
             public boolean isValid(Player player, MaskType type) {
-                if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot)) {
+                if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(finalPlot)) {
                     return false;
                 }
                 return isAllowed(player, finalPlot, type);
