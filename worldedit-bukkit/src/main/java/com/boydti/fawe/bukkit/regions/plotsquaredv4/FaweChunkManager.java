@@ -1,12 +1,12 @@
-package com.boydti.fawe.bukkit.regions.plotsquared;
+package com.boydti.fawe.bukkit.regions.plotsquaredv4;
 
 import static org.bukkit.Bukkit.getWorld;
 
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
-import com.plotsquared.core.location.Location;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.util.ChunkManager;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;

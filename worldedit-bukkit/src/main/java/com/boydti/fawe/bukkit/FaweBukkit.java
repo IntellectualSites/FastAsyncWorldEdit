@@ -305,8 +305,16 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     private void setupPlotSquared() {
-        if(this.plugin.getServer().getPluginManager().getPlugin("PlotSquared") == null) return;
-        WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
-        log.debug("Plugin 'PlotSquared' found. Using it now.");
+        Plugin plotSquared = this.plugin.getServer().getPluginManager().getPlugin("PlotSquared");
+        if (plotSquared == null)
+            return;
+        if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
+            WEManager.IMP.managers
+                .add(new com.boydti.fawe.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+        } else {
+            WEManager.IMP.managers
+                .add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
+        }
+        log.info("Plugin 'PlotSquared' found. Using it now.");
     }
 }
