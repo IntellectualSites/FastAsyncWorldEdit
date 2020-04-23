@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -238,7 +239,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
 
             // Remove existing tiles
             {
-                Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
+                Map<BlockPosition, TileEntity> tiles = new HashMap<>(nmsChunk.getTileEntities());
                 if (!tiles.isEmpty()) {
                     for (Map.Entry<BlockPosition, TileEntity> entry : tiles.entrySet()) {
                         final BlockPosition pos = entry.getKey();
@@ -251,8 +252,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                         }
                         if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
                             TileEntity tile = entry.getValue();
-                            tile.hasWorld();
-                            tile.invalidateBlockCache();
+                            nmsChunk.removeTileEntity(tile.getPosition());
                         }
                     }
                 }
