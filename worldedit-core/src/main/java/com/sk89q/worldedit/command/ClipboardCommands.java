@@ -19,12 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.google.common.collect.Lists;
-
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RunnableVal;
@@ -36,6 +33,7 @@ import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
+import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -55,10 +53,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -75,8 +70,9 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -91,12 +87,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
-import java.util.List;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 
 /**
@@ -373,35 +370,26 @@ public class ClipboardCommands {
             player.print(Caption.of("fawe.web.download.link" , urlText));
         }
     }
-    
-    @Command(
-        name = "/paste",
-        aliases = { "/p", "/pa" },
-        desc = "Paste the clipboard's contents"
+
+    @Command(name = "/paste", aliases = {"/p", "/pa"}, desc = "Paste the clipboard's contents"
 
     )
     @CommandPermissions("worldedit.clipboard.paste")
     @Logging(PLACEMENT)
     public void paste(Actor actor, World world, LocalSession session, EditSession editSession,
-                      @Switch(name = 'a', desc = "Skip air blocks")
-                          boolean ignoreAirBlocks,
-                      @Switch(name = 'o', desc = "Paste at the original position")
-                          boolean atOrigin,
-                      @Switch(name = 's', desc = "Select the region after pasting")
-                          boolean selectPasted,
-                      @Switch(name = 'n', desc = "No paste, select only. (Implies -s)")
-                          boolean onlySelect,
-                      @Switch(name = 'e', desc = "Paste entities if available")
-                          boolean pasteEntities,
-                      @Switch(name = 'b', desc = "Paste biomes if available")
-                          boolean pasteBiomes,
-                      @ArgFlag(name = 'm', desc = "Only paste blocks matching this mask", def = "")
-                      @ClipboardMask
-                          Mask sourceMask) throws WorldEditException {
+        @Switch(name = 'a', desc = "Skip air blocks") boolean ignoreAirBlocks,
+        @Switch(name = 'o', desc = "Paste at the original position") boolean atOrigin,
+        @Switch(name = 's', desc = "Select the region after pasting") boolean selectPasted,
+        @Switch(name = 'n', desc = "No paste, select only. (Implies -s)") boolean onlySelect,
+        @Switch(name = 'e', desc = "Paste entities if available") boolean pasteEntities,
+        @Switch(name = 'b', desc = "Paste biomes if available") boolean pasteBiomes,
+        @ArgFlag(name = 'm', desc = "Only paste blocks matching this mask", def = "") @ClipboardMask
+            Mask sourceMask) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
         if (holder.getTransform().isIdentity() && editSession.getSourceMask() == null) {
-            place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, pasteEntities, pasteBiomes);
+            place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted,
+                pasteEntities, pasteBiomes);
             return;
         }
         Clipboard clipboard = holder.getClipboard();
@@ -412,33 +400,34 @@ public class ClipboardCommands {
         checkPaste(actor, editSession, to, holder, clipboard);
 
         if (!onlySelect) {
-            Operation operation = holder
-                    .createPaste(editSession)
-                    .to(to)
-                    .ignoreAirBlocks(ignoreAirBlocks)
-                    .copyBiomes(pasteBiomes)
-                    .copyEntities(pasteEntities)
-                    .maskSource(sourceMask)
+            Operation operation =
+                holder.createPaste(editSession).to(to).ignoreAirBlocks(ignoreAirBlocks)
+                    .copyBiomes(pasteBiomes).copyEntities(pasteEntities).maskSource(sourceMask)
                     .build();
             Operations.completeLegacy(operation);
-			messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
+            messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
         }
 
         if (selectPasted || onlySelect) {
-            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
-            Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
-            RegionSelector selector = new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
+            BlockVector3 clipboardOffset =
+                clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            Vector3 realTo =
+                to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
+            Vector3 max = realTo.add(holder.getTransform()
+                .apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+            RegionSelector selector =
+                new CuboidRegionSelector(world, realTo.toBlockPoint(), max.toBlockPoint());
             session.setRegionSelector(world, selector);
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
-		if (onlySelect) {
+        if (onlySelect) {
             actor.printInfo(TranslatableComponent.of("worldedit.paste.selected"));
         } else {
-            actor.printInfo(TranslatableComponent.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
+            actor.printInfo(TranslatableComponent
+                .of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
-		messages.forEach(actor::print);
+        messages.forEach(actor::print);
     }
 
     private void checkPaste(Actor player, EditSession editSession, BlockVector3 to, ClipboardHolder holder, Clipboard clipboard) {
