@@ -2,6 +2,8 @@ package com.sk89q.worldedit.function.operation;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
@@ -11,16 +13,18 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import java.util.List;
 
-public class BackwardsExtentBlockCopy implements Operation {
+public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation {
     private final Region region;
     private final Transform transform;
     private final RegionFunction function;
     private final BlockVector3 origin;
+    private int affected = 0;
 
     private MutableBlockVector3 mutBV3 = new MutableBlockVector3();
     private MutableVector3 mutV3 = new MutableVector3();
 
     BackwardsExtentBlockCopy(Region region, BlockVector3 origin, Transform transform, RegionFunction function) {
+        super(region, function);
         this.region = region;
         this.transform = transform;
         this.function = function;
@@ -34,7 +38,9 @@ public class BackwardsExtentBlockCopy implements Operation {
         for (BlockVector3 pt : destRegion) {
             BlockVector3 copyFrom = transform(inverse, pt);
             if (region.contains(copyFrom)) {
-                function.apply(pt);
+                if(function.apply(pt)) {
+                    affected++;
+                }
             }
         }
         return null;
@@ -66,6 +72,10 @@ public class BackwardsExtentBlockCopy implements Operation {
         mutBV3.mutY((tmp.getBlockY() + origin.getBlockY()));
         mutBV3.mutZ((tmp.getBlockZ() + origin.getBlockZ()));
         return mutBV3;
+    }
+
+    public int getAffected() {
+        return affected;
     }
 
     @Override

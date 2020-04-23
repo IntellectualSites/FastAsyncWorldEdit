@@ -305,7 +305,7 @@ public class ForwardExtentCopy implements Operation {
         }
 
         RegionFunction copy;
-        Operation blockCopy = null;
+        RegionVisitor blockCopy = null;
         PositionTransformExtent transExt = null;
         if (!currentTransform.isIdentity()) {
             if (!(currentTransform instanceof AffineTransform) || ((AffineTransform) currentTransform).isOffAxis()) {
@@ -414,8 +414,7 @@ public class ForwardExtentCopy implements Operation {
             }
 
         }
-        int affected;
-        affected = region.getArea();
+        affectedBlocks += blockCopy.getAffected();
         return null;
     }
 
