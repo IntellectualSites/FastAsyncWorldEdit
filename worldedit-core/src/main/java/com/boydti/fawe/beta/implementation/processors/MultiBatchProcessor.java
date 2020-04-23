@@ -56,7 +56,8 @@ public class MultiBatchProcessor implements IBatchProcessor {
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         try {
-            for (IBatchProcessor processor : this.processors) {
+            for (int i = processors.length - 1 ; i >= 0; i--) {
+                IBatchProcessor processor = processors[i];
                 set = processor.processSet(chunk, get, set);
                 if (set == null) {
                     return null;
