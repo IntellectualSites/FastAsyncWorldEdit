@@ -15,7 +15,6 @@ plugins {
 
 repositories {
     maven { url = uri("https://plotsquared.com/mvn") }
-    maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
     mavenCentral()
 
 }

@@ -9,7 +9,6 @@ fun Project.applyCommonConfiguration() {
         mavenCentral()
         mavenLocal()
         maven { url = uri("https://plotsquared.com/mvn/") }
-        maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
         maven { url = uri("https://maven.sk89q.com/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
