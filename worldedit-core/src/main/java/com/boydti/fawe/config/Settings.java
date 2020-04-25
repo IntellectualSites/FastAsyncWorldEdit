@@ -258,7 +258,6 @@ public class Settings extends Config {
         @Comment({
                 "This should equal the number of processors you have",
         })
-        @Final
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
         @Create
         public static PROGRESS PROGRESS;
