@@ -88,10 +88,10 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("de.schlichtherle:truezip"))
         include(dependency("net.java.truevfs:truevfs-profile-default_2.13"))
-        include(dependency("org.mozilla:rhino"))
+        include(dependency("org.mozilla:rhino-runtime"))
     }
     minimize {
-        exclude(dependency("org.mozilla:rhino"))
+        exclude(dependency("org.mozilla:rhino-runtime"))
     }
 }
 
