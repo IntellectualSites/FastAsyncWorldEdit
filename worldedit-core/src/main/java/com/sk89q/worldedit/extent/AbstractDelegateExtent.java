@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
@@ -31,6 +32,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
@@ -47,11 +49,15 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
 public class AbstractDelegateExtent implements Extent {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
 
     private final Extent extent;
 
@@ -239,6 +245,15 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public Extent addProcessor(IBatchProcessor processor) {
+        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            logger.info("addProcessor Info: \t " + processor.getClass().getName());
+            logger.info("The following is not an error or a crash:");
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement stackTraceElement : stackTrace) {
+                logger.info(stackTraceElement.toString());
+            }
+
+        }
         Extent result = this.extent.addProcessor(processor);
         if (result != this.extent) {
             new ExtentTraverser<Extent>(this).setNext(result);
