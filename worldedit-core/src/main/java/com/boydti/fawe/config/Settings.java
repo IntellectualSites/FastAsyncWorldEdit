@@ -364,6 +364,11 @@ public class Settings extends Config {
                 " - PERM: fawe.freebuild.<plugin>"
         })
         public boolean FREEBUILD = false;
+        
+        @Comment({
+                "Other experimental features"
+        })
+        public boolean OTHER = false;
     }
 
     public static class WEB {
