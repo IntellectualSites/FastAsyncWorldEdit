@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.wrappers.AsyncPlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -335,14 +336,18 @@ public class PlatformManager {
         Request.request().setSession(session);
         Request.request().setWorld(player.getWorld());
 
-            try {
+        try {
             Vector3 vector = location.toVector();
 
             VirtualWorld virtual = session.getVirtualWorld();
             if (virtual != null) {
+                if (Settings.IMP.EXPERIMENTAL.OTHER) {
+                    logger.debug("virtualWorld was not null in handlePlayerInput()");
+                }
+
                 virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
                 if (event.isCancelled()) return;
-                        }
+            }
 
             if (event.getType() == Interaction.HIT) {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
@@ -408,6 +413,9 @@ public class PlatformManager {
         LocalSession session = worldEdit.getSessionManager().get(player);
         VirtualWorld virtual = session.getVirtualWorld();
         if (virtual != null) {
+            if (Settings.IMP.EXPERIMENTAL.OTHER) {
+                logger.debug("virtualWorld was not null in handlePlayerInput()");
+            }
             virtual.handlePlayerInput(player,  event);
             if (event.isCancelled()) return;
         }

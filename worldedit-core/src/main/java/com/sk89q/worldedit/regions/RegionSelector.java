@@ -30,10 +30,11 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Region selectors create {@link Region}s from a series of "selected points."
@@ -76,13 +77,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her primary selection.
      *
-<<<<<<< HEAD
-     * @param actor    the actor
-     * @param session  the session
-=======
      * @param actor the actor
      * @param session the session
->>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
      * @param position position
      */
     void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -90,8 +86,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her secondary selection.
      *
-     * @param actor    the actor
-     * @param session  the session
+     * @param actor the actor
+     * @param session the session
      * @param position position
      */
     void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -100,7 +96,7 @@ public interface RegionSelector {
      * The the player information about the region's changes. This may resend
      * all the defining region information if needed.
      *
-     * @param actor   the actor
+     * @param actor the actor
      * @param session the session
      */
     void explainRegionAdjust(Actor actor, LocalSession session);
@@ -167,7 +163,7 @@ public interface RegionSelector {
     @Deprecated
     default List<String> getInformationLines() {
         return Lists.newArrayList();
-    }
+    };
 
     /**
      * Get lines of information about the selection.
