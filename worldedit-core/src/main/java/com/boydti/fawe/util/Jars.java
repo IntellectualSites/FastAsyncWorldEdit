@@ -11,13 +11,13 @@ import java.util.Base64;
 
 public enum Jars {
 
-    MM_v1_7_3(
-        "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.3-SNAPSHOT/MapManager_v1.7.3-SNAPSHOT.jar",
-        "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 554831),
+    MM_v1_7_8(
+        "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.8-SNAPSHOT/MapManager_v1.7.8-SNAPSHOT.jar",
+        "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 544000),
 
-    PL_v3_7_3(
-        "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.3-SNAPSHOT/PacketListenerAPI_v3.7.3-SNAPSHOT.jar",
-        "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 167205),
+    PL_v3_7_6(
+        "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.6-SNAPSHOT/PacketListenerAPI_v3.7.6-SNAPSHOT.jar",
+        "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 143000),
 
     ;
 

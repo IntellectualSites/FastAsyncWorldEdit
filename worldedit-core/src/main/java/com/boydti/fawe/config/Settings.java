@@ -276,6 +276,7 @@ public class Settings extends Config {
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)"
         })
+        //TODO Find out where this was used and why the usage was removed
         public int MAX_WAIT_MS = 1000;
 
         @Comment({
@@ -292,6 +293,7 @@ public class Settings extends Config {
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
         })
+        //TODO Find out where this was used and why the usage was removed
         public int PRELOAD_CHUNKS = 100000;
 
         @Comment({

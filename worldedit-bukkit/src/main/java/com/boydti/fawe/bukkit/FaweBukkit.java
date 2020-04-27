@@ -124,15 +124,15 @@ public class FaweBukkit implements IFawe, Listener {
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.7.3-SNAPSHOT.jar");
-                byte[] jarData = Jars.PL_v3_7_3.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.7.6-SNAPSHOT.jar");
+                byte[] jarData = Jars.PL_v3_7_6.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
             }
             if (manager.getPlugin("MapManager") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.7.3-SNAPSHOT.jar");
-                byte[] jarData = Jars.MM_v1_7_3.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.7.8-SNAPSHOT.jar");
+                byte[] jarData = Jars.MM_v1_7_8.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }

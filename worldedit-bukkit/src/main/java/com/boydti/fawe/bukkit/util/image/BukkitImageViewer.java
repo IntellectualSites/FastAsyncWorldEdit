@@ -98,7 +98,7 @@ public class BukkitImageViewer implements ImageViewer {
 
             World world = pos1.getWorld();
 
-            this.reverse = (facing == BlockFace.NORTH || facing == BlockFace.EAST);
+            this.reverse = facing == BlockFace.NORTH || facing == BlockFace.EAST;
             int v = 0;
             for (double y = pos1.getY(); y <= pos2.getY(); y++, v++) {
                 int h = 0;
