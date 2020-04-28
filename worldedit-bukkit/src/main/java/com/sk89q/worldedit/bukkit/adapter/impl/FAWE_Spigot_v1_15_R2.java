@@ -56,6 +56,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World.Environment;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -370,7 +371,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
+    public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
         WorldServer originalWorld = ((CraftWorld) world).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {
@@ -389,26 +390,16 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
                     server.dataConverterManager, getDataVersion(), null);
             newWorldData.setName(UUID.randomUUID().toString());
 
-            ChunkGenerator generator = world.getGenerator();
-            org.bukkit.World.Environment environment = world.getEnvironment();
-            if (seed != null) {
-                if (biome == BiomeTypes.NETHER) {
-                    environment = org.bukkit.World.Environment.NETHER;
-                } else if (biome == BiomeTypes.THE_END) {
-                    environment = org.bukkit.World.Environment.THE_END;
-                } else {
-                    environment = org.bukkit.World.Environment.NORMAL;
-                }
-                generator = null;
-            }
+            ChunkGenerator gen = world.getGenerator();
+            Environment env = world.getEnvironment();
             try (WorldServer freshWorld = new WorldServer(server,
                     server.executorService, saveHandler,
                     newWorldData,
                     originalWorld.worldProvider.getDimensionManager(),
                     originalWorld.getMethodProfiler(),
                     server.worldLoadListenerFactory.create(11),
-                    environment,
-                    generator){
+                    env,
+                    gen){
                 @Override
                 public boolean addEntityChunk(net.minecraft.server.v1_15_R1.Entity entity) {
                     //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously

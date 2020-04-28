@@ -240,11 +240,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @return true on success, false on failure
      */
     default boolean regenerate(org.bukkit.World world, Region region, EditSession session) {
-        return regenerate(world, region, null, null, session);
-    }
-
-    default boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
-        return editSession.regenerate(region);
+        return session.regenerate(region);
     }
 
     default IChunkGet get(World world, int chunkX, int chunkZ) {
