@@ -383,7 +383,7 @@ public class Settings extends Config {
                 " - Downloads can be deleted by the user",
                 " - Supports clipboard uploads, downloads and saves",
         })
-        public String URL = "https://athion.net/fawe/";
+        public String URL = "https://schem.intellectualsites.com/fawe/";
     }
 
     public static class EXTENT {
