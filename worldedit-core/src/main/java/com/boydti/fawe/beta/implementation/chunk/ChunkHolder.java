@@ -243,6 +243,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.chunkExisting;
         }
 
@@ -271,6 +272,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getBiomeType(x, y, z);
         }
 
@@ -278,6 +280,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getBlock(x, y, z);
         }
 
@@ -286,6 +289,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getFullBlock(x, y, z);
         }
     };
