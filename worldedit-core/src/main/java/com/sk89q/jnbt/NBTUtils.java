@@ -72,7 +72,7 @@ public final class NBTUtils {
         } else if (clazz.equals(LongArrayTag.class)) {
             return "TAG_Long_Array";
         } else {
-            throw new IllegalArgumentException("Invalid tag classs ("
+            throw new IllegalArgumentException("Invalid tag class ("
                     + clazz.getName() + ").");
         }
     }
@@ -112,7 +112,7 @@ public final class NBTUtils {
         } else if (clazz.equals(LongArrayTag.class)) {
             return NBTConstants.TYPE_LONG_ARRAY;
         } else {
-            throw new IllegalArgumentException("Invalid tag classs ("
+            throw new IllegalArgumentException("Invalid tag class ("
                     + clazz.getName() + ").");
         }
     }

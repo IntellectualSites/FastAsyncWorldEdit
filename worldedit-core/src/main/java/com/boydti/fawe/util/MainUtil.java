@@ -513,11 +513,11 @@ public class MainUtil {
         }
         try (FileInputStream fIn = new FileInputStream(sourceFile); FileChannel source = fIn.getChannel();
              FileOutputStream fOut = new FileOutputStream(destFile); FileChannel destination = fOut.getChannel()) {
-            long transfered = 0;
+            long transferred = 0;
             long bytes = source.size();
-            while (transfered < bytes) {
-                transfered += destination.transferFrom(source, 0, source.size());
-                destination.position(transfered);
+            while (transferred < bytes) {
+                transferred += destination.transferFrom(source, 0, source.size());
+                destination.position(transferred);
             }
         }
         return destFile;

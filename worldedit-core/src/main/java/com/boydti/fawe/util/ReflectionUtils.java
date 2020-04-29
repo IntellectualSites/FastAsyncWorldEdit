@@ -131,13 +131,13 @@ public class ReflectionUtils {
         }
     }
 
-    public static <T> T callConstructor(Constructor<T> constructor, Object... paramaters) {
+    public static <T> T callConstructor(Constructor<T> constructor, Object... parameters) {
         if (constructor == null) {
             throw new RuntimeException("No such constructor");
         }
         constructor.setAccessible(true);
         try {
-            return constructor.newInstance(paramaters);
+            return constructor.newInstance(parameters);
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
         } catch (Exception ex) {
