@@ -73,12 +73,12 @@ public class DelegateLock extends ReentrantLockWithGetOwner {
 
     @Override
     public synchronized int getHoldCount() {
-        throw new UnsupportedOperationException();
+        return parent.getHoldCount();
     }
 
     @Override
     public synchronized boolean isHeldByCurrentThread() {
-        throw new UnsupportedOperationException();
+        return parent.isHeldByCurrentThread();
     }
 
     @Override
@@ -96,12 +96,12 @@ public class DelegateLock extends ReentrantLockWithGetOwner {
 
     @Override
     public synchronized boolean hasWaiters(Condition condition) {
-        throw new UnsupportedOperationException();
+        return parent.hasWaiters(condition);
     }
 
     @Override
     public synchronized int getWaitQueueLength(Condition condition) {
-        throw new UnsupportedOperationException();
+        return parent.getWaitQueueLength(condition);
     }
 
     @Override

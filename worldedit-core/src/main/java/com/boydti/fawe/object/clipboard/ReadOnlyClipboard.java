@@ -61,7 +61,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
                 if (current.getWorld().equals(world)) {
                     return current;
                 }
-                throw new UnsupportedOperationException("TODO: Cannot lazy copy accross worlds (bug jesse)");
+                throw new UnsupportedOperationException("TODO: Cannot lazy copy across worlds (bug jesse)");
             }
             throw new IllegalStateException("No world");
         };

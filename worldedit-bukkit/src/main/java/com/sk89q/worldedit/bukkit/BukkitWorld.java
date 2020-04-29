@@ -184,7 +184,7 @@ public class BukkitWorld extends AbstractWorld {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         try {
             if (adapter != null) {
-                return adapter.regenerate(getWorld(), region, null, null, editSession);
+                return adapter.regenerate(getWorld(), region, editSession);
             } else {
                 throw new UnsupportedOperationException("Missing BukkitImplAdapater for this version.");
             }

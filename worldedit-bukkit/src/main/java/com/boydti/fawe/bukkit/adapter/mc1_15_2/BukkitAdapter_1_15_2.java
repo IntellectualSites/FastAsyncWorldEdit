@@ -104,7 +104,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     }
 
     protected static DelegateLock applyLock(ChunkSection section) {
-        //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which aquires the lock in NMS?
+        //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();

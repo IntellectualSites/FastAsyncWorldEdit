@@ -17,15 +17,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.event.platform;
+package com.sk89q.worldedit.scripting.compat;
 
-import com.sk89q.worldedit.event.Event;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
- * Fired when configuration has been loaded and the platform is in the
- * initialization stage.
- *
- * <p>This event is fired once.</p>
+ * Transpile a script from one (version) of a language to another.
  */
-public class PlatformInitializeEvent extends Event {
+public interface ScriptTranspiler {
+
+    /**
+     * Given input {@code script}, return the transpiled script.
+     *
+     * @param script the script to transpile
+     * @return the new script
+     */
+    Reader transpile(Reader script) throws IOException;
+
 }

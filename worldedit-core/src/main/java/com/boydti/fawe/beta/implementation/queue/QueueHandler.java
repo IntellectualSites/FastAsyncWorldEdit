@@ -167,7 +167,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return sync(call, syncTasks);
     }
 
-    // Lower priorty sync task (runs only when there are no other tasks)
+    // Lower priority sync task (runs only when there are no other tasks)
     public <T> Future<T> syncWhenFree(Runnable run, T value) {
         return sync(run, value, syncWhenFree);
     }
