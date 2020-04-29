@@ -212,4 +212,12 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         return chunks;
     }
 
+    @Override
+    public int hashCode() {
+        int worldHash = this.world == null ? 7 : this.world.hashCode();
+        int result = worldHash ^ (worldHash >>> 32);
+        result = 31 * result + this.getMinimumPoint().hashCode();
+        result = 31 * result + this.getMaximumPoint().hashCode();
+        return result;
+    }
 }
