@@ -413,6 +413,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public T call(IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
+            get.trim(false);
             set = getExtent().processSet(this, get, set);
             if (set != null) {
                 return get.call(set, finalize);
