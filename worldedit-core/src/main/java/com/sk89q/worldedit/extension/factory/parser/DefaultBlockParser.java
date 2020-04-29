@@ -381,6 +381,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
         // Check if the item is allowed
         BlockType blockType = state.getBlockType();
+        
+        if (context.isRestricted()) {
+            Actor actor = context.requireActor();
+            if (actor != null && !actor.hasPermission("worldedit.anyblock")
+                    && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
+                throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
+            }
+        }
 
         if (nbt != null) return validate(context, state.toBaseBlock(nbt));
 
