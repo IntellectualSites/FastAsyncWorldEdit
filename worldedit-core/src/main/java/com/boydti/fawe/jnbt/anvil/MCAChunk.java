@@ -8,7 +8,7 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -71,7 +71,7 @@ public class MCAChunk implements IChunk {
         }
 
         int bitsPerEntry = MathMan.log2nlz(section.palette.length - 1);
-        BitArray4096 bitArray = new BitArray4096(section.blocks, bitsPerEntry);
+        BitArray bitArray = new BitArray(bitsPerEntry, 4096, section.blocks);
         char[] buffer = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         bitArray.toRaw(buffer);
         int offset = section.layer << 12;
@@ -324,7 +324,7 @@ public class MCAChunk implements IChunk {
                         blockstates[0] = 0;
                         blockBitArrayEnd = 1;
                     } else {
-                        BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                        BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockstates);
                         bitArray.fromRaw(blocksCopy);
                     }
 

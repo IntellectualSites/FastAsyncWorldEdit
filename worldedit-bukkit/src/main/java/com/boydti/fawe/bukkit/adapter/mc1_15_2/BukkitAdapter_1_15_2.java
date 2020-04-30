@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
@@ -14,7 +14,6 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
@@ -26,7 +25,6 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 public final class BukkitAdapter_1_15_2 extends NMSAdapter {
@@ -219,7 +217,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                final BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 

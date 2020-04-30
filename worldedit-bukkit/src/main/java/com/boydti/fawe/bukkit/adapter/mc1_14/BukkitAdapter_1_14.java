@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
@@ -34,10 +34,8 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 public final class BukkitAdapter_1_14 extends NMSAdapter {
@@ -88,12 +86,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
 
             {
-                Field tmp;
-                try {
-                    tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
-                } catch (NoSuchFieldException paper) {
-                    tmp = DataPaletteBlock.class.getDeclaredField("j");
-                }
+                Field tmp = DataPaletteBlock.class.getDeclaredField("j");
                 ReflectionUtils.setAccessibleNonFinal(tmp);
                 fieldLock = tmp;
                 fieldLock.setAccessible(true);
@@ -236,7 +229,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                final BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 

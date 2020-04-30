@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
-import com.boydti.fawe.object.IntegerTrio;
+import com.boydti.fawe.object.IntTriple;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -28,7 +28,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     private BiomeType[] biomes = null;
     private char[] states;
 
-    private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
+    private final HashMap<IntTriple, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
 
@@ -91,8 +91,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         if (nbtMapLoc.isEmpty()) {
             return;
         }
-        for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMapLoc.entrySet()) {
-            IntegerTrio key = entry.getKey();
+        for (Map.Entry<IntTriple, CompoundTag> entry : nbtMapLoc.entrySet()) {
+            IntTriple key = entry.getKey();
             setTile(getIndex(key.x, key.y, key.z), entry.getValue());
         }
         nbtMapLoc.clear();
@@ -164,7 +164,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntegerTrio(x, y, z), tag);
+        nbtMapLoc.put(new IntTriple(x, y, z), tag);
         return true;
     }
 

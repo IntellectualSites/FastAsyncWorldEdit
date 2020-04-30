@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
+
     private final FaweLimit limit;
 
     /**
@@ -68,7 +69,8 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
+        throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);

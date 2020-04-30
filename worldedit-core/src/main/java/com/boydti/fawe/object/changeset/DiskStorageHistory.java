@@ -6,8 +6,7 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.IntegerPair;
-import com.boydti.fawe.object.change.MutableFullBlockChange;
+import com.boydti.fawe.object.IntPair;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -16,7 +15,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -386,7 +384,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         return null;
     }
 
-    public IntegerPair readHeader() {
+    public IntPair readHeader() {
         int ox = getOriginX();
         int oz = getOriginZ();
         if (ox == 0 && oz == 0 && bdFile.exists()) {
@@ -404,7 +402,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 e.printStackTrace();
             }
         }
-        return new IntegerPair(ox, oz);
+        return new IntPair(ox, oz);
     }
 
     @Override

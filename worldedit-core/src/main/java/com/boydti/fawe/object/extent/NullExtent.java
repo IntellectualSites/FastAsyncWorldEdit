@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
+//todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
 public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     private final FaweException reason;

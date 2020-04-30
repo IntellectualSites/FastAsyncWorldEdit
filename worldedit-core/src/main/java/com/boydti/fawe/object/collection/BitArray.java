@@ -1,18 +1,18 @@
 package com.boydti.fawe.object.collection;
 
-public final class BitArray4096 {
+public final class BitArray {
 
     private final long[] data;
     private final int bitsPerEntry;
     private final int maxSeqLocIndex;
-    private final int maxEntryValue;
+    private final long mask;
     private final int longLen;
 
-    public BitArray4096(long[] buffer, int bitsPerEntry) {
+    public BitArray(int bitsPerEntry, int arraySize, long[] buffer) {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
-        maxEntryValue = (1 << bitsPerEntry) - 1;
-        this.longLen = (this.bitsPerEntry << 12) >> 6;
+        this.mask = (1L << bitsPerEntry) - 1L;
+        this.longLen = (arraySize * bitsPerEntry) >> 6;
         if (buffer.length < longLen) {
             this.data = new long[longLen];
         } else {
@@ -20,11 +20,11 @@ public final class BitArray4096 {
         }
     }
 
-    public BitArray4096(int bitsPerEntry) {
+    public BitArray(int bitsPerEntry, int arraySize) {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
-        maxEntryValue = (1 << bitsPerEntry) - 1;
-        this.longLen = (this.bitsPerEntry * 4096) >> 6;
+        this.mask = (1L << bitsPerEntry) - 1L;
+        this.longLen = (arraySize * bitsPerEntry) >> 6;
         this.data = new long[longLen];
     }
 
@@ -37,13 +37,13 @@ public final class BitArray4096 {
         int bitIndexStart = index * bitsPerEntry;
         int longIndexStart = bitIndexStart >> 6;
         int localBitIndexStart = bitIndexStart & 63;
-        this.data[longIndexStart] = this.data[longIndexStart] & ~((long) maxEntryValue << localBitIndexStart) | ((long) value) << localBitIndexStart;
+        this.data[longIndexStart] = this.data[longIndexStart] & ~(mask << localBitIndexStart) | (long) value << localBitIndexStart;
 
         if(localBitIndexStart > maxSeqLocIndex) {
             int longIndexEnd = longIndexStart + 1;
             int localShiftStart = 64 - localBitIndexStart;
             int localShiftEnd = bitsPerEntry - localShiftStart;
-            this.data[longIndexEnd] = this.data[longIndexEnd] >>> localShiftEnd << localShiftEnd | (((long) value) >> localShiftStart);
+            this.data[longIndexEnd] = this.data[longIndexEnd] >>> localShiftEnd << localShiftEnd | ((long) value >> localShiftStart);
         }
     }
 
@@ -55,34 +55,27 @@ public final class BitArray4096 {
 
         int localBitIndexStart = bitIndexStart & 63;
         if(localBitIndexStart <= maxSeqLocIndex) {
-            return (int)(this.data[longIndexStart] >>> localBitIndexStart & maxEntryValue);
+            return (int)(this.data[longIndexStart] >>> localBitIndexStart & mask);
         } else {
             int localShift = 64 - localBitIndexStart;
-            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & maxEntryValue);
+            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & mask);
         }
     }
 
     public int getLength() {
         return longLen;
     }
-
-    public final void fromRawSlow(char[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            set(i, arr[i]);
-        }
-    }
-
+    
     public final void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
 
         int localStart = 0;
-        int lastVal;
         int arrI = 0;
         long l = 0;
-        long nextVal;
         for (int i = 0; i < longLen; i++) {
+            int lastVal;
             for (; localStart <= maxSeqLocIndex; localStart += bitsPerEntry) {
                 lastVal = arr[arrI++];
                 l |= ((long) lastVal << localStart);
@@ -92,7 +85,7 @@ public final class BitArray4096 {
                     lastVal = arr[arrI++];
                     int shift = 64 - localStart;
 
-                    nextVal = lastVal >> shift;
+                    long nextVal = lastVal >> shift;
 
                     l |= ((lastVal - (nextVal << shift)) << localStart);
 
@@ -109,22 +102,6 @@ public final class BitArray4096 {
         }
     }
 
-    public BitArray4096 growSlow(int bitsPerEntry) {
-        BitArray4096 newBitArray = new BitArray4096(bitsPerEntry);
-        for (int i = 0; i < 4096; i++) {
-            newBitArray.set(i, get(i));
-        }
-        return newBitArray;
-    }
-
-    public final char[] toRawSlow() {
-        char[] arr = new char[4096];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = (char) get(i);
-        }
-        return arr;
-    }
-
     public final int[] toRaw() {
         return toRaw(new int[4096]);
     }
@@ -133,15 +110,14 @@ public final class BitArray4096 {
         final long[] data = this.data;
         final int dataLength = longLen;
         final int bitsPerEntry = this.bitsPerEntry;
-        final int maxEntryValue = this.maxEntryValue;
+        final long maxEntryValue = this.mask;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
 
         int localStart = 0;
-        char lastVal;
         int arrI = 0;
-        long l;
         for (int i = 0; i < dataLength; i++) {
-            l = data[i];
+            long l = data[i];
+            char lastVal;
             for (; localStart <= maxSeqLocIndex; localStart += bitsPerEntry) {
                 lastVal = (char) (l >>> localStart & maxEntryValue);
                 buffer[arrI++] = lastVal;
@@ -167,15 +143,14 @@ public final class BitArray4096 {
         final long[] data = this.data;
         final int dataLength = longLen;
         final int bitsPerEntry = this.bitsPerEntry;
-        final int maxEntryValue = this.maxEntryValue;
+        final long maxEntryValue = this.mask;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
 
         int localStart = 0;
-        char lastVal;
         int arrI = 0;
-        long l;
         for (int i = 0; i < dataLength; i++) {
-            l = data[i];
+            long l = data[i];
+            char lastVal;
             for (; localStart <= maxSeqLocIndex; localStart += bitsPerEntry) {
                 lastVal = (char) (l >>> localStart & maxEntryValue);
                 buffer[arrI++] = lastVal;

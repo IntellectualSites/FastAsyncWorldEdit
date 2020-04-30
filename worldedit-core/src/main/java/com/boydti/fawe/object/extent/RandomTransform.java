@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
@@ -9,9 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Uses a random pattern of a weighted list of patterns.
@@ -28,6 +27,10 @@ public class RandomTransform extends SelectTransform {
         this(new TrueRandom());
     }
 
+    public RandomTransform(SimpleRandom random) {
+        this.random = random;
+    }
+
     @Override
     public AbstractDelegateExtent getExtent(int x, int y, int z) {
         return collection.next(x, y, z);
@@ -36,10 +39,6 @@ public class RandomTransform extends SelectTransform {
     @Override
     public AbstractDelegateExtent getExtent(int x, int z) {
         return collection.next(x, 0, z);
-    }
-
-    public RandomTransform(SimpleRandom random) {
-        this.random = random;
     }
 
     @Override

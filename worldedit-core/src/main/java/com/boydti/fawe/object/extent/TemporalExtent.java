@@ -61,7 +61,7 @@ public class TemporalExtent extends PassthroughExtent {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
             if(block instanceof BaseBlock) {
                 return (BaseBlock)block;
-            }else {
+            } else {
                 return block.toBaseBlock();
             }
         }

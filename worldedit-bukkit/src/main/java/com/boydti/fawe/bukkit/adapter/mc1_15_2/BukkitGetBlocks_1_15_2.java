@@ -8,7 +8,7 @@ import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
 import com.boydti.fawe.object.collection.AdaptedMap;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
@@ -530,7 +530,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 final int bitsPerEntry = bits.c();
                 final long[] blockStates = bits.a();
 
-                new BitArray4096(blockStates, bitsPerEntry).toRaw(data);
+                new BitArray(bitsPerEntry, 4096, blockStates).toRaw(data);
 
                 int num_palette;
                 if (palette instanceof DataPaletteLinear) {

@@ -30,6 +30,7 @@ public class PositionTransformExtent extends ResettableExtent {
         return super.setExtent(extent);
     }
 
+    @Override
     public void setOrigin(BlockVector3 pos) {
         this.min = pos;
     }
@@ -38,9 +39,9 @@ public class PositionTransformExtent extends ResettableExtent {
         if (min == null) {
             min = pos;
         }
-        mutable.mutX(((pos.getX() - min.getX())));
-        mutable.mutY(((pos.getY() - min.getY())));
-        mutable.mutZ(((pos.getZ() - min.getZ())));
+        mutable.mutX(pos.getX() - min.getX());
+        mutable.mutY(pos.getY() - min.getY());
+        mutable.mutZ(pos.getZ() - min.getZ());
         MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
         return min.add(tmp.toBlockPoint());
     }

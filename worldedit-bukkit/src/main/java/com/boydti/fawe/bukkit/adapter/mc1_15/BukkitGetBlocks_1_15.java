@@ -10,7 +10,7 @@ import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
 import com.boydti.fawe.object.collection.AdaptedMap;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
@@ -439,6 +439,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 //Lighting
                 // TODO optimize, cause this is really slow
                 LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
+                //lightChunk()
                 engine.a(nmsChunk, false);
 
                 Runnable callback;
@@ -448,6 +449,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                     int finalMask = bitMask;
                     callback = () -> {
                         // Set Modified
+                        //setLastSaveHadEntities
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
@@ -518,15 +520,19 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 final DataBits bits = (DataBits) BukkitAdapter_1_15.fieldBits.get(blocks);
                 final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_15.fieldPalette.get(blocks);
 
+                //getBits()
                 final int bitsPerEntry = bits.c();
+                //getRaw()
                 final long[] blockStates = bits.a();
 
-                new BitArray4096(blockStates, bitsPerEntry).toRaw(data);
+                new BitArray(bitsPerEntry, 4096, blockStates).toRaw(data);
 
                 int num_palette;
                 if (palette instanceof DataPaletteLinear) {
+                    //Get the size of the palette
                     num_palette = ((DataPaletteLinear<IBlockData>) palette).b();
                 } else if (palette instanceof DataPaletteHash) {
+                    //Get the size of the palette
                     num_palette = ((DataPaletteHash<IBlockData>) palette).b();
                 } else {
                     num_palette = 0;
@@ -538,6 +544,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             char ordinal = paletteToBlockChars[paletteVal];
                             if (ordinal == Character.MAX_VALUE) {
                                 paletteToBlockInts[num_palette++] = paletteVal;
+                                //palette.a(Object) is palette.idFor(Object)
                                 IBlockData ibd = palette.a(data[i]);
                                 if (ibd == null) {
                                     ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
@@ -561,6 +568,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {
+                            //palette.a(Object) is palette.idFor(Object)
                             char ordinal = ordinal(palette.a(i), adapter);
                             paletteToOrdinal[i] = ordinal;
                         }

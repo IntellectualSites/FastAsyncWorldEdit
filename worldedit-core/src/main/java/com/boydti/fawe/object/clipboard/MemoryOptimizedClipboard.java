@@ -2,7 +2,7 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
-import com.boydti.fawe.object.IntegerTrio;
+import com.boydti.fawe.object.IntTriple;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -39,7 +39,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private byte[] buffer = new byte[MainUtil.getMaxCompressedLength(BLOCK_SIZE)];
     private byte[] biomes = null;
 
-    private final HashMap<IntegerTrio, CompoundTag> nbtMap;
+    private final HashMap<IntTriple, CompoundTag> nbtMap;
 
 
     private int lastOrdinalsI = -1;
@@ -198,8 +198,8 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             CompoundTag nbt;
             if (nbtMap.size() < 4) {
                 nbt = null;
-                for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
-                    IntegerTrio trio = entry.getKey();
+                for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
+                    IntTriple trio = entry.getKey();
                     int index = getIndex(trio.x, trio.y, trio.z);
                     if (index == i) {
                         nbt = entry.getValue();
@@ -211,7 +211,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
                 int newI = i - y * getArea();
                 int z = newI / getWidth();
                 int x = newI - z * getWidth();
-                nbt = nbtMap.get(new IntegerTrio(x, y, z));
+                nbt = nbtMap.get(new IntTriple(x, y, z));
             }
             return state.toBaseBlock(nbt);
         }
@@ -247,7 +247,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new IntegerTrio(x, y, z), tag);
+        nbtMap.put(new IntTriple(x, y, z), tag);
         Map<String, Tag> values = tag.getValue();
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));

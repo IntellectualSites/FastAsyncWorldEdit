@@ -38,7 +38,9 @@ public class HeightBoundExtent extends FaweRegionExtent {
 
     @Override
     public Collection<Region> getRegions() {
-        return Collections.singletonList(new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        return Collections.singletonList(
+            new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE,
+                Integer.MAX_VALUE));
     }
 
     @Override

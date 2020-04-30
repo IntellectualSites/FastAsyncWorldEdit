@@ -3,7 +3,7 @@ package com.boydti.fawe.object.clipboard;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
-import com.boydti.fawe.object.IntegerTrio;
+import com.boydti.fawe.object.IntTriple;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -56,7 +56,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private static int HEADER_SIZE = 14;
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     
-    private final HashMap<IntegerTrio, CompoundTag> nbtMap;
+    private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
 
     private RandomAccessFile braf;
@@ -322,8 +322,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             CompoundTag nbt;
             if (nbtMap.size() < 4) {
                 nbt = null;
-                for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMap.entrySet()) {
-                    IntegerTrio key = entry.getKey();
+                for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
+                    IntTriple key = entry.getKey();
                     int index = getIndex(key.x, key.y, key.z);
                     if (index == i) {
                         nbt = entry.getValue();
@@ -335,7 +335,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 int newI = i - y * getArea();
                 int z = newI / getWidth();
                 int x = newI - z * getWidth();
-                nbt = nbtMap.get(new IntegerTrio(x, y, z));
+                nbt = nbtMap.get(new IntTriple(x, y, z));
             }
             return state.toBaseBlock(nbt);
         }
@@ -344,7 +344,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private BaseBlock toBaseBlock(BlockState state, int x, int y, int z) {
         if (state.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
-            CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
+            CompoundTag nbt = nbtMap.get(new IntTriple(x, y, z));
             return state.toBaseBlock(nbt);
         }
         return state.toBaseBlock();
@@ -375,7 +375,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new IntegerTrio(x, y, z), tag);
+        nbtMap.put(new IntTriple(x, y, z), tag);
         Map<String, Tag> values = tag.getValue();
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));

@@ -1,10 +1,10 @@
 package com.boydti.fawe.object;
 
-public class IntegerPair {
+public final class IntPair {
     public int x;
     public int z;
 
-    public IntegerPair(final int x, final int z) {
+    public IntPair(final int x, final int z) {
         this.x = x;
         this.z = z;
     }
@@ -27,7 +27,7 @@ public class IntegerPair {
         if ((obj == null) || (this.getClass() != obj.getClass())) {
             return false;
         }
-        final IntegerPair other = (IntegerPair) obj;
-        return ((this.x == other.x) && (this.z == other.z));
+        final IntPair other = (IntPair) obj;
+        return (this.x == other.x) && (this.z == other.z);
     }
 }

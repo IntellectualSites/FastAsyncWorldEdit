@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -11,15 +10,14 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import javax.annotation.Nullable;
 
 public class ScaleTransform extends ResettableExtent {
+
+    private final double dx, dy, dz;
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient int maxy;
     private transient BlockVector3 min;
-
-    private final double dx, dy, dz;
 
 
     public ScaleTransform(Extent parent, double dx, double dy, double dz) {
@@ -42,9 +40,9 @@ public class ScaleTransform extends ResettableExtent {
         if (min == null) {
             min = pos;
         }
-        mutable.mutX((min.getX() + (pos.getX() - min.getX()) * dx));
-        mutable.mutY((min.getY() + (pos.getY() - min.getY()) * dy));
-        mutable.mutZ((min.getZ() + (pos.getZ() - min.getZ()) * dz));
+        mutable.mutX(min.getX() + (pos.getX() - min.getX()) * dx);
+        mutable.mutY(min.getY() + (pos.getY() - min.getY()) * dy);
+        mutable.mutZ(min.getZ() + (pos.getZ() - min.getZ()) * dz);
         return mutable;
     }
 
@@ -52,15 +50,16 @@ public class ScaleTransform extends ResettableExtent {
         if (min == null) {
             min = BlockVector3.at(x, y, z);
         }
-        mutable.mutX((min.getX() + (x - min.getX()) * dx));
-        mutable.mutY((min.getY() + (y - min.getY()) * dy));
-        mutable.mutZ((min.getZ() + (z - min.getZ()) * dz));
+        mutable.mutX(min.getX() + (x - min.getX()) * dx);
+        mutable.mutY(min.getY() + (y - min.getY()) * dy);
+        mutable.mutZ(min.getZ() + (z - min.getZ()) * dz);
         return mutable;
     }
 
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
+        throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(location));
         double sx = pos.getX();
@@ -82,7 +81,8 @@ public class ScaleTransform extends ResettableExtent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         boolean result = false;
-        MutableBlockVector3 pos = new MutableBlockVector3(getPos(position.getBlockX(), 0, position.getBlockZ()));
+        MutableBlockVector3 pos = new MutableBlockVector3(
+            getPos(position.getBlockX(), 0, position.getBlockZ()));
         double sx = pos.getX();
         double sz = pos.getZ();
         double ex = pos.getX() + dx;
@@ -96,7 +96,8 @@ public class ScaleTransform extends ResettableExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x1, int y1, int z1, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x1, int y1, int z1, B block)
+        throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(x1, y1, z1));
         double sx = pos.getX();
@@ -118,7 +119,9 @@ public class ScaleTransform extends ResettableExtent {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
-        Location newLoc = new Location(location.getExtent(), getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(), location.getYaw(), location.getPitch());
+        Location newLoc = new Location(location.getExtent(),
+            getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(),
+            location.getYaw(), location.getPitch());
         return super.createEntity(newLoc, entity);
     }
 }

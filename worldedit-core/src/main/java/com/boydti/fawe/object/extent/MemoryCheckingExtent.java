@@ -10,6 +10,7 @@ import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class MemoryCheckingExtent extends PassthroughExtent {
+
     private final Player player;
 
     public MemoryCheckingExtent(Player player, Extent extent) {

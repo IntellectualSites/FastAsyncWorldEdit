@@ -9,6 +9,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class OffsetExtent extends ResettableExtent {
+
     private final int dx, dy, dz;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
@@ -21,7 +22,9 @@ public class OffsetExtent extends ResettableExtent {
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return getExtent().setBiome(mutable.setComponents(position.getBlockX() + dx, position.getBlockZ() + dz), biome);
+        return getExtent()
+            .setBiome(mutable.setComponents(position.getBlockX() + dx, position.getBlockZ() + dz),
+                biome);
     }
 
     @Override
@@ -30,12 +33,15 @@ public class OffsetExtent extends ResettableExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        return getExtent().setBlock(location.getBlockX() + dx, location.getBlockY() + dy, location.getBlockZ() + dz, block);
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block)
+        throws WorldEditException {
+        return getExtent().setBlock(location.getBlockX() + dx, location.getBlockY() + dy,
+            location.getBlockZ() + dz, block);
     }
 
     @Override
-    public  <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
         return getExtent().setBlock(x + dx, y + dy, z + dz, block);
     }
 

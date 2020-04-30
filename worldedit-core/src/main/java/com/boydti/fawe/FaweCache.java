@@ -8,7 +8,7 @@ import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.beta.implementation.queue.QueuePool;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.collection.VariableThreadLocal;
 import com.boydti.fawe.object.exception.FaweBlockBagException;
@@ -278,7 +278,7 @@ public enum FaweCache implements Trimable {
                 blockStates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 
