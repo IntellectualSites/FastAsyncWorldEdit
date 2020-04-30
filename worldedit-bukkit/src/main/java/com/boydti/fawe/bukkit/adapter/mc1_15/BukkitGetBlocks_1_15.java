@@ -214,10 +214,9 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
             if (this.sections == null) {
                 this.sections = sections.clone();
             }
-            //TODO: Understand why this causes #329, what the purpose of this is, and what may or may not break after commenting this out.
-//            if (this.sections[layer] != section) {
-//                this.sections[layer] = section;
-//            }
+            if (this.sections[layer] != section) {
+                this.sections[layer] = section;
+            }
             this.blocks[layer] = arr;
         }
     }
@@ -287,19 +286,17 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
-                            ChunkSection getSection;
                             if (this.nmsChunk != nmsChunk) {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
                                 this.reset();
-                            } else {
-                                getSection = this.getSections()[layer];
-                                if (getSection != existingSection) {
-                                    this.sections[layer] = existingSection;
-                                    this.reset();
-                                } else if (lock.isModified()) {
-                                    this.reset(layer);
-                                }
+                            } else if (existingSection != getSections()[layer]) {
+                                this.sections[layer] = existingSection;
+                                this.reset();
+                            } else if (!Arrays.equals(update(layer, new char[4096]), load(layer))) {
+                                this.reset(layer);
+                            } else if (lock.isModified()) {
+                                this.reset(layer);
                             }
                             newSection = BukkitAdapter_1_15.newChunkSection(layer, this::load, setArr);
                             if (!BukkitAdapter_1_15.setSectionAtomic(sections, existingSection, newSection, layer)) {
