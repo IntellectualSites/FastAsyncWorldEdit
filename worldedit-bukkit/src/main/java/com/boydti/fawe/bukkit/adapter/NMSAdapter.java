@@ -1,10 +1,16 @@
 package com.boydti.fawe.bukkit.adapter;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
+
+import java.util.Map;
 import java.util.function.Function;
 
 public class NMSAdapter {
-    public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, char[] set) {
+    public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy,
+        int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks) {
         int air = 0;
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
@@ -16,6 +22,14 @@ public class NMSAdapter {
                 case BlockID.CAVE_AIR:
                 case BlockID.VOID_AIR:
                     air++;
+                    break;
+                default:
+                    BlockState state = BlockState.getFromOrdinal(ordinal);
+                    if (state.getMaterial().isTicksRandomly()) {
+                        ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                .getInternalBlockStateId(state).orElse(0));
+                    }
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -29,20 +43,31 @@ public class NMSAdapter {
         return air;
     }
 
-    public static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set) {
+    public static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock,
+        int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set,
+        Map<BlockVector3, Integer> ticking_blocks) {
         int air = 0;
         int num_palette = 0;
         int i = 0;
+        int setblocks = 0;
         outer:
         for (; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
                 case BlockID.__RESERVED__:
-                    break outer;
+                    continue outer;
                 case BlockID.AIR:
                 case BlockID.CAVE_AIR:
                 case BlockID.VOID_AIR:
                     air++;
+                    break;
+                default:
+                    BlockState state = BlockState.getFromOrdinal(ordinal);
+                    if (state.getMaterial().isTicksRandomly()) {
+                        ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                .getInternalBlockStateId(state).orElse(0));
+                    }
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -51,10 +76,11 @@ public class NMSAdapter {
                 num_palette++;
             }
             blocksCopy[i] = palette;
+            setblocks++;
         }
-        if (i != 4096) {
+        if (setblocks != 4096) {
             char[] getArr = get.apply(layer);
-            for (; i < 4096; i++) {
+            for (i = setblocks; i < 4096; i++) {
                 char ordinal = set[i];
                 switch (ordinal) {
                     case BlockID.__RESERVED__:
@@ -66,7 +92,15 @@ public class NMSAdapter {
                             case BlockID.CAVE_AIR:
                             case BlockID.VOID_AIR:
                                 air++;
+                                break;
                             default:
+                                BlockState state = BlockState.getFromOrdinal(ordinal);
+                                if (state.getMaterial().isTicksRandomly()) {
+                                    ticking_blocks
+                                        .put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                                .getInternalBlockStateId(state).orElse(0));
+                                }
                                 set[i] = ordinal;
                         }
                         break;
