@@ -66,6 +66,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "mask",
+            aliases = "/mask",
             desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
@@ -126,6 +127,7 @@ public class ToolUtilCommands {
 
     @Command(
         name = "range",
+        aliases = "/range",
         desc = "Set the brush range"
         )
     @CommandPermissions("worldedit.brush.options.range")
