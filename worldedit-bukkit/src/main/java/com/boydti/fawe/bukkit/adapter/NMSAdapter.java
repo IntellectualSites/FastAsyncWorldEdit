@@ -60,14 +60,14 @@ public class NMSAdapter {
                     switch (ordinal) {
                         case BlockID.__RESERVED__:
                             ordinal = BlockID.AIR;
-                            air++;
-                            break;
                         case BlockID.AIR:
                         case BlockID.CAVE_AIR:
                         case BlockID.VOID_AIR:
                             air++;
                             break;
                     }
+                    set[i] = ordinal;
+                    break;
                 }
                 case BlockID.AIR:
                 case BlockID.CAVE_AIR:
