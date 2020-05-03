@@ -9,12 +9,15 @@ import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_15_R1.*;
@@ -198,11 +201,14 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
+            Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
             int air;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set);
+                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer,
+                    set, ticking_blocks);
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set);
+                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy,
+                    num_palette_buffer, get, set, ticking_blocks);
             }
             int num_palette = num_palette_buffer[0];
             // BlockStates
@@ -244,7 +250,11 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
                 fieldBits.set(dataPaletteBlocks, nmsBits);
                 fieldPalette.set(dataPaletteBlocks, palette);
                 fieldSize.set(dataPaletteBlocks, bitsPerEntry);
-                setCount(0, 4096 - air, section);
+                setCount(ticking_blocks.size(), 4096 - air, section);
+                ticking_blocks.forEach((pos, ordinal) -> {
+                    section.setType(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
+                        Block.getByCombinedId(ordinal));
+                });
             } catch (final IllegalAccessException | NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
