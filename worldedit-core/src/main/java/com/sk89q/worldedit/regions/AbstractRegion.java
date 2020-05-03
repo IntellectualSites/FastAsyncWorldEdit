@@ -218,6 +218,30 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         int result = worldHash ^ (worldHash >>> 32);
         result = 31 * result + this.getMinimumPoint().hashCode();
         result = 31 * result + this.getMaximumPoint().hashCode();
+        result = 31 * result + this.getArea();
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == this) {
+            return true;
+        }
+        if(!(o instanceof Region)){
+            return false;
+        }
+        Region region = ((Region) o);
+        if(this.getWorld() != region.getWorld()){
+            if(this.getWorld() == null || region.getWorld() == null){
+                return false;
+            }
+        }
+        if(this.getWorld().equals(region.getWorld())
+        && this.getMinimumPoint().equals(region.getMinimumPoint())
+        && this.getMaximumPoint().equals(region.getMaximumPoint())
+        && this.getArea() == region.getArea()){
+            return true;
+        }
+        return false;
     }
 }
