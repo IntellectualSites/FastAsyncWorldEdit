@@ -16,7 +16,6 @@ import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
-import com.boydti.fawe.bukkit.regions.WorldguardFlag;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
@@ -214,7 +213,6 @@ public class FaweBukkit implements IFawe, Listener {
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
                 managers.add(new Worldguard(worldguardPlugin));
-                managers.add(new WorldguardFlag(worldguardPlugin));
                 log.debug("Attempting to use plugin 'WorldGuard'");
             } catch (Throwable ignored) {
             }
