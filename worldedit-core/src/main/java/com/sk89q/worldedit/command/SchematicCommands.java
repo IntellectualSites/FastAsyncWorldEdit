@@ -201,7 +201,7 @@ public class SchematicCommands {
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
+        ClipboardFormat format = null;
         InputStream in = null;
         try {
             URI uri;
@@ -221,6 +221,7 @@ public class SchematicCommands {
                 File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
+                    format = ClipboardFormats.findByAlias(formatName);
                     String[] extensions;
                     if (format != null) {
                         extensions = format.getFileExtensions().toArray(new String[0]);
@@ -237,9 +238,11 @@ public class SchematicCommands {
                         actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
                         return;
                     }
-                    if (format == null && filename.matches(".*\\.[\\w].*")) {
-                        String extension = filename.substring(filename.lastIndexOf('.') + 1);
-                        format = ClipboardFormats.findByExtension(extension);
+                    if (filename.matches(".*\\.[\\w].*")) {
+                        format = ClipboardFormats
+                            .findByExtension(filename.substring(filename.lastIndexOf('.') + 1));
+                    } else {
+                        format = ClipboardFormats.findByAlias(formatName);
                     }
                     file = MainUtil.resolve(dir, filename, format, false);
                 }

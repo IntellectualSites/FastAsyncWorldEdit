@@ -69,6 +69,7 @@ public class FastSchematicReader extends NBTSchematicReader {
     private final NBTInputStream inputStream;
     private DataFixer fixer = null;
     private int dataVersion = -1;
+    private int version = -1;
 
     private FastByteArrayOutputStream blocksOut;
     private FaweOutputStream blocks;
@@ -119,6 +120,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         StreamDelegate root = new StreamDelegate();
         StreamDelegate schematic = root.add("Schematic");
         schematic.add("DataVersion").withInt((i, v) -> dataVersion = v);
+        schematic.add("Version").withInt((i, v) -> version = v);
         schematic.add("Width").withInt((i, v) -> width = v);
         schematic.add("Height").withInt((i, v) -> height = v);
         schematic.add("Length").withInt((i, v) -> length = v);
@@ -196,6 +198,11 @@ public class FastSchematicReader extends NBTSchematicReader {
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
         inputStream.readNamedTagLazy(root);
+
+        if (version != 1 && version != 2) {
+            throw new IOException("This schematic version is currently not supported");
+        }
+
         if (blocks != null) blocks.close();
         if (biomes != null) biomes.close();
         blocks = null;
