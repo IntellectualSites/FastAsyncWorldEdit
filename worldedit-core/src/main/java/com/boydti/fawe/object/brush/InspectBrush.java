@@ -77,17 +77,14 @@ public class InspectBrush extends BrushTool {
             final int z = target.getBlockZ();
             World world = player.getWorld();
             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
-            System.out.println("World " + world.getName());
             int count = 0;
             for (Supplier<RollbackOptimizedHistory> supplier : db.getEdits(target, false)) {
-                System.out.println("History " + db);
                 count++;
                 RollbackOptimizedHistory edit = supplier.get();
                 Iterator<MutableFullBlockChange> iter = edit.getFullBlockIterator(null, 0, false);
                 while (iter.hasNext()) {
                     MutableFullBlockChange change = iter.next();
                     if (change.x != x || change.y != y || change.z != z) {
-                        System.out.println("Not pos " + change.x + "," + change.y + "," + change.z + " | " + x + "," + y + "," + z);
                         continue;
                     }
                     int from = change.from;
