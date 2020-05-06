@@ -237,6 +237,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
         String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
+        Map<Property<?>, Object> blockStates = new HashMap<>();
 
         BlockState state = null;
 
@@ -287,6 +288,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 }
                 stateString = blockAndExtraData[0].substring(stateStart + 1, blockAndExtraData[0].length() - 1);
             }
+            String[] stateProperties = EMPTY_STRING_ARRAY;
+            if(stateString != null) {
+                stateProperties = stateString.split(",");
+            }
             if (typeString.isEmpty()) {
                 throw new InputParseException("Invalid format");
             }
@@ -319,7 +324,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 }
                 Player player = (Player) actor;
                 BlockBag bag = player.getInventoryBlockBag();
-                if (bag == null || !(bag instanceof SlottableBlockBag)) {
+                if (!(bag instanceof SlottableBlockBag)) {
                     throw new InputParseException("Unsupported!");
                 }
                 SlottableBlockBag slottable = (SlottableBlockBag) bag;
@@ -341,25 +346,21 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         "Does not match a valid block type: '" + input + "'");
                 }
             }
-            if (nbt == null) nbt = state.getNbtData();
-
-            if (stateString != null) {
-                state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
+            if (nbt == null) {
+                nbt = state.getNbtData();
             }
+
+            blockStates.putAll(parseProperties(state.getBlockType(), stateProperties, context));
             if (context.isPreferringWildcard()) {
                 if (stateString == null || stateString.isEmpty()) {
                     state = new FuzzyBlockState(state);
                 } else {
-                    BlockType blockType = state.getBlockType();
                     FuzzyBlockState.Builder fuzzyBuilder = FuzzyBlockState.builder();
-                    fuzzyBuilder.type(blockType);
-                    String[] entries = stateString.split(",");
-                    for (String entry : entries) {
-                        String[] split = entry.split("=");
-                        String key = split[0];
-                        String val = split[1];
-                        Property<Object> prop = blockType.getProperty(key);
-                        fuzzyBuilder.withProperty(prop, prop.getValueFor(val));
+                    fuzzyBuilder.type(state.getBlockType());
+                    for (Map.Entry<Property<?>, Object> blockState : blockStates.entrySet()) {
+                        @SuppressWarnings("unchecked")
+                        Property<Object> objProp = (Property<Object>) blockState.getKey();
+                        fuzzyBuilder.withProperty(objProp, blockState.getValue());
                     }
                     state = fuzzyBuilder.build();
                 }
@@ -390,7 +391,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
         }
 
-        if (nbt != null) return validate(context, state.toBaseBlock(nbt));
+        if (nbt != null) {
+            return validate(context, state.toBaseBlock(nbt));
+        }
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN
                 || BlockCategories.SIGNS.contains(blockType)) {
