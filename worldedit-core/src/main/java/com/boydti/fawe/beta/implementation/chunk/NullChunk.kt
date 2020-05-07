@@ -117,5 +117,9 @@ object NullChunk : IQueueChunk<Nothing> {
     override fun trim(aggressive: Boolean): Boolean {
         return true
     }
+
+    override fun trim(aggressive: Boolean, layer: Int): Boolean {
+        return true
+    }
 }
 

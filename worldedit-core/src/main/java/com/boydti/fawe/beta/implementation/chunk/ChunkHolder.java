@@ -345,6 +345,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return this.trim(aggressive);
+    }
+
+    @Override
     public boolean isEmpty() {
         return chunkSet == null || chunkSet.isEmpty();
     }
