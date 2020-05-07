@@ -41,6 +41,8 @@ public interface IBlocks extends Trimable {
             .map(layer -> (1 << layer)).sum();
     }
 
+    boolean trim(boolean aggressive, int layer);
+
     IBlocks reset();
 
     default byte[] toByteArray(boolean full) {

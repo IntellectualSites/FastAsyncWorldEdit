@@ -50,6 +50,10 @@ object NullChunkGet : IChunkGet {
         return true
     }
 
+    override fun trim(aggressive: Boolean, layer: Int): Boolean {
+        return true
+    }
+
     override fun <T : Future<T>> call(set: IChunkSet, finalize: Runnable): T? {
         return null
     }
