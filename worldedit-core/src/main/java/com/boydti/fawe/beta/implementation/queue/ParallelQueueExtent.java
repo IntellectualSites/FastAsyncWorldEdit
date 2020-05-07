@@ -1,13 +1,14 @@
 package com.boydti.fawe.beta.implementation.queue;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IQueueChunk;
-import com.boydti.fawe.beta.IQueueWrapper;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.IQueueWrapper;
 import com.boydti.fawe.beta.implementation.filter.CountFilter;
 import com.boydti.fawe.beta.implementation.filter.DistrFilter;
+import com.boydti.fawe.beta.implementation.filter.LinkedFilter;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.BatchProcessorHolder;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -16,6 +17,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
@@ -36,13 +38,12 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrapper {
 
     private final World world;
     private final QueueHandler handler;
     private final BatchProcessorHolder processor;
+    private int changes;
 
     public ParallelQueueExtent(QueueHandler handler, World world) {
         super(handler.getQueue(world, new BatchProcessorHolder()));
@@ -52,8 +53,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     @Override
-    public IQueueExtent getExtent() {
-        return (IQueueExtent) super.getExtent();
+    public IQueueExtent<IQueueChunk> getExtent() {
+        return (IQueueExtent<IQueueChunk>) super.getExtent();
     }
 
     @Override
@@ -126,10 +127,6 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         return filter;
     }
 
-    public int getChanges() {
-        return -1;
-    }
-
     @Override
     public int countBlocks(Region region, Mask searchMask) {
         return
@@ -142,33 +139,30 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        apply(region, block, true);
-        return getChanges();
+        return this.changes = apply(region, new BlockMaskBuilder().add(block).build(this).toFilter(new CountFilter())).getParent().getTotal();
     }
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        apply(region, pattern, true);
-        return getChanges();
+        return this.changes = apply(region, new LinkedFilter<>(pattern, new CountFilter()), true).getChild().getTotal();
     }
 
     @Override
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
         if (vset instanceof Region) {
-            setBlocks((Region) vset, pattern);
+            this.changes = setBlocks((Region) vset, pattern);
         }
         // TODO optimize parallel
         for (BlockVector3 blockVector3 : vset) {
             pattern.apply(this, blockVector3, blockVector3);
         }
-        return getChanges();
+        return this.changes;
     }
 
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern)
         throws MaxChangedBlocksException {
-        apply(region, mask.toFilter(pattern), false);
-        return getChanges();
+        return this.changes = apply(region, mask.toFilter(pattern), false).getBlocksApplied();
     }
 
     @Override

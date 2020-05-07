@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.implementation.filter.MaskFilter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;

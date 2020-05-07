@@ -1069,6 +1069,31 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return this.changes;
     }
 
+    @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, block);
+    }
+
+    @Override
+    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, pattern);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+        return this.changes = super.replaceBlocks(region, filter, replacement);
+    }
+
+    @Override
+    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
+        return this.changes = super.replaceBlocks(region, filter, pattern);
+    }
+
+    @Override
+    public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
+        return this.changes = super.replaceBlocks(region, mask, pattern);
+    }
+
     /**
      * Fills an area recursively in the X/Z directions.
      *
