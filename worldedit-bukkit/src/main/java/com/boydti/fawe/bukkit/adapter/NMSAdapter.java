@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -49,6 +50,8 @@ public class NMSAdapter {
         int air = 0;
         int num_palette = 0;
         char[] getArr = null;
+        char lastOrdinal = BlockID.__RESERVED__;
+        boolean lastticking = false;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -75,8 +78,16 @@ public class NMSAdapter {
                     air++;
                     break;
             }
-            BlockState state = BlockState.getFromOrdinal(ordinal);
-            if (state.getMaterial().isTicksRandomly()) {
+            boolean ticking;
+            if (ordinal != lastOrdinal) {
+                ticking = BlockTypesCache.ticking[ordinal];
+                lastOrdinal = ordinal;
+                lastticking = ticking;
+            } else {
+                ticking = lastticking;
+            }
+            if (ticking) {
+                BlockState state = BlockState.getFromOrdinal(ordinal);
                 ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
                     WorldEditPlugin.getInstance().getBukkitImplAdapter()
                         .getInternalBlockStateId(state).orElse(0));

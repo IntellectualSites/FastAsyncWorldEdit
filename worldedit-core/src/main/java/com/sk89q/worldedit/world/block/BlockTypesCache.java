@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.util.MathMan;
+import com.google.common.primitives.Booleans;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -166,12 +167,14 @@ public class BlockTypesCache {
 
     public static final BlockType[] values;
     public static final BlockState[] states;
+    public static final boolean[] ticking;
 
     protected static final Set<String> $NAMESPACES = new LinkedHashSet<>();
 
     static {
         try {
             ArrayList<BlockState> stateList = new ArrayList<>();
+            ArrayList<Boolean> tickList = new ArrayList<>();
 
             Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS);
             Registries registries = platform.getRegistries();
@@ -202,7 +205,7 @@ public class BlockTypesCache {
                     if (values[internalId] != null) {
                         throw new IllegalStateException("Invalid duplicate id for " + field.getName());
                     }
-                    BlockType type = register(defaultState, internalId, stateList);
+                    BlockType type = register(defaultState, internalId, stateList, tickList);
                     // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
                     values[internalId] = type;
                 }
@@ -214,7 +217,7 @@ public class BlockTypesCache {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
                     for (; values[internalId] != null; internalId++);
-                    BlockType type = register(defaultState, internalId, stateList);
+                    BlockType type = register(defaultState, internalId, stateList, tickList);
                     values[internalId] = type;
                 }
             }
@@ -223,7 +226,7 @@ public class BlockTypesCache {
             }
 
             states = stateList.toArray(new BlockState[stateList.size()]);
-
+            ticking = Booleans.toArray(tickList);
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -231,12 +234,17 @@ public class BlockTypesCache {
         }
     }
 
-    private static BlockType register(final String id, int internalId, List<BlockState> states) {
+    private static BlockType register(final String id, int internalId, List<BlockState> states, List<Boolean> tickList) {
         // Get the enum name (remove namespace if minecraft:)
         int propStart = id.indexOf('[');
         String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
         String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase(Locale.ROOT);
+        int oldsize = states.size();
         BlockType existing = new BlockType(id, internalId, states);
+        Boolean[] filled = new Boolean[states.size() - oldsize];
+        Arrays.fill(filled, existing.getMaterial().isTicksRandomly());
+        List<Boolean> list = new ArrayList<>(Arrays.asList(filled));
+        tickList.addAll(list);
         // register states
         BlockType.REGISTRY.register(typeName, existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
