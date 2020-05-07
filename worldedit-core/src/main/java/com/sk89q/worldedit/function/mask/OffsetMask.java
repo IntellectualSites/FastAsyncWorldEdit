@@ -88,7 +88,11 @@ public class OffsetMask extends AbstractMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 pos) {
-        return getMask().test(extent, pos);
+        BlockVector3 testPos = pos.add(offset);
+        if (testPos.getBlockY() < 0 || testPos.getBlockY() > 255) {
+            return false;
+        }
+        return getMask().test(extent, pos.add(offset));
     }
 
     @Nullable
