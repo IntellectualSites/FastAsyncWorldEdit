@@ -673,7 +673,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     super.trim(false, i);
                 } catch (IllegalAccessException ignored) {
                     super.trim(false, i);
-                    ignored.printStackTrace();
                 }
             }
             return true;

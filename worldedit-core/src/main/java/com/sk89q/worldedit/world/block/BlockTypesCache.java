@@ -240,7 +240,7 @@ public class BlockTypesCache {
         String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
         String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase(Locale.ROOT);
         int oldsize = states.size();
-        BlockType existing = new BlockType(id, internalId, states);;
+        BlockType existing = new BlockType(id, internalId, states);
         tickList.addAll(Collections.nCopies(states.size() - oldsize, existing.getMaterial().isTicksRandomly()));
         // register states
         BlockType.REGISTRY.register(typeName, existing);
