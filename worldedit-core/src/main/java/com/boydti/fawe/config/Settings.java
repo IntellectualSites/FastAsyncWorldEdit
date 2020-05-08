@@ -369,6 +369,12 @@ public class Settings extends Config {
                 "Other experimental features"
         })
         public boolean OTHER = false;
+
+        @Comment({
+            "Allow blocks placed by WorldEdit to tick. This could cause the big lags.",
+            "This has no effect on existing blocks one way or the other."
+        })
+        public boolean ALLOW_TICK_PLACED = false;
     }
 
     public static class WEB {

@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.adapter;
 
+import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -68,6 +69,24 @@ public class NMSAdapter {
                         case BlockID.VOID_AIR:
                             air++;
                             break;
+                        default:
+                            if (!Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED) {
+                                boolean ticking;
+                                if (ordinal != lastOrdinal) {
+                                    ticking = BlockTypesCache.ticking[ordinal];
+                                    lastOrdinal = ordinal;
+                                    lastticking = ticking;
+                                } else {
+                                    ticking = lastticking;
+                                }
+                                if (ticking) {
+                                    BlockState state = BlockState.getFromOrdinal(ordinal);
+                                    ticking_blocks
+                                        .put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                                .getInternalBlockStateId(state).orElse(0));
+                                }
+                            }
                     }
                     set[i] = ordinal;
                     break;
@@ -78,19 +97,21 @@ public class NMSAdapter {
                     air++;
                     break;
             }
-            boolean ticking;
-            if (ordinal != lastOrdinal) {
-                ticking = BlockTypesCache.ticking[ordinal];
-                lastOrdinal = ordinal;
-                lastticking = ticking;
-            } else {
-                ticking = lastticking;
-            }
-            if (ticking) {
-                BlockState state = BlockState.getFromOrdinal(ordinal);
-                ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                    WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                        .getInternalBlockStateId(state).orElse(0));
+            if (Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED) {
+                boolean ticking;
+                if (ordinal != lastOrdinal) {
+                    ticking = BlockTypesCache.ticking[ordinal];
+                    lastOrdinal = ordinal;
+                    lastticking = ticking;
+                } else {
+                    ticking = lastticking;
+                }
+                if (ticking) {
+                    BlockState state = BlockState.getFromOrdinal(ordinal);
+                    ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                        WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                            .getInternalBlockStateId(state).orElse(0));
+                }
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
