@@ -15,6 +15,9 @@ public class NMSAdapter {
         int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks) {
         int air = 0;
         int num_palette = 0;
+        char lastOrdinal = BlockID.__RESERVED__;
+        boolean lastticking = false;
+        boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -26,11 +29,22 @@ public class NMSAdapter {
                     air++;
                     break;
                 default:
-                    BlockState state = BlockState.getFromOrdinal(ordinal);
-                    if (state.getMaterial().isTicksRandomly()) {
-                        ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                                .getInternalBlockStateId(state).orElse(0));
+                    if (!tick_placed) {
+                        boolean ticking;
+                        if (ordinal != lastOrdinal) {
+                            ticking = BlockTypesCache.ticking[ordinal];
+                            lastOrdinal = ordinal;
+                            lastticking = ticking;
+                        } else {
+                            ticking = lastticking;
+                        }
+                        if (ticking) {
+                            BlockState state = BlockState.getFromOrdinal(ordinal);
+                            ticking_blocks
+                                .put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                    WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                        .getInternalBlockStateId(state).orElse(0));
+                        }
                     }
             }
             int palette = blockToPalette[ordinal];
@@ -53,6 +67,7 @@ public class NMSAdapter {
         char[] getArr = null;
         char lastOrdinal = BlockID.__RESERVED__;
         boolean lastticking = false;
+        boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -70,7 +85,7 @@ public class NMSAdapter {
                             air++;
                             break;
                         default:
-                            if (!Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED) {
+                            if (!tick_placed) {
                                 boolean ticking;
                                 if (ordinal != lastOrdinal) {
                                     ticking = BlockTypesCache.ticking[ordinal];
@@ -97,7 +112,7 @@ public class NMSAdapter {
                     air++;
                     break;
             }
-            if (Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED) {
+            if (tick_placed) {
                 boolean ticking;
                 if (ordinal != lastOrdinal) {
                     ticking = BlockTypesCache.ticking[ordinal];
