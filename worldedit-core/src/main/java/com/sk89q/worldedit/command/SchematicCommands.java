@@ -212,6 +212,7 @@ public class SchematicCommands {
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
                 URL webUrl = new URL(Settings.IMP.WEB.URL);
+                format = ClipboardFormats.findByAlias(formatName);
                 URL url = new URL(webUrl, "uploads/" + uuid + "." + format.getPrimaryFileExtension());
                 ReadableByteChannel byteChannel = Channels.newChannel(url.openStream());
                 in = Channels.newInputStream(byteChannel);
