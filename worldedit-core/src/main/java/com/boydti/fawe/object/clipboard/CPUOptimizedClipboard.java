@@ -184,7 +184,11 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
-        states[index] = block.getOrdinalChar();
+        char ordinal = block.getOrdinalChar();
+        if (ordinal == 0) {
+            ordinal = 1;
+        }
+        states[index] = ordinal;
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             setTile(index, block.getNbtData());
