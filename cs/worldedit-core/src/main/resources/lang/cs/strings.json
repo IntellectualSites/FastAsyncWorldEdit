@@ -13,7 +13,7 @@
 	"fawe.info.worldedit.delayed": "Please wait while we process your FAWE action...",
 	"fawe.info.worldedit.run": "Apologies for the delay. Now executing: {0}",
 	"fawe.info.worldedit.complete": "Úprava dokončena.",
-	"fawe.info.require.selection.in.mask": "&7{0} of your selection is not within your mask. You can only make edits within allowed regions.",
+	"fawe.info.require.selection.in.mask": "&7{0} tvého výběru je mimo masku. Můžeš upravovat pouze v rozmezí tvého povoleného regionu.",
 	"fawe.info.worldedit.volume": "&7You cannot select a volume of {0}. The maximum volume you can modify is {1}.",
 	"fawe.info.worldedit.iterations": "You cannot iterate {0} times. The maximum number of iterations allowed is {1}.",
 	"fawe.info.worldedit.unsafe": "&7Access to that command has been blocked",
