@@ -54,7 +54,7 @@
 	"fawe.worldedit.history.command.history.clear": "Historique supprimé",
 	"fawe.worldedit.history.command.redo.error": "Plus rien à refaire. (Regarde aussi `/inspect` et`/frb`)",
 	"fawe.worldedit.history.command.history.other.error": "Unable to find session for {0}.",
-	"fawe.worldedit.history.command.redo.success": "La sélection a bien été remise en place {0}.",
+	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Plus rien à annuler. (Regarde aussi `/inspect` et`/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Undo désactivé, utilise //fast",
 	"fawe.worldedit.history.command.undo.success": "L'opération a été annulée {0}.",
