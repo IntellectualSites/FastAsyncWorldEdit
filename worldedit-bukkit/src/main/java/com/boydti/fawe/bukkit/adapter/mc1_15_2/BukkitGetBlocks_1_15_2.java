@@ -282,6 +282,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     char[] setArr = set.load(layer);
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
+
+                    //ensure that the server doesn't try to tick the chunksection while we're editing it.
+                    BukkitAdapter_1_15_2.fieldTickingBlockCount.set(existingSection, (short) 0);
+
                     if (existingSection == null) {
                         newSection = BukkitAdapter_1_15_2.newChunkSection(layer, setArr);
                         if (BukkitAdapter_1_15_2.setSectionAtomic(sections, null, newSection, layer)) {
