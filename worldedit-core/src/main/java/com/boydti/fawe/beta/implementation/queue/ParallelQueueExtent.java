@@ -162,7 +162,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern)
         throws MaxChangedBlocksException {
-        return this.changes = apply(region, mask.toFilter(pattern), false).getBlocksApplied();
+        boolean full = mask.replacesAir();
+        return this.changes = apply(region, mask.toFilter(pattern), full).getBlocksApplied();
     }
 
     @Override

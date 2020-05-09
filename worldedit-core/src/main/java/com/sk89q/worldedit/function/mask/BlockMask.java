@@ -189,7 +189,15 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
-        return ordinals[vector.getOrdinal(extent)];
+        int test = vector.getOrdinal(extent);
+        return ordinals[test] || replacesAir() && test == 0;
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return ordinals[BlockTypes.AIR.getDefaultState().getOrdinal()]
+            || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
+            || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
     }
 
     @Override

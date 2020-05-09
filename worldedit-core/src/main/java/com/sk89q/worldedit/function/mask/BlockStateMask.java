@@ -26,6 +26,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -63,6 +65,11 @@ public class BlockStateMask extends AbstractExtentMask {
         }
         return checkProps.entrySet().stream()
                 .allMatch(entry -> block.getState(entry.getKey()) == entry.getValue());
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return test(BlockTypes.AIR.getDefaultState()) || test(BlockTypes.CAVE_AIR.getDefaultState()) || test(BlockTypes.VOID_AIR.getDefaultState());
     }
 
     @Nullable

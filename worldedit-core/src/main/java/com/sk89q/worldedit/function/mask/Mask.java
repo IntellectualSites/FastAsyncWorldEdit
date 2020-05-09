@@ -123,4 +123,8 @@ public interface Mask {
             }
         };
     }
+
+    default boolean replacesAir() {
+        return false;
+    }
 }

@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 public class BlockTypeMask extends AbstractExtentMask {
 
     private final boolean[] types;
+    private boolean hasAir;
 
     /**
      * Create a new block mask.
@@ -63,7 +64,9 @@ public class BlockTypeMask extends AbstractExtentMask {
     public BlockTypeMask(Extent extent, @NotNull BlockType... block) {
         super(extent);
         this.types = new boolean[BlockTypes.size()];
-        for (BlockType type : block) this.types[type.getInternalId()] = true;
+        for (BlockType type : block) {
+            add(type);
+        }
     }
 
     /**
@@ -76,9 +79,6 @@ public class BlockTypeMask extends AbstractExtentMask {
         for (BlockType type : blocks) {
             add(type);
         }
-        for (BlockType type : blocks) {
-            this.types[type.getInternalId()] = true;
-        }
     }
 
     /**
@@ -88,6 +88,9 @@ public class BlockTypeMask extends AbstractExtentMask {
      */
     public void add(@NotNull BlockType... block) {
         for (BlockType type : block) {
+            if (!hasAir && (type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR)) {
+                hasAir = true;
+            }
             this.types[type.getInternalId()] = true;
         }
     }
@@ -108,6 +111,11 @@ public class BlockTypeMask extends AbstractExtentMask {
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
         return test(vector.getBlock(extent).getBlockType());
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return hasAir;
     }
 
     public boolean test(BlockType block) {
