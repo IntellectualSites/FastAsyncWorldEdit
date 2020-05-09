@@ -18,7 +18,7 @@
 	"fawe.info.worldedit.iterations": "You cannot iterate {0} times. The maximum number of iterations allowed is {1}.",
 	"fawe.info.worldedit.unsafe": "&7Access to that command has been blocked",
 	"fawe.info.worldedit.dangerous.worldedit": "&cProcessed unsafe edit at {0} by {1}",
-	"fawe.error.worldedit.extend": "&cYour edit may have extended outside your allowed region.",
+	"fawe.error.worldedit.extend": "&cEndringene dine kan ha havnet utenfor din tillate region.",
 	"fawe.info.worldedit.toggle.tips.on": "Deaktivert FAWE-tips.",
 	"fawe.info.worldedit.toggle.tips.off": "Aktivert FAWE-tips.",
 	"fawe.info.worldedit.bypassed": "Unngår nå FAWE-restriksjoner.",
