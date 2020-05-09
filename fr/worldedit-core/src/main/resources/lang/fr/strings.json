@@ -195,7 +195,7 @@
 	"fawe.progress.progress.finished": "[ Fini! ]",
 	"fawe.error.command.syntax": "Usage: {0}",
 	"fawe.error.no-perm": "Il te manque la permission: {0}",
-	"fawe.error.block.not.allowed": "Tu n'es pas autorisé à faire ça",
+	"fawe.error.block.not.allowed": "You are not allowed to use: {0}",
 	"fawe.error.setting.disable": "Lacking setting: {0}",
 	"fawe.error.brush.not.found": "Available brushes: {0}",
 	"fawe.error.brush.incompatible": "Brush not compatible with this version",
