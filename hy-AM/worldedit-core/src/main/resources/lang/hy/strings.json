@@ -54,7 +54,7 @@
 	"fawe.worldedit.history.command.history.clear": "History cleared",
 	"fawe.worldedit.history.command.redo.error": "Nothing left to redo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.history.other.error": "Unable to find session for {0}.",
-	"fawe.worldedit.history.command.redo.success": "Redo successful{0}.",
+	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Nothing left to undo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Undo disabled, use: //fast",
 	"fawe.worldedit.history.command.undo.success": "Undo successful{0}.",
