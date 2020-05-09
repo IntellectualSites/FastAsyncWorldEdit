@@ -54,7 +54,7 @@
 	"fawe.worldedit.history.command.history.clear": "История очищена",
 	"fawe.worldedit.history.command.redo.error": "Нечего переделывать. (Смотрите также `/inspect` и `/frb`)",
 	"fawe.worldedit.history.command.history.other.error": "Не получилось найти сессию для {0}.",
-	"fawe.worldedit.history.command.redo.success": "Успешно переделано{0}.",
+	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Нечего отменять. (Смотрите также `/inspect` и `/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Отмена выключена, используйте: //fast",
 	"fawe.worldedit.history.command.undo.success": "Успешно отменено{0}.",
