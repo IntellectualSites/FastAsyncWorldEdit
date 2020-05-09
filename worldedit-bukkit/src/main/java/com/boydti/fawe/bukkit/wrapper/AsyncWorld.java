@@ -1053,6 +1053,18 @@ public class AsyncWorld extends PassthroughExtent implements World {
         return parent.getViewDistance();
     }
 
+    @Override public void setViewDistance(int i) {
+        parent.setViewDistance(i);
+    }
+
+    @Override public int getNoTickViewDistance() {
+        return parent.getNoTickViewDistance();
+    }
+
+    @Override public void setNoTickViewDistance(int i) {
+        parent.setNoTickViewDistance(i);
+    }
+
     @Override
     public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3, boolean arg4,
             double arg5, Predicate<Entity> arg6) {
