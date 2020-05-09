@@ -54,7 +54,7 @@
 	"fawe.worldedit.history.command.history.clear": "Historia tyhjennetty",
 	"fawe.worldedit.history.command.redo.error": "Ei mitään uudestaan tehtävää. (Katso myös '/inspect' ja '/frb')",
 	"fawe.worldedit.history.command.history.other.error": "Istunnon löytö {0}:lle epäonnistui.",
-	"fawe.worldedit.history.command.redo.success": "Uudelleentekeminen onnistui{0}.",
+	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Ei mitään palautettavaa. (Katso myös '/inspect' ja '/frb')",
 	"fawe.worldedit.history.command.undo.disabled": "Palauttaminen disabloitu, käytä komentoa: //fast",
 	"fawe.worldedit.history.command.undo.success": "Kumoaminen onnistui{0}.",
