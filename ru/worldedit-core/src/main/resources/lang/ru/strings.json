@@ -176,7 +176,7 @@
 	"fawe.worldedit.selector.selector.already.set": "Точка уже установлена.",
 	"fawe.worldedit.selector.selector.set.default": "Your default region selector is now {0}.",
 	"fawe.worldedit.timezone.timezone.set": "Timezone set for this session to: {0}",
-	"fawe.worldedit.timezone.timezone.display": "The current time in that timezone is:  {0}",
+	"fawe.worldedit.timezone.timezone.display": "Текущее время в этом часовом поясе: {0}",
 	"fawe.worldedit.cycler.block.cycler.cannot.cycle": "Метаданные этого блока не могут быть проциклированы!",
 	"fawe.worldedit.cycler.block.cycler.limit": "Достигнут лимит изменения блоков.",
 	"fawe.worldedit.cycler.block.cycler.no-perm": "You are not permitted to cycle the data value of that block.",
