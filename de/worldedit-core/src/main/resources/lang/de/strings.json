@@ -3,7 +3,7 @@
 	"fawe.error": "&c{0}",
 	"fawe.info": "&7{0}",
 	"fawe.debug": "&3{0}",
-	"fawe.worldedit.history.find.element": "&2{0} {1} &7ago &3{2}m &6{3} &c/{4}",
+	"fawe.worldedit.history.find.element": "&2{0} {1} &7vor &3{2}m &6{3} &c/{4}",
 	"fawe.worldedit.history.find.element.more": " - Änderungen: {0}\n - Grenzen: {1} -> {2}\n - Extra: {3}\n - Größe auf der Festplatte: {4}",
 	"fawe.worldedit.history.find.hover": "{0} Blöcke geändert, klicke hier für weitere Informationen",
 	"fawe.info.lighting.propagate.selection": "{0} Chunks wurden ausgeleuchtet. (Hinweis: Um Licht zu entfernen, verwende //removelight)",
