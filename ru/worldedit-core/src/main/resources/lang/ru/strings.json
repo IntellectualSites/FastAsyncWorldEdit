@@ -194,7 +194,7 @@
 	"fawe.progress.progress.message": "{1}/{0} ({2}%) @{3}cps {4}s left",
 	"fawe.progress.progress.finished": "[ Готово! ]",
 	"fawe.error.command.syntax": "Использование: {0}",
-	"fawe.error.no-perm": "You are lacking the permission node: {0}",
+	"fawe.error.no-perm": "Требуется право: {0}",
 	"fawe.error.block.not.allowed": "Вам не разрешено использовать: {0}",
 	"fawe.error.setting.disable": "Требуется настройка: {0}",
 	"fawe.error.brush.not.found": "Доступные кисти: {0}",
