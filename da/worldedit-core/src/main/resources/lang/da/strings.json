@@ -537,7 +537,7 @@
 	"worldedit.tool.superpickaxe.mode.single": "Mode is now single. Left click with a pickaxe. // to disable.",
 	"worldedit.tool.superpickaxe.mode.area": "Mode is now area. Left click with a pickaxe. // to disable.",
 	"worldedit.tool.superpickaxe.mode.recursive": "Mode is now recursive. Left click with a pickaxe. // to disable.",
-	"worldedit.tool.superpickaxe.max-range": "Maximum range is {0}.",
+	"worldedit.tool.superpickaxe.max-range": "Maksimal rækkevidde er {0}.",
 	"worldedit.tool.superpickaxe.enabled.already": "Super pickaxe already enabled.",
 	"worldedit.tool.superpickaxe.disabled.already": "Super pickaxe already disabled.",
 	"worldedit.tool.superpickaxe.enabled": "Super pickaxe enabled.",
