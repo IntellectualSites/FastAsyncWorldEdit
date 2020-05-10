@@ -178,7 +178,7 @@
 	"fawe.worldedit.timezone.timezone.set": "Timezone set for this session to: {0}",
 	"fawe.worldedit.timezone.timezone.display": "The current time in that timezone is:  {0}",
 	"fawe.worldedit.cycler.block.cycler.cannot.cycle": "Метаданные этого блока не могут быть проциклированы!",
-	"fawe.worldedit.cycler.block.cycler.limit": "Max blocks change limit reached.",
+	"fawe.worldedit.cycler.block.cycler.limit": "Достигнут лимит изменения блоков.",
 	"fawe.worldedit.cycler.block.cycler.no-perm": "You are not permitted to cycle the data value of that block.",
 	"fawe.worldedit.command.command.invalid.syntax": "The command was not used properly (no more help available).",
 	"fawe.worldedit.help.command.clarifying.bracket": "Added clarifying bracket for {0}",
