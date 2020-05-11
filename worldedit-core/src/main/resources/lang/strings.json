@@ -75,7 +75,7 @@
 	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Nothing left to undo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Undo disabled, use: //fast",
-	"fawe.worldedit.history.command.undo.success": "Undo successful{0}.",
+	"fawe.worldedit.history.command.undo.success": "Undo successful {0}.",
 
 	"fawe.worldedit.operation.operation": "Operation queued ({0})",
 
@@ -97,7 +97,7 @@
 	"fawe.worldedit.selection.selection.shift": "Region shifted",
 	"fawe.worldedit.selection.selection.cleared": "Selection cleared",
 
-	"fawe.worldedit.anvil.world.is.loaded": "The world shouldn't be in use when executing. Unload the world, or use use -f to override (save first)",
+	"fawe.worldedit.anvil.world.is.loaded": "The world shouldn't be in use when executing. Unload the world, or use -f to override (save first)",
 
 	"fawe.worldedit.brush.brush.reset": "Reset your brush. (SHIFT + Click)",
 	"fawe.worldedit.brush.brush.none": "You aren't holding a brush!",

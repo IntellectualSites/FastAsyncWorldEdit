@@ -49,6 +49,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     private boolean enabledQueue = true;
 
+    private boolean fastmode = false;
+
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
      * be removed later
@@ -78,6 +80,16 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public IChunkSet getCachedSet(int chunkX, int chunkZ) {
         return cacheSet.get(chunkX, chunkZ);
+    }
+
+    @Override
+    public void setFastMode(boolean fastmode) {
+        this.fastmode = fastmode;
+    }
+
+    @Override
+    public boolean isFastMode() {
+        return fastmode;
     }
 
     /**

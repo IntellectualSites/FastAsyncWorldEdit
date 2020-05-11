@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public class NMSAdapter {
     public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy,
-        int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks) {
+        int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks, boolean fastmode) {
         int air = 0;
         int num_palette = 0;
         char lastOrdinal = BlockID.__RESERVED__;
@@ -29,7 +29,7 @@ public class NMSAdapter {
                     air++;
                     break;
                 default:
-                    if (!tick_placed) {
+                    if (!fastmode && !tick_placed) {
                         boolean ticking;
                         if (ordinal != lastOrdinal) {
                             ticking = BlockTypesCache.ticking[ordinal];
@@ -61,13 +61,14 @@ public class NMSAdapter {
 
     public static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock,
         int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set,
-        Map<BlockVector3, Integer> ticking_blocks) {
+        Map<BlockVector3, Integer> ticking_blocks, boolean fastmode) {
         int air = 0;
         int num_palette = 0;
         char[] getArr = null;
         char lastOrdinal = BlockID.__RESERVED__;
         boolean lastticking = false;
         boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
+        boolean tick_existing = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_EXISTING;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -85,7 +86,7 @@ public class NMSAdapter {
                             air++;
                             break;
                         default:
-                            if (!tick_placed) {
+                            if (!fastmode && !tick_placed && tick_existing) {
                                 boolean ticking;
                                 if (ordinal != lastOrdinal) {
                                     ticking = BlockTypesCache.ticking[ordinal];
@@ -112,7 +113,7 @@ public class NMSAdapter {
                     air++;
                     break;
             }
-            if (tick_placed) {
+            if (!fastmode && tick_placed) {
                 boolean ticking;
                 if (ordinal != lastOrdinal) {
                     ticking = BlockTypesCache.ticking[ordinal];

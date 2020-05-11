@@ -10,6 +10,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray;
 import com.google.common.base.Suppliers;
@@ -228,6 +229,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         try {
             WorldServer nmsWorld = world;
             Chunk nmsChunk = ensureLoaded(nmsWorld, X, Z);
+            boolean fastmode = set.isFastMode() && Settings.IMP.QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles
             {
@@ -263,7 +265,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
-                        newSection = BukkitAdapter_1_14.newChunkSection(layer, setArr);
+                        newSection = BukkitAdapter_1_14.newChunkSection(layer, setArr, fastmode);
                         if (BukkitAdapter_1_14.setSectionAtomic(sections, null, newSection, layer)) {
                             updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             continue;
@@ -295,7 +297,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                             } else if (lock.isModified()) {
                                 this.reset(layer);
                             }
-                            newSection = BukkitAdapter_1_14.newChunkSection(layer, this::load, setArr);
+                            newSection = BukkitAdapter_1_14.newChunkSection(layer, this::load, setArr, fastmode);
                             if (!BukkitAdapter_1_14.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
