@@ -82,6 +82,10 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         return BlockVector3.at(30000000, FaweCache.IMP.WORLD_MAX_Y, 30000000);
     }
 
+    void setFastMode(boolean fastMode);
+
+    boolean isFastMode();
+
     /**
      * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
      * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
@@ -143,6 +147,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         T chunk = this.getOrCreateChunk(chunkX, chunkZ);
         // Initialize
         chunk.init(this, chunkX, chunkZ);
+        chunk.setFastMode(isFastMode());
 
         T newChunk = filter.applyChunk(chunk, region);
         if (newChunk != null) {

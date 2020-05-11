@@ -186,11 +186,11 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
     /*
     NMS conversion
      */
-    public static ChunkSection newChunkSection(final int layer, final char[] blocks) {
-        return newChunkSection(layer, null, blocks);
+    public static ChunkSection newChunkSection(final int layer, final char[] blocks, boolean fastmode) {
+        return newChunkSection(layer, null, blocks, fastmode);
     }
 
-    public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set) {
+    public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set, boolean fastmode) {
         if (set == null) {
             return newChunkSection(layer);
         }
@@ -203,9 +203,9 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
             int air;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set, ticking_blocks);
+                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set, ticking_blocks, fastmode);
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set, ticking_blocks);
+                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set, ticking_blocks, fastmode);
             }
             int num_palette = num_palette_buffer[0];
             // BlockStates

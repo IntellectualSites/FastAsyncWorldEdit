@@ -309,6 +309,11 @@ public class Settings extends Config {
         })
         public int DISCARD_AFTER_MS = 60000;
 
+        @Comment({
+            "When using fastmode also do not bother to fix existing ticking blocks"
+        })
+        public boolean NO_TICK_FASTMODE = true;
+
         public static class PROGRESS {
             @Comment({"Display constant titles about the progress of a user's edit",
                     " - false = disabled",

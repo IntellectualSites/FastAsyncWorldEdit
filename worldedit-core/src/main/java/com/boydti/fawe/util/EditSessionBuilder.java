@@ -296,7 +296,7 @@ public class EditSessionBuilder {
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
                 } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && threaded) {
-                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world);
+                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastmode);
                     queue = parallel.getExtent();
                     extent = parallel;
                 } else {
