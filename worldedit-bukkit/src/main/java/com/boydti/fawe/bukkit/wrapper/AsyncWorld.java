@@ -55,6 +55,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
@@ -650,6 +651,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public <T extends Entity> @NotNull T spawn(@NotNull Location location, @NotNull Class<T> clazz, @Nullable Consumer<T> function, CreatureSpawnEvent.@NotNull SpawnReason reason) throws IllegalArgumentException {
+        return null;
+    }
+
+    @Override
     public FallingBlock spawnFallingBlock(Location location, MaterialData data) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, data));
     }
@@ -1054,6 +1060,21 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public void setViewDistance(int viewDistance) {
+
+    }
+
+    @Override
+    public int getNoTickViewDistance() {
+        return 0;
+    }
+
+    @Override
+    public void setNoTickViewDistance(int viewDistance) {
+
+    }
+
+    @Override
     public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3, boolean arg4,
             double arg5, Predicate<Entity> arg6) {
         return parent.rayTrace(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1172,6 +1193,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public CompletableFuture<Chunk> getChunkAtAsync(int arg0, int arg1, boolean arg2) {
         return parent.getChunkAtAsync(arg0, arg1, arg2);
+    }
+
+    @Override
+    public @NotNull CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen, boolean urgent) {
+        return null;
     }
 
     @Override
