@@ -29,7 +29,7 @@ public class NMSAdapter {
                     air++;
                     break;
                 default:
-                    if (!tick_placed && !tick_placed) {
+                    if (!fastmode && !tick_placed) {
                         boolean ticking;
                         if (ordinal != lastOrdinal) {
                             ticking = BlockTypesCache.ticking[ordinal];
@@ -68,6 +68,7 @@ public class NMSAdapter {
         char lastOrdinal = BlockID.__RESERVED__;
         boolean lastticking = false;
         boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
+        boolean tick_existing = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_EXISTING;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -85,7 +86,7 @@ public class NMSAdapter {
                             air++;
                             break;
                         default:
-                            if (!fastmode && !tick_placed) {
+                            if (!fastmode && !tick_placed && tick_existing) {
                                 boolean ticking;
                                 if (ordinal != lastOrdinal) {
                                     ticking = BlockTypesCache.ticking[ordinal];

@@ -380,6 +380,12 @@ public class Settings extends Config {
             "This has no effect on existing blocks one way or the other."
         })
         public boolean ALLOW_TICK_PLACED = false;
+
+        @Comment({
+            "Force re-ticking of existing blocks not edited by FAWE.",
+            "This will increase time taken slightly."
+        })
+        public boolean ALLOW_TICK_EXISTING = true;
     }
 
     public static class WEB {
