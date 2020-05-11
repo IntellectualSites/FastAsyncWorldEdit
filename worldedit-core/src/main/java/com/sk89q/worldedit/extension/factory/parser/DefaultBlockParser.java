@@ -364,6 +364,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     }
                     state = fuzzyBuilder.build();
                 }
+            } else {
+                for (Map.Entry<Property<?>, Object> blockState : blockStates.entrySet()) {
+                    @SuppressWarnings("unchecked")
+                    Property<Object> objProp = (Property<Object>) blockState.getKey();
+                    state = state.with(objProp, blockState.getValue());
+                }
             }
         }
         // this should be impossible but IntelliJ isn't that smart
