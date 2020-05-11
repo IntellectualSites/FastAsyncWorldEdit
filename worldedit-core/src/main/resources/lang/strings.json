@@ -75,7 +75,7 @@
 	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Nothing left to undo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Undo disabled, use: //fast",
-	"fawe.worldedit.history.command.undo.success": "Undo successful{0}.",
+	"fawe.worldedit.history.command.undo.success": "Undo successful {0}.",
 
 	"fawe.worldedit.operation.operation": "Operation queued ({0})",
 
