@@ -223,11 +223,19 @@ public class FastSchematicReader extends NBTSchematicReader {
                     int volume = width * height * length;
                     if (palette.length < 128) {
                         for (int index = 0; index < volume; index++) {
-                            linear.setBlock(index, getBlockState(fis.read()));
+                            int ordinal = fis.read();
+                            if (ordinal == 0) {
+                                ordinal = 1;
+                            }
+                            linear.setBlock(index, getBlockState(ordinal));
                         }
                     } else {
                         for (int index = 0; index < volume; index++) {
-                            linear.setBlock(index, getBlockState(fis.readVarInt()));
+                            int ordinal = fis.readVarInt();
+                            if (ordinal == 0) {
+                                ordinal = 1;
+                            }
+                            linear.setBlock(index, getBlockState(ordinal));
                         }
                     }
                 } else {
@@ -235,7 +243,11 @@ public class FastSchematicReader extends NBTSchematicReader {
                         for (int y = 0; y < height; y++) {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
-                                    clipboard.setBlock(x, y, z, getBlockState(fis.read()));
+                                    int ordinal = fis.read();
+                                    if (ordinal == 0) {
+                                        ordinal = 1;
+                                    }
+                                    clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
                         }
@@ -243,7 +255,11 @@ public class FastSchematicReader extends NBTSchematicReader {
                         for (int y = 0; y < height; y++) {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
-                                    clipboard.setBlock(x, y, z, getBlockState(fis.readVarInt()));
+                                    int ordinal = fis.readVarInt();
+                                    if (ordinal == 0) {
+                                        ordinal = 1;
+                                    }
+                                    clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
                         }
