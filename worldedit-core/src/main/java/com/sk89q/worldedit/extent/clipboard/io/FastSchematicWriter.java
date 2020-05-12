@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.util.IOUtil;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -45,7 +44,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -181,6 +179,9 @@ public class FastSchematicWriter implements ClipboardWriter {
                 }
 
                 int ordinal = block.getOrdinal();
+                if (ordinal == 0) {
+                    ordinal = 1;
+                }
                 char value = palette[ordinal];
                 if (value == Character.MAX_VALUE) {
                     int size = paletteMax++;
