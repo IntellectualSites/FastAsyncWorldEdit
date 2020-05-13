@@ -224,17 +224,11 @@ public class FastSchematicReader extends NBTSchematicReader {
                     if (palette.length < 128) {
                         for (int index = 0; index < volume; index++) {
                             int ordinal = fis.read();
-                            if (ordinal == 0) {
-                                ordinal = 1;
-                            }
                             linear.setBlock(index, getBlockState(ordinal));
                         }
                     } else {
                         for (int index = 0; index < volume; index++) {
                             int ordinal = fis.readVarInt();
-                            if (ordinal == 0) {
-                                ordinal = 1;
-                            }
                             linear.setBlock(index, getBlockState(ordinal));
                         }
                     }
@@ -244,9 +238,6 @@ public class FastSchematicReader extends NBTSchematicReader {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
                                     int ordinal = fis.read();
-                                    if (ordinal == 0) {
-                                        ordinal = 1;
-                                    }
                                     clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
@@ -256,9 +247,6 @@ public class FastSchematicReader extends NBTSchematicReader {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
                                     int ordinal = fis.readVarInt();
-                                    if (ordinal == 0) {
-                                        ordinal = 1;
-                                    }
                                     clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
