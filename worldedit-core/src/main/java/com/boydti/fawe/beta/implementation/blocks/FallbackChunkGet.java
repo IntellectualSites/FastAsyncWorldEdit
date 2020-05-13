@@ -86,6 +86,11 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return true;
+    }
+
+    @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
         for (int layer = 0; layer < 16; layer++) {
             if (set.hasSection(layer)) {

@@ -3,10 +3,12 @@ package com.boydti.fawe.bukkit.adapter.mc1_15_2;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray;
 import com.google.common.base.Suppliers;
@@ -242,6 +244,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         try {
             WorldServer nmsWorld = world;
             Chunk nmsChunk = ensureLoaded(nmsWorld, X, Z);
+            boolean fastmode = set.isFastMode() && Settings.IMP.QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles
             {
@@ -282,7 +285,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
-                        newSection = BukkitAdapter_1_15_2.newChunkSection(layer, setArr);
+                        newSection = BukkitAdapter_1_15_2.newChunkSection(layer, setArr, fastmode);
                         if (BukkitAdapter_1_15_2.setSectionAtomic(sections, null, newSection, layer)) {
                             updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             continue;
@@ -294,7 +297,11 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                             }
                         }
                     }
+                    BukkitAdapter_1_15_2.fieldTickingBlockCount.set(existingSection, (short) 0);
+
+                    //ensure that the server doesn't try to tick the chunksection while we're editing it.
                     DelegateLock lock = BukkitAdapter_1_15_2.applyLock(existingSection);
+
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
@@ -310,7 +317,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                             } else if (lock.isModified()) {
                                 this.reset(layer);
                             }
-                            newSection = BukkitAdapter_1_15_2.newChunkSection(layer, this::load, setArr);
+                            newSection = BukkitAdapter_1_15_2.newChunkSection(layer, this::load, setArr, fastmode);
                             if (!BukkitAdapter_1_15_2.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
@@ -644,7 +651,37 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         if (aggressive) {
             sections = null;
             nmsChunk = null;
+            return super.trim(true);
+        } else {
+            for (int i = 0; i < 16; i++) {
+                if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
+                    continue;
+                }
+                ChunkSection existing = getSections()[i];
+                try {
+                    final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
+
+                    final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_15_2.fieldPalette.get(blocksExisting);
+                    int paletteSize;
+
+                    if (palette instanceof DataPaletteLinear) {
+                        paletteSize = ((DataPaletteLinear<IBlockData>) palette).b();
+                    } else if (palette instanceof DataPaletteHash) {
+                        paletteSize = ((DataPaletteHash<IBlockData>) palette).b();
+                    } else {
+                        super.trim(false, i);
+                        continue;
+                    }
+                    if (paletteSize == 1) {
+                        //If the cached palette size is 1 then no blocks can have been changed i.e. do not need to update these chunks.
+                        continue;
+                    }
+                    super.trim(false, i);
+                } catch (IllegalAccessException ignored) {
+                    super.trim(false, i);
+                }
+            }
+            return true;
         }
-        return super.trim(aggressive);
     }
 }

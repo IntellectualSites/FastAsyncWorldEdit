@@ -34,6 +34,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
+    private boolean fastMode = false;
 
     private CharSetBlocks() {}
 
@@ -129,6 +130,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             entityRemoves = new HashSet<>();
         }
         entityRemoves.add(uuid);
+    }
+
+    @Override
+    public void setFastMode(boolean fastMode) {
+        this.fastMode = fastMode;
+    }
+
+    @Override
+    public boolean isFastMode() {
+        return fastMode;
     }
 
     @Override

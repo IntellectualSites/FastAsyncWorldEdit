@@ -263,6 +263,9 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         int ordinal = block.getOrdinal();
+        if (ordinal == 0) {
+            ordinal = 1;
+        }
         setOrdinal(index, ordinal);
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {

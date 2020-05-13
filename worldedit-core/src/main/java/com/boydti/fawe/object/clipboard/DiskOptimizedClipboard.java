@@ -388,6 +388,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         try {
             int index = HEADER_SIZE + (getIndex(x, y, z) << 1);
             char ordinal = block.getOrdinalChar();
+            if (ordinal == 0) {
+                ordinal = 1;
+            }
             byteBuffer.putChar(index, ordinal);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
             if (hasNbt) {

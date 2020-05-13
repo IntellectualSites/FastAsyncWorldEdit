@@ -153,4 +153,9 @@ public class BitSetBlocks implements IChunkSet {
     public boolean trim(boolean aggressive) {
         return false;
     }
+
+    @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return false;
+    }
 }

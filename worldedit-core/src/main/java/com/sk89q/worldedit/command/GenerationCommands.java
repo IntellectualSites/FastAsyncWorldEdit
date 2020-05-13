@@ -134,8 +134,8 @@ public class GenerationCommands {
                       @Arg(desc = "TODO", def = "100") int threshold, @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(argStr);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com") && !url.getHost().equalsIgnoreCase("empcraft.com")) {
-            throw new IOException("Only i.imgur.com or empcraft.com/ui links are allowed!");
+        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
+            throw new IOException("Only i.imgur.com links are allowed!");
         }
         BufferedImage image = MainUtil.readImage(url);
         if (dimensions != null) {

@@ -42,6 +42,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private IQueueExtent<? extends IChunk> extent; // the parent queue extent which has this chunk
     private int chunkX;
     private int chunkZ;
+    private boolean fastmode;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -98,6 +99,16 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public char[] load(int layer) {
         return getOrCreateGet().load(layer);
+    }
+
+    @Override
+    public boolean isFastMode() {
+        return fastmode;
+    }
+
+    @Override
+    public void setFastMode(boolean fastmode) {
+        this.fastmode = fastmode;
     }
 
     @Override
@@ -313,6 +324,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
+        set.setFastMode(fastmode);
         try {
             block.filter(this, get, set, filter, region, full);
         } finally {
@@ -342,6 +354,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunkExisting.trim(false);
         }
         return false;
+    }
+
+    @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return this.trim(aggressive);
     }
 
     @Override

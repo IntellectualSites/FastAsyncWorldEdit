@@ -72,10 +72,10 @@
 	"fawe.worldedit.history.command.history.clear": "History cleared",
 	"fawe.worldedit.history.command.redo.error": "Nothing left to redo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.history.other.error": "Unable to find session for {0}.",
-	"fawe.worldedit.history.command.redo.success": "Redo successful{0}.",
+	"fawe.worldedit.history.command.redo.success": "Redo successful {0}.",
 	"fawe.worldedit.history.command.undo.error": "Nothing left to undo. (See also `/inspect` and `/frb`)",
 	"fawe.worldedit.history.command.undo.disabled": "Undo disabled, use: //fast",
-	"fawe.worldedit.history.command.undo.success": "Undo successful{0}.",
+	"fawe.worldedit.history.command.undo.success": "Undo successful {0}.",
 
 	"fawe.worldedit.operation.operation": "Operation queued ({0})",
 
@@ -97,7 +97,7 @@
 	"fawe.worldedit.selection.selection.shift": "Region shifted",
 	"fawe.worldedit.selection.selection.cleared": "Selection cleared",
 
-	"fawe.worldedit.anvil.world.is.loaded": "The world shouldn't be in use when executing. Unload the world, or use use -f to override (save first)",
+	"fawe.worldedit.anvil.world.is.loaded": "The world shouldn't be in use when executing. Unload the world, or use -f to override (save first)",
 
 	"fawe.worldedit.brush.brush.reset": "Reset your brush. (SHIFT + Click)",
 	"fawe.worldedit.brush.brush.none": "You aren't holding a brush!",
@@ -238,7 +238,7 @@
 
 	"fawe.error.command.syntax": "Usage: {0}",
 	"fawe.error.no-perm": "You are lacking the permission node: {0}",
-	"fawe.error.block.not.allowed": "You are not allowed to use",
+	"fawe.error.block.not.allowed": "You are not allowed to use: {0}",
 	"fawe.error.setting.disable": "Lacking setting: {0}",
 	"fawe.error.brush.not.found": "Available brushes: {0}",
 	"fawe.error.brush.incompatible": "Brush not compatible with this version",
@@ -373,7 +373,7 @@
     "worldedit.limit.set": "Block change limit set to {0}.",
     "worldedit.limit.return-to-default": "(Use //limit to go back to the default.)",
     "worldedit.timeout.too-high": "Your maximum allowable timeout is {0}ms.",
-    "worldedit.timeout.set": "Timeout time set to {0} ms.",
+    "worldedit.timeout.set": "Timeout time set to {0}ms.",
     "worldedit.timeout.return-to-default": " (Use //timeout to go back to the default.)",
     "worldedit.fast.disabled": "Fast mode disabled.",
     "worldedit.fast.enabled": "Fast mode enabled. Lighting in the affected chunks may be wrong and/or you may need to rejoin to see changes.",

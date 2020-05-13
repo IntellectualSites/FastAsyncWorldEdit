@@ -72,6 +72,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -366,7 +367,7 @@ public class ClipboardCommands {
                     e.printStackTrace();
                 }
             }
-            player.print(Caption.of("fawe.web.download.link" , urlText));
+            player.print(Caption.of("fawe.web.download.link" , urlText).clickEvent(ClickEvent.openUrl(urlText)));
         }
     }
 

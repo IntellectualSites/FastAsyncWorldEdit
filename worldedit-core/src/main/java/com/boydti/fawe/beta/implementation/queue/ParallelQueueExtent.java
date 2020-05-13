@@ -44,12 +44,14 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     private final QueueHandler handler;
     private final BatchProcessorHolder processor;
     private int changes;
+    private final boolean fastmode;
 
-    public ParallelQueueExtent(QueueHandler handler, World world) {
+    public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode) {
         super(handler.getQueue(world, new BatchProcessorHolder()));
         this.world = world;
         this.handler = handler;
         this.processor = (BatchProcessorHolder) getExtent().getProcessor();
+        this.fastmode = fastmode;
     }
 
     @Override
@@ -94,6 +96,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                     final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
                     final IQueueExtent<IQueueChunk> queue = getNewQueue();
+                    queue.setFastMode(fastmode);
                     synchronized (queue) {
                         ChunkFilterBlock block = null;
 
@@ -162,7 +165,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern)
         throws MaxChangedBlocksException {
-        return this.changes = apply(region, mask.toFilter(pattern), false).getBlocksApplied();
+        boolean full = mask.replacesAir();
+        return this.changes = apply(region, mask.toFilter(pattern), full).getBlocksApplied();
     }
 
     @Override

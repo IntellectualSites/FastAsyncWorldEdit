@@ -8,10 +8,12 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class SingleBlockTypeMask extends ABlockMask {
     private final int internalId;
+    private final boolean isAir;
 
     public SingleBlockTypeMask(Extent extent, BlockType type) {
         super(extent);
-        this.internalId = type.getInternalId();
+        isAir = type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR;
+            this.internalId = type.getInternalId();
     }
 
     @Override
@@ -26,5 +28,10 @@ public class SingleBlockTypeMask extends ABlockMask {
 
     public BlockType getBlockType() {
         return BlockTypes.get(internalId);
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return isAir;
     }
 }

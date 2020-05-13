@@ -26,6 +26,13 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        sections[layer] = EMPTY;
+        blocks[layer] = null;
+        return true;
+    }
+
+    @Override
     public IChunkSet reset() {
         super.reset();
         return null;

@@ -550,6 +550,11 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return hasSection(layer);
+    }
+
+    @Override
     public CompoundTag getEntity(UUID uuid) {
         return this.entities.get(uuid);
     }

@@ -61,6 +61,17 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        boolean result = true;
+        if (sections[layer] == EMPTY && blocks[layer] != null) {
+            blocks[layer] = null;
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
     public IChunkSet reset() {
         for (int i = 0; i < 16; i++) {
             sections[i] = EMPTY;
