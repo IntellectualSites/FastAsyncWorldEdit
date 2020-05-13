@@ -201,7 +201,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
-    private int changes = -1;
+    private int changes = 0;
     private final BlockBag blockBag;
 
     private final Extent bypassHistory;
