@@ -328,7 +328,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                                 final Biome craftBiome = BukkitAdapter.adapt(biome);
                                 BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
                                 for (int y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
-                                    currentBiomes.setBiome(x, y, z, nmsBiome);
+                                    currentBiomes.setBiome(x >> 2, y >> 2, z >> 2, nmsBiome);
                                 }
                             }
                         }
