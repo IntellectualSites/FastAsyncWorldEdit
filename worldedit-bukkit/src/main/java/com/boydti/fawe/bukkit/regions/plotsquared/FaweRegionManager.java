@@ -6,40 +6,33 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.util.ChunkManager;
+import com.plotsquared.core.util.RegionManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.function.FlatRegionFunction;
+import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.world.World;
-import java.util.concurrent.CompletableFuture;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
-public class FaweChunkManager extends ChunkManager {
+public class FaweRegionManager extends RegionManager {
 
-    private ChunkManager parent;
+    private RegionManager parent;
 
-    public FaweChunkManager(ChunkManager parent) {
+    public FaweRegionManager(RegionManager parent) {
         this.parent = parent;
     }
 
     @Override
     public int[] countEntities(Plot plot) {
         return parent.countEntities(plot);
-    }
-
-    @Override
-    public CompletableFuture loadChunk(String world, BlockVector2 loc, boolean force) {
-        return parent.loadChunk(world, loc, force);
-    }
-
-    @Override
-    public void unloadChunk(String world, BlockVector2 loc, boolean save) {
-        parent.unloadChunk(world, loc, save);
     }
 
     @Override
@@ -50,7 +43,7 @@ public class FaweChunkManager extends ChunkManager {
     @Override
     public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweChunkManager.class) {
+            synchronized (FaweRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
@@ -76,9 +69,29 @@ public class FaweChunkManager extends ChunkManager {
     }
 
     @Override
+    public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
+        region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
+        region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
+        TaskManager.IMP.async(() -> {
+            synchronized (FaweRegionManager.class) {
+                EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(world))).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+                FlatRegionFunction replace = new BiomeReplace(editSession, biome);
+                FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace);
+                try {
+                    Operations.completeLegacy(visitor);
+                    editSession.flushQueue();
+                } catch (MaxChangedBlocksException e) {
+                    e.printStackTrace();
+                }
+                TaskManager.IMP.task(whenDone);
+            }
+        });
+    }
+
+    @Override
     public boolean copyRegion(final Location pos1, final Location pos2, final Location pos3, final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweChunkManager.class) {
+            synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
                 EditSession from = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
@@ -100,7 +113,7 @@ public class FaweChunkManager extends ChunkManager {
     @Override
     public boolean regenerateRegion(final Location pos1, final Location pos2, boolean ignore, final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweChunkManager.class) {
+            synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false)
                     .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {

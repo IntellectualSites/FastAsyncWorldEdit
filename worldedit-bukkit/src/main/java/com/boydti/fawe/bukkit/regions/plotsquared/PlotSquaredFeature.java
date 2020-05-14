@@ -15,7 +15,7 @@ import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.implementations.DoneFlag;
 import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
-import com.plotsquared.core.util.ChunkManager;
+import com.plotsquared.core.util.RegionManager;
 import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.WEManager;
 import com.plotsquared.core.util.uuid.UUIDHandler;
@@ -45,7 +45,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             try {
                 setupBlockQueue();
                 setupSchematicHandler();
-                setupChunkManager();
+                setupRegionManager();
             } catch (Throwable ignored) {
                 log.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
             }
@@ -81,9 +81,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
         log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
     }
 
-    private void setupChunkManager() throws RuntimeException {
-        ChunkManager.manager = new FaweChunkManager(ChunkManager.manager);
-        log.debug(" - ChunkManager: " + ChunkManager.manager);
+    private void setupRegionManager() throws RuntimeException {
+        RegionManager.manager = new FaweRegionManager(RegionManager.manager);
+        log.debug(" - RegionManager: " + RegionManager.manager);
     }
 
     private void setupSchematicHandler() throws RuntimeException {

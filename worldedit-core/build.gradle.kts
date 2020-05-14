@@ -15,6 +15,7 @@ plugins {
 
 repositories {
     maven { url = uri("https://plotsquared.com/mvn") }
+    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
     mavenCentral()
 
 }
@@ -58,7 +59,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared:5.1") {
+    "compile"("com.plotsquared:PlotSquared:5.11.1") {
         isTransitive = false
     }
     implementation(kotlin("stdlib-jdk8", "1.3.61"))

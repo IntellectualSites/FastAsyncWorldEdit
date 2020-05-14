@@ -8,6 +8,7 @@ fun Project.applyCommonConfiguration() {
     repositories {
         mavenCentral()
         mavenLocal()
+        maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
         maven { url = uri("https://plotsquared.com/mvn/") }
         maven { url = uri("https://maven.sk89q.com/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
