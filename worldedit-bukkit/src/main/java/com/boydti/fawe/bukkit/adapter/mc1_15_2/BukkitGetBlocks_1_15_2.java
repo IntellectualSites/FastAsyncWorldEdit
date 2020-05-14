@@ -80,8 +80,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public Chunk nmsChunk;
     public WorldServer world;
     public int X, Z;
-    //This is (hopefully) a temp fix for random blocks returning the wrong biome. Static because it was seemingly using the wrong chunk to return the biome value.
-    private static final Object biomeLock = new Object();
 
     public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -113,9 +111,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         } else {
             base = index.getBiome(x >> 2, y >> 2, z >> 2);
         }
-        synchronized (biomeLock) {
-            return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
-        }
+        return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
     }
 
     @Override
