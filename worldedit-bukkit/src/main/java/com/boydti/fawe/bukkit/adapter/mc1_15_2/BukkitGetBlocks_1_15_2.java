@@ -105,11 +105,11 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         BiomeBase base = null;
         if (y == -1) {
             for (y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
-                base = index.getBiome(x, y, z);
+                base = index.getBiome(x >> 2, y >> 2, z >> 2);
                 if (base != null) break;
             }
         } else {
-            base = index.getBiome(x, y, z);
+            base = index.getBiome(x >> 2, y >> 2, z >> 2);
         }
         return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
     }
