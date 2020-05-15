@@ -83,6 +83,30 @@ public interface OutputExtent {
     }
 
     /**
+     * Set the light value
+     *
+     * @param position position of the block
+     * @param value light level to set
+     */
+    default void setBlockLight(BlockVector3 position, int value) {
+        setBlockLight(position.getX(), position.getY(), position.getZ(), value);
+    }
+
+    default void setBlockLight(int x, int y, int z, int value) {}
+
+    /**
+     * Set the sky light value
+     *
+     * @param position position of the block
+     * @param value light level to set
+     */
+    default void setSkyLight(BlockVector3 position, int value) {
+        setSkyLight(position.getX(), position.getY(), position.getZ(), value);
+    }
+
+    default void setSkyLight(int x, int y, int z, int value) {}
+
+    /**
      * Return an {@link Operation} that should be called to tie up loose ends
      * (such as to commit changes in a buffer).
      *

@@ -205,6 +205,56 @@ public class AbstractDelegateExtent implements Extent {
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return extent.setBiome(position.getX(), 0, position.getZ(), biome);
     }
+
+    @Override
+    public boolean relight(int x, int y, int z) {
+        return extent.relight(x, y, z);
+    }
+
+    @Override
+    public boolean relightBlock(int x, int y, int z) {
+        return extent.relightBlock(x, y, z);
+    }
+
+    @Override
+    public boolean relightSky(int x, int y, int z) {
+        return extent.relightSky(x, y, z);
+    }
+
+    @Override
+    public void setSkyLight(int x, int y, int z, int value) {
+        extent.setSkyLight(x, y, z, value);
+    }
+
+    @Override
+    public void setBlockLight(int x, int y, int z, int value) {
+        extent.setSkyLight(x, y, z, value);
+    }
+
+    @Override
+    public int getLight(int x, int y, int z) {
+        return extent.getLight(x, y, z);
+    }
+
+    @Override
+    public int getSkyLight(int x, int y, int z) {
+        return extent.getSkyLight(x, y, z);
+    }
+
+    @Override
+    public int getEmmittedLight(int x, int y, int z) {
+        return extent.getEmmittedLight(x, y, z);
+    }
+
+    @Override
+    public int getBrightness(int x, int y, int z) {
+        return extent.getBrightness(x, y, z);
+    }
+
+    @Override
+    public int getOpacity(int x, int y, int z) {
+        return extent.getOpacity(x, y, z);
+    }
     
     @Override
     public String toString() {

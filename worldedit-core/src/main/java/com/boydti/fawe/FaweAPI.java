@@ -2,11 +2,15 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
+import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -28,10 +32,13 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -43,7 +50,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -391,8 +397,42 @@ public class FaweAPI {
      * @param selection (assumes cuboid)
      * @return
      */
-    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
-        throw new UnsupportedOperationException();
+    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue, final RelightMode mode) {
+        final BlockVector3 bot = selection.getMinimumPoint();
+        final BlockVector3 top = selection.getMaximumPoint();
+
+        final int minX = bot.getBlockX() >> 4;
+        final int minZ = bot.getBlockZ() >> 4;
+
+        final int maxX = top.getBlockX() >> 4;
+        final int maxZ = top.getBlockZ() >> 4;
+
+        int count = 0;
+
+        EditSessionBuilder builder = new EditSessionBuilder(world);
+        //RelightMode.NONE because we're doing that ourselves here
+        EditSession session = builder.fastmode(true).relightMode(RelightMode.NONE).compile().build();
+
+        // Remove existing lighting first
+        final LightingExtent lightQueue = (LightingExtent) session.getExtent();
+        NMSRelighter relighter = new NMSRelighter(session);
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                relighter.addChunk(x, z, null, 65535);
+                count++;
+            }
+        }
+        if (mode != RelightMode.NONE) {
+            boolean sky = nmsQueue.hasSky();
+            if (sky) {
+                relighter.fixSkyLighting();
+            }
+            relighter.fixBlockLighting();
+        } else {
+            relighter.removeLighting();
+        }
+        relighter.sendChunks();
+        return count;
     }
 
     /**

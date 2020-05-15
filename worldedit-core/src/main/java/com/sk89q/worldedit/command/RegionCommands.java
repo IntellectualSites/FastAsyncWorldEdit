@@ -27,9 +27,11 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.RelightMode;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -134,21 +136,21 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/fixlighting",
+            name = "/ing",
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
         player.print(TextComponent.of("Temporarily not working"));
-//        final Location loc = player.getLocation();
-//        Region selection = player.getSelection();
-//        if (selection == null) {
-//            final int cx = loc.getBlockX() >> 4;
-//            final int cz = loc.getBlockZ() >> 4;
-//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-//        }
-//        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-//        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
+        final Location loc = player.getLocation();
+        Region selection = player.getSelection();
+        if (selection == null) {
+            final int cx = loc.getBlockX() >> 4;
+            final int cz = loc.getBlockZ() >> 4;
+            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+        }
+        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, RelightMode.ALL);
+        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
     }
 
 //    @Command(

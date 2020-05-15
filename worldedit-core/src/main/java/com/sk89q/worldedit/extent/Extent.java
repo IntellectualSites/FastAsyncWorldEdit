@@ -651,6 +651,18 @@ public interface Extent extends InputExtent, OutputExtent {
         return count;
     }
 
+    default boolean relight(int x, int y, int z) {
+        return false;
+    }
+
+    default boolean relightBlock(int x, int y, int z) {
+        return false;
+    }
+
+    default boolean relightSky(int x, int y, int z) {
+        return false;
+    }
+
     /**
      * Have an extent processed
      *  - Either block (Extent) processing or chunk processing

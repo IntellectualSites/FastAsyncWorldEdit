@@ -8,8 +8,13 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
+import com.boydti.fawe.object.RelightMode;
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
@@ -60,6 +65,7 @@ public class EditSessionBuilder {
     private boolean threaded = true;
     private EditSessionEvent event;
     private String command;
+    private RelightMode relightMode;
 
     /**
      * An EditSession builder<br>
@@ -169,6 +175,11 @@ public class EditSessionBuilder {
 
     public EditSessionBuilder fastmode(@Nullable Boolean fastmode) {
         this.fastmode = fastmode;
+        return setDirty();
+    }
+
+    public EditSessionBuilder relightMode(@Nullable RelightMode relightMode) {
+        this.relightMode = relightMode;
         return setDirty();
     }
 
@@ -384,6 +395,10 @@ public class EditSessionBuilder {
                 queue.addProcessor(limitProcessor);
             } else if (regionExtent != null) {
                 this.extent = limitProcessor.construct(regionExtent.getExtent());
+            }
+            if(this.relightMode != null) {
+                Relighter relighter = Settings.IMP.LIGHTING.MODE > 0 ? new NMSRelighter(extent) : NullRelighter.INSTANCE;
+                this.extent = new LightingExtent(this.extent, relighter, this.relightMode);
             }
             if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
                 System.out.println("TODO add batch processor for strip nbt");
