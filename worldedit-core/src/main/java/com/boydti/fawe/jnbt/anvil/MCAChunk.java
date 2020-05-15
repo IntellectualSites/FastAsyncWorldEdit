@@ -499,6 +499,19 @@ public class MCAChunk implements IChunk {
         return BlockState.getFromOrdinal(ordinal);
     }
 
+    //TODO implement lighting
+    @Override public int getLight(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override public int getSkyLight(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override public int getEmmittedLight(int x, int y, int z) {
+        return 0;
+    }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         BlockState block = getBlock(x, y, z);

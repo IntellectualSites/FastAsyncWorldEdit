@@ -250,11 +250,6 @@ public class AbstractDelegateExtent implements Extent {
     public int getBrightness(int x, int y, int z) {
         return extent.getBrightness(x, y, z);
     }
-
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        return extent.getOpacity(x, y, z);
-    }
     
     @Override
     public String toString() {

@@ -62,6 +62,18 @@ object NullChunk : IQueueChunk<Nothing> {
         return null
     }
 
+    override fun getSkyLight(x: Int, y: Int, z: Int): Int {
+        return 15
+    }
+
+    override fun getLight(x: Int, y: Int, z: Int): Int {
+        return 15
+    }
+
+    override fun getEmmittedLight(x: Int, y: Int, z: Int): Int {
+        return 15
+    }
+
     override fun getBiomes(): Array<BiomeType>? {
         return null
     }

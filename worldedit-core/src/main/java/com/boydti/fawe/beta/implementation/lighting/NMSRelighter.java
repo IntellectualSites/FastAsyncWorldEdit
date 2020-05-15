@@ -141,8 +141,8 @@ public class NMSRelighter implements Relighter {
             long pair = entry.getKey();
             Integer existing = chunksToSend.get(pair);
             chunksToSend.put(pair, chunk.bitmask | (existing != null ? existing : 0));
-            Object sections = get.getCachedSections(extent.getWorld(), chunk.x, chunk.z);
-            extent.removeLighting(sections, RelightMode.ALL, extent.hasSky());
+            //Object sections = get.getCachedSections(extent.getWorld(), chunk.x, chunk.z);
+            //extent.removeLighting(sections, RelightMode.ALL);
             iter.remove();
         }
     }
@@ -322,7 +322,7 @@ public class NMSRelighter implements Relighter {
                     int bitMask = entry.getValue();
                     int x = MathMan.unpairIntX(pair);
                     int z = MathMan.unpairIntY(pair);
-                    extent.sendChunk(x, z, bitMask);
+                    //extent.sendChunk(x, z, bitMask);
                     iter.remove();
                 }
             }
@@ -357,15 +357,15 @@ public class NMSRelighter implements Relighter {
                 int start = i * DISPATCH_SIZE;
                 int end = Math.min(size, start + DISPATCH_SIZE);
                 List<RelightSkyEntry> sub = chunksList.subList(start, end);
-                fixSkyLighting(sub);
+                //fixSkyLighting(sub);
             }
         } else {
-            fixSkyLighting(chunksList);
+            //fixSkyLighting(chunksList);
         }
     }
 
     public void fill(byte[] mask, int chunkX, int y, int chunkZ, byte reason) {
-        if (y >= FaweChunk.HEIGHT) {
+        if (y >= 16) {
             Arrays.fill(mask, (byte) 15);
             return;
         }
@@ -387,7 +387,7 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private void fixSkyLighting(List<RelightSkyEntry> sorted) {
+/*    private void fixSkyLighting(List<RelightSkyEntry> sorted) {
         RelightSkyEntry[] chunks = sorted.toArray(new RelightSkyEntry[sorted.size()]);
         boolean remove = this.removeFirst;
         BlockVectorSet chunkSet = null;
@@ -534,7 +534,7 @@ public class NMSRelighter implements Relighter {
                 if (value > mask[j]) extent.setSkyLight(section, x, y, z, mask[j] = value);
             }
         }
-    }
+    }*/
 
     public boolean isUnlit(byte[] array) {
         for (byte val : array) {

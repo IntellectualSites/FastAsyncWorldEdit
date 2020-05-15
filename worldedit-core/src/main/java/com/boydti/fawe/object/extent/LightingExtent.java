@@ -1,9 +1,7 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
 import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RelightMode;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;

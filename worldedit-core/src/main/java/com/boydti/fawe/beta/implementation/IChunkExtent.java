@@ -55,4 +55,46 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getBiomeType(x & 15, y, z & 15);
     }
+
+    @Override
+    default void setSkyLight(int x, int y, int z, int value) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        chunk.setSkyLight(x, y, z, value);
+    }
+
+    @Override
+    default void setBlockLight(int x, int y, int z, int value) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        chunk.setSkyLight(x, y, z, value);
+    }
+
+    @Override
+    default int getLight(int x, int y, int z) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        return chunk.getLight(x, y, z);
+    }
+
+    @Override
+    default int getSkyLight(int x, int y, int z) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        return chunk.getSkyLight(x, y, z);
+    }
+
+    @Override
+    default int getEmmittedLight(int x, int y, int z) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        return chunk.getEmmittedLight(x, y, z);
+    }
+
+    @Override
+    default int getBrightness(int x, int y, int z) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        return chunk.getBrightness(x, y, z);
+    }
+
+    @Override
+    default int getOpacity(int x, int y, int z) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        return chunk.getOpacity(x, y, z);
+    }
 }

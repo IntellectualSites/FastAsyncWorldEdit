@@ -423,10 +423,7 @@ public class FaweAPI {
             }
         }
         if (mode != RelightMode.NONE) {
-            boolean sky = nmsQueue.hasSky();
-            if (sky) {
-                relighter.fixSkyLighting();
-            }
+            relighter.fixSkyLighting();
             relighter.fixBlockLighting();
         } else {
             relighter.removeLighting();

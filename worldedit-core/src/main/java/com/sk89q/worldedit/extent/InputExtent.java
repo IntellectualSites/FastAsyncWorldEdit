@@ -127,7 +127,7 @@ public interface InputExtent {
     }
 
     default int getBrightness(int x, int y, int z) {
-        return 0;
+        return getBlock(x, y, z).getMaterial().getLightValue();
     }
 
     default int getOpacity(MutableBlockVector3 position) {
@@ -135,6 +135,6 @@ public interface InputExtent {
     }
 
     default int getOpacity(int x, int y, int z) {
-        return 15;
+        return getBlock(x, y, z).getMaterial().getLightOpacity();
     }
 }

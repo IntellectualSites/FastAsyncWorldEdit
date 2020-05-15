@@ -38,12 +38,14 @@ import net.minecraft.server.v1_15_R1.DataPaletteHash;
 import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
+import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -80,6 +82,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public Chunk nmsChunk;
     public WorldServer world;
     public int X, Z;
+    public ChunkSnapshot chunkSnapshot;
 
     public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -130,6 +133,24 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             return Collections.emptyMap();
         }
         return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
+    }
+
+    @Override
+    public int getLight(int x, int y, int z) {
+        return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
+    }
+
+    @Override
+    public int getSkyLight(int x, int y, int z) {
+        return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
+    }
+
+    @Override
+    public int getEmmittedLight(int x, int y, int z) {
+        if (chunkSnapshot == null) {
+            chunkSnapshot = getChunk().getBukkitChunk().getChunkSnapshot();
+        }
+        return chunkSnapshot.getBlockEmittedLight(x, y, z);
     }
 
     @Override
