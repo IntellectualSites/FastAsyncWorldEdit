@@ -153,7 +153,6 @@ public class NMSRelighter implements Relighter {
     public void updateBlockLight(Map<Long, long[][][]> map) {
         int size = map.size();
         if (size == 0) {
-            System.out.println("b");
             return;
         }
         Queue<MutableBlockVector3> lightPropagationQueue = new ArrayDeque<>();
@@ -163,11 +162,9 @@ public class NMSRelighter implements Relighter {
 
         Iterator<Map.Entry<Long, long[][][]>> iter = map.entrySet().iterator();
         while (iter.hasNext() && size-- > 0) {
-            System.out.println("c");
             Map.Entry<Long, long[][][]> entry = iter.next();
             long index = entry.getKey();
             long[][][] blocks = entry.getValue();
-            System.out.println(blocks.length);
             int chunkX = MathMan.unpairIntX(index);
             int chunkZ = MathMan.unpairIntY(index);
             int bx = chunkX << 4;
@@ -194,7 +191,7 @@ public class NMSRelighter implements Relighter {
                                     int oldLevel = iChunk.getEmmittedLight(lx, y, lz);
                                     int newLevel = iChunk.getBrightness(lx, y, lz);
                                     if (oldLevel != newLevel) {
-                                        iChunk.setBlockLight(x, y, z, newLevel);
+                                        iChunk.setBlockLight(lx, y, lz, newLevel);
                                         MutableBlockVector3 node = new MutableBlockVector3(x, y, z);
                                         if (newLevel < oldLevel) {
                                             removalVisited.put(node, present);
