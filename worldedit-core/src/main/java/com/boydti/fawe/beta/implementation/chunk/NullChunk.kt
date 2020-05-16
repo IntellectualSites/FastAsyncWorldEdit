@@ -66,12 +66,40 @@ object NullChunk : IQueueChunk<Nothing> {
         return 15
     }
 
-    override fun getLight(x: Int, y: Int, z: Int): Int {
-        return 15
+    override fun getLight(): Array<CharArray> {
+        return emptyArray()
+    }
+
+    override fun getSkyLight(): Array<CharArray> {
+        return emptyArray()
     }
 
     override fun getEmmittedLight(x: Int, y: Int, z: Int): Int {
         return 15
+    }
+
+    override fun setSkyLight(x: Int, y: Int, z: Int, value: Int) {
+
+    }
+
+    override fun setBlockLight(x: Int, y: Int, z: Int, value: Int) {
+
+    }
+
+    override fun setFullBright(layer: Int) {
+
+    }
+
+    override fun removeSectionLighting(layer: Int, sky: Boolean) {
+
+    }
+
+    override fun setSkyLightLayer(layer: Int, toSet: CharArray?) {
+
+    }
+
+    override fun setLightLayer(layer: Int, toSet: CharArray?) {
+
     }
 
     override fun getBiomes(): Array<BiomeType>? {

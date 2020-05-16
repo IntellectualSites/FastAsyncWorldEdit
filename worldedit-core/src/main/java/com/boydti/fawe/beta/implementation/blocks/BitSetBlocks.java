@@ -66,6 +66,18 @@ public class BitSetBlocks implements IChunkSet {
         return false;
     }
 
+    @Override public void setBlockLight(int x, int y, int z, int value) {}
+
+    @Override public void setSkyLight(int x, int y, int z, int value) {}
+
+    @Override public void setLightLayer(int layer, char[] toSet) {}
+
+    @Override public void setSkyLightLayer(int layer, char[] toSet) {}
+
+    @Override public void removeSectionLighting(int layer, boolean sky) {}
+
+    @Override public void setFullBright(int layer) {}
+
     @Override
     public void setEntity(CompoundTag tag) {
     }
@@ -116,6 +128,14 @@ public class BitSetBlocks implements IChunkSet {
     @Override
     public BiomeType[] getBiomes() {
         return null;
+    }
+
+    @Override public char[][] getLight() {
+        return new char[0][];
+    }
+
+    @Override public char[][] getSkyLight() {
+        return new char[0][];
     }
 
     @Override

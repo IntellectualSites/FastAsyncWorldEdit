@@ -33,8 +33,8 @@ public class NullRelighter implements Relighter {
     }
 
     @Override
-    public void fixBlockLighting() {
-
+    public void fixBlockLighting(Runnable whenDone) {
+        whenDone.run();
     }
 
     @Override

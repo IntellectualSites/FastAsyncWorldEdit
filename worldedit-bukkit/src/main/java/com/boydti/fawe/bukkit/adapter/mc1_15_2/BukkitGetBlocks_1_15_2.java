@@ -40,9 +40,12 @@ import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.LightEngineLayer;
 import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
+import net.minecraft.server.v1_15_R1.NibbleArray;
+import net.minecraft.server.v1_15_R1.SectionPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.ChunkSnapshot;
@@ -83,6 +86,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public WorldServer world;
     public int X, Z;
     public ChunkSnapshot chunkSnapshot;
+    public NibbleArray blockLight;
+    private boolean blockLightReflect = true;
+    public NibbleArray skyLight;
+    private boolean skyLightReflect = true;
 
     public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -136,21 +143,33 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     }
 
     @Override
-    public int getLight(int x, int y, int z) {
-        return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
-    }
-
-    @Override
     public int getSkyLight(int x, int y, int z) {
-        return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
+        if (skyLight == null && skyLightReflect) {
+            try {
+                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldSkyLightEngineLayer
+                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
+            } catch (IllegalAccessException ignored) {
+                skyLightReflect = false;
+                return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
+            }
+        }
+        long l = BlockPosition.a(x,y, z);
+        return skyLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
     public int getEmmittedLight(int x, int y, int z) {
-        if (chunkSnapshot == null) {
-            chunkSnapshot = getChunk().getBukkitChunk().getChunkSnapshot();
+        if (blockLight == null && blockLightReflect) {
+            try {
+                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
+                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
+            } catch (IllegalAccessException ignored) {
+                blockLightReflect = false;
+                return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
+            }
         }
-        return chunkSnapshot.getBlockEmittedLight(x, y, z);
+        long l = BlockPosition.a(x,y, z);
+        return blockLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
@@ -258,6 +277,32 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
         return BukkitAdapter_1_15_2.ensureLoaded(nmsWorld, X, Z);
+    }
+
+    public void flushLight(IChunkSet set) {
+        boolean lightUpdate = false;
+        char[][] light = set.getLight();
+        if (light != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.BLOCK);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+        char[][] skyLight = set.getSkyLight();
+        if (skyLight != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.SKY);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+        if (!lightUpdate) {
+            return;
+        }
     }
 
     @Override
@@ -368,6 +413,33 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     }
                 }
 
+                boolean lightUpdate = false;
+
+                // Lighting
+                char[][] light = set.getLight();
+                if (light != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(light, EnumSkyBlock.BLOCK);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("a");
+                }
+
+                char[][] skyLight = set.getSkyLight();
+                if (skyLight != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(skyLight, EnumSkyBlock.SKY);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("b");
+                }
+
                 Runnable[] syncTasks = null;
 
                 int bx = X << 4;
@@ -473,23 +545,24 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     };
                 }
 
-                //Lighting
+/*                //Lighting
                 // TODO optimize, cause this is really slow
                 LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
-                engine.a(nmsChunk, false);
+                engine.a(nmsChunk, false);*/
 
                 Runnable callback;
-                if (bitMask == 0 && biomes == null) {
+                if (bitMask == 0 && biomes == null && !lightUpdate) {
                     callback = null;
                 } else {
-                    int finalMask = bitMask;
+                    int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
+                    boolean finalLightUpdate = lightUpdate;
                     callback = () -> {
                         // Set Modified
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, X, Z, finalMask);
+                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
                         if (finalizer != null) finalizer.run();
                     };
                 }
@@ -662,6 +735,26 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         return tmp;
     }
 
+    private void fillLightNibble(char[][] light, EnumSkyBlock skyBlock) {
+        int a = 0;
+        for (int Y = 0; Y < 16; Y++) {
+            if (light[Y] == null) {
+                continue;
+            }
+            NibbleArray nibble = world.getChunkProvider().getLightEngine().a(skyBlock).a(SectionPosition.a(nmsChunk.getPos(), Y));
+            if (nibble == null) {
+                continue;
+            }
+            synchronized (nibble) {
+                for (int i = 0; i < 4096; i++) {
+                    if (light[Y][i] < 16) {
+                        nibble.a(i, light[Y][i]);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public boolean hasSection(int layer) {
         return getSections()[layer] != null;
@@ -669,6 +762,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public boolean trim(boolean aggressive) {
+        skyLight = null;
+        blockLight = null;
+        skyLightReflect = true;
+        blockLightReflect = true;
         if (aggressive) {
             sections = null;
             nmsChunk = null;

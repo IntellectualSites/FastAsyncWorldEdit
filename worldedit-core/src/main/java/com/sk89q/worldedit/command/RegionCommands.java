@@ -136,12 +136,11 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/ing",
+            name = "/fixlighting",
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
-        player.print(TextComponent.of("Temporarily not working"));
         final Location loc = player.getLocation();
         Region selection = player.getSelection();
         if (selection == null) {
@@ -165,22 +164,21 @@ public class RegionCommands {
 //        player.print(TextComponent.of("Light: " + block + " | " + sky));
 //    }
 
-//    @Command(
-//            name = "/removelighting",
-//            desc = "Removing lighting in a selection"
-//    )
-//    @CommandPermissions("worldedit.light.remove")
-//    public void removeLighting(Player player) {
-//        player.print(TextComponent.of("Temporarily not working"));
-//        Region selection = player.getSelection();
-//        if (selection == null) {
-//            final int cx = player.getLocation().getBlockX() >> 4;
-//            final int cz = player.getLocation().getBlockZ() >> 4;
-//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-//        }
-//        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
-//        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
-//    }
+    @Command(
+            name = "/removelighting",
+            desc = "Removing lighting in a selection"
+    )
+    @CommandPermissions("worldedit.light.remove")
+    public void removeLighting(Player player) {
+        Region selection = player.getSelection();
+        if (selection == null) {
+            final int cx = player.getLocation().getBlockX() >> 4;
+            final int cz = player.getLocation().getBlockZ() >> 4;
+            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+        }
+        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, RelightMode.NONE);
+        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
+    }
 
     @Command(
             name = "/nbtinfo",

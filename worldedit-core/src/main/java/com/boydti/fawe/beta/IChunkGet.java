@@ -27,9 +27,6 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     BlockState getBlock(int x, int y, int z);
 
     @Override
-    int getLight(int x, int y, int z);
-
-    @Override
     int getSkyLight(int x, int y, int z);
 
     @Override

@@ -123,21 +123,13 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     }
 
     @Override
-    public int getLight(int x, int y, int z) {
-        return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
-    }
-
-    @Override
     public int getSkyLight(int x, int y, int z) {
         return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
     }
 
     @Override
     public int getEmmittedLight(int x, int y, int z) {
-        if (chunkSnapshot == null) {
-            chunkSnapshot = getChunk().getBukkitChunk().getChunkSnapshot();
-        }
-        return chunkSnapshot.getBlockEmittedLight(x, y, z);
+        return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
     }
 
     @Override

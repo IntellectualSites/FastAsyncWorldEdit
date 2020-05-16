@@ -92,11 +92,11 @@ public interface InputExtent {
      * @param position location
      * @return the light level at the location
      */
-    default int getLight(MutableBlockVector3 position) {
-        return getLight(position.getX(), position.getY(), position.getZ());
+    default int getEmmittedLight(MutableBlockVector3 position) {
+        return getEmmittedLight(position.getX(), position.getY(), position.getZ());
     }
 
-    default int getLight(int x, int y, int z) {
+    default int getEmmittedLight(int x, int y, int z) {
         return 0;
     }
 
@@ -114,20 +114,12 @@ public interface InputExtent {
         return 0;
     }
 
-    default int getEmmittedLight(MutableBlockVector3 position) {
-        return getEmmittedLight(position.getX(), position.getY(), position.getZ());
-    }
-
-    default int getEmmittedLight(int x, int y, int z) {
-        return 0;
-    }
-
     default int getBrightness(MutableBlockVector3 position) {
         return getBrightness(position.getX(), position.getY(), position.getZ());
     }
 
     default int getBrightness(int x, int y, int z) {
-        return getBlock(x, y, z).getMaterial().getLightValue();
+        return getFullBlock(x, y, z).getMaterial().getLightValue();
     }
 
     default int getOpacity(MutableBlockVector3 position) {
@@ -135,6 +127,6 @@ public interface InputExtent {
     }
 
     default int getOpacity(int x, int y, int z) {
-        return getBlock(x, y, z).getMaterial().getLightOpacity();
+        return getFullBlock(x, y, z).getMaterial().getLightOpacity();
     }
 }

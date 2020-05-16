@@ -10,6 +10,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
+import com.boydti.fawe.bukkit.adapter.mc1_15_2.BukkitAdapter_1_15_2;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray;
@@ -57,9 +58,12 @@ import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.LightEngineLayer;
 import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
+import net.minecraft.server.v1_15_R1.NibbleArray;
+import net.minecraft.server.v1_15_R1.SectionPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.ChunkSnapshot;
@@ -78,6 +82,10 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public WorldServer world;
     public int X, Z;
     public ChunkSnapshot chunkSnapshot;
+    public NibbleArray blockLight;
+    private boolean blockLightReflect = true;
+    public NibbleArray skyLight;
+    private boolean skyLightReflect = true;
 
     public BukkitGetBlocks_1_15(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -129,23 +137,34 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         }
         return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
     }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
-    }
-
     @Override
     public int getSkyLight(int x, int y, int z) {
-        return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
+        if (skyLight == null && skyLightReflect) {
+            try {
+                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
+                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
+            } catch (IllegalAccessException ignored) {
+                skyLightReflect = false;
+                return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
+            }
+        }
+        long l = BlockPosition.a(x,y, z);
+        return skyLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
     public int getEmmittedLight(int x, int y, int z) {
-        if (chunkSnapshot == null) {
-            chunkSnapshot = getChunk().getBukkitChunk().getChunkSnapshot();
+        if (blockLight == null && blockLightReflect) {
+            try {
+                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
+                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
+            } catch (IllegalAccessException ignored) {
+                blockLightReflect = false;
+                return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
+            }
         }
-        return chunkSnapshot.getBlockEmittedLight(x, y, z);
+        long l = BlockPosition.a(x,y, z);
+        return blockLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override

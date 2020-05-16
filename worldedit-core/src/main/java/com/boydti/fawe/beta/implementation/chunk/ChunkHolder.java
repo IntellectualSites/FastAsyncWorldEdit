@@ -1,13 +1,13 @@
 package com.boydti.fawe.beta.implementation.chunk;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IQueueChunk;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -17,13 +17,13 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.Range;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
@@ -44,6 +44,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private int chunkX;
     private int chunkZ;
     private boolean fastmode;
+    private int bitMask = -1; // Allow forceful setting of bitmask (for lighting)
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -92,6 +93,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.set(this).getBiomes(); // TODO return get?
     }
 
+    @Override public char[][] getLight() {
+        return delegate.set(this).getLight();
+    }
+
+    @Override public char[][] getSkyLight() {
+        return delegate.set(this).getSkyLight();
+    }
+
     @Override
     public void setBlocks(int layer, char[] data) {
         delegate.set(this).setBlocks(layer, data);
@@ -110,6 +119,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public void setFastMode(boolean fastmode) {
         this.fastmode = fastmode;
+    }
+
+    public void setBitMask(int bitMask) {
+        this.bitMask = bitMask;
+    }
+
+    public int getBitMask() {
+        return bitMask;
     }
 
     @Override
@@ -151,6 +168,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
+        public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.chunkSet.removeSectionLighting(layer, sky);
+        }
+
+        @Override
+        public void setFullBright(ChunkHolder chunk, int layer){
+            chunk.chunkSet.setFullBright(layer);
+        }
+
+        @Override
+        public void setLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.chunkSet.setLightLayer(layer, toSet);
+        }
+
+        @Override
+        public void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.chunkSet.setSkyLightLayer(layer, toSet);
+        }
+
+        @Override
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getBiomeType(x, y, z);
         }
@@ -167,17 +204,30 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getLight(ChunkHolder chunk, int x, int y, int z) {
-            return chunk.chunkExisting.getLight(x, y, z);
-        }
-
-        @Override
         public int getSkyLight(ChunkHolder chunk, int x, int y, int z) {
+            if (chunk.chunkSet.getSkyLight() != null) {
+                int layer = y >> 4;
+                if (chunk.chunkSet.getSkyLight()[layer] != null) {
+                    int setLightValue = chunk.chunkSet.getSkyLight()[y >> 4][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                    if (setLightValue < 16) {
+                        return setLightValue;
+                    }
+                }
+            }
             return chunk.chunkExisting.getSkyLight(x, y, z);
         }
 
         @Override
         public int getEmmittedLight(ChunkHolder chunk, int x, int y, int z) {
+            if (chunk.chunkSet.getLight() != null) {
+                int layer = y >> 4;
+                if (chunk.chunkSet.getLight()[layer] != null) {
+                    int setLightValue = chunk.chunkSet.getLight()[y >> 4][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                    if (setLightValue < 16) {
+                        return setLightValue;
+                    }
+                }
+            }
             return chunk.chunkExisting.getEmmittedLight(x, y, z);
         }
 
@@ -224,15 +274,43 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public void setSkyLight(ChunkHolder chunk, int x, int y, int z, int value) {
             chunk.getOrCreateSet();
-            chunk.delegate = SET;
+            chunk.delegate = BOTH;
             chunk.setSkyLight(x, y, z, value);
         }
 
         @Override
         public void setBlockLight(ChunkHolder chunk, int x, int y, int z, int value) {
             chunk.getOrCreateSet();
-            chunk.delegate = SET;
+            chunk.delegate = BOTH;
             chunk.setBlockLight(x, y, z, value);
+        }
+
+        @Override
+        public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            chunk.removeSectionLighting(layer, sky);
+        }
+
+        @Override
+        public void setFullBright(ChunkHolder chunk, int layer){
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            chunk.setFullBright(layer);
+        }
+
+        @Override
+        public void setLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            chunk.setLightLayer(layer, toSet);
+        }
+
+        @Override
+        public void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            chunk.setSkyLightLayer(layer, toSet);
         }
 
         @Override
@@ -249,11 +327,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
             int z) {
             return chunk.chunkExisting.getFullBlock(x, y, z);
-        }
-
-        @Override
-        public int getLight(ChunkHolder chunk, int x, int y, int z) {
-            return chunk.chunkExisting.getLight(x, y, z);
         }
 
         @Override
@@ -312,6 +385,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
+        public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.chunkSet.removeSectionLighting(layer, sky);
+        }
+
+        @Override
+        public void setFullBright(ChunkHolder chunk, int layer){
+            chunk.chunkSet.setFullBright(layer);
+        }
+
+        @Override
+        public void setLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.chunkSet.setLightLayer(layer, toSet);
+        }
+
+        @Override
+        public void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.chunkSet.setSkyLightLayer(layer, toSet);
+        }
+
+        @Override
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
@@ -331,13 +424,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
             return chunk.getFullBlock(x, y, z);
-        }
-
-        @Override
-        public int getLight(ChunkHolder chunk, int x, int y, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
-            return chunk.getLight(x, y, z);
         }
 
         @Override
@@ -439,11 +525,31 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getLight(ChunkHolder chunk, int x, int y, int z) {
-            chunk.getOrCreateGet();
-            chunk.delegate = GET;
-            chunk.chunkExisting.trim(false);
-            return chunk.getLight(x, y, z);
+        public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            chunk.removeSectionLighting(layer, sky);
+        }
+
+        @Override
+        public void setFullBright(ChunkHolder chunk, int layer){
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            chunk.setFullBright(layer);
+        }
+
+        @Override
+        public void setLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            chunk.setLightLayer(layer, toSet);
+        }
+
+        @Override
+        public void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            chunk.setSkyLightLayer(layer, toSet);
         }
 
         @Override
@@ -595,6 +701,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized T call() {
         if (chunkSet != null) {
+            chunkSet.setBitMask(bitMask);
             return this.call(chunkSet, this::recycle);
         }
         return null;
@@ -660,14 +767,27 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         delegate.setSkyLight(this, x, y, z, value);
     }
 
+    @Override public void removeSectionLighting(int layer, boolean sky) {
+        delegate.removeSectionLighting(this, layer, sky);
+    }
+
+    @Override public void setFullBright(int layer) {
+        delegate.setFullBright(this, layer);
+    }
+
     @Override
     public void setBlockLight(int x, int y, int z, int value) {
         delegate.setBlockLight(this, x, y, z, value);
     }
 
     @Override
-    public int getLight(int x, int y, int z) {
-        return delegate.getLight(this, x, y, z);
+    public void setLightLayer(int layer, char[] toSet) {
+        delegate.setLightLayer(this, layer, toSet);
+    }
+
+    @Override
+    public void setSkyLightLayer(int layer, char[] toSet) {
+        delegate.setLightLayer(this, layer, toSet);
     }
 
     @Override
@@ -708,7 +828,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         void setBlockLight(ChunkHolder chunk, int x, int y, int z, int value);
 
-        int getLight(ChunkHolder chunk, int x, int y, int z);
+        void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky);
+
+        void setFullBright(ChunkHolder chunk, int layer);
+
+        void setLightLayer(ChunkHolder chunk, int layer, char[] toSet);
+
+        void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet);
 
         int getSkyLight(ChunkHolder chunk, int x, int y, int z);
 

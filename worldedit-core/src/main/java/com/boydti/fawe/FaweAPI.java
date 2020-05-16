@@ -1,5 +1,6 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
@@ -397,7 +398,7 @@ public class FaweAPI {
      * @param selection (assumes cuboid)
      * @return
      */
-    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue, final RelightMode mode) {
+    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent<IQueueChunk> queue, final RelightMode mode) {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
@@ -409,13 +410,20 @@ public class FaweAPI {
 
         int count = 0;
 
-        EditSessionBuilder builder = new EditSessionBuilder(world);
-        //RelightMode.NONE because we're doing that ourselves here
-        EditSession session = builder.fastmode(true).relightMode(RelightMode.NONE).compile().build();
+        if (queue == null) {
+            World unwrapped = WorldWrapper.unwrap(world);
+            if (unwrapped instanceof IQueueExtent) {
+                queue = (IQueueExtent) unwrapped;
+            } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1) {
+                ParallelQueueExtent parallel =
+                    new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, true);
+                queue = parallel.getExtent();
+            } else {
+                queue = Fawe.get().getQueueHandler().getQueue(world);
+            }
+        }
 
-        // Remove existing lighting first
-        final LightingExtent lightQueue = (LightingExtent) session.getExtent();
-        NMSRelighter relighter = new NMSRelighter(session);
+        NMSRelighter relighter = new NMSRelighter(queue);
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 relighter.addChunk(x, z, null, 65535);
@@ -424,11 +432,11 @@ public class FaweAPI {
         }
         if (mode != RelightMode.NONE) {
             relighter.fixSkyLighting();
-            relighter.fixBlockLighting();
+            relighter.fixBlockLighting(relighter::sendChunks);
         } else {
             relighter.removeLighting();
+            relighter.sendChunks();
         }
-        relighter.sendChunks();
         return count;
     }
 

@@ -232,11 +232,6 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public int getLight(int x, int y, int z) {
-        return extent.getLight(x, y, z);
-    }
-
-    @Override
     public int getSkyLight(int x, int y, int z) {
         return extent.getSkyLight(x, y, z);
     }

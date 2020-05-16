@@ -69,12 +69,6 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     }
 
     @Override
-    default int getLight(int x, int y, int z) {
-        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
-        return chunk.getLight(x, y, z);
-    }
-
-    @Override
     default int getSkyLight(int x, int y, int z) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getSkyLight(x, y, z);

@@ -397,7 +397,7 @@ public class EditSessionBuilder {
                 this.extent = limitProcessor.construct(regionExtent.getExtent());
             }
             if (this.relightMode != null && extent != null) {
-                Relighter relighter = Settings.IMP.LIGHTING.MODE > 0 ? new NMSRelighter(extent) : NullRelighter.INSTANCE;
+                Relighter relighter = Settings.IMP.LIGHTING.MODE > 0 ? new NMSRelighter(queue) : NullRelighter.INSTANCE;
                 this.extent = new LightingExtent(this.extent, relighter, this.relightMode);
             }
             if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {

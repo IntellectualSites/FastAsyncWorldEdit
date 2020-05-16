@@ -1,13 +1,13 @@
 package com.boydti.fawe.beta.implementation.lighting;
 
-import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IQueueChunk;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NMSRelighter implements Relighter {
-    private final Extent extent;
+    private final IQueueExtent<IQueueChunk> queue;
 
     private final Map<Long, RelightSkyEntry> skyToRelight;
     private final Object present = new Object();
@@ -37,20 +37,19 @@ public class NMSRelighter implements Relighter {
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
 
     private final int maxY;
-    private volatile boolean relighting = false;
 
     public final MutableBlockVector3 mutableBlockPos = new MutableBlockVector3(0, 0, 0);
 
     private static final int DISPATCH_SIZE = 64;
     private boolean removeFirst;
 
-    public NMSRelighter(Extent extent) {
-        this.extent = extent;
+    public NMSRelighter(IQueueExtent<IQueueChunk> queue) {
+        this.queue = queue;
         this.skyToRelight = new Long2ObjectOpenHashMap<>();
         this.lightQueue = new Long2ObjectOpenHashMap<>();
         this.chunksToSend = new Long2ObjectOpenHashMap<>();
         this.concurrentLightQueue = new ConcurrentHashMap<>();
-        this.maxY = extent.getMaxY();
+        this.maxY = queue.getMaxY();
     }
 
     @Override
@@ -107,12 +106,12 @@ public class NMSRelighter implements Relighter {
         skyToRelight.clear();
         chunksToSend.clear();
         lightQueue.clear();
-        concurrentLightQueue.clear();
     }
 
     public boolean addChunk(int cx, int cz, byte[] fix, int bitmask) {
         RelightSkyEntry toPut = new RelightSkyEntry(cx, cz, fix, bitmask);
         extentdSkyToRelight.add(toPut);
+        queue.getOrCreateChunk(cx, cz);
         return true;
     }
 
@@ -141,8 +140,13 @@ public class NMSRelighter implements Relighter {
             long pair = entry.getKey();
             Integer existing = chunksToSend.get(pair);
             chunksToSend.put(pair, chunk.bitmask | (existing != null ? existing : 0));
-            //Object sections = get.getCachedSections(extent.getWorld(), chunk.x, chunk.z);
-            //extent.removeLighting(sections, RelightMode.ALL);
+            ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
+            if (iChunk.isEmpty()) {
+                iChunk.init(queue, chunk.x, chunk.z);
+            }
+            for (int i = 0; i < 16; i++) {
+                iChunk.removeSectionLighting(i, true);
+            }
             iter.remove();
         }
     }
@@ -150,6 +154,7 @@ public class NMSRelighter implements Relighter {
     public void updateBlockLight(Map<Long, long[][][]> map) {
         int size = map.size();
         if (size == 0) {
+            System.out.println("b");
             return;
         }
         Queue<MutableBlockVector3> lightPropagationQueue = new ArrayDeque<>();
@@ -159,13 +164,19 @@ public class NMSRelighter implements Relighter {
 
         Iterator<Map.Entry<Long, long[][][]>> iter = map.entrySet().iterator();
         while (iter.hasNext() && size-- > 0) {
+            System.out.println("c");
             Map.Entry<Long, long[][][]> entry = iter.next();
             long index = entry.getKey();
             long[][][] blocks = entry.getValue();
+            System.out.println(blocks.length);
             int chunkX = MathMan.unpairIntX(index);
             int chunkZ = MathMan.unpairIntY(index);
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
+            ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(bx, bz);
+            if (iChunk.isEmpty()) {
+                iChunk.init(queue, bx, bz);
+            }
             for (int lz = 0; lz < blocks.length; lz++) {
                 long[][] m1 = blocks[lz];
                 if (m1 == null) continue;
@@ -181,10 +192,10 @@ public class NMSRelighter implements Relighter {
                                     int x = lx + bx;
                                     int y = yStart + j;
                                     int z = lz + bz;
-                                    int oldLevel = extent.getEmmittedLight(x, y, z);
-                                    int newLevel = extent.getBrightness(x, y, z);
+                                    int oldLevel = iChunk.getEmmittedLight(x, y, z);
+                                    int newLevel = iChunk.getBrightness(x, y, z);
                                     if (oldLevel != newLevel) {
-                                        extent.setBlockLight(x, y, z, newLevel);
+                                        iChunk.setBlockLight(x, y, z, newLevel);
                                         MutableBlockVector3 node = new MutableBlockVector3(x, y, z);
                                         if (newLevel < oldLevel) {
                                             removalVisited.put(node, present);
@@ -222,7 +233,7 @@ public class NMSRelighter implements Relighter {
 
         while (!lightPropagationQueue.isEmpty()) {
             MutableBlockVector3 node = lightPropagationQueue.poll();
-            int lightLevel = extent.getEmmittedLight(node.getX(), node.getY(), node.getZ());
+            int lightLevel = queue.getEmmittedLight(node.getX(), node.getY(), node.getZ());
             if (lightLevel > 1) {
                 this.computeSpreadBlockLight(node.getX() - 1, node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited);
                 this.computeSpreadBlockLight(node.getX() + 1, node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited);
@@ -238,16 +249,16 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private void computeRemoveBlockLight(int x, int y, int z, int currentLight, Queue<Object[]> extent, Queue<MutableBlockVector3> spreadQueue, Map<MutableBlockVector3, Object> visited,
+    private void computeRemoveBlockLight(int x, int y, int z, int currentLight, Queue<Object[]> queue, Queue<MutableBlockVector3> spreadQueue, Map<MutableBlockVector3, Object> visited,
         Map<MutableBlockVector3, Object> spreadVisited) {
-        int current = this.extent.getEmmittedLight(x, y, z);
+        int current = this.queue.getEmmittedLight(x, y, z);
         if (current != 0 && current < currentLight) {
-            this.extent.setBlockLight(x, y, z, 0);
+            this.queue.setBlockLight(x, y, z, 0);
             if (current > 1) {
                 if (!visited.containsKey(mutableBlockPos)) {
                     MutableBlockVector3 index = new MutableBlockVector3(x, y, z);
                     visited.put(index, present);
-                    extent.add(new Object[]{index, current});
+                    queue.add(new Object[]{index, current});
                 }
             }
         } else if (current >= currentLight) {
@@ -260,17 +271,17 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private void computeSpreadBlockLight(int x, int y, int z, int currentLight, Queue<MutableBlockVector3> extent, Map<MutableBlockVector3, Object> visited) {
-        currentLight = currentLight - Math.max(1, this.extent.getOpacity(x, y, z));
+    private void computeSpreadBlockLight(int x, int y, int z, int currentLight, Queue<MutableBlockVector3> queue, Map<MutableBlockVector3, Object> visited) {
+        currentLight = currentLight - Math.max(1, this.queue.getOpacity(x, y, z));
         if (currentLight > 0) {
-            int current = this.extent.getEmmittedLight(x, y, z);
+            int current = this.queue.getEmmittedLight(x, y, z);
             if (current < currentLight) {
-                this.extent.setBlockLight(x, y, z, currentLight);
+                this.queue.setBlockLight(x, y, z, currentLight);
                 mutableBlockPos.setComponents(x, y, z);
                 if (!visited.containsKey(mutableBlockPos)) {
                     visited.put(new MutableBlockVector3(x, y, z), present);
                     if (currentLight > 1) {
-                        extent.add(new MutableBlockVector3(x, y, z));
+                        queue.add(new MutableBlockVector3(x, y, z));
                     }
                 }
             }
@@ -293,20 +304,20 @@ public class NMSRelighter implements Relighter {
                     }
                 }
             }
-            fixBlockLighting();
-            sendChunks();
+            fixBlockLighting(this::sendChunks);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    public void fixBlockLighting() {
+    public void fixBlockLighting(Runnable whenDone) {
         synchronized (lightQueue) {
             while (!lightLock.compareAndSet(false, true));
             try {
                 updateBlockLight(this.lightQueue);
             } finally {
                 lightLock.set(false);
+                whenDone.run();
             }
         }
     }
@@ -322,7 +333,9 @@ public class NMSRelighter implements Relighter {
                     int bitMask = entry.getValue();
                     int x = MathMan.unpairIntX(pair);
                     int z = MathMan.unpairIntY(pair);
-                    //extent.sendChunk(x, z, bitMask);
+                    ChunkHolder chunk = (ChunkHolder) queue.getOrCreateChunk(x, z);
+                    chunk.setBitMask(bitMask);
+                    queue.submit(chunk);
                     iter.remove();
                 }
             }
@@ -335,7 +348,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private boolean isTransparent(int x, int y, int z) {
-        return extent.getOpacity(x, y, z) < 15;
+        return queue.getOpacity(x, y, z) < 15;
     }
 
     public synchronized void fixSkyLighting() {
@@ -357,10 +370,10 @@ public class NMSRelighter implements Relighter {
                 int start = i * DISPATCH_SIZE;
                 int end = Math.min(size, start + DISPATCH_SIZE);
                 List<RelightSkyEntry> sub = chunksList.subList(start, end);
-                //fixSkyLighting(sub);
+                fixSkyLighting(sub);
             }
         } else {
-            //fixSkyLighting(chunksList);
+            fixSkyLighting(chunksList);
         }
     }
 
@@ -380,14 +393,14 @@ public class NMSRelighter implements Relighter {
                 int index = 0;
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {
-                        mask[index++] = (byte) extent.getSkyLight(bx + x, y, bz + z);
+                        mask[index++] = (byte) queue.getSkyLight(bx + x, y, bz + z);
                     }
                 }
             }
         }
     }
 
-/*    private void fixSkyLighting(List<RelightSkyEntry> sorted) {
+    private void fixSkyLighting(List<RelightSkyEntry> sorted) {
         RelightSkyEntry[] chunks = sorted.toArray(new RelightSkyEntry[sorted.size()]);
         boolean remove = this.removeFirst;
         BlockVectorSet chunkSet = null;
@@ -405,10 +418,8 @@ public class NMSRelighter implements Relighter {
                 }
             }
         }
-
-        byte[] cacheX = FaweCache.CACHE_X[0];
-        byte[] cacheZ = FaweCache.CACHE_Z[0];
-        for (int y = FaweChunk.HEIGHT - 1; y > 0; y--) {
+        for (int y = 255; y > 0; y--) {
+            boolean l = true;
             for (RelightSkyEntry chunk : chunks) { // Propogate skylight
                 int layer = y >> 4;
                 byte[] mask = chunk.mask;
@@ -420,22 +431,21 @@ public class NMSRelighter implements Relighter {
                 }
                 int bx = chunk.x << 4;
                 int bz = chunk.z << 4;
-                Object chunkObj = extent.ensureChunkLoaded(chunk.x, chunk.z);
-                Object sections = extent.getCachedSections(extent.getWorld(), chunk.x, chunk.z);
-                if (sections == null) continue;
-                Object section = extent.getCachedSection(sections, layer);
-                if (section == null) continue;
+                ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
+                if (iChunk.isEmpty()) {
+                    iChunk.init(queue, chunk.x, chunk.z);
+                }
                 chunk.smooth = false;
 
                 if (remove && (y & 15) == 15 && chunkSet.contains(chunk.x, 0, chunk.z)) {
-                    extent.removeSectionLighting(section, y >> 4, true);
+                    iChunk.removeSectionLighting(y >> 4, true);
                 }
 
-                for (int j = 0; j <= maxY; j++) {
-                    int x = cacheX[j];
-                    int z = cacheZ[j];
+                for (int j = 0; j < 256; j++) {
+                    int x = j & 15;
+                    int z = j >> 4;
                     byte value = mask[j];
-                    byte pair = (byte) extent.getOpacityBrightnessPair(section, x, y, z);
+                    byte pair = MathMan.pair16(queue.getOpacity(x, y, z), queue.getBrightness(x, y, z));
                     int opacity = MathMan.unpair16x(pair);
                     int brightness = MathMan.unpair16y(pair);
                     if (brightness > 1 && (brightness != 15 || opacity != 15)) {
@@ -444,7 +454,7 @@ public class NMSRelighter implements Relighter {
                     switch (value) {
                         case 0:
                             if (opacity > 1) {
-                                extent.setSkyLight(section, x, y, z, 0);
+                                iChunk.setSkyLight(x, y, z, 0);
                                 continue;
                             }
                             break;
@@ -464,7 +474,7 @@ public class NMSRelighter implements Relighter {
                         case 14:
                             if (opacity >= value) {
                                 mask[j] = 0;
-                                extent.setSkyLight(section, x, y, z, 0);
+                                iChunk.setSkyLight(x, y, z, 0);
                                 continue;
                             }
                             if (opacity <= 1) {
@@ -478,13 +488,12 @@ public class NMSRelighter implements Relighter {
                                 value -= opacity;
                                 mask[j] = value;
                             }
-                            extent.setSkyLight(section, x, y, z, value);
+                            iChunk.setSkyLight(x, y, z, value);
                             continue;
                     }
                     chunk.smooth = true;
-                    extent.setSkyLight(section, x, y, z, value);
+                    iChunk.setSkyLight(x, y, z, value);
                 }
-                extent.saveChunk(chunkObj);
             }
             for (RelightSkyEntry chunk : chunks) { // Smooth forwards
                 if (chunk.smooth) {
@@ -498,43 +507,43 @@ public class NMSRelighter implements Relighter {
                 }
             }
         }
+        queue.flush();
     }
 
     public void smoothSkyLight(RelightSkyEntry chunk, int y, boolean direction) {
         byte[] mask = chunk.mask;
         int bx = chunk.x << 4;
         int bz = chunk.z << 4;
-        extent.ensureChunkLoaded(chunk.x, chunk.z);
-        Object sections = extent.getCachedSections(extent.getWorld(), chunk.x, chunk.z);
-        if (sections == null) return;
-        Object section = extent.getCachedSection(sections, y >> 4);
-        if (section == null) return;
+        ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
+        if (iChunk.isEmpty()) {
+            iChunk.init(queue, chunk.x, chunk.z);
+        }
         if (direction) {
             for (int j = 0; j < 256; j++) {
                 int x = j & 15;
                 int z = j >> 4;
-                if (mask[j] >= 14 || (mask[j] == 0 && extent.getOpacity(section, x, y, z) > 1)) {
+                if (mask[j] >= 14 || (mask[j] == 0 && iChunk.getOpacity(x, y, z) > 1)) {
                     continue;
                 }
                 byte value = mask[j];
-                if ((value = (byte) Math.max(extent.getSkyLight(bx + x - 1, y, bz + z) - 1, value)) >= 14) ;
-                else if ((value = (byte) Math.max(extent.getSkyLight(bx + x, y, bz + z - 1) - 1, value)) >= 14) ;
-                if (value > mask[j]) extent.setSkyLight(section, x, y, z, mask[j] = value);
+                if ((value = (byte) Math.max(iChunk.getSkyLight(bx + x - 1, y, bz + z) - 1, value)) >= 14) ;
+                else if ((value = (byte) Math.max(iChunk.getSkyLight(bx + x, y, bz + z - 1) - 1, value)) >= 14) ;
+                if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
             }
         } else {
             for (int j = 255; j >= 0; j--) {
                 int x = j & 15;
                 int z = j >> 4;
-                if (mask[j] >= 14 || (mask[j] == 0 && extent.getOpacity(section, x, y, z) > 1)) {
+                if (mask[j] >= 14 || (mask[j] == 0 && iChunk.getOpacity(x, y, z) > 1)) {
                     continue;
                 }
                 byte value = mask[j];
-                if ((value = (byte) Math.max(extent.getSkyLight(bx + x + 1, y, bz + z) - 1, value)) >= 14) ;
-                else if ((value = (byte) Math.max(extent.getSkyLight(bx + x, y, bz + z + 1) - 1, value)) >= 14) ;
-                if (value > mask[j]) extent.setSkyLight(section, x, y, z, mask[j] = value);
+                if ((value = (byte) Math.max(iChunk.getSkyLight(bx + x + 1, y, bz + z) - 1, value)) >= 14) ;
+                else if ((value = (byte) Math.max(iChunk.getSkyLight(bx + x, y, bz + z + 1) - 1, value)) >= 14) ;
+                if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
             }
         }
-    }*/
+    }
 
     public boolean isUnlit(byte[] array) {
         for (byte val : array) {

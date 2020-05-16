@@ -74,10 +74,6 @@ object NullChunkGet : IChunkGet {
         return 15
     }
 
-    override fun getLight(x: Int, y: Int, z: Int): Int {
-        return 15
-    }
-
     override fun reset(): IBlocks? {
         return null
     }
