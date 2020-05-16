@@ -172,9 +172,9 @@ public class NMSRelighter implements Relighter {
             int chunkZ = MathMan.unpairIntY(index);
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
-            ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(bx, bz);
+            ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunkX, chunkZ);
             if (!iChunk.isInit()) {
-                iChunk.init(queue, bx, bz);
+                iChunk.init(queue, chunkX, chunkZ);
             }
             for (int lz = 0; lz < blocks.length; lz++) {
                 long[][] m1 = blocks[lz];
@@ -191,8 +191,8 @@ public class NMSRelighter implements Relighter {
                                     int x = lx + bx;
                                     int y = yStart + j;
                                     int z = lz + bz;
-                                    int oldLevel = iChunk.getEmmittedLight(x, y, z);
-                                    int newLevel = iChunk.getBrightness(x, y, z);
+                                    int oldLevel = iChunk.getEmmittedLight(lx, y, lz);
+                                    int newLevel = iChunk.getBrightness(lx, y, lz);
                                     if (oldLevel != newLevel) {
                                         iChunk.setBlockLight(x, y, z, newLevel);
                                         MutableBlockVector3 node = new MutableBlockVector3(x, y, z);
