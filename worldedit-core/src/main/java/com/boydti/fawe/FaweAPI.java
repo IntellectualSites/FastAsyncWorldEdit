@@ -432,11 +432,11 @@ public class FaweAPI {
         }
         if (mode != RelightMode.NONE) {
             relighter.fixSkyLighting();
-            relighter.fixBlockLighting(relighter::sendChunks);
+            relighter.fixBlockLighting();
         } else {
             relighter.removeLighting();
-            relighter.sendChunks();
         }
+        relighter.sendChunks();
         return count;
     }
 

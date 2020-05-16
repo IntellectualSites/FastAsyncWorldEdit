@@ -111,7 +111,6 @@ public class NMSRelighter implements Relighter {
     public boolean addChunk(int cx, int cz, byte[] fix, int bitmask) {
         RelightSkyEntry toPut = new RelightSkyEntry(cx, cz, fix, bitmask);
         extentdSkyToRelight.add(toPut);
-        queue.getOrCreateChunk(cx, cz);
         return true;
     }
 
@@ -141,7 +140,7 @@ public class NMSRelighter implements Relighter {
             Integer existing = chunksToSend.get(pair);
             chunksToSend.put(pair, chunk.bitmask | (existing != null ? existing : 0));
             ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
-            if (iChunk.isEmpty()) {
+            if (!iChunk.isInit()) {
                 iChunk.init(queue, chunk.x, chunk.z);
             }
             for (int i = 0; i < 16; i++) {
@@ -174,7 +173,7 @@ public class NMSRelighter implements Relighter {
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
             ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(bx, bz);
-            if (iChunk.isEmpty()) {
+            if (!iChunk.isInit()) {
                 iChunk.init(queue, bx, bz);
             }
             for (int lz = 0; lz < blocks.length; lz++) {
@@ -304,46 +303,43 @@ public class NMSRelighter implements Relighter {
                     }
                 }
             }
-            fixBlockLighting(this::sendChunks);
+            fixBlockLighting();
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    public void fixBlockLighting(Runnable whenDone) {
+    public void fixBlockLighting() {
         synchronized (lightQueue) {
             while (!lightLock.compareAndSet(false, true));
             try {
                 updateBlockLight(this.lightQueue);
             } finally {
                 lightLock.set(false);
-                whenDone.run();
             }
         }
     }
 
     public synchronized void sendChunks() {
-        RunnableVal<Object> runnable = new RunnableVal<Object>() {
-            @Override
-            public void run(Object value) {
-                Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry<Long, Integer> entry = iter.next();
-                    long pair = entry.getKey();
-                    int bitMask = entry.getValue();
-                    int x = MathMan.unpairIntX(pair);
-                    int z = MathMan.unpairIntY(pair);
-                    ChunkHolder chunk = (ChunkHolder) queue.getOrCreateChunk(x, z);
-                    chunk.setBitMask(bitMask);
-                    queue.submit(chunk);
-                    iter.remove();
-                }
-            }
-        };
+        Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Long, Integer> entry = iter.next();
+            long pair = entry.getKey();
+            int bitMask = entry.getValue();
+            int x = MathMan.unpairIntX(pair);
+            int z = MathMan.unpairIntY(pair);
+            ChunkHolder chunk = (ChunkHolder) queue.getOrCreateChunk(x, z);
+            chunk.setBitMask(bitMask);
+            iter.remove();
+        }
         if (Settings.IMP.LIGHTING.ASYNC) {
-            runnable.run();
+            queue.flush();
         } else {
-            TaskManager.IMP.sync(runnable);
+            TaskManager.IMP.sync(new RunnableVal<Object>() {
+                @Override public void run(Object value) {
+                    queue.flush();
+                }
+            });
         }
     }
 
@@ -432,7 +428,7 @@ public class NMSRelighter implements Relighter {
                 int bx = chunk.x << 4;
                 int bz = chunk.z << 4;
                 ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
-                if (iChunk.isEmpty()) {
+                if (!iChunk.isInit()) {
                     iChunk.init(queue, chunk.x, chunk.z);
                 }
                 chunk.smooth = false;
@@ -445,7 +441,7 @@ public class NMSRelighter implements Relighter {
                     int x = j & 15;
                     int z = j >> 4;
                     byte value = mask[j];
-                    byte pair = MathMan.pair16(queue.getOpacity(x, y, z), queue.getBrightness(x, y, z));
+                    byte pair = MathMan.pair16(iChunk.getOpacity(x, y, z), iChunk.getBrightness(x, y, z));
                     int opacity = MathMan.unpair16x(pair);
                     int brightness = MathMan.unpair16y(pair);
                     if (brightness > 1 && (brightness != 15 || opacity != 15)) {
@@ -507,7 +503,6 @@ public class NMSRelighter implements Relighter {
                 }
             }
         }
-        queue.flush();
     }
 
     public void smoothSkyLight(RelightSkyEntry chunk, int y, boolean direction) {
@@ -515,7 +510,7 @@ public class NMSRelighter implements Relighter {
         int bx = chunk.x << 4;
         int bz = chunk.z << 4;
         ChunkHolder iChunk = (ChunkHolder) queue.getOrCreateChunk(chunk.x, chunk.z);
-        if (iChunk.isEmpty()) {
+        if (!iChunk.isInit()) {
             iChunk.init(queue, chunk.x, chunk.z);
         }
         if (direction) {

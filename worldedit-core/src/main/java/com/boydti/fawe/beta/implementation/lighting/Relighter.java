@@ -16,7 +16,7 @@ public interface Relighter {
 
     void removeLighting();
 
-    void fixBlockLighting(Runnable whenDone);
+    void fixBlockLighting();
 
     void fixSkyLighting();
 

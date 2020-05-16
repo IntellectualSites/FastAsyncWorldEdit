@@ -45,6 +45,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private int chunkZ;
     private boolean fastmode;
     private int bitMask = -1; // Allow forceful setting of bitmask (for lighting)
+    private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -127,6 +128,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     public int getBitMask() {
         return bitMask;
+    }
+
+    public boolean isInit() {
+        return isInit;
     }
 
     @Override
@@ -696,6 +701,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             delegate = NULL;
         }
         chunkExisting = null;
+        isInit = true;
     }
 
     @Override
