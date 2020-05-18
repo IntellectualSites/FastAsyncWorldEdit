@@ -123,7 +123,10 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
-        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
+        Chunk nmsChunk;
+        synchronized (nmsWorld) {
+            nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
+        }
         if (nmsChunk != null) {
             return nmsChunk;
         }
@@ -131,13 +134,15 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             return nmsWorld.getChunkAt(X, Z);
         }
         if (PaperLib.isPaper()) {
-            CraftWorld craftWorld = nmsWorld.getWorld();
-            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
-            try {
-                CraftChunk chunk = (CraftChunk) future.get();
-                return chunk.getHandle();
-            } catch (Throwable e) {
-                e.printStackTrace();
+            synchronized (nmsWorld) {
+                CraftWorld craftWorld = nmsWorld.getWorld();
+                CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
+                try {
+                    CraftChunk chunk = (CraftChunk) future.get();
+                    return chunk.getHandle();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
             }
         }
         // TODO optimize
