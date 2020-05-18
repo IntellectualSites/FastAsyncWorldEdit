@@ -410,7 +410,7 @@ public class Settings extends Config {
         })
         public List<String> ALLOWED_PLUGINS = new ArrayList<>();
         @Comment("Should debug messages be sent when third party extents are used?")
-        public boolean DEBUG = true;
+        public boolean DEBUG = false;
     }
 
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")
