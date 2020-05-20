@@ -1,6 +1,5 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
@@ -11,7 +10,6 @@ import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;

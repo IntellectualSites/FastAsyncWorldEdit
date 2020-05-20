@@ -23,7 +23,6 @@ import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
@@ -395,10 +394,6 @@ public class EditSessionBuilder {
                 queue.addProcessor(limitProcessor);
             } else if (regionExtent != null) {
                 this.extent = limitProcessor.construct(regionExtent.getExtent());
-            }
-            if (this.relightMode != null && extent != null) {
-                Relighter relighter = Settings.IMP.LIGHTING.MODE > 0 ? new NMSRelighter(queue) : NullRelighter.INSTANCE;
-                this.extent = new LightingExtent(this.extent, relighter, this.relightMode);
             }
             if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
                 System.out.println("TODO add batch processor for strip nbt");
