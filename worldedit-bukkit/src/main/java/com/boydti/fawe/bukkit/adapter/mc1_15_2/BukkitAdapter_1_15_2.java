@@ -9,7 +9,6 @@ import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
-import com.google.common.util.concurrent.Striped;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -19,10 +18,22 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_15_R1.Block;
+import net.minecraft.server.v1_15_R1.Chunk;
+import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_15_R1.ChunkSection;
+import net.minecraft.server.v1_15_R1.DataBits;
+import net.minecraft.server.v1_15_R1.DataPalette;
+import net.minecraft.server.v1_15_R1.DataPaletteBlock;
+import net.minecraft.server.v1_15_R1.DataPaletteLinear;
+import net.minecraft.server.v1_15_R1.GameProfileSerializer;
+import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.PlayerChunk;
+import net.minecraft.server.v1_15_R1.PlayerChunkMap;
+import net.minecraft.server.v1_15_R1.World;
+import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import sun.misc.Unsafe;
@@ -53,8 +64,6 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
-
-    private static final Striped<Semaphore> stripe = Striped.lazyWeakSemaphore(5, 1);
 
     static {
         try {
@@ -128,15 +137,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-        Semaphore lock = stripe.get(nmsWorld.hashCode());
-        Chunk nmsChunk = null;
-        try {
-            lock.acquire();
-            nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
-        } catch (InterruptedException ignored) {
-        } finally {
-            lock.release();
-        }
+        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
             return nmsChunk;
         }
@@ -144,19 +145,13 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             return nmsWorld.getChunkAt(X, Z);
         }
         if (PaperLib.isPaper()) {
+            CraftWorld craftWorld = nmsWorld.getWorld();
+            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
             try {
-                lock.acquire();
-                CraftWorld craftWorld = nmsWorld.getWorld();
-                CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
-                try {
-                    CraftChunk chunk = (CraftChunk) future.get();
-                    return chunk.getHandle();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            } catch (InterruptedException ignored) {
-            } finally {
-                lock.release();
+                CraftChunk chunk = (CraftChunk) future.get();
+                return chunk.getHandle();
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
         // TODO optimize
