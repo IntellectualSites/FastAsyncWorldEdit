@@ -51,7 +51,6 @@ public class FaweRegionManager extends RegionManager {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
                 EditSession session = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 for (CuboidRegion region : regions) {
-                    System.out.println(minY + " " + maxY);
                     region.setPos1(region.getPos1().withY(minY));
                     region.setPos2(region.getPos2().withY(maxY));
                     session.setBlocks((Region) region, blocks);
