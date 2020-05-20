@@ -40,15 +40,12 @@ import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.LightEngineLayer;
-import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
 import net.minecraft.server.v1_15_R1.NibbleArray;
 import net.minecraft.server.v1_15_R1.SectionPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -264,32 +261,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
         return BukkitAdapter_1_15_2.ensureLoaded(nmsWorld, X, Z);
-    }
-
-    public void flushLight(IChunkSet set) {
-        boolean lightUpdate = false;
-        char[][] light = set.getLight();
-        if (light != null) {
-            lightUpdate = true;
-            try {
-                fillLightNibble(light, EnumSkyBlock.BLOCK);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
-        char[][] skyLight = set.getSkyLight();
-        if (skyLight != null) {
-            lightUpdate = true;
-            try {
-                fillLightNibble(light, EnumSkyBlock.SKY);
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-        if (!lightUpdate) {
-            return;
-        }
     }
 
     @Override
@@ -527,11 +498,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         }
                     };
                 }
-
-/*                //Lighting
-                // TODO optimize, cause this is really slow
-                LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
-                engine.a(nmsChunk, false);*/
 
                 Runnable callback;
                 if (bitMask == 0 && biomes == null && !lightUpdate) {

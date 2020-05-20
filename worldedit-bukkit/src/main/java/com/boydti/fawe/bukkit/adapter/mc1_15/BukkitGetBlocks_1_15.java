@@ -10,7 +10,6 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15_2.BukkitAdapter_1_15_2;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray;
@@ -58,7 +57,6 @@ import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.LightEngineLayer;
 import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
@@ -66,7 +64,6 @@ import net.minecraft.server.v1_15_R1.NibbleArray;
 import net.minecraft.server.v1_15_R1.SectionPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
@@ -81,11 +78,8 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public Chunk nmsChunk;
     public WorldServer world;
     public int X, Z;
-    public ChunkSnapshot chunkSnapshot;
-    public NibbleArray blockLight;
-    private boolean blockLightReflect = true;
-    public NibbleArray skyLight;
-    private boolean skyLightReflect = true;
+    public NibbleArray[] blockLight = new NibbleArray[16];
+    public NibbleArray[] skyLight = new NibbleArray[16];
 
     public BukkitGetBlocks_1_15(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -137,34 +131,25 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         }
         return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
     }
+
     @Override
     public int getSkyLight(int x, int y, int z) {
-        if (skyLight == null && skyLightReflect) {
-            try {
-                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15.fieldBlockLightEngineLayer
-                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
-            } catch (IllegalAccessException ignored) {
-                skyLightReflect = false;
-                return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
-            }
+        int layer = y >> 4;
+        if (skyLight[layer] == null) {
+            skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x,y, z);
-        return skyLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+        return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
     public int getEmmittedLight(int x, int y, int z) {
-        if (blockLight == null && blockLightReflect) {
-            try {
-                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15.fieldBlockLightEngineLayer
-                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
-            } catch (IllegalAccessException ignored) {
-                blockLightReflect = false;
-                return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
-            }
+        int layer = y >> 4;
+        if (blockLight[layer] == null) {
+            blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x,y, z);
-        return blockLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+        return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
@@ -375,6 +360,29 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                     }
                 }
 
+                boolean lightUpdate = false;
+
+                // Lighting
+                char[][] light = set.getLight();
+                if (light != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(light, EnumSkyBlock.BLOCK);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                char[][] skyLight = set.getSkyLight();
+                if (skyLight != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(skyLight, EnumSkyBlock.SKY);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 Runnable[] syncTasks = null;
 
                 int bx = X << 4;
@@ -480,25 +488,19 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                     };
                 }
 
-                //Lighting
-                // TODO optimize, cause this is really slow
-                LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
-                //lightChunk()
-                engine.a(nmsChunk, false);
-
                 Runnable callback;
-                if (bitMask == 0 && biomes == null) {
+                if (bitMask == 0 && biomes == null && !lightUpdate) {
                     callback = null;
                 } else {
-                    int finalMask = bitMask;
+                    int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
+                    boolean finalLightUpdate = lightUpdate;
                     callback = () -> {
                         // Set Modified
-                        //setLastSaveHadEntities
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_15.sendChunk(nmsWorld, X, Z, finalMask);
+                        BukkitAdapter_1_15.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
                         if (finalizer != null) finalizer.run();
                     };
                 }
@@ -675,6 +677,25 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
             }
         }
         return tmp;
+    }
+
+    private void fillLightNibble(char[][] light, EnumSkyBlock skyBlock) {
+        for (int Y = 0; Y < 16; Y++) {
+            if (light[Y] == null) {
+                continue;
+            }
+            NibbleArray nibble = world.getChunkProvider().getLightEngine().a(skyBlock).a(SectionPosition.a(nmsChunk.getPos(), Y));
+            if (nibble == null) {
+                continue;
+            }
+            synchronized (nibble) {
+                for (int i = 0; i < 4096; i++) {
+                    if (light[Y][i] < 16) {
+                        nibble.a(i, light[Y][i]);
+                    }
+                }
+            }
+        }
     }
 
     @Override
