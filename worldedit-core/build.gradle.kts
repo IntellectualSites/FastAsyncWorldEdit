@@ -59,7 +59,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared:5.11.1") {
+    "compile"("com.plotsquared:PlotSquared:5.11.2") {
         isTransitive = false
     }
     implementation(kotlin("stdlib-jdk8", "1.3.61"))
