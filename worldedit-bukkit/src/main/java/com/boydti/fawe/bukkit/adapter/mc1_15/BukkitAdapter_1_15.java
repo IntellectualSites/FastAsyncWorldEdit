@@ -24,6 +24,7 @@ import net.minecraft.server.v1_15_R1.DataPaletteBlock;
 import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.GameProfileSerializer;
 import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.LightEngine;
 import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunkMap;
 import net.minecraft.server.v1_15_R1.World;

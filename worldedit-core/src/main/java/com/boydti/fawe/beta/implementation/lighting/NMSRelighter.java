@@ -412,11 +412,10 @@ public class NMSRelighter implements Relighter {
             }
         }
         for (int y = 255; y > 0; y--) {
-            boolean l = true;
             for (RelightSkyEntry chunk : chunks) { // Propogate skylight
                 int layer = y >> 4;
                 byte[] mask = chunk.mask;
-                if (chunk.fix[layer] != SkipReason.NONE) {
+                if ((y & 15) == 15 && chunk.fix[layer] != SkipReason.NONE) {
                     if ((y & 15) == 0 && layer != 0 && chunk.fix[layer - 1] == SkipReason.NONE) {
                         fill(mask, chunk.x, y, chunk.z, chunk.fix[layer]);
                     }

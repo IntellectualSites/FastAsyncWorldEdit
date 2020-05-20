@@ -89,9 +89,6 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
 
     @Override
     public int getLightValue() {
-        if(defaultState.h() > 0) {
-            System.out.println(material.toString() + defaultState.h());
-        }
         return defaultState.h();
     }
 
