@@ -32,6 +32,7 @@ import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
+import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import sun.misc.Unsafe;
@@ -135,7 +136,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
+    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
             return nmsChunk;

@@ -13,21 +13,33 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_15_R1.Block;
+import net.minecraft.server.v1_15_R1.Chunk;
+import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_15_R1.ChunkSection;
+import net.minecraft.server.v1_15_R1.DataBits;
+import net.minecraft.server.v1_15_R1.DataPalette;
+import net.minecraft.server.v1_15_R1.DataPaletteBlock;
+import net.minecraft.server.v1_15_R1.DataPaletteLinear;
+import net.minecraft.server.v1_15_R1.GameProfileSerializer;
+import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.PlayerChunk;
+import net.minecraft.server.v1_15_R1.PlayerChunkMap;
+import net.minecraft.server.v1_15_R1.World;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import sun.misc.Unsafe;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 public final class BukkitAdapter_1_15 extends NMSAdapter {
@@ -127,7 +139,7 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
+    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
             return nmsChunk;

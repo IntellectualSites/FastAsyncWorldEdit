@@ -1,11 +1,10 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
-import static org.bukkit.Bukkit.getWorld;
-
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.util.RegionManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -15,12 +14,17 @@ import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Regions;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+
+import java.util.Set;
+
+import static org.bukkit.Bukkit.getWorld;
 
 public class FaweRegionManager extends RegionManager {
 
@@ -38,6 +42,27 @@ public class FaweRegionManager extends RegionManager {
     @Override
     public void clearAllEntities(Location pos1, Location pos2) {
         parent.clearAllEntities(pos1, pos2);
+    }
+
+    @Override
+    public boolean setCuboids(final PlotArea area, final Set<CuboidRegion> regions, final Pattern blocks, final int minY, final int maxY) {
+        TaskManager.IMP.async(() -> {
+            synchronized (FaweRegionManager.class) {
+                World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
+                EditSession session = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+                for (CuboidRegion region : regions) {
+                    region.setPos1(region.getPos1().withY(minY));
+                    region.setPos2(region.getPos2().withY(maxY));
+                    session.setBlocks((Region) region, blocks);
+                }
+                try {
+                    session.flushQueue();
+                } catch (MaxChangedBlocksException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return true;
     }
 
     @Override
