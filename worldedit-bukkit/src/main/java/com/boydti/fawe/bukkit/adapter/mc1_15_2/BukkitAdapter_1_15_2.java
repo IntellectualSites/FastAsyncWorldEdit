@@ -60,15 +60,11 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     public final static Field fieldTickingBlockCount;
     public final static Field fieldNonEmptyBlockCount;
 
-    public final static Field fieldBlockLightEngineLayer;
-    public final static Field fieldSkyLightEngineLayer;
-
     private final static Field fieldDirtyCount;
     private final static Field fieldDirtyBits;
 
     private final static MethodHandle methodGetVisibleChunk;
 
-    public final static Field fieldLightEngineStorage;
     public final static MethodHandle methodSetLightNibbleArray;
 
     private static final int CHUNKSECTION_BASE;
@@ -96,13 +92,6 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
-
-            fieldBlockLightEngineLayer = LightEngine.class.getDeclaredField("a");
-            fieldBlockLightEngineLayer.setAccessible(true);
-            fieldSkyLightEngineLayer = LightEngine.class.getDeclaredField("b");
-            fieldSkyLightEngineLayer.setAccessible(true);
-            fieldLightEngineStorage = LightEngineLayer.class.getDeclaredField("c");
-            fieldLightEngineStorage.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);

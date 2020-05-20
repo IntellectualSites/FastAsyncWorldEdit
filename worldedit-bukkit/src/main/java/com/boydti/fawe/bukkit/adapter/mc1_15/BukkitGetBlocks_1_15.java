@@ -141,7 +141,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public int getSkyLight(int x, int y, int z) {
         if (skyLight == null && skyLightReflect) {
             try {
-                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
+                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15.fieldBlockLightEngineLayer
                     .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
             } catch (IllegalAccessException ignored) {
                 skyLightReflect = false;
@@ -156,7 +156,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public int getEmmittedLight(int x, int y, int z) {
         if (blockLight == null && blockLightReflect) {
             try {
-                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
+                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15.fieldBlockLightEngineLayer
                     .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
             } catch (IllegalAccessException ignored) {
                 blockLightReflect = false;

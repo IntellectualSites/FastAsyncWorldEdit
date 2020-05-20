@@ -85,11 +85,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public Chunk nmsChunk;
     public WorldServer world;
     public int X, Z;
-    public ChunkSnapshot chunkSnapshot;
-    public NibbleArray blockLight;
-    private boolean blockLightReflect = true;
-    public NibbleArray skyLight;
-    private boolean skyLightReflect = true;
+    public NibbleArray[] blockLight = new NibbleArray[16];
+    public NibbleArray[] skyLight = new NibbleArray[16];
 
     public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -144,32 +141,22 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public int getSkyLight(int x, int y, int z) {
-        if (skyLight == null && skyLightReflect) {
-            try {
-                skyLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldSkyLightEngineLayer
-                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
-            } catch (IllegalAccessException ignored) {
-                skyLightReflect = false;
-                return getChunk().getWorld().getBrightness(EnumSkyBlock.SKY, new BlockPosition(x, y, z));
-            }
+        int layer = y >> 4;
+        if (skyLight[layer] == null) {
+            skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x,y, z);
-        return skyLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+        return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
     public int getEmmittedLight(int x, int y, int z) {
-        if (blockLight == null && blockLightReflect) {
-            try {
-                blockLight = ((LightEngineLayer<?, ?>) BukkitAdapter_1_15_2.fieldBlockLightEngineLayer
-                    .get(world.getChunkProvider().getLightEngine())).a(SectionPosition.a(x >> 4, y >> 4, z >> 4));
-            } catch (IllegalAccessException ignored) {
-                blockLightReflect = false;
-                return getChunk().getWorld().getBrightness(EnumSkyBlock.BLOCK, new BlockPosition(x, y, z));
-            }
+        int layer = y >> 4;
+        if (blockLight[layer] == null) {
+            blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x,y, z);
-        return blockLight.a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+        return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
@@ -424,8 +411,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
-                } else {
-                    System.out.println("a");
                 }
 
                 char[][] skyLight = set.getSkyLight();
@@ -436,8 +421,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
-                } else {
-                    System.out.println("b");
                 }
 
                 Runnable[] syncTasks = null;
@@ -736,7 +719,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     }
 
     private void fillLightNibble(char[][] light, EnumSkyBlock skyBlock) {
-        int a = 0;
         for (int Y = 0; Y < 16; Y++) {
             if (light[Y] == null) {
                 continue;
@@ -762,10 +744,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public boolean trim(boolean aggressive) {
-        skyLight = null;
-        blockLight = null;
-        skyLightReflect = true;
-        blockLightReflect = true;
+        skyLight = new NibbleArray[16];
+        blockLight = new NibbleArray[16];
         if (aggressive) {
             sections = null;
             nmsChunk = null;
