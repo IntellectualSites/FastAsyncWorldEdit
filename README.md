@@ -35,6 +35,8 @@ $ gradlew setupDecompWorkspace
 $ gradlew build
 ```
 
+The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.15-###.jar`
+
 ## Contributing
 Have an idea for an optimization, or a cool feature?
  - We will accept most PR's
