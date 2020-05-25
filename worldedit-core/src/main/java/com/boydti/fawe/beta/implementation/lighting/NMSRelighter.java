@@ -45,10 +45,10 @@ public class NMSRelighter implements Relighter {
 
     public NMSRelighter(IQueueExtent<IQueueChunk> queue) {
         this.queue = queue;
-        this.skyToRelight = new Long2ObjectOpenHashMap<>();
-        this.lightQueue = new Long2ObjectOpenHashMap<>();
-        this.chunksToSend = new Long2ObjectOpenHashMap<>();
-        this.concurrentLightQueue = new ConcurrentHashMap<>();
+        this.skyToRelight = new Long2ObjectOpenHashMap<>(12);
+        this.lightQueue = new Long2ObjectOpenHashMap<>(12);
+        this.chunksToSend = new Long2ObjectOpenHashMap<>(12);
+        this.concurrentLightQueue = new ConcurrentHashMap<>(12);
         this.maxY = queue.getMaxY();
     }
 
@@ -155,10 +155,10 @@ public class NMSRelighter implements Relighter {
         if (size == 0) {
             return;
         }
-        Queue<MutableBlockVector3> lightPropagationQueue = new ArrayDeque<>();
-        Queue<Object[]> lightRemovalQueue = new ArrayDeque<>();
-        Map<MutableBlockVector3, Object> visited = new HashMap<>();
-        Map<MutableBlockVector3, Object> removalVisited = new HashMap<>();
+        Queue<MutableBlockVector3> lightPropagationQueue = new ArrayDeque<>(32);
+        Queue<Object[]> lightRemovalQueue = new ArrayDeque<>(32);
+        Map<MutableBlockVector3, Object> visited = new HashMap<>(32);
+        Map<MutableBlockVector3, Object> removalVisited = new HashMap<>(32);
 
         Iterator<Map.Entry<Long, long[][][]>> iter = map.entrySet().iterator();
         while (iter.hasNext() && size-- > 0) {
