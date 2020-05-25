@@ -142,7 +142,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         if (skyLight[layer] == null) {
             skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
-        long l = BlockPosition.a(x,y, z);
+        long l = BlockPosition.a(x, y, z);
         return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
@@ -152,7 +152,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         if (blockLight[layer] == null) {
             blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
-        long l = BlockPosition.a(x,y, z);
+        long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
