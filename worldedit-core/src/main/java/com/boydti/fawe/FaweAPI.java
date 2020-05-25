@@ -392,9 +392,11 @@ public class FaweAPI {
      * - Relights in parallel (if enabled) for best performance<br>
      * - Also resends chunks<br>
      *
-     * @param world
-     * @param selection (assumes cuboid)
-     * @return
+     * @param world World to relight in
+     * @param selection Region to relight
+     * @param queue Queue to relight in/from
+     * @param mode The mode to relight with
+     * @return Chunks changed
      */
     public static int fixLighting(World world, Region selection, @Nullable IQueueExtent<IQueueChunk> queue, final RelightMode mode) {
         final BlockVector3 bot = selection.getMinimumPoint();

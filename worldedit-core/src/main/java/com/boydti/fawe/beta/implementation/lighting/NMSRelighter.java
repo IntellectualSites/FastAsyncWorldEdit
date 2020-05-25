@@ -64,6 +64,14 @@ public class NMSRelighter implements Relighter {
         removeFirst = false;
     }
 
+    /**
+     * Utility method to reduce duplicated code to ensure values are written to long[][][] without NPEs
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     * @param map long[][][] to add values to
+     */
     private void set(int x, int y, int z, long[][][] map) {
         long[][] m1 = map[z];
         if (m1 == null) {

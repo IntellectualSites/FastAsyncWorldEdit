@@ -1,7 +1,7 @@
 package com.boydti.fawe.object;
 
 public enum RelightMode {
-    NONE,
-    OPTIMAL,
-    ALL
+    NONE, // no relighting
+    OPTIMAL, // relight changed light sources and changed blocks
+    ALL // relight every single block
 }
