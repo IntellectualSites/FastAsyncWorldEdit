@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.wrappers.AsyncPlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -328,39 +329,43 @@ public class PlatformManager {
         if (!(actor instanceof Player)) {
             return;
         }
-            Player player = (Player) actor;
-            LocalSession session = worldEdit.getSessionManager().get(actor);
+        Player player = (Player) actor;
+        LocalSession session = worldEdit.getSessionManager().get(actor);
 
-            Request.reset();
-            Request.request().setSession(session);
-            Request.request().setWorld(player.getWorld());
+        Request.reset();
+        Request.request().setSession(session);
+        Request.request().setWorld(player.getWorld());
 
-            try {
+        try {
             Vector3 vector = location.toVector();
 
             VirtualWorld virtual = session.getVirtualWorld();
             if (virtual != null) {
+                if (Settings.IMP.EXPERIMENTAL.OTHER) {
+                    logger.info("virtualWorld was not null in handlePlayerInput()");
+                }
+
                 virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
                 if (event.isCancelled()) return;
-                        }
+            }
 
             if (event.getType() == Interaction.HIT) {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
                 // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
                 if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
-                        final BlockTool superPickaxe = session.getSuperPickaxe();
-                        if (superPickaxe != null && superPickaxe.canUse(player)) {
+                    final BlockTool superPickaxe = session.getSuperPickaxe();
+                    if (superPickaxe != null && superPickaxe.canUse(player)) {
                         player.runAction(() -> reset(superPickaxe)
                             .actPrimary(queryCapability(Capability.WORLD_EDITING),
                                 getConfiguration(), player, session, location), false, true);
-                        event.setCancelled(true);
-                            return;
-                        }
+                            event.setCancelled(true);
+                        return;
                     }
+                }
 
                 Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
-                    player.runAction(() -> reset(((DoubleActionBlockTool) tool))
+                    player.runAction(() -> reset((DoubleActionBlockTool) tool)
                         .actSecondary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session, location), false, true);
                             event.setCancelled(true);
@@ -384,10 +389,10 @@ public class PlatformManager {
                     }
         } catch (Throwable e) {
             handleThrowable(e, actor);
-            } finally {
-                Request.reset();
-            }
+        } finally {
+            Request.reset();
         }
+    }
 
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
@@ -406,9 +411,11 @@ public class PlatformManager {
         // making changes to the world
         Player player = createProxyActor(event.getPlayer());
         LocalSession session = worldEdit.getSessionManager().get(player);
-
         VirtualWorld virtual = session.getVirtualWorld();
         if (virtual != null) {
+            if (Settings.IMP.EXPERIMENTAL.OTHER) {
+                logger.info("virtualWorld was not null in handlePlayerInput()");
+            }
             virtual.handlePlayerInput(player,  event);
             if (event.isCancelled()) return;
         }
@@ -416,7 +423,6 @@ public class PlatformManager {
         try {
             switch (event.getInputType()) {
                 case PRIMARY: {
-
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),

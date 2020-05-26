@@ -21,36 +21,16 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.JoinedCharSequence;
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
-import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import com.sk89q.worldedit.world.registry.Registries;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Optional;
 
 /**
  * Stores a list of common Block String IDs.
@@ -777,7 +757,7 @@ public final class BlockTypes {
         if (result != null) return result;
 
         try {
-            BlockStateHolder block = LegacyMapper.getInstance().getBlockFromLegacy(input);
+            BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
             if (block != null) return block.getBlockType();
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
         }

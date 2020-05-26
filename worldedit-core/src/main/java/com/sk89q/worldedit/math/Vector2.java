@@ -19,13 +19,12 @@
 
 package com.sk89q.worldedit.math;
 
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 /**
  * An immutable 2-dimensional vector.
  */
-public class Vector2 {
+public final class Vector2 {
 
     public static final Vector2 ZERO = new Vector2(0, 0);
     public static final Vector2 UNIT_X = new Vector2(1, 0);
@@ -33,7 +32,6 @@ public class Vector2 {
     public static final Vector2 ONE = new Vector2(1, 1);
 
     public static Vector2 at(double x, double z) {
-        /* Unnecessary
         int xTrunc = (int) x;
         switch (xTrunc) {
             case 0:
@@ -47,11 +45,10 @@ public class Vector2 {
                 }
                 break;
         }
-        */
         return new Vector2(x, z);
     }
 
-    protected double x, z;
+    private final double x, z;
 
     /**
      * Construct an instance.
@@ -59,46 +56,9 @@ public class Vector2 {
      * @param x the X coordinate
      * @param z the Z coordinate
      */
-    protected Vector2(double x, double z) {
+    private Vector2(double x, double z) {
         this.x = x;
         this.z = z;
-    }
-
-    protected Vector2(Vector2 other) {
-        this.x = other.x;
-        this.z = other.z;
-    }
-
-    public int getBlockX() {
-        return MathMan.roundInt(getX());
-    }
-
-    public int getBlockZ() {
-        return MathMan.roundInt(getZ());
-    }
-
-    public MutableVector2 setComponents(int x, int z) {
-        return new MutableVector2(x, z);
-    }
-
-    public MutableVector2 setComponents(double x, double z) {
-        return new MutableVector2(x, z);
-    }
-
-    public MutableVector2 mutX(int x) {
-        return new MutableVector2(x, z);
-    }
-
-    public MutableVector2 mutZ(int z) {
-        return new MutableVector2(x, z);
-    }
-
-    public MutableVector2 mutX(double x) {
-        return new MutableVector2(x, z);
-    }
-
-    public MutableVector2 mutZ(double z) {
-        return new MutableVector2(x, z);
     }
 
     /**
@@ -458,7 +418,7 @@ public class Vector2 {
             Math.max(z, v2.z)
         );
     }
-
+    
     public static BlockVector2 toBlockPoint(double x, double z) {
         return BlockVector2.at(x, z);
     }

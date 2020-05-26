@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
@@ -28,7 +26,6 @@ import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -39,6 +36,7 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
+import com.google.common.collect.Lists;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
@@ -79,8 +77,10 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.snapshot.Snapshot;
+import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -96,8 +96,11 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores session information.
@@ -138,7 +141,8 @@ public class LocalSession implements TextureHolder {
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
-    private transient Snapshot snapshot;
+    private transient com.sk89q.worldedit.world.snapshot.Snapshot snapshot;
+    private transient Snapshot snapshotExperimental;
     private transient boolean hasCUISupport = false;
     private transient int cuiVersion = -1;
     private transient boolean fastMode = false;
@@ -153,9 +157,12 @@ public class LocalSession implements TextureHolder {
 
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
+    @SuppressWarnings("unused")
+    private transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
+    private transient boolean hasBeenToldVersion;
 
     // Saved properties
     private String lastScript;
@@ -331,6 +338,10 @@ public class LocalSession implements TextureHolder {
         return (historyNegativeIndex == null ? historyNegativeIndex = 0 : historyNegativeIndex);
     }
 
+    public List<ChangeSet> getHistory() {
+        return history.stream().map(this::getChangeSet).collect(Collectors.toList());
+    }
+
     public boolean save() {
         saveHistoryNegativeIndex(uuid, currentWorld);
         if (defaultSelector == RegionSelectorType.CUBOID) {
@@ -390,14 +401,17 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
+        // Don't store anything if no changes were made
+        if (editSession.size() == 0) return;
+        
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
     }
 
-    private FaweChangeSet getChangeSet(Object o) {
-        if (o instanceof FaweChangeSet) {
-            FaweChangeSet cs = (FaweChangeSet) o;
+    private ChangeSet getChangeSet(Object o) {
+        if (o instanceof ChangeSet) {
+            ChangeSet cs = (ChangeSet) o;
             try {
                 cs.close();
             } catch (IOException e) {
@@ -427,16 +441,16 @@ public class LocalSession implements TextureHolder {
             return;
         }
         loadSessionHistoryFromDisk(player.getUniqueId(), world);
-        if (changeSet instanceof FaweChangeSet) {
+        if (changeSet instanceof ChangeSet) {
             ListIterator<Object> iter = history.listIterator();
             int i = 0;
             int cutoffIndex = history.size() - getHistoryNegativeIndex();
             while (iter.hasNext()) {
                 Object item = iter.next();
                 if (++i > cutoffIndex) {
-                    FaweChangeSet oldChangeSet;
-                    if (item instanceof FaweChangeSet) {
-                        oldChangeSet = (FaweChangeSet) item;
+                    ChangeSet oldChangeSet;
+                    if (item instanceof ChangeSet) {
+                        oldChangeSet = (ChangeSet) item;
                     } else {
                         oldChangeSet = getChangeSet(item);
                     }
@@ -454,7 +468,7 @@ public class LocalSession implements TextureHolder {
         if (limit != null) {
             int limitMb = limit.MAX_HISTORY;
             while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
-                FaweChangeSet item = (FaweChangeSet) history.remove(0);
+                ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
                 long size = MainUtil.getSize(item);
                 historySize -= size;
@@ -478,7 +492,7 @@ public class LocalSession implements TextureHolder {
         }
         */
 
-        FaweChangeSet changeSet = (FaweChangeSet) editSession.getChangeSet();
+        ChangeSet changeSet = editSession.getChangeSet();
         if (changeSet.isEmpty()) {
             return;
         }
@@ -495,9 +509,9 @@ public class LocalSession implements TextureHolder {
             while (iter.hasNext()) {
                 Object item = iter.next();
                 if (++i > cutoffIndex) {
-                    FaweChangeSet oldChangeSet;
-                    if (item instanceof FaweChangeSet) {
-                        oldChangeSet = (FaweChangeSet) item;
+                    ChangeSet oldChangeSet;
+                    if (item instanceof ChangeSet) {
+                        oldChangeSet = (ChangeSet) item;
                     } else {
                         oldChangeSet = getChangeSet(item);
                     }
@@ -518,7 +532,7 @@ public class LocalSession implements TextureHolder {
             history.add(0, changeSet);
         }
         while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
-            FaweChangeSet item = (FaweChangeSet) history.remove(0);
+            ChangeSet item = (ChangeSet) history.remove(0);
             item.delete();
             long size = MainUtil.getSize(item);
             historySize -= size;
@@ -534,10 +548,11 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player) actor).getWorldForEditing());
+        World world = ((Player) actor).getWorldForEditing();
+        loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
-            FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
+            ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
+            try (EditSession newEditSession = new EditSessionBuilder(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -570,12 +585,13 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        loadSessionHistoryFromDisk(actor.getUniqueId(), ((Player)actor).getWorldForEditing());
+        World world = ((Player) actor).getWorldForEditing();
+        loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
-            FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
+            ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
+            try (EditSession newEditSession = new EditSessionBuilder(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -888,7 +904,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the position use for commands that take a center point
-     * (i.e., //forestgen, etc.).
+     * (i.e. //forestgen, etc.).
      *
      * @param actor the actor
      * @return the position to use
@@ -905,6 +921,14 @@ public class LocalSession implements TextureHolder {
         }
 
         return selector.getPrimaryPosition();
+    }
+
+    public void setPlaceAtPos1(boolean placeAtPos1) {
+        this.placeAtPos1 = placeAtPos1;
+    }
+
+    public boolean isPlaceAtPos1() {
+        return placeAtPos1;
     }
 
     /**
@@ -933,22 +957,40 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
+     * Get the legacy snapshot that has been selected.
+     *
+     * @return the legacy snapshot
+     */
+    @Nullable
+    public com.sk89q.worldedit.world.snapshot.Snapshot getSnapshot() {
+        return snapshot;
+    }
+
+    /**
+     * Select a legacy snapshot.
+     *
+     * @param snapshot a legacy snapshot
+     */
+    public void setSnapshot(@Nullable com.sk89q.worldedit.world.snapshot.Snapshot snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    /**
      * Get the snapshot that has been selected.
      *
      * @return the snapshot
      */
-    @Nullable
-    public Snapshot getSnapshot() {
-        return snapshot;
+    public @Nullable Snapshot getSnapshotExperimental() {
+        return snapshotExperimental;
     }
 
     /**
      * Select a snapshot.
      *
-     * @param snapshot a snapshot
+     * @param snapshotExperimental a snapshot
      */
-    public void setSnapshot(@Nullable Snapshot snapshot) {
-        this.snapshot = snapshot;
+    public void setSnapshotExperimental(@Nullable Snapshot snapshotExperimental) {
+        this.snapshotExperimental = snapshotExperimental;
     }
 
     /**
@@ -1074,7 +1116,8 @@ public class LocalSession implements TextureHolder {
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.hasBlockType()) {
             throw new InvalidToolBindException(item, "Blocks can't be used");
-        } else if (tool instanceof SelectionWand) {
+        }
+        if (tool instanceof SelectionWand) {
             changeTool(this.wandItem, this.wandItem = item, tool);
             setDirty();
             return;
@@ -1104,14 +1147,6 @@ public class LocalSession implements TextureHolder {
                 this.tools.put(newType.getInternalId(), newTool);
             }
         }
-    }
-
-    public void setPlaceAtPos1(boolean placeAtPos1) {
-        this.placeAtPos1 = placeAtPos1;
-    }
-
-    public boolean isPlaceAtPos1() {
-        return placeAtPos1;
     }
 
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
@@ -1199,6 +1234,9 @@ public class LocalSession implements TextureHolder {
      * @param actor the actor
      */
     public void tellVersion(Actor actor) {
+        if (hasBeenToldVersion) return;
+        hasBeenToldVersion = true;
+        actor.sendAnnouncements();
     }
 
     public boolean shouldUseServerCUI() {
@@ -1474,6 +1512,15 @@ public class LocalSession implements TextureHolder {
         return editSession;
     }
 
+    private void prepareEditingExtents(EditSession editSession, Actor actor) {
+        editSession.setFastMode(fastMode);
+        editSession.setReorderMode(reorderMode);
+        if (editSession.getSurvivalExtent() != null) {
+            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
+        }
+        editSession.setTickingWatchdog(tickingWatchdog);
+    }
+
     /**
      * Checks if the session has fast mode enabled.
      *
@@ -1498,7 +1545,6 @@ public class LocalSession implements TextureHolder {
      * @return The reorder mode
      */
     public EditSession.ReorderMode getReorderMode() {
-//        return reorderMode;
         return EditSession.ReorderMode.FAST;
     }
 
@@ -1508,7 +1554,6 @@ public class LocalSession implements TextureHolder {
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(EditSession.ReorderMode reorderMode) {
-//        this.reorderMode = reorderMode;
     }
 
     /**
@@ -1547,15 +1592,12 @@ public class LocalSession implements TextureHolder {
         this.sourceMask = mask;
     }
 
-    public void setTextureUtil(TextureUtil texture) {
-        synchronized (this) {
-            this.texture = texture;
-        }
+    public synchronized void setTextureUtil(TextureUtil texture) {
+        this.texture = texture;
     }
 
     /**
      * Get the TextureUtil currently being used
-     * @return
      */
     @Override
     public TextureUtil getTextureUtil() {
@@ -1619,14 +1661,4 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    private void prepareEditingExtents(EditSession editSession, Actor actor) {
-        editSession.setFastMode(fastMode);
-        /*
-        editSession.setReorderMode(reorderMode);
-        */
-        if (editSession.getSurvivalExtent() != null) {
-            editSession.getSurvivalExtent().setStripNbt(!actor.hasPermission("worldedit.setnbt"));
-        }
-        editSession.setTickingWatchdog(tickingWatchdog);
-    }
 }

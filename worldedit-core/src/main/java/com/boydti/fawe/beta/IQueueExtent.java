@@ -13,6 +13,7 @@ import java.io.Flushable;
 import java.util.Set;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
@@ -53,15 +54,15 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * @param z
      * @return
      */
-    IChunkGet getCachedGet(int x, int z);
+    IChunkGet getCachedGet(@Range(from = 0, to = 15) int x, @Range(from = 0, to = 15) int z);
 
     /**
      * Get the cached chunk set object
-     * @param x
-     * @param z
+     * @param chunkX
+     * @param chunkZ
      * @return
      */
-    IChunkSet getCachedSet(int x, int z);
+    IChunkSet getCachedSet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
 
     /**
      * Submit the chunk so that it's changes are applied to the world
@@ -80,6 +81,10 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     default BlockVector3 getMaximumPoint() {
         return BlockVector3.at(30000000, FaweCache.IMP.WORLD_MAX_Y, 30000000);
     }
+
+    void setFastMode(boolean fastMode);
+
+    boolean isFastMode();
 
     /**
      * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
@@ -142,6 +147,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         T chunk = this.getOrCreateChunk(chunkX, chunkZ);
         // Initialize
         chunk.init(this, chunkX, chunkZ);
+        chunk.setFastMode(isFastMode());
 
         T newChunk = filter.applyChunk(chunk, region);
         if (newChunk != null) {

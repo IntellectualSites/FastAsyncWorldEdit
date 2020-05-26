@@ -1,8 +1,6 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -24,7 +22,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     private int[] missingBlocks = new int[BlockTypes.size()];
     private BlockBag blockBag;
 
-    public BlockBagChangeSet(FaweChangeSet parent, BlockBag blockBag, boolean mine) {
+    public BlockBagChangeSet(AbstractChangeSet parent, BlockBag blockBag, boolean mine) {
         super(parent);
         this.blockBag = blockBag;
         this.mine = mine;
@@ -88,10 +86,10 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
             try {
                 blockBag.fetchPlacedBlock(typeTo.getDefaultState());
             } catch (UnplaceableBlockException e) {
-                throw FaweCache.BLOCK_BAG;
+                throw FaweCache.IMP.BLOCK_BAG;
             } catch (BlockBagException e) {
                 missingBlocks[typeTo.getInternalId()]++;
-                throw FaweCache.BLOCK_BAG;
+                throw FaweCache.IMP.BLOCK_BAG;
             }
         }
         if (mine) {
@@ -115,7 +113,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     @Override
     public void addTileCreate(CompoundTag nbt) {
         if (nbt.containsKey("items")) {
-            Map<String, Tag> map = ReflectionUtils.getMap(nbt.getValue());
+            Map<String, Tag> map = nbt.getValue();
             map.remove("items");
         }
         super.addTileCreate(nbt);

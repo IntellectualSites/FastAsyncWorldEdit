@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
@@ -17,6 +16,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,6 +52,7 @@ public class SplineBrush implements Brush, ResettableTool {
         } else {
             mask = new MaskIntersection(mask, new IdMask(editSession));
         }
+        mask = mask.withExtent(editSession);
         boolean visualization = editSession.getExtent() instanceof VisualExtent;
         if (visualization && positionSets.isEmpty()) {
             return;
@@ -92,7 +93,7 @@ public class SplineBrush implements Brush, ResettableTool {
                 points.add(position);
             }
             this.positionSets.add(points);
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.primary.2"));
+            player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
             if (!visualization) {
                 return;
             }
@@ -130,7 +131,7 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary"));
+        player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
         if (visualization) {
             numSplines = originalSize;
             positionSets.remove(positionSets.size() - 1);

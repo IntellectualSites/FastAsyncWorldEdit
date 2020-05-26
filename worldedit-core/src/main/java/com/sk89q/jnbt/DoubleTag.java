@@ -28,10 +28,6 @@ public final class DoubleTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_DOUBLE;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Double";
-    }
 
     private final double value;
 

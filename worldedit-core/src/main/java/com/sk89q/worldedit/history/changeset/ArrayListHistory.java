@@ -21,8 +21,12 @@ package com.sk89q.worldedit.history.changeset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,4 +74,16 @@ public class ArrayListHistory implements ChangeSet {
         return changes.size();
     }
 
+    @Override
+    public ChangeSetSummary summarize(Region region, boolean shallow) {
+        SimpleChangeSetSummary summary = new SimpleChangeSetSummary();
+        for (Change change : changes) {
+            if (change instanceof BlockChange) {
+                BlockChange blockChange = (BlockChange) change;
+                BlockVector3 pos = blockChange.getPosition();
+                summary.add(pos.getX(), pos.getZ(), blockChange.getCurrent().getOrdinal());
+            }
+        }
+        return summary;
+    }
 }

@@ -35,6 +35,7 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.auth.Subject;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,9 +78,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printDebug)
      */
     @Deprecated
-    default void printDebug(String msg) {
-        printDebug(TextComponent.of(msg));
-    }
+    void printDebug(String msg);
 
     /**
      * Print a WorldEdit message.
@@ -88,9 +87,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printInfo)
      */
     @Deprecated
-    default void print(String msg) {
-        printInfo(TextComponent.of(msg));
-    }
+    void print(String msg);
 
     /**
      * Print a WorldEdit error.
@@ -99,9 +96,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @deprecated Use component-based functions (printError)
      */
     @Deprecated
-    default void printError(String msg) {
-        printError(TextComponent.of(msg));
-    }
+    void printError(String msg);
 
 
     /**
@@ -110,7 +105,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printError(Component component) {
-        print(TranslatableComponent.of("fawe.error", component));
+        print(component.color(TextColor.RED));
     }
 
     /**
@@ -119,7 +114,16 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @param component The component to print
      */
     default void printInfo(Component component) {
-        print(TranslatableComponent.of("fawe.info", component));
+        print(component.color(TextColor.LIGHT_PURPLE));
+    }
+
+    /**
+     * Print a WorldEdit message.
+     *
+     * @param component The component to print
+     */
+    default void printDebug(Component component) {
+        print(component.color(TextColor.GRAY));
     }
 
     /**
@@ -135,15 +139,6 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @return true if bedrock can be broken by the actor
      */
     boolean canDestroyBedrock();
-
-    /**
-     * Print a WorldEdit message.
-     *
-     * @param component The component to print
-     */
-    default void printDebug(Component component) {
-        print(TranslatableComponent.of("fawe.debug", component));
-    }
 
     /**
      * Return whether this actor is a player.
@@ -275,4 +270,10 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      * @return The locale
      */
     Locale getLocale();
+
+    /**
+     * Sends any relevant notices to the user when they first use WorldEdit in a session.
+     */
+    default void sendAnnouncements() {
+    }
 }

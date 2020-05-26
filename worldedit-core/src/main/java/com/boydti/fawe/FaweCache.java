@@ -3,15 +3,17 @@ package com.boydti.fawe;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.beta.implementation.queue.Pool;
+import com.boydti.fawe.beta.implementation.queue.QueuePool;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.collection.VariableThreadLocal;
 import com.boydti.fawe.object.exception.FaweBlockBagException;
 import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MathMan;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -34,7 +36,6 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,9 +43,9 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -53,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 public enum FaweCache implements Trimable {
     IMP
@@ -65,43 +67,7 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
-    private final IdentityHashMap<Class, CleanableThreadLocal> REGISTERED_SINGLETONS = new IdentityHashMap<>();
-    private final IdentityHashMap<Class, Pool> REGISTERED_POOLS = new IdentityHashMap<>();
-
-    public interface Pool<T> {
-        T poll();
-        default boolean offer(T recycle) {
-            return false;
-        }
-        default void clear() {}
-    }
-
-    public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
-        private final Supplier<T> supplier;
-
-        public QueuePool(Supplier<T> supplier) {
-            this.supplier = supplier;
-        }
-
-        @Override
-        public boolean offer(T t) {
-            return super.offer(t);
-        }
-
-        @Override
-        public T poll() {
-            T result = super.poll();
-            if (result == null) {
-                return supplier.get();
-            }
-            return result;
-        }
-
-        @Override
-        public void clear() {
-            if (!isEmpty()) super.clear();
-        }
-    }
+    private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
 
     /*
     Palette buffers / cache
@@ -125,65 +91,16 @@ public enum FaweCache implements Trimable {
             MUTABLE_VECTOR3.clean();
             MUTABLE_BLOCKVECTOR3.clean();
             SECTION_BITS_TO_CHAR.clean();
-            for (Map.Entry<Class, CleanableThreadLocal> entry : REGISTERED_SINGLETONS.entrySet()) {
-                entry.getValue().clean();
-            }
         }
-        for (Map.Entry<Class, Pool> entry : REGISTERED_POOLS.entrySet()) {
-            Pool pool = entry.getValue();
+        for (Entry<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> entry : REGISTERED_POOLS.entrySet()) {
+            Pool<? extends IChunkSet> pool = entry.getValue();
             pool.clear();
         }
 
         return false;
     }
 
-    public final <T> Pool<T> getPool(Class<T> clazz) {
-        Pool<T> pool = REGISTERED_POOLS.get(clazz);
-        if (pool == null) {
-            synchronized (this) {
-                pool = REGISTERED_POOLS.get(clazz);
-                if (pool == null) {
-                    getLogger(FaweCache.class).debug("Not registered " + clazz);
-                    Supplier<T> supplier = IOUtil.supplier(clazz::newInstance);
-                    pool = supplier::get;
-                    REGISTERED_POOLS.put(clazz, pool);
-                }
-            }
-        }
-        return pool;
-    }
-
-    public final <T> T getFromPool(Class<T> clazz) {
-        Pool<T> pool = getPool(clazz);
-        return pool.poll();
-    }
-
-    public final <T> T getSingleton(Class<T> clazz) {
-        CleanableThreadLocal<T> cache = REGISTERED_SINGLETONS.get(clazz);
-        if (cache == null) {
-            synchronized (this) {
-                cache = REGISTERED_SINGLETONS.get(clazz);
-                if (cache == null) {
-                    getLogger(FaweCache.class).debug("Not registered " + clazz);
-                    cache = new CleanableThreadLocal<>(IOUtil.supplier(clazz::newInstance));
-                    REGISTERED_SINGLETONS.put(clazz, cache);
-                }
-            }
-        }
-        return cache.get();
-    }
-
-    public synchronized <T> CleanableThreadLocal<T> registerSingleton(Class<T> clazz, Supplier<T> cache) {
-        checkNotNull(cache);
-        CleanableThreadLocal<T> local = new CleanableThreadLocal<>(cache);
-        CleanableThreadLocal previous = REGISTERED_SINGLETONS.putIfAbsent(clazz, local);
-        if (previous != null) {
-            throw new IllegalStateException("Previous key");
-        }
-        return local;
-    }
-
-    public synchronized <T> Pool<T> registerPool(Class<T> clazz, Supplier<T> cache, boolean buffer) {
+    public synchronized <T extends IChunkSet> Pool<T> registerPool(Class<T> clazz, Supplier<T> cache, boolean buffer) {
         checkNotNull(cache);
         Pool<T> pool;
         if (buffer) {
@@ -191,7 +108,7 @@ public enum FaweCache implements Trimable {
         } else {
             pool = cache::get;
         }
-        Pool<T> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
+        Pool<? extends IChunkSet> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
         if (previous != null) {
             throw new IllegalStateException("Previous key");
         }
@@ -201,7 +118,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(T key) {
+            public V load(@NotNull T key) {
                 return withInitial.get();
             }
         });
@@ -210,7 +127,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(T key) {
+            public V load(@NotNull T key) {
                 return withInitial.apply(key);
             }
         });
@@ -269,7 +186,7 @@ public enum FaweCache implements Trimable {
     /**
      * Holds data for a palette used in a chunk section
      */
-    public final class Palette {
+    public static final class Palette {
         public int bitsPerEntry;
 
         public int paletteToBlockLength;
@@ -313,10 +230,10 @@ public enum FaweCache implements Trimable {
         long[] blockStates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
-        int blockIndexStart = layerOffset << 12;
-        int blockIndexEnd = blockIndexStart + 4096;
-        int num_palette = 0;
         try {
+            int num_palette = 0;
+            int blockIndexStart = layerOffset << 12;
+            int blockIndexEnd = blockIndexStart + 4096;
             if (blocksChars != null) {
                 for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
                     int ordinal = blocksChars[i];
@@ -361,7 +278,7 @@ public enum FaweCache implements Trimable {
                 blockStates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -489,26 +406,9 @@ public enum FaweCache implements Trimable {
             return (Tag) value;
         } else if (value instanceof Boolean) {
             return asTag((byte) ((boolean) value ? 1 : 0));
-        } else if (value == null) {
-            System.out.println("Invalid nbt: " + value);
-            return null;
-        } else {
-            Class<? extends Object> clazz = value.getClass();
-            if (clazz.getName().startsWith("com.intellectualcrafters.jnbt")) {
-                try {
-                    if (clazz.getName().equals("com.intellectualcrafters.jnbt.EndTag")) {
-                        return new EndTag();
-                    }
-                    Field field = clazz.getDeclaredField("value");
-                    field.setAccessible(true);
-                    return asTag(field.get(value));
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-            }
-            System.out.println("Invalid nbt: " + value);
-            return null;
         }
+        System.out.println("Invalid nbt: " + value);
+        return null;
     }
 
     public ListTag asTag(Object... values) {

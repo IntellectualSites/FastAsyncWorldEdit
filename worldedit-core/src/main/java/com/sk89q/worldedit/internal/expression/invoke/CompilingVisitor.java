@@ -19,10 +19,13 @@
 
 package com.sk89q.worldedit.internal.expression.invoke;
 
-import com.google.common.collect.SetMultimap;
 import com.sk89q.worldedit.antlr.ExpressionBaseVisitor;
 import com.sk89q.worldedit.antlr.ExpressionParser;
-import com.sk89q.worldedit.internal.expression.*;
+import com.sk89q.worldedit.internal.expression.EvaluationException;
+import com.sk89q.worldedit.internal.expression.ExecutionData;
+import com.sk89q.worldedit.internal.expression.ExpressionHelper;
+import com.sk89q.worldedit.internal.expression.Functions;
+import com.sk89q.worldedit.internal.expression.LocalSlot;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
 import org.antlr.v4.runtime.CommonToken;
@@ -40,9 +43,36 @@ import java.util.function.DoubleBinaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.sk89q.worldedit.antlr.ExpressionLexer.*;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.DIVIDE;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.DIVIDE_ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.EQUAL;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.EXCLAMATION_MARK;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.GREATER_THAN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.GREATER_THAN_OR_EQUAL;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.INCREMENT;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.LEFT_SHIFT;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.LESS_THAN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.LESS_THAN_OR_EQUAL;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.MINUS;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.MINUS_ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.MODULO;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.MODULO_ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.NEAR;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.NOT_EQUAL;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.PLUS;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.PLUS_ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.POWER_ASSIGN;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.RIGHT_SHIFT;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.TIMES;
+import static com.sk89q.worldedit.antlr.ExpressionLexer.TIMES_ASSIGN;
 import static com.sk89q.worldedit.internal.expression.ExpressionHelper.WRAPPED_CONSTANT;
-import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.*;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.CALL_BINARY_OP;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.DOUBLE_TO_BOOL;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.IS_NULL;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.NEW_LS_CONSTANT;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.NULL_DOUBLE;
+import static com.sk89q.worldedit.internal.expression.invoke.ExpressionHandles.unboxDoubles;
 import static java.lang.invoke.MethodType.methodType;
 
 /**
@@ -50,75 +80,23 @@ import static java.lang.invoke.MethodType.methodType;
  */
 class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
 
-    private static final MethodHandle BREAK_STATEMENT =
-            ExpressionHandles.dropData(MethodHandles.throwException(Double.class, BreakException.class)
-                    .bindTo(BreakException.BREAK));
-    private static final MethodHandle CONTINUE_STATEMENT =
-            ExpressionHandles.dropData(MethodHandles.throwException(Double.class, BreakException.class)
-                    .bindTo(BreakException.CONTINUE));
-    private static final double[] factorials = new double[171];
-    /**
-     * Method handle (ExecutionData)Double, returns null.
-     */
-    private static final MethodHandle DEFAULT_RESULT =
-            ExpressionHandles.dropData(MethodHandles.constant(Double.class, null));
-
-    static {
-        factorials[0] = 1;
-        for (int i = 1; i < factorials.length; ++i) {
-            factorials[i] = factorials[i - 1] * i;
-        }
-    }
-
     /*
      * General idea is that we don't need to pass around variables, they're all in ExecutionData.
      * We do need to pass that around, so most MethodHandles will be of the type
      * (ExecutionData)Double, with a few as (ExecutionData,Double)Double where it needs an existing
-     * value passed in. EVERY handle returned from an overriden method must be of the first type.
+     * value passed in. EVERY handle returned from an overridden method must be of the first type.
      */
-    private final SetMultimap<String, MethodHandle> functions;
+    private final Functions functions;
 
-    CompilingVisitor(SetMultimap<String, MethodHandle> functions) {
+    CompilingVisitor(Functions functions) {
         this.functions = functions;
-    }
-
-    // Usable AlmostEqual function, based on http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
-    private static boolean almostEqual2sComplement(double a, double b, long maxUlps) {
-        // Make sure maxUlps is non-negative and small enough that the
-        // default NAN won't compare as equal to anything.
-        //assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024); // this is for floats, not doubles
-
-        long aLong = Double.doubleToRawLongBits(a);
-        // Make aLong lexicographically ordered as a twos-complement long
-        if (aLong < 0) aLong = 0x8000000000000000L - aLong;
-
-        long bLong = Double.doubleToRawLongBits(b);
-        // Make bLong lexicographically ordered as a twos-complement long
-        if (bLong < 0) bLong = 0x8000000000000000L - bLong;
-
-        final long longDiff = Math.abs(aLong - bLong);
-        return longDiff <= maxUlps;
-    }
-
-    private static double factorial(double x) throws EvaluationException {
-        final int n = (int) x;
-
-        if (n < 0) {
-            return 0;
-        }
-
-        if (n >= factorials.length) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        return factorials[n];
     }
 
     private Token extractToken(ParserRuleContext ctx) {
         List<TerminalNode> children = ctx.children.stream()
-                .filter(TerminalNode.class::isInstance)
-                .map(TerminalNode.class::cast)
-                .collect(Collectors.toList());
+            .filter(TerminalNode.class::isInstance)
+            .map(TerminalNode.class::cast)
+            .collect(Collectors.toList());
         ExpressionHelper.check(children.size() == 1, ctx, "Expected exactly one token, got " + children.size());
         return children.get(0).getSymbol();
     }
@@ -133,19 +111,19 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
 
     private void checkHandle(MethodHandle mh, ParserRuleContext ctx) {
         ExpressionHelper.check(mh.type().equals(ExpressionHandles.COMPILED_EXPRESSION_SIG), ctx,
-                "Incorrect type returned from handler for " + ctx.getClass());
+            "Incorrect type returned from handler for " + ctx.getClass());
     }
 
     private MethodHandle evaluateForNamedValue(ParserRuleContext ctx, String name) {
         MethodHandle guard = MethodHandles.guardWithTest(
-                // if result is null
-                IS_NULL.asType(methodType(boolean.class, Double.class)),
-                // throw appropriate exception, dropping `result` argument
-                MethodHandles.dropArguments(
-                        ExpressionHandles.throwEvalException(ctx, "Invalid expression for " + name), 0, Double.class
-                ),
-                // else return the argument we were passed
-                MethodHandles.identity(Double.class)
+            // if result is null
+            IS_NULL.asType(methodType(boolean.class, Double.class)),
+            // throw appropriate exception, dropping `result` argument
+            MethodHandles.dropArguments(
+                ExpressionHandles.throwEvalException(ctx, "Invalid expression for " + name), 0, Double.class
+            ),
+            // else return the argument we were passed
+            MethodHandles.identity(Double.class)
         );
         // now pass `result` into `guard`
         MethodHandle result = evaluate(ctx).handle;
@@ -158,10 +136,9 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
 
     private MethodHandle evaluateBoolean(ParserRuleContext boolExpression) {
         MethodHandle value = evaluateForNamedValue(boolExpression, "a boolean");
-        value = value.asType(value.type().unwrap());
         // Pass `value` into converter, returns (ExecutionData)boolean;
         return MethodHandles.collectArguments(
-                DOUBLE_TO_BOOL, 0, value
+            DOUBLE_TO_BOOL, 0, value
         );
     }
 
@@ -170,9 +147,9 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                                              ParserRuleContext falseBranch) {
         // easiest one of the bunch
         return MethodHandles.guardWithTest(
-                evaluateBoolean(condition),
-                trueBranch == null ? NULL_DOUBLE : evaluate(trueBranch).handle,
-                falseBranch == null ? NULL_DOUBLE : evaluate(falseBranch).handle
+            evaluateBoolean(condition),
+            trueBranch == null ? NULL_DOUBLE : evaluate(trueBranch).handle,
+            falseBranch == null ? NULL_DOUBLE : evaluate(falseBranch).handle
         );
     }
 
@@ -189,38 +166,45 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
     @Override
     public MethodHandle visitWhileStatement(ExpressionParser.WhileStatementContext ctx) {
         return ExpressionHandles.whileLoop(
-                evaluateBoolean(ctx.condition),
-                evaluate(ctx.body)
+            evaluateBoolean(ctx.condition),
+            evaluate(ctx.body)
         );
     }
 
     @Override
     public MethodHandle visitDoStatement(ExpressionParser.DoStatementContext ctx) {
         return ExpressionHandles.doWhileLoop(
-                evaluateBoolean(ctx.condition),
-                evaluate(ctx.body)
+            evaluateBoolean(ctx.condition),
+            evaluate(ctx.body)
         );
     }
 
     @Override
     public MethodHandle visitForStatement(ExpressionParser.ForStatementContext ctx) {
         return ExpressionHandles.forLoop(
-                evaluate(ctx.init).handle,
-                evaluateBoolean(ctx.condition),
-                evaluate(ctx.body),
-                evaluate(ctx.update).handle
+            evaluate(ctx.init).handle,
+            evaluateBoolean(ctx.condition),
+            evaluate(ctx.body),
+            evaluate(ctx.update).handle
         );
     }
 
     @Override
     public MethodHandle visitSimpleForStatement(ExpressionParser.SimpleForStatementContext ctx) {
         return ExpressionHandles.simpleForLoop(
-                evaluateForValue(ctx.first),
-                evaluateForValue(ctx.last),
-                ctx.counter,
-                evaluate(ctx.body)
+            evaluateForValue(ctx.first),
+            evaluateForValue(ctx.last),
+            ctx.counter,
+            evaluate(ctx.body)
         );
     }
+
+    private static final MethodHandle BREAK_STATEMENT =
+        ExpressionHandles.dropData(MethodHandles.throwException(Double.class, BreakException.class)
+            .bindTo(BreakException.BREAK));
+    private static final MethodHandle CONTINUE_STATEMENT =
+        ExpressionHandles.dropData(MethodHandles.throwException(Double.class, BreakException.class)
+            .bindTo(BreakException.CONTINUE));
 
     @Override
     public MethodHandle visitBreakStatement(ExpressionParser.BreakStatementContext ctx) {
@@ -232,12 +216,24 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         return CONTINUE_STATEMENT;
     }
 
+    // MH = (Double)Double
+    // takes the double to return, conveniently has Double return type
+    private static final MethodHandle RETURN_STATEMENT_BASE = MethodHandles.filterReturnValue(
+        // take the (Double)ReturnException constructor
+        ExpressionHandles.NEW_RETURN_EXCEPTION,
+        // and map the return type to Double by throwing it
+        MethodHandles.throwException(Double.class, ReturnException.class)
+    );
+
     @Override
     public MethodHandle visitReturnStatement(ExpressionParser.ReturnStatementContext ctx) {
-        if (ctx.value != null) {
-            return evaluate(ctx.value).handle;
-        }
-        return defaultResult();
+        return MethodHandles.filterArguments(
+            // take the (Double)Double return statement
+            RETURN_STATEMENT_BASE,
+            0,
+            // map the Double back to ExecutionData via the returnValue
+            evaluate(ctx.value).handle
+        );
     }
 
     @Override
@@ -273,23 +269,6 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         return ExpressionHandles.call(data -> {
             LocalSlot.Variable variable = ExpressionHandles.getVariable(data, target);
             double value = variable.getValue();
-            if (opType == INCREMENT) {
-                value++;
-            } else {
-                value--;
-            }
-            variable.setValue(value);
-            return value;
-        });
-    }
-
-    @Override
-    public MethodHandle visitPreCrementExpr(ExpressionParser.PreCrementExprContext ctx) {
-        Token target = ctx.target;
-        int opType = ctx.op.getType();
-        return ExpressionHandles.call(data -> {
-            LocalSlot.Variable variable = ExpressionHandles.getVariable(data, target);
-            double value = variable.getValue();
             double result = value;
             if (opType == INCREMENT) {
                 value++;
@@ -302,6 +281,23 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
     }
 
     @Override
+    public MethodHandle visitPreCrementExpr(ExpressionParser.PreCrementExprContext ctx) {
+        Token target = ctx.target;
+        int opType = ctx.op.getType();
+        return ExpressionHandles.call(data -> {
+            LocalSlot.Variable variable = ExpressionHandles.getVariable(data, target);
+            double value = variable.getValue();
+            if (opType == INCREMENT) {
+                value++;
+            } else {
+                value--;
+            }
+            variable.setValue(value);
+            return value;
+        });
+    }
+
+    @Override
     public MethodHandle visitPlusMinusExpr(ExpressionParser.PlusMinusExprContext ctx) {
         MethodHandle value = evaluateForValue(ctx.expr);
         switch (ctx.op.getType()) {
@@ -309,7 +305,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                 return value;
             case MINUS:
                 return ExpressionHandles.call(data ->
-                        -(double) ExpressionHandles.standardInvoke(value, data)
+                    -(double) ExpressionHandles.standardInvoke(value, data)
                 );
         }
         throw ExpressionHelper.evalException(ctx, "Invalid text for plus/minus expr: " + ctx.op.getText());
@@ -319,7 +315,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
     public MethodHandle visitNotExpr(ExpressionParser.NotExprContext ctx) {
         MethodHandle expr = evaluateBoolean(ctx.expr);
         return ExpressionHandles.call(data ->
-                ExpressionHandles.boolToDouble(!(boolean) ExpressionHandles.standardInvoke(expr, data))
+            ExpressionHandles.boolToDouble(!(boolean) ExpressionHandles.standardInvoke(expr, data))
         );
     }
 
@@ -331,7 +327,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         // - Convert to long from double value
         // - Convert from Object to Double to double.
         return ExpressionHandles.call(data ->
-                (double) ~(long) (double) ExpressionHandles.standardInvoke(expr, data)
+            (double) ~(long) (double) ExpressionHandles.standardInvoke(expr, data)
         );
     }
 
@@ -340,11 +336,11 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         MethodHandle left = evaluateBoolean(ctx.left);
         MethodHandle right = evaluateForValue(ctx.right);
         return MethodHandles.guardWithTest(
-                left,
-                right,
-                ExpressionHandles.dropData(
-                        MethodHandles.constant(Double.class, ExpressionHandles.boolToDouble(false))
-                )
+            left,
+            right,
+            ExpressionHandles.dropData(
+                MethodHandles.constant(Double.class, ExpressionHandles.boolToDouble(false))
+            )
         );
     }
 
@@ -355,20 +351,20 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         // Inject left as primary condition, on failure take right with data parameter
         // logic = (Double,ExecutionData)Double
         MethodHandle logic = MethodHandles.guardWithTest(
-                // data arg dropped implicitly
-                DOUBLE_TO_BOOL,
-                // drop data arg
-                MethodHandles.dropArguments(
-                        MethodHandles.identity(Double.class), 1, ExecutionData.class
-                ),
-                // drop left arg, call right
-                MethodHandles.dropArguments(
-                        right, 0, Double.class
-                )
+            // data arg dropped implicitly -- (Double)boolean;
+            DOUBLE_TO_BOOL,
+            // drop data arg -- (Double,ExecutionData)Double;
+            MethodHandles.dropArguments(
+                MethodHandles.identity(Double.class), 1, ExecutionData.class
+            ),
+            // drop left arg, call right -- (Double,ExecutionData)Double;
+            MethodHandles.dropArguments(
+                right, 0, Double.class
+            )
         );
         // mixed = (ExecutionData,ExecutionData)Double
         MethodHandle mixed = MethodHandles.collectArguments(
-                logic, 0, left
+            logic, 0, left
         );
         // Deduplicate ExecutionData
         return ExpressionHandles.dedupData(mixed);
@@ -381,10 +377,9 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         MethodHandle mhRight = evaluateForValue(right);
         // Map two data args to two double args, then evaluate op
         MethodHandle doubleData = MethodHandles.filterArguments(
-                CALL_BINARY_OP.bindTo(op), 0,
-                mhLeft.asType(mhLeft.type().unwrap()), mhRight.asType(mhRight.type().unwrap())
+            CALL_BINARY_OP.bindTo(op), 0,
+            unboxDoubles(mhLeft), unboxDoubles(mhRight)
         );
-        doubleData = doubleData.asType(doubleData.type().wrap());
         return ExpressionHandles.dedupData(doubleData);
     }
 
@@ -466,12 +461,28 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                 case NOT_EQUAL:
                     return (l, r) -> ExpressionHandles.boolToDouble(l != r);
                 case NEAR:
-                    return (l, r) -> ExpressionHandles.boolToDouble(almostEqual2sComplement(l, r, 450359963L));
-                case GREATER_THAN_OR_EQUAL:
-                    return (l, r) -> ExpressionHandles.boolToDouble(l >= r);
+                    return (l, r) -> ExpressionHandles.boolToDouble(almostEqual2sComplement(l, r));
             }
             throw ExpressionHelper.evalException(ctx, "Invalid text for equality expr: " + ctx.op.getText());
         });
+    }
+
+    // Usable AlmostEqual function, based on http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+    private static boolean almostEqual2sComplement(double a, double b) {
+        // Make sure maxUlps is non-negative and small enough that the
+        // default NAN won't compare as equal to anything.
+        //assert(maxUlps > 0 && maxUlps < 4 * 1024 * 1024); // this is for floats, not doubles
+
+        long aLong = Double.doubleToRawLongBits(a);
+        // Make aLong lexicographically ordered as a twos-complement long
+        if (aLong < 0) aLong = 0x8000000000000000L - aLong;
+
+        long bLong = Double.doubleToRawLongBits(b);
+        // Make bLong lexicographically ordered as a twos-complement long
+        if (bLong < 0) bLong = 0x8000000000000000L - bLong;
+
+        final long longDiff = Math.abs(aLong - bLong);
+        return longDiff <= 450359963L;
     }
 
     @Override
@@ -479,11 +490,34 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         MethodHandle value = evaluateForValue(ctx.expr);
         if (ctx.op.getType() == EXCLAMATION_MARK) {
             return ExpressionHandles.call(data ->
-                    factorial((double) ExpressionHandles.standardInvoke(value, data))
+                factorial((double) ExpressionHandles.standardInvoke(value, data))
             );
         }
         throw ExpressionHelper.evalException(ctx,
-                "Invalid text for post-unary expr: " + ctx.op.getText());
+            "Invalid text for post-unary expr: " + ctx.op.getText());
+    }
+
+    private static final double[] factorials = new double[171];
+
+    static {
+        factorials[0] = 1;
+        for (int i = 1; i < factorials.length; ++i) {
+            factorials[i] = factorials[i - 1] * i;
+        }
+    }
+
+    private static double factorial(double x) throws EvaluationException {
+        final int n = (int) x;
+
+        if (n < 0) {
+            return 0;
+        }
+
+        if (n >= factorials.length) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        return factorials[n];
     }
 
     @Override
@@ -522,7 +556,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                         break;
                     default:
                         throw ExpressionHelper.evalException(ctx, "Invalid text for assign expr: " +
-                                ctx.assignmentOperator().getText());
+                            ctx.assignmentOperator().getText());
                 }
             }
             variable.setValue(value);
@@ -551,7 +585,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         // Collapse every data into one argument
         int[] permutation = new int[arguments.length];
         return MethodHandles.permuteArguments(
-                manyData, ExpressionHandles.COMPILED_EXPRESSION_SIG, permutation
+            manyData, ExpressionHandles.COMPILED_EXPRESSION_SIG, permutation
         );
     }
 
@@ -567,7 +601,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
             MethodHandle filter = evaluateForValue(arg);
             filter = filter.asType(filter.type().unwrap());
             return MethodHandles.collectArguments(
-                    NEW_LS_CONSTANT, 0, filter
+                NEW_LS_CONSTANT, 0, filter
             );
         }
         // small hack
@@ -578,14 +612,9 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
 
     @Override
     public MethodHandle visitConstantExpression(ExpressionParser.ConstantExpressionContext ctx) {
-        try {
-            return ExpressionHandles.dropData(
-                    MethodHandles.constant(Double.class, Double.parseDouble(ctx.getText()))
-            );
-        } catch (NumberFormatException e) {
-            // Rare, but might happen, e.g. if too many digits
-            throw ExpressionHelper.evalException(ctx, "Invalid constant: " + e.getMessage());
-        }
+        return ExpressionHandles.dropData(
+            MethodHandles.constant(Double.class, Double.parseDouble(ctx.getText()))
+        );
     }
 
     @Override
@@ -593,6 +622,12 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         Token source = ctx.source;
         return ExpressionHandles.call(data -> ExpressionHandles.getSlotValue(data, source));
     }
+
+    /**
+     * Method handle (ExecutionData)Double, returns null.
+     */
+    private static final MethodHandle DEFAULT_RESULT =
+        ExpressionHandles.dropData(MethodHandles.constant(Double.class, null));
 
     @Override
     protected MethodHandle defaultResult() {
@@ -614,11 +649,7 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                 checkHandle(childResult, (ParserRuleContext) c);
             }
 
-            boolean returning = c instanceof ExpressionParser.ReturnStatementContext;
-            result = aggregateResult(result, childResult, returning);
-            if (returning) {
-                return result;
-            }
+            result = aggregateHandleResult(result, childResult);
         }
 
         return result;
@@ -629,25 +660,29 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
         throw new UnsupportedOperationException();
     }
 
-    private MethodHandle aggregateResult(MethodHandle oldResult, MethodHandle result,
-                                         boolean keepDefault) {
+    private MethodHandle aggregateHandleResult(MethodHandle oldResult, MethodHandle result) {
+        // MH:oldResult,result = (ExecutionData)Double
+
         // Execute `oldResult` but ignore its return value, then execute result and return that.
-        // If `oldResult` (the old value) is `defaultResult`, it's bogus, so just skip it
+        // If either result is `defaultResult`, it's bogus, so just skip it
         if (oldResult == DEFAULT_RESULT) {
             return result;
         }
-        if (result == DEFAULT_RESULT && !keepDefault) {
+        if (result == DEFAULT_RESULT) {
             return oldResult;
         }
         // Add a dummy Double parameter to the end
+        // MH:dummyDouble = (ExecutionData, Double)Double
         MethodHandle dummyDouble = MethodHandles.dropArguments(
-                result, 1, Double.class
+            result, 1, Double.class
         );
         // Have oldResult turn it from data->Double
+        // MH:doubledData = (ExecutionData, ExecutionData)Double
         MethodHandle doubledData = MethodHandles.collectArguments(
-                dummyDouble, 1, oldResult
+            dummyDouble, 1, oldResult
         );
         // Deduplicate the `data` parameter
+        // MH:@return = (ExecutionData)Double
         return ExpressionHandles.dedupData(doubledData);
     }
 }

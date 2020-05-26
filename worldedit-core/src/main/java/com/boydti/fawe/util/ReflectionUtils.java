@@ -1,11 +1,8 @@
 package com.boydti.fawe.util;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
+import com.boydti.fawe.Fawe;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -17,87 +14,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class ReflectionUtils {
+
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName) {
-        try {
-            return addEnum(enumType, enumName, new Class<?>[]{}, new Object[]{});
-        } catch (Throwable ignore) {
-            return ReflectionUtils9.addEnum(enumType, enumName);
-        }
-    }
-
-    public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName, Class<?>[] additionalTypes, Object[] additionalValues) {
-
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-
-        try {
-
-            // 2. Copy it
-            T[] previousValues = (T[]) valuesField.get(enumType);
-            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
-
-            // 3. build new enum
-            T newValue = (T) makeEnum(enumType, // The target enum class
-                    enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
-                    values.size(),
-                    additionalTypes, // can be used to pass values to the enum constructor
-                    additionalValues); // can be used to pass values to the enum constructor
-
-            // 4. add new value
-            values.add(newValue);
-
-            // 5. Set new values field
-            setFailsafeFieldValue(valuesField, null,
-                    values.toArray((T[]) Array.newInstance(enumType, 0)));
-
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
-            return newValue;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static Object makeEnum(Class<?> enumClass, String value, int ordinal,
-                                  Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
-        Object[] parms = new Object[additionalValues.length + 2];
-        parms[0] = value;
-        parms[1] = ordinal;
-        System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
-        return enumClass.cast(getConstructorAccessor(enumClass, additionalTypes).newInstance(parms));
-    }
-
-    private static ConstructorAccessor getConstructorAccessor(Class<?> enumClass,
-                                                              Class<?>[] additionalParameterTypes) throws NoSuchMethodException {
-        Class<?>[] parameterTypes = new Class[additionalParameterTypes.length + 2];
-        parameterTypes[0] = String.class;
-        parameterTypes[1] = int.class;
-        System.arraycopy(additionalParameterTypes, 0,
-                parameterTypes, 2, additionalParameterTypes.length);
-        return ReflectionFactory.getReflectionFactory().newConstructorAccessor(enumClass.getDeclaredConstructor(parameterTypes));
+        return ReflectionUtils9.addEnum(enumType, enumName);
     }
 
     public static void setAccessibleNonFinal(Field field)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -106,44 +36,28 @@ public class ReflectionUtils {
         // letting us modify the static final field
         if (Modifier.isFinal(field.getModifiers())) {
             try {
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                int modifiers = modifiersField.getInt(field);
+                Field lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+                lookupField.setAccessible(true);
 
                 // blank out the final bit in the modifiers int
-                modifiers &= ~Modifier.FINAL;
-                modifiersField.setInt(field, modifiers);
-            } catch (NoSuchFieldException e) {
-                // Java 12+ compatibility - search fields with hidden method for modifiers
-                // same concept as above, just with a more hacky way of getting to the modifiers
-                Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-                getDeclaredFields0.setAccessible(true);
-                Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-                for (Field classField : fields) {
-                    if ("modifiers".equals(classField.getName())) {
-                        classField.setAccessible(true);
-                        classField.set(field, field.getModifiers() & ~Modifier.FINAL);
-                        break;
-                    }
-                }
+                ((MethodHandles.Lookup) lookupField.get(null))
+                    .findSetter(Field.class, "modifiers", int.class)
+                    .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
     }
 
     public static void setFailsafeFieldValue(Field field, Object target, Object value)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         setAccessibleNonFinal(field);
-        try {
-            FieldAccessor fa = ReflectionFactory.getReflectionFactory().newFieldAccessor(field, false);
-            fa.set(target, value);
-        } catch (NoSuchMethodError error) {
-            field.set(target, value);
-        }
+        field.set(target, value);
     }
 
     private static void blankField(Class<?> enumClass, String fieldName)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         for (Field field : Class.class.getDeclaredFields()) {
             if (field.getName().contains(fieldName)) {
                 AccessibleObject.setAccessible(new Field[]{field}, true);
@@ -154,30 +68,18 @@ public class ReflectionUtils {
     }
 
     static void cleanEnumCache(Class<?> enumClass)
-            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         blankField(enumClass, "enumConstantDirectory"); // Sun (Oracle?!?) JDK 1.5/6
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
 
-    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
-
-    public static <T, V> Map<T, V> getMap(Map<T, V> map) {
-        try {
-            Class<? extends Map> clazz = map.getClass();
-            if (clazz != UNMODIFIABLE_MAP) return map;
-            Field m = clazz.getDeclaredField("m");
-            m.setAccessible(true);
-            return (Map<T, V>) m.get(map);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return map;
-        }
-    }
-
     public static <T> List<T> getList(List<T> list) {
         try {
-            Class<? extends List<T>> clazz = (Class<? extends List<T>>) Class.forName("java.util.Collections$UnmodifiableList");
-            if (!clazz.isInstance(list)) return list;
+            Class<? extends List<T>> clazz = (Class<? extends List<T>>) Class
+                .forName("java.util.Collections$UnmodifiableList");
+            if (!clazz.isInstance(list)) {
+                return list;
+            }
             Field m = clazz.getDeclaredField("list");
             m.setAccessible(true);
             return (List<T>) m.get(list);
@@ -229,13 +131,13 @@ public class ReflectionUtils {
         }
     }
 
-    public static <T> T callConstructor(Constructor<T> constructor, Object... paramaters) {
+    public static <T> T callConstructor(Constructor<T> constructor, Object... parameters) {
         if (constructor == null) {
             throw new RuntimeException("No such constructor");
         }
         constructor.setAccessible(true);
         try {
-            return constructor.newInstance(paramaters);
+            return constructor.newInstance(parameters);
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
         } catch (Exception ex) {
@@ -278,25 +180,32 @@ public class ReflectionUtils {
         return findMethod(clazz, 0, returnType, params);
     }
 
-    public static Method findMethod(Class<?> clazz, int index, int hasMods, int noMods, Class<?> returnType, Class... params) {
+    public static Method findMethod(Class<?> clazz, int index, int hasMods, int noMods,
+        Class<?> returnType, Class... params) {
         outer:
         for (Method method : sortMethods(clazz.getDeclaredMethods())) {
             if (returnType == null || method.getReturnType() == returnType) {
                 Class<?>[] mp = method.getParameterTypes();
                 int mods = method.getModifiers();
-                if ((mods & hasMods) != hasMods || (mods & noMods) != 0) continue;
+                if ((mods & hasMods) != hasMods || (mods & noMods) != 0) {
+                    continue;
+                }
                 if (params == null) {
-                    if (index-- == 0) return setAccessible(method);
-                    else {
+                    if (index-- == 0) {
+                        return setAccessible(method);
+                    } else {
                         continue;
                     }
                 }
                 if (mp.length == params.length) {
                     for (int i = 0; i < mp.length; i++) {
-                        if (mp[i] != params[i]) continue outer;
+                        if (mp[i] != params[i]) {
+                            continue outer;
+                        }
                     }
-                    if (index-- == 0) return setAccessible(method);
-                    else {
+                    if (index-- == 0) {
+                        return setAccessible(method);
+                    } else {
                         continue;
                     }
                 }
@@ -315,7 +224,8 @@ public class ReflectionUtils {
         return fields;
     }
 
-    public static Method findMethod(Class<?> clazz, int index, Class<?> returnType, Class... params) {
+    public static Method findMethod(Class<?> clazz, int index, Class<?> returnType,
+        Class<?>... params) {
         return findMethod(clazz, index, 0, 0, returnType, params);
     }
 
@@ -325,10 +235,7 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Field field, Object instance) {
-        if (field == null) {
-            throw new RuntimeException("No such field");
-        }
+    public static <T> T getField(@NotNull Field field, Object instance) {
         field.setAccessible(true);
         try {
             return (T) field.get(instance);
@@ -337,10 +244,7 @@ public class ReflectionUtils {
         }
     }
 
-    public static void setField(Field field, Object instance, Object value) {
-        if (field == null) {
-            throw new RuntimeException("No such field");
-        }
+    public static void setField(@NotNull Field field, Object instance, Object value) {
         field.setAccessible(true);
         try {
             field.set(instance, value);
@@ -372,7 +276,7 @@ public class ReflectionUtils {
      * @param clazz class
      * @return RefClass based on passed class
      */
-    public static RefClass getRefClass(Class clazz) {
+    public static RefClass getRefClass(Class<?> clazz) {
         return new RefClass(clazz);
     }
 
@@ -380,6 +284,7 @@ public class ReflectionUtils {
      * RefClass - utility to simplify work with reflections.
      */
     public static class RefClass {
+
         private final Class<?> clazz;
 
         private RefClass(Class<?> clazz) {
@@ -408,7 +313,7 @@ public class ReflectionUtils {
         /**
          * get existing method by name and types
          *
-         * @param name  name
+         * @param name name
          * @param types method parameters. can be Class or RefClass
          * @return RefMethod object
          * @throws RuntimeException if method not found
@@ -543,9 +448,9 @@ public class ReflectionUtils {
          * @return RefMethod
          * @throws RuntimeException if method not found
          */
-        public RefMethod findMethodByReturnType(Class type) {
+        public RefMethod findMethodByReturnType(Class<?> type) {
             if (type == null) {
-                type = void.class;
+                type = void.class.getComponentType();
             }
             final List<Method> methods = new ArrayList<>();
             Collections.addAll(methods, this.clazz.getMethods());
@@ -614,7 +519,7 @@ public class ReflectionUtils {
          * @return RefField
          * @throws RuntimeException if field not found
          */
-        public RefField findField(Class type) {
+        public RefField findField(Class<?> type) {
             if (type == null) {
                 type = void.class;
             }
@@ -634,6 +539,7 @@ public class ReflectionUtils {
      * Method wrapper
      */
     public static class RefMethod {
+
         private final Method method;
 
         private RefMethod(Method method) {
@@ -687,6 +593,7 @@ public class ReflectionUtils {
         }
 
         public class RefExecutor {
+
             final Object e;
 
             public RefExecutor(Object e) {
@@ -714,9 +621,10 @@ public class ReflectionUtils {
      * Constructor wrapper
      */
     public static class RefConstructor {
-        private final Constructor constructor;
 
-        private RefConstructor(Constructor constructor) {
+        private final Constructor<?> constructor;
+
+        private RefConstructor(Constructor<?> constructor) {
             this.constructor = constructor;
             constructor.setAccessible(true);
         }
@@ -724,7 +632,7 @@ public class ReflectionUtils {
         /**
          * @return passed constructor
          */
-        public Constructor getRealConstructor() {
+        public Constructor<?> getRealConstructor() {
             return this.constructor;
         }
 
@@ -752,6 +660,7 @@ public class ReflectionUtils {
     }
 
     public static class RefField {
+
         private final Field field;
 
         private RefField(Field field) {
@@ -781,7 +690,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * apply fiend for object
+         * Apply field for object
          *
          * @param e applied object
          * @return RefExecutor with getter and setter
@@ -791,6 +700,7 @@ public class ReflectionUtils {
         }
 
         public class RefExecutor {
+
             final Object e;
 
             public RefExecutor(Object e) {
@@ -798,7 +708,7 @@ public class ReflectionUtils {
             }
 
             /**
-             * set field value for applied object
+             * Set field value for applied object
              *
              * @param param value
              */
@@ -811,7 +721,7 @@ public class ReflectionUtils {
             }
 
             /**
-             * get field value for applied object
+             * Get field value for the applied object..
              *
              * @return value of field
              */

@@ -40,8 +40,8 @@ public class BlockCategoryMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return category.contains(getExtent().getBlock(vector));
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return category.contains(vector.getBlock(extent));
     }
 
     @Nullable

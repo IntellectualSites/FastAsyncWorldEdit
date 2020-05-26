@@ -21,11 +21,12 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
@@ -34,7 +35,6 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
@@ -69,12 +69,14 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
 import javax.annotation.Nullable;
 
 /**
@@ -152,7 +154,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param z the z coordinate
      * @param uuid the unique identifier of the entity
      */
-    default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
+    default void removeEntity(int x, int y, int z, UUID uuid) {}
 
     /*
     Queue based methods
@@ -206,7 +208,7 @@ public interface Extent extends InputExtent, OutputExtent {
         maxY = Math.min(maxY, Math.max(0, maxY));
         minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(MutableBlockVector3.get(x, y, z))) {
+            if (filter.test(this, MutableBlockVector3.get(x, y, z))) {
                 return y;
             }
         }
@@ -276,22 +278,22 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        boolean state = !mask.test(MutableBlockVector3.get(x, y, z));
+        boolean state = !mask.test(this, MutableBlockVector3.get(x, y, z));
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
+            if (mask.test(this, MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
             int y2 = y - d;
-            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
+            if (mask.test(this, MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
+                    if (mask.test(this, MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
+                    if (mask.test(this, MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
                 }
             }
         }
@@ -508,7 +510,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return the number of blocks that matched the mask
      */
     default int countBlocks(Region region, Mask searchMask) {
-        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        RegionVisitor visitor = new RegionVisitor(region, position -> searchMask.test(this, position));
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -524,7 +526,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
 
         int changes = 0;
         for (BlockVector3 pos : region) {
@@ -606,7 +608,7 @@ public interface Extent extends InputExtent, OutputExtent {
         checkNotNull(pattern);
 
         BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionMaskingFilter filter = new RegionMaskingFilter(this, mask, replace);
         RegionVisitor visitor = new RegionVisitor(region, filter);
         Operations.completeLegacy(visitor);
         return visitor.getAffected();
@@ -659,7 +661,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return processor.construct(this);
     }
 
-    default Extent enableHistory(FaweChangeSet changeSet) {
+    default Extent enableHistory(AbstractChangeSet changeSet) {
         return addProcessor(changeSet);
     }
 

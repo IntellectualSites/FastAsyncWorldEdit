@@ -29,8 +29,6 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 
 import java.util.stream.Stream;
 
-import java.util.stream.Stream;
-
 public class BlockStateMaskParser extends InputParser<Mask> {
 
     public BlockStateMaskParser(WorldEdit worldEdit) {

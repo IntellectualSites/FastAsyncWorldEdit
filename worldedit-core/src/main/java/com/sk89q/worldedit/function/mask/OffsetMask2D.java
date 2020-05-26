@@ -21,7 +21,9 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 
 /**
  * Checks whether another mask tests true for a position that is offset
@@ -31,6 +33,7 @@ public class OffsetMask2D extends AbstractMask2D {
 
     private Mask2D mask;
     private BlockVector2 offset;
+    private MutableBlockVector2 mutable;
 
     /**
      * Create a new instance.
@@ -43,6 +46,7 @@ public class OffsetMask2D extends AbstractMask2D {
         checkNotNull(offset);
         this.mask = mask;
         this.offset = offset;
+        this.mutable = new MutableBlockVector2();
     }
 
     /**
@@ -84,8 +88,9 @@ public class OffsetMask2D extends AbstractMask2D {
     }
 
     @Override
-    public boolean test(BlockVector2 vector) {
-        return getMask().test(vector.add(offset));
+    public boolean test(Extent extent, BlockVector2 vector) {
+        mutable.setComponents(vector.getX() + offset.getX(), vector.getZ() + offset.getZ());
+        return getMask().test(extent, mutable);
     }
 
 }

@@ -2,8 +2,6 @@ package com.boydti.fawe.util;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.brush.BrushSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.jnbt.CompoundTag;
@@ -41,23 +39,24 @@ public final class BrushCache {
         CompoundTag nbt = item.getNbtData();
         if (nbt == null) return null;
         StringTag json = (StringTag) nbt.getValue().get("weBrushJson");
-        if (json != null) {
-            try {
-                if (RECURSION.get() != null) return null;
-                RECURSION.set(true);
-
-                BrushTool tool = BrushTool.fromString(player, session, json.getValue());
-                tool.setHolder(item);
-                brushCache.put(key, tool);
-                return tool;
-            } catch (Exception throwable) {
-                getLogger(BrushCache.class).debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue(), throwable);
-                item.setNbtData(null);
-                brushCache.remove(key);
-            } finally {
-                RECURSION.remove();
-            }
-        }
+        // TODO: Ping @MattBDev to reimplement 2020-02-04
+//        if (json != null) {
+//            try {
+//                if (RECURSION.get() != null) return null;
+//                RECURSION.set(true);
+//
+//                BrushTool tool = BrushTool.fromString(player, session, json.getValue());
+//                tool.setHolder(item);
+//                brushCache.put(key, tool);
+//                return tool;
+//            } catch (Exception throwable) {
+//                getLogger(BrushCache.class).debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue(), throwable);
+//                item.setNbtData(null);
+//                brushCache.remove(key);
+//            } finally {
+//                RECURSION.remove();
+//            }
+//        }
         return null;
     }
 
@@ -79,45 +78,11 @@ public final class BrushCache {
             }
             nbt = new CompoundTag(map = new HashMap<>());
         } else {
-            map = ReflectionUtils.getMap(nbt.getValue());
+            map = nbt.getValue();
         }
         brushCache.remove(getKey(item));
         CompoundTag display = (CompoundTag) map.get("display");
         Map<String, Tag> displayMap;
-        if (tool != null) {
-            String json = tool.toString(gson);
-            map.put("weBrushJson", new StringTag(json));
-            if (display == null) {
-                map.put("display", new CompoundTag(displayMap = new HashMap<>()));
-            } else {
-                displayMap = ReflectionUtils.getMap(display.getValue());
-            }
-            displayMap.put("Lore", FaweCache.IMP.asTag(json.split("\\r?\\n")));
-            String primary = (String) tool.getPrimary().getSettings().get(BrushSettings.SettingType.BRUSH);
-            String secondary = (String) tool.getSecondary().getSettings().get(BrushSettings.SettingType.BRUSH);
-            if (primary == null) primary = secondary;
-            if (secondary == null) secondary = primary;
-            if (primary != null) {
-                String name = primary == secondary ? primary.split(" ")[0] : primary.split(" ")[0] + " / " + secondary.split(" ")[0];
-                displayMap.put("Name", new StringTag("{\"text\":\"" + name + "\"}"));
-            }
-        } else if (map.containsKey("weBrushJson")) {
-            map.remove("weBrushJson");
-            if (display != null) {
-                displayMap = ReflectionUtils.getMap(display.getValue());
-                displayMap.remove("Lore");
-                displayMap.remove("Name");
-                if (displayMap.isEmpty()) {
-                    map.remove("display");
-                }
-            }
-        } else {
-            return tool;
-        }
-        item.setNbtData(nbt);
-        if (tool != null) {
-            brushCache.put(getKey(item), tool);
-        }
         return tool;
     }
 }

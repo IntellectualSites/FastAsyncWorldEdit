@@ -15,13 +15,13 @@ public class Settings extends Config {
     @Ignore
     public boolean PROTOCOL_SUPPORT_FIX = false;
     @Ignore
-    public boolean PLOTSQUARED_HOOK = false;
+    public boolean PLOTSQUARED_HOOK = true;
 
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
-    public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues";
+    public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
-    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
@@ -30,12 +30,7 @@ public class Settings extends Config {
     public String COMMIT; // These values are set from FAWE before loading
     @Final
     public String PLATFORM; // These values are set from FAWE before loading
-
-    @Comment({"Options: cn, de, es, fr, it, nl, ru, tr",
-            "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/tree/master/worldedit-core/src/main/resources",})
-    public String LANGUAGE = "en";
-    @Comment("@deprecated - use bstats config.yml")
-    public boolean METRICS = true;
+    
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
             "To be allowed to WorldEdit in a region, users need the appropriate",
@@ -93,7 +88,7 @@ public class Settings extends Config {
                 " - Use a shared directory or NFS/Samba"
         })
         public String CLIPBOARD = "clipboard";
-        @Comment("Each player has their own sub directory for schematics")
+        @Comment("Each player has his or her own sub directory for schematics")
         public boolean PER_PLAYER_SCHEMATICS = true;
         public String COMMANDS = "commands";
     }
@@ -263,7 +258,6 @@ public class Settings extends Config {
         @Comment({
                 "This should equal the number of processors you have",
         })
-        @Final
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
         @Create
         public static PROGRESS PROGRESS;
@@ -282,13 +276,14 @@ public class Settings extends Config {
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)"
         })
+        //TODO Find out where this was used and why the usage was removed
         public int MAX_WAIT_MS = 1000;
 
         @Comment({
                 "Increase or decrease queue intensity (ms) [-50,50]:",
                 "    0 = balance of performance / stability",
                 "    -10 = Allocate 10ms less for chunk placement",
-                "Too high will can cause lag spikes (you might be okay with this)",
+                "Too high can cause lag spikes (you might be okay with this)",
                 "Too low will result in slow edits",
         })
         public int EXTRA_TIME_MS = 0;
@@ -298,6 +293,7 @@ public class Settings extends Config {
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
         })
+        //TODO Find out where this was used and why the usage was removed
         public int PRELOAD_CHUNKS = 100000;
 
         @Comment({
@@ -312,6 +308,11 @@ public class Settings extends Config {
                 " - This only applies to plugins improperly using WorldEdit's legacy API"
         })
         public int DISCARD_AFTER_MS = 60000;
+
+        @Comment({
+            "When using fastmode also do not bother to fix existing ticking blocks"
+        })
+        public boolean NO_TICK_FASTMODE = true;
 
         public static class PROGRESS {
             @Comment({"Display constant titles about the progress of a user's edit",
@@ -340,7 +341,7 @@ public class Settings extends Config {
         public boolean ANVIL_QUEUE_MODE = false;
         @Comment({
                 "[SAFE] Dynamically increase the number of chunks rendered",
-                " - Requires Paper: ci.destroystokyo.com/job/Paper-1.13/",
+                " - Requires Paper",
                 " - Set your server view distance to 1 (spigot.yml, server.properties)",
                 " - Based on tps and player movement",
                 " - Note: If entities become hidden, increase the server view distance to 3",
@@ -361,19 +362,30 @@ public class Settings extends Config {
                 "Might cause client-side FPS lagg in some situations"
         })
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
-
-        @Comment({
-                "[SAFE] Experimental scripting support for Java 9",
-                " - https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki/JavaScript-API"
-        })
-        public boolean MODERN_CRAFTSCRIPTS = false;
-
+        
         @Comment({
                 "[SAFE] Experimental freebuild region restrictions",
                 " - PERM: fawe.freebuild",
                 " - PERM: fawe.freebuild.<plugin>"
         })
         public boolean FREEBUILD = false;
+        
+        @Comment({
+                "Other experimental features"
+        })
+        public boolean OTHER = false;
+
+        @Comment({
+            "Allow blocks placed by WorldEdit to tick. This could cause the big lags.",
+            "This has no effect on existing blocks one way or the other."
+        })
+        public boolean ALLOW_TICK_PLACED = false;
+
+        @Comment({
+            "Force re-ticking of existing blocks not edited by FAWE.",
+            "This will increase time taken slightly."
+        })
+        public boolean ALLOW_TICK_EXISTING = true;
     }
 
     public static class WEB {
@@ -388,13 +400,7 @@ public class Settings extends Config {
                 " - Downloads can be deleted by the user",
                 " - Supports clipboard uploads, downloads and saves",
         })
-        public String URL = "https://empcraft.com/fawe/";
-        @Comment({
-                "The web interface for assets",
-                " - All schematics are organized and public",
-                " - Assets can be searched, selected and downloaded",
-        })
-        public String ASSETS = "https://empcraft.com/assetpack/";
+        public String URL = "https://schem.intellectualsites.com/fawe/";
     }
 
     public static class EXTENT {
@@ -404,7 +410,7 @@ public class Settings extends Config {
         })
         public List<String> ALLOWED_PLUGINS = new ArrayList<>();
         @Comment("Should debug messages be sent when third party extents are used?")
-        public boolean DEBUG = true;
+        public boolean DEBUG = false;
     }
 
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")

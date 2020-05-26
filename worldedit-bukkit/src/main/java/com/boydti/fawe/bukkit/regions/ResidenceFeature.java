@@ -6,14 +6,15 @@ import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class ResidenceFeature extends BukkitMaskManager implements Listener {
-    FaweBukkit plugin;
-    Plugin residence;
+    private FaweBukkit plugin;
+    private Plugin residence;
 
     public ResidenceFeature(final Plugin residencePlugin, final FaweBukkit p3) {
         super(residencePlugin.getName());
@@ -41,7 +42,7 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
                 final Location pos1 = area.getLowLoc();
                 final Location pos2 = area.getHighLoc();
                 final ClaimedResidence finalResidence = residence;
-                return new FaweMask(BukkitAdapter.asBlockVector(pos1), BukkitAdapter.asBlockVector(pos2)) {
+                return new FaweMask(new CuboidRegion(BukkitAdapter.asBlockVector(pos1), BukkitAdapter.asBlockVector(pos2))) {
                 @Override
                     public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                         return isAllowed(BukkitAdapter.adapt(player), finalResidence, type);

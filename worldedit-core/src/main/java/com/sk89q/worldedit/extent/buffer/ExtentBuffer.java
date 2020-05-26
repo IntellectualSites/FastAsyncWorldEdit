@@ -66,16 +66,16 @@ public class ExtentBuffer extends AbstractBufferingExtent {
     }
 
     @Override
-    protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
+    protected BaseBlock getBufferedFullBlock(BlockVector3 position) {
         if (mask.test(position)) {
-            return Optional.of(buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos))));
+            return buffer.computeIfAbsent(position, (pos -> getExtent().getFullBlock(pos)));
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        if (mask.test(location)) {
+        if (mask.test(getExtent(), location)) {
             buffer.put(location, block.toBaseBlock());
             return true;
         }

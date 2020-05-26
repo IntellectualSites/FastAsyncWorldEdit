@@ -62,8 +62,8 @@ public class Triangle {
         return StringMan.getString(verts);
     }
 
-    public Vector3 getVertex(int index) {
-        return Vector3.at(verts[index][0], verts[index][1], verts[index][2]);
+    public BlockVector3 getVertex(int index) {
+        return BlockVector3.at(verts[index][0], verts[index][1], verts[index][2]);
     }
 
     public boolean contains(BlockVector3 pos) {

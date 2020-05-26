@@ -80,7 +80,7 @@ public class PropertyGroup<G, A> {
 
     private static final Function VOID_FUNCTION = o -> o;
 
-    public G get(BlockStateHolder state) {
+    public <B extends BlockStateHolder<B>> G get(BlockStateHolder<B> state) {
         BlockType type = state.getBlockType();
         PropertyFunction func = states[type.getInternalId()];
         if (func == null) return defaultValue;
@@ -88,7 +88,7 @@ public class PropertyGroup<G, A> {
         return (G) func.getFunc.apply(value);
     }
 
-    public BlockStateHolder set(BlockStateHolder state, A value) {
+    public <B extends BlockStateHolder<B>> BlockStateHolder<B> set(BlockStateHolder<B> state, A value) {
         BlockType type = state.getBlockType();
         PropertyFunction func = states[type.getInternalId()];
         if (func != null) {

@@ -9,15 +9,17 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import java.util.Arrays;
 import java.util.Collection;
 import javax.annotation.Nullable;
 
 public class MultiTransform extends RandomTransform {
+
     private ResettableExtent[] extents;
 
     public MultiTransform(Collection<ResettableExtent> extents) {
-        for (ResettableExtent extent : extents) add(extent, 1);
+        for (ResettableExtent extent : extents) {
+            add(extent, 1);
+        }
     }
 
     public MultiTransform() {
@@ -31,18 +33,24 @@ public class MultiTransform extends RandomTransform {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
         // don't use streams for each block place, it'd be incredibly slow
         boolean result = false;
-        for (AbstractDelegateExtent extent : extents) result |= extent.setBlock(x, y, z, block);
+        for (AbstractDelegateExtent extent : extents) {
+            result |= extent.setBlock(x, y, z, block);
+        }
         return result;
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block)
+        throws WorldEditException {
         // don't use streams for each block place, it'd be incredibly slow
         boolean result = false;
-        for (AbstractDelegateExtent extent : extents) result |= extent.setBlock(location, block);
+        for (AbstractDelegateExtent extent : extents) {
+            result |= extent.setBlock(location, block);
+        }
         return result;
     }
 
@@ -50,7 +58,9 @@ public class MultiTransform extends RandomTransform {
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         // don't use streams for each block place, it'd be incredibly slow
         boolean result = false;
-        for (AbstractDelegateExtent extent : extents) result |= extent.setBiome(position, biome);
+        for (AbstractDelegateExtent extent : extents) {
+            result |= extent.setBiome(position, biome);
+        }
         return result;
     }
 
@@ -58,7 +68,9 @@ public class MultiTransform extends RandomTransform {
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
         Entity created = null;
-        for (AbstractDelegateExtent extent : extents) created = extent.createEntity(location, entity);
+        for (AbstractDelegateExtent extent : extents) {
+            created = extent.createEntity(location, entity);
+        }
         return created;
     }
 }

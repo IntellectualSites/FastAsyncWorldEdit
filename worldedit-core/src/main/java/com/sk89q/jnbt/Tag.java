@@ -37,6 +37,4 @@ public abstract class Tag {
 
     public abstract int getTypeCode();
 
-    public abstract String getTypeName();
-
 }

@@ -41,6 +41,11 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
@@ -48,6 +53,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
@@ -335,12 +341,16 @@ public enum BukkitAdapter {
         return getAdapter().adapt(entityType);
     }
 
+    private static EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
+    private static EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
+
     /**
      * Converts a Material to a BlockType
      *
      * @param material The material
      * @return The blocktype
      */
+    @Nullable
     public static BlockType asBlockType(Material material) {
         return getAdapter().asBlockType(material);
     }
@@ -351,12 +361,13 @@ public enum BukkitAdapter {
      * @param material The material
      * @return The itemtype
      */
+    @Nullable
     public static ItemType asItemType(Material material) {
         return getAdapter().asItemType(material);
     }
-    /*
-    private static Map<String, BlockState> blockStateCache = new HashMap<>();
-    /*
+
+    private static Int2ObjectMap<BlockState> blockStateCache = new Int2ObjectOpenHashMap<>();
+    private static Map<String, BlockState> blockStateStringCache = new HashMap<>();
 
     /**
      * Create a WorldEdit BlockState from a Bukkit BlockData
@@ -367,9 +378,9 @@ public enum BukkitAdapter {
     public static BlockState adapt(@NotNull BlockData blockData) {
         return getAdapter().adapt(blockData);
     }
-    /*
-    private static Map<String, BlockData> blockDataCache = new HashMap<>();
-    */
+
+    private static Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
+
     /**
      * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
      *

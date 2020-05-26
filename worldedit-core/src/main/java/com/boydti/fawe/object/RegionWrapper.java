@@ -49,6 +49,7 @@ public class RegionWrapper extends CuboidRegion {
         this.maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
     }
 
+    @Override
     public RegionWrapper[] toArray() {
         return new RegionWrapper[]{this};
     }

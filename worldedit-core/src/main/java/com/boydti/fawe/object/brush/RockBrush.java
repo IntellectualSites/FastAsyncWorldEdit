@@ -7,7 +7,6 @@ import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RockBrush implements Brush {

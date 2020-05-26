@@ -5,13 +5,20 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
@@ -25,15 +32,14 @@ import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
+import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 public final class BukkitAdapter_1_14 extends NMSAdapter {
@@ -50,6 +56,8 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
 
     private final static Field fieldDirtyCount;
     private final static Field fieldDirtyBits;
+
+    private final static MethodHandle methodGetVisibleChunk;
 
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
@@ -77,13 +85,12 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
 
+            Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
+            declaredGetVisibleChunk.setAccessible(true);
+            methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
+
             {
-                Field tmp;
-                try {
-                    tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
-                } catch (NoSuchFieldException paper) {
-                    tmp = DataPaletteBlock.class.getDeclaredField("j");
-                }
+                Field tmp = DataPaletteBlock.class.getDeclaredField("j");
                 ReflectionUtils.setAccessibleNonFinal(tmp);
                 fieldLock = tmp;
                 fieldLock.setAccessible(true);
@@ -115,7 +122,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         try {
             synchronized (section) {
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                Lock currentLock = (Lock) fieldLock.get(blocks);
+                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }
@@ -129,7 +136,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
+    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
             return nmsChunk;
@@ -153,11 +160,11 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
 
     public static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
-        PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
-        if (playerChunk == null) {
-            return null;
+        try {
+            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
+        } catch (Throwable thr) {
+            throw new RuntimeException(thr);
         }
-        return playerChunk;
     }
 
     public static void sendChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, int X, int Z, int mask) {
@@ -193,11 +200,11 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
     /*
     NMS conversion
      */
-    public static ChunkSection newChunkSection(final int layer, final char[] blocks) {
-        return newChunkSection(layer, null, blocks);
+    public static ChunkSection newChunkSection(final int layer, final char[] blocks, boolean fastmode) {
+        return newChunkSection(layer, null, blocks, fastmode);
     }
 
-    public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set) {
+    public static ChunkSection newChunkSection(final int layer, final Function<Integer, char[]> get, char[] set, boolean fastmode) {
         if (set == null) {
             return newChunkSection(layer);
         }
@@ -207,11 +214,12 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
         final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
+            Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
             int air;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set);
+                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set, ticking_blocks, fastmode);
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set);
+                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set, ticking_blocks, fastmode);
             }
             int num_palette = num_palette_buffer[0];
             // BlockStates
@@ -226,7 +234,7 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
+                final BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -253,7 +261,11 @@ public final class BukkitAdapter_1_14 extends NMSAdapter {
                 fieldBits.set(dataPaletteBlocks, nmsBits);
                 fieldPalette.set(dataPaletteBlocks, palette);
                 fieldSize.set(dataPaletteBlocks, bitsPerEntry);
-                setCount(0, 4096 - air, section);
+                setCount(ticking_blocks.size(), 4096 - air, section);
+                ticking_blocks.forEach((pos, ordinal) -> {
+                    section.setType(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
+                        Block.getByCombinedId(ordinal));
+                });
             } catch (final IllegalAccessException | NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }

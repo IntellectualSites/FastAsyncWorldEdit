@@ -23,10 +23,11 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.OptionalInt;
+
+import javax.annotation.Nullable;
 
 /**
  * A block registry that uses {@link BundledBlockData} to serve information

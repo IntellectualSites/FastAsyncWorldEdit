@@ -10,7 +10,6 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.chunk.NullChunk;
-import com.boydti.fawe.beta.implementation.chunk.ReferenceChunk;
 import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
@@ -50,6 +49,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     private boolean enabledQueue = true;
 
+    private boolean fastmode = false;
+
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
      * be removed later
@@ -72,13 +73,23 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public IChunkGet getCachedGet(int x, int z) {
-        return cacheGet.get(x, z);
+    public IChunkGet getCachedGet(int chunkX, int chunkZ) {
+        return cacheGet.get(chunkX, chunkZ);
     }
 
     @Override
-    public IChunkSet getCachedSet(int x, int z) {
-        return cacheSet.get(x, z);
+    public IChunkSet getCachedSet(int chunkX, int chunkZ) {
+        return cacheSet.get(chunkX, chunkZ);
+    }
+
+    @Override
+    public void setFastMode(boolean fastmode) {
+        this.fastmode = fastmode;
+    }
+
+    @Override
+    public boolean isFastMode() {
+        return fastmode;
     }
 
     /**
@@ -157,7 +168,12 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
 
         if (Fawe.isMainThread()) {
-            return (V) chunk.call();
+            V result = (V)chunk.call();
+            if (result == null){
+                return (V) (Future) Futures.immediateFuture(null);
+            }else{
+                return result;
+            }
         }
 
         return (V) Fawe.get().getQueueHandler().submit(chunk);
@@ -188,13 +204,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the
      * coordinates
      *
-     * @param X
-     * @param Z
+     * @param chunkX
+     * @param chunkZ
      * @return IChunk
      */
-    private ChunkHolder poolOrCreate(int X, int Z) {
+    private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {
         ChunkHolder next = create(false);
-        next.init(this, X, Z);
+        next.init(this, chunkX, chunkZ);
         return next;
     }
 
@@ -209,11 +225,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             lastChunk = NullChunk.INSTANCE;
             return NullChunk.INSTANCE;
         }
-
         IQueueChunk chunk = chunks.get(pair);
-        if (chunk instanceof ReferenceChunk) {
-            chunk = ((ReferenceChunk) chunk).getParent();
-        }
         if (chunk != null) {
             lastPair = pair;
             lastChunk = chunk;

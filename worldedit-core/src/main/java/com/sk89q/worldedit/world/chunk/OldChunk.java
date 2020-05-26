@@ -184,11 +184,11 @@ public class OldChunk implements Chunk {
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
 
-            CompoundTag tileEntity = getBlockTileEntity(position);
+        CompoundTag tileEntity = getBlockTileEntity(position);
 
-            if (tileEntity != null) {
-                return state.toBaseBlock(tileEntity);
-            }
+        if (tileEntity != null) {
+            return state.toBaseBlock(tileEntity);
+        }
 
         return state.toBaseBlock();
     }

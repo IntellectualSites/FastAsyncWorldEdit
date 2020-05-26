@@ -22,6 +22,7 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
+
     private final FaweLimit limit;
 
     /**
@@ -68,7 +69,8 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
+        throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
@@ -131,61 +133,6 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
             return BlockTypes.AIR.getDefaultState();
         }
         return super.getBlock(position);
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return 0;
-        }
-        return super.getBlockLight(x, y, z);
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return 0;
-        }
-        return super.getBrightness(x, y, z);
-    }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return 0;
-        }
-        return super.getLight(x, y, z);
-    }
-
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return 0;
-        }
-        return super.getOpacity(x, y, z);
-    }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return 0;
-        }
-        return super.getSkyLight(x, y, z);
     }
 
     @Nullable

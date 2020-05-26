@@ -2,26 +2,19 @@ package com.boydti.fawe.bukkit.adapter;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import co.aikar.timings.Timings;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import org.spigotmc.AsyncCatcher;
 
 public class BukkitQueueHandler extends QueueHandler {
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 
-    private static Field fieldTimingsEnabled;
-    private static Field fieldAsyncCatcherEnabled;
     private static Method methodCheck;
     static {
         try {
-            fieldAsyncCatcherEnabled = Class.forName("org.spigotmc.AsyncCatcher").getField("enabled");
-            fieldAsyncCatcherEnabled.setAccessible(true);
-        } catch (Throwable ignore) {}
-        try {
-            fieldTimingsEnabled = Class.forName("co.aikar.timings.Timings").getDeclaredField("timingsEnabled");
-            fieldTimingsEnabled.setAccessible(true);
             methodCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
             methodCheck.setAccessible(true);
         } catch (Throwable ignore){}
@@ -32,19 +25,15 @@ public class BukkitQueueHandler extends QueueHandler {
         ChunkListener.physicsFreeze = true;
         if (parallel) {
             try {
-                if (fieldAsyncCatcherEnabled != null) {
-                    fieldAsyncCatcherEnabled.set(null, false);
-                }
-                if (fieldTimingsEnabled != null) {
-                    timingsEnabled = (boolean) fieldTimingsEnabled.get(null);
-                    if (timingsEnabled) {
-                        if (alertTimingsChange) {
-                            alertTimingsChange = false;
-                            getLogger(BukkitQueueHandler.class).debug("Having `parallel-threads` > 1 interferes with the timings.");
-                        }
-                        fieldTimingsEnabled.set(null, false);
-                        methodCheck.invoke(null);
+                AsyncCatcher.enabled = false;
+                timingsEnabled = Timings.isTimingsEnabled();
+                if (timingsEnabled) {
+                    if (alertTimingsChange) {
+                        alertTimingsChange = false;
+                        getLogger(BukkitQueueHandler.class).debug("Having `parallel-threads` > 1 interferes with the timings.");
                     }
+                    Timings.setTimingsEnabled(false);
+                    methodCheck.invoke(null);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -57,11 +46,9 @@ public class BukkitQueueHandler extends QueueHandler {
         ChunkListener.physicsFreeze = false;
         if (parallel) {
             try {
-                if (fieldAsyncCatcherEnabled != null) {
-                    fieldAsyncCatcherEnabled.set(null, true);
-                }
-                if (fieldTimingsEnabled != null && timingsEnabled) {
-                    fieldTimingsEnabled.set(null, true);
+                AsyncCatcher.enabled = true;
+                if (timingsEnabled) {
+                    Timings.setTimingsEnabled(true);
                     methodCheck.invoke(null);
                 }
             } catch (Throwable e) {

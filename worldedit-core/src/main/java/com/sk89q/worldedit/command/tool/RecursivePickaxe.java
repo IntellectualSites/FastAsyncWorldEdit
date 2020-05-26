@@ -120,4 +120,5 @@ public class RecursivePickaxe implements BlockTool {
         recurse(server, editSession, world, pos.add(0, -1, 0),
                 origin, size, initialType, visited);
     }
+
 }

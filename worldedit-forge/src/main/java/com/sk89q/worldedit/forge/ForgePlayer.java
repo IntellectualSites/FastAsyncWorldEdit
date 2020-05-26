@@ -20,12 +20,12 @@
 package com.sk89q.worldedit.forge;
 
 import com.sk89q.jnbt.CompoundTag;
-
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.forge.internal.NBTConverter;
 import com.sk89q.worldedit.forge.net.handler.WECUIPacketHandler;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -36,22 +36,21 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.minecraft.item.ItemStack;
-
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SChangeBlockPacket;
 import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -59,7 +58,6 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
 import java.util.Locale;
-
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -98,7 +96,7 @@ public class ForgePlayer extends AbstractPlayerActor {
 
     @Override
     public Location getLocation() {
-        Vector3 position = Vector3.at(this.player.posX, this.player.posY, this.player.posZ);
+        Vector3 position = Vector3.at(this.player.getPosX(), this.player.getPosY(), this.player.getPosZ());
         return new Location(
                 ForgeWorldEdit.inst.getWorld(this.player.world),
                 position,

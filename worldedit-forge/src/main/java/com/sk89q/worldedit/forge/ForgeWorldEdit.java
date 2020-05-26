@@ -39,8 +39,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Hand;
@@ -72,10 +72,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.forge.ForgeAdapter.adaptPlayer;
+import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
 /**
  * The Forge implementation of WorldEdit.
@@ -190,7 +190,9 @@ public class ForgeWorldEdit {
 
     @SubscribeEvent
     public void serverStopping(FMLServerStoppingEvent event) {
-        WorldEdit.getInstance().getPlatformManager().unregister(platform);
+        WorldEdit worldEdit = WorldEdit.getInstance();
+        worldEdit.getSessionManager().unload();
+        worldEdit.getPlatformManager().unregister(platform);
     }
 
     @SubscribeEvent

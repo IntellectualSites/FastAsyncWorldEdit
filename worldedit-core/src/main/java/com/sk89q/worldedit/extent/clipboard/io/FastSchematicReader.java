@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
 import com.boydti.fawe.object.FaweInputStream;
@@ -70,6 +69,7 @@ public class FastSchematicReader extends NBTSchematicReader {
     private final NBTInputStream inputStream;
     private DataFixer fixer = null;
     private int dataVersion = -1;
+    private int version = -1;
 
     private FastByteArrayOutputStream blocksOut;
     private FaweOutputStream blocks;
@@ -111,10 +111,16 @@ public class FastSchematicReader extends NBTSchematicReader {
         return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag, dataVersion);
     }
 
+    private String fixBiome(String biomePalettePart) {
+        if(fixer == null || dataVersion == -1) return biomePalettePart;
+        return fixer.fixUp(DataFixer.FixTypes.BIOME, biomePalettePart, dataVersion);
+    }
+
     public StreamDelegate createDelegate() {
         StreamDelegate root = new StreamDelegate();
         StreamDelegate schematic = root.add("Schematic");
         schematic.add("DataVersion").withInt((i, v) -> dataVersion = v);
+        schematic.add("Version").withInt((i, v) -> version = v);
         schematic.add("Width").withInt((i, v) -> width = v);
         schematic.add("Height").withInt((i, v) -> height = v);
         schematic.add("Length").withInt((i, v) -> length = v);
@@ -145,7 +151,8 @@ public class FastSchematicReader extends NBTSchematicReader {
             blocksOut = new FastByteArrayOutputStream();
             blocks = new FaweOutputStream(new LZ4BlockOutputStream(blocksOut));
         });
-        blockData.withInt((index, value) -> blocks.writeVarInt(value));
+        blockData.withInt((index, value) -> blocks.write(value));
+
         StreamDelegate tilesDelegate = schematic.add("TileEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
@@ -153,36 +160,28 @@ public class FastSchematicReader extends NBTSchematicReader {
         StreamDelegate entitiesDelegate = schematic.add("Entities");
         entitiesDelegate.withInfo((length, type) -> entities = new ArrayList<>(length));
         entitiesDelegate.withElem((ValueReader<Map<String, Object>>) (index, entity) -> entities.add(entity));
+
+        StreamDelegate biomePaletteDelegate = schematic.add("BiomePalette");
+        biomePaletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
+            biomePalette = new char[v.size()];
+            for (Entry<String, Object> entry : v.entrySet()) {
+                BiomeType biome = null;
+                try {
+                    String biomePalettePart = fixBiome(entry.getKey());
+                    biome = BiomeTypes.get(biomePalettePart);
+                } catch (InputParseException e) {
+                    e.printStackTrace();
+                }
+                int index = (int) entry.getValue();
+                biomePalette[index] = (char) biome.getInternalId();
+            }
+        });
         StreamDelegate biomeData = schematic.add("BiomeData");
         biomeData.withInfo((length, type) -> {
             biomesOut = new FastByteArrayOutputStream();
-            biomes = new FaweOutputStream(new LZ4BlockOutputStream(blocksOut));
+            biomes = new FaweOutputStream(new LZ4BlockOutputStream(biomesOut));
         });
-        biomeData.withElem((IntValueReader) (index, value) -> {
-            try {
-                biomes.write(value); // byte of varInt
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        StreamDelegate biomePaletteDelegate = schematic.add("BiomePalette");
-        biomePaletteDelegate.withInfo((length, type) -> biomePalette = new char[length]);
-        biomePaletteDelegate.withElem(new ValueReader<Map.Entry<String, Number>>() {
-            @Override
-            public void apply(int index, Map.Entry<String, Number> palettePart) {
-                String key = palettePart.getKey();
-                if (fixer != null) {
-                    key = fixer.fixUp(DataFixer.FixTypes.BIOME, key, dataVersion);
-                }
-                BiomeType biome = BiomeTypes.get(key);
-                if (biome == null) {
-                    System. out.println("Unknown biome " + key);
-                    biome = BiomeTypes.FOREST;
-                }
-                int paletteIndex = palettePart.getValue().intValue();
-                biomePalette[paletteIndex] = (char) biome.getInternalId();
-            }
-        });
+        biomeData.withInt((index, value) -> biomes.write(value));
         return root;
     }
 
@@ -192,14 +191,18 @@ public class FastSchematicReader extends NBTSchematicReader {
 
     private BiomeType getBiomeType(FaweInputStream fis) throws IOException {
         char biomeId = biomePalette[fis.readVarInt()];
-        BiomeType biome = BiomeTypes.get(biomeId);
-        return biome;
+        return BiomeTypes.get(biomeId);
     }
 
     @Override
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
         inputStream.readNamedTagLazy(root);
+
+        if (version != 1 && version != 2) {
+            throw new IOException("This schematic version is currently not supported");
+        }
+
         if (blocks != null) blocks.close();
         if (biomes != null) biomes.close();
         blocks = null;
@@ -220,11 +223,13 @@ public class FastSchematicReader extends NBTSchematicReader {
                     int volume = width * height * length;
                     if (palette.length < 128) {
                         for (int index = 0; index < volume; index++) {
-                            linear.setBlock(index, getBlockState(fis.read()));
+                            int ordinal = fis.read();
+                            linear.setBlock(index, getBlockState(ordinal));
                         }
                     } else {
                         for (int index = 0; index < volume; index++) {
-                            linear.setBlock(index, getBlockState(fis.readVarInt()));
+                            int ordinal = fis.readVarInt();
+                            linear.setBlock(index, getBlockState(ordinal));
                         }
                     }
                 } else {
@@ -232,7 +237,8 @@ public class FastSchematicReader extends NBTSchematicReader {
                         for (int y = 0; y < height; y++) {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
-                                    clipboard.setBlock(x, y, z, getBlockState(fis.read()));
+                                    int ordinal = fis.read();
+                                    clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
                         }
@@ -240,7 +246,8 @@ public class FastSchematicReader extends NBTSchematicReader {
                         for (int y = 0; y < height; y++) {
                             for (int z = 0; z < length; z++) {
                                 for (int x = 0; x < width; x++) {
-                                    clipboard.setBlock(x, y, z, getBlockState(fis.readVarInt()));
+                                    int ordinal = fis.readVarInt();
+                                    clipboard.setBlock(x, y, z, getBlockState(ordinal));
                                 }
                             }
                         }
@@ -254,12 +261,14 @@ public class FastSchematicReader extends NBTSchematicReader {
                     LinearClipboard linear = (LinearClipboard) clipboard;
                     int volume = width * length;
                     for (int index = 0; index < volume; index++) {
-                        linear.setBiome(index, getBiomeType(fis));
+                        BiomeType biome = getBiomeType(fis);
+                        linear.setBiome(index, biome);
                     }
                 } else {
                     for (int z = 0; z < length; z++) {
                         for (int x = 0; x < width; x++) {
-                            clipboard.setBiome(x, 0, z, getBiomeType(fis));
+                            BiomeType biome = getBiomeType(fis);
+                            clipboard.setBiome(x, 0, z, biome);
                         }
                     }
                 }

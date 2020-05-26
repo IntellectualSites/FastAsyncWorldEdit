@@ -19,20 +19,14 @@
 
 package com.sk89q.jnbt;
 
+import java.util.Locale;
+
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.Locale;
-
-import java.util.Locale;
 
 /**
  * The {@code TAG_Int_Array} tag.
  */
 public final class IntArrayTag extends Tag {
-    @Override
-    public String getTypeName() {
-        return "TAG_Int_Array";
-    }
 
     @Override
     public int getTypeCode() {

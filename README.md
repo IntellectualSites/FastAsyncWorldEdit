@@ -9,9 +9,10 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 ## Links 
 
 * [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
-* [Discord](https://discord.gg/ngZCzbU)
-* [Wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki)
+* [Discord](https://discord.gg/KxkjDVg)
+* [Wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit/index)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues)
+* [Crowdin](https://intellectualsites.crowdin.com/fastasyncworldedit)
 
 ## Downloads
 ### 1.13+
@@ -34,8 +35,19 @@ $ gradlew setupDecompWorkspace
 $ gradlew build
 ```
 
+The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.15-###.jar`
+
 ## Contributing
 Have an idea for an optimization, or a cool feature?
  - We will accept most PR's
  - Let us know what you've tested / what may need further testing
- - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/ngZCzbU)
+ - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/KxkjDVg)
+
+## YourKit
+<a href="https://www.yourkit.com">
+  <img src="https://www.yourkit.com/images/yklogo.png">
+</a>
+</br>
+Thank you to YourKit for supporting our product by providing us with their innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>, <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>

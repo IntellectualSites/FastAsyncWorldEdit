@@ -33,6 +33,7 @@ public interface ItemRegistry {
      * @param itemType the item
      * @return The name, or null if it's unknown
      */
+    @Deprecated
     @Nullable
     String getName(ItemType itemType);
 

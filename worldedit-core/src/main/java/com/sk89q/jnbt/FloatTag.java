@@ -27,10 +27,6 @@ public final class FloatTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_FLOAT;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Float";
-    }
 
     private final float value;
 

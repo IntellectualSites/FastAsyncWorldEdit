@@ -9,10 +9,10 @@ import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface HeightMap {
+    
     double getHeight(int x, int z);
 
     void setSize(int size);

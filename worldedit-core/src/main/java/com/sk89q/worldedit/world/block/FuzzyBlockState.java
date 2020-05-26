@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 
@@ -28,6 +26,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A Fuzzy BlockState. Used for partial matching.
@@ -37,6 +37,7 @@ import java.util.Objects;
 public class FuzzyBlockState extends BlockState {
 
     private final Map<PropertyKey, Object> props;
+    private final Map<Property<?>, Object> values;
 
     FuzzyBlockState(BlockType blockType) {
         this(blockType.getDefaultState(), null);
@@ -50,12 +51,15 @@ public class FuzzyBlockState extends BlockState {
         super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
             props = Collections.emptyMap();
+            this.values = Collections.emptyMap();
         } else {
             props = new HashMap<>(values.size());
             for (Map.Entry<Property<?>, Object> entry : values.entrySet()) {
                 props.put(entry.getKey().getKey(), entry.getValue());
             }
+            this.values = new HashMap<>(values);
         }
+
     }
 
     /**
@@ -89,14 +93,25 @@ public class FuzzyBlockState extends BlockState {
         return true;
     }
 
-    @Override
-    public BaseBlock toBaseBlock() {
-        return new BaseBlock(this);
+    @Override public BaseBlock toBaseBlock() {
+        if (props == null || props.isEmpty()) {
+            return super.toBaseBlock();
+        }
+        BlockState state = this;
+        for (Map.Entry<PropertyKey, Object> entry : props.entrySet()) {
+            state = state.with(entry.getKey(), entry.getValue());
+        }
+        return new BaseBlock(state);
     }
 
     @Override
     public BlockState toImmutableState() {
         return getFullState();
+    }
+
+    @Override
+    public Map<Property<?>, Object> getStates() {
+        return values;
     }
 
     /**

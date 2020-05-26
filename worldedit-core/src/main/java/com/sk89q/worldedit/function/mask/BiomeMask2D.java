@@ -90,7 +90,7 @@ public class BiomeMask2D extends AbstractMask2D {
     }
 
     @Override
-    public boolean test(BlockVector2 vector) {
+    public boolean test(Extent extent, BlockVector2 vector) {
         BiomeType biome = extent.getBiome(vector);
         return biomes.contains(biome);
     }

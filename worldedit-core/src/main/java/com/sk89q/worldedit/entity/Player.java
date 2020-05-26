@@ -370,9 +370,10 @@ public interface Player extends Entity, Actor {
     default void unregister() {
         cancel(true);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
-            getSession().setClipboard(null);
             getSession().clearHistory();
             getSession().unregisterTools(this);
+        } else if (Settings.IMP.CLIPBOARD.USE_DISK) {
+            getSession().setClipboard(null);
         }
     }
 

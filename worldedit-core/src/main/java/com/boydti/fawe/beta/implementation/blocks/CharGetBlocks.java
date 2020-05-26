@@ -17,16 +17,18 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return BlockTypesCache.states[get(x, y, z)];
-    }
-
-    @Override
     public boolean trim(boolean aggressive) {
         for (int i = 0; i < 16; i++) {
             sections[i] = EMPTY;
             blocks[i] = null;
         }
+        return true;
+    }
+
+    @Override
+    public boolean trim(boolean aggressive, int layer) {
+        sections[layer] = EMPTY;
+        blocks[layer] = null;
         return true;
     }
 

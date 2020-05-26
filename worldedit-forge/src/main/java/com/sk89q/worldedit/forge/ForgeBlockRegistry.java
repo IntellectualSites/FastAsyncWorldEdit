@@ -26,17 +26,14 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.state.IProperty;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 import javax.annotation.Nullable;
-import net.minecraftforge.fml.loading.FMLLoader;
-import java.util.OptionalInt;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.TreeMap;
 
 public class ForgeBlockRegistry extends BundledBlockRegistry {

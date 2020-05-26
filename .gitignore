@@ -6,6 +6,7 @@ eclipse
 *.iml
 *.ipr
 *.iws
+/.metadata/
 
 bin
 build

@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.util.MathMan;
@@ -20,9 +21,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.IntStream;
+import org.jetbrains.annotations.Range;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
-    private static FaweCache.Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }
@@ -31,6 +34,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
+    private boolean fastMode = false;
 
     private CharSetBlocks() {}
 
@@ -80,12 +84,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return BlockTypesCache.states[get(x, y, z)];
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T holder) {
         set(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;
@@ -134,16 +133,21 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public void setFastMode(boolean fastMode) {
+        this.fastMode = fastMode;
+    }
+
+    @Override
+    public boolean isFastMode() {
+        return fastMode;
+    }
+
+    @Override
     public boolean isEmpty() {
         if (biomes != null) {
             return false;
         }
-        for (int i = 0; i < 16; i++) {
-            if (hasSection(i)) {
-                return false;
-            }
-        }
-        return true;
+        return IntStream.range(0, 16).noneMatch(this::hasSection);
     }
 
     @Override

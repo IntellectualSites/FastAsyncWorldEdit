@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.util.translation;
 
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,12 +27,15 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.renderer.FriendlyComponentRenderer;
 import com.sk89q.worldedit.util.io.ResourceLoader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Locale;
@@ -42,6 +43,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Handles translations for the plugin.
@@ -84,15 +87,17 @@ public class TranslationManager {
             .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map<String, String> parseTranslationFile(InputStream inputStream) {
-        return filterTranslations(gson.fromJson(new InputStreamReader(inputStream), STRING_MAP_TYPE));
+    private Map<String, String> parseTranslationFile(InputStream inputStream) throws IOException {
+        try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            return filterTranslations(gson.fromJson(reader, STRING_MAP_TYPE));
+        }
     }
 
     private Optional<Map<String, String>> loadTranslationFile(String filename) {
         Map<String, String> baseTranslations;
 
-        try {
-            baseTranslations = parseTranslationFile(ResourceLoader.getResourceRoot("lang/" + filename).openStream());
+        try (InputStream stream = ResourceLoader.getResourceRoot("lang/" + filename).openStream()) {
+            baseTranslations = parseTranslationFile(stream);
         } catch (IOException e) {
             // Seem to be missing base. If the user has provided a file use that.
             baseTranslations = new ConcurrentHashMap<>();
@@ -100,8 +105,8 @@ public class TranslationManager {
 
         File localFile = worldEdit.getWorkingDirectoryFile("lang/" + filename);
         if (localFile.exists()) {
-            try {
-                baseTranslations.putAll(parseTranslationFile(new FileInputStream(localFile)));
+            try (InputStream stream = new FileInputStream(localFile)) {
+                baseTranslations.putAll(parseTranslationFile(stream));
             } catch (IOException e) {
                 // Failed to parse custom language file. Worth printing.
                 e.printStackTrace();

@@ -1,17 +1,17 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
-import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.mask.DelegateExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -22,6 +22,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.concurrent.ThreadLocalRandom;
@@ -64,11 +65,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             }
             final ResizableClipboardBuilder builder = new ResizableClipboardBuilder(editSession.getWorld());
             final int minY = position.getBlockY();
-            mask = new AbstractDelegateMask(mask) {
+            mask = new DelegateExtentMask(editSession, mask) {
                 @Override
-                public boolean test(BlockVector3 vector) {
-                    if (super.test(vector) && vector.getBlockY() >= minY) {
-                        BaseBlock block = editSession.getFullBlock(vector);
+                public boolean test(Extent extent, BlockVector3 vector) {
+                    if (super.test(extent, vector) && vector.getBlockY() >= minY) {
+                        BaseBlock block = vector.getFullBlock(editSession);
                         if (!block.getBlockType().getMaterial().isAir()) {
                             builder.add(vector, BlockTypes.AIR.getDefaultState().toBaseBlock(), block);
                             return true;
@@ -78,7 +79,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 }
             };
             // Add origin
-            mask.test(position);
+            mask.test(editSession, position);
             RecursiveVisitor visitor = new RecursiveVisitor(mask, new NullRegionFunction(), (int) size);
             visitor.visit(position);
             Operations.completeBlindly(visitor);

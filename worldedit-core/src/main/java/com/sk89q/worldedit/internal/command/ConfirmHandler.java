@@ -22,6 +22,7 @@ package com.sk89q.worldedit.internal.command;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import java.util.Optional;
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.gen.CommandCallListener;
@@ -39,7 +40,12 @@ public class ConfirmHandler implements CommandCallListener {
         if (confirmAnnotation == null) {
             return;
         }
-        Actor actor = parameters.injectedValue(Key.of(Actor.class)).get();
+        Optional<Actor> actorOpt = parameters.injectedValue(Key.of(Actor.class));
+
+        if (!actorOpt.isPresent()) {
+            return;
+        }
+        Actor actor = actorOpt.get();
         if (!confirmAnnotation.value().passes(actor, parameters, 1)) {
             throw new StopExecutionException(TextComponent.empty());
         }

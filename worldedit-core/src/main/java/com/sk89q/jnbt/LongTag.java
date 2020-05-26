@@ -28,10 +28,6 @@ public final class LongTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_LONG;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Long";
-    }
 
     private final long value;
 

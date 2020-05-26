@@ -1,22 +1,14 @@
 package com.boydti.fawe.bukkit.wrapper.state;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Map.Entry;
-
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import net.minecraft.server.v1_14_R1.NBTBase;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang.Validate;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_14_R1.persistence.CraftPersistentDataAdapterContext;
-import org.bukkit.craftbukkit.v1_14_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -42,10 +34,10 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Map<String, Tag> raw;
         if (tag == null) {
             if (!create) return Collections.emptyMap();
-            Map<String, Tag> map = ReflectionUtils.getMap(root.getValue());
+            Map<String, Tag> map = root.getValue();
             map.put("PublicBukkitValues", new CompoundTag(raw = new HashMap<>()));
         } else {
-            raw = ReflectionUtils.getMap(tag.getValue());
+            raw = tag.getValue();
         }
         return raw;
     }

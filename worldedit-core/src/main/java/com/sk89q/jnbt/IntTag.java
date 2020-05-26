@@ -27,10 +27,6 @@ public final class IntTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_INT;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Int";
-    }
 
     private final int value;
 

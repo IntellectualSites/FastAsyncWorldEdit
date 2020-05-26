@@ -35,6 +35,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.legacycompat.BannerBlockCompatibilityHandler;
+import com.sk89q.worldedit.extent.clipboard.io.legacycompat.BedBlockCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.EntityNBTCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.FlowerPotCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NBTCompatibilityHandler;
@@ -79,7 +81,9 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 new SignCompatibilityHandler(),
                 new FlowerPotCompatibilityHandler(),
                 new NoteBlockCompatibilityHandler(),
-                new SkullBlockCompatibilityHandler()
+                new SkullBlockCompatibilityHandler(),
+                new BannerBlockCompatibilityHandler(),
+                new BedBlockCompatibilityHandler()
     );
     private static final ImmutableList<EntityNBTCompatibilityHandler> ENTITY_COMPATIBILITY_HANDLERS
             = ImmutableList.of(
@@ -210,9 +214,6 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
             if (values.isEmpty()) {
                 t = null;
-            }
-            if (values.isEmpty()) {
-                t = null;
             } else {
                 t = new CompoundTag(values);
             }
@@ -248,8 +249,13 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                                 clipboard.setBlock(region.getMinimumPoint().add(pt), state);
                             }
                         } else {
-                            log.warn("Unknown block when pasting schematic: "
-                                             + blocks[index] + ":" + blockData[index] + ". Please report this issue.");
+                            short block = blocks[index];
+                            byte data = blockData[index];
+                            int combined = block << 8 | data;
+                            if (unknownBlocks.add(combined)) {
+                                log.warn("Unknown block when loading schematic: "
+                                        + block + ":" + data + ". This is most likely a bad schematic.");
+                            }
                         }
                     } catch (WorldEditException ignored) { // BlockArrayClipboard won't throw this
                     }

@@ -2,11 +2,14 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
-
 import java.util.Arrays;
 
 public class ExtentHeightCacher extends PassthroughExtent {
 
+    private transient int cacheBotX = Integer.MIN_VALUE;
+    private transient int cacheBotZ = Integer.MIN_VALUE;
+    private transient byte[] cacheHeights;
+    private transient int lastY;
     public ExtentHeightCacher(Extent extent) {
         super(extent);
     }
@@ -18,11 +21,6 @@ public class ExtentHeightCacher extends PassthroughExtent {
             Arrays.fill(cacheHeights, (byte) 0);
         }
     }
-
-    private transient int cacheBotX = Integer.MIN_VALUE;
-    private transient int cacheBotZ = Integer.MIN_VALUE;
-    private transient byte[] cacheHeights;
-    private transient int lastY;
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
@@ -46,7 +44,8 @@ public class ExtentHeightCacher extends PassthroughExtent {
         }
         int result = cacheHeights[index] & 0xFF;
         if (result == 0) {
-            cacheHeights[index] = (byte) (result = lastY = super.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
+            cacheHeights[index] = (byte) (result = lastY = super
+                .getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
         }
         return result;
     }

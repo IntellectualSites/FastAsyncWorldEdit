@@ -21,8 +21,6 @@ package com.sk89q.worldedit.util.collection;
 
 import com.google.common.collect.Iterators;
 import com.sk89q.worldedit.WorldEdit;
-import com.google.common.collect.Iterators;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -39,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocatedBlockList implements Iterable<LocatedBlock> {
 
-    private final BlockMap blocks = BlockMap.create();
+    private final BlockMap<BaseBlock> blocks = BlockMap.createForBaseBlock();
     private final PositionList order = PositionList.create(
         WorldEdit.getInstance().getConfiguration().extendedYLimit
     );

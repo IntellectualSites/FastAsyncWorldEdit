@@ -77,6 +77,7 @@ public class ChunkCommands {
 
     @Command(
         name = "chunkinfo",
+        aliases = { "/chunkinfo" },
         desc = "Get information about the chunk you're inside"
     )
     @CommandPermissions("worldedit.chunkinfo")
@@ -93,6 +94,7 @@ public class ChunkCommands {
 
     @Command(
         name = "listchunks",
+        aliases = { "/listchunks" },
         desc = "List chunks that your selection includes"
     )
     @CommandPermissions("worldedit.listchunks")
@@ -106,12 +108,13 @@ public class ChunkCommands {
 
     @Command(
         name = "delchunks",
+        aliases = { "/delchunks" },
         desc = "Delete chunks that your selection includes"
     )
     @CommandPermissions("worldedit.delchunks")
     @Logging(REGION)
     public void deleteChunks(Actor actor, World world, LocalSession session,
-                                @ArgFlag(name = 'o', desc = "Only delete chunks older than the specified time.", def = "")
+                                @ArgFlag(name = 'o', desc = "Only delete chunks older than the specified time.")
                                     ZonedDateTime beforeTime) throws WorldEditException {
         Path worldDir = world.getStoragePath();
         if (worldDir == null) {
@@ -161,19 +164,20 @@ public class ChunkCommands {
             throw new StopExecutionException(TextComponent.of("Failed to write chunk list: " + e.getMessage()));
         }
 
-        actor.print(String.format("%d chunk(s) have been marked for deletion the next time the server starts.",
-                newBatch.getChunkCount()));
+        actor.print(TextComponent.of(String.format("%d chunk(s) have been marked for deletion the next time the server starts.",
+                newBatch.getChunkCount())));
         if (currentInfo.batches.size() > 1) {
-            actor.printDebug(String.format("%d chunks total marked for deletion. (May have overlaps).",
-                    currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum()));
+            actor.printDebug(TextComponent.of(String.format("%d chunks total marked for deletion. (May have overlaps).",
+                    currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum())));
         }
-        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.GRAY)
+        actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.LIGHT_PURPLE)
                 .append(TextComponent.of("/stop", TextColor.AQUA)
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/stop"))));
     }
 
     private static class ChunkListPaginationBox extends PaginationBox.ListPaginationBox {
         //private final Region region;
+        private final List<BlockVector2> chunks = null;
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%", region.getChunks());

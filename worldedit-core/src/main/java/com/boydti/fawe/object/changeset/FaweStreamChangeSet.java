@@ -15,6 +15,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -27,7 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public abstract class FaweStreamChangeSet extends FaweChangeSet {
+public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
     private int mode;
@@ -39,17 +40,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     public FaweStreamChangeSet(World world) {
         this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
     }
-
-    public FaweStreamChangeSet(String world) {
-        this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
-    }
-
-    public FaweStreamChangeSet(String world, int compression, boolean storeRedo, boolean smallLoc) {
-        super(world);
-        this.compression = compression;
-        init(storeRedo, smallLoc);
-    }
-
+    
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
         super(world);
         this.compression = compression;
@@ -177,7 +168,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             };
         } else {
             posDel = new FaweStreamPositionDelegate() {
-                byte[] buffer = new byte[5];
+                final byte[] buffer = new byte[5];
                 int lx, ly, lz;
 
                 @Override
@@ -404,7 +395,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     public Iterator<MutableBlockChange> getBlockIterator(final boolean dir) throws IOException {
         final FaweInputStream is = getBlockIS();
         if (is == null) {
-            return new ArrayList<MutableBlockChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableBlockChange change = new MutableBlockChange(0, 0, 0, BlockTypes.AIR.getInternalId());
         return new Iterator<MutableBlockChange>() {
@@ -455,7 +446,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     public Iterator<MutableBiomeChange> getBiomeIterator(final boolean dir) throws IOException {
         final FaweInputStream is = getBiomeIS();
         if (is == null) {
-            return new ArrayList<MutableBiomeChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableBiomeChange change = new MutableBiomeChange();
         return new Iterator<MutableBiomeChange>() {
@@ -569,7 +560,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
 
     public Iterator<MutableEntityChange> getEntityIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return new ArrayList<MutableEntityChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableEntityChange change = new MutableEntityChange(null, create);
         try {
@@ -618,7 +609,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
 
     public Iterator<MutableTileChange> getTileIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
-            return new ArrayList<MutableTileChange>().iterator();
+            return Collections.emptyIterator();
         }
         final MutableTileChange change = new MutableTileChange(null, create);
         try {
@@ -728,5 +719,36 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     @Override
     public Iterator<Change> forwardIterator() {
         return getIterator(true);
+    }
+
+    protected SimpleChangeSetSummary summarizeShallow() {
+        return new SimpleChangeSetSummary(getOriginX(), getOriginZ());
+    }
+
+    @Override
+    public SimpleChangeSetSummary summarize(Region region, boolean shallow) {
+        int ox = getOriginX();
+        int oz = getOriginZ();
+        SimpleChangeSetSummary summary = summarizeShallow();
+        if (region != null && !region.contains(ox, oz)) {
+            return summary;
+        }
+        try (FaweInputStream fis = getBlockIS()) {
+            if (!shallow) {
+                int amount = (Settings.IMP.HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
+                MutableFullBlockChange change = new MutableFullBlockChange(null, 0, false);
+                for (int i = 0; i < amount; i++) {
+                    int x = posDel.readX(fis) + ox;
+                    int y = posDel.readY(fis);
+                    int z = posDel.readZ(fis) + ox;
+                    idDel.readCombined(fis, change);
+                    summary.add(x, z, change.to);
+                }
+            }
+        } catch (EOFException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return summary;
     }
 }

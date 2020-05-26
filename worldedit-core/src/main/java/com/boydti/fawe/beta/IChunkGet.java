@@ -26,23 +26,11 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     @Override
     BlockState getBlock(int x, int y, int z);
 
-    @Override
-    Map<BlockVector3, CompoundTag> getTiles();
-
-    @Override
-    Set<CompoundTag> getEntities();
-
-    @Override
-    boolean trim(boolean aggressive);
-
     default void optimize() {
 
     }
 
     <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
-
-    @Override
-    char[] load(int layer);
 
     CompoundTag getEntity(UUID uuid);
 }

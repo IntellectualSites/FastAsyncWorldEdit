@@ -100,7 +100,7 @@ public class SparseBitSet implements Cloneable, Serializable
         bits (setting, flipping, clearing, etc.) do not attempt to normalize the
         set, in the interests of speed. However, when a set is scanned as the
         resultant set of some operation, then, in most cases, the set will be
-        normalized--the exception being level2 areas that are not completly scanned
+        normalized--the exception being level2 areas that are not completely scanned
         in a particular pass.
 
         The sizes of the blocks and areas has been the result of some investigation
@@ -338,8 +338,8 @@ public class SparseBitSet implements Cloneable, Serializable
      *  needed actions to initialise the bit set.
      *  <p>
      *  The capacity is taken to be a <i>suggestion</i> for a size of the bit set,
-     *  in bits. An appropiate table size (a power of two) is then determined and
-     *  used. The size will be grown as needed to accomodate any bits addressed
+     *  in bits. An appropriate table size (a power of two) is then determined and
+     *  used. The size will be grown as needed to accommodate any bits addressed
      *  during the use of the bit set.
      *
      * @param       capacity a size in terms of bits
@@ -530,7 +530,7 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Creates a bit set from thie first <code>SparseBitSet</code> whose
+     *  Creates a bit set from the first <code>SparseBitSet</code> whose
      *  corresponding bits are cleared by the set bits of the second
      *  <code>SparseBitSet</code>. The resulting bit set is created so that a bit
      *  in it has the value <code>true</code> if and only if the corresponding bit
@@ -1669,7 +1669,7 @@ public class SparseBitSet implements Cloneable, Serializable
     }
 
     /**
-     *  Intializes all the additional objects required for correct operation.
+     *  Initializes all the additional objects required for correct operation.
      *
      * @since       1.6
      */

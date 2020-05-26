@@ -1,15 +1,14 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
-import com.boydti.fawe.object.IntegerTrio;
-import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.object.IntTriple;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -21,30 +20,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class CPUOptimizedClipboard extends LinearClipboard {
 
     private BiomeType[] biomes = null;
     private char[] states;
 
-    private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
+    private final HashMap<IntTriple, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
 
-    private final HashSet<BlockArrayClipboard.ClipboardEntity> entities;
 
-    public CPUOptimizedClipboard(BlockVector3 dimensions) {
-        super(dimensions);
+    public CPUOptimizedClipboard(Region region) {
+        super(region.getDimensions());
         this.states = new char[getVolume()];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
-        entities = new HashSet<>();
     }
-
+    
     @Override
     public boolean hasBiomes() {
         return biomes != null;
@@ -97,8 +91,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         if (nbtMapLoc.isEmpty()) {
             return;
         }
-        for (Map.Entry<IntegerTrio, CompoundTag> entry : nbtMapLoc.entrySet()) {
-            IntegerTrio key = entry.getKey();
+        for (Map.Entry<IntTriple, CompoundTag> entry : nbtMapLoc.entrySet()) {
+            IntTriple key = entry.getKey();
             setTile(getIndex(key.x, key.y, key.z), entry.getValue());
         }
         nbtMapLoc.clear();
@@ -154,7 +148,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
             int index = entry.getKey();
             CompoundTag tag = entry.getValue();
-            Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+            Map<String, Tag> values = tag.getValue();
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -170,13 +164,13 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntegerTrio(x, y, z), tag);
+        nbtMapLoc.put(new IntTriple(x, y, z), tag);
         return true;
     }
 
     public boolean setTile(int index, CompoundTag tag) {
         nbtMapIndex.put(index, tag);
-        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> values = tag.getValue();
         values.remove("x");
         values.remove("y");
         values.remove("z");
@@ -190,7 +184,11 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
-        states[index] = block.getOrdinalChar();
+        char ordinal = block.getOrdinalChar();
+        if (ordinal == 0) {
+            ordinal = 1;
+        }
+        states[index] = ordinal;
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             setTile(index, block.getNbtData());
@@ -216,17 +214,4 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         this.entities.remove(entity);
     }
 
-    @Nullable
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
-        while (iter.hasNext()) {
-            BlockArrayClipboard.ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
-            if (uuid.equals(entUUID)) {
-                iter.remove();
-                return;
-            }
-        }
-    }
 }

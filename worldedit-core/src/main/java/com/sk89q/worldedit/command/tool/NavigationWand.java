@@ -32,6 +32,9 @@ public enum NavigationWand implements DoubleActionTraceTool {
 
   @Override
   public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+      if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
+           return false;
+      }
       final int maxDist = config.navigationWandMaxDistance;
       if (maxDist <= 0) {
           return false;
@@ -47,6 +50,9 @@ public enum NavigationWand implements DoubleActionTraceTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission("worldedit.navigation.thru.tool")) {
+            return false;
+        }
         final int maxDist = config.navigationWandMaxDistance;
         if (maxDist <= 0) {
             return false;

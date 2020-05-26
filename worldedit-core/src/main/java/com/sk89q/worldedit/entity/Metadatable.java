@@ -10,7 +10,6 @@ public interface Metadatable {
      *
      * @param key
      * @param value
-     * @return previous value
      */
     void setMeta(String key, Object value);
 

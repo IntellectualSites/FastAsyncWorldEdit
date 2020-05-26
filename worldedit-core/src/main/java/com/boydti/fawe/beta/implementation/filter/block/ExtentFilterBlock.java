@@ -32,4 +32,9 @@ public class ExtentFilterBlock extends AbstractFilterBlock {
     public BlockVector3 getPosition() {
         return pos;
     }
+
+    @Override
+    public Extent getExtent() {
+        return extent;
+    }
 }

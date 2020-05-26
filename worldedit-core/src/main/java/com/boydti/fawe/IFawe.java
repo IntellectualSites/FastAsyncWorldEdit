@@ -17,17 +17,9 @@ public interface IFawe {
 
     File getDirectory();
 
-    Player wrap(final Object obj);
-
-    void setupVault();
-
     TaskManager getTaskManager();
 
-    String getWorldName(World world);
-
     Collection<FaweMaskManager> getMaskManagers();
-
-    void startMetrics();
 
     default ImageViewer getImageViewer(Player player) {
         return null;
@@ -40,8 +32,6 @@ public interface IFawe {
     UUID getUUID(String name);
 
     String getName(UUID uuid);
-
-    Object getBlocksHubApi();
 
     default String getDebugInfo() {
         return "";

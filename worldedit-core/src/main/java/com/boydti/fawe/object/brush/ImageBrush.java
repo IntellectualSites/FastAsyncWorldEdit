@@ -8,6 +8,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -17,9 +18,8 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
@@ -50,7 +50,7 @@ public class ImageBrush implements Brush {
                     case 255:
                         return color;
                     default:
-                        BlockStateHolder block = extent.getBlock(pos);
+                        BlockState block = extent.getBlock(pos);
                         TextureUtil tu = session.getTextureUtil();
                         int existingColor = tu.getColor(block.getBlockType());
                         return tu.combineTransparency(color, existingColor);
@@ -86,11 +86,11 @@ public class ImageBrush implements Brush {
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
 
-        RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
+        RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
             @Override
-            public boolean test(BlockVector3 vector) {
-                if (solid.test(vector)) {
+            public boolean test(Extent extent, BlockVector3 vector) {
+                if (solid.test(extent, vector)) {
                     int dx = vector.getBlockX() - cx;
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
@@ -133,7 +133,4 @@ public class ImageBrush implements Brush {
         Operations.completeBlindly(visitor);
     }
 
-    private void apply(double val) {
-
-    }
 }

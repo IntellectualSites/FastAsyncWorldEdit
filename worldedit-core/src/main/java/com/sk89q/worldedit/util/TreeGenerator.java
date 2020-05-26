@@ -162,7 +162,7 @@ public class TreeGenerator {
          */
         @Nullable
         public static TreeType lookup(String name) {
-            return lookup.get(name.toLowerCase(Locale.ROOT));
+            return lookup.get(name.replace("_", "").toLowerCase(Locale.ROOT));
         }
     }
 

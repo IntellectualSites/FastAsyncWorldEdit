@@ -54,7 +54,7 @@ public class AnvilChunk13 implements Chunk {
 
     /**
      * Construct the chunk with a compound tag.
-     *
+     * 
      * @param tag the tag to read
      * @throws DataException on a data error
      */
@@ -226,7 +226,7 @@ public class AnvilChunk13 implements Chunk {
         BlockState[] sectionBlocks = blocks[section];
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
 
-            CompoundTag tileEntity = getBlockTileEntity(position);
+        CompoundTag tileEntity = getBlockTileEntity(position);
 
         if (tileEntity != null) {
             return state.toBaseBlock(tileEntity);

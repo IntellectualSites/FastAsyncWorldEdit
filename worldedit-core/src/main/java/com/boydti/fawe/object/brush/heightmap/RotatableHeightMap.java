@@ -6,7 +6,7 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 
 public class RotatableHeightMap extends AbstractDelegateHeightMap {
     private AffineTransform transform;
-    private MutableVector3 mutable;
+    private final MutableVector3 mutable;
 
     public RotatableHeightMap(HeightMap parent) {
         super(parent);

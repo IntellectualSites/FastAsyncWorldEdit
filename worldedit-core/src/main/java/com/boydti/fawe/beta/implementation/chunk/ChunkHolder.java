@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -22,13 +23,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
  */
-public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
+public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static FaweCache.Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+    private static final Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
 
     public static ChunkHolder newInstance() {
         return POOL.poll();
@@ -37,11 +39,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     private IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
-    private IQueueExtent extent; // the parent queue extent which has this chunk
+    private IQueueExtent<? extends IChunk> extent; // the parent queue extent which has this chunk
     private int chunkX;
     private int chunkZ;
+    private boolean fastmode;
 
-    public ChunkHolder() {
+    private ChunkHolder() {
         this.delegate = NULL;
     }
 
@@ -99,11 +102,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
+    public boolean isFastMode() {
+        return fastmode;
+    }
+
+    @Override
+    public void setFastMode(boolean fastmode) {
+        this.fastmode = fastmode;
+    }
+
+    @Override
     public CompoundTag getEntity(UUID uuid) {
         return delegate.get(this).getEntity(uuid);
     }
 
-    public static final IBlockDelegate BOTH = new IBlockDelegate() {
+    private static final IBlockDelegate BOTH = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             return chunk.chunkExisting;
@@ -121,8 +134,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
+            B block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -142,7 +155,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate GET = new IBlockDelegate() {
+    
+    private static final IBlockDelegate GET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             return chunk.chunkExisting;
@@ -164,8 +178,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            BlockStateHolder block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
+            T block) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             return chunk.setBlock(x, y, z, block);
@@ -187,7 +201,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate SET = new IBlockDelegate() {
+    
+    private static final IBlockDelegate SET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
@@ -207,7 +222,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, @Range(from = 0, to = 255) int y, int z, B block) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -233,11 +248,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
             return chunk.getFullBlock(x, y, z);
         }
     };
-    public static final IBlockDelegate NULL = new IBlockDelegate() {
+    
+    private static final IBlockDelegate NULL = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.chunkExisting;
         }
 
@@ -256,7 +273,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         }
 
         @Override
-        public boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T block) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             return chunk.setBlock(x, y, z, block);
@@ -266,6 +283,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getBiomeType(x, y, z);
         }
 
@@ -273,6 +291,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
         public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getBlock(x, y, z);
         }
 
@@ -281,14 +300,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
             int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
             return chunk.getFullBlock(x, y, z);
         }
     };
-
-//    @Override
-//    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
-////        block.flood(get, set, mask, block, );
-//    }
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
@@ -309,6 +324,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
+        set.setFastMode(fastmode);
         try {
             block.filter(this, get, set, filter, region, full);
         } finally {
@@ -341,13 +357,17 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return this.trim(aggressive);
+    }
+
+    @Override
     public boolean isEmpty() {
         return chunkSet == null || chunkSet.isEmpty();
     }
 
     /**
-     * Get or create the existing part of this chunk
-     * @return
+     * Get or create the existing part of this chunk.
      */
     public final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
@@ -357,8 +377,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     /**
-     * Get or create the settable part of this chunk
-     * @return
+     * Get or create the settable part of this chunk.
      */
     public final IChunkSet getOrCreateSet() {
         if (chunkSet == null) {
@@ -371,7 +390,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
      * Create a wrapped set object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
-     * @return
      */
     private IChunkSet newWrappedSet() {
         return extent.getCachedSet(chunkX, chunkZ);
@@ -381,14 +399,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
      * Create a wrapped get object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
-     * @return
      */
     private IChunkGet newWrappedGet() {
         return extent.getCachedGet(chunkX, chunkZ);
     }
 
     @Override
-    public void init(IQueueExtent extent, int chunkX, int chunkZ) {
+    public <V extends IChunk> void init(IQueueExtent<V> extent, int chunkX, int chunkZ) {
         this.extent = extent;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -413,6 +430,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     public T call(IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
+            get.trim(false);
             set = getExtent().processSet(this, get, set);
             if (set != null) {
                 return get.call(set, finalize);
@@ -423,9 +441,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
 
     /**
      * Get the extent this chunk is in
-     * @return
      */
-    public IQueueExtent getExtent() {
+    public IQueueExtent<? extends IChunk> getExtent() {
         return extent;
     }
 
@@ -445,7 +462,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return delegate.setBlock(this, x, y, z, block);
     }
 
@@ -465,12 +482,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk {
     }
 
     public interface IBlockDelegate {
-        IChunkGet get(ChunkHolder chunk);
+        <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
         IChunkSet set(ChunkHolder chunk);
 
         boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome);
 
-        boolean setBlock(ChunkHolder chunk, int x, int y, int z, BlockStateHolder holder);
+        <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T holder);
 
         BiomeType getBiome(ChunkHolder chunk, int x, int y, int z);
 

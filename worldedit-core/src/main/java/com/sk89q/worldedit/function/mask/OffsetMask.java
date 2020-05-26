@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
@@ -86,8 +87,12 @@ public class OffsetMask extends AbstractMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return getMask().test(vector.add(offset));
+    public boolean test(Extent extent, BlockVector3 pos) {
+        BlockVector3 testPos = pos.add(offset);
+        if (testPos.getBlockY() < 0 || testPos.getBlockY() > 255) {
+            return false;
+        }
+        return getMask().test(extent, pos.add(offset));
     }
 
     @Nullable

@@ -25,10 +25,6 @@ import java.util.Locale;
  * The {@code TAG_Byte_Array} tag.
  */
 public final class ByteArrayTag extends Tag {
-    @Override
-    public String getTypeName() {
-        return "TAG_Byte_Array";
-    }
 
     @Override
     public int getTypeCode() {

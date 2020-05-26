@@ -14,16 +14,16 @@ public class VisualQueue extends SingleThreadIntervalQueue<Player> {
     }
 
     @Override
-    public void operate(Player fp) {
-        LocalSession session = fp.getSession();
-        Tool tool = session.getTool(fp);
+    public void operate(Player player) {
+        LocalSession session = player.getSession();
+        Tool tool = session.getTool(player);
         if (tool instanceof BrushTool) {
             BrushTool brushTool = (BrushTool) tool;
             if (brushTool.getVisualMode() != VisualMode.NONE) {
                 try {
-                    brushTool.visualize(BrushTool.BrushAction.PRIMARY, fp);
+                    brushTool.visualize(BrushTool.BrushAction.PRIMARY, player);
                 } catch (Throwable e) {
-                    WorldEdit.getInstance().getPlatformManager().handleThrowable(e, fp);
+                    WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
                 }
             }
         }

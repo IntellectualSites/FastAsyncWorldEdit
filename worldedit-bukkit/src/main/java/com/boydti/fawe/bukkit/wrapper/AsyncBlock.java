@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import java.util.Collections;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -30,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class AsyncBlock implements Block {
 
@@ -121,17 +124,17 @@ public class AsyncBlock implements Block {
 
     @Override
     public byte getLightLevel() {
-        return (byte) world.getLight(x, y, z);
+        return (byte) 15;
     }
 
     @Override
     public byte getLightFromSky() {
-        return (byte) world.getSkyLight(x, y, z);
+        return (byte) 15;
     }
 
     @Override
     public byte getLightFromBlocks() {
-        return (byte) world.getBlockLight(x, y, z);
+        return (byte) 15;
     }
 
     @NotNull @Override
@@ -312,9 +315,10 @@ public class AsyncBlock implements Block {
         return this.getWorld().getHumidity(this.getX(), this.getZ());
     }
 
+    @NotNull
     @Override
     public PistonMoveReaction getPistonMoveReaction() {
-        return null;
+        return PistonMoveReaction.IGNORE;
     }
 
     @Deprecated
@@ -332,6 +336,10 @@ public class AsyncBlock implements Block {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
     }
 
+    public boolean breakNaturally(@NotNull ItemStack tool, boolean value) {
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
+    }
+    
     @NotNull @Override
     public Collection<ItemStack> getDrops() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops());
@@ -381,4 +389,9 @@ public class AsyncBlock implements Block {
     public @NotNull BlockSoundGroup getSoundGroup() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getSoundGroup());
     }
+
+    public Collection<ItemStack> getDrops(ItemStack tool, Entity entity) {
+        return Collections.emptyList(); //todo
+    }
+
 }

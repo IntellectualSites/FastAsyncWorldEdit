@@ -46,7 +46,7 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
 
 
     /**
-     * filter a single block
+     * Filter a single block
      * @param filter
      * @param x
      * @param y

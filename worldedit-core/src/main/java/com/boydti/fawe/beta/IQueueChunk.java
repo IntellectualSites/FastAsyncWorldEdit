@@ -36,6 +36,5 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
         while (future != null) {
             future = future.get();
         }
-        return;
     }
 }

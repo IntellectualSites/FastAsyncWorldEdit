@@ -25,6 +25,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +49,19 @@ class BaseExpressionTest {
         });
         WorldEdit.getInstance().getPlatformManager().register(mockPlat);
         WorldEdit.getInstance().getConfiguration().calculationTimeout = 1_000;
+    }
+
+    @AfterEach
+    void tearDown() {
+        WorldEdit.getInstance().getPlatformManager().unregister(mockPlat);
+    }
+
+    void checkTestCase(String expression, double result) {
+        checkTestCase(ExpressionTestCase.testCase(expression, result));
+    }
+
+    void checkTestCase(ExpressionTestCase testCase) {
+        assertEquals(testCase.getResult(), simpleEval(testCase.getExpression()), 0);
     }
 
     double simpleEval(String expressionString) throws ExpressionException {
@@ -86,11 +100,6 @@ class BaseExpressionTest {
         });
 
         return expression.evaluate();
-    }
-
-    @AfterEach
-    void tearDown() {
-        WorldEdit.getInstance().getPlatformManager().unregister(mockPlat);
     }
 
     Expression compile(String expressionString, String... variableNames) throws ExpressionException {

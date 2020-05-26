@@ -4,7 +4,6 @@ import static java.lang.System.arraycopy;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
-import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
@@ -30,7 +29,6 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,7 +60,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
@@ -89,6 +86,7 @@ import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
 import net.jpountz.lz4.LZ4Utils;
+import org.jetbrains.annotations.NotNull;
 
 public class MainUtil {
 
@@ -371,15 +369,11 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(UUID uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
         return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
-    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
-        if (writeTask == null) {
-            getLogger(MainUtil.class).debug("Write task cannot be null");
-            return null;
-        }
+    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
         final String website;
@@ -438,14 +432,14 @@ public class MainUtil {
     }
 
     public static void setPosition(CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> value = tag.getValue();
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
     }
 
     public static void setEntityInfo(CompoundTag tag, Entity entity) {
-        Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
+        Map<String, Tag> map = tag.getValue();
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {
@@ -519,11 +513,11 @@ public class MainUtil {
         }
         try (FileInputStream fIn = new FileInputStream(sourceFile); FileChannel source = fIn.getChannel();
              FileOutputStream fOut = new FileOutputStream(destFile); FileChannel destination = fOut.getChannel()) {
-            long transfered = 0;
+            long transferred = 0;
             long bytes = source.size();
-            while (transfered < bytes) {
-                transfered += destination.transferFrom(source, 0, source.size());
-                destination.position(transfered);
+            while (transferred < bytes) {
+                transferred += destination.transferFrom(source, 0, source.size());
+                destination.position(transferred);
             }
         }
         return destFile;
@@ -730,7 +724,7 @@ public class MainUtil {
     public static Object copyNd(Object arr) {
         if (arr.getClass().isArray()) {
             int innerArrayLength = Array.getLength(arr);
-            Class component = arr.getClass().getComponentType();
+            Class<?> component = arr.getClass().getComponentType();
             Object newInnerArray = Array.newInstance(component, innerArrayLength);
             if (component.isPrimitive()) {
                 arraycopy(arr, 0, newInnerArray, 0, innerArrayLength);
@@ -743,7 +737,7 @@ public class MainUtil {
             }
             return newInnerArray;
         } else {
-            return arr;//cant deep copy an opac object??
+            return arr;//can't deep copy an opac object??
         }
     }
 

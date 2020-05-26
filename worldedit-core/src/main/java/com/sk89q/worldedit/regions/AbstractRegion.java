@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -170,8 +169,11 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     public Set<BlockVector2> getChunks() {
         final Set<BlockVector2> chunks = new HashSet<>();
 
-        final BlockVector3 min = getMinimumPoint().divide(16);
-        final BlockVector3 max = getMaximumPoint().divide(16);
+        final BlockVector3 minBlock = getMinimumPoint();
+        final BlockVector3 maxBlock = getMaximumPoint();
+
+        final BlockVector2 min = BlockVector2.at(minBlock.getX() >> 4, minBlock.getZ() >> 4);
+        final BlockVector2 max = BlockVector2.at(maxBlock.getX() >> 4, maxBlock.getZ() >> 4);
 
         for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
             for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
@@ -210,4 +212,36 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         return chunks;
     }
 
+    @Override
+    public int hashCode() {
+        int worldHash = this.world == null ? 7 : this.world.hashCode();
+        int result = worldHash ^ (worldHash >>> 32);
+        result = 31 * result + this.getMinimumPoint().hashCode();
+        result = 31 * result + this.getMaximumPoint().hashCode();
+        result = 31 * result + this.getArea();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == this) {
+            return true;
+        }
+        if(!(o instanceof Region)){
+            return false;
+        }
+        Region region = ((Region) o);
+        if(this.getWorld() != region.getWorld()){
+            if(this.getWorld() == null || region.getWorld() == null){
+                return false;
+            }
+        }
+        if(this.getWorld().equals(region.getWorld())
+        && this.getMinimumPoint().equals(region.getMinimumPoint())
+        && this.getMaximumPoint().equals(region.getMaximumPoint())
+        && this.getArea() == region.getArea()){
+            return true;
+        }
+        return false;
+    }
 }

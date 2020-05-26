@@ -28,7 +28,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
@@ -56,55 +55,54 @@ public class HistoryCommands {
     }
 
     @Command(
-            name = "/undo",
-            aliases = { "/un", "/ud", "undo" },
-            desc = "Undoes the last action (from history)"
+        name = "undo",
+        aliases = { "/undo" },
+        desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
-    public void undo(Actor actor, LocalSession session,
+    public void undo(Player player, LocalSession session,
                      @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
-                             int times,
+                         int times,
                      @Arg(name = "player", desc = "Undo this player's operations", def = "")
-                             String playerName) throws WorldEditException {
+                         String playerName) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
         if (session.hasFastMode()) {
-            actor.print(TranslatableComponent.of("fawe.worldedit.history.command.undo.disabled"));
+            player.print(TranslatableComponent.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
         if (playerName != null) {
-            actor.checkPermission("worldedit.history.undo.other");
+            player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {
-                actor.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
         int timesUndone = 0;
         for (int i = 0; i < times; ++i) {
-            BlockBag bag = actor instanceof Player ? undoSession.getBlockBag((Player) actor) : null;
-            EditSession undone = undoSession.undo(bag, actor);
+            EditSession undone = undoSession.undo(undoSession.getBlockBag(player), player);
             if (undone != null) {
                 timesUndone++;
-                worldEdit.flushBlockBag(actor, undone);
+                worldEdit.flushBlockBag(player, undone);
             } else {
                 break;
             }
         }
         if (timesUndone > 0) {
-            actor.printInfo(TranslatableComponent.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
+            player.printInfo(TranslatableComponent.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
         } else {
-            actor.printError(TranslatableComponent.of("worldedit.undo.none"));
+            player.printError(TranslatableComponent.of("worldedit.undo.none"));
         }
     }
 
     @Command(
-        name = "/redo",
-        aliases = { "/do", "/rd", "redo" },
+        name = "redo",
+        aliases = { "/redo" },
         desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
-    public void redo(Actor actor, LocalSession session,
+    public void redo(Player player, LocalSession session,
                      @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")
                          int times,
                      @Arg(name = "player", desc = "Redo this player's operations", def = "")
@@ -112,39 +110,39 @@ public class HistoryCommands {
         times = Math.max(1, times);
         LocalSession redoSession = session;
         if (playerName != null) {
-            actor.checkPermission("worldedit.history.redo.other");
+            player.checkPermission("worldedit.history.redo.other");
             redoSession = worldEdit.getSessionManager().findByName(playerName);
             if (redoSession == null) {
-                actor.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
+                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
         int timesRedone = 0;
         for (int i = 0; i < times; ++i) {
-            BlockBag bag = actor instanceof Player ? redoSession.getBlockBag((Player) actor) : null;
-            EditSession redone = redoSession.redo(bag, actor);
+            EditSession redone = redoSession.redo(redoSession.getBlockBag(player), player);
             if (redone != null) {
                 timesRedone++;
-                worldEdit.flushBlockBag(actor, redone);
+                worldEdit.flushBlockBag(player, redone);
             } else {
                 break;
             }
         }
         if (timesRedone > 0) {
-            actor.printInfo(TranslatableComponent.of("worldedit.redo.redone", TextComponent.of(timesRedone)));
+            player.printInfo(TranslatableComponent.of("worldedit.redo.redone", TextComponent.of(timesRedone)));
         } else {
-            actor.printError(TranslatableComponent.of("worldedit.redo.none"));
+            player.printError(TranslatableComponent.of("worldedit.redo.none"));
         }
     }
 
     @Command(
-            name = "clearhistory",
-            aliases = { "/clearhistory" },
-            desc = "Clear your history"
+        name = "clearhistory",
+        aliases = { "/clearhistory" },
+        desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
         actor.printInfo(TranslatableComponent.of("worldedit.clearhistory.cleared"));
     }
+
 }

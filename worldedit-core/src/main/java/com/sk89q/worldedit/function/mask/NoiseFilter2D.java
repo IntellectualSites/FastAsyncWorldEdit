@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
@@ -83,7 +84,7 @@ public class NoiseFilter2D extends AbstractMask2D {
     }
 
     @Override
-    public boolean test(BlockVector2 pos) {
+    public boolean test(Extent extent, BlockVector2 pos) {
         return noiseGenerator.noise(pos.toVector2()) <= density;
     }
 

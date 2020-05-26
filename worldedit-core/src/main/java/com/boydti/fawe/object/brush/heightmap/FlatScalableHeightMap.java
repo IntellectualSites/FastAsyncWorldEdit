@@ -5,6 +5,7 @@ public class FlatScalableHeightMap extends ScalableHeightMap {
         super();
     }
 
+    @Override
     public double getHeight(int x, int z) {
         int dx = Math.abs(x);
         int dz = Math.abs(z);

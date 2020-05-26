@@ -69,6 +69,7 @@ public class NullWorld extends AbstractWorld {
     public String getId() {
         return "null";
     }
+
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return false;

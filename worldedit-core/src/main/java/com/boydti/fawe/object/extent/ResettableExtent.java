@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 
 public class ResettableExtent extends AbstractDelegateExtent implements Serializable {
+
     public ResettableExtent(Extent parent) {
         super(parent);
     }
@@ -26,12 +27,14 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         setOrigin(pos);
     }
 
-    protected void setOrigin(BlockVector3 pos) {}
+    protected void setOrigin(BlockVector3 pos) {
+    }
 
     public ResettableExtent setExtent(Extent extent) {
         checkNotNull(extent);
         Extent next = getExtent();
-        if (!(next instanceof NullExtent) && !(next instanceof World) && next instanceof ResettableExtent) {
+        if (!(next instanceof NullExtent) && !(next instanceof World)
+            && next instanceof ResettableExtent) {
             ((ResettableExtent) next).setExtent(extent);
         } else {
             new ExtentTraverser(this).setNext(new AbstractDelegateExtent(extent));
@@ -49,7 +52,8 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         }
     }
 
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream stream)
+        throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         if (stream.readBoolean()) {
             try {

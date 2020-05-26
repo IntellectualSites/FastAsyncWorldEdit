@@ -29,8 +29,9 @@ public class DataAnglePattern extends AbstractPattern {
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return -1;
         }
-        int slope;
-        slope = Math.abs(extent.getNearestSurfaceTerrainBlock(x + distance, z, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x - distance, z, y, 0, maxY)) * 7;
+        int slope = Math.abs(
+            extent.getNearestSurfaceTerrainBlock(x + distance, z, y, 0, maxY) - extent
+                .getNearestSurfaceTerrainBlock(x - distance, z, y, 0, maxY)) * 7;
         slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x, z - distance, y, 0, maxY)) * 7;
         slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x + distance, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x - distance, z - distance, y, 0, maxY)) * 5;
         slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x - distance, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x + distance, z - distance, y, 0, maxY)) * 5;
@@ -42,16 +43,16 @@ public class DataAnglePattern extends AbstractPattern {
         BlockState block = extent.getBlock(position);
         int slope = getSlope(block, position, extent);
         if (slope == -1) return block.toBaseBlock();
-        int data = (Math.min(slope, 255)) >> 4;
+        int data = Math.min(slope, 255) >> 4;
         return block.withPropertyId(data).toBaseBlock();
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockStateHolder block = extent.getBlock(getPosition);
+        BlockState block = extent.getBlock(getPosition);
         int slope = getSlope(block, getPosition, extent);
         if (slope == -1) return false;
-        int data = (Math.min(slope, 255)) >> 4;
+        int data = Math.min(slope, 255) >> 4;
         return extent.setBlock(setPosition, block.withPropertyId(data));
     }
 }

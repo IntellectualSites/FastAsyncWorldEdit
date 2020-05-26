@@ -33,6 +33,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,7 +162,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
 
         session.describeCUI(player);
 
-        player.print("Started new selection with vertex " + pos + ".");
+        player.print(TextComponent.of("Started new selection with vertex " + pos + "."));
     }
 
     @Override
@@ -172,7 +173,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
 
         session.describeCUI(player);
 
-        player.print("Added vertex " + pos + " to the selection.");
+        player.print(TextComponent.of("Added vertex " + pos + " to the selection."));
     }
 
     @Override

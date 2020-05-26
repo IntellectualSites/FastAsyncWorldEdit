@@ -26,7 +26,7 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
      * @return The Bukkit BlockData
      */
     @Override
-    public BlockData adapt(BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> BlockData adapt(B block) {
         try {
             checkNotNull(block);
             int typeId = block.getInternalBlockTypeId();

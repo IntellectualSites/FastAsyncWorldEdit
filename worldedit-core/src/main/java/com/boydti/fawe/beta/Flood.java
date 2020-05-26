@@ -17,12 +17,12 @@ public class Flood {
     private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
     private int[] queue;
     private long[] visit;
-    private int[][] queues;
-    private long[][] visits;
+    private final int[][] queues;
+    private final long[][] visits;
     private int chunkX;
     private int chunkYLayer;
     private int chunkZ;
-    private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
 
     public Flood(int maxBranch, int maxDepth, Direction[] directions) {
         this.maxBranch = maxBranch;
@@ -38,7 +38,7 @@ public class Flood {
 
     public synchronized void run(World world) {
         QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        IQueueExtent fq = queueHandler.getQueue(world);
+        IQueueExtent<IQueueChunk> fq = queueHandler.getQueue(world);
         while (!chunkQueues.isEmpty()) {
             long firstKey = chunkQueues.firstLongKey();
             int x = MathMan.unpairIntX(firstKey);

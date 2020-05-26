@@ -25,6 +25,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.chunk.Chunk;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -38,6 +39,22 @@ public abstract class ChunkStore implements Closeable {
      * {@code <<} - from chunk
      */
     public static final int CHUNK_SHIFTS = 4;
+
+    /**
+     * {@code >>} - to Y of 3D-chunk
+     * {@code <<} - from Y of 3D-chunk
+     */
+    public static final int CHUNK_SHIFTS_Y = 8;
+
+    /**
+     * Convert a position to a 3D-chunk. Y is counted in steps of 256.
+     *
+     * @param position the position
+     * @return chunk coordinates
+     */
+    public static BlockVector3 toChunk3d(BlockVector3 position) {
+        return position.shr(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
+    }
 
     /**
      * Convert a position to a chunk.

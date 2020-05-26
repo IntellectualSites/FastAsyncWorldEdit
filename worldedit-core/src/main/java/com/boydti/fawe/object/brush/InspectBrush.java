@@ -2,36 +2,34 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
+import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.change.MutableFullBlockChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.command.tool.BrushTool;
-import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
+public class InspectBrush extends BrushTool {
 
     /**
      * Construct the tool.
@@ -61,12 +59,15 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
     }
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
-        if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
+        if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
+            System.out.println("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(Caption.of("fawe.error.setting.disable", ("history.use-database (Import with /history import )")));
+            player.print(Caption.of("fawe.error.setting.disable",
+                "history.use-database (Import with /history import )"));
+            System.out.println("No db");
             return false;
         }
         try {
@@ -107,7 +108,10 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
             }
             player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
         } catch (IOException e) {
+            System.out.println("IOE");
             throw new RuntimeException(e);
+        } catch (Throwable e) {
+            System.out.println("E throw");
         }
         return true;
     }

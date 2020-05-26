@@ -27,7 +27,6 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -189,22 +188,7 @@ public class SchematicCommands {
         }
         player.print(Caption.of("fawe.worldedit.clipboard.clipboard.uri.not.found" , fileName));
     }
-
-    @Command(
-            name = "remap",
-            desc = "Remap a clipboard between MCPE/PC values"
-    )
-    @Deprecated
-    @CommandPermissions({"worldedit.schematic.remap"})
-    public void remap(Player player, LocalSession session) throws WorldEditException {
-        ClipboardRemapper remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PE, ClipboardRemapper.RemapPlatform.PC);
-
-        for (Clipboard clip : session.getClipboard().getClipboards()) {
-            remapper.apply(clip);
-        }
-        player.print("Remapped schematic");
-    }
-
+    
     @Command(
         name = "load",
         desc = "Load a schematic into your clipboard"
@@ -213,11 +197,11 @@ public class SchematicCommands {
     public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "")
+                     @Arg(desc = "Format name.", def = "sponge")
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        ClipboardFormat format = formatName != null ? ClipboardFormats.findByAlias(formatName) : null;
+        ClipboardFormat format = null;
         InputStream in = null;
         try {
             URI uri;
@@ -228,6 +212,7 @@ public class SchematicCommands {
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
                 URL webUrl = new URL(Settings.IMP.WEB.URL);
+                format = ClipboardFormats.findByAlias(formatName);
                 URL url = new URL(webUrl, "uploads/" + uuid + "." + format.getPrimaryFileExtension());
                 ReadableByteChannel byteChannel = Channels.newChannel(url.openStream());
                 in = Channels.newInputStream(byteChannel);
@@ -237,6 +222,7 @@ public class SchematicCommands {
                 File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
+                    format = ClipboardFormats.findByAlias(formatName);
                     String[] extensions;
                     if (format != null) {
                         extensions = format.getFileExtensions().toArray(new String[0]);
@@ -253,9 +239,11 @@ public class SchematicCommands {
                         actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
                         return;
                     }
-                    if (format == null && filename.matches(".*\\.[\\w].*")) {
-                        String extension = filename.substring(filename.lastIndexOf('.') + 1);
-                        format = ClipboardFormats.findByExtension(extension);
+                    if (filename.matches(".*\\.[\\w].*")) {
+                        format = ClipboardFormats
+                            .findByExtension(filename.substring(filename.lastIndexOf('.') + 1));
+                    } else {
+                        format = ClipboardFormats.findByAlias(formatName);
                     }
                     file = MainUtil.resolve(dir, filename, format, false);
                 }
@@ -465,70 +453,7 @@ public class SchematicCommands {
             actor.printInfo(TextComponent.of(builder.toString()));
         }
     }
-
-
-/*
-    @Command(
-            name = "show",
-            desc = "Show a schematic",
-            descFooter = "List all schematics in the schematics directory\n" +
-                    " -f <format> restricts by format\n"
-    )
-    @CommandPermissions("worldedit.schematic.show")
-    public void show(Player player, InjectedValueAccess args, @Switch(name='f', desc = "") String formatName) {
-        FawePlayer fp = FawePlayer.wrap(player);
-        if (args.argsLength() == 0) {
-            if (fp.getSession().getVirtualWorld() != null) fp.setVirtualWorld(null);
-            else {
-                player.print(TranslatableComponent.of("fawe.error.command.syntax" , "/" + Commands.getAlias(SchematicCommands.class, "schematic") + " " + getCommand().aliases()[0] + " " + getCommand().usage()));
-            }
-            return;
-        }
-        LocalConfiguration config = worldEdit.getConfiguration();
-        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        try {
-            SchemVis visExtent = new SchemVis(fp);
-            LongAdder count = new LongAdder();
-            UtilityCommands.getFiles(dir, player, args, 0, Character.MAX_VALUE, formatName, Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS, file -> {
-                if (file.isFile()) {
-                    try {
-                        visExtent.add(file);
-                        count.add(1);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-            long total = count.longValue();
-            if (total == 0) {
-                if (args.getJoinedStrings(0).toLowerCase().startsWith("all")) {
-                    player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"))
-                } else {
-                    String joined = args.getJoinedStrings(0);
-                    String cmd = "/" + Commands.getAlias(SchematicCommands.class, "schematic") + " " + getCommand().aliases()[0] + " all " + joined;
-                    player.print(TranslatableComponent.of("fawe.worldedit.help.help.suggest" , joined, cmd));
-                }
-                return;
-            }
-            visExtent.bind();
-            visExtent.update();
-
-            String cmdPrefix = "/" + (config.noDoubleSlash ? "" : "/");
-            String cmdShow = Commands.getAlias(ClipboardCommands.class, "schematic") + " " + Commands.getAlias(ClipboardCommands.class, "show");
-            fp.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.show" , count.longValue(), args.getJoinedStrings(0), cmdShow));
-
-            if (fp.getSession().getExistingClipboard() != null) {
-                String cmd = cmdPrefix + Commands.getAlias(ClipboardCommands.class, "clearclipboard");
-                fp.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.prompt.clear" , cmd));
-            }
-
-        } catch (Throwable e) {
-            fp.setVirtualWorld(null);
-            throw e;
-        }
-    }
-*/
-
+    
     @Command(
         name = "list",
         aliases = {"all", "ls"},
@@ -537,7 +462,7 @@ public class SchematicCommands {
     )
     @CommandPermissions("worldedit.schematic.list")
     public void list(Actor actor, LocalSession session,
-                     @ArgFlag(name = 'p', desc = "Page to view.", def = "-1")
+                     @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
                          int page,
                      @Switch(name = 'd', desc = "Sort by date, oldest first")
                          boolean oldFirst,
@@ -571,15 +496,6 @@ public class SchematicCommands {
         final boolean hasShow = false;
 
         //If player forgot -p argument
-        if (page == -1) {
-            page = 1;
-            if (args.size() != 0) {
-                String lastArg = args.get(args.size() - 1);
-                if (MathMan.isInteger(lastArg)) {
-                    page = Integer.parseInt(lastArg);
-                }
-            }
-        }
         boolean playerFolder = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         UUID uuid = playerFolder ? actor.getUniqueId() : null;
         List<File> files = UtilityCommands.getFiles(dir, actor, args, formatName, playerFolder, oldFirst, newFirst);

@@ -48,7 +48,7 @@ Ready to submit? Perform the checklist below:
    the team prior to starting work.
 6. Are my commit messages descriptive?
 
-You should be aware of `git rebase`.
+You should be aware of [`git rebase`](http://learn.github.com/p/rebasing.html).
 It allows you to modify existing commit messages, and combine, break apart, or
 adjust past changes.
 

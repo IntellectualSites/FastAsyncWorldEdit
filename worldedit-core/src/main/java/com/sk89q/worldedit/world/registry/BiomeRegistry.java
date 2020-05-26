@@ -35,6 +35,7 @@ public interface BiomeRegistry {
      * @param biome the biome
      * @return a data object or null if information is not known
      */
+    @Deprecated
     @Nullable
     BiomeData getData(BiomeType biome);
 

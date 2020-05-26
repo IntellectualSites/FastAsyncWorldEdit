@@ -1,5 +1,9 @@
 package com.boydti.fawe.object.pattern;
 
-public interface ResettablePattern {
+import com.boydti.fawe.Resettable;
+
+public interface ResettablePattern extends Resettable {
+
+    @Override
     void reset();
 }

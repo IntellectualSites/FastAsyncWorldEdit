@@ -37,7 +37,6 @@ import static com.sk89q.worldedit.util.Direction.findClosest;
 import static com.sk89q.worldedit.util.Direction.values;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -67,7 +66,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import java.util.HashMap;
 import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -105,16 +103,27 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     private static long combine(Direction... directions) {
-        return Arrays.stream(directions).mapToLong(dir -> (1L << dir.ordinal()))
-            .reduce(0, (a, b) -> a | b);
+        long mask = 0;
+        for (Direction dir : directions) {
+            mask = mask | (1L << dir.ordinal());
+        }
+        return mask;
     }
 
     private static long[] adapt(Direction... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = 1L << dirs[i].ordinal();
+        }
+        return arr;
     }
 
     private static long[] adapt(Long... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = dirs[i];
+        }
+        return arr;
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -228,7 +237,9 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long notIndex(long mask, int... indexes) {
-        mask |= Arrays.stream(indexes).mapToLong(index -> (1L << (index + values().length))).reduce(0, (a, b) -> a | b);
+        for (int index : indexes) {
+            mask = mask | (1L << (index + values().length));
+        }
         return mask;
     }
 
@@ -322,12 +333,12 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                        Map<String, Tag> values = tag.getValue();
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                     }
                 }
-                return new BaseBlock(transformed, tag);
             }
+            return new BaseBlock(transformed, tag);
         }
         return transformed.toBaseBlock();
     }

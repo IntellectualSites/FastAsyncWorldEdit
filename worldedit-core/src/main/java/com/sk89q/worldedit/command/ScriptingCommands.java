@@ -59,6 +59,7 @@ public class ScriptingCommands {
 
     @Command(
         name = "cs",
+        aliases = { "/cs" },
         desc = "Execute a CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")
@@ -84,6 +85,7 @@ public class ScriptingCommands {
 
     @Command(
         name = ".s",
+        aliases = { "/.s" },
         desc = "Execute last CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")

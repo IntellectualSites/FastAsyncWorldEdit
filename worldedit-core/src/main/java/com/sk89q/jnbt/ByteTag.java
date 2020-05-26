@@ -27,10 +27,6 @@ public final class ByteTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_BYTE;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Byte";
-    }
 
     private final byte value;
 

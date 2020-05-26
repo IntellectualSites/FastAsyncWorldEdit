@@ -8,6 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 
 public class BiomeCopy implements RegionFunction {
+
     protected final Extent source;
     protected final Extent destination;
     private final MutableBlockVector2 mPos2d;

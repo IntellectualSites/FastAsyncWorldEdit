@@ -13,8 +13,7 @@ public class DataMask extends AbstractExtentMask implements ResettableMask {
     private transient int data = -1;
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        Extent extent = getExtent();
+    public boolean test(Extent extent, BlockVector3 vector) {
         if (data != -1) {
             return extent.getBlock(vector).getInternalPropertiesId() == data;
         } else {

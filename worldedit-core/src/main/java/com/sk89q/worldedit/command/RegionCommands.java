@@ -27,7 +27,6 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.FaweLimit;
@@ -71,7 +70,6 @@ import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
@@ -97,9 +95,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/set",
-            aliases = {"/"},
-            desc = "Sets all the blocks in the region"
+        name = "/set",
+        desc = "Sets all the blocks in the region"
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
@@ -107,15 +104,12 @@ public class RegionCommands {
     public int set(Actor actor, EditSession editSession,
                    @Selection Region region,
                    @Arg(desc = "The pattern of blocks to set")
-                           Pattern pattern) {
+                       Pattern pattern) {
         int affected = editSession.setBlocks(region, pattern);
         if (affected != 0) {
             actor.printInfo(TranslatableComponent.of("worldedit.set.done"));
-            if (!actor.hasPermission("fawe.tips"))
-                System.out.println("TODO FIXME TIPS");
-//                TranslatableComponent.of("fawe.tips.tip.fast").or(TranslatableComponent.of("fawe.tips.tip.cancel"), TranslatableComponent.of("fawe.tips.tip.mask"), TranslatableComponent.of("fawe.tips.tip.mask.angle"), TranslatableComponent.of("fawe.tips.tip.set.linear"), TranslatableComponent.of("fawe.tips.tip.surface.spread"), TranslatableComponent.of("fawe.tips.tip.set.hand")).send(actor);
         }
-        return 0;
+        return affected;
     }
 
     @Command(
@@ -136,7 +130,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
     public void test(Player player, EditSession editSession, @Arg(desc = "test") double testValue) throws WorldEditException {
-        player.print("" + testValue);
+        player.print(TextComponent.of(testValue));
     }
 
     @Command(
@@ -145,44 +139,46 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
-        final Location loc = player.getLocation();
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = loc.getBlockX() >> 4;
-            final int cz = loc.getBlockZ() >> 4;
-            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
+        player.print(TextComponent.of("Temporarily not working"));
+//        final Location loc = player.getLocation();
+//        Region selection = player.getSelection();
+//        if (selection == null) {
+//            final int cx = loc.getBlockX() >> 4;
+//            final int cz = loc.getBlockZ() >> 4;
+//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+//        }
+//        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
+//        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
     }
 
-    @Command(
-            name = "/getlighting",
-            desc = "Get the light at a position"
-    )
-    @CommandPermissions("worldedit.light.fix")
-    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
-        final Location loc = player.getLocation();
-        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        player.print("Light: " + block + " | " + sky);
-    }
+//    @Command(
+//            name = "/getlighting",
+//            desc = "Get the light at a position"
+//    )
+//    @CommandPermissions("worldedit.light.fix")
+//    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
+//        final Location loc = player.getLocation();
+//        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+//        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+//        player.print(TextComponent.of("Light: " + block + " | " + sky));
+//    }
 
-    @Command(
-            name = "/removelighting",
-            desc = "Removing lighting in a selection"
-    )
-    @CommandPermissions("worldedit.light.remove")
-    public void removeLighting(Player player) {
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = player.getLocation().getBlockX() >> 4;
-            final int cz = player.getLocation().getBlockZ() >> 4;
-            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
-        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
-    }
+//    @Command(
+//            name = "/removelighting",
+//            desc = "Removing lighting in a selection"
+//    )
+//    @CommandPermissions("worldedit.light.remove")
+//    public void removeLighting(Player player) {
+//        player.print(TextComponent.of("Temporarily not working"));
+//        Region selection = player.getSelection();
+//        if (selection == null) {
+//            final int cx = player.getLocation().getBlockX() >> 4;
+//            final int cz = player.getLocation().getBlockZ() >> 4;
+//            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
+//        }
+//        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
+//        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
+//    }
 
     @Command(
             name = "/nbtinfo",
@@ -198,7 +194,7 @@ public class RegionCommands {
         }
         CompoundTag nbt = editSession.getFullBlock(pos.toBlockPoint()).getNbtData();
         if (nbt != null) {
-            player.print(nbt.getValue().toString());
+            player.print(TextComponent.of(nbt.getValue().toString()));
         } else {
             player.printError(TranslatableComponent.of("fawe.navigation.no.block"));
         }
@@ -210,7 +206,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(from = 0, to = 15) int value) {
-        // TODO NOT IMPLEMENTED
+        player.print(TextComponent.of("Temporarily not working"));
     }
 
     @Command(
@@ -219,13 +215,13 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(from = 0, to= 15) int value) {
-        // TODO NOT IMPLEMENTED
+        player.printInfo(TextComponent.of("Temporarily not working"));
     }
 
     @Command(
         name = "/line",
-        desc = "Draws a line segment between cuboid selection corners",
-        descFooter = "Can only be used with a cuboid selection"
+        desc = "Draws line segments between cuboid selection corners or convex polyhedral selection vertices",
+        descFooter = "Can only be used with a cuboid selection or a convex polyhedral selection"
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
@@ -260,7 +256,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.curve")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void curve(Actor actor, EditSession editSession,
+    public int curve(Actor actor, EditSession editSession,
                      @Selection Region region,
                      @Arg(desc = "The pattern of blocks to place")
                          Pattern pattern,
@@ -269,8 +265,8 @@ public class RegionCommands {
                      @Switch(name = 'h', desc = "Generate only a shell")
                          boolean shell) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
-            actor.printError(TranslatableComponent.of("worldedit.curve.convex-only"));
-            return;
+            actor.printError(TranslatableComponent.of("worldedit.curve.invalid-type"));
+            return 0;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
@@ -280,6 +276,7 @@ public class RegionCommands {
         int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
 
         actor.printInfo(TranslatableComponent.of("worldedit.curve.changed", TextComponent.of(blocksChanged)));
+        return blocksChanged;
     }
 
     @Command(
@@ -290,7 +287,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void replace(Actor actor, EditSession editSession, @Selection Region region,
+    public int replace(Actor actor, EditSession editSession, @Selection Region region,
                        @Arg(desc = "The mask representing blocks to replace", def = "")
                            Mask from,
                        @Arg(desc = "The pattern of blocks to replace with")
@@ -300,6 +297,7 @@ public class RegionCommands {
         }
         int affected = editSession.replaceBlocks(region, from, to);
         actor.printInfo(TranslatableComponent.of("worldedit.replace.replaced", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -309,11 +307,12 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void overlay(Actor actor, EditSession editSession, @Selection Region region,
+    public int overlay(Actor actor, EditSession editSession, @Selection Region region,
                        @Arg(desc = "The pattern of blocks to overlay")
-                            Pattern pattern) throws WorldEditException {
+                           Pattern pattern) throws WorldEditException {
         int affected = editSession.overlayCuboidBlocks(region, pattern);
         actor.printInfo(TranslatableComponent.of("worldedit.overlay.overlaid", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -363,9 +362,10 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.naturalize")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void naturalize(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
+    public int naturalize(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         int affected = editSession.naturalizeCuboidBlocks(region);
         actor.printInfo(TranslatableComponent.of("worldedit.naturalize.naturalized", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -375,11 +375,12 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.walls")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void walls(Actor actor, EditSession editSession, @Selection Region region,
+    public int walls(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The pattern of blocks to set")
                          Pattern pattern) throws WorldEditException {
         int affected = editSession.makeWalls(region, pattern);
         actor.printInfo(TranslatableComponent.of("worldedit.walls.changed", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -390,11 +391,12 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.faces")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void faces(Actor actor, EditSession editSession, @Selection Region region,
+    public int faces(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The pattern of blocks to set")
                          Pattern pattern) throws WorldEditException {
         int affected = editSession.makeCuboidFaces(region, pattern);
         actor.printInfo(TranslatableComponent.of("worldedit.faces.changed", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -405,7 +407,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void smooth(Actor actor, EditSession editSession, @Selection Region region,
+    public int smooth(Actor actor, EditSession editSession, @Selection Region region,
                       @Arg(desc = "# of iterations to perform", def = "1")
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
@@ -418,14 +420,16 @@ public class RegionCommands {
         if (volume >= limit.MAX_CHECKS) {
             throw FaweCache.MAX_CHECKS;
         }
+        int affected;
         try {
             HeightMap heightMap = new HeightMap(editSession, region, mask, snow);
-        HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
-        int affected = heightMap.applyFilter(filter, iterations);
-        actor.printInfo(TranslatableComponent.of("worldedit.smooth.changed", TextComponent.of(affected)));
+            HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
+            affected = heightMap.applyFilter(filter, iterations);
+            actor.printInfo(TranslatableComponent.of("worldedit.smooth.changed", TextComponent.of(affected)));
         } catch (Throwable e) {
             throw new RuntimeException(e);
-    }
+        }
+        return affected;
     }
 
     @Command(
@@ -462,9 +466,9 @@ public class RegionCommands {
 
 
     @Command(
-            name = "/move",
-            aliases = {"/mv"},
-            desc = "Move the contents of the selection"
+        name = "/move",
+        aliases = {"/mv"},
+        desc = "Move the contents of the selection"
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
@@ -472,25 +476,25 @@ public class RegionCommands {
     public int move(Actor actor, World world, EditSession editSession, LocalSession session,
                     @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
-                            int count,
+                        int count,
                     @Arg(desc = "The direction to move", def = Direction.AIM)
                     @Direction(includeDiagonals = true)
-                            BlockVector3 direction,
+                        BlockVector3 direction,
                     @Arg(desc = "The pattern of blocks to leave", def = "air")
-                            Pattern replace,
+                        Pattern replace,
                     @Switch(name = 's', desc = "Shift the selection to the target location")
-                            boolean moveSelection,
+                        boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
-                            boolean ignoreAirBlocks,
-                    @Switch(name = 'e', desc = "Skip copy entities")
-                            boolean skipEntities,
+                        boolean ignoreAirBlocks,
+                    @Switch(name = 'e', desc = "Also copy entities")
+                        boolean copyEntities,
                     @Switch(name = 'b', desc = "Also copy biomes")
-                            boolean copyBiomes,
-                    @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
-                            Mask mask) throws WorldEditException {
+                        boolean copyBiomes,
+                    @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
+                        Mask mask) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
 
-		Mask combinedMask;
+        Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
                 combinedMask = new ExistingBlockMask(editSession);
@@ -501,7 +505,7 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.moveRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask, replace);
+        int affected = editSession.moveRegion(region, direction, count, copyEntities, copyBiomes, combinedMask, replace);
 
         if (moveSelection) {
             try {
@@ -553,14 +557,14 @@ public class RegionCommands {
                          boolean moveSelection,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name = 'e', desc = "Skip entities")
-                         boolean skipEntities,
+                     @Switch(name = 'e', desc = "Also copy entities")
+                         boolean copyEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
-                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
+                     @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                          Mask mask) throws WorldEditException {
 
-		Mask combinedMask;
+        Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
                 combinedMask = new ExistingBlockMask(editSession);
@@ -571,13 +575,13 @@ public class RegionCommands {
             combinedMask = mask;
         }
 
-        int affected = editSession.stackCuboidRegion(region, direction, count, !skipEntities, copyBiomes, combinedMask);
+        int affected = editSession.stackCuboidRegion(region, direction, count, copyEntities, copyBiomes, combinedMask);
 
         if (moveSelection) {
             try {
-            final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+                final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
 
-            final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
+                final BlockVector3 shiftVector = direction.multiply(size).multiply(count);
                 region.shift(shiftVector);
 
                 session.getRegionSelector(world).learnChanges();
@@ -601,17 +605,22 @@ public class RegionCommands {
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
     public void regenerateChunk(Actor actor, World world, LocalSession session,
-            EditSession editSession, @Selection Region region,
-        @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
-        @Arg(def = "", desc = "Regenerate with seed") Long seed) throws WorldEditException {
+            EditSession editSession, @Selection Region region) throws WorldEditException {
         Mask mask = session.getMask();
-        session.setMask((Mask) null);
-        session.setSourceMask((Mask) null);
-        world.regenerate(region, editSession);
-//        editSession.regenerate(region, biome, seed);
-        session.setMask(mask);
-        session.setSourceMask(mask);
-        actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
+        boolean success;
+        try {
+            session.setMask((Mask) null);
+            session.setSourceMask((Mask) null);
+            success = world.regenerate(region, editSession);
+        } finally {
+            session.setMask(mask);
+            session.setSourceMask(mask);
+        }
+        if (success) {
+            actor.printInfo(TranslatableComponent.of("worldedit.regen.regenerated"));
+        } else {
+            actor.printError(TranslatableComponent.of("worldedit.regen.failed"));
+        }
     }
 
     @Command(
@@ -624,7 +633,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
     @Confirm(Confirm.Processor.REGION)
-    public void deform(Actor actor, LocalSession session, EditSession editSession,
+    public int deform(Actor actor, LocalSession session, EditSession editSession,
                       @Selection Region region,
                       @Arg(desc = "The expression to use", variable = true)
                           List<String> expression,
@@ -660,8 +669,10 @@ public class RegionCommands {
                 ((Player) actor).findFreePosition();
             }
             actor.printInfo(TranslatableComponent.of("worldedit.deform.deformed", TextComponent.of(affected)));
+            return affected;
         } catch (ExpressionException e) {
             actor.printError(TextComponent.of(e.getMessage()));
+            return 0;
         }
     }
 
@@ -676,17 +687,19 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void hollow(Actor actor, EditSession editSession,
+    public int hollow(Actor actor, EditSession editSession,
                       @Selection Region region,
-                       @Range(from=0, to=Integer.MAX_VALUE) @Arg(desc = "Thickness of the shell to leave", def = "0")
+                      @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
-        @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask) throws WorldEditException {
+                      @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
+
         int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
         actor.printInfo(TranslatableComponent.of("worldedit.hollow.changed", TextComponent.of(affected)));
+        return affected;
     }
 
     @Command(
@@ -714,18 +727,20 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void flora(Actor actor, EditSession editSession, @Selection Region region,
+    public int flora(Actor actor, EditSession editSession, @Selection Region region,
                      @Arg(desc = "The density of the forest", def = "5")
                          double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be in [0, 100]");
+        density = density / 100;
         FloraGenerator generator = new FloraGenerator(editSession);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
         LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
-        visitor.setMask(new NoiseFilter2D(new RandomNoise(), density / 100));
+        visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
 
         int affected = ground.getAffected();
         actor.printInfo(TranslatableComponent.of("worldedit.flora.created", TextComponent.of(affected)));
+        return affected;
     }
 
 }

@@ -9,16 +9,13 @@ import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
-import com.boydti.fawe.bukkit.listener.ChunkListener_8;
 import com.boydti.fawe.bukkit.listener.ChunkListener_9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
-import com.boydti.fawe.bukkit.regions.WorldguardFlag;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
@@ -27,10 +24,10 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
-import com.sk89q.worldedit.world.World;
 import io.papermc.lib.PaperLib;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,9 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -86,7 +81,13 @@ public class FaweBukkit implements IFawe, Listener {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
-
+        
+        //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
+        setupVault();
+        
+        //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
+        TaskManager.IMP.later(this::setupPlotSquared, 0);
+        
         // Registered delayed Event Listeners
         TaskManager.IMP.task(() -> {
             // Fix for ProtocolSupport
@@ -96,12 +97,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
-            try {
-                Class.forName("sun.misc.SharedSecrets");
-                new ChunkListener_8();
-            } catch (ClassNotFoundException e) {
-                new ChunkListener_9();
-            }
+            new ChunkListener_9();
         });
     }
 
@@ -127,15 +123,15 @@ public class FaweBukkit implements IFawe, Listener {
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.7.3-SNAPSHOT.jar");
-                byte[] jarData = Jars.PL_v3_7_3.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "PacketListenerAPI_v3.7.6-SNAPSHOT.jar");
+                byte[] jarData = Jars.PL_v3_7_6.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
             }
             if (manager.getPlugin("MapManager") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.7.3-SNAPSHOT.jar");
-                byte[] jarData = Jars.MM_v1_7_3.download();
+                File output = new File(plugin.getDataFolder().getParentFile(), "MapManager_v1.7.8-SNAPSHOT.jar");
+                byte[] jarData = Jars.MM_v1_7_8.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
@@ -151,8 +147,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public void debug(final String message) {
-        ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(message);
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 
     @Override
@@ -160,30 +155,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin.getDataFolder();
     }
 
-
-    @Override
-    public com.sk89q.worldedit.entity.Player wrap(final Object obj) {
-        Player player = null;
-        if (obj.getClass() == Player.class) {
-            player = (Player) obj;
-        }
-        else if (obj.getClass() == String.class) {
-            String name = (String) obj;
-            player = Bukkit.getPlayer(name);
-        }
-        else if (obj.getClass() == UUID.class) {
-            UUID uuid = (UUID) obj;
-            player = Bukkit.getPlayer(uuid);
-        }
-        if (player == null) {
-            throw new IllegalArgumentException("Unknown player type: " + obj);
-        }
-        return BukkitAdapter.adapt(player);
-    }
-
-    @Override public void startMetrics() {
-        new Metrics(plugin);
-    }
 
     public ItemUtil getItemUtil() {
         ItemUtil tmp = itemUtil;
@@ -201,8 +172,7 @@ public class FaweBukkit implements IFawe, Listener {
     /**
      * Vault isn't required, but used for setting player permissions (WorldEdit bypass)
      */
-    @Override
-    public void setupVault() {
+    private void setupVault() {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable ignored) {
@@ -233,11 +203,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin;
     }
 
-    @Override
-    public String getWorldName(World world) {
-        return world.getName();
-    }
-
     /**
      * A mask manager handles region restrictions e.g., PlotSquared plots / WorldGuard regions
      */
@@ -248,7 +213,6 @@ public class FaweBukkit implements IFawe, Listener {
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
                 managers.add(new Worldguard(worldguardPlugin));
-                managers.add(new WorldguardFlag(worldguardPlugin));
                 log.debug("Attempting to use plugin 'WorldGuard'");
             } catch (Throwable ignored) {
             }
@@ -258,14 +222,6 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new TownyFeature(townyPlugin));
                 log.debug("Attempting to use plugin 'Towny'");
-            } catch (Throwable ignored) {
-            }
-        }
-        final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
-        if (factionsPlugin != null && factionsPlugin.isEnabled()) {
-            try {
-                managers.add(new FactionsUUIDFeature(factionsPlugin, this));
-                log.debug("Attempting to use plugin 'FactionsUUID'");
             } catch (Throwable ignored) {
             }
         }
@@ -325,7 +281,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override
     public String getPlatform() {
-        return "bukkit";
+        return "Bukkit";
     }
 
     @Override
@@ -338,26 +294,25 @@ public class FaweBukkit implements IFawe, Listener {
         return Bukkit.getOfflinePlayer(uuid).getName();
     }
 
-    private boolean enabledBlocksHub = true;
-
-    @Override
-    public Object getBlocksHubApi() {
-        if (!enabledBlocksHub) {
-            return null;
-        }
-        Plugin blocksHubPlugin = Bukkit.getPluginManager().getPlugin("BlocksHub");
-        if (blocksHubPlugin == null) {
-            enabledBlocksHub = false;
-            return null;
-        }
-        return null;
-    }
-
     @Override
     public Preloader getPreloader() {
         if (PaperLib.isPaper()) {
             return new AsyncPreloader();
         }
         return null;
+    }
+
+    private void setupPlotSquared() {
+        Plugin plotSquared = this.plugin.getServer().getPluginManager().getPlugin("PlotSquared");
+        if (plotSquared == null)
+            return;
+        if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
+            WEManager.IMP.managers
+                .add(new com.boydti.fawe.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+        } else {
+            WEManager.IMP.managers
+                .add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
+        }
+        log.info("Plugin 'PlotSquared' found. Using it now.");
     }
 }

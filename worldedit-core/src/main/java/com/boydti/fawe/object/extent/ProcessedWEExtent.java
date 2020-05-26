@@ -2,7 +2,6 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -19,6 +18,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class ProcessedWEExtent extends AbstractDelegateExtent {
+
     private final FaweLimit limit;
     private final Extent extent;
 
@@ -65,7 +65,8 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
+        throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -75,7 +76,8 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
+        throws WorldEditException {
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {

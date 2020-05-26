@@ -27,10 +27,6 @@ public final class ShortTag extends NumberTag {
     public int getTypeCode() {
         return NBTConstants.TYPE_SHORT;
     }
-    @Override
-    public String getTypeName() {
-        return "TAG_Short";
-    }
 
     private final short value;
 

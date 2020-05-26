@@ -3,17 +3,15 @@ package com.boydti.fawe.beta;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent} Used for getting and setting blocks / biomes
  * / entities
  */
 public interface IChunk extends Trimable, IChunkGet, IChunkSet {
+
     /**
      * Initialize at the location
      * (allows for reuse)
@@ -22,17 +20,20 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      * @param x
      * @param z
      */
-    default void init(IQueueExtent extent, int x, int z) {}
+    default <V extends IChunk> void init(IQueueExtent<V> extent, int x, int z) {}
+
     /**
      * Get chunkX
-     * @return
+     * @return the x coordinate of the chunk
      */
+    @Range(from = 0, to = 15)
     int getX();
 
     /**
      * Get chunkZ
-     * @return
+     * @return the z coordinate of the chunk
      */
+    @Range(from = 0, to = 15)
     int getZ();
 
     /**
@@ -43,14 +44,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
     default IChunk getRoot() {
         return this;
     }
-
-    /**
-     * Checks if there are any queued changes for this chunk.
-     *
-     * @return true if no changes are queued for this chunk
-     */
-    @Override
-    boolean isEmpty();
 
     /**
      * Filter through all the blocks in the chunk
@@ -69,28 +62,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
 //     * @param block
 //     */
 //    void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
-
-    /* set - queues a change */
-    @Override
-    boolean setBiome(int x, int y, int z, BiomeType biome);
-
-    @Override
-    boolean setTile(int x, int y, int z, CompoundTag tag);
-
-    @Override
-    boolean setBlock(int x, int y, int z, BlockStateHolder block);
-
-    @Override
-    BiomeType getBiomeType(int x, int y, int z);
-
-    @Override
-    BlockState getBlock(int x, int y, int z);
-
-    @Override
-    BaseBlock getFullBlock(int x, int y, int z);
-
-    @Override
-    CompoundTag getTile(int x, int y, int z);
 
     @Override
     default IChunk reset() {

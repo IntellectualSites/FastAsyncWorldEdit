@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public abstract class BlockSet extends AbstractRegion {
+
     private final int chunkOffsetX;
     private final int chunkOffsetZ;
     private final int blockOffsetX;
@@ -88,20 +89,23 @@ public abstract class BlockSet extends AbstractRegion {
 
     @Override
     public abstract boolean contains(int x, int y, int z);
+
     public abstract boolean add(int x, int y, int z);
+
     public abstract void set(int x, int y, int z);
+
     public abstract void clear(int x, int y, int z);
+
     public abstract boolean remove(int x, int y, int z);
+
     @Override
     public abstract Iterator<BlockVector3> iterator();
+
     @Override
     public abstract Set<BlockVector2> getChunks();
+
     @Override
     public abstract Set<BlockVector3> getChunkCubes();
-    @Override
-    public abstract BlockVector3 getMaximumPoint();
-    @Override
-    public abstract BlockVector3 getMinimumPoint();
 
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {

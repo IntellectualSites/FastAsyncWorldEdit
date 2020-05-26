@@ -23,16 +23,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.HistoryExtent;
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
-import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
@@ -44,13 +44,20 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import java.util.List;
+
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
-public class AbstractDelegateExtent implements Extent, LightingExtent {
+public class AbstractDelegateExtent implements Extent {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
 
     private final Extent extent;
 
@@ -116,7 +123,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     /*
      History
      */
-    public void setChangeSet(FaweChangeSet changeSet) {
+    public void setChangeSet(AbstractChangeSet changeSet) {
         if (extent instanceof HistoryExtent) {
             HistoryExtent history = ((HistoryExtent) extent);
             if (changeSet == null) {
@@ -184,7 +191,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T block)
         throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }
@@ -198,55 +205,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return extent.setBiome(position.getX(), 0, position.getZ(), biome);
     }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getSkyLight(x, y, z);
-        }
-        return 0;
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBlockLight(x, y, z);
-        }
-        return getBrightness(x, y, z);
-    }
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getOpacity(x, y, z);
-        }
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
-    }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getLight(x, y, z);
-        }
-        return 0;
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getBrightness(x, y, z);
-        }
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
-    }
-
-    @Override
-    public void relightChunk(int chunkX, int chunkZ) {
-        if (extent instanceof LightingExtent) {
-            ((LightingExtent) extent).relightChunk(chunkX, chunkZ);
-        } else {
-            throw new UnsupportedOperationException("Cannot relight");
-        }
-    }
-
+    
     @Override
     public String toString() {
         return super.toString() + ":" + (extent == this ? "" : extent.toString());
@@ -286,6 +245,15 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
 
     @Override
     public Extent addProcessor(IBatchProcessor processor) {
+        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            logger.info("addProcessor Info: \t " + processor.getClass().getName());
+            logger.info("The following is not an error or a crash:");
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement stackTraceElement : stackTrace) {
+                logger.info(stackTraceElement.toString());
+            }
+
+        }
         Extent result = this.extent.addProcessor(processor);
         if (result != this.extent) {
             new ExtentTraverser<Extent>(this).setNext(result);

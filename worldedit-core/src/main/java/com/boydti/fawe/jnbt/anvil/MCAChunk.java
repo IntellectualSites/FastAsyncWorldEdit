@@ -8,7 +8,7 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
-import com.boydti.fawe.object.collection.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -71,7 +71,7 @@ public class MCAChunk implements IChunk {
         }
 
         int bitsPerEntry = MathMan.log2nlz(section.palette.length - 1);
-        BitArray4096 bitArray = new BitArray4096(section.blocks, bitsPerEntry);
+        BitArray bitArray = new BitArray(bitsPerEntry, 4096, section.blocks);
         char[] buffer = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         bitArray.toRaw(buffer);
         int offset = section.layer << 12;
@@ -101,7 +101,7 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public void init(IQueueExtent extent, int x, int z) {
+    public <V extends IChunk> void init(IQueueExtent<V> extent, int x, int z) {
         if (x != chunkX || z != chunkZ) {
             throw new UnsupportedOperationException("Not reuse capable");
         }
@@ -324,7 +324,7 @@ public class MCAChunk implements IChunk {
                         blockstates[0] = 0;
                         blockBitArrayEnd = 1;
                     } else {
-                        BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                        BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockstates);
                         bitArray.fromRaw(blocksCopy);
                     }
 
@@ -414,6 +414,7 @@ public class MCAChunk implements IChunk {
         this.modified++;
     }
 
+    @Override
     public int getBitMask() {
         int bitMask = 0;
         for (int section = 0; section < hasSections.length; section++) {
@@ -475,6 +476,7 @@ public class MCAChunk implements IChunk {
         return tiles == null ? Collections.emptyMap() : tiles;
     }
 
+    @Override
     public CompoundTag getTile(int x, int y, int z) {
         if (tiles == null || tiles.isEmpty()) {
             return null;
@@ -509,7 +511,7 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B holder) {
         setBlock(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;
@@ -545,6 +547,11 @@ public class MCAChunk implements IChunk {
     @Override
     public boolean trim(boolean aggressive) {
         return isEmpty();
+    }
+
+    @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return hasSection(layer);
     }
 
     @Override

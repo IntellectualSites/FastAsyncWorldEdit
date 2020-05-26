@@ -3,7 +3,6 @@ package com.boydti.fawe.object.schematic;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
@@ -231,7 +230,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
             BaseEntity state = entity.getState();
             if (state != null) {
                 CompoundTag nbt = state.getNbtData();
-                Map<String, Tag> nbtMap = ReflectionUtils.getMap(nbt.getValue());
+                Map<String, Tag> nbtMap = nbt.getValue();
                 // Replace rotation data
                 nbtMap.put("Rotation", writeRotation(entity.getLocation()));
                 nbtMap.put("id", new StringTag(state.getType().getId()));

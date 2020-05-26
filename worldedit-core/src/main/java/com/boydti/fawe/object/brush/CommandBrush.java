@@ -1,8 +1,8 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.AsyncPlayer;
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.SilentPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;

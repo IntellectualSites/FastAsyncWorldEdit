@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
@@ -30,10 +28,6 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
-import com.boydti.fawe.util.ExtentTraverser;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -42,8 +36,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Requires that all mutating methods pass a given {@link Mask}.
@@ -86,17 +79,17 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return mask.test(location) && super.setBlock(location, block);
+        return mask.test(getExtent(), location) && super.setBlock(location, block);
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
+        return mask.test(getExtent(), position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
+        return mask.test(getExtent(), BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 
     @Override
@@ -107,9 +100,11 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public void applyBlock(FilterBlock block) {
-        int ordinal = block.getOrdinal();
-        if (ordinal != 0 && !mask.test(block)) {
-            block.setOrdinal(0);
+        //TODO: Find a way to make masking thread safe without having to synchonise the whole extent
+        synchronized (this) {
+            if (!mask.test(getExtent(), block)) {
+                block.setOrdinal(0);
+            }
         }
     }
 

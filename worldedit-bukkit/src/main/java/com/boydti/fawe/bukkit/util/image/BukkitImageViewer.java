@@ -98,7 +98,7 @@ public class BukkitImageViewer implements ImageViewer {
 
             World world = pos1.getWorld();
 
-            this.reverse = (facing == BlockFace.NORTH || facing == BlockFace.EAST);
+            this.reverse = facing == BlockFace.NORTH || facing == BlockFace.EAST;
             int v = 0;
             for (double y = pos1.getY(); y <= pos2.getY(); y++, v++) {
                 int h = 0;
@@ -108,7 +108,7 @@ public class BukkitImageViewer implements ImageViewer {
                         Collection<Entity> entities = world.getNearbyEntities(pos, 0.1, 0.1, 0.1);
                         boolean contains = false;
                         for (Entity ent : entities) {
-                            if (ent instanceof ItemFrame && ((ItemFrame) ent).getFacing() == facing) {
+                            if (ent instanceof ItemFrame && ent.getFacing() == facing) {
                                 ItemFrame itemFrame = (ItemFrame) ent;
                                 itemFrame.setRotation(Rotation.NONE);
                                 contains = true;

@@ -1,11 +1,12 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
+import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -20,13 +21,13 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -133,18 +134,6 @@ public class FaweAPI {
     }
 
     /**
-     * Create a command with the provided aliases and register all methods of the class as sub commands.<br>
-     * - You should try to register commands during startup
-     * - If no aliases are specified, all methods become root commands
-     *
-     * @param clazz   The class containing all the sub command methods
-     * @param aliases The aliases to give the command (or none)
-     */
-    public static void registerCommands(Object clazz, String... aliases) {
-//        PlatformCommandManager.getInstance().registerCommands(clazz, aliases); TODO NOT IMPLEMENTED
-    }
-
-    /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
@@ -154,8 +143,8 @@ public class FaweAPI {
      * @param autoQueue If it should start dispatching before you enqueue it.
      * @return the queue extent
      */
-    public static IQueueExtent createQueue(World world, boolean autoQueue) {
-        IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
+    public static IQueueExtent<IQueueChunk> createQueue(World world, boolean autoQueue) {
+        IQueueExtent<IQueueChunk> queue = Fawe.get().getQueueHandler().getQueue(world);
         if (!autoQueue) {
             queue.disableQueue();
         }
@@ -181,7 +170,7 @@ public class FaweAPI {
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
-        return format.uploadAnonymous(clipboard);
+        return format.upload(clipboard);
     }
 
     /**
@@ -232,7 +221,7 @@ public class FaweAPI {
      * @param reason
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
-    public static void cancelEdit(Extent extent, Component reason) {
+    public static void cancelEdit(AbstractDelegateExtent extent, Component reason) {
         try {
             WEManager.IMP.cancelEdit(extent, new FaweException(reason));
         } catch (WorldEditException ignore) {
@@ -253,11 +242,11 @@ public class FaweAPI {
         if (!file.exists() || file.isDirectory()) {
             throw new IllegalArgumentException("Not a file!");
         }
-        if (!file.getName().toLowerCase().endsWith(".bd")) {
-            throw new IllegalArgumentException("Not a BD file!");
-        }
         if (Settings.IMP.HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
+        }
+        if (!file.getName().toLowerCase().endsWith(".bd")) {
+            throw new IllegalArgumentException("Not a BD file!");
         }
         String[] path = file.getPath().split(File.separator);
         if (path.length < 3) {
@@ -275,8 +264,7 @@ public class FaweAPI {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid UUID from file path: " + uuidString);
         }
-        DiskStorageHistory history = new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
-        return history;
+        return new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
     }
 
     /**
@@ -289,7 +277,7 @@ public class FaweAPI {
      * @param timediff - The max age of the file in milliseconds
      * @param shallow  - If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
      *                 Reading only part of the file will result in unreliable bounds info for large edits
-     * @return
+     * @return a list of DiskStorageHistory Objects
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
         Extent extent = origin.getExtent();
@@ -297,7 +285,7 @@ public class FaweAPI {
             throw new IllegalArgumentException("Origin is not a valid world");
         }
         World world = (World) extent;
-        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world));
+        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName());
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -343,7 +331,7 @@ public class FaweAPI {
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());
             DiskStorageHistory dsh = new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
-            DiskStorageHistory.DiskStorageSummary summary = dsh.summarize(boundsPlus, shallow);
+            SimpleChangeSetSummary summary = dsh.summarize(boundsPlus, shallow);
             RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
             boolean encompassed = false;
             boolean isIn = false;
@@ -393,11 +381,6 @@ public class FaweAPI {
     }
 
 
-    @Deprecated
-    public static int fixLighting(World world, Region selection) {
-        return fixLighting(world, selection, null);
-    }
-
     /**
      * Fix the lighting in a selection<br>
      * - First removes all lighting, then relights
@@ -409,30 +392,7 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
-        final BlockVector3 bot = selection.getMinimumPoint();
-        final BlockVector3 top = selection.getMaximumPoint();
-
-        final int minX = bot.getBlockX() >> 4;
-        final int minZ = bot.getBlockZ() >> 4;
-
-        final int maxX = top.getBlockX() >> 4;
-        final int maxZ = top.getBlockZ() >> 4;
-
-        int count = 0;
-        if (queue == null) queue = createQueue(world, false);
-        // Remove existing lighting first
-        if (queue instanceof LightingExtent) {
-            LightingExtent relighter = (LightingExtent) queue;
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    relighter.relightChunk(x, z);
-                    count++;
-                }
-            }
-        } else {
-            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
-        }
-        return count;
+        throw new UnsupportedOperationException();
     }
 
     /**

@@ -193,7 +193,7 @@ public class FaweLimit {
                 MAX_HISTORY == Integer.MAX_VALUE &&
                 INVENTORY_MODE == 0 &&
                 SPEED_REDUCTION == 0 &&
-                FAST_PLACEMENT == true &&
+                FAST_PLACEMENT &&
                 (STRIP_NBT == null || STRIP_NBT.isEmpty());
     }
 

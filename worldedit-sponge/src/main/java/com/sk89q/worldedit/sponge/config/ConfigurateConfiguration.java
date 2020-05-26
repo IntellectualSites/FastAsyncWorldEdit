@@ -122,9 +122,8 @@ public class ConfigurateConfiguration extends LocalConfiguration {
         showHelpInfo = node.getNode("show-help-on-first-use").getBoolean(true);
 
         String snapshotsDir = node.getNode("snapshots", "directory").getString("");
-        if (!snapshotsDir.isEmpty()) {
-            snapshotRepo = new SnapshotRepository(snapshotsDir);
-        }
+        boolean experimentalSnapshots = node.getNode("snapshots", "experimental").getBoolean(false);
+        initializeSnapshotConfiguration(snapshotsDir, experimentalSnapshots);
 
         String type = node.getNode("shell-save-type").getString("").trim();
         shellSaveType = type.equals("") ? null : type;

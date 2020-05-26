@@ -63,7 +63,7 @@ public class Naturalizer implements LayerFunction {
 
     @Override
     public boolean isGround(BlockVector3 position) {
-        return mask.test(position);
+        return mask.test(editSession, position);
     }
 
     private BlockState getTargetBlock(int depth) {
@@ -95,7 +95,7 @@ public class Naturalizer implements LayerFunction {
 
     @Override
     public boolean apply(BlockVector3 position, int depth) throws WorldEditException {
-        if (mask.test(position)) {
+        if (mask.test(editSession, position)) {
             if (naturalize(position, depth)) {
                 ++affected;
             }

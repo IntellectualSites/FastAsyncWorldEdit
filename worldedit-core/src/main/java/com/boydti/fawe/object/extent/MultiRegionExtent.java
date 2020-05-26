@@ -7,15 +7,14 @@ import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
-
 import java.util.Arrays;
 import java.util.Collection;
 
 public class MultiRegionExtent extends FaweRegionExtent {
 
     private final RegionIntersection intersection;
-    private Region region;
     private final Region[] regions;
+    private Region region;
     private int index;
 
     /**

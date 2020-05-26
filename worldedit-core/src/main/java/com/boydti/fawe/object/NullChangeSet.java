@@ -1,25 +1,23 @@
 package com.boydti.fawe.object;
 
-import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
-public class NullChangeSet extends FaweChangeSet {
+public class NullChangeSet extends AbstractChangeSet {
+
     public NullChangeSet(World world) {
         super(world);
     }
-
-    public NullChangeSet(String world) {
-        super(world);
-    }
-
+    
     @Override
-    public final void close() {}
+    public final void close() {
+    }
 
     @Override
     public final void add(int x, int y, int z, int combinedFrom, int combinedTo) {
@@ -58,7 +56,7 @@ public class NullChangeSet extends FaweChangeSet {
 
     @Override
     public final Iterator<Change> getIterator(boolean undo) {
-        return new ArrayList<Change>().iterator();
+        return Collections.emptyIterator();
     }
 
     @Override

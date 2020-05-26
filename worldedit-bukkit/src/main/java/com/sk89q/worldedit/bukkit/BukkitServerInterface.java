@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
-
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -35,6 +33,13 @@ import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.registry.Registries;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.enginehub.piston.CommandManager;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -43,12 +48,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.bukkit.Bukkit;
-import javax.annotation.Nullable;
-import org.bukkit.Server;
-import org.bukkit.World;
-import org.bukkit.entity.EntityType;
-import org.enginehub.piston.CommandManager;
+
+import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class BukkitServerInterface implements MultiUserPlatform {
     public Server server;
@@ -68,6 +69,10 @@ public class BukkitServerInterface implements MultiUserPlatform {
         this.plugin = plugin;
         this.server = server;
         dynamicCommands = new CommandRegistration(plugin);
+    }
+
+    CommandRegistration getDynamicCommands() {
+        return dynamicCommands;
     }
 
     boolean isHookingEvents() {

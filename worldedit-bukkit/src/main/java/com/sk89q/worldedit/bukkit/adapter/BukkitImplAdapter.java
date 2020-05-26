@@ -102,7 +102,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param notifyAndLight notify and light if set
      * @return true if a block was likely changed
      */
-    boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight);
+    <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight);
 
     /**
      * Notifies the simulation that the block at the given location has
@@ -187,6 +187,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     BaseItemStack adapt(ItemStack itemStack);
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
+        // return OptionalInt.empty();
         return getInternalBlockStateId(BukkitAdapter.adapt(data));
     }
 
@@ -239,11 +240,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @return true on success, false on failure
      */
     default boolean regenerate(org.bukkit.World world, Region region, EditSession session) {
-        return regenerate(world, region, null, null, session);
-    }
-
-    default boolean regenerate(org.bukkit.World world, Region region, @Nullable Long seed, @Nullable BiomeType biome, EditSession editSession) {
-        return editSession.regenerate(region);
+        return session.regenerate(region);
     }
 
     default IChunkGet get(World world, int chunkX, int chunkZ) {

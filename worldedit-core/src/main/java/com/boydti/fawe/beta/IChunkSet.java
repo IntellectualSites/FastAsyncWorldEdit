@@ -3,14 +3,12 @@ package com.boydti.fawe.beta;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import java.util.Map;
+
+import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 /**
  * Interface for setting blocks
@@ -21,7 +19,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
     @Override
-    boolean setBlock(int x, int y, int z, BlockStateHolder holder);
+    <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder);
 
     void setBlocks(int layer, char[] data);
 
@@ -42,14 +40,12 @@ public interface IChunkSet extends IBlocks, OutputExtent {
         return getBiomes() != null;
     }
 
-    @Override
-    BiomeType getBiomeType(int x, int y, int z);
+    default boolean isFastMode() {
+        return false;
+    }
 
-    @Override
-    Map<BlockVector3, CompoundTag> getTiles();
-
-    @Override
-    Set<CompoundTag> getEntities();
+    //default to avoid tricky child classes. We only need it in a few cases anyway.
+    default void setFastMode(boolean fastMode){}
 
     @Override
     IChunkSet reset();

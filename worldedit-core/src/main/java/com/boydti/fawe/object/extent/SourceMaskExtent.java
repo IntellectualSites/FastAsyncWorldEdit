@@ -11,8 +11,20 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class SourceMaskExtent extends TemporalExtent {
     private Mask mask;
+    private Extent get;
     private MutableBlockVector3 mutable = new MutableBlockVector3();
 
+    public SourceMaskExtent(Extent extent, Mask mask) {
+        this(extent, extent, mask);
+    }
+
+    public SourceMaskExtent(Extent get, Extent set, Mask mask) {
+        super(set);
+        checkNotNull(get);
+        checkNotNull(mask);
+        this.get = get;
+        this.mask = mask;
+    }
 
     /**
      * Get the mask.
@@ -33,16 +45,10 @@ public class SourceMaskExtent extends TemporalExtent {
         this.mask = mask;
     }
 
-    public SourceMaskExtent(Extent extent, Mask mask) {
-        super(extent);
-        checkNotNull(mask);
-        this.mask = mask;
-    }
-
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         set(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
-        return mask.test(location) && super.setBlock(location, block);
+        return mask.test(get, location) && super.setBlock(location, block);
     }
 
     @Override
@@ -51,6 +57,6 @@ public class SourceMaskExtent extends TemporalExtent {
         mutable.mutX(x);
         mutable.mutY(y);
         mutable.mutZ(z);
-        return mask.test(mutable) && super.setBlock(x, y, z, block);
+        return mask.test(get, mutable) && super.setBlock(x, y, z, block);
     }
 }

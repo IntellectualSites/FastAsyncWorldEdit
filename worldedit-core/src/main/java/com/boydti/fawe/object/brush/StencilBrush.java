@@ -1,13 +1,12 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
-import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -44,27 +43,21 @@ public class StencilBrush extends HeightBrush {
         } else {
             add = 0;
         }
-        double scale = (yscale / sizeDouble) * (maxY + 1);
         final HeightMap map = getHeightMap();
         map.setSize(size);
         int cutoff = onlyWhite ? maxY : 0;
         final SolidBlockMask solid = new SolidBlockMask(editSession);
-        final AdjacentAnyMask adjacent = new AdjacentAnyMask(Masks.negate(solid));
-
-        // BlockVector3 pos = player.getLocation();
-
-
-
+        
         Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
 
-
-        RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
+        double scale = (yscale / sizeDouble) * (maxY + 1);
+        RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
             @Override
-            public boolean test(BlockVector3 vector) {
+            public boolean test(Extent extent, BlockVector3 vector) {
                 if (solid.test(vector)) {
                     int dx = vector.getBlockX() - cx;
                     int dy = vector.getBlockY() - cy;
@@ -93,9 +86,5 @@ public class StencilBrush extends HeightBrush {
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
-    }
-
-    private void apply(double val) {
-
     }
 }

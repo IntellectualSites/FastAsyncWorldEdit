@@ -2,9 +2,10 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
-import com.boydti.fawe.object.pattern.BiomePattern;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
@@ -27,27 +28,24 @@ public class SplatterBrush extends ScatterBrush {
     public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
         final Pattern finalPattern;
         if (solid) {
-            Pattern tmp;
-            try {
-                tmp = p.apply(position);
-            } catch (BiomePattern.BiomePatternException e) {
-                tmp = e.getPattern();
-            }
-            finalPattern = tmp;
+            finalPattern = p.apply(position);
         } else {
             finalPattern = p;
         }
         final int size2 = (int) (size * size);
         SurfaceMask surface = new SurfaceMask(editSession);
 
-        RecursiveVisitor visitor = new RecursiveVisitor(vector -> {
-            double dist = vector.distanceSq(position);
-            if (dist < size2 && !placed.contains(vector) && ThreadLocalRandom.current().nextInt(5) < 2
-                && surface.test(vector)) {
-                placed.add(vector);
-                return true;
+        RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
+            @Override
+            public boolean test(Extent extent, BlockVector3 vector) {
+                double dist = vector.distanceSq(position);
+                if (dist < size2 && !placed.contains(vector) && ThreadLocalRandom.current().nextInt(5) < 2
+                        && surface.test(extent, vector)) {
+                    placed.add(vector);
+                    return true;
+                }
+                return false;
             }
-            return false;
         }, vector -> editSession.setBlock(vector, finalPattern), recursion);
         visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));

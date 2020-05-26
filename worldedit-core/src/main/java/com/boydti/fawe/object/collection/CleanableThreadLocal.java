@@ -87,7 +87,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
         return list;
     }
 
-    public static void iterate(ThreadLocal instance, Consumer<Object> withMap) {
+    public static <L> void iterate(ThreadLocal<L> instance, Consumer<Object> withMap) {
         try {
             Thread[] threads = MainUtil.getThreads();
             Field tl = Thread.class.getDeclaredField("threadLocals");
@@ -105,7 +105,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
         }
     }
 
-    public static void clean(ThreadLocal instance) {
+    public static <L> void clean(ThreadLocal<L> instance) {
         iterate(instance, new Consumer<Object>() {
             Method methodRemove;
             @Override
@@ -138,7 +138,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
 
             // Get a reference to the array holding the thread local variables inside the
             // ThreadLocalMap of the current thread
-            Class threadLocalMapClass = Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
+            Class<?> threadLocalMapClass = Class.forName("java.lang.ThreadLocal$ThreadLocalMap");
             Field tableField = threadLocalMapClass.getDeclaredField("table");
             tableField.setAccessible(true);
             Object table = tableField.get(threadLocalTable);

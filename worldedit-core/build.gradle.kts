@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import com.mendhak.gradlecrowdin.DownloadTranslationsTask
 import com.mendhak.gradlecrowdin.UploadSourceFileTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java-library")
@@ -12,10 +13,13 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
+    kotlin("jvm") version "1.3.61"
 }
 
 repositories {
-    maven { url = uri("http://ci.athion.net/job/PlotSquared-breaking/ws/mvn/") }
+    maven { url = uri("https://plotsquared.com/mvn") }
+    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
+    mavenCentral()
 
 }
 
@@ -30,7 +34,8 @@ configurations.all {
 dependencies {
     "compile"(project(":worldedit-libs:core"))
     "compile"("de.schlichtherle:truezip:6.8.3")
-    "compile"("org.mozilla:rhino:1.7.11")
+    "compile"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
+    "compile"("org.mozilla:rhino-runtime:1.7.12")
     "compile"("org.yaml:snakeyaml:1.23")
     "compile"("com.google.guava:guava:21.0")
     "compile"("com.google.code.findbugs:jsr305:3.0.2")
@@ -49,12 +54,22 @@ dependencies {
     "annotationProcessor"("com.google.guava:guava:21.0")
     "compileOnly"("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
+    "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
+    "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
     "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.4.3-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
+    "compile"("com.plotsquared:PlotSquared-Core:5.11.2") {
+        isTransitive = false
+    }
+    implementation(kotlin("stdlib-jdk8", "1.3.61"))
+}
+
+tasks.named<Test>("test") {
+    maxHeapSize = "1G"
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -149,7 +164,7 @@ tasks.named<ShadowJar>("shadowJar") {
 
 val crowdinApiKey = "crowdin_apikey"
 
-if (project.hasProperty(crowdinApiKey)) {
+if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
     tasks.named<UploadSourceFileTask>("crowdinUpload") {
         apiKey = "${project.property(crowdinApiKey)}"
         projectId = "worldedit-core"
@@ -161,10 +176,17 @@ if (project.hasProperty(crowdinApiKey)) {
         )
     }
 
-    tasks.named<DownloadTranslationsTask>("crowdinDownload") {
+    val dlTranslationsTask = tasks.named<DownloadTranslationsTask>("crowdinDownload") {
         apiKey = "${project.property(crowdinApiKey)}"
-        destination = "${file("build/resources/main/lang")}"
+        destination = "${buildDir.resolve("crowdin-i18n")}"
         projectId = "worldedit-core"
+    }
+
+    tasks.named<Copy>("processResources") {
+        dependsOn(dlTranslationsTask)
+        from(dlTranslationsTask.get().destination) {
+            into("lang")
+        }
     }
 
     tasks.named("classes").configure {
@@ -174,4 +196,12 @@ if (project.hasProperty(crowdinApiKey)) {
 
 tasks.named("dataContent").configure {
     dependsOn("writeNewPom")
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

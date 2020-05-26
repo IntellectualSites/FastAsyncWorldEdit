@@ -9,6 +9,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.world.World;
+
 import java.io.IOException;
 
 /**
@@ -44,10 +45,6 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     private NBTOutputStream tileRStreamZip;
 
     public MemoryOptimizedHistory(World world) {
-        super(world);
-    }
-
-    public MemoryOptimizedHistory(String world) {
         super(world);
     }
 
@@ -241,6 +238,5 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     @Override
     public void setRecordChanges(boolean recordChanges) {
         // TODO Auto-generated method stub
-
     }
 }

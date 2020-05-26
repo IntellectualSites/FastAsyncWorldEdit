@@ -8,7 +8,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 public class InverseSingleBlockStateMask extends ABlockMask {
     private final char ordinal;
 
-    public BlockStateHolder getBlockState() {
+    public BlockState getBlockState() {
         return BlockState.getFromOrdinal(ordinal);
     }
 
@@ -18,8 +18,8 @@ public class InverseSingleBlockStateMask extends ABlockMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return ordinal != vector.getOrdinal(getExtent());
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return ordinal != vector.getOrdinal(extent);
     }
 
     @Override

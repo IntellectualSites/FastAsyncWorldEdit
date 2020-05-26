@@ -40,7 +40,7 @@ public class Caption {
     private static Component color(TextComponent text) {
         String content = text.content();
         if (content.indexOf('&') != -1) {
-            TextComponent legacy = LegacyComponentSerializer.legacy().deserialize(content, '&');
+            TextComponent legacy = LegacyComponentSerializer.INSTANCE.deserialize(content, '&');
             legacy = (TextComponent) legacy.style(text.style());
             if (!text.children().isEmpty()) {
                 text = TextComponent.builder().append(legacy).append(text.children()).build();

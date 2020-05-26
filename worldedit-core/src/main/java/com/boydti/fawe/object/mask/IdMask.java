@@ -13,8 +13,7 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        Extent extent = getExtent();
+    public boolean test(Extent extent, BlockVector3 vector) {
         if (id != -1) {
             return extent.getBlock(vector).getInternalBlockTypeId() == id;
         } else {

@@ -40,12 +40,10 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
-import com.sk89q.worldedit.command.util.annotation.SkipQueue;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -83,6 +81,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -92,6 +91,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -104,7 +104,7 @@ import org.jetbrains.annotations.Range;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
+@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -128,7 +128,7 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.admin")
     public void heightmapInterface(Player player, @Arg(name = "min", desc = "int", def = "100") int min, @Arg(name = "max", desc = "int", def = "200") int max) throws IOException {
-        player.print("Please wait while we generate the minified heightmaps.");
+        player.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
@@ -150,7 +150,7 @@ public class UtilityCommands {
                 BufferedImage img = MainUtil.readImage(file);
                 BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                player.print("Writing " + name);
+                player.print(TextComponent.of(String.format("Writing %s", name)));
                 File minFile = new File(minImages, name);
                 File maxFile = new File(maxImages, name);
                 minFile.getParentFile().mkdirs();
@@ -175,9 +175,9 @@ public class UtilityCommands {
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
         File configFile = new File(webSrc, "config.js");
-        player.print("Writing " + configFile);
+        player.print(TextComponent.of(String.format("Writing %s",configFile)));
         Files.write(configFile.toPath(), config.toString().getBytes());
-        player.print("Done! See: `FastAsyncWorldEdit/web/heightmap`");
+        player.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
     }
 
     @Command(
@@ -185,8 +185,7 @@ public class UtilityCommands {
             aliases= {"fcancel"},
             desc = "Cancel your current command"
     )
-    @CommandPermissions("fawe.cancel")
-    @SkipQueue
+    @CommandPermissions(value = "fawe.cancel", queued = false)
     public void cancel(Player player) {
         int cancelled = player.cancel(false);
         player.print(Caption.of("fawe.cancel.worldedit.cancel.count" , cancelled));
@@ -202,9 +201,9 @@ public class UtilityCommands {
     public int fill(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
-                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The radius to fill in")
+                    @Arg(desc = "The radius to fill in")
                         Expression radiusExp,
-                    @Range(from=1, to=Integer.MAX_VALUE) @Arg(desc = "The depth to fill", def = "1")
+                    @Arg(desc = "The depth to fill", def = "1")
                         int depth,
                     @Arg(desc = "The direction to move", def = "down")
                         @Direction BlockVector3 direction) throws WorldEditException, EvaluationException {
@@ -545,6 +544,7 @@ public class UtilityCommands {
 
     @Command(
         name = "butcher",
+        aliases = { "/butcher" },
         desc = "Kill all or nearby mobs"
     )
     @CommandPermissions("worldedit.butcher")
@@ -607,16 +607,16 @@ public class UtilityCommands {
 
     @Command(
         name = "remove",
-        aliases = { "rem", "rement" },
+        aliases = { "rem", "rement", "/remove", "/rem", "/rement" },
         desc = "Remove all entities of a type"
     )
     @CommandPermissions("worldedit.remove")
     @Logging(PLACEMENT)
     public int remove(Actor actor,
-        @Arg(desc = "The type of entity to remove")
-            EntityRemover remover,
-        @Arg(desc = "The radius of the cuboid to remove from")
-            int radius) throws WorldEditException {
+                      @Arg(desc = "The type of entity to remove")
+                          EntityRemover remover,
+                      @Arg(desc = "The radius of the cuboid to remove from")
+                          int radius) throws WorldEditException {
         if (radius < -1) {
             actor.printError(TranslatableComponent.of("worldedit.remove.explain-all"));
             return 0;
@@ -628,7 +628,7 @@ public class UtilityCommands {
     }
 
     private int killMatchingEntities(Integer radius, Actor actor, Supplier<EntityFunction> func) throws IncompleteRegionException,
-        MaxChangedBlocksException {
+            MaxChangedBlocksException {
         List<EntityVisitor> visitors = new ArrayList<>();
 
         LocalSession session = we.getSessionManager().get(actor);
@@ -652,22 +652,6 @@ public class UtilityCommands {
         session.remember(editSession);
         editSession.flushSession();
         return killed;
-    }
-
-    @Command(
-        name = "/help",
-        desc = "Displays help for WorldEdit commands"
-    )
-    @CommandPermissions("worldedit.help")
-    public void help(Actor actor,
-                     @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
-                         boolean listSubCommands,
-                     @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
-                         int page,
-                     @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
-        PrintCommandHelp.help(command, page, listSubCommands,
-                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
     }
 
     private DecimalFormat formatForLocale(Locale locale) {
@@ -701,23 +685,40 @@ public class UtilityCommands {
     }
 
     @Command(
+        name = "/help",
+        desc = "Displays help for WorldEdit commands"
+    )
+    @CommandPermissions("worldedit.help")
+    public void help(Actor actor,
+                     @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
+                         boolean listSubCommands,
+                     @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
+                         int page,
+                     @Arg(desc = "The command to retrieve help for", def = "", variable = true)
+                         List<String> command) throws WorldEditException {
+        PrintCommandHelp.help(command, page, listSubCommands,
+                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "//help");
+    }
+
+
+    @Command(
             name = "/confirm",
             desc = "Confirm a command"
     )
-    @SkipQueue
-    @CommandPermissions("fawe.confirm")
-    public void confirm(Player fp) throws WorldEditException {
-        if (!fp.confirm()) {
-            fp.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));
+    @CommandPermissions(value = "fawe.confirm", queued = false)
+    public void confirm(Player player) throws WorldEditException {
+        if (!player.confirm()) {
+            player.print(TranslatableComponent.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
 
     public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
-        return Lists.transform(files, input -> { // Keep this functional, as transform is evaluated lazily
-            URI uri = input.toURI();
-            String path = getPath(root, input, uuid);
-            return new AbstractMap.SimpleEntry<>(uri, path);
-        });
+        return files.stream()
+            .map(input -> { // Keep this functional, as transform is evaluated lazily
+                URI uri = input.toURI();
+                String path = getPath(root, input, uuid);
+                return new SimpleEntry<>(uri, path);
+            }).collect(Collectors.toList());
     }
 
     public static enum URIType {
@@ -728,7 +729,7 @@ public class UtilityCommands {
     }
 
     public static List<Component> entryToComponent(File root, List<Map.Entry<URI, String>> entries, Function<URI, Boolean> isLoaded, QuadFunction<String, String, URIType, Boolean, Component> adapter) {
-        return Lists.transform(entries, input -> {
+        return entries.stream().map(input -> {
             URI uri = input.getKey();
             String path = input.getValue();
 
@@ -745,11 +746,13 @@ public class UtilityCommands {
                 if (file.isDirectory()) {
                     type = URIType.DIRECTORY;
                 } else {
-                    if (name.indexOf('.') != -1) name = name.substring(0, name.lastIndexOf('.'));
+                    if (name.indexOf('.') != -1)
+                        name = name.substring(0, name.lastIndexOf('.'));
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new RuntimeException(new StopExecutionException(TextComponent.of("Invalid path")));
+                        throw new RuntimeException(
+                            new StopExecutionException(TextComponent.of("Invalid path")));
                     }
                 } catch (IOException ignore) {
                 }
@@ -760,7 +763,7 @@ public class UtilityCommands {
             }
 
             return adapter.apply(name, path, type, loaded);
-        });
+        }).collect(Collectors.toList());
     }
 
     public static List<File> getFiles(File dir, Actor actor, List<String> args, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst) {
@@ -810,8 +813,7 @@ public class UtilityCommands {
         boolean listMine = false;
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
-            for (int i = 0; i < len; i++) {
-                String arg = args.get(i);
+            for (String arg : args) {
                 switch (arg.toLowerCase()) {
                     case "me":
                     case "mine":
@@ -831,7 +833,10 @@ public class UtilityCommands {
                         if (arg.endsWith("/") || arg.endsWith(File.separator)) {
                             arg = arg.replace("/", File.separator);
                             String newDirFilter = dirFilter + arg;
-                            boolean exists = new File(dir, newDirFilter).exists() || playerFolder && MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + newDirFilter)).exists();
+                            boolean exists =
+                                new File(dir, newDirFilter).exists() || playerFolder && MainUtil
+                                    .resolveRelative(
+                                        new File(dir, actor.getUniqueId() + newDirFilter)).exists();
                             if (!exists) {
                                 arg = arg.substring(0, arg.length() - File.separator.length());
                                 if (arg.length() > 3 && arg.length() <= 16) {
@@ -843,8 +848,7 @@ public class UtilityCommands {
                                 }
                             }
                             dirFilter = newDirFilter;
-                        }
-                        else {
+                        } else {
                             filters.add(arg);
                         }
                         break;

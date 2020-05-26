@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.minecraftforge.gradle.common.util.RunConfig
 import net.minecraftforge.gradle.userdev.UserDevExtension
-import net.minecraftforge.gradle.userdev.tasks.GenerateSRG
+import net.minecraftforge.gradle.mcp.task.GenerateSRG
 import net.minecraftforge.gradle.userdev.tasks.RenameJarInPlace
 
 plugins {
@@ -77,11 +77,7 @@ tasks.named<Copy>("processResources") {
     }
 }
 
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("WorldEdit-Version" to project.version)
-    }
-}
+addJarManifest(includeClasspath = false)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
@@ -91,10 +87,11 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("de.schlichtherle:truezip"))
-        include(dependency("org.mozilla:rhino"))
+        include(dependency("net.java.truevfs:truevfs-profile-default_2.13"))
+        include(dependency("org.mozilla:rhino-runtime"))
     }
     minimize {
-        exclude(dependency("org.mozilla:rhino"))
+        exclude(dependency("org.mozilla:rhino-runtime"))
     }
 }
 

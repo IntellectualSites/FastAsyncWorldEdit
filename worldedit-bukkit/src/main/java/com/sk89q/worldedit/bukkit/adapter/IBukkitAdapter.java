@@ -231,7 +231,7 @@ public interface IBukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    default BlockData adapt(BlockStateHolder block) {
+    default <B extends BlockStateHolder<B>> BlockData adapt(B block) {
         return Bukkit.createBlockData(block.getAsString());
     }
 

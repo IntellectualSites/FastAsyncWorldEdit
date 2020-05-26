@@ -19,11 +19,13 @@
 
 package com.sk89q.worldedit.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -132,6 +134,24 @@ public class LocationTest {
         assertEquals(0, location2.getX(), EPSILON);
         assertEquals(0, location2.getY(), EPSILON);
         assertEquals(TEST_VALUE, location2.getZ(), EPSILON);
+    }
+    
+    @RepeatedTest(value = 5)
+    public void testAddInt() throws Exception {
+        World world = mock(World.class);
+        long start = System.currentTimeMillis();
+        BlockVector3 location1 = BlockVector3.ZERO;
+        BlockVector3.at(location1.getX() + 10, location1.getY() + 10, location1.getZ() + 10);
+        System.out.println(System.currentTimeMillis() - start + " ms");
+    }
+    
+    @RepeatedTest(value = 5)
+    public void testAddObj() throws Exception {
+        World world = mock(World.class);
+        long start = System.currentTimeMillis();
+        BlockVector3 location1 = BlockVector3.ZERO;
+        location1.add(10,10,10);
+        System.out.println(System.currentTimeMillis() - start + " ms");
     }
 
 }

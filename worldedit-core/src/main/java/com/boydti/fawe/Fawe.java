@@ -3,7 +3,6 @@ package com.boydti.fawe;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
-import com.boydti.fawe.regions.general.integrations.plotquared.PlotSquaredFeature;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -15,9 +14,10 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -92,7 +92,8 @@ public class Fawe {
     private FaweVersion version;
     private VisualQueue visualQueue;
     private TextureUtil textures;
-    private DefaultTransformParser transformParser;
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    private DefaultTransformParser transformParser;
 
     private QueueHandler queueHandler;
 
@@ -144,13 +145,27 @@ public class Fawe {
      *
      * @param s
      */
-    public static void debug(Object s) {
+    public static void debug(String s) {
         Actor actor = Request.request().getActor();
         if (actor != null && actor.isPlayer()) {
-            actor.print((String)s);
+            actor.printInfo(TextComponent.of(s));
             return;
         }
-        debugPlain((String) s);
+        debugPlain(s);
+    }
+    
+    /**
+     * Write something to the console
+     *
+     * @param c The Component to be printed
+     */
+    public static void debug(Component c) {
+        Actor actor = Request.request().getActor();
+        if (actor != null && actor.isPlayer()) {
+            actor.printDebug(c);
+            return;
+        }
+        debugPlain(c.toString());
     }
 
     /**
@@ -179,22 +194,15 @@ public class Fawe {
          */
         this.setupMemoryListener();
         this.timer = new FaweTimer();
-        Fawe.this.IMP.setupVault();
 
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                transformParser = new DefaultTransformParser(getWorldEdit());
+                // TODO: Ping @MattBDev to reimplement 2020-02-04
+//                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-                WEManager.IMP.managers.add(new PlotSquaredFeature());
-                log.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
-            try {
-                imp().startMetrics();
-            } catch (Throwable e) {
-                debug(e.getMessage());
-            }
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
@@ -213,10 +221,11 @@ public class Fawe {
         }
         return queueHandler;
     }
-
-    public DefaultTransformParser getTransformParser() {
-        return transformParser;
-    }
+    
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    public DefaultTransformParser getTransformParser() {
+//        return transformParser;
+//    }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
         // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util
@@ -283,21 +292,11 @@ public class Fawe {
     }
 
     public void setupConfigs() {
-        MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "de/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "ru/commands.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "tr/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "es/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "es/commands.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "nl/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "fr/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "cn/message.yml", null);
-//        MainUtil.copyFile(MainUtil.getJarFile(), "it/message.yml", null);
+        MainUtil.copyFile(MainUtil.getJarFile(), "lang" + File.separator + "strings.json", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
-        try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
+        try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
             String commitString = br.readLine();
@@ -305,20 +304,14 @@ public class Fawe {
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-commanding-pipeline/" + version.build;
+            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.15/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
         try {
             Settings.IMP.reload(file);
-            // Setting up message.yml
-            String lang = Objects.toString(Settings.IMP.LANGUAGE);
-            if (!lang.isEmpty()) {
-                getWorldEdit().getTranslationManager().setDefaultLocale(Locale.forLanguageTag(lang));
-            }
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");
-            debug("====================================");
             e.printStackTrace();
             debug("====================================");
         }
@@ -343,8 +336,7 @@ public class Fawe {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
                     debug("====== ZSTD COMPRESSION BINDING NOT FOUND ======");
-                    debug(e);
-                    debug("===============================================");
+                    debug(e.getMessage());
                     debug("FAWE will work but won't compress data as much");
                     debug("===============================================");
                 }
@@ -354,25 +346,22 @@ public class Fawe {
             } catch (Throwable e) {
                 e.printStackTrace();
                 debug("====== LZ4 COMPRESSION BINDING NOT FOUND ======");
-                debug(e);
-                debug("===============================================");
+                debug(e.getMessage());
                 debug("FAWE will work but compression will be slower");
                 debug(" - Try updating your JVM / OS");
                 debug(" - Report this issue if you cannot resolve it");
                 debug("===============================================");
             }
         }
-        try {
-            String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-            String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-            boolean x86OS = !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
-            boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
-            if (x86OS != x86JVM) {
-                debug("====== UPGRADE TO 64-BIT JAVA ======");
-                debug("You are running 32-bit Java on a 64-bit machine");
-                debug("====================================");
-            }
-        } catch (Throwable ignore) {}
+
+        // Check Base OS Arch for Mismatching Architectures
+        boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
+        boolean x86JVM = System.getProperty("os.arch").contains("32");
+        if (x86OS != x86JVM) {
+            debug("====== UPGRADE TO 64-BIT JAVA ======");
+            debug("You are running 32-bit Java on a 64-bit machine");
+            debug("====================================");
+        }
     }
 
     private void setupMemoryListener() {
@@ -406,7 +395,6 @@ public class Fawe {
             }
         } catch (Throwable ignored) {
             debug("====== MEMORY LISTENER ERROR ======");
-            debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");
             debug(" - Disable this with `max-memory-percent: -1`");

@@ -9,6 +9,7 @@ import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -247,10 +248,10 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(167, "modified_badlands_plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
         new BiomeColor(168, "bamboo_jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(169, "bamboo_jungle_hills", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(170, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(171, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(172, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(173, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(170, "Unknown Biome", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(171, "Unknown Biome", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(172, "Unknown Biome", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(173, "Unknown Biome", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
         new BiomeColor(174, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(175, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(176, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
@@ -375,7 +376,7 @@ public class TextureUtil implements TextureHolder {
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
             extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
-            if (mask.test(extent)) {
+            if (mask.test(extent, extent)) {
                 blocks.add(block);
             }
         }

@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import java.util.function.Supplier;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
@@ -71,23 +72,16 @@ public class AsyncChunk implements Chunk {
         if (Fawe.isMainThread()) {
             return world.getChunkAt(x, z).getChunkSnapshot(includeMaxblocky, includeBiome, includeBiomeTempRain);
         }
-        return whenLoaded(new RunnableVal<ChunkSnapshot>() {
-            @Override
-            public void run(ChunkSnapshot value) {
-                this.value = world.getChunkAt(x, z).getChunkSnapshot(includeBiome, includeBiome, includeBiomeTempRain);
-            }
-        });
+        return whenLoaded(() -> world.getChunkAt(x, z).getChunkSnapshot(includeBiome, includeBiome, includeBiomeTempRain));
     }
 
-    private <T> T whenLoaded(RunnableVal<T> task) {
+    private <T> T whenLoaded(Supplier<T> task) {
         if (Fawe.isMainThread()) {
-            task.run();
-            return task.value;
+            return task.get();
         }
         if (world.isWorld()) {
             if (world.isChunkLoaded(x, z)) {
-                task.run();
-                return task.value;
+                return task.get();
             }
         }
         return TaskManager.IMP.sync(task);
@@ -98,12 +92,7 @@ public class AsyncChunk implements Chunk {
         if (!isLoaded()) {
             return new Entity[0];
         }
-        return whenLoaded(new RunnableVal<Entity[]>() {
-            @Override
-            public void run(Entity[] value) {
-                world.getChunkAt(x, z).getEntities();
-            }
-        });
+        return whenLoaded(() -> world.getChunkAt(x, z).getEntities());
     }
 
     @Override
@@ -111,12 +100,7 @@ public class AsyncChunk implements Chunk {
         if (!isLoaded()) {
             return new BlockState[0];
         }
-        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
-            @Override
-            public void run(BlockState[] value) {
-                this.value = world.getChunkAt(x, z).getTileEntities();
-            }
-        });
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).getTileEntities());
     }
 
     @Override
@@ -124,12 +108,7 @@ public class AsyncChunk implements Chunk {
         if (!isLoaded()) {
             return new BlockState[0];
         }
-        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
-            @Override
-            public void run(BlockState[] value) {
-                this.value = world.getChunkAt(x, z).getTileEntities(useSnapshot);
-            }
-        });
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).getTileEntities(useSnapshot));
     }
 
     @Override
@@ -139,12 +118,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public boolean load(final boolean generate) {
-        return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
-            @Override
-            public void run(Boolean value) {
-                this.value = world.loadChunk(x, z, generate);
-            }
-        });
+        return TaskManager.IMP.sync(() -> world.loadChunk(x, z, generate));
     }
 
     @Override

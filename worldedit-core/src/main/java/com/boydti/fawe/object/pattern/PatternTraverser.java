@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.Resettable;
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -21,11 +22,8 @@ public class PatternTraverser {
         if (pattern == null) {
             return;
         }
-        if (pattern instanceof ResettablePattern) {
-            ((ResettablePattern) pattern).reset();
-        }
-        if (pattern instanceof ResettableMask) {
-            ((ResettableMask) pattern).reset();
+        if (pattern instanceof Resettable) {
+            ((Resettable) pattern).reset();
         }
         Class<?> current = pattern.getClass();
         while (current.getSuperclass() != null) {

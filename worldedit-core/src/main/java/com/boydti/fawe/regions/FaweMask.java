@@ -9,11 +9,6 @@ import com.sk89q.worldedit.regions.Region;
 public class FaweMask implements IDelegateRegion {
     private final Region region;
 
-    @Deprecated
-    public FaweMask(final BlockVector3 pos1, final BlockVector3 pos2) {
-        this(new CuboidRegion(pos1, pos2));
-    }
-
     public FaweMask(Region region) {
         this.region = region;
     }

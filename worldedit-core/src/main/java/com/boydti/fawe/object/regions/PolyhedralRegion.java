@@ -249,9 +249,9 @@ public class PolyhedralRegion extends AbstractRegion {
         for (int i = 0; i < triangles.size(); ++i) {
             final Triangle triangle = triangles.get(i);
 
-            final BlockVector3 v0 = change.add(triangle.getVertex(0).toBlockPoint());
-            final BlockVector3 v1 = change.add(triangle.getVertex(1).toBlockPoint());
-            final BlockVector3 v2 = change.add(triangle.getVertex(2).toBlockPoint());
+            final BlockVector3 v0 = change.add(triangle.getVertex(0));
+            final BlockVector3 v1 = change.add(triangle.getVertex(1));
+            final BlockVector3 v2 = change.add(triangle.getVertex(2));
 
             triangles.set(i, new Triangle(v0, v1, v2));
         }

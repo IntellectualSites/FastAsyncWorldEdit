@@ -29,9 +29,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import com.sk89q.worldedit.world.block.ImmutableBaseBlock;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -71,7 +73,7 @@ public class BlockMask extends ABlockMask {
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         this(extent);
         checkNotNull(blocks);
-        add(blocks);
+        this.add(blocks);
     }
 
     /**
@@ -153,7 +155,13 @@ public class BlockMask extends ABlockMask {
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
         for (BaseBlock block : blocks) {
-            add(block.toBlockState());
+            if (block instanceof ImmutableBaseBlock) {
+                for (BlockState state : block.getBlockType().getAllStates()) {
+                    ordinals[state.getOrdinal()] = true;
+                }
+            } else {
+                add(block.toBlockState());
+            }
         }
     }
 
@@ -166,14 +174,30 @@ public class BlockMask extends ABlockMask {
         add(Arrays.asList(checkNotNull(block)));
     }
 
+    /**
+     * Get the list of blocks that are tested with.
+     *
+     * @return a list of blocks
+     */
+    public Collection<BaseBlock> getBlocks() {
+        return Collections.emptyList(); //TODO Not supported in FAWE yet
+    }
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()];
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return ordinals[vector.getOrdinal(getExtent())];
+    public boolean test(Extent extent, BlockVector3 vector) {
+        int test = vector.getOrdinal(extent);
+        return ordinals[test] || replacesAir() && test == 0;
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return ordinals[BlockTypes.AIR.getDefaultState().getOrdinal()]
+            || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
+            || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
     }
 
     @Override

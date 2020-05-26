@@ -14,13 +14,15 @@ import com.sk89q.worldedit.world.registry.BlockRegistry;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
+import org.jetbrains.annotations.Range;
 
 /**
- * Shared interface for IGetBlocks and ISetBlocks
+ * A shared interface for IGetBlocks and ISetBlocks
  */
 public interface IBlocks extends Trimable {
 
-    boolean hasSection(int layer);
+    boolean hasSection(@Range(from = 0, to = 15) int layer);
 
     char[] load(int layer);
 
@@ -35,14 +37,11 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        int mask = 0;
-        for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
-            if (hasSection(layer)) {
-                mask += (1 << layer);
-            }
-        }
-        return mask;
+        return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
+            .map(layer -> (1 << layer)).sum();
     }
+
+    boolean trim(boolean aggressive, int layer);
 
     IBlocks reset();
 
@@ -55,13 +54,14 @@ public interface IBlocks extends Trimable {
             buffer = new byte[1024];
         }
 
-        BlockRegistry registry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
+        BlockRegistry registry = WorldEdit.getInstance().getPlatformManager()
+            .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
-        FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray);
-
-        try {
+        try (FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
-                if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) continue;
+                if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) {
+                    continue;
+                }
 
                 char[] ids = this.load(layer);
 
@@ -81,46 +81,30 @@ public interface IBlocks extends Trimable {
                 }
 
                 sectionWriter.writeShort(nonEmpty); // non empty
+                FaweCache.Palette palette = FaweCache.IMP.toPalette(0, ids);
 
-//                if (false) { // short palette
-//                    sectionWriter.writeByte(14); // globalPaletteBitsPerBlock
-//                    BitArray4096 bits = new BitArray4096(14); // globalPaletteBitsPerBlock
-//                    bits.setAt(0, 0);
-//                    for (int i = 0; i < 4096; i++) {
-//                        int ordinal = ids[i];
-//                        BlockState state = BlockState.getFromOrdinal(ordinal);
-//                        if (!state.getMaterial().isAir()) {
-//                            int mcId = registry.getInternalBlockStateId(state).getAsInt();
-//                            bits.setAt(i, mcId);
-//                        }
-//                    }
-//                    sectionWriter.write(bits.getData());
-//                } else {
-                    FaweCache.Palette palette = FaweCache.IMP.toPalette(0, ids);
-
-                    sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
-                    sectionWriter.writeVarInt(palette.paletteToBlockLength);
-                    for (int i = 0; i < palette.paletteToBlockLength; i++) {
-                        int ordinal = palette.paletteToBlock[i];
-                        switch (ordinal) {
-                            case BlockID.__RESERVED__:
-                            case BlockID.CAVE_AIR:
-                            case BlockID.VOID_AIR:
-                            case BlockID.AIR:
-                                sectionWriter.write(0);
-                                break;
-                            default:
-                                BlockState state = BlockState.getFromOrdinal(ordinal);
-                                int mcId = registry.getInternalBlockStateId(state).getAsInt();
-                                sectionWriter.writeVarInt(mcId);
-                                break;
-                        }
+                sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
+                sectionWriter.writeVarInt(palette.paletteToBlockLength);
+                for (int i = 0; i < palette.paletteToBlockLength; i++) {
+                    int ordinal = palette.paletteToBlock[i];
+                    switch (ordinal) {
+                        case BlockID.__RESERVED__:
+                        case BlockID.CAVE_AIR:
+                        case BlockID.VOID_AIR:
+                        case BlockID.AIR:
+                            sectionWriter.write(0);
+                            break;
+                        default:
+                            BlockState state = BlockState.getFromOrdinal(ordinal);
+                            int mcId = registry.getInternalBlockStateId(state).getAsInt();
+                            sectionWriter.writeVarInt(mcId);
+                            break;
                     }
-                    sectionWriter.writeVarInt(palette.blockStatesLength);
-                    for (int i = 0; i < palette.blockStatesLength; i++) {
-                        sectionWriter.writeLong(palette.blockStates[i]);
-                    }
-//                }
+                }
+                sectionWriter.writeVarInt(palette.blockStatesLength);
+                for (int i = 0; i < palette.blockStatesLength; i++) {
+                    sectionWriter.writeLong(palette.blockStates[i]);
+                }
             }
             if (full) {
                 for (int z = 0; z < 16; z++) {

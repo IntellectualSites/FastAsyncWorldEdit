@@ -37,7 +37,7 @@ public class ReflectionUtils9 {
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class
                     enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
-                    values.size()); // can be used to pass values to the enum constuctor
+                    values.size()); // can be used to pass values to the enum constructor
 
             // 4. add new value
             values.add(newValue);

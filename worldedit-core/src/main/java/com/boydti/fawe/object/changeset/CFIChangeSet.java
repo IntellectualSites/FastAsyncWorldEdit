@@ -7,14 +7,19 @@ import com.boydti.fawe.object.change.CFIChange;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.history.changeset.ChangeSetSummary;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
-public class CFIChangeSet extends FaweChangeSet {
+public class CFIChangeSet extends AbstractChangeSet {
 
     private final File file;
 

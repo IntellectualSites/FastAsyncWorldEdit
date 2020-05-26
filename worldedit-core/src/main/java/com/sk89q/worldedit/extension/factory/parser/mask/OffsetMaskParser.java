@@ -32,8 +32,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.stream.Stream;
 
-import java.util.stream.Stream;
-
 public class OffsetMaskParser extends InputParser<Mask> {
 
     public OffsetMaskParser(WorldEdit worldEdit) {

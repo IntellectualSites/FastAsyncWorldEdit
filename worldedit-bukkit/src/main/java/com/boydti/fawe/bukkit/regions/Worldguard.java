@@ -14,6 +14,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -27,7 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
-    private WorldGuardPlugin worldguard;
+    private final WorldGuardPlugin worldguard;
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -61,6 +62,10 @@ public class Worldguard extends BukkitMaskManager implements Listener {
             return global;
         }
         final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(location.getX(), location.getY(), location.getZ()));
+        //Merge WorldGuardFlag
+        if(player.hasPermission("fawe.worldguardflag") && !regions.testState(player, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK)){
+            return null;
+        }
         for (ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;
@@ -70,6 +75,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     public boolean isAllowed(LocalPlayer localplayer, ProtectedRegion region) {
+        //Check if player is the owner of the region, the region's ID contains the player's name (why?), or if the region's owners contains "*".
         if (region.isOwner(localplayer) || region.isOwner(localplayer.getName())) {
             return true;
         } else if (region.getId().toLowerCase().equals(localplayer.getName().toLowerCase())) {
@@ -79,6 +85,8 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         } else if (region.isOwner("*")) {
             return true;
         }
+
+        //Check if the player has the FAWE permission for editing in WG regions as member, then checking member status.
         if (localplayer.hasPermission("fawe.worldguard.member")) {
             if (region.isMember(localplayer) || region.isMember(localplayer.getName())) {
                 return true;
@@ -89,8 +97,8 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player fp, MaskType type) {
-        final Player player = BukkitAdapter.adapt(fp);
+    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+        final Player player = BukkitAdapter.adapt(wePlayer);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final Location location = player.getLocation();
         final ProtectedRegion myregion = this.getRegion(localplayer, location);
@@ -113,7 +121,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
                     };
                 }
             }
-            return new FaweMask(pos1, pos2) {
+            return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
             @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {

@@ -40,10 +40,10 @@ public final class NBTConstants {
     private NBTConstants() {
 
     }
-
+    
     /**
      * Convert a type ID to its corresponding {@link Tag} class.
-     *
+     * 
      * @param id type ID
      * @return tag class
      * @throws IllegalArgumentException thrown if the tag ID is not valid
@@ -80,4 +80,5 @@ public final class NBTConstants {
             throw new IllegalArgumentException("Unknown tag type ID of " + id);
         }
     }
+
 }

@@ -21,12 +21,10 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
-import com.sk89q.worldedit.function.pattern.FawePattern;
 
+import com.sk89q.worldedit.function.pattern.Pattern;
 import java.util.Locale;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -37,7 +35,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern, TileEntityBlock {
+public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 
     /**
      * Get the block type

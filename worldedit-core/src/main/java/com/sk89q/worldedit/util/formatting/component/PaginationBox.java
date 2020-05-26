@@ -196,4 +196,34 @@ public abstract class PaginationBox extends MessageBox {
             return lines.size();
         }
     }
+
+    public static class MergedPaginationBox extends PaginationBox {
+        private final PaginationBox[] values;
+
+        public MergedPaginationBox(String header, String pageCommand, PaginationBox... values) {
+            super(header, pageCommand);
+            this.values = values;
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            for (PaginationBox box : values) {
+                int size = box.getComponentsSize();
+                if (size > number) {
+                    return box.getComponent(number);
+                }
+                number -= size;
+            }
+            return null;
+        }
+
+        @Override
+        public int getComponentsSize() {
+            int size = 0;
+            for (PaginationBox box : values) {
+                size += box.getComponentsSize();
+            }
+            return size;
+        }
+    }
 }

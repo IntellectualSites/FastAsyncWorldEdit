@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.operation;
 
+import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
 import com.boydti.fawe.object.function.block.BiomeCopy;
@@ -31,7 +32,9 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.FastSchematicReader;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
@@ -302,7 +305,7 @@ public class ForwardExtentCopy implements Operation {
         }
 
         RegionFunction copy;
-        Operation blockCopy = null;
+        RegionVisitor blockCopy = null;
         PositionTransformExtent transExt = null;
         if (!currentTransform.isIdentity()) {
             if (!(currentTransform instanceof AffineTransform) || ((AffineTransform) currentTransform).isOffAxis()) {
@@ -317,9 +320,9 @@ public class ForwardExtentCopy implements Operation {
                 }
                 if (sourceMask != Masks.alwaysTrue()) {
                     new MaskTraverser(sourceMask).reset(transExt);
-                    copy = new RegionMaskingFilter(sourceMask, copy);
+                    copy = new RegionMaskingFilter(source, sourceMask, copy);
                 }
-                if (copyingBiomes && source.isWorld() || (source instanceof Clipboard && ((Clipboard) source).hasBiomes())) {
+                if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
                 }
                 blockCopy = new BackwardsExtentBlockCopy(region, from, transform, copy);
@@ -362,8 +365,7 @@ public class ForwardExtentCopy implements Operation {
                     };
                 }
                 copy = new CombinedBlockCopy(source, finalDest, copySrcFunc);
-            }
-            else {
+            } else {
                 copy = new SimpleBlockCopy(source, finalDest);
             }
             if (this.filterFunction != null) {
@@ -371,9 +373,9 @@ public class ForwardExtentCopy implements Operation {
             }
             if (sourceMask != Masks.alwaysTrue()) {
                 if (maskFunc != null) copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
-                else copy = new RegionMaskingFilter(sourceMask, copy);
+                else copy = new RegionMaskingFilter(source, sourceMask, copy);
             }
-            if (copyingBiomes && source.isWorld() || (source instanceof Clipboard && ((Clipboard) source).hasBiomes())) {
+            if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
             }
             blockCopy = new RegionVisitor(region, copy);
@@ -412,8 +414,7 @@ public class ForwardExtentCopy implements Operation {
             }
 
         }
-        int affected;
-        affected = region.getArea();
+        affectedBlocks += blockCopy.getAffected();
         return null;
     }
 

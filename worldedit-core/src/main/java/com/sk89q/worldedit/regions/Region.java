@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -32,7 +32,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
-
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -80,9 +79,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return (max.getX() - min.getX() + 1) *
-                (max.getY() - min.getY() + 1) *
-                (max.getZ() - min.getZ() + 1);
+        return (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
     }
 
     /**
@@ -206,6 +203,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
         int minSection = Math.max(0, getMinimumY() >> 4);
         int maxSection = Math.min(15, getMaximumY() >> 4);
+        block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
             if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
             block = block.initLayer(get, set, layer);
@@ -222,12 +220,14 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             filter(chunk, filter, block, get, set, minSection, yStart, yEnd, full);
             return;
         }
+        //If the yStart is not 0, the edit is smaller than the height of a ChunkSection, so filter individually and remove section as the minSection layer entry
         if (yStart != 0) {
             filter(chunk, filter, block, get, set, minSection, yStart, 15, full);
             minSection++;
         }
+        //If the yEnd is not 15, the edit is smaller than the height of a ChunkSection, so filter individually and remove section as the maxSection layer entry
         if (yEnd != 15) {
-            filter(chunk, filter, block, get, set, minSection, 0, yEnd, full);
+            filter(chunk, filter, block, get, set, maxSection, 0, yEnd, full);
             maxSection--;
         }
         for (int layer = minSection; layer <= maxSection; layer++) {
@@ -283,31 +283,27 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        boolean processExtra = false;
         if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
             // contains some
+            boolean processExtra = false;
             for (int layer = 0; layer < 16; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     continue;
                 } else {
-                    boolean changed = true;
                     processExtra = true;
                     char[] arr = set.load(layer);
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
                                 if (arr[index] != 0 && !contains(x, y, z)) {
-                                    changed = true;
                                     arr[index] = 0;
                                 }
                             }
                         }
                     }
-                    if (changed) {
-                        set.setBlocks(layer, arr);
-                    }
+                    set.setBlocks(layer, arr);
                 }
             }
             if (processExtra) {
@@ -319,6 +315,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         }
     }
 
+    @Override
     default Extent construct(Extent child) {
         if (isGlobal()) {
             return child;

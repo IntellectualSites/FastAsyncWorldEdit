@@ -41,6 +41,6 @@ public final class CommandPermissionsConditionGenerator implements CommandCondit
         CommandPermissions annotation = commandMethod.getAnnotation(CommandPermissions.class);
         checkNotNull(annotation, "Annotation is missing from commandMethod");
         Set<String> permissions = ImmutableSet.copyOf(annotation.value());
-        return new PermissionCondition(permissions);
+        return new PermissionCondition(permissions, annotation.queued());
     }
 }

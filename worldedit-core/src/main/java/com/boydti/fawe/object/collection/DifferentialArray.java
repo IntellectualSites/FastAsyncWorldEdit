@@ -294,14 +294,14 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
         dataInts[index] = value;
     }
 
-//    public void setChar(int index, char value) {
-//        changed = true;
-//        try {
-//            changesChars[index] += dataChars[index] - value;
-//        } catch (NullPointerException ignore) {
-//            changes = (T) (changesChars = new char[dataChars.length]);
-//            changesChars[index] += dataChars[index] - value;
-//        }
-//        dataChars[index] = value;
-//    }
+    public void setChar(int index, char value) {
+        changed = true;
+        try {
+            changesChars[index] += dataChars[index] - value;
+        } catch (NullPointerException ignore) {
+            changes = (T) (changesChars = new char[dataChars.length]);
+            changesChars[index] += dataChars[index] - value;
+        }
+        dataChars[index] = value;
+    }
 }

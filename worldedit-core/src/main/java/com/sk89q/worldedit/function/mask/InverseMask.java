@@ -2,6 +2,7 @@ package com.sk89q.worldedit.function.mask;
 
 import javax.annotation.Nullable;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class InverseMask extends AbstractMask {
@@ -12,8 +13,8 @@ public class InverseMask extends AbstractMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return !mask.test(vector);
+    public boolean test(Extent extent, BlockVector3 pos) {
+        return !mask.test(extent, pos);
     }
 
     @Nullable

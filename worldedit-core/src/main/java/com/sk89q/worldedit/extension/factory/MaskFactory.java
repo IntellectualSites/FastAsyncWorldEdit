@@ -20,8 +20,22 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.BlocksMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.FalseMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.LiquidMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.TrueMaskParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -49,8 +63,6 @@ public final class MaskFactory extends AbstractFactory<Mask> {
      * @param worldEdit the WorldEdit instance
      */
     public MaskFactory(WorldEdit worldEdit) {
-		super(worldEdit, new DefaultMaskParser(worldEdit));
-		/*
         super(worldEdit, new BlocksMaskParser(worldEdit));
 
         register(new ExistingMaskParser(worldEdit));
@@ -62,11 +74,13 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new BlockStateMaskParser(worldEdit));
         register(new NegateMaskParser(worldEdit));
         register(new ExpressionMaskParser(worldEdit));
-		*/
         register(new BlockCategoryMaskParser(worldEdit));
-		/*
         register(new BiomeMaskParser(worldEdit));
-		*/
+        // Mask Parsers from FAWE
+        register(new FalseMaskParser(worldEdit));
+        register(new TrueMaskParser(worldEdit));
+        register(new AirMaskParser(worldEdit));
+        register(new LiquidMaskParser(worldEdit));
 
 
     }

@@ -12,7 +12,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -20,7 +19,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public final Region region;
 
     public ReadOnlyClipboard(Region region) {
-        super(region.getDimensions());
+        super(region);
         this.region = region;
     }
 
@@ -37,12 +36,12 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region) {
-        Fawe.get().getQueueHandler().uncache();
+        Fawe.get().getQueueHandler().unCache();
         return of(() -> extent, region);
     }
 
     public static ReadOnlyClipboard of(Extent extent, final Region region, boolean copyEntities, boolean copyBiomes) {
-        Fawe.get().getQueueHandler().uncache();
+        Fawe.get().getQueueHandler().unCache();
         return of(() -> extent, region, copyEntities, copyBiomes);
     }
 
@@ -62,12 +61,13 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
                 if (current.getWorld().equals(world)) {
                     return current;
                 }
-                throw new UnsupportedOperationException("TODO: Cannot lazy copy accross worlds (bug jesse)");
+                throw new UnsupportedOperationException("TODO: Cannot lazy copy across worlds (bug jesse)");
             }
             throw new IllegalStateException("No world");
         };
     }
 
+    @Override
     public Region getRegion() {
         return region;
     }
@@ -81,7 +81,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public abstract List<? extends Entity> getEntities();
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 

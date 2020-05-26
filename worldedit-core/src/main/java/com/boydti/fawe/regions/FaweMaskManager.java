@@ -36,14 +36,7 @@ public abstract class FaweMaskManager {
         return this.key;
     }
 
-    @Deprecated
-    public FaweMask getMask(final Player player) {
-        return getMask(player, MaskType.getDefaultMaskType());
-    }
-
-    public FaweMask getMask(final Player player, MaskType type) {
-        return getMask(player);
-    }
+    public FaweMask getMask(final Player player, MaskType type){ return null; }
 
     public boolean isValid(FaweMask mask) {
         return true;

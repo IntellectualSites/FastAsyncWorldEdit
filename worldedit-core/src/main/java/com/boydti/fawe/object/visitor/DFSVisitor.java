@@ -1,17 +1,16 @@
 package com.boydti.fawe.object.visitor;
 
+import com.boydti.fawe.object.IntTriple;
 import com.google.common.collect.Lists;
-import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.boydti.fawe.object.IntegerTrio;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,11 +56,11 @@ public abstract class DFSVisitor implements Operation {
         return this.directions;
     }
 
-    private IntegerTrio[] getIntDirections() {
-        IntegerTrio[] array = new IntegerTrio[directions.size()];
+    private IntTriple[] getIntDirections() {
+        IntTriple[] array = new IntTriple[directions.size()];
         for (int i = 0; i < array.length; i++) {
             BlockVector3 dir = directions.get(i);
-            array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
+            array[i] = new IntTriple(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
         }
         return array;
     }
@@ -77,17 +76,13 @@ public abstract class DFSVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        NodePair current;
-        Node from;
-        Node adjacent;
-//        MutableBlockVector3 mutable = new MutableBlockVector3();
+        //        MutableBlockVector3 mutable = new MutableBlockVector3();
 //        MutableBlockVector3 mutable2 = new MutableBlockVector3();
-        int countAdd, countAttempt;
-        IntegerTrio[] dirs = getIntDirections();
+        IntTriple[] dirs = getIntDirections();
 
-        for (int layer = 0; !queue.isEmpty(); layer++) {
-            current = queue.poll();
-            from = current.to;
+        while (!queue.isEmpty()) {
+            NodePair current = queue.poll();
+            Node from = current.to;
             hashQueue.remove(from);
             if (visited.containsKey(from)) {
                 continue;
@@ -97,16 +92,18 @@ public abstract class DFSVisitor implements Operation {
 //            mutable.mutZ(from.getZ());
             BlockVector3 bv = BlockVector3.at(from.getX(), from.getY(), from.getZ());
             function.apply(bv);
-            countAdd = 0;
-            countAttempt = 0;
-            for (IntegerTrio direction : dirs) {
+            int countAdd = 0;
+            int countAttempt = 0;
+            for (IntTriple direction : dirs) {
 //                mutable2.mutX(from.getX() + direction.x);
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
-                BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
+                BlockVector3 bv2 = BlockVector3
+                    .at(from.getX() + direction.x, from.getY() + direction.y,
+                        from.getZ() + direction.z);
                 if (isVisitable(bv, bv2)) {
-                    adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
-                    if ((!adjacent.equals(current.from))) {
+                    Node adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
+                    if (!adjacent.equals(current.from)) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {
                             if (countAdd++ < maxBranch) {
@@ -115,7 +112,8 @@ public abstract class DFSVisitor implements Operation {
                                         countAttempt++;
                                     } else {
                                         hashQueue.add(adjacent);
-                                        queue.addFirst(new NodePair(from, adjacent, current.depth + 1));
+                                        queue.addFirst(
+                                            new NodePair(from, adjacent, current.depth + 1));
                                     }
                                 } else {
                                     countAttempt++;
@@ -146,8 +144,8 @@ public abstract class DFSVisitor implements Operation {
 
     public Iterable<Component> getStatusMessages() {
         return Lists.newArrayList(TranslatableComponent.of(
-                "fawe.worldedit.visitor.visitor.block",
-                TextComponent.of(getAffected())
+            "fawe.worldedit.visitor.visitor.block",
+            TextComponent.of(getAffected())
         ).color(TextColor.GRAY));
     }
 
@@ -155,19 +153,8 @@ public abstract class DFSVisitor implements Operation {
         return this.affected;
     }
 
-    public class NodePair {
-        public final Node to;
-        public final Node from;
-        private final int depth;
-
-        public NodePair(Node from, Node to, int depth) {
-            this.from = from;
-            this.to = to;
-            this.depth = depth;
-        }
-    }
-
     public static final class Node {
+
         private int x, y, z;
 
         public Node(int x, int y, int z) {
@@ -176,13 +163,13 @@ public abstract class DFSVisitor implements Operation {
             this.z = z;
         }
 
-        private final void set(int x, int y, int z) {
+        private void set(int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        private final void set(Node node) {
+        private void set(Node node) {
             this.x = node.x;
             this.y = node.y;
             this.z = node.z;
@@ -193,15 +180,15 @@ public abstract class DFSVisitor implements Operation {
             return (x ^ (z << 12)) ^ (y << 24);
         }
 
-        private final int getX() {
+        private int getX() {
             return x;
         }
 
-        private final int getY() {
+        private int getY() {
             return y;
         }
 
-        private final int getZ() {
+        private int getZ() {
             return z;
         }
 
@@ -214,6 +201,19 @@ public abstract class DFSVisitor implements Operation {
         public boolean equals(Object obj) {
             Node other = (Node) obj;
             return other.x == x && other.z == z && other.y == y;
+        }
+    }
+
+    public static class NodePair {
+
+        public final Node to;
+        public final Node from;
+        private final int depth;
+
+        NodePair(Node from, Node to, int depth) {
+            this.from = from;
+            this.to = to;
+            this.depth = depth;
         }
     }
 }

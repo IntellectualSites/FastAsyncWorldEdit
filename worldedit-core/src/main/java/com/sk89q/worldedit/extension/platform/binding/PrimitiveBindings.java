@@ -1,15 +1,7 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.extent.NullExtent;
-import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
@@ -17,7 +9,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.world.World;
 import java.util.Locale;
 import javax.annotation.Nullable;
 
@@ -44,29 +35,31 @@ public class PrimitiveBindings extends Bindings {
         }
     }
 
-    /**
-     * Gets an {@link Extent} from a {@link Binding}.
-     *
-     * @param argument the context
-     * @return an extent
-     * @throws InputParseException on other error
-     */
-    @Binding
-    public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
-        if (argument.equalsIgnoreCase("#null")) {
-            return new NullExtent();
-        }
-        DefaultTransformParser parser = Fawe.get().getTransformParser();
-        ParserContext parserContext = new ParserContext();
-        if (actor instanceof Entity) {
-            Extent extent = ((Entity) actor).getExtent();
-            if (extent instanceof World) {
-                parserContext.setWorld((World) extent);
-            }
-        }
-        parserContext.setSession(WorldEdit.getInstance().getSessionManager().get(actor));
-        return parser.parseFromInput(argument, parserContext);
-    }
+// TODO: Ping @MattBDev to reimplement 2020-02-04
+//
+//    /**
+//     * Gets an {@link Extent} from a {@link Binding}.
+//     *
+//     * @param argument the context
+//     * @return an extent
+//     * @throws InputParseException on other error
+//     */
+//    @Binding
+//    public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
+//        if (argument.equalsIgnoreCase("#null")) {
+//            return new NullExtent();
+//        }
+//        DefaultTransformParser parser = Fawe.get().getTransformParser();
+//        ParserContext parserContext = new ParserContext();
+//        if (actor instanceof Entity) {
+//            Extent extent = ((Entity) actor).getExtent();
+//            if (extent instanceof World) {
+//                parserContext.setWorld((World) extent);
+//            }
+//        }
+//        parserContext.setSession(WorldEdit.getInstance().getSessionManager().get(actor));
+//        return parser.parseFromInput(argument, parserContext);
+//    }
 
     /**
      * Gets a type from a {@link Binding}.
@@ -112,13 +105,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusY, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusY = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 3:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusY = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[2]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
                 break;
 
             default:
@@ -142,12 +135,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 2:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[1]);
                 break;
 
             default:
@@ -170,13 +163,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusY, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusY = radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
+                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
                 break;
 
             case 3:
-                radiusX = Math.max(1, PrimitiveBindings.parseNumericInput(radii[0]));
-                radiusY = Math.max(1, PrimitiveBindings.parseNumericInput(radii[1]));
-                radiusZ = Math.max(1, PrimitiveBindings.parseNumericInput(radii[2]));
+                radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
+                radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
+                radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
                 break;
 
             default:
@@ -199,12 +192,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX, radiusZ;
         switch (radii.length) {
             case 1:
-                radiusX = radiusZ = Math.max(1, parseNumericInput(radii[0]));
+                radiusX = radiusZ = parseNumericInput(radii[0]);
                 break;
 
             case 2:
-                radiusX = Math.max(1, parseNumericInput(radii[0]));
-                radiusZ = Math.max(1, parseNumericInput(radii[1]));
+                radiusX = parseNumericInput(radii[0]);
+                radiusZ = parseNumericInput(radii[1]);
                 break;
 
             default:

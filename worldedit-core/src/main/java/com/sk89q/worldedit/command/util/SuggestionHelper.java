@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.command.util;
 
-import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
-import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
-
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
@@ -39,6 +36,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
+import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
 /**
  * Internal class for generating common command suggestions.
@@ -149,7 +149,8 @@ public final class SuggestionHelper {
         if (input.isEmpty() || input.equals(":")) {
             final Set<String> namespaces = registry.getKnownNamespaces();
             if (namespaces.size() == 1) {
-                return registry.keySet().stream();
+                int def = namespaces.iterator().next().length() + 1; // default namespace length + ':'
+                return registry.keySet().stream().map(s -> s.substring(def));
             } else {
                 return namespaces.stream().map(s -> s + ":");
             }
@@ -164,7 +165,8 @@ public final class SuggestionHelper {
             // don't yet have namespace - search namespaces + default
             final String lowerSearch = input.toLowerCase(Locale.ROOT);
             String defKey = registry.getDefaultNamespace() + ":" + lowerSearch;
-            return Stream.concat(registry.keySet().stream().filter(s -> s.startsWith(defKey)),
+            int defLength = registry.getDefaultNamespace().length() + 1;
+            return Stream.concat(registry.keySet().stream().filter(s -> s.startsWith(defKey)).map(s -> s.substring(defLength)),
                     registry.getKnownNamespaces().stream().filter(n -> n.startsWith(lowerSearch)).map(n -> n + ":"));
         }
         // have a namespace - search that

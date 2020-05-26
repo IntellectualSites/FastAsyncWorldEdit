@@ -25,7 +25,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
-import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
@@ -38,6 +38,7 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -48,14 +49,19 @@ import java.util.stream.IntStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class BlockType implements FawePattern, Keyed {
+public class BlockType implements Keyed, Pattern {
 
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
 
     private final String id;
     private final BlockTypesCache.Settings settings;
+    private final LazyReference<FuzzyBlockState> emptyFuzzy
+        = LazyReference.from(() -> new FuzzyBlockState(this));
+    
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
+    
+    private Integer legacyCombinedId;
     private boolean initItemType;
     private ItemType itemType;
 
@@ -65,6 +71,16 @@ public class BlockType implements FawePattern, Keyed {
         this.settings = new BlockTypesCache.Settings(this, id, internalId, states);
     }
 
+    public BlockType(String id, Function<BlockState, BlockState> values) {
+        // If it has no namespace, assume minecraft.
+        if (!id.contains(":")) {
+            id = "minecraft:" + id;
+        }
+        this.id = id;
+        //TODO fix the line below
+        this.settings = new BlockTypesCache.Settings(this, id, 0, null);
+    }
+    
     @Deprecated
     public int getMaxStateId() {
         return settings.permutations;
@@ -177,13 +193,12 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public final BlockState getDefaultState() {
+    public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
-    @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
-        return new FuzzyBlockState(this);
+        return emptyFuzzy.getValue();
     }
 
     /**
@@ -310,7 +325,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Deprecated
     public int getLegacyId() {
-        return legacyId.getValue();
+        return computeLegacy(0);
     }
 
     /**
@@ -322,11 +337,13 @@ public class BlockType implements FawePattern, Keyed {
      */
     @Deprecated
     public int getLegacyData() {
-        return legacyData.getValue();
+        return computeLegacy(1);
     }
 
     private int computeLegacy(int index) {
-        int[] legacy = LegacyMapper.getInstance().getLegacyFromBlock(this.getDefaultState());
-        return legacy != null ? legacy[index] : 0;
+        if (this.legacyCombinedId == null) {
+            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
+        }
+        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 }

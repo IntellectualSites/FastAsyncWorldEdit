@@ -77,6 +77,7 @@ public final class MemBlockSet extends BlockSet {
         return BlockVector3.at(getMinX(), getMinimumY(), getMinZ());
     }
 
+    @Override
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.at(getMaxX(), getMaximumY(), getMaxZ());
     }

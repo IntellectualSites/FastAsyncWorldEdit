@@ -66,7 +66,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "mask",
-            aliases = {"/mask"},
+            aliases = "/mask",
             desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
@@ -83,16 +83,17 @@ public class ToolUtilCommands {
             return;
         }
         if (maskOpt == null) {
-            player.print(TranslatableComponent.of("worldedit.tool.mask.disabled"));
+            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
-            return;
-    }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-        settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
-        settings.setMask(maskOpt);
-        tool.update();
-        player.print(TranslatableComponent.of("worldedit.tool.mask.set"));
+        } else {
+            BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+            String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get()))
+                .getSubstring();
+            settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
+            settings.setMask(maskOpt);
+            tool.update();
+            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.set"));
+        }
     }
 
     @Command(
@@ -109,7 +110,7 @@ public class ToolUtilCommands {
                          Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.printInfo(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
             return;
     }
         if (pattern == null) {
@@ -121,11 +122,12 @@ public class ToolUtilCommands {
 	        settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
 	        tool.update();
 		}
-		player.print(TranslatableComponent.of("worldedit.tool.material.set"));
+		player.printInfo(TranslatableComponent.of("worldedit.tool.material.set"));
     }
 
     @Command(
         name = "range",
+        aliases = "/range",
         desc = "Set the brush range"
         )
     @CommandPermissions("worldedit.brush.options.range")
@@ -149,18 +151,7 @@ public class ToolUtilCommands {
         session.getBrushTool(player, false).setSize(size);
         player.printInfo(TranslatableComponent.of("worldedit.tool.size.set"));
     }
-
-    //todo none should be moved to the same class where it is in upstream
-    @Command(
-            name = "none",
-            aliases = {"/none"},
-            desc = "Unbind a bound tool from your current item"
-    )
-    public void none(Player player, LocalSession session) throws WorldEditException {
-        session.setTool(player, null);
-        player.print(TranslatableComponent.of("fawe.worldedit.tool.tool.none"));
-    }
-
+    
     @Command(
         name = "tracemask",
         aliases = {"tarmask", "tm", "targetmask"},
@@ -180,7 +171,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "/superpickaxe",
-            aliases = {",", "/sp", "/pickaxe"},
+            aliases = {",", "/sp", "/pickaxe", "/"},
             desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
@@ -203,6 +194,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "primary",
+            aliases = { "/primary" },
             desc = "Set the right click brush",
             descFooter = "Set the right click brush"
     )
@@ -223,6 +215,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "secondary",
+            aliases = { "/secondary" },
             desc = "Set the left click brush",
             descFooter = "Set the left click brush"
     )
@@ -244,7 +237,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "visualize",
-            aliases = {"visual", "vis"},
+            aliases = {"visual", "vis", "/visualize", "/visual", "/vis"},
             desc = "Toggle between different visualization modes",
             descFooter = "Toggle between different visualization modes\n" +
                     "0 = No visualization\n" +
@@ -269,7 +262,7 @@ public class ToolUtilCommands {
 
     @Command(
             name = "target",
-            aliases = {"tar"},
+            aliases = {"tar", "/target", "/tar"},
             desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.target")
@@ -367,31 +360,32 @@ public class ToolUtilCommands {
         player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.source.mask"));
     }
 
-    @Command(
-            name = "transform",
-            desc = "Set the brush transform"
-    )
-    @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
-    public void transform(Player player, LocalSession session, EditSession editSession,
-                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
-                          @Switch(name = 'h', desc = "TODO")
-                                  boolean offHand,
-                          Arguments arguments) throws WorldEditException {
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
-            return;
-        }
-        if (transform == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform.disabled"));
-            tool.setTransform(null);
-            return;
-        }
-        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-        settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
-        settings.setTransform(transform);
-        tool.update();
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform"));
-    }
+    // TODO: Ping @MattBDev to reimplement 2020-02-04
+//    @Command(
+//            name = "transform",
+//            desc = "Set the brush transform"
+//    )
+//    @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
+//    public void transform(Player player, LocalSession session, EditSession editSession,
+//                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
+//                          @Switch(name = 'h', desc = "TODO")
+//                                  boolean offHand,
+//                          Arguments arguments) throws WorldEditException {
+//        BrushTool tool = session.getBrushTool(player, false);
+//        if (tool == null) {
+//            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+//            return;
+//        }
+//        if (transform == null) {
+//            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform.disabled"));
+//            tool.setTransform(null);
+//            return;
+//        }
+//        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+//        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
+//        settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
+//        settings.setTransform(transform);
+//        tool.update();
+//        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform"));
+//    }
 }
