@@ -47,7 +47,7 @@ public class LocationMaskedPlayerWrapper extends AsyncPlayer {
     @Override
     public void findFreePosition(Location searchPos) {
         if (allowTeleport) {
-            super.setPosition(searchPos);
+            super.findFreePosition(searchPos);
             update();
         }
     }
@@ -55,7 +55,7 @@ public class LocationMaskedPlayerWrapper extends AsyncPlayer {
     @Override
     public void setOnGround(Location searchPos) {
         if (allowTeleport) {
-            super.setPosition(searchPos);
+            super.setOnGround(searchPos);
             update();
         }
     }
