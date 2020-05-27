@@ -5,24 +5,21 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.jetbrains.annotations.Range;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
-import org.jetbrains.annotations.Range;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
@@ -31,10 +28,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     public BiomeType[] biomes;
+    public char[][] light;
+    public char[][] skyLight;
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
     private boolean fastMode = false;
+    private int bitMask = -1;
 
     private CharSetBlocks() {}
 
@@ -111,6 +111,80 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return true;
     }
 
+    @Override public void setBlockLight(int x, int y, int z, int value) {
+        if (light == null) {
+            light = new char[16][];
+        }
+        final int layer = y >> 4;
+        if (light[layer] == null) {
+            char[] c = new char[4096];
+            Arrays.fill(c, (char) 16);
+            light[layer] = c;
+        }
+        final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
+        light[y >> 4][index] = (char) value;
+    }
+
+    @Override public void setSkyLight(int x, int y, int z, int value) {
+        if (skyLight == null) {
+            skyLight = new char[16][];
+        }
+        final int layer = y >> 4;
+        if (skyLight[layer] == null) {
+            char[] c = new char[4096];
+            Arrays.fill(c, (char) 16);
+            skyLight[layer] = c;
+        }
+        final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
+        skyLight[y >> 4][index] = (char) value;
+    }
+
+    @Override public void setLightLayer(int layer, char[] toSet) {
+        if (light == null) {
+            light = new char[16][];
+        }
+        light[layer] = toSet;
+    }
+
+    @Override public void setSkyLightLayer(int layer, char[] toSet) {
+        if (skyLight == null) {
+            skyLight = new char[16][];
+        }
+        skyLight[layer] = toSet;
+    }
+
+    @Override public char[][] getLight() {
+        return light;
+    }
+
+    @Override public char[][] getSkyLight() {
+        return skyLight;
+    }
+
+    @Override public void removeSectionLighting(int layer, boolean sky) {
+        if (light == null) {
+            light = new char[16][];
+        }
+        if (light[layer] == null) {
+            light[layer] = new char[4096];
+        }
+        Arrays.fill(light[layer], (char) 0);
+        if (sky) {
+            if (skyLight == null) {
+                skyLight = new char[16][];
+            }
+            if (skyLight[layer] == null) {
+                skyLight[layer] = new char[4096];
+            }
+            Arrays.fill(skyLight[layer], (char) 0);
+        }
+    }
+
+    @Override public void setFullBright(int layer) {
+        Arrays.fill(light[layer], (char) 15);
+        Arrays.fill(skyLight[layer], (char) 15);
+    }
+
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return setBiome(position.getX(),0, position.getZ(), biome);
@@ -143,8 +217,18 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public void setBitMask(int bitMask) {
+        this.bitMask = bitMask;
+    }
+
+    @Override
+    public int getBitMask() {
+        return bitMask;
+    }
+
+    @Override
     public boolean isEmpty() {
-        if (biomes != null) {
+        if (biomes != null || light != null || skyLight != null) {
             return false;
         }
         return IntStream.range(0, 16).noneMatch(this::hasSection);

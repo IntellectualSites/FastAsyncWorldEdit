@@ -28,6 +28,20 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     @Override
     boolean setTile(int x, int y, int z, CompoundTag tile);
 
+    @Override
+    void setBlockLight(int x, int y, int z, int value);
+
+    @Override
+    void setSkyLight(int x, int y, int z, int value);
+
+    void setLightLayer(int layer, char[] toSet);
+
+    void setSkyLightLayer(int layer, char[] toSet);
+
+    void removeSectionLighting(int layer, boolean sky);
+
+    void setFullBright(int layer);
+
     void setEntity(CompoundTag tag);
 
     void removeEntity(UUID uuid);
@@ -40,12 +54,27 @@ public interface IChunkSet extends IBlocks, OutputExtent {
         return getBiomes() != null;
     }
 
+    char[][] getLight();
+
+    char[][] getSkyLight();
+
+    default boolean hasLight() {
+        return getLight() != null;
+    }
+
+    // Default to avoid tricky child classes. We only need it in a few cases anyway.
+    default void setFastMode(boolean fastMode){}
+
     default boolean isFastMode() {
         return false;
     }
 
-    //default to avoid tricky child classes. We only need it in a few cases anyway.
-    default void setFastMode(boolean fastMode){}
+    // Allow setting for bitmask for flushing lighting. Default to avoid tricky child classes.
+    default void setBitMask(int bitMask){}
+
+    default int getBitMask(){
+        return -1;
+    }
 
     @Override
     IChunkSet reset();

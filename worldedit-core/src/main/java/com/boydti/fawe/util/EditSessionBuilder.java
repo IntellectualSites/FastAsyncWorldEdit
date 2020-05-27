@@ -1,27 +1,26 @@
 package com.boydti.fawe.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
-import com.sk89q.worldedit.util.Identifiable;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.NullChangeSet;
 import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
+import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
-import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
@@ -37,11 +36,16 @@ import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
-import java.util.UUID;
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class EditSessionBuilder {
     @NotNull
@@ -60,6 +64,7 @@ public class EditSessionBuilder {
     private boolean threaded = true;
     private EditSessionEvent event;
     private String command;
+    private RelightMode relightMode;
 
     /**
      * An EditSession builder<br>
@@ -80,7 +85,7 @@ public class EditSessionBuilder {
         checkNotNull(world);
         this.world = world;
     }
-    
+
     public EditSessionBuilder player(@Nullable Player player) {
         this.player = player;
         return setDirty();
@@ -169,6 +174,11 @@ public class EditSessionBuilder {
 
     public EditSessionBuilder fastmode(@Nullable Boolean fastmode) {
         this.fastmode = fastmode;
+        return setDirty();
+    }
+
+    public EditSessionBuilder relightMode(@Nullable RelightMode relightMode) {
+        this.relightMode = relightMode;
         return setDirty();
     }
 
@@ -402,7 +412,7 @@ public class EditSessionBuilder {
     public World getWorld() {
         return world;
     }
-    
+
     public Extent getExtent() {
         return extent != null ? extent : world;
     }
@@ -410,7 +420,7 @@ public class EditSessionBuilder {
     public boolean isWrapped() {
         return wrapped;
     }
-    
+
     public Extent getBypassHistory() {
         return bypassHistory;
     }

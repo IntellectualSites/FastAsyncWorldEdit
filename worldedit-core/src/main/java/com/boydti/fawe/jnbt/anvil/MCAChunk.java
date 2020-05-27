@@ -436,6 +436,24 @@ public class MCAChunk implements IChunk {
         return true;
     }
 
+    @Override public void setBlockLight(int x, int y, int z, int value) {
+
+    }
+
+    @Override public void setSkyLight(int x, int y, int z, int value) {
+
+    }
+
+    @Override public void removeSectionLighting(int layer, boolean sky) {}
+
+    @Override public void setFullBright(int layer) {}
+
+    @Override
+    public void setLightLayer(int layer, char[] toSet) {}
+
+    @Override
+    public void setSkyLightLayer(int layer, char[] toSet) {}
+
     @Override
     public void setEntity(CompoundTag entityTag) {
         setModified();
@@ -452,6 +470,14 @@ public class MCAChunk implements IChunk {
     @Override
     public BiomeType[] getBiomes() {
         return this.biomes;
+    }
+
+    @Override public char[][] getLight() {
+        return new char[0][];
+    }
+
+    @Override public char[][] getSkyLight() {
+        return new char[0][];
     }
 
     @Override
@@ -497,6 +523,15 @@ public class MCAChunk implements IChunk {
     public BlockState getBlock(int x, int y, int z) {
         int ordinal = getBlockOrdinal(x, y, z);
         return BlockState.getFromOrdinal(ordinal);
+    }
+
+    //TODO implement lighting
+    @Override public int getSkyLight(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override public int getEmmittedLight(int x, int y, int z) {
+        return 0;
     }
 
     @Override

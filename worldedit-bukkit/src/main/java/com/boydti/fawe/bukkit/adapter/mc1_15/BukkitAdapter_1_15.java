@@ -24,6 +24,7 @@ import net.minecraft.server.v1_15_R1.DataPaletteBlock;
 import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.GameProfileSerializer;
 import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.PacketPlayOutLightUpdate;
 import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunkMap;
 import net.minecraft.server.v1_15_R1.World;
@@ -84,6 +85,8 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
+
+            fieldTickingBlockCount.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -165,7 +168,7 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
         }
     }
 
-    public static void sendChunk(net.minecraft.server.v1_15_R1.WorldServer nmsWorld, int X, int Z, int mask) {
+    public static void sendChunk(net.minecraft.server.v1_15_R1.WorldServer nmsWorld, int X, int Z, int mask, boolean lighting) {
         PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
         if (playerChunk == null) {
             return;
@@ -185,6 +188,15 @@ public final class BukkitAdapter_1_15 extends NMSAdapter {
 
                     fieldDirtyBits.set(playerChunk, dirtyBits);
                     fieldDirtyCount.set(playerChunk, 64);
+
+                    if (lighting) {
+                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
+                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
+                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                            p.playerConnection.sendPacket(packet);
+                        });
+                    }
+
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

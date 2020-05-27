@@ -13,12 +13,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.Chunk;
@@ -30,6 +24,11 @@ import net.minecraft.server.v1_15_R1.DataPaletteBlock;
 import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.GameProfileSerializer;
 import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.LightEngine;
+import net.minecraft.server.v1_15_R1.LightEngineLayer;
+import net.minecraft.server.v1_15_R1.LightEngineStorage;
+import net.minecraft.server.v1_15_R1.NibbleArray;
+import net.minecraft.server.v1_15_R1.PacketPlayOutLightUpdate;
 import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunkMap;
 import net.minecraft.server.v1_15_R1.World;
@@ -38,9 +37,15 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import sun.misc.Unsafe;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 public final class BukkitAdapter_1_15_2 extends NMSAdapter {
@@ -59,6 +64,8 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     private final static Field fieldDirtyBits;
 
     private final static MethodHandle methodGetVisibleChunk;
+
+    public final static MethodHandle methodSetLightNibbleArray;
 
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
@@ -89,6 +96,10 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
+
+            Method declaredSetLightNibbleArray = LightEngineStorage.class.getDeclaredMethod("a", long.class, NibbleArray.class);
+            declaredSetLightNibbleArray.setAccessible(true);
+            methodSetLightNibbleArray = MethodHandles.lookup().unreflect(declaredSetLightNibbleArray);
 
             Field tmp = DataPaletteBlock.class.getDeclaredField("j");
             ReflectionUtils.setAccessibleNonFinal(tmp);
@@ -167,7 +178,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         }
     }
 
-    public static void sendChunk(WorldServer nmsWorld, int X, int Z, int mask) {
+    public static void sendChunk(WorldServer nmsWorld, int X, int Z, int mask, boolean lighting) {
         PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
         if (playerChunk == null) {
             return;
@@ -187,6 +198,15 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
 
                     fieldDirtyBits.set(playerChunk, dirtyBits);
                     fieldDirtyCount.set(playerChunk, 64);
+
+                    if (lighting) {
+                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
+                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
+                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                            p.playerConnection.sendPacket(packet);
+                        });
+                    }
+
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

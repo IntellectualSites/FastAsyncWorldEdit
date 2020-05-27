@@ -85,4 +85,48 @@ public interface InputExtent {
     default BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(MutableBlockVector2.get(x, z));
     }
+
+    /**
+     * Get the light level at the given location
+     *
+     * @param position location
+     * @return the light level at the location
+     */
+    default int getEmmittedLight(MutableBlockVector3 position) {
+        return getEmmittedLight(position.getX(), position.getY(), position.getZ());
+    }
+
+    default int getEmmittedLight(int x, int y, int z) {
+        return 0;
+    }
+
+    /**
+     * Get the sky light level at the given location
+     *
+     * @param position location
+     * @return the sky light level at the location
+     */
+    default int getSkyLight(MutableBlockVector3 position) {
+        return getSkyLight(position.getX(), position.getY(), position.getZ());
+    }
+
+    default int getSkyLight(int x, int y, int z) {
+        return 0;
+    }
+
+    default int getBrightness(MutableBlockVector3 position) {
+        return getBrightness(position.getX(), position.getY(), position.getZ());
+    }
+
+    default int getBrightness(int x, int y, int z) {
+        return getFullBlock(x, y, z).getMaterial().getLightValue();
+    }
+
+    default int getOpacity(MutableBlockVector3 position) {
+        return getOpacity(position.getX(), position.getY(), position.getZ());
+    }
+
+    default int getOpacity(int x, int y, int z) {
+        return getFullBlock(x, y, z).getMaterial().getLightOpacity();
+    }
 }

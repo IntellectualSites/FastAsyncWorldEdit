@@ -41,6 +41,14 @@ public class FallbackChunkGet implements IChunkGet {
         return extent.getBlock(bx + x, y, bz + z);
     }
 
+    @Override public int getSkyLight(int x, int y, int z) {
+        return extent.getSkyLight(bx + x, y, bz + z);
+    }
+
+    @Override public int getEmmittedLight(int x, int y, int z) {
+        return extent.getEmmittedLight(bx + x, y, bz + z);
+    }
+
     @Override
     public CompoundTag getTile(int x, int y, int z) {
         return extent.getFullBlock(bx + x, y, bz + z).getNbtData();

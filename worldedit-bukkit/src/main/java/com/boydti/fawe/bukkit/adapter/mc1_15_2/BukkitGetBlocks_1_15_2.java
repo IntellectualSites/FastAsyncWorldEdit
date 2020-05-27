@@ -38,10 +38,12 @@ import net.minecraft.server.v1_15_R1.DataPaletteHash;
 import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
+import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
+import net.minecraft.server.v1_15_R1.NibbleArray;
+import net.minecraft.server.v1_15_R1.SectionPosition;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.World;
@@ -80,6 +82,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public Chunk nmsChunk;
     public WorldServer world;
     public int X, Z;
+    public NibbleArray[] blockLight = new NibbleArray[16];
+    public NibbleArray[] skyLight = new NibbleArray[16];
 
     public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
@@ -130,6 +134,26 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             return Collections.emptyMap();
         }
         return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
+    }
+
+    @Override
+    public int getSkyLight(int x, int y, int z) {
+        int layer = y >> 4;
+        if (skyLight[layer] == null) {
+            skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
+        }
+        long l = BlockPosition.a(x, y, z);
+        return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+    }
+
+    @Override
+    public int getEmmittedLight(int x, int y, int z) {
+        int layer = y >> 4;
+        if (blockLight[layer] == null) {
+            blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
+        }
+        long l = BlockPosition.a(x, y, z);
+        return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
     @Override
@@ -347,6 +371,29 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     }
                 }
 
+                boolean lightUpdate = false;
+
+                // Lighting
+                char[][] light = set.getLight();
+                if (light != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(light, EnumSkyBlock.BLOCK);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                char[][] skyLight = set.getSkyLight();
+                if (skyLight != null) {
+                    lightUpdate = true;
+                    try {
+                        fillLightNibble(skyLight, EnumSkyBlock.SKY);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 Runnable[] syncTasks = null;
 
                 int bx = X << 4;
@@ -452,23 +499,19 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     };
                 }
 
-                //Lighting
-                // TODO optimize, cause this is really slow
-                LightEngineThreaded engine = (LightEngineThreaded) nmsChunk.e();
-                engine.a(nmsChunk, false);
-
                 Runnable callback;
-                if (bitMask == 0 && biomes == null) {
+                if (bitMask == 0 && biomes == null && !lightUpdate) {
                     callback = null;
                 } else {
-                    int finalMask = bitMask;
+                    int finalMask = bitMask != 0 ? bitMask : lightUpdate ? set.getBitMask() : 0;
+                    boolean finalLightUpdate = lightUpdate;
                     callback = () -> {
                         // Set Modified
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, X, Z, finalMask);
+                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
                         if (finalizer != null) finalizer.run();
                     };
                 }
@@ -641,6 +684,25 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         return tmp;
     }
 
+    private void fillLightNibble(char[][] light, EnumSkyBlock skyBlock) {
+        for (int Y = 0; Y < 16; Y++) {
+            if (light[Y] == null) {
+                continue;
+            }
+            NibbleArray nibble = world.getChunkProvider().getLightEngine().a(skyBlock).a(SectionPosition.a(nmsChunk.getPos(), Y));
+            if (nibble == null) {
+                continue;
+            }
+            synchronized (nibble) {
+                for (int i = 0; i < 4096; i++) {
+                    if (light[Y][i] < 16) {
+                        nibble.a(i, light[Y][i]);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public boolean hasSection(int layer) {
         return getSections()[layer] != null;
@@ -648,6 +710,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public boolean trim(boolean aggressive) {
+        skyLight = new NibbleArray[16];
+        blockLight = new NibbleArray[16];
         if (aggressive) {
             sections = null;
             nmsChunk = null;

@@ -12,7 +12,6 @@ import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockState
 import com.sk89q.worldedit.world.block.BlockTypes
 
-import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.Future
 
@@ -64,6 +63,14 @@ object NullChunkGet : IChunkGet {
 
     override fun hasSection(layer: Int): Boolean {
         return false
+    }
+
+    override fun getEmmittedLight(x: Int, y: Int, z: Int): Int {
+        return 15
+    }
+
+    override fun getSkyLight(x: Int, y: Int, z: Int): Int {
+        return 15
     }
 
     override fun reset(): IBlocks? {
