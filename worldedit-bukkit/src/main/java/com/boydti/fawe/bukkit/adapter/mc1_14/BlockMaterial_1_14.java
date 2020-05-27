@@ -98,7 +98,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public int getLightOpacity() {
-        return isTranslucent() ? 15 : 0;
+        return !isTranslucent() ? 15 : 0;
     }
 
     @Override
