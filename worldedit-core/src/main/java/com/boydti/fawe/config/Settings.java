@@ -176,6 +176,7 @@ public class Settings extends Config {
                 " - Persists restarts",
                 " - Unlimited undo",
                 " - Does not affect edit performance if `combine-stages`",
+                "- WARNING: Disabling this may improve performance, but is considered unsafe!",
         })
         public boolean USE_DISK = true;
         @Comment({
