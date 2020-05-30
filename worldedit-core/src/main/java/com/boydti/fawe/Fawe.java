@@ -28,6 +28,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -305,7 +306,7 @@ public class Fawe {
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.15/" + version.build;
-            Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
+            Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
         try {
             Settings.IMP.reload(file);

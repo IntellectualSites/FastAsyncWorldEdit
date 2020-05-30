@@ -47,7 +47,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 setupSchematicHandler();
                 setupRegionManager();
             } catch (Throwable ignored) {
-                log.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
+                log.debug("Please update PlotSquared");
             }
             if (Settings.PLATFORM.toLowerCase().startsWith("bukkit")) {
                 new FaweTrim();
