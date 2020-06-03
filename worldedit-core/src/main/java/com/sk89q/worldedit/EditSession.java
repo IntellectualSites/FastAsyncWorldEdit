@@ -1102,7 +1102,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param radius the radius of the spherical area to fill
      * @param depth the maximum depth, starting from the origin
      * @param direction the direction to fill
-     * @return number of blocks affected
+     * @return the number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int fillDirection(final BlockVector3 origin, final Pattern pattern, final double radius, final int depth, BlockVector3 direction) throws MaxChangedBlocksException {
@@ -1181,7 +1181,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         visitor.visit(origin);
 
         // Execute
-        Operations.completeBlindly(visitor);
+        Operations.completeLegacy(visitor);
 
         return this.changes = visitor.getAffected();
     }
@@ -2185,12 +2185,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @param position a position
      * @param radius a radius
-     * @param onlyNormalDirt only affect normal dirt (data value 0)
+     * @param onlyNormalDirt only affect normal dirt (all default properties)
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+    @Deprecated
     public int green(BlockVector3 position, double radius, boolean onlyNormalDirt)
-            throws MaxChangedBlocksException {
+        throws MaxChangedBlocksException {
         final double radiusSq = radius * radius;
 
         final int ox = position.getBlockX();
@@ -2257,7 +2258,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
         LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
-        Operations.completeBlindly(visitor);
+        Operations.completeLegacy(visitor);
         return this.changes = ground.getAffected();
     }
 
@@ -2403,11 +2404,42 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return changed;
     }
 
+    /**
+     * Deforms the region by a given expression. A deform provides a block's x, y, and z coordinates (possibly scaled)
+     * to an expression, and then sets the block to the block given by the resulting values of the variables, if they
+     * have changed.
+     *
+     * @param region the region to deform
+     * @param zero the origin of the coordinate system
+     * @param unit the scale of the coordinate system
+     * @param expressionString the expression to evaluate for each block
+     *
+     * @return number of blocks changed
+     *
+     * @throws ExpressionException thrown on invalid expression input
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
     public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString)
             throws ExpressionException, MaxChangedBlocksException {
         return deformRegion(region, zero, unit, expressionString, WorldEdit.getInstance().getConfiguration().calculationTimeout);
     }
 
+    /**
+     * Deforms the region by a given expression. A deform provides a block's x, y, and z coordinates (possibly scaled)
+     * to an expression, and then sets the block to the block given by the resulting values of the variables, if they
+     * have changed.
+     *
+     * @param region the region to deform
+     * @param zero the origin of the coordinate system
+     * @param unit the scale of the coordinate system
+     * @param expressionString the expression to evaluate for each block
+     * @param timeout maximum time for the expression to evaluate for each block. -1 for unlimited.
+     *
+     * @return number of blocks changed
+     *
+     * @throws ExpressionException thrown on invalid expression input
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
     public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final String expressionString,
                             final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
@@ -2425,7 +2457,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final Vector3 zero2 = zero.add(0.5, 0.5, 0.5);
 
         RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-        private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
             @Override
             public boolean apply(BlockVector3 position) throws WorldEditException {

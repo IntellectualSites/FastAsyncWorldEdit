@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 
 import java.lang.reflect.Field;
+
 import org.jetbrains.annotations.NotNull;
 
 public class ExtentTraverser<T extends Extent> {
@@ -48,21 +49,8 @@ public class ExtentTraverser<T extends Extent> {
         return last;
     }
 
-    public boolean insert(T extent) {
-        try {
-            Field field = AbstractDelegateExtent.class.getDeclaredField("extent");
-            field.setAccessible(true);
-            field.set(extent, field.get(root));
-            field.set(root, extent);
-            return true;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public <U> U findAndGet(Class<U> clazz) {
-        ExtentTraverser<Extent> traverser = find( clazz);
+        ExtentTraverser<Extent> traverser = find(clazz);
         return (traverser != null) ? (U) traverser.get() : null;
     }
 
