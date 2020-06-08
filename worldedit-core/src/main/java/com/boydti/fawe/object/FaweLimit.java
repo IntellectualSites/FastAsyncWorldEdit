@@ -162,12 +162,19 @@ public class FaweLimit {
     public void THROW_MAX_CHANGES(int amt) {
         if ((MAX_CHANGES -= amt) <= 0) throw FaweCache.MAX_CHANGES;
     }
+    public void THROW_MAX_CHANGES(long amt) {
+        if ((MAX_CHANGES -= amt) <= 0) throw FaweCache.MAX_CHANGES;
+    }
 
     public void THROW_MAX_FAILS(int amt) {
         if ((MAX_FAILS -= amt) <= 0) throw FaweCache.MAX_CHECKS;
     }
 
     public void THROW_MAX_CHECKS(int amt) {
+        if ((MAX_CHECKS -= amt) <= 0) throw FaweCache.MAX_CHECKS;
+    }
+
+    public void THROW_MAX_CHECKS(long amt) {
         if ((MAX_CHECKS -= amt) <= 0) throw FaweCache.MAX_CHECKS;
     }
 

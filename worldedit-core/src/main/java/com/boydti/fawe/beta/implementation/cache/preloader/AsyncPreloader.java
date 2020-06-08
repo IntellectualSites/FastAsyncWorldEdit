@@ -50,7 +50,7 @@ public class AsyncPreloader implements Preloader, Runnable {
         MutablePair<World, Set<BlockVector2>> existing = cancelAndGet(player);
         try {
             Region region = session.getSelection(world);
-            if (!(region instanceof CuboidRegion) || region.getArea() > 50466816) {
+            if (!(region instanceof CuboidRegion) || region.getVolume() > 50466816) {
                 // TOO LARGE or NOT CUBOID
                 return;
             }
