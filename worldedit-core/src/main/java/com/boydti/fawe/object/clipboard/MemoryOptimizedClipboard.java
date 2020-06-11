@@ -200,7 +200,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
                 nbt = null;
                 for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
                     IntTriple trio = entry.getKey();
-                    int index = getIndex(trio.x, trio.y, trio.z);
+                    int index = getIndex(trio.getX(), trio.getY(), trio.getZ());
                     if (index == i) {
                         nbt = entry.getValue();
                         break;
