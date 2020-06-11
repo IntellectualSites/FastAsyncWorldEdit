@@ -128,6 +128,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public int getSkyLight(int x, int y, int z) {
         int layer = y >> 4;
         if (skyLight[layer] == null) {
+            //getDataLayerData
             skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x, y, z);
@@ -138,6 +139,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
         if (blockLight[layer] == null) {
+            //getDataLayerData
             blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
         }
         long l = BlockPosition.a(x, y, z);
