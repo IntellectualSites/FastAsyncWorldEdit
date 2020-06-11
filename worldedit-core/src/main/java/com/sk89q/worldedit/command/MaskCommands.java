@@ -7,10 +7,7 @@
 //import com.boydti.fawe.object.mask.BiomeMask;
 //import com.boydti.fawe.object.mask.BlockLightMask;
 //import com.boydti.fawe.object.mask.BrightnessMask;
-//import com.boydti.fawe.object.mask.DataMask;
 //import com.boydti.fawe.object.mask.ExtremaMask;
-//import com.boydti.fawe.object.mask.IdDataMask;
-//import com.boydti.fawe.object.mask.IdMask;
 //import com.boydti.fawe.object.mask.LightMask;
 //import com.boydti.fawe.object.mask.OpacityMask;
 //import com.boydti.fawe.object.mask.ROCAngleMask;
@@ -168,22 +165,6 @@
 //    )
 //    public Mask zaxis() {
 //        return new ZAxisMask();
-//    }
-//
-//    @Command(
-//            name = "#id",
-//            desc = "Restrict to initial id"
-//    )
-//    public Mask id(Extent extent) {
-//        return new IdMask(extent);
-//    }
-//
-//    @Command(
-//            name = "#data",
-//            desc = "Restrict to initial data"
-//    )
-//    public Mask data(Extent extent) {
-//        return new DataMask(extent);
 //    }
 //
 //    @Command(

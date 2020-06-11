@@ -9,6 +9,9 @@ public class ZAxisMask extends AbstractMask implements ResettableMask {
 
     private transient int layer = -1;
 
+    public ZAxisMask(Extent extent) {
+    }
+
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
         if (layer == -1) {
