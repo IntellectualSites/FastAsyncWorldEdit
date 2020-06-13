@@ -17,21 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.util.task;
+package com.sk89q.worldedit.math;
 
-import java.util.Comparator;
+import com.sk89q.worldedit.util.test.VariedVectors;
+import org.junit.jupiter.api.DisplayName;
 
-/**
- * Compares task states according to the order of the {@link Task.State}
- * enumeration.
- */
-public class TaskStateComparator implements Comparator<Task<?>> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Override
-    public int compare(com.sk89q.worldedit.util.task.Task<?> o1, Task<?> o2) {
-        int ordinal1 = o1.getState().ordinal();
-        int ordinal2 = o2.getState().ordinal();
-        return Integer.compare(ordinal1, ordinal2);
+@DisplayName("A 3D block vector")
+public class BlockVector3Test {
+
+    @VariedVectors.Test(capToVanilla = true, divisionsXZ = 50, divisionsY = 50)
+    @DisplayName("survives a round-trip through long-packing")
+    void longPackingRoundTrip(BlockVector3 vec) {
+        assertEquals(vec, BlockVector3.fromLongPackedForm(vec.toLongPackedForm()));
     }
 
 }

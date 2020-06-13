@@ -2,9 +2,9 @@ package com.boydti.fawe.object;
 
 public final class IntTriple {
 
-    public int x;
-    public int y;
-    public int z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     public IntTriple(int x, int y, int z) {
         this.x = x;

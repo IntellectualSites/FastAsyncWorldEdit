@@ -205,7 +205,7 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(from = 0, to = 15) int value) {
+    public void setlighting(Player player, EditSession editSession, @Selection Region region) {
         player.print(TextComponent.of("Temporarily not working"));
     }
 
@@ -214,7 +214,7 @@ public class RegionCommands {
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setskylighting(Player player, @Selection Region region, @Range(from = 0, to= 15) int value) {
+    public void setskylighting(Player player, @Selection Region region) {
         player.printInfo(TextComponent.of("Temporarily not working"));
     }
 

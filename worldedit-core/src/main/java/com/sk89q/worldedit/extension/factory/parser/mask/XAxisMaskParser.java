@@ -17,21 +17,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.util.task;
+package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import java.util.Comparator;
+import com.boydti.fawe.function.mask.XAxisMask;
+import com.google.common.collect.ImmutableList;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.internal.registry.SimpleInputParser;
 
-/**
- * Compares task states according to the order of the {@link Task.State}
- * enumeration.
- */
-public class TaskStateComparator implements Comparator<Task<?>> {
+import java.util.List;
 
-    @Override
-    public int compare(com.sk89q.worldedit.util.task.Task<?> o1, Task<?> o2) {
-        int ordinal1 = o1.getState().ordinal();
-        int ordinal2 = o2.getState().ordinal();
-        return Integer.compare(ordinal1, ordinal2);
+public class XAxisMaskParser extends SimpleInputParser<Mask> {
+
+    private final List<String> aliases = ImmutableList.of("#xaxis");
+
+    public XAxisMaskParser(WorldEdit worldEdit) {
+        super(worldEdit);
     }
 
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+
+    @Override
+    public Mask parseFromSimpleInput(String input, ParserContext context) {
+        return new XAxisMask(context.getExtent());
+    }
 }

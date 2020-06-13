@@ -32,8 +32,10 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.Nullable;
 
 /**
@@ -74,14 +76,40 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Get the number of blocks in the region.
      *
      * @return number of blocks
+     * @deprecated use {@link Region#getVolume()} to prevent overflows
      */
+    @Deprecated
     default int getArea() {
+        return (int) getVolume();
+    }
+
+    /**
+     * Get the number of blocks in the region.
+     *
+     * <p>Note: This method <b>must</b> be overridden.</p>
+     *
+     * @return number of blocks
+     */
+    default long getVolume() {
+        // TODO Remove default status when getArea is removed.
+        try {
+            if (getClass().getMethod("getArea").getDeclaringClass().equals(Region.class)) {
+                throw new IllegalStateException("Class " + getClass().getName() + " must override getVolume.");
+            }
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        }
+        return getArea();
+    }
+
+    /* FAWE code for getArea() before merge:
+        default int getArea() {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
         return (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
     }
-
+    */
     /**
      * Get X-size.
      *

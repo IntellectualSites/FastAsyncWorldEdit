@@ -87,14 +87,12 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
 
     @Override
     public void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position) {
-        int size = this.region.getArea();
-        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos1", position, "(" + region.getArea() + ")"));
+        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos1", position, "(" + region.getVolume() + ")"));
     }
 
     @Override
     public void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position) {
-        int size = this.region.getArea();
-        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos2", position, "(" + region.getArea() + ")"));
+        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos2", position, "(" + region.getVolume() + ")"));
     }
 
     @Override

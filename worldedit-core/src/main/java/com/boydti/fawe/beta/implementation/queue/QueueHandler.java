@@ -151,10 +151,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return forkJoinPoolPrimary.submit(call);
     }
 
-    public <T> Future<T> sync(Runnable run, T value) {
-        return sync(run, value, syncTasks);
-    }
-
     public <T> Future<T> sync(Runnable run) {
         return sync(run, syncTasks);
     }

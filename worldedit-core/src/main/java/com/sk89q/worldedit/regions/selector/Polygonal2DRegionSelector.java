@@ -174,7 +174,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
         player.printInfo(TranslatableComponent.of("worldedit.selection.polygon2d.explain.primary", TextComponent.of(pos.toString())));
 
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
-        session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getArea()));
+        session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getVolume()));
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));
     }
 
@@ -186,7 +186,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
                 TextComponent.of(pos.toString())
         ));
 
-        session.dispatchCUIEvent(player, new SelectionPoint2DEvent(region.size() - 1, pos, getArea()));
+        session.dispatchCUIEvent(player, new SelectionPoint2DEvent(region.size() - 1, pos, getVolume()));
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));
     }
 
@@ -247,8 +247,8 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public int getArea() {
-        return region.getArea();
+    public long getVolume() {
+        return region.getVolume();
     }
 
     /**
@@ -264,7 +264,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     public void describeCUI(LocalSession session, Actor player) {
         final List<BlockVector2> points = region.getPoints();
         for (int id = 0; id < points.size(); id++) {
-            session.dispatchCUIEvent(player, new SelectionPoint2DEvent(id, points.get(id), getArea()));
+            session.dispatchCUIEvent(player, new SelectionPoint2DEvent(id, points.get(id), getVolume()));
         }
 
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));

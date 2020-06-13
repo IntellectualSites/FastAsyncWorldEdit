@@ -33,15 +33,9 @@ public class WEManager {
 
     public void cancelEditSafe(AbstractDelegateExtent parent, FaweException reason) throws FaweException {
         log.warn("CancelEditSafe was hit. Please ignore this message.");
-        try {
-            final Field field = AbstractDelegateExtent.class.getDeclaredField("extent");
-            field.setAccessible(true);
-            Extent currentExtent = parent.getExtent();
-            if (!(currentExtent instanceof NullExtent)) {
-                field.set(parent, new NullExtent((Extent) field.get(parent), reason));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        Extent currentExtent = parent.getExtent();
+        if (!(currentExtent instanceof NullExtent)) {
+            parent.extent = new NullExtent(parent.extent, reason);
         }
         throw reason;
     }

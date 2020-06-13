@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -14,7 +15,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     private final CachedMask mask;
     private final MutableBlockVector3 mutable;
 
-    public AdjacentAnyMask(Mask mask) {
+    public AdjacentAnyMask(AbstractExtentMask mask) {
         this.mask = CachedMask.cache(mask);
         mutable = new MutableBlockVector3();
     }

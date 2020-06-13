@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -11,7 +12,7 @@ public class SurfaceMask extends AdjacentAnyMask {
         super(getMask(extent));
     }
 
-    public static Mask getMask(Extent extent) {
+    public static AbstractExtentMask getMask(Extent extent) {
         return new BlockMaskBuilder()
         .addTypes(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR)
         .addAll(b -> !b.getMaterial().isMovementBlocker())

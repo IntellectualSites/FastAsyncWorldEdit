@@ -324,7 +324,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 nbt = null;
                 for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
                     IntTriple key = entry.getKey();
-                    int index = getIndex(key.x, key.y, key.z);
+                    int index = getIndex(key.getX(), key.getY(), key.getZ());
                     if (index == i) {
                         nbt = entry.getValue();
                         break;

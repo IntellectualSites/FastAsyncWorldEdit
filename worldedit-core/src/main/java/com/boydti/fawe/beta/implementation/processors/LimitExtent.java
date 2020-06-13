@@ -52,7 +52,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        limit.THROW_MAX_CHECKS(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
         try {
             return getExtent().getEntities(region);
         } catch (FaweException e) {
@@ -223,8 +223,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void addCaves(Region region) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().addCaves(region);
         } catch (FaweException e) {
@@ -236,8 +236,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().generate(region, gen);
         } catch (FaweException e) {
@@ -249,8 +249,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().addSchems(region, mask, clipboards, rarity, rotate);
         } catch (FaweException e) {
@@ -262,8 +262,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().spawnResource(region, gen, rarity, frequency);
         } catch (FaweException e) {
@@ -275,8 +275,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().addOre(region, mask, material, size, frequency, rarity, minY, maxY);
         } catch (FaweException e) {
@@ -288,8 +288,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public void addOres(Region region, Mask mask) throws WorldEditException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             getExtent().addOres(region, mask);
         } catch (FaweException e) {
@@ -301,7 +301,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public List<Countable<BlockType>> getBlockDistribution(Region region) {
-        limit.THROW_MAX_CHECKS(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
         try {
             return getExtent().getBlockDistribution(region);
         } catch (FaweException e) {
@@ -314,7 +314,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
-        limit.THROW_MAX_CHECKS(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
         try {
             return getExtent().getBlockDistributionWithData(region);
         } catch (FaweException e) {
@@ -327,7 +327,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
-        limit.THROW_MAX_CHECKS(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
         try {
             return getExtent().countBlocks(region, searchBlocks);
         } catch (FaweException e) {
@@ -340,7 +340,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int countBlocks(Region region, Mask searchMask) {
-        limit.THROW_MAX_CHECKS(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
         try {
             return getExtent().countBlocks(region, searchMask);
         } catch (FaweException e) {
@@ -353,7 +353,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().setBlocks(region, block);
         } catch (FaweException e) {
@@ -366,7 +366,7 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().setBlocks(region, pattern);
         } catch (FaweException e) {
@@ -379,8 +379,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().replaceBlocks(region, filter, replacement);
         } catch (FaweException e) {
@@ -393,8 +393,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().replaceBlocks(region, filter, pattern);
         } catch (FaweException e) {
@@ -407,8 +407,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().replaceBlocks(region, mask, pattern);
         } catch (FaweException e) {
@@ -421,8 +421,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().center(region, pattern);
         } catch (FaweException e) {
@@ -448,8 +448,8 @@ public class LimitExtent extends PassthroughExtent {
 
     @Override
     public <T extends Filter> T apply(Region region, T filter, boolean full) {
-        limit.THROW_MAX_CHECKS(region.getArea());
-        limit.THROW_MAX_CHANGES(region.getArea());
+        limit.THROW_MAX_CHECKS(region.getVolume());
+        limit.THROW_MAX_CHANGES(region.getVolume());
         try {
             return getExtent().apply(region, filter, full);
         } catch (FaweException e) {

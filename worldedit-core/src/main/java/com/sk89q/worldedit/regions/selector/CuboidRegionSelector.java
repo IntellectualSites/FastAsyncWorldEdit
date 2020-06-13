@@ -161,13 +161,13 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
             player.printInfo(TranslatableComponent.of(
                     "worldedit.selection.cuboid.explain.primary-area",
                     TextComponent.of(position1.toString()),
-                    TextComponent.of(region.getArea())
+                    TextComponent.of(region.getVolume())
             ));
         } else if (position1 != null) {
             player.printInfo(TranslatableComponent.of("worldedit.selection.cuboid.explain.primary", TextComponent.of(position1.toString())));
         }
 
-        session.dispatchCUIEvent(player, new SelectionPointEvent(0, pos, getArea()));
+        session.dispatchCUIEvent(player, new SelectionPointEvent(0, pos, getVolume()));
     }
 
     @Override
@@ -180,13 +180,13 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
             player.printInfo(TranslatableComponent.of(
                     "worldedit.selection.cuboid.explain.secondary-area",
                     TextComponent.of(position2.toString()),
-                    TextComponent.of(region.getArea())
+                    TextComponent.of(region.getVolume())
             ));
         } else if (position2 != null) {
             player.printInfo(TranslatableComponent.of("worldedit.selection.cuboid.explain.secondary", TextComponent.of(position2.toString())));
         }
 
-        session.dispatchCUIEvent(player, new SelectionPointEvent(1, pos, getArea()));
+        session.dispatchCUIEvent(player, new SelectionPointEvent(1, pos, getVolume()));
     }
 
     @Override
@@ -197,11 +197,11 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
 
         if (position1 != null) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(0, position1, getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(0, position1, getVolume()));
         }
 
         if (position2 != null) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(1, position2, getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(1, position2, getVolume()));
         }
     }
 
@@ -268,7 +268,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public int getArea() {
+    public long getVolume() {
         if (position1 == null) {
             return -1;
         }
@@ -277,17 +277,17 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
             return -1;
         }
 
-        return region.getArea();
+        return region.getVolume();
     }
 
     @Override
     public void describeCUI(LocalSession session, Actor player) {
         if (position1 != null) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(0, position1, getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(0, position1, getVolume()));
         }
 
         if (position2 != null) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(1, position2, getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(1, position2, getVolume()));
         }
     }
 
