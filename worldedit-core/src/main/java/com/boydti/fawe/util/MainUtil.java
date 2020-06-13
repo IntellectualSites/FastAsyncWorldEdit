@@ -2,10 +2,7 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweInputStream;
-import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
@@ -40,6 +37,7 @@ import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.zip.*;
@@ -71,22 +69,22 @@ public class MainUtil {
 
     public static long getTotalSize(Path path) {
         final AtomicLong size = new AtomicLong(0);
-        traverse(path, new RunnableVal<BasicFileAttributes>() {
+        traverse(path, new RunnableVal2<Path, BasicFileAttributes>() {
             @Override
-            public void run(BasicFileAttributes attrs) {
+            public void run(Path path, BasicFileAttributes attrs) {
                 size.addAndGet(attrs.size());
             }
         });
         return size.get();
     }
 
-    public static void traverse(Path path, final Consumer<BasicFileAttributes> onEach) {
+    public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
         try {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult
                 visitFile(Path file, BasicFileAttributes attrs) {
-                    onEach.accept(attrs);
+                    onEach.accept(file, attrs);
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -128,7 +126,7 @@ public class MainUtil {
         return out.toString();
     }
 
-    public static void forEachFile(Path path, final RunnableVal<BasicFileAttributes> onEach, Comparator<File> comparator) {
+    public static void forEachFile(Path path, final RunnableVal2<Path, BasicFileAttributes> onEach, Comparator<File> comparator) {
         File dir = path.toFile();
         if (!dir.exists()) return;
         File[] files = path.toFile().listFiles();
@@ -137,7 +135,7 @@ public class MainUtil {
             Path filePath = file.toPath();
             try {
                 BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-                onEach.run(attr);
+                onEach.run(file.toPath(), attr);
             } catch (IOException e) {
                 e.printStackTrace();
             }
