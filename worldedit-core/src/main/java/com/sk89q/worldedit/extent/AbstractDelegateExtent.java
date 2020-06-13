@@ -59,8 +59,7 @@ public class AbstractDelegateExtent implements Extent {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
 
-    //Not safe for public usage
-    public Extent extent;
+    private final Extent extent;
 
     /**
      * Create a new instance.

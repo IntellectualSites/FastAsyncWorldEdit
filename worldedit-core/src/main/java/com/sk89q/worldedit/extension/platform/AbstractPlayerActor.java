@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.sk89q.worldedit.EditSession;
 
@@ -700,10 +701,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
      * @return
      */
     public Region getLargestRegion() {
-        long area = 0;
+        int area = 0;
         Region max = null;
         for (Region region : this.getCurrentRegions()) {
-            final long tmp = region.getVolume();
+            final int tmp = region.getArea();
             if (tmp > area) {
                 area = tmp;
                 max = region;

@@ -31,7 +31,13 @@ public class TaskStateComparator implements Comparator<Task<?>> {
     public int compare(com.sk89q.worldedit.util.task.Task<?> o1, Task<?> o2) {
         int ordinal1 = o1.getState().ordinal();
         int ordinal2 = o2.getState().ordinal();
-        return Integer.compare(ordinal1, ordinal2);
+        if (ordinal1 < ordinal2) {
+            return -1;
+        } else if (ordinal1 > ordinal2) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
 }

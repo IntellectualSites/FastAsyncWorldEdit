@@ -428,7 +428,7 @@ public class NMSRelighter implements Relighter {
             }
         }
         for (int y = 255; y > 0; y--) {
-            for (RelightSkyEntry chunk : chunks) { // Propagate skylight
+            for (RelightSkyEntry chunk : chunks) { // Propogate skylight
                 int layer = y >> 4;
                 byte[] mask = chunk.mask;
                 if ((y & 15) == 15 && chunk.fix[layer] != SkipReason.NONE) {
@@ -596,7 +596,7 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private class RelightSkyEntry implements Comparable<RelightSkyEntry> {
+    private class RelightSkyEntry implements Comparable {
         public final int x;
         public final int z;
         public final byte[] mask;
@@ -625,17 +625,18 @@ public class NMSRelighter implements Relighter {
         }
 
         @Override
-        public int compareTo(RelightSkyEntry o) {
-            if (o.x < x) {
+        public int compareTo(Object o) {
+            RelightSkyEntry other = (RelightSkyEntry) o;
+            if (other.x < x) {
                 return 1;
             }
-            if (o.x > x) {
+            if (other.x > x) {
                 return -1;
             }
-            if (o.z < z) {
+            if (other.z < z) {
                 return 1;
             }
-            if (o.z > z) {
+            if (other.z > z) {
                 return -1;
             }
             return 0;

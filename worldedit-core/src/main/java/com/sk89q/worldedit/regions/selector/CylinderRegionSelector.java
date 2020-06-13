@@ -188,7 +188,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
                     "worldedit.selection.cylinder.explain.secondary",
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getX())),
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getZ())),
-                    TextComponent.of(region.getVolume())
+                    TextComponent.of(region.getArea())
             ));
         } else {
             player.printError(TranslatableComponent.of("worldedit.selection.cylinder.explain.secondary-missing"));
@@ -260,8 +260,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public long getVolume() {
-        return region.getVolume();
+    public int getArea() {
+        return region.getArea();
     }
 
     @Override
@@ -273,8 +273,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     @Override
     public void describeLegacyCUI(LocalSession session, Actor player) {
         if (isDefined()) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(0, region.getMinimumPoint(), getVolume()));
-            session.dispatchCUIEvent(player, new SelectionPointEvent(1, region.getMaximumPoint(), getVolume()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(0, region.getMinimumPoint(), getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(1, region.getMaximumPoint(), getArea()));
         }
     }
 

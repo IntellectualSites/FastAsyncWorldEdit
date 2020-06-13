@@ -30,54 +30,49 @@ import java.util.Iterator;
 
 class VectorPositionList implements PositionList {
 
-    private final IntList delegateX = new IntArrayList();
-    private final IntList delegateY = new IntArrayList();
-    private final IntList delegateZ = new IntArrayList();
+    private final IntList delegate = new IntArrayList();
 
     @Override
     public BlockVector3 get(int index) {
+        int ri = index * 3;
         return BlockVector3.at(
-            delegateX.getInt(index),
-            delegateY.getInt(index),
-            delegateZ.getInt(index));
+            delegate.getInt(ri),
+            delegate.getInt(ri + 1),
+            delegate.getInt(ri + 2));
     }
 
     @Override
     public void add(BlockVector3 vector) {
-        delegateX.add(vector.getX());
-        delegateY.add(vector.getY());
-        delegateZ.add(vector.getZ());
+        delegate.add(vector.getX());
+        delegate.add(vector.getY());
+        delegate.add(vector.getZ());
     }
 
     @Override
     public int size() {
-        return delegateX.size();
+        return delegate.size();
     }
 
     @Override
     public void clear() {
-        delegateX.clear();
-        delegateY.clear();
-        delegateZ.clear();
+        delegate.clear();
     }
 
     @Override
     public Iterator<BlockVector3> iterator() {
         return new AbstractIterator<BlockVector3>() {
 
-            private final IntIterator iteratorX = delegateX.iterator();
-            private final IntIterator iteratorY = delegateY.iterator();
-            private final IntIterator iteratorZ = delegateZ.iterator();
+            private final IntIterator iterator = delegate.iterator();
 
             @Override
             protected BlockVector3 computeNext() {
-                if (!iteratorX.hasNext()) {
+                if (!iterator.hasNext()) {
                     return endOfData();
                 }
                 return BlockVector3.at(
-                    iteratorX.nextInt(),
-                    iteratorY.nextInt(),
-                    iteratorZ.nextInt());
+                    iterator.nextInt(),
+                    iterator.nextInt(),
+                    iterator.nextInt());
             }
         };
     }
@@ -86,19 +81,17 @@ class VectorPositionList implements PositionList {
     public Iterator<BlockVector3> reverseIterator() {
         return new AbstractIterator<BlockVector3>() {
 
-            private final IntListIterator iteratorX = delegateX.listIterator(delegateX.size());
-            private final IntListIterator iteratorY = delegateY.listIterator(delegateY.size());
-            private final IntListIterator iteratorZ = delegateZ.listIterator(delegateZ.size());
+            private final IntListIterator iterator = delegate.listIterator(delegate.size());
 
             @Override
             protected BlockVector3 computeNext() {
-                if (!iteratorX.hasPrevious()) {
+                if (!iterator.hasPrevious()) {
                     return endOfData();
                 }
                 return BlockVector3.at(
-                    iteratorX.previousInt(),
-                    iteratorY.previousInt(),
-                    iteratorZ.previousInt());
+                    iterator.previousInt(),
+                    iterator.previousInt(),
+                    iterator.previousInt());
             }
         };
     }

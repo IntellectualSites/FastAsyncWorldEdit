@@ -4,8 +4,6 @@ import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-
 import java.lang.reflect.Field;
 import java.util.Collection;
 
@@ -37,18 +35,6 @@ public class MaskTraverser {
                     Field field = current.getDeclaredField("extent");
                     field.setAccessible(true);
                     field.set(mask, newExtent);
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
-                }
-            }
-            if (mask instanceof MaskIntersection) {
-                MaskIntersection mask1 = (MaskIntersection) mask;
-                try {
-                    Field field = mask1.getClass().getDeclaredField("masks");
-                    field.setAccessible(true);
-                    Collection<Mask> masks = (Collection<Mask>) field.get(mask);
-                    for (Mask next : masks) {
-                        reset(next, newExtent);
-                    }
                 } catch (NoSuchFieldException | IllegalAccessException ignored) {
                 }
             }

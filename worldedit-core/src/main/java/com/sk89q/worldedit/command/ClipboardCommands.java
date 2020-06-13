@@ -176,7 +176,7 @@ public class ClipboardCommands {
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
-        actor.print(Caption.of("fawe.worldedit.copy.command.copy" , region.getVolume()));
+        actor.print(Caption.of("fawe.worldedit.copy.command.copy" , region.getArea()));
     }
 
 //    @Command(

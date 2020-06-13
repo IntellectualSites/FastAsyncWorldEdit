@@ -99,8 +99,8 @@ public abstract class DFSVisitor implements Operation {
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
                 BlockVector3 bv2 = BlockVector3
-                    .at(from.getX() + direction.getX(), from.getY() + direction.getY(),
-                        from.getZ() + direction.getZ());
+                    .at(from.getX() + direction.x, from.getY() + direction.y,
+                        from.getZ() + direction.z);
                 if (isVisitable(bv, bv2)) {
                     Node adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if (!adjacent.equals(current.from)) {

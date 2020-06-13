@@ -78,8 +78,8 @@ public class RequestSelection implements Region {
     }
 
     @Override
-    public long getVolume() {
-        return getRegion().getVolume();
+    public int getArea() {
+        return getRegion().getArea();
     }
 
     @Override

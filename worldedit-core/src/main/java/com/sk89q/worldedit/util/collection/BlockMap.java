@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util.collection;
 
+import com.google.common.collect.AbstractIterator;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -35,7 +36,6 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -43,7 +43,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.sk89q.worldedit.math.BitMath.fixSign;
 import static com.sk89q.worldedit.math.BitMath.mask;
 
@@ -51,6 +50,12 @@ import static com.sk89q.worldedit.math.BitMath.mask;
  * A space-efficient map implementation for block locations.
  */
 public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
+
+    /* =========================
+       IF YOU MAKE CHANGES TO THIS CLASS
+       Re-run BlockMapTest with the blockmap.fulltesting=true system property.
+       Or just temporarily remove the annotation disabling the related tests.
+       ========================= */
 
     public static <V> BlockMap<V> create() {
         return create(() -> new Int2ObjectOpenHashMap<>(64, 0.9f));
@@ -240,65 +245,26 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
             entrySet = es = new AbstractSet<Entry<BlockVector3, V>>() {
                 @Override
                 public Iterator<Entry<BlockVector3, V>> iterator() {
-                    return new Iterator<Entry<BlockVector3,V>>() {
+                    return new AbstractIterator<Entry<BlockVector3, V>>() {
 
                         private final ObjectIterator<Long2ObjectMap.Entry<Int2ObjectMap<V>>> primaryIterator
                             = Long2ObjectMaps.fastIterator(maps);
-                        private Long2ObjectMap.Entry<Int2ObjectMap<V>> currentPrimaryEntry;
+                        private long currentGroupKey;
                         private ObjectIterator<Int2ObjectMap.Entry<V>> secondaryIterator;
-                        private boolean finished;
-                        private LazyEntry next;
 
                         @Override
-                        public boolean hasNext() {
-                            if (finished) {
-                                return false;
-                            }
-                            if (next == null) {
-                                LazyEntry proposedNext = computeNext();
-                                if (proposedNext == null) {
-                                    finished = true;
-                                    return false;
-                                }
-                                next = proposedNext;
-                            }
-                            return true;
-                        }
-
-                        private LazyEntry computeNext() {
+                        protected Entry<BlockVector3, V> computeNext() {
                             if (secondaryIterator == null || !secondaryIterator.hasNext()) {
                                 if (!primaryIterator.hasNext()) {
-                                    return null;
+                                    return endOfData();
                                 }
 
-                                currentPrimaryEntry = primaryIterator.next();
-                                secondaryIterator = Int2ObjectMaps.fastIterator(currentPrimaryEntry.getValue());
-                                // be paranoid
-                                checkState(secondaryIterator.hasNext(),
-                                    "Should not have an empty map entry, it should have been removed!");
+                                Long2ObjectMap.Entry<Int2ObjectMap<V>> next = primaryIterator.next();
+                                currentGroupKey = next.getLongKey();
+                                secondaryIterator = Int2ObjectMaps.fastIterator(next.getValue());
                             }
                             Int2ObjectMap.Entry<V> next = secondaryIterator.next();
-                            return new LazyEntry(currentPrimaryEntry.getLongKey(), next.getIntKey(), next.getValue());
-                        }
-
-                        @Override
-                        public Entry<BlockVector3, V> next() {
-                            if (!hasNext()) {
-                                throw new NoSuchElementException();
-                            }
-                            LazyEntry tmp = next;
-                            next = null;
-                            return tmp;
-                        }
-
-                        @Override
-                        public void remove() {
-                            secondaryIterator.remove();
-                            // ensure invariants hold
-                            if (currentPrimaryEntry.getValue().isEmpty()) {
-                                // the remove call cleared this map. call remove on the primary iter
-                                primaryIterator.remove();
-                            }
+                            return new LazyEntry(currentGroupKey, next.getIntKey(), next.getValue());
                         }
                     };
                 }
@@ -398,14 +364,13 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
     @Override
     public V remove(Object key) {
         BlockVector3 vec = (BlockVector3) key;
-        long groupKey = toGroupKey(vec);
-        Int2ObjectMap<V> activeMap = maps.get(groupKey);
+        Int2ObjectMap<V> activeMap = maps.get(toGroupKey(vec));
         if (activeMap == null) {
             return null;
         }
         V removed = activeMap.remove(toInnerKey(vec));
         if (activeMap.isEmpty()) {
-            maps.remove(groupKey);
+            maps.remove(toGroupKey(vec));
         }
         return removed;
     }
@@ -464,9 +429,7 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
         }
         if (o instanceof BlockMap) {
             // optimize by skipping entry translations:
-            @SuppressWarnings("unchecked")
-            BlockMap<V> other = (BlockMap<V>) o;
-            return maps.equals(other.maps);
+            return maps.equals(((BlockMap) o).maps);
         }
         return super.equals(o);
     }

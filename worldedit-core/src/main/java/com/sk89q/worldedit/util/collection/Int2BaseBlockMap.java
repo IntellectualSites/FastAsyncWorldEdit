@@ -91,7 +91,6 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
                         = Int2IntMaps.fastIterator(commonMap);
                     private final ObjectIterator<Entry<BaseBlock>> uncommonIter
                         = Int2ObjectMaps.fastIterator(uncommonMap);
-                    private boolean lastNextFromCommon = false;
 
                     @Override
                     public boolean hasNext() {
@@ -102,25 +101,14 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
                     public Entry<BaseBlock> next() {
                         if (commonIter.hasNext()) {
                             Int2IntMap.Entry e = commonIter.next();
-                            lastNextFromCommon = true;
                             return new BasicEntry<>(
                                 e.getIntKey(), assumeAsBlock(e.getIntValue())
                             );
                         }
                         if (uncommonIter.hasNext()) {
-                            lastNextFromCommon = false;
                             return uncommonIter.next();
                         }
                         throw new NoSuchElementException();
-                    }
-
-                    @Override
-                    public void remove() {
-                        if (lastNextFromCommon) {
-                            commonIter.remove();
-                        } else {
-                            uncommonIter.remove();
-                        }
                     }
                 };
             }

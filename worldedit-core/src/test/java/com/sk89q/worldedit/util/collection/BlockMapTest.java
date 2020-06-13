@@ -27,8 +27,7 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Registry;
-import com.sk89q.worldedit.util.test.VariedVectorGenerator;
-import com.sk89q.worldedit.util.test.VariedVectors;
+import com.sk89q.worldedit.util.VariedVectorsProvider;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -46,11 +45,11 @@ import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
 import java.util.AbstractMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -64,23 +63,24 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("An ordered block map")
 class BlockMapTest {
 /*
-    private static final Platform MOCKED_PLATFORM = mock(Platform.class);
+    private static Platform mockedPlatform = mock(Platform.class);
 
     @BeforeAll
     static void setupFakePlatform() {
-        when(MOCKED_PLATFORM.getRegistries()).thenReturn(new BundledRegistries() {
+        when(mockedPlatform.getRegistries()).thenReturn(new BundledRegistries() {
         });
-        when(MOCKED_PLATFORM.getCapabilities()).thenReturn(ImmutableMap.of(
+        when(mockedPlatform.getCapabilities()).thenReturn(ImmutableMap.of(
             Capability.WORLD_EDITING, Preference.PREFERRED,
             Capability.GAME_HOOKS, Preference.PREFERRED
         ));
         PlatformManager platformManager = WorldEdit.getInstance().getPlatformManager();
-        platformManager.register(MOCKED_PLATFORM);
+        platformManager.register(mockedPlatform);
 
         registerBlock("minecraft:air");
         registerBlock("minecraft:oak_wood");
@@ -88,7 +88,7 @@ class BlockMapTest {
 
     @AfterAll
     static void tearDownFakePlatform() throws Exception {
-        WorldEdit.getInstance().getPlatformManager().unregister(MOCKED_PLATFORM);
+        WorldEdit.getInstance().getPlatformManager().unregister(mockedPlatform);
         Field map = Registry.class.getDeclaredField("map");
         map.setAccessible(true);
         ((Map<?, ?>) map.get(BlockType.REGISTRY)).clear();
@@ -99,6 +99,8 @@ class BlockMapTest {
     }
 
     @Mock
+    private Function<? super BlockVector3, ? extends BaseBlock> function;
+    @Mock
     private BiFunction<? super BlockVector3, ? super BaseBlock, ? extends BaseBlock> biFunction;
     @Mock
     private BiFunction<? super BaseBlock, ? super BaseBlock, ? extends BaseBlock> mergeFunction;
@@ -108,7 +110,7 @@ class BlockMapTest {
     private final BaseBlock air = checkNotNull(BlockTypes.AIR).getDefaultState().toBaseBlock();
     private final BaseBlock oakWood = checkNotNull(BlockTypes.OAK_WOOD).getDefaultState().toBaseBlock();
 
-    private final BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
+    private BlockMap<BaseBlock> map = BlockMap.createForBaseBlock();
 
     @BeforeEach
     void setUp() {
@@ -184,14 +186,14 @@ class BlockMapTest {
         @DisplayName("never calls the forEach action")
         void neverCallsForEachAction() {
             map.forEach(biConsumer);
-            verifyNoMoreInteractions(biConsumer);
+            verifyZeroInteractions(biConsumer);
         }
 
         @Test
         @DisplayName("never calls the replaceAll function")
         void neverCallsReplaceAllFunction() {
             map.replaceAll(biFunction);
-            verifyNoMoreInteractions(biFunction);
+            verifyZeroInteractions(biFunction);
         }
 
         @Test
@@ -252,62 +254,63 @@ class BlockMapTest {
             assertEquals(air, map.merge(BlockVector3.ZERO, air, mergeFunction));
             assertEquals(1, map.size());
             assertEquals(air, map.get(BlockVector3.ZERO));
-            verifyNoMoreInteractions(mergeFunction);
+            verifyZeroInteractions(mergeFunction);
         }
 
     }
 
     @Nested
     @DisplayName("after having an entry added")
+    @EnabledIfSystemProperty(named = "blockmap.fulltesting", matches = "true")
     class AfterEntryAdded {
 
         // Note: This section of tests would really benefit from
         // being able to parameterize classes. It's not part of JUnit
         // yet though: https://github.com/junit-team/junit5/issues/878
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("has a size of one")
         void hasSizeOne(BlockVector3 vec) {
             map.put(vec, air);
             assertEquals(1, map.size());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("is equal to another map with the same entry")
         void isEqualToSimilarMap(BlockVector3 vec) {
             map.put(vec, air);
             assertEquals(ImmutableMap.of(vec, air), map);
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("is not equal to another map with a different key")
         void isNotEqualToDifferentKeyMap(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
             assertNotEquals(ImmutableMap.of(nonMatch, air), map);
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("is not equal to another map with a different value")
         void isNotEqualToDifferentValueMap(BlockVector3 vec) {
             map.put(vec, air);
             assertNotEquals(ImmutableMap.of(vec, oakWood), map);
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("is not equal to an empty map")
         void isNotEqualToEmptyMap(BlockVector3 vec) {
             map.put(vec, air);
             assertNotEquals(ImmutableMap.of(), map);
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("has the same hashCode as another map with the same entry")
         void isHashCodeEqualToSimilarMap(BlockVector3 vec) {
             map.put(vec, air);
             assertEquals(ImmutableMap.of(vec, air).hashCode(), map.hashCode());
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("has a different hashCode from another map with a different key")
         void isHashCodeNotEqualToDifferentKeyMap(BlockVector3 vec, BlockVector3 nonMatch) {
             assumeFalse(vec.hashCode() == nonMatch.hashCode(),
@@ -316,35 +319,35 @@ class BlockMapTest {
             assertNotEquals(ImmutableMap.of(nonMatch, air).hashCode(), map.hashCode());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("has a different hashCode from another map with a different value")
         void isHashCodeNotEqualToDifferentValueMap(BlockVector3 vec) {
             map.put(vec, air);
             assertNotEquals(ImmutableMap.of(vec, oakWood).hashCode(), map.hashCode());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("has a different hashCode from an empty map")
         void isHashCodeNotEqualToEmptyMap(BlockVector3 vec) {
             map.put(vec, air);
             assertNotEquals(ImmutableMap.of().hashCode(), map.hashCode());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("returns value from get")
         void returnsValueFromGet(BlockVector3 vec) {
             map.put(vec, air);
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("returns `null` from get with different key")
         void returnsValueFromGet(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
             assertNotEquals(air, map.get(nonMatch));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("contains the key")
         void containsTheKey(BlockVector3 vec) {
             map.put(vec, air);
@@ -353,7 +356,7 @@ class BlockMapTest {
             assertTrue(map.containsKey(vec));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("contains the value")
         void containsTheValue(BlockVector3 vec) {
             map.put(vec, air);
@@ -362,7 +365,7 @@ class BlockMapTest {
             assertTrue(map.containsValue(air));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("contains the entry")
         void containsTheEntry(BlockVector3 vec) {
             map.put(vec, air);
@@ -370,21 +373,21 @@ class BlockMapTest {
             assertEquals(new AbstractMap.SimpleImmutableEntry<>(vec, air), map.entrySet().iterator().next());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("returns the provided value from getOrDefault")
         void returnsProvidedFromGetOrDefault(BlockVector3 vec) {
             map.put(vec, air);
             assertEquals(air, map.getOrDefault(vec, oakWood));
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("returns the default value from getOrDefault with a different key")
         void returnsDefaultFromGetOrDefaultWrongKey(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
             assertEquals(oakWood, map.getOrDefault(nonMatch, oakWood));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("calls the forEach action once")
         void neverCallsForEachAction(BlockVector3 vec) {
             map.put(vec, air);
@@ -393,7 +396,7 @@ class BlockMapTest {
             verifyNoMoreInteractions(biConsumer);
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("replaces value using replaceAll")
         void neverCallsReplaceAllFunction(BlockVector3 vec) {
             map.put(vec, air);
@@ -401,7 +404,7 @@ class BlockMapTest {
             assertEquals(oakWood, map.get(vec));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("does not insert on `putIfAbsent`")
         void noInsertOnPutIfAbsent(BlockVector3 vec) {
             map.put(vec, air);
@@ -410,7 +413,7 @@ class BlockMapTest {
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("inserts on `putIfAbsent` to a different key")
         void insertOnPutIfAbsentDifferentKey(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
@@ -420,7 +423,7 @@ class BlockMapTest {
             assertEquals(oakWood, map.get(nonMatch));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("remove(key) returns the old value")
         void removeKeyReturnsOldValue(BlockVector3 vec) {
             map.put(vec, air);
@@ -428,27 +431,7 @@ class BlockMapTest {
             assertEquals(0, map.size());
         }
 
-        @VariedVectors.Test
-        @DisplayName("keySet().remove(key) removes the entry from the map")
-        void keySetRemovePassesThrough(BlockVector3 vec) {
-            map.put(vec, air);
-            assertTrue(map.keySet().remove(vec));
-            assertEquals(0, map.size());
-        }
-
-        @VariedVectors.Test
-        @DisplayName("entrySet().iterator().remove() removes the entry from the map")
-        void entrySetIteratorRemovePassesThrough(BlockVector3 vec) {
-            map.put(vec, air);
-            Iterator<Map.Entry<BlockVector3, BaseBlock>> iterator = map.entrySet().iterator();
-            assertTrue(iterator.hasNext());
-            Map.Entry<BlockVector3, BaseBlock> entry = iterator.next();
-            assertEquals(entry.getKey(), vec);
-            iterator.remove();
-            assertEquals(0, map.size());
-        }
-
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("remove(nonMatch) returns null")
         void removeNonMatchingKeyReturnsNull(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
@@ -456,7 +439,7 @@ class BlockMapTest {
             assertEquals(1, map.size());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("remove(key, value) returns true")
         void removeKeyValueReturnsTrue(BlockVector3 vec) {
             map.put(vec, air);
@@ -464,7 +447,7 @@ class BlockMapTest {
             assertEquals(0, map.size());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("remove(key, value) returns false for wrong value")
         void removeKeyValueReturnsFalseWrongValue(BlockVector3 vec) {
             map.put(vec, air);
@@ -472,7 +455,7 @@ class BlockMapTest {
             assertEquals(1, map.size());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("replaces value at key")
         void replacesValueAtKey(BlockVector3 vec) {
             map.put(vec, air);
@@ -486,7 +469,7 @@ class BlockMapTest {
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("does not replace value at different key")
         void doesNotReplaceAtDifferentKey(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
@@ -500,7 +483,7 @@ class BlockMapTest {
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("does not insert on computeIfAbsent")
         void doesNotInsertComputeIfAbsent(BlockVector3 vec) {
             map.put(vec, air);
@@ -512,7 +495,7 @@ class BlockMapTest {
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("inserts on computeIfAbsent with different key")
         void insertsOnComputeIfAbsentDifferentKey(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
@@ -525,7 +508,7 @@ class BlockMapTest {
             assertEquals(oakWood, map.get(nonMatch));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("replaces on compute")
         void replaceOnCompute(BlockVector3 vec) {
             map.put(vec, air);
@@ -540,7 +523,7 @@ class BlockMapTest {
             assertEquals(0, map.size());
         }
 
-        @VariedVectors.Test(provideNonMatching = true)
+        @VariedVectorsProvider.Test(provideNonMatching = true)
         @DisplayName("inserts on compute with different key")
         void insertOnComputeDifferentKey(BlockVector3 vec, BlockVector3 nonMatch) {
             map.put(vec, air);
@@ -557,7 +540,7 @@ class BlockMapTest {
             assertEquals(air, map.get(vec));
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("replaces on computeIfPresent")
         void replacesOnComputeIfPresent(BlockVector3 vec) {
             map.put(vec, air);
@@ -572,7 +555,7 @@ class BlockMapTest {
             assertEquals(0, map.size());
         }
 
-        @VariedVectors.Test
+        @VariedVectorsProvider.Test
         @DisplayName("inserts on merge, with call to merge function")
         void insertsOnMerge(BlockVector3 vec) {
             map.put(vec, air);
@@ -590,9 +573,7 @@ class BlockMapTest {
     @Test
     @DisplayName("contains all inserted vectors")
     void containsAllInsertedVectors() {
-        Set<BlockVector3> allVectors = new VariedVectorGenerator()
-            .makeVectorsStream()
-            .collect(Collectors.toSet());
+        Set<BlockVector3> allVectors = VariedVectorsProvider.makeVectorsStream().collect(Collectors.toSet());
         for (BlockVector3 vec : allVectors) {
             map.put(vec, air);
         }

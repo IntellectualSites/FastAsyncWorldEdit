@@ -170,8 +170,8 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public long getVolume() {
-        return region.getVolume();
+    public int getArea() {
+        return region.getArea();
     }
 
     @Override
@@ -250,7 +250,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         int lastVertexId = -1;
         for (BlockVector3 vertex : vertices) {
             vertexIds.put(vertex, ++lastVertexId);
-            session.dispatchCUIEvent(player, new SelectionPointEvent(lastVertexId, vertex, getVolume()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(lastVertexId, vertex, getArea()));
         }
 
         for (Triangle triangle : triangles) {
@@ -273,8 +273,8 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         checkNotNull(session);
 
         if (isDefined()) {
-            session.dispatchCUIEvent(player, new SelectionPointEvent(0, region.getMinimumPoint(), getVolume()));
-            session.dispatchCUIEvent(player, new SelectionPointEvent(1, region.getMaximumPoint(), getVolume()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(0, region.getMinimumPoint(), getArea()));
+            session.dispatchCUIEvent(player, new SelectionPointEvent(1, region.getMaximumPoint(), getArea()));
         }
     }
 

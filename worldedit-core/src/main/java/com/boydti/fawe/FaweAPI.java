@@ -117,6 +117,27 @@ public class FaweAPI {
 //        return parser != null;
 //    }
 
+    public static <T> T getParser(Class<T> parserClass) {
+        try {
+            Field field = AbstractFactory.class.getDeclaredField("parsers");
+            field.setAccessible(true);
+            ArrayList<InputParser> parsers = new ArrayList<>();
+            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getMaskFactory()));
+            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getBlockFactory()));
+            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getItemFactory()));
+            parsers.addAll((List<InputParser>) field.get(WorldEdit.getInstance().getPatternFactory()));
+            for (InputParser parser : parsers) {
+                if (parserClass.isAssignableFrom(parser.getClass())) {
+                    return (T) parser;
+                }
+            }
+            return null;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>

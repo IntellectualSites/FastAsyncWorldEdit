@@ -339,7 +339,7 @@ public class SelectionCommands {
                              List<BlockVector3> direction) throws WorldEditException {
         try {
             Region region = session.getSelection(world);
-            long oldSize = region.getVolume();
+            int oldSize = region.getArea();
             if (reverseAmount == 0) {
                 for (BlockVector3 dir : direction) {
                     region.contract(dir.multiply(amount));
@@ -350,7 +350,7 @@ public class SelectionCommands {
                 }
             }
             session.getRegionSelector(world).learnChanges();
-            long newSize = region.getVolume();
+            int newSize = region.getArea();
 
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
@@ -501,7 +501,7 @@ public class SelectionCommands {
 
         actor.printInfo(TranslatableComponent.of("worldedit.size.size", TextComponent.of(size.toString())));
         actor.printInfo(TranslatableComponent.of("worldedit.size.distance", TextComponent.of(region.getMaximumPoint().distance(region.getMinimumPoint()))));
-        actor.printInfo(TranslatableComponent.of("worldedit.size.blocks", TextComponent.of(region.getVolume())));
+        actor.printInfo(TranslatableComponent.of("worldedit.size.blocks", TextComponent.of(region.getArea())));
     }
 
     @Command(

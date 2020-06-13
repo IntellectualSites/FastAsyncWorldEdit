@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.regions;
 
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import com.google.common.primitives.Longs;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -45,7 +44,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
 
     @Override
     public int size() {
-        return com.google.common.primitives.Ints.saturatedCast(getVolume());
+        return getArea();
     }
 
     @Override
@@ -107,14 +106,19 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         return points;
     }
 
+    /**
+     * Get the number of blocks in the region.
+     *
+     * @return number of blocks
+     */
     @Override
-    public long getVolume() {
+    public int getArea() {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return (max.getX() - min.getX() + 1L) *
-                (max.getY() - min.getY() + 1L) *
-                (max.getZ() - min.getZ() + 1L);
+        return (max.getX() - min.getX() + 1) *
+                (max.getY() - min.getY() + 1) *
+                (max.getZ() - min.getZ() + 1);
     }
 
     /**
@@ -214,7 +218,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         int result = worldHash ^ (worldHash >>> 32);
         result = 31 * result + this.getMinimumPoint().hashCode();
         result = 31 * result + this.getMaximumPoint().hashCode();
-        result = (int) (31 * result + this.getVolume());
+        result = 31 * result + this.getArea();
         return result;
     }
 
@@ -235,7 +239,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         if(this.getWorld().equals(region.getWorld())
         && this.getMinimumPoint().equals(region.getMinimumPoint())
         && this.getMaximumPoint().equals(region.getMaximumPoint())
-        && this.getVolume() == region.getVolume()){
+        && this.getArea() == region.getArea()){
             return true;
         }
         return false;
