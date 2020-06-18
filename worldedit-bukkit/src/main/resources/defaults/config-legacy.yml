@@ -30,7 +30,10 @@ limits:
     butcher-radius:
         default: -1
         maximum: -1
-    disallowed-blocks: []
+    disallowed-blocks:
+    - "minecraft:wheat"
+    - "minecraft:fire"
+    - "minecraft:redstone_wire"
 
 use-inventory:
     enable: false
