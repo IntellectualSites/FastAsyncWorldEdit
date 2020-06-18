@@ -463,12 +463,11 @@ public class BrushCommands {
 
     @Command(
             name = "image",
-            aliases = {"color"},
             desc = "Use a height map to paint a surface",
             descFooter = "Use a height map to paint any surface.\n")
     @CommandPermissions("worldedit.brush.stencil")
     public void imageBrush(LocalSession session, InjectedValueAccess context,
-        @Arg(desc = "Expression", def = "5")
+        @Arg(desc = "The size of the brush", def = "5")
             Expression radius,
         ProvideBindings.ImageUri imageUri,
         @Arg(def = "1", desc = "scale height")

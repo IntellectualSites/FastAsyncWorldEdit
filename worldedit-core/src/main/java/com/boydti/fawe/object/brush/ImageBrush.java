@@ -27,8 +27,10 @@ import java.util.Arrays;
 public class ImageBrush implements Brush {
     private final LocalSession session;
     private final SummedColorTable table;
-    private final int width, height;
-    private final double centerX, centerZ;
+    private final int width;
+    private final int height;
+    private final double centerX;
+    private final double centerZ;
 
     private final ColorFunction colorFunction;
 
@@ -64,10 +66,6 @@ public class ImageBrush implements Brush {
 
     private interface ColorFunction {
         int call(int x1, int z1, int x2, int z2, Extent extent, BlockVector3 pos);
-    }
-
-    private interface BlockFunction {
-        void apply(int color, Extent extent, BlockVector3 pos);
     }
 
     @Override
