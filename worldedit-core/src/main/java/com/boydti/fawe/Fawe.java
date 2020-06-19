@@ -293,7 +293,7 @@ public class Fawe {
     }
 
     public void setupConfigs() {
-        MainUtil.copyFile(MainUtil.getJarFile(), "lang" + File.separator + "strings.json", null);
+        MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
