@@ -195,11 +195,19 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
+        System.out.println("blockarrayclipboard");
         region = region.clone();
         region.shift(BlockVector3.ZERO.subtract(origin));
         return getParent().getEntities(region);
     }
 
+    @Override
+    public List<? extends Entity> getEntities() {
+        System.out.println("blockarrayall");
+        return getParent().getEntities();
+    }
+    
+    
     @Override
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
