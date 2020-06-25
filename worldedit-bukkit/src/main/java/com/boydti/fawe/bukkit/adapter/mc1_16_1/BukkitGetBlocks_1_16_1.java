@@ -1,6 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_15;
-
-import static org.slf4j.LoggerFactory.getLogger;
+package com.boydti.fawe.bukkit.adapter.mc1_16_1;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
@@ -9,71 +7,47 @@ import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
-import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
+import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArray;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongTag;
-import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R1;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
+import net.minecraft.server.v1_16_R1.*;
+import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-import net.minecraft.server.v1_15_R1.BiomeBase;
-import net.minecraft.server.v1_15_R1.BiomeStorage;
-import net.minecraft.server.v1_15_R1.BlockPosition;
-import net.minecraft.server.v1_15_R1.Chunk;
-import net.minecraft.server.v1_15_R1.ChunkSection;
-import net.minecraft.server.v1_15_R1.DataBits;
-import net.minecraft.server.v1_15_R1.DataPalette;
-import net.minecraft.server.v1_15_R1.DataPaletteBlock;
-import net.minecraft.server.v1_15_R1.DataPaletteHash;
-import net.minecraft.server.v1_15_R1.DataPaletteLinear;
-import net.minecraft.server.v1_15_R1.Entity;
-import net.minecraft.server.v1_15_R1.EntityTypes;
-import net.minecraft.server.v1_15_R1.EnumSkyBlock;
-import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.LightEngineThreaded;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagInt;
-import net.minecraft.server.v1_15_R1.NibbleArray;
-import net.minecraft.server.v1_15_R1.SectionPosition;
-import net.minecraft.server.v1_15_R1.TileEntity;
-import net.minecraft.server.v1_15_R1.WorldServer;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.jetbrains.annotations.NotNull;
 
-public class BukkitGetBlocks_1_15 extends CharGetBlocks {
+import static org.slf4j.LoggerFactory.getLogger;
+
+public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
+
+    private static final Logger log = LoggerFactory.getLogger(
+        BukkitGetBlocks_1_16_1.class);
+
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
-    private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_15(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+    private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_16_1(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     public ChunkSection[] sections;
     public Chunk nmsChunk;
     public WorldServer world;
@@ -81,11 +55,11 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public NibbleArray[] blockLight = new NibbleArray[16];
     public NibbleArray[] skyLight = new NibbleArray[16];
 
-    public BukkitGetBlocks_1_15(World world, int X, int Z) {
+    public BukkitGetBlocks_1_16_1(World world, int X, int Z) {
         this(((CraftWorld) world).getHandle(), X, Z);
     }
 
-    public BukkitGetBlocks_1_15(WorldServer world, int X, int Z) {
+    public BukkitGetBlocks_1_16_1(WorldServer world, int X, int Z) {
         this.world = world;
         this.X = X;
         this.Z = Z;
@@ -120,7 +94,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         if (tileEntity == null) {
             return null;
         }
-        return new LazyCompoundTag_1_15(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+        return new LazyCompoundTag_1_16_1(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
     @Override
@@ -219,19 +193,21 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
             @NotNull
             @Override
             public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = StreamSupport
-                    .stream(Iterables.concat(slices).spliterator(), false).map(input -> {
-                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance()
-                            .getBukkitImplAdapter();
+                Iterable<CompoundTag> result = Iterables.transform(Iterables.concat(slices), new com.google.common.base.Function<Entity, CompoundTag>() {
+                    @Nullable
+                    @Override
+                    public CompoundTag apply(@Nullable Entity input) {
+                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
                         NBTTagCompound tag = new NBTTagCompound();
                         return (CompoundTag) adapter.toNative(input.save(tag));
-                    }).collect(Collectors.toList());
+                    }
+                });
                 return result.iterator();
             }
         };
     }
 
-    private void updateGet(BukkitGetBlocks_1_15 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
+    private void updateGet(BukkitGetBlocks_1_16_1 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
             if (this.nmsChunk != nmsChunk) {
                 this.nmsChunk = nmsChunk;
@@ -242,7 +218,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 this.sections = sections.clone();
             }
             if (this.sections[layer] != section) {
-                this.sections[layer] = section;
+                this.sections[layer] = new ChunkSection[]{section}.clone()[0];
             }
             this.blocks[layer] = arr;
         }
@@ -254,7 +230,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     }
 
     public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
-        return BukkitAdapter_1_15.ensureLoaded(nmsWorld, X, Z);
+        return BukkitAdapter_1_16_1.ensureLoaded(nmsWorld, X, Z);
     }
 
     @Override
@@ -266,6 +242,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
 
             // Remove existing tiles
             {
+                // Create a copy so that we can remove blocks
                 Map<BlockPosition, TileEntity> tiles = new HashMap<>(nmsChunk.getTileEntities());
                 if (!tiles.isEmpty()) {
                     for (Map.Entry<BlockPosition, TileEntity> entry : tiles.entrySet()) {
@@ -277,7 +254,9 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                         if (!set.hasSection(layer)) {
                             continue;
                         }
-                        if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
+
+                        int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
+                        if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
                             nmsChunk.removeTileEntity(tile.getPosition());
                         }
@@ -290,7 +269,9 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 ChunkSection[] sections = nmsChunk.getSections();
 
                 for (int layer = 0; layer < 16; layer++) {
-                    if (!set.hasSection(layer)) continue;
+                    if (!set.hasSection(layer)){
+                        continue;
+                    }
 
                     bitMask |= 1 << layer;
 
@@ -298,8 +279,8 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
-                        newSection = BukkitAdapter_1_15.newChunkSection(layer, setArr, fastmode);
-                        if (BukkitAdapter_1_15.setSectionAtomic(sections, null, newSection, layer)) {
+                        newSection = BukkitAdapter_1_16_1.newChunkSection(layer, setArr, fastmode);
+                        if (BukkitAdapter_1_16_1.setSectionAtomic(sections, null, newSection, layer)) {
                             updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             continue;
                         } else {
@@ -310,11 +291,11 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             }
                         }
                     }
+                    BukkitAdapter_1_16_1.fieldTickingBlockCount.set(existingSection, (short) 0);
 
                     //ensure that the server doesn't try to tick the chunksection while we're editing it.
-                    BukkitAdapter_1_15.fieldTickingBlockCount.set(existingSection, (short) 0);
+                    DelegateLock lock = BukkitAdapter_1_16_1.applyLock(existingSection);
 
-                    DelegateLock lock = BukkitAdapter_1_15.applyLock(existingSection);
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
@@ -330,8 +311,10 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             } else if (lock.isModified()) {
                                 this.reset(layer);
                             }
-                            newSection = BukkitAdapter_1_15.newChunkSection(layer, this::load, setArr, fastmode);
-                            if (!BukkitAdapter_1_15.setSectionAtomic(sections, existingSection, newSection, layer)) {
+                            newSection = BukkitAdapter_1_16_1
+                                .newChunkSection(layer, this::load, setArr, fastmode);
+                            if (!BukkitAdapter_1_16_1
+                                .setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
@@ -421,7 +404,8 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
                             if (idTag == null || posTag == null || rotTag == null) {
-                                getLogger(BukkitGetBlocks_1_15.class).debug("Unknown entity tag: " + nativeTag);
+                                getLogger(
+                                    BukkitGetBlocks_1_16_1.class).debug("Unknown entity tag: " + nativeTag);
                                 continue;
                             }
                             final double x = posTag.getDouble(0);
@@ -500,7 +484,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_15.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
+                        BukkitAdapter_1_16_1.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
                         if (finalizer != null) finalizer.run();
                     };
                 }
@@ -554,31 +538,27 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
             data = new char[4096];
         }
-        DelegateLock lock = BukkitAdapter_1_15.applyLock(section);
+        DelegateLock lock = BukkitAdapter_1_16_1.applyLock(section);
         synchronized (lock) {
             lock.untilFree();
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                FAWE_Spigot_v1_15_R1 adapter = ((FAWE_Spigot_v1_15_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                FAWE_Spigot_v1_16_R1 adapter = ((FAWE_Spigot_v1_16_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                final DataBits bits = (DataBits) BukkitAdapter_1_15.fieldBits.get(blocks);
-                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_15.fieldPalette.get(blocks);
+                final DataBits bits = (DataBits) BukkitAdapter_1_16_1.fieldBits.get(blocks);
+                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_16_1.fieldPalette.get(blocks);
 
-                //getBits()
                 final int bitsPerEntry = bits.c();
-                //getRaw()
                 final long[] blockStates = bits.a();
 
                 new BitArray(bitsPerEntry, 4096, blockStates).toRaw(data);
 
                 int num_palette;
                 if (palette instanceof DataPaletteLinear) {
-                    //Get the size of the palette
                     num_palette = ((DataPaletteLinear<IBlockData>) palette).b();
                 } else if (palette instanceof DataPaletteHash) {
-                    //Get the size of the palette
                     num_palette = ((DataPaletteHash<IBlockData>) palette).b();
                 } else {
                     num_palette = 0;
@@ -590,7 +570,6 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             char ordinal = paletteToBlockChars[paletteVal];
                             if (ordinal == Character.MAX_VALUE) {
                                 paletteToBlockInts[num_palette++] = paletteVal;
-                                //palette.a(Object) is palette.idFor(Object)
                                 IBlockData ibd = palette.a(data[i]);
                                 if (ibd == null) {
                                     ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
@@ -614,7 +593,6 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {
-                            //palette.a(Object) is palette.idFor(Object)
                             char ordinal = ordinal(palette.a(i), adapter);
                             paletteToOrdinal[i] = ordinal;
                         }
@@ -644,7 +622,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_15_R1 adapter) {
+    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_16_R1 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {
@@ -705,6 +683,8 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
 
     @Override
     public boolean trim(boolean aggressive) {
+        skyLight = new NibbleArray[16];
+        blockLight = new NibbleArray[16];
         if (aggressive) {
             sections = null;
             nmsChunk = null;
@@ -718,7 +698,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                 try {
                     final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
 
-                    final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_15.fieldPalette.get(blocksExisting);
+                    final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_16_1.fieldPalette.get(blocksExisting);
                     int paletteSize;
 
                     if (palette instanceof DataPaletteLinear) {
