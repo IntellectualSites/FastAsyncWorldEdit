@@ -28,6 +28,7 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureUtil;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -36,6 +37,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.HookMode;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -44,6 +46,8 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
+import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
@@ -54,6 +58,9 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
+import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.CommandManagerService;
+import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -65,8 +72,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -75,6 +84,62 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class GeneralCommands {
+
+    public static void register(CommandRegistrationHandler registration,
+                                CommandManager commandManager,
+                                CommandManagerService commandManagerService,
+                                WorldEdit worldEdit) {
+        // Collect the tool commands
+        CommandManager collect = commandManagerService.newCommandManager();
+
+        registration.register(
+            collect,
+            GeneralCommandsRegistration.builder(),
+            new GeneralCommands(worldEdit)
+        );
+
+
+        Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
+            .collect(Collectors.toSet());
+        for (org.enginehub.piston.Command command : commands) {
+            if (command.getName().equals("/fast")) {
+                // deprecate to `//perf`
+                commandManager.register(CommandUtil.deprecate(
+                    command, "//fast duplicates //perf " +
+                        "and will be removed in WorldEdit 8",
+                    GeneralCommands::replaceFastForPerf
+                ));
+                continue;
+            }
+
+            commandManager.register(command);
+        }
+    }
+
+    private static Component replaceFastForPerf(org.enginehub.piston.Command oldCmd,
+                                                CommandParameters oldParams) {
+        if (oldParams.getMetadata() == null) {
+            return CommandUtil.createNewCommandReplacementText("//perf");
+        }
+        ImmutableList<String> args = oldParams.getMetadata().getArguments();
+        if (args.isEmpty()) {
+            return TextComponent.of("There is not yet a replacement for //fast" +
+                " with no arguments");
+        }
+        String arg0 = args.get(0).toLowerCase(Locale.ENGLISH);
+        String flipped;
+        switch (arg0) {
+            case "on":
+                flipped = "off";
+                break;
+            case "off":
+                flipped = "on";
+                break;
+            default:
+                return TextComponent.of("There is no replacement for //fast " + arg0);
+        }
+        return CommandUtil.createNewCommandReplacementText("//perf " + flipped);
+    }
 
     private final WorldEdit worldEdit;
 
@@ -145,22 +210,48 @@ public class GeneralCommands {
 
     @Command(
         name = "/fast",
-        desc = "Toggle fast mode side effects"
+        desc = "Toggle fast mode"
     )
     @CommandPermissions("worldedit.fast")
-    public void fast(Actor actor, LocalSession session,
-                    @Arg(desc = "The side effect", def = "")
-                        SideEffect sideEffect,
-                    @Arg(desc = "The new side effect state", def = "")
-                        SideEffect.State newState,
-                    @Switch(name = 'h', desc = "Show the info box")
-                        boolean showInfoBox) throws WorldEditException {
+    @Deprecated
+    void fast(Actor actor, LocalSession session,
+              @Arg(desc = "The new fast mode state", def = "")
+                  Boolean fastMode) {
+        boolean hasFastMode = session.hasFastMode();
+        if (fastMode != null && fastMode == hasFastMode) {
+            actor.printError(TranslatableComponent.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
+            return;
+        }
+
+        if (hasFastMode) {
+            session.setFastMode(false);
+            actor.printInfo(TranslatableComponent.of("worldedit.fast.disabled"));
+        } else {
+            session.setFastMode(true);
+            actor.printInfo(TranslatableComponent.of("worldedit.fast.enabled"));
+        }
+    }
+
+    @Command(
+        name = "/perf",
+        desc = "Toggle side effects for performance",
+        descFooter = "Note that this command is GOING to change in the future." +
+            " Do not depend on the exact format of this command yet."
+    )
+    @CommandPermissions("worldedit.perf")
+    void perf(Actor actor, LocalSession session,
+              @Arg(desc = "The side effect", def = "")
+                  SideEffect sideEffect,
+              @Arg(desc = "The new side effect state", def = "")
+                  SideEffect.State newState,
+              @Switch(name = 'h', desc = "Show the info box")
+                  boolean showInfoBox) throws WorldEditException {
         if (sideEffect != null) {
             SideEffect.State currentState = session.getSideEffectSet().getState(sideEffect);
             if (newState != null && newState == currentState) {
                 if (!showInfoBox) {
                     actor.printError(TranslatableComponent.of(
-                            "worldedit.fast.sideeffect.already-set",
+                            "worldedit.perf.sideeffect.already-set",
                             TranslatableComponent.of(sideEffect.getDisplayName()),
                             TranslatableComponent.of(newState.getDisplayName())
                     ));
@@ -172,14 +263,14 @@ public class GeneralCommands {
                 session.setSideEffectSet(session.getSideEffectSet().with(sideEffect, newState));
                 if (!showInfoBox) {
                     actor.printInfo(TranslatableComponent.of(
-                            "worldedit.fast.sideeffect.set",
+                            "worldedit.perf.sideeffect.set",
                             TranslatableComponent.of(sideEffect.getDisplayName()),
                             TranslatableComponent.of(newState.getDisplayName())
                     ));
                 }
             } else {
                 actor.printInfo(TranslatableComponent.of(
-                        "worldedit.fast.sideeffect.get",
+                        "worldedit.perf.sideeffect.get",
                         TranslatableComponent.of(sideEffect.getDisplayName()),
                         TranslatableComponent.of(currentState.getDisplayName())
                 ));
@@ -192,7 +283,7 @@ public class GeneralCommands {
             session.setSideEffectSet(applier);
             if (!showInfoBox) {
                 actor.printInfo(TranslatableComponent.of(
-                        "worldedit.fast.sideeffect.set-all",
+                        "worldedit.perf.sideeffect.set-all",
                         TranslatableComponent.of(newState.getDisplayName())
                 ));
             }
@@ -331,7 +422,7 @@ public class GeneralCommands {
                            @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
                                int page,
                            @Arg(desc = "Search query", variable = true)
-                               List<String> query) throws Exception {
+                               List<String> query) {
         String search = String.join(" ", query);
         if (search.length() <= 2) {
             actor.printError(TranslatableComponent.of("worldedit.searchitem.too-short"));
@@ -342,7 +433,8 @@ public class GeneralCommands {
             return;
         }
 
-        actor.print(new ItemSearcher(search, blocksOnly, itemsOnly, page).call());
+        WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new ItemSearcher(search, blocksOnly, itemsOnly, page),
+                TranslatableComponent.of("worldedit.searchitem.searching"));
     }
 
     private static class ItemSearcher implements Callable<Component> {
@@ -361,7 +453,7 @@ public class GeneralCommands {
         @Override
         public Component call() throws Exception {
             String command = "/searchitem " + (blocksOnly ? "-b " : "") + (itemsOnly ? "-i " : "") + "-p %page% " + search;
-            Map<String, String> results = new TreeMap<>();
+            Map<String, Component> results = new TreeMap<>();
             String idMatch = search.replace(' ', '_');
             String nameMatch = search.toLowerCase(Locale.ROOT);
             for (ItemType searchType : ItemType.REGISTRY) {
@@ -373,15 +465,17 @@ public class GeneralCommands {
                     continue;
                 }
                 final String id = searchType.getId();
-                String name = searchType.getName();
-                final boolean hasName = !name.equals(id);
-                name = name.toLowerCase(Locale.ROOT);
-                if (id.contains(idMatch) || (hasName && name.contains(nameMatch))) {
-                    results.put(id, name + (hasName ? " (" + id + ")" : ""));
+                if (id.contains(idMatch)) {
+                    Component name = searchType.getRichName();
+                    results.put(id, TextComponent.builder()
+                        .append(name)
+                        .append(" (" + id + ")")
+                        .build());
                 }
             }
-            List<String> list = new ArrayList<>(results.values());
-            return PaginationBox.fromStrings("Search results for '" + search + "'", command, list).create(page);
+            List<Component> list = new ArrayList<>(results.values());
+            return PaginationBox.fromComponents("Search results for '" + search + "'", command, list)
+                .create(page);
         }
     }
 
