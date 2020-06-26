@@ -229,7 +229,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         entity.valid = false;
     }
 
-    public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
+    public Chunk ensureLoaded(net.minecraft.server.v1_16_R1.World nmsWorld, int X, int Z) {
         return BukkitAdapter_1_16_1.ensureLoaded(nmsWorld, X, Z);
     }
 
@@ -428,7 +428,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                                         for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                             tag.remove(name);
                                         }
-                                        entity.f(tag);
+                                        entity.save(tag);
                                     }
                                     entity.setLocation(x, y, z, yaw, pitch);
                                     nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);

@@ -47,8 +47,6 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
 
     private final static MethodHandle methodGetVisibleChunk;
 
-    public final static MethodHandle methodSetLightNibbleArray;
-
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
 
@@ -78,10 +76,6 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
-
-            Method declaredSetLightNibbleArray = LightEngineStorage.class.getDeclaredMethod("a", long.class, NibbleArray.class);
-            declaredSetLightNibbleArray.setAccessible(true);
-            methodSetLightNibbleArray = MethodHandles.lookup().unreflect(declaredSetLightNibbleArray);
 
             Field tmp = DataPaletteBlock.class.getDeclaredField("j");
             ReflectionUtils.setAccessibleNonFinal(tmp);
@@ -130,7 +124,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
+        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(X, Z, false);
         if (nmsChunk != null) {
             return nmsChunk;
         }
@@ -183,7 +177,8 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
 
                     if (lighting) {
                         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
+                        boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
+                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                         playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
                             p.playerConnection.sendPacket(packet);
                         });
@@ -194,9 +189,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
                 }
                 return null;
             });
-            return;
         }
-        return;
     }
 
     /*
