@@ -465,7 +465,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                                     tag.set("x", NBTTagInt.a(x));
                                     tag.set("y", NBTTagInt.a(y));
                                     tag.set("z", NBTTagInt.a(z));
-                                    tileEntity.load(tag);
+                                    tileEntity.load(tileEntity.getBlock(), tag);
                                 }
                             }
                         }
@@ -550,7 +550,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                 final DataBits bits = (DataBits) BukkitAdapter_1_16_1.fieldBits.get(blocks);
                 final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_16_1.fieldPalette.get(blocks);
 
-                final int bitsPerEntry = bits.c();
+                final int bitsPerEntry = (int) BukkitAdapter_1_16_1.fieldBitsPerEntry.get(bits);
                 final long[] blockStates = bits.a();
 
                 new BitArray(bitsPerEntry, 4096, blockStates).toRaw(data);

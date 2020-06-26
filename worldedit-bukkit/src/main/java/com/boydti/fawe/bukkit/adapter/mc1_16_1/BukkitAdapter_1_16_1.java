@@ -38,6 +38,8 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     public final static Field fieldPalette;
     public final static Field fieldSize;
 
+    public final static Field fieldBitsPerEntry;
+
     public final static Field fieldFluidCount;
     public final static Field fieldTickingBlockCount;
     public final static Field fieldNonEmptyBlockCount;
@@ -60,6 +62,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             fieldBits.setAccessible(true);
             fieldPalette = DataPaletteBlock.class.getDeclaredField("h");
             fieldPalette.setAccessible(true);
+
+            fieldBitsPerEntry = DataBits.class.getDeclaredField("c");
+            fieldBitsPerEntry.setAccessible(true);
 
             fieldFluidCount = ChunkSection.class.getDeclaredField("e");
             fieldFluidCount.setAccessible(true);
