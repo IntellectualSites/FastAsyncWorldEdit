@@ -85,7 +85,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     default Entity createEntity(Location location, BaseEntity state) {
         return getParent().createEntity(location, state);
     }
-
+        
     @Override
     default Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
         return getParent().getProperties(blockType);

@@ -54,6 +54,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
@@ -61,6 +64,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
@@ -115,7 +119,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public com.sk89q.worldedit.entity.Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity entity) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (adapter != null) {
+        if (adapter != null && Fawe.isMainThread()) {
             try {
                 Entity createdEntity = adapter.createEntity(BukkitAdapter.adapt(getWorld(), location), entity);
                 if (createdEntity != null) {
@@ -130,6 +134,16 @@ public class BukkitWorld extends AbstractWorld {
                 }
                 e.printStackTrace();
                 return null;
+            }
+        } else if (adapter != null && !Fawe.isMainThread()){
+            Future<com.sk89q.worldedit.entity.Entity> future = Fawe.get().getQueueHandler().sync((Supplier<com.sk89q.worldedit.entity.Entity>)() -> this.createEntity(location, entity));
+            while (!future.isDone()) {
+                ((CraftWorld)worldRef.get()).getHandle().getChunkProvider().runTasks();
+            }
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
             }
         } else {
             return null;
