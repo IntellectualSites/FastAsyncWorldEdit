@@ -38,8 +38,9 @@ public class RandomPatternParser extends InputParser<Pattern> {
 
     @Override
     public Stream<String> getSuggestions(String input) {
-        String[] splits = input.split(",", -1);
-        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);
+        List<String> patterns = StringUtil.split(input, ',', '[', ']');
+        /*String[] splits = input.split(",", -1);
+        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);*/
         if (patterns.size() == 1) {
             return Stream.empty();
         }
@@ -63,8 +64,9 @@ public class RandomPatternParser extends InputParser<Pattern> {
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
         RandomPattern randomPattern = new RandomPattern();
 
-        String[] splits = input.split(",", -1);
-        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);
+        List<String> patterns = StringUtil.split(input, ',', '[', ']');
+        /*String[] splits = input.split(",", -1);
+        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);*/
         if (patterns.size() == 1) {
             return null; // let a 'single'-pattern parser handle it
         }
