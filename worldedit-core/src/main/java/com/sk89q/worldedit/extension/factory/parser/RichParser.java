@@ -24,12 +24,12 @@ public abstract class RichParser<E> extends InputParser<E> {
     @Override
     public Stream<String> getSuggestions(String input) {
         // we don't even want to start suggesting if it's not meant to be this parser result
-        if (input.length() >= this.prefix.length() && !input.startsWith(this.required)) {
+        if (input.length() > this.required.length() && !input.startsWith(this.required)) {
             return Stream.empty();
         }
         // suggest until the first [ as long as it isn't fully typed
-        if (input.length() < this.required.length() && this.required.startsWith(input)) {
-            return Stream.of(this.required);
+        if (input.length() < this.required.length()) {
+            return Stream.of(this.required).filter(s -> s.startsWith(input));
         }
         // we know that it is at least "<required>"
         String[] strings = extractArguments(input.substring(this.prefix.length()), false);
@@ -43,7 +43,8 @@ public abstract class RichParser<E> extends InputParser<E> {
 
     @Override
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
-        if (!input.startsWith(prefix)) return null;
+        if (!input.startsWith(this.prefix)) return null;
+        if (input.length() < this.prefix.length()) return null;
         // if it's not "atomic", we can't parse it like that
         if (StringUtil.split(input, ',', '[', ']').size() > 1) return null;
         // TODO if no arguments -> exception

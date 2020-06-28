@@ -29,7 +29,7 @@ public class SimplexPatternParser extends RichParser<Pattern> {
                 if (argument.indexOf('.') == -1) {
                     numbers = Stream.concat(numbers, Stream.of("."));
                 }
-                return numbers;
+                return numbers.map(s -> argument + s);
             }
             // no valid input anymore
             return Stream.empty();
