@@ -76,7 +76,7 @@ public class RandomPatternParser extends InputParser<Pattern> {
 
             // Parse special percentage syntax
             if (token.matches("[0-9]+(\\.[0-9]*)?%.*")) {
-                String[] p = token.split("%");
+                String[] p = token.split("%", 2);
 
                 if (p.length < 2) {
                     throw new InputParseException("Missing the type after the % symbol for '" + input + "'");
