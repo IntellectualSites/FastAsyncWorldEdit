@@ -2,11 +2,7 @@ package com.boydti.fawe.object.regions;
 
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
-import com.sk89q.worldedit.function.mask.DelegateExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
@@ -45,12 +41,9 @@ public class FuzzyRegion extends AbstractRegion {
     }
 
     public void select(int x, int y, int z) {
-        RecursiveVisitor search = new RecursiveVisitor(mask.withExtent(extent), new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 p) throws WorldEditException {
-                setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
-                return true;
-            }
+        RecursiveVisitor search = new RecursiveVisitor(mask.withExtent(extent), p -> {
+            setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
+            return true;
         }, 256);
         search.setVisited(set);
         search.visit(BlockVector3.at(x, y, z));
