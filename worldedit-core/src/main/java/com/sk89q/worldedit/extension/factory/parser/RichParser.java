@@ -5,16 +5,29 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
+/**
+ * A rich parser allows parsing of patterns and masks with extra arguments,
+ * e.g. #simplex[scale][pattern].
+ *
+ * @param <E> the parse result.
+ */
 public abstract class RichParser<E> extends InputParser<E> {
     private final String prefix;
     private final String required;
 
+    /**
+     * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
+     *
+     * @param worldEdit the worldedit instance.
+     * @param prefix    the prefix of this parser result.
+     */
     protected RichParser(WorldEdit worldEdit, String prefix) {
         super(worldEdit);
         this.prefix = prefix;
@@ -53,9 +66,24 @@ public abstract class RichParser<E> extends InputParser<E> {
         return parseFromInput(arguments, context);
     }
 
-    protected abstract Stream<String> getSuggestions(String argument, int index);
+    /**
+     * Returns a stream of suggestions for the argument at the given index.
+     *
+     * @param argumentInput the already provided input for the argument at the given index.
+     * @param index         the index of the argument to get suggestions for.
+     * @return a stream of suggestions matching the given input for the argument at the given index.
+     */
+    protected abstract Stream<String> getSuggestions(String argumentInput, int index);
 
-    protected abstract E parseFromInput(String[] arguments, ParserContext context);
+    /**
+     * Parses the already split arguments.
+     *
+     * @param arguments the array of arguments that were split.
+     * @param context   the context of this parsing process.
+     * @return the resulting parsed type.
+     * @throws InputParseException if the input couldn't be parsed correctly.
+     */
+    protected abstract E parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException;
 
     /**
      * Extracts arguments enclosed by {@code []} into an array.
@@ -64,9 +92,10 @@ public abstract class RichParser<E> extends InputParser<E> {
      * @param input          the input to extract arguments from.
      * @param requireClosing whether or not the extraction requires valid bracketing.
      * @return an array of extracted arguments.
+     * @throws InputParseException if {@code requireClosing == true} and the count of [ != the count of ]
      */
-    protected String[] extractArguments(String input, boolean requireClosing) {
-        int open = 0;
+    protected String[] extractArguments(String input, boolean requireClosing) throws InputParseException {
+        int open = 0; // the "level"
         int openIndex = 0;
         int i = 0;
         List<String> arguments = new ArrayList<>();
@@ -85,7 +114,9 @@ public abstract class RichParser<E> extends InputParser<E> {
         if (!requireClosing && open > 0) {
             arguments.add(input.substring(openIndex + 1));
         }
-        // TODO if open != 0 -> exception
+        if (requireClosing && open != 0) {
+            throw new InputParseException("Invalid bracketing, are you missing a '[' or ']'?");
+        }
         return arguments.toArray(new String[0]);
     }
 }

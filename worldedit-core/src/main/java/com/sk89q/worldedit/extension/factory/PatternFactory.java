@@ -46,8 +46,6 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
      */
     public PatternFactory(WorldEdit worldEdit) {
         super(worldEdit, new SingleBlockPatternParser(worldEdit));
-        // FAWE
-        register(new SimplexPatternParser(worldEdit));
 
         // split and parse each sub-pattern
         register(new RandomPatternParser(worldEdit));
@@ -57,6 +55,9 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new TypeOrStateApplyingPatternParser(worldEdit));
         register(new RandomStatePatternParser(worldEdit));
         register(new BlockCategoryPatternParser(worldEdit));
+
+        // FAWE
+        register(new SimplexPatternParser(worldEdit));
     }
 
 }
