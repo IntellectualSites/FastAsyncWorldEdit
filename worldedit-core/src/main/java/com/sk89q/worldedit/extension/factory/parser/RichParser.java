@@ -58,10 +58,6 @@ public abstract class RichParser<E> extends InputParser<E> {
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
         if (!input.startsWith(this.prefix)) return null;
         if (input.length() < this.prefix.length()) return null;
-        // if it's not "atomic", we can't parse it like that
-        if (StringUtil.split(input, ',', '[', ']').size() > 1) return null;
-        // TODO if no arguments -> exception
-        // TODO if not starts with [ and ends with ] -> exception
         String[] arguments = extractArguments(input.substring(prefix.length()), true);
         return parseFromInput(arguments, context);
     }
@@ -78,7 +74,7 @@ public abstract class RichParser<E> extends InputParser<E> {
     /**
      * Parses the already split arguments.
      *
-     * @param arguments the array of arguments that were split.
+     * @param arguments the array of arguments that were split (can be empty).
      * @param context   the context of this parsing process.
      * @return the resulting parsed type.
      * @throws InputParseException if the input couldn't be parsed correctly.
