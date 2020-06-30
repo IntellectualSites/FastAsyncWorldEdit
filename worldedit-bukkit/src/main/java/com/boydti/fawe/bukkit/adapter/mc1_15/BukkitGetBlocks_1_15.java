@@ -57,7 +57,7 @@ import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.IBlockData;
-import net.minecraft.server.v1_15_R1.LightEngineThreaded;
+import net.minecraft.server.v1_15_R1.LightEngine;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagInt;
 import net.minecraft.server.v1_15_R1.NibbleArray;
@@ -70,8 +70,13 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BukkitGetBlocks_1_15 extends CharGetBlocks {
+
+    private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_15.class);
+
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
     private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_15(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     public ChunkSection[] sections;
@@ -136,7 +141,17 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public int getSkyLight(int x, int y, int z) {
         int layer = y >> 4;
         if (skyLight[layer] == null) {
-            skyLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(SectionPosition.a(nmsChunk.getPos(), layer));
+            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPosition);
+            // If the server hasn't generated the section's NibbleArray yet, it will be null
+            if (nibbleArray == null) {
+               byte[] a = new byte[2048];
+               // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
+               Arrays.fill(a, (byte) 15);
+               nibbleArray = new NibbleArray(a);
+               ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibbleArray);
+            }
+            skyLight[layer] = nibbleArray;
         }
         long l = BlockPosition.a(x, y, z);
         return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
@@ -146,7 +161,17 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
     public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
         if (blockLight[layer] == null) {
-            blockLight[layer] = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(SectionPosition.a(nmsChunk.getPos(), layer));
+            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
+            // If the server hasn't generated the section's NibbleArray yet, it will be null
+            if (nibbleArray == null) {
+                byte[] a = new byte[2048];
+                // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
+                Arrays.fill(a, (byte) 15);
+                nibbleArray = new NibbleArray(a);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.BLOCK, sectionPosition, nibbleArray);
+            }
+            blockLight[layer] = nibbleArray;
         }
         long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
@@ -305,7 +330,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                         } else {
                             existingSection = sections[layer];
                             if (existingSection == null) {
-                                System.out.println("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
+                                log.error("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             }
                         }
@@ -332,7 +357,7 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
                             }
                             newSection = BukkitAdapter_1_15.newChunkSection(layer, this::load, setArr, fastmode);
                             if (!BukkitAdapter_1_15.setSectionAtomic(sections, existingSection, newSection, layer)) {
-                                System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
+                                log.error("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
@@ -684,9 +709,13 @@ public class BukkitGetBlocks_1_15 extends CharGetBlocks {
             if (light[Y] == null) {
                 continue;
             }
-            NibbleArray nibble = world.getChunkProvider().getLightEngine().a(skyBlock).a(SectionPosition.a(nmsChunk.getPos(), Y));
+            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), Y);
+            NibbleArray nibble = world.getChunkProvider().getLightEngine().a(skyBlock).a(sectionPosition);
             if (nibble == null) {
-                continue;
+                byte[] a = new byte[2048];
+                Arrays.fill(a, skyBlock == EnumSkyBlock.SKY ? (byte) 15 : (byte) 0);
+                nibble = new NibbleArray(a);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibble);
             }
             synchronized (nibble) {
                 for (int i = 0; i < 4096; i++) {
