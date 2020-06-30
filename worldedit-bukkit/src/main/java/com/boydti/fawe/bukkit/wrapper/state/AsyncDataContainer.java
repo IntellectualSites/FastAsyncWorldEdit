@@ -5,16 +5,21 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 public final class AsyncDataContainer implements PersistentDataContainer {
     private final CompoundTag root;
+    private final Set<NamespacedKey> keys = new HashSet<>();
 
     public AsyncDataContainer(CompoundTag root) {
         this.root = root;
@@ -47,6 +52,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(type, "The provided type for the custom value was null");
         Validate.notNull(value, "The provided value for the custom value was null");
         get().put(key.toString(), FaweCache.IMP.asTag(type.toPrimitive(value, null)));
+        keys.add(key);
     }
 
     public <T, Z> boolean has(NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -69,9 +75,14 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         return z != null ? z : defaultValue;
     }
 
+    @Override public @NotNull Set<NamespacedKey> getKeys() {
+        return keys;
+    }
+
     public void remove(NamespacedKey key) {
         Validate.notNull(key, "The provided key for the custom value was null");
         get(false).remove(key.toString());
+        keys.remove(key);
     }
 
     public boolean isEmpty() {
