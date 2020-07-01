@@ -82,6 +82,8 @@ public class FaweBukkit implements IFawe, Listener {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
+
+        chunksStretched = Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
         
         //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
         setupVault();
@@ -100,8 +102,6 @@ public class FaweBukkit implements IFawe, Listener {
             // The tick limiter
             new ChunkListener_9();
         });
-
-        chunksStretched = Integer.parseInt(Bukkit.getMinecraftVersion().split("\\.")[1]) >= 16;
     }
 
     @Override // Please don't delete this again, it's WIP
