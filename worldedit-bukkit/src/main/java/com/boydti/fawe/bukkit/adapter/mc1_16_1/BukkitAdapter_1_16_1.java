@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.BitArray;
+import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
@@ -232,11 +232,13 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
             }
 
-            final int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
+            final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
+            final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
+
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 

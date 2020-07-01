@@ -45,11 +45,11 @@ public interface IBlocks extends Trimable {
 
     IBlocks reset();
 
-    default byte[] toByteArray(boolean full) {
-        return toByteArray(null, getBitMask(), full);
+    default byte[] toByteArray(boolean full, boolean stretched) {
+        return toByteArray(null, getBitMask(), full, stretched);
     }
 
-    default byte[] toByteArray(byte[] buffer, int bitMask, boolean full) {
+    default byte[] toByteArray(byte[] buffer, int bitMask, boolean full, boolean stretched) {
         if (buffer == null) {
             buffer = new byte[1024];
         }
@@ -81,7 +81,12 @@ public interface IBlocks extends Trimable {
                 }
 
                 sectionWriter.writeShort(nonEmpty); // non empty
-                FaweCache.Palette palette = FaweCache.IMP.toPalette(0, ids);
+                FaweCache.Palette palette;
+                if (stretched) {
+                     palette = FaweCache.IMP.toPalette(0, ids);
+                } else {
+                    palette = FaweCache.IMP.toPaletteUnstretched(0, ids);
+                }
 
                 sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
                 sectionWriter.writeVarInt(palette.paletteToBlockLength);

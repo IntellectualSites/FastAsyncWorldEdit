@@ -10,7 +10,7 @@ import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
-import com.boydti.fawe.object.collection.BitArray;
+import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.Tag;
@@ -553,7 +553,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                 final int bitsPerEntry = (int) BukkitAdapter_1_16_1.fieldBitsPerEntry.get(bits);
                 final long[] blockStates = bits.a();
 
-                new BitArray(bitsPerEntry, 4096, blockStates).toRaw(data);
+                new BitArrayUnstretched(bitsPerEntry, blockStates).toRaw(data);
 
                 int num_palette;
                 if (palette instanceof DataPaletteLinear) {
