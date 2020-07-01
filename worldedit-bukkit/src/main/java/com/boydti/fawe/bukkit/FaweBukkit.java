@@ -58,6 +58,7 @@ public class FaweBukkit implements IFawe, Listener {
     private boolean listeningImages;
     private BukkitImageListener imageListener;
     private CFIPacketListener packetListener;
+    private final boolean chunksStretched;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -99,6 +100,8 @@ public class FaweBukkit implements IFawe, Listener {
             // The tick limiter
             new ChunkListener_9();
         });
+
+        chunksStretched = Integer.parseInt(Bukkit.getMinecraftVersion().split("\\.")[1]) >= 16;
     }
 
     @Override // Please don't delete this again, it's WIP
@@ -300,6 +303,11 @@ public class FaweBukkit implements IFawe, Listener {
             return new AsyncPreloader();
         }
         return null;
+    }
+
+    @Override
+    public boolean isChunksStretched() {
+        return chunksStretched;
     }
 
     private void setupPlotSquared() {

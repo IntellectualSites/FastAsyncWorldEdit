@@ -1,14 +1,14 @@
-package com.boydti.fawe.bukkit.adapter.mc1_15.nbt;
+package com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import net.minecraft.server.v1_15_R1.NBTBase;
-import net.minecraft.server.v1_15_R1.NBTNumber;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NBTTagList;
+import net.minecraft.server.v1_16_R1.NBTBase;
+import net.minecraft.server.v1_16_R1.NBTNumber;
+import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.NBTTagList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class LazyCompoundTag_1_15 extends CompoundTag {
+public class LazyCompoundTag_1_16_1 extends CompoundTag {
     private final Supplier<NBTTagCompound> nmsTag;
 
-    public LazyCompoundTag_1_15(Supplier<NBTTagCompound> tag) {
+    public LazyCompoundTag_1_16_1(Supplier<NBTTagCompound> tag) {
         super(null);
         this.nmsTag = tag;
     }
 
-    public LazyCompoundTag_1_15(NBTTagCompound tag) {
+    public LazyCompoundTag_1_16_1(NBTTagCompound tag) {
         this(() -> tag);
     }
 
@@ -93,7 +93,7 @@ public class LazyCompoundTag_1_15 extends CompoundTag {
             NBTTagList nbtList = (NBTTagList) tag;
             for (NBTBase elem : nbtList) {
                 if (elem instanceof NBTTagCompound) {
-                    list.add(new LazyCompoundTag_1_15((NBTTagCompound) elem));
+                    list.add(new LazyCompoundTag_1_16_1((NBTTagCompound) elem));
                 } else {
                     list.add(WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(elem));
                 }

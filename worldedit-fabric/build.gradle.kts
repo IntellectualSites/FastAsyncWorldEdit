@@ -7,8 +7,8 @@ applyShadowConfiguration()
 apply(plugin = "fabric-loom")
 
 val minecraftVersion = "1.15.2"
-val yarnMappings = "1.15.2+build.8:v2"
-val loaderVersion = "0.7.6+build.180"
+val yarnMappings = "1.15.2+build.14:v2"
+val loaderVersion = "0.7.8+build.189"
 
 configurations.all {
     resolutionStrategy {
@@ -61,16 +61,12 @@ tasks.named<Copy>("processResources") {
     }
 }
 
-<<<<<<< HEAD
-addJarManifest(includeClasspath = true)
-=======
 tasks.named<Jar>("jar") {
     manifest {
         attributes("Class-Path" to CLASSPATH,
                    "WorldEdit-Version" to project.version)
     }
 }
->>>>>>> 18a55bc14... Add new experimental snapshot API (#524)
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("dist-dev")

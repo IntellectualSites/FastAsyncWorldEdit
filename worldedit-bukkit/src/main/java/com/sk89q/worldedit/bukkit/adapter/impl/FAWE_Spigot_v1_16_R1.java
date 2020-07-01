@@ -26,11 +26,8 @@ import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.mc1_15.BlockMaterial_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitAdapter_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15.BukkitGetBlocks_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15.MapChunkUtil_1_15;
-import com.boydti.fawe.bukkit.adapter.mc1_15.nbt.LazyCompoundTag_1_15;
+import com.boydti.fawe.bukkit.adapter.mc1_16_1.*;
+import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -44,35 +41,39 @@ import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
+import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -81,16 +82,16 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
-    private final Spigot_v1_15_R1 parent;
+public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
+    private final Spigot_v1_16_R1 parent;
     private char[] ibdToStateOrdinal;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public FAWE_Spigot_v1_15_R1() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new Spigot_v1_15_R1();
+    public FAWE_Spigot_v1_16_R1() throws NoSuchFieldException, NoSuchMethodException {
+        this.parent = new Spigot_v1_16_R1();
     }
 
     @Override
@@ -99,11 +100,11 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
     }
 
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null) return false;
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
         ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
-            BlockMaterial_1_15 material = (BlockMaterial_1_15) state.getMaterial();
+            BlockMaterial_1_16_1 material = (BlockMaterial_1_16_1) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
             ibdToStateOrdinal[id] = state.getOrdinalChar();
         }
@@ -113,13 +114,15 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
         Block block = getBlock(blockType);
-        return new BlockMaterial_1_15(block);
+        return new BlockMaterial_1_16_1(block);
     }
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
-        return new BlockMaterial_1_15(bs.getBlock(), bs);
+        return new BlockMaterial_1_16_1(bs.getBlock(), bs);
+
+
     }
 
     public Block getBlock(BlockType blockType) {
@@ -156,24 +159,24 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
-        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+    public Set<SideEffect> getSupportedSideEffects() {
+        return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
-    public <B extends BlockStateHolder<B>> boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, B state, boolean update) {
+    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
 
         BlockPosition blockPos = new BlockPosition(x, y, z);
-        IBlockData blockData = ((BlockMaterial_1_15) state.getMaterial()).getState();
+        IBlockData blockData = ((BlockMaterial_1_16_1) state.getMaterial()).getState();
         ChunkSection[] sections = nmsChunk.getSections();
         int y4 = y >> 4;
         ChunkSection section = sections[y4];
 
         IBlockData existing;
         if (section == null) {
-            existing = ((BlockMaterial_1_15) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
+            existing = ((BlockMaterial_1_16_1) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
         } else {
             existing = section.getType(x & 15, y & 15, z & 15);
         }
@@ -194,7 +197,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
                     tag.set("x", NBTTagInt.a(x));
                     tag.set("y", NBTTagInt.a(y));
                     tag.set("z", NBTTagInt.a(z));
-                    tileEntity.load(tag); // readTagIntoTileEntity - load data
+                    tileEntity.load(tileEntity.getBlock(), tag); // readTagIntoTileEntity - load data
                 }
             }
         } else {
@@ -209,6 +212,12 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
             nmsWorld.getMinecraftWorld().notify(blockPos, existing, blockData, 0);
         }
         return true;
+    }
+
+    @Override
+    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
+        return new FAWEWorldNativeAccess_1_16(this,
+                new WeakReference<>(((CraftWorld)world).getHandle()));
     }
 
     @Nullable
@@ -245,7 +254,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
-        BlockMaterial_1_15 material = (BlockMaterial_1_15) state.getMaterial();
+        BlockMaterial_1_16_1 material = (BlockMaterial_1_16_1) state.getMaterial();
         IBlockData mcState = material.getCraftBlockData().getState();
         return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
     }
@@ -286,7 +295,7 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
             } catch (NullPointerException e) {
                 init();
                 return adaptToChar(ibd);
-            } catch (ArrayIndexOutOfBoundsException e1) {
+            } catch(ArrayIndexOutOfBoundsException e1){
                 Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
                 return 0;
             }
@@ -295,21 +304,16 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
-        BlockMaterial_1_15 material = (BlockMaterial_1_15) state.getMaterial();
+        BlockMaterial_1_16_1 material = (BlockMaterial_1_16_1) state.getMaterial();
         return material.getCraftBlockData();
     }
 
-    @Override
-    public void notifyAndLightBlock(Location position, BlockState previousType) {
-        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
-    }
-
-    private MapChunkUtil_1_15 mapUtil = new MapChunkUtil_1_15();
+    private MapChunkUtil_1_16_1 mapUtil = new MapChunkUtil_1_16_1();
 
     @Override
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
         WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-        PlayerChunk map = BukkitAdapter_1_15.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
+        PlayerChunk map = BukkitAdapter_1_16_1.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
         if (map != null && map.hasBeenLoaded()) {
             boolean flag = false;
             PlayerChunk.d players = map.players;
@@ -362,91 +366,93 @@ public final class FAWE_Spigot_v1_15_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public NBTBase fromNative(Tag foreign) {
-        if (foreign instanceof LazyCompoundTag_1_15) {
-            return ((LazyCompoundTag_1_15) foreign).get();
+        if (foreign instanceof LazyCompoundTag_1_16_1) {
+            return ((LazyCompoundTag_1_16_1) foreign).get();
         }
         return parent.fromNative(foreign);
     }
 
     @Override
     public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
-        WorldServer originalWorld = ((CraftWorld) world).getHandle();
-        ChunkProviderServer provider = originalWorld.getChunkProvider();
-        if (!(provider instanceof ChunkProviderServer)) {
-            return false;
-        }
+//        WorldServer originalWorld = ((CraftWorld) world).getHandle();
+//        ChunkProviderServer provider = originalWorld.getChunkProvider();
+//        if (!(provider instanceof ChunkProviderServer)) {
+//            return false;
+//        }
+//
+//        File saveFolder = Files.createTempDir();
+//        // register this just in case something goes wrong
+//        // normally it should be deleted at the end of this method
+//        saveFolder.deleteOnExit();
+//        try {
+//            MinecraftServer server = originalWorld.getServer().getServer();
+//            Convertable.ConversionSession originalDataManager = server.convertable;
+////            Convertable.ConversionSession saveHandler = new Convertable.ConversionSession(world.getName(), world.);
+//            WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound) null),
+//                    server.dataConverterManager, getDataVersion(), null);
+//            newWorldData.setName(UUID.randomUUID().toString());
+//
+//            ChunkGenerator gen = world.getGenerator();
+//            Environment env = world.getEnvironment();
+//            try (WorldServer freshWorld = new WorldServer(server,
+//                    server.executorService, originalDataManager,
+//                    newWorldData,
+//                    originalWorld.worldProvider.getDimensionManager(),
+//                    originalWorld.getMethodProfiler(),
+//                    server.worldLoadListenerFactory.create(11),
+//                    env,
+//                    gen){
+//                @Override
+//                public boolean addEntityChunk(Entity entity) {
+//                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously
+//                    return false;
+//                }
+//            }) {
+//
+//                // Pre-gen all the chunks
+//                // We need to also pull one more chunk in every direction
+//                Fawe.get().getQueueHandler().startSet(true);
+//                try {
+//                    IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
+//                    extent.init(null, (x, z) -> new BukkitGetBlocks_1_16_1(freshWorld, x, z) {
+//                        @Override
+//                        public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
+//                            Chunk cached = nmsWorld.getChunkIfLoaded(X, Z);
+//                            if (cached != null) return cached;
+//                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
+//                            while (!future.isDone()) {
+//                                // this feels so dirty
+//                                freshWorld.getChunkProvider().runTasks();
+//                            }
+//                            try {
+//                                return future.get();
+//                            } catch (InterruptedException | ExecutionException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                    }, null);
+//                    for (BlockVector3 vec : region) {
+//                        editSession.setBlock(vec, extent.getFullBlock(vec));
+//                    }
+//                } finally {
+//                    Fawe.get().getQueueHandler().endSet(true);
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        } catch (MaxChangedBlocksException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            saveFolder.delete();
+//        }
+//        return true;
 
-        File saveFolder = Files.createTempDir();
-        // register this just in case something goes wrong
-        // normally it should be deleted at the end of this method
-        saveFolder.deleteOnExit();
-        try {
-            MinecraftServer server = originalWorld.getServer().getServer();
-            WorldNBTStorage originalDataManager = originalWorld.getDataManager();
-            WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalDataManager.getDirectory().getName(), server, originalDataManager.getDataFixer());
-            WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound) null),
-                    server.dataConverterManager, getDataVersion(), null);
-            newWorldData.setName(UUID.randomUUID().toString());
-
-            ChunkGenerator gen = world.getGenerator();
-            Environment env = world.getEnvironment();
-            try (WorldServer freshWorld = new WorldServer(server,
-                    server.executorService, saveHandler,
-                    newWorldData,
-                    originalWorld.worldProvider.getDimensionManager(),
-                    originalWorld.getMethodProfiler(),
-                    server.worldLoadListenerFactory.create(11),
-                    env,
-                    gen){
-                @Override
-                public boolean addEntityChunk(net.minecraft.server.v1_15_R1.Entity entity) {
-                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously
-                    return false;
-                }
-            }) {
-
-                // Pre-gen all the chunks
-                // We need to also pull one more chunk in every direction
-                Fawe.get().getQueueHandler().startSet(true);
-                try {
-                    IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
-                    extent.init(null, (x, z) -> new BukkitGetBlocks_1_15(freshWorld, x, z) {
-                        @Override
-                        public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-                            Chunk cached = nmsWorld.getChunkIfLoaded(X, Z);
-                            if (cached != null) return cached;
-                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
-                            while (!future.isDone()) {
-                                // this feels so dirty
-                                freshWorld.getChunkProvider().runTasks();
-                            }
-                            try {
-                                return future.get();
-                            } catch (InterruptedException | ExecutionException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }, null);
-                    for (BlockVector3 vec : region) {
-                        editSession.setBlock(vec, extent.getFullBlock(vec));
-                    }
-                } finally {
-                    Fawe.get().getQueueHandler().endSet(true);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (MaxChangedBlocksException e) {
-            throw new RuntimeException(e);
-        } finally {
-            saveFolder.delete();
-        }
-        return true;
+        return false; //TODO: rework or remove for 1.16
     }
 
     @Override
     public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_15(world, chunkX, chunkZ);
+        return new BukkitGetBlocks_1_16_1(world, chunkX, chunkZ);
     }
 
     @Override

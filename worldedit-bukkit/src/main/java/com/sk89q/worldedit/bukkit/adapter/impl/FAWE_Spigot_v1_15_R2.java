@@ -26,10 +26,7 @@ import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.mc1_15_2.BlockMaterial_1_15_2;
-import com.boydti.fawe.bukkit.adapter.mc1_15_2.BukkitAdapter_1_15_2;
-import com.boydti.fawe.bukkit.adapter.mc1_15_2.BukkitGetBlocks_1_15_2;
-import com.boydti.fawe.bukkit.adapter.mc1_15_2.MapChunkUtil_1_15_2;
+import com.boydti.fawe.bukkit.adapter.mc1_15_2.*;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
@@ -44,9 +41,12 @@ import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
+import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -71,8 +71,10 @@ import org.bukkit.generator.ChunkGenerator;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -158,11 +160,11 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(Location location, B state, boolean notifyAndLight) {
-        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+    public Set<SideEffect> getSupportedSideEffects() {
+        return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
-    public <B extends BlockStateHolder<B>> boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, B state, boolean update) {
+    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
@@ -211,6 +213,12 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
             nmsWorld.getMinecraftWorld().notify(blockPos, existing, blockData, 0);
         }
         return true;
+    }
+
+    @Override
+    public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
+        return new FAWEWorldNativeAccess_1_15_2(this,
+                new WeakReference<>(((CraftWorld) world).getHandle()));
     }
 
     @Nullable
@@ -299,11 +307,6 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
         BlockMaterial_1_15_2 material = (BlockMaterial_1_15_2) state.getMaterial();
         return material.getCraftBlockData();
-    }
-
-    @Override
-    public void notifyAndLightBlock(Location position, BlockState previousType) {
-        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
     }
 
     private MapChunkUtil_1_15_2 mapUtil = new MapChunkUtil_1_15_2();

@@ -31,7 +31,8 @@ public class CopyPastaBrush implements Brush, ResettableTool {
 
     private final LocalSession session;
     private final Player player;
-    public boolean autoRotate, randomRotate;
+    public boolean autoRotate;
+    public boolean randomRotate;
 
     public CopyPastaBrush(Player player, LocalSession session, boolean randomRotate, boolean autoRotate) {
         session.setClipboard(null);

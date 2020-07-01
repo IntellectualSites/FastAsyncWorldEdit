@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -33,6 +34,8 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.fabric.internal.FabricWorldNativeAccess;
+import com.sk89q.worldedit.fabric.internal.NBTConverter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -42,6 +45,8 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -71,6 +76,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -104,6 +110,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -123,6 +130,7 @@ public class FabricWorld extends AbstractWorld {
     private static final net.minecraft.block.BlockState JUNGLE_SHRUB = Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, Boolean.TRUE);
 
     private final WeakReference<World> worldRef;
+    private final FabricWorldNativeAccess worldNativeAccess;
 
     /**
      * Construct a new world.
@@ -132,6 +140,7 @@ public class FabricWorld extends AbstractWorld {
     FabricWorld(World world) {
         checkNotNull(world);
         this.worldRef = new WeakReference<>(world);
+        this.worldNativeAccess = new FabricWorldNativeAccess(worldRef);
     }
 
     /**
@@ -186,61 +195,14 @@ public class FabricWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
-        checkNotNull(position);
-        checkNotNull(block);
-
-        World world = getWorldChecked();
-        int x = position.getBlockX();
-        int y = position.getBlockY();
-        int z = position.getBlockZ();
-
-        // First set the block
-        Chunk chunk = world.getChunk(x >> 4, z >> 4);
-        BlockPos pos = new BlockPos(x, y, z);
-        net.minecraft.block.BlockState old = chunk.getBlockState(pos);
-        OptionalInt stateId = BlockStateIdAccess.getBlockStateId(block.toImmutableState());
-        net.minecraft.block.BlockState newState = stateId.isPresent() ? Block.getStateFromRawId(stateId.getAsInt()) : FabricAdapter.adapt(block.toImmutableState());
-        net.minecraft.block.BlockState successState = chunk.setBlockState(pos, newState, false);
-        boolean successful = successState != null;
-
-        // Create the TileEntity
-        if (successful || old == newState) {
-            if (block instanceof BaseBlock) {
-                CompoundTag tag = ((BaseBlock) block).getNbtData();
-                if (tag != null) {
-                    net.minecraft.nbt.CompoundTag nativeTag = NBTConverter.toNative(tag);
-                    BlockEntity tileEntity = getWorld().getWorldChunk(pos).getBlockEntity(pos);
-                    if (tileEntity != null) {
-                        tileEntity.fromTag(nativeTag);
-                        tileEntity.setPos(pos);
-                        tileEntity.setWorld(world);
-                        successful = true; // update if TE changed as well
-                    }
-                }
-            }
-        }
-
-        if (successful && notifyAndLight) {
-            world.getChunkManager().getLightingProvider().enqueueLightUpdate(pos);
-            world.scheduleBlockRender(pos, old, newState);
-            world.updateListeners(pos, old, newState, UPDATE | NOTIFY);
-            world.updateNeighbors(pos, newState.getBlock());
-            if (old.hasComparatorOutput()) {
-                world.updateHorizontalAdjacent(pos, newState.getBlock());
-            }
-        }
-
-        return successful;
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+        return worldNativeAccess.setBlock(position, block, sideEffects);
     }
 
     @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        BlockPos pos = new BlockPos(position.getX(), position.getY(), position.getZ());
-        net.minecraft.block.BlockState state = getWorld().getBlockState(pos);
-        getWorld().updateListeners(pos, FabricAdapter.adapt(previousType), state, 1 | 2);
-        getWorld().updateNeighbors(pos, state.getBlock());
-        return true;
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException {
+        worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
+        return Sets.intersection(FabricWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
     }
 
     @Override

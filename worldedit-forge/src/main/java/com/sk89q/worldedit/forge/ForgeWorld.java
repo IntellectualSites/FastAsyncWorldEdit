@@ -32,6 +32,9 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.forge.internal.ForgeWorldNativeAccess;
+import com.sk89q.worldedit.forge.internal.NBTConverter;
+import com.sk89q.worldedit.forge.internal.TileEntityUtils;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.util.BiomeMath;
@@ -96,6 +99,7 @@ import net.minecraft.world.gen.feature.SwampTreeFeature;
 import net.minecraft.world.gen.feature.TallTaigaTreeFeature;
 import net.minecraft.world.gen.feature.TreeFeature;
 
+import net.minecraft.world.server.ChunkHolder;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.SaveHandler;
@@ -125,13 +129,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ForgeWorld extends AbstractWorld {
 
     private static final Random random = new Random();
-    private static final int UPDATE = 1, NOTIFY = 2;
 
     private static final net.minecraft.block.BlockState JUNGLE_LOG = Blocks.JUNGLE_LOG.getDefaultState();
     private static final net.minecraft.block.BlockState JUNGLE_LEAF = Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, Boolean.TRUE);
     private static final net.minecraft.block.BlockState JUNGLE_SHRUB = Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, Boolean.TRUE);
-    
+
     private final WeakReference<World> worldRef;
+    private final ForgeWorldNativeAccess nativeAccess;
 
     /**
      * Construct a new world.
@@ -141,6 +145,7 @@ public class ForgeWorld extends AbstractWorld {
     ForgeWorld(World world) {
         checkNotNull(world);
         this.worldRef = new WeakReference<>(world);
+        this.nativeAccess = new ForgeWorldNativeAccess(worldRef);
     }
 
     /**
@@ -193,50 +198,14 @@ public class ForgeWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
-        checkNotNull(position);
-        checkNotNull(block);
-
-        World world = getWorldChecked();
-        int x = position.getBlockX();
-        int y = position.getBlockY();
-        int z = position.getBlockZ();
-
-        // First set the block
-        Chunk chunk = world.getChunk(x >> 4, z >> 4);
-        BlockPos pos = new BlockPos(x, y, z);
-        net.minecraft.block.BlockState old = chunk.getBlockState(pos);
-        OptionalInt stateId = BlockStateIdAccess.getBlockStateId(block.toImmutableState());
-        net.minecraft.block.BlockState newState = stateId.isPresent() ? Block.getStateById(stateId.getAsInt()) : ForgeAdapter.adapt(block.toImmutableState());
-        net.minecraft.block.BlockState successState = chunk.setBlockState(pos, newState, false);
-        boolean successful = successState != null;
-
-        // Create the TileEntity
-        if (successful || old == newState) {
-            if (block instanceof BaseBlock) {
-                CompoundTag tag = ((BaseBlock) block).getNbtData();
-                if (tag != null) {
-                    CompoundNBT nativeTag = NBTConverter.toNative(tag);
-                    nativeTag.putString("id", ((BaseBlock) block).getNbtId());
-                    TileEntityUtils.setTileEntity(world, position, nativeTag);
-                    successful = true; // update if TE changed as well
-                }
-            }
-        }
-
-        if (successful && notifyAndLight) {
-            world.getChunkProvider().getLightManager().checkBlock(pos);
-            world.markAndNotifyBlock(pos, chunk, old, newState, UPDATE | NOTIFY);
-        }
-
-        return successful;
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+        return nativeAccess.setBlock(position, block, sideEffects);
     }
 
     @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        BlockPos pos = new BlockPos(position.getX(), position.getY(), position.getZ());
-        getWorld().notifyBlockUpdate(pos, ForgeAdapter.adapt(previousType), getWorld().getBlockState(pos), 1 | 2);
-        return true;
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException {
+        nativeAccess.applySideEffects(position, previousType, sideEffectSet);
+        return Sets.intersection(ForgeWorldEdit.inst.getPlatform().getSupportedSideEffects(), sideEffectSet.getSideEffectsToApply());
     }
 
     @Override

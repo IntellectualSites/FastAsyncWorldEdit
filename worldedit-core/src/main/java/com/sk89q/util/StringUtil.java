@@ -20,6 +20,7 @@
 package com.sk89q.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -330,5 +331,38 @@ public final class StringUtil {
         }
 
         return parsableBlocks;
+    }
+
+    /**
+     * Splits a string respecting enclosing quotes.
+     *
+     * @param input the input to split.
+     * @param delimiter the delimiter to split on.
+     * @param open the opening quote character.
+     * @param close the closing quote character.
+     * @return a list of split strings.
+     */
+    public static List<String> split(String input, char delimiter, char open, char close) {
+        if (input.indexOf(open) == -1 && input.indexOf(close) == -1) {
+            return Arrays.asList(input.split(String.valueOf(delimiter)));
+        }
+        int level = 0;
+        int begin = 0;
+        List<String> split = new ArrayList<>();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == delimiter && level == 0) {
+                split.add(input.substring(begin, i));
+                begin = i + 1;
+            } else if (c == open) {
+                level++;
+            } else if (c == close) {
+                level--;
+            }
+        }
+        if (begin < input.length()) {
+            split.add(input.substring(begin));
+        }
+        return split;
     }
 }

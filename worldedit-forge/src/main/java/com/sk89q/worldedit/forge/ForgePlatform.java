@@ -27,6 +27,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
+import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
@@ -204,6 +205,18 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
         capabilities.put(Capability.USER_COMMANDS, Preference.NORMAL);
         capabilities.put(Capability.WORLD_EDITING, Preference.PREFERRED);
         return capabilities;
+    }
+
+    private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
+            SideEffect.VALIDATION,
+            SideEffect.ENTITY_AI,
+            SideEffect.LIGHTING,
+            SideEffect.NEIGHBORS
+    );
+
+    @Override
+    public Set<SideEffect> getSupportedSideEffects() {
+        return SUPPORTED_SIDE_EFFECTS;
     }
 
     @Override

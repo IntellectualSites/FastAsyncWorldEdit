@@ -1,10 +1,12 @@
 package com.boydti.fawe.beta.implementation.packet;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 
 import java.util.HashMap;
 import java.util.function.Function;
@@ -64,13 +66,14 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
                 if (sectionBytes == null) {
                     IBlocks tmpChunk = getChunk();
                     byte[] buf = FaweCache.IMP.BYTE_BUFFER_8192.get();
-                    sectionBytes = tmpChunk.toByteArray(buf, tmpChunk.getBitMask(), this.full);
+                    sectionBytes = tmpChunk.toByteArray(buf, tmpChunk.getBitMask(), this.full, Fawe.imp().isChunksStretched());
                 }
                 tmp = sectionBytes;
             }
         }
         return tmp;
     }
+
 
     public Object getNativePacket() {
         return nativePacket;

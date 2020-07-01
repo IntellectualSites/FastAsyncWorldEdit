@@ -119,7 +119,7 @@ import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -573,6 +573,20 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Deprecated
     public void setFastMode(boolean enabled) {
         disableHistory(enabled);
+    }
+
+    /**
+     * Set which block updates should occur.
+     *
+     * @param sideEffectSet side effects to enable
+     */
+    public void setSideEffectApplier(SideEffectSet sideEffectSet) {
+        //Do nothing; TODO: SideEffects currently not fully implemented in FAWE.
+    }
+
+    public SideEffectSet getSideEffectApplier() {
+        //Do nothing; TODO: SideEffects currently not fully implemented in FAWE.
+        return SideEffectSet.defaults();
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.boydti.fawe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.Trimable;
@@ -9,6 +8,7 @@ import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.beta.implementation.queue.QueuePool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray;
+import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.boydti.fawe.object.collection.VariableThreadLocal;
 import com.boydti.fawe.object.exception.FaweBlockBagException;
@@ -279,6 +279,102 @@ public enum FaweCache implements Trimable {
                 blockBitArrayEnd = 1;
             } else {
                 BitArray bitArray = new BitArray(bitsPerEntry, 4096, blockStates);
+                bitArray.fromRaw(blocksCopy);
+            }
+
+            // Construct palette
+            Palette palette = PALETTE_CACHE.get();
+            palette.bitsPerEntry = bitsPerEntry;
+            palette.paletteToBlockLength = num_palette;
+            palette.paletteToBlock = paletteToBlock;
+
+            palette.blockStatesLength = blockBitArrayEnd;
+            palette.blockStates = blockStates;
+
+            return palette;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            throw e;
+        }
+    }
+
+    /**
+     * Convert raw int array to unstretched palette (1.16)
+     * @param layerOffset
+     * @param blocks
+     * @return palette
+     */
+    public Palette toPaletteUnstretched(int layerOffset, char[] blocks) {
+        return toPaletteUnstretched(layerOffset, null, blocks);
+    }
+
+    /**
+     * Convert raw int array to unstretched palette (1.16)
+     * @param layerOffset
+     * @param blocks
+     * @return palette
+     */
+    public Palette toPaletteUnstretched(int layerOffset, int[] blocks) {
+        return toPaletteUnstretched(layerOffset, blocks, null);
+    }
+
+    private Palette toPaletteUnstretched(int layerOffset, int[] blocksInts, char[] blocksChars) {
+        int[] blockToPalette = BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = PALETTE_TO_BLOCK.get();
+        long[] blockStates = BLOCK_STATES.get();
+        int[] blocksCopy = SECTION_BLOCKS.get();
+
+        try {
+            int num_palette = 0;
+            int blockIndexStart = layerOffset << 12;
+            int blockIndexEnd = blockIndexStart + 4096;
+            if (blocksChars != null) {
+                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                    int ordinal = blocksChars[i];
+                    int palette = blockToPalette[ordinal];
+                    if (palette == Integer.MAX_VALUE) {
+                        blockToPalette[ordinal] = palette = num_palette;
+                        paletteToBlock[num_palette] = ordinal;
+                        num_palette++;
+                    }
+                    blocksCopy[j] = palette;
+                }
+            } else if (blocksInts != null) {
+                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                    int ordinal = blocksInts[i];
+                    int palette = blockToPalette[ordinal];
+                    if (palette == Integer.MAX_VALUE) {
+                        //                        BlockState state = BlockTypesCache.states[ordinal];
+                        blockToPalette[ordinal] = palette = num_palette;
+                        paletteToBlock[num_palette] = ordinal;
+                        num_palette++;
+                    }
+                    blocksCopy[j] = palette;
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+
+            for (int i = 0; i < num_palette; i++) {
+                blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
+            }
+
+            // BlockStates
+            int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+                bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+            } else {
+                bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+            }
+            int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
+            int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
+            if (num_palette == 1) {
+                // Set a value, because minecraft needs it for some  reason
+                blockStates[0] = 0;
+                blockBitArrayEnd = 1;
+            } else {
+                BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 
