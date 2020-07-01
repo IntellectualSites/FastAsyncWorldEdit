@@ -698,7 +698,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                 byte[] a = new byte[2048];
                 Arrays.fill(a, skyBlock == EnumSkyBlock.SKY ? (byte) 15 : (byte) 0);
                 nibble = new NibbleArray(a);
-                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibble);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(skyBlock, sectionPosition, nibble);
             }
             synchronized (nibble) {
                 for (int i = 0; i < 4096; i++) {
