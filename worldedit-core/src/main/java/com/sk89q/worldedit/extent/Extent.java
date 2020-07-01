@@ -132,7 +132,6 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return a list of entities
      */
     default List<? extends Entity> getEntities() {
-        System.out.println("el");
         return Collections.emptyList();
     }
 

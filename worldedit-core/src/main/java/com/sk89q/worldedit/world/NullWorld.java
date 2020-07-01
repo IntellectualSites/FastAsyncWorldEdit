@@ -192,7 +192,6 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public List<Entity> getEntities(Region region) {
-        System.out.println("nullworld");
         return Collections.emptyList();
     }
 
