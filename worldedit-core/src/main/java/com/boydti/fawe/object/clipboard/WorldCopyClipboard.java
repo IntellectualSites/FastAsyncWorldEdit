@@ -63,4 +63,8 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         return hasBiomes;
     }
 
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return getExtent().getEntities(region); 
+    } 
 }

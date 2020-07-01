@@ -46,6 +46,7 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -3054,4 +3055,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         return false;
     }
+
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return world.getEntities(region);
+    }  
 }

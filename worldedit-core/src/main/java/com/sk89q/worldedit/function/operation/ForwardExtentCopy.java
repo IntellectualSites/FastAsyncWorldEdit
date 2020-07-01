@@ -406,6 +406,7 @@ public class ForwardExtentCopy implements Operation {
                 });
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);
+                affectedEntities += entityVisitor.getAffected();
             }
 
             if (transExt != null) {
@@ -427,8 +428,8 @@ public class ForwardExtentCopy implements Operation {
         return ImmutableList.of(
                 TranslatableComponent.of("worldedit.operation.affected.block",
                         TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.biome",
-                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
+//                TranslatableComponent.of("worldedit.operation.affected.biome",
+//                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
                 TranslatableComponent.of("worldedit.operation.affected.entity",
                         TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE)
         );
