@@ -181,6 +181,18 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override public void setFullBright(int layer) {
+        if (light == null) {
+            light = new char[16][];
+        }
+        if (light[layer] == null) {
+            light[layer] = new char[4096];
+        }
+        if (skyLight == null) {
+            skyLight = new char[16][];
+        }
+        if (skyLight[layer] == null) {
+            skyLight[layer] = new char[4096];
+        }
         Arrays.fill(light[layer], (char) 15);
         Arrays.fill(skyLight[layer], (char) 15);
     }
