@@ -41,4 +41,8 @@ public interface IFawe {
 
     Preloader getPreloader();
 
+    default boolean isChunksStretched() {
+        return true;
+    }
+
 }

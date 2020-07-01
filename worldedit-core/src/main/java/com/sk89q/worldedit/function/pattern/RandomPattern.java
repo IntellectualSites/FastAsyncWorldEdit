@@ -53,6 +53,19 @@ public class RandomPattern extends AbstractPattern {
     }
 
     /**
+     * Create a random pattern from an existing one but with a different random.
+     *
+     * @param random the new random to use.
+     * @param parent the existing random pattern.
+     */
+    public RandomPattern(SimpleRandom random, RandomPattern parent) {
+        this.random = random;
+        this.weights = parent.weights;
+        this.collection = RandomCollection.of(weights, random);
+        this.patterns = parent.patterns;
+    }
+
+    /**
      * Add a pattern to the weight list of patterns.
      *
      * <p>The probability for the pattern added is chance / max where max is

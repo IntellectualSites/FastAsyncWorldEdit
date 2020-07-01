@@ -17,7 +17,7 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 ## Downloads
 ### 1.13+
 * [Download](https://intellectualsites.github.io/download/fawe.html)
-* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.15/)
+* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
 
 ### < 1.12.2
 * [Download](https://intellectualsites.github.io/download/fawe.html)
@@ -35,7 +35,7 @@ $ gradlew setupDecompWorkspace
 $ gradlew build
 ```
 
-The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.15-###.jar`
+The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.jar`
 
 ## Contributing
 Have an idea for an optimization, or a cool feature?

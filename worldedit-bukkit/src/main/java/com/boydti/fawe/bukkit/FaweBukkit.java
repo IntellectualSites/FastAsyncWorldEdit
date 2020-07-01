@@ -58,6 +58,7 @@ public class FaweBukkit implements IFawe, Listener {
     private boolean listeningImages;
     private BukkitImageListener imageListener;
     private CFIPacketListener packetListener;
+    private final boolean chunksStretched;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -81,6 +82,8 @@ public class FaweBukkit implements IFawe, Listener {
             e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
+
+        chunksStretched = Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
         
         //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
         setupVault();
@@ -300,6 +303,11 @@ public class FaweBukkit implements IFawe, Listener {
             return new AsyncPreloader();
         }
         return null;
+    }
+
+    @Override
+    public boolean isChunksStretched() {
+        return chunksStretched;
     }
 
     private void setupPlotSquared() {

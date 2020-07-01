@@ -15,7 +15,7 @@ logger.lifecycle("""
 *******************************************
 """)
 //TODO FIX THIS WHEN I FEEL LIKE IT
-var rootVersion = "1.15"
+var rootVersion = "1.16"
 var revision: String = ""
 var buildNumber = ""
 var date: String = ""
