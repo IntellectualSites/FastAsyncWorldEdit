@@ -65,10 +65,13 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -179,8 +182,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             }
 
             if (free == 2) {
+                boolean worked = true;
+
                 if (y - 1 != origY) {
-                    setPosition(Vector3.at(x + 0.5, y - 2 + 1, z + 0.5));
+                    worked = trySetPosition(Vector3.at(x + 0.5, y - 2 + 1, z + 0.5));
+                }
+
+                if (worked) {
                     return;
                 }
             }
@@ -199,8 +207,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         while (y >= 0) {
             final BlockVector3 pos = BlockVector3.at(x, y, z);
             final BlockState id = world.getBlock(pos);
-            if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(Vector3.at(x + 0.5, y + +BlockTypeUtil.centralTopLimit(id), z + 0.5));
+            if (id.getBlockType().getMaterial().isMovementBlocker()
+                && trySetPosition(Vector3.at(x + 0.5, y + +BlockTypeUtil.centralTopLimit(id), z + 0.5))) {
                 return;
             }
 
@@ -211,6 +219,26 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     @Override
     public void findFreePosition() {
         findFreePosition(getBlockLocation());
+    }
+
+    private boolean isBadSpaceForStanding(BlockVector3 location) {
+        BlockType type = getWorld().getBlock(location).getBlockType();
+        return type.getMaterial().isMovementBlocker() || type == BlockTypes.LAVA;
+    }
+
+    /**
+     * @param location where the player would be placed (not Y offset)
+     * @return if the player can stand at the location
+     */
+    private boolean isLocationGoodForStanding(BlockVector3 location) {
+        if (isBadSpaceForStanding(location.add(0, 1, 0))) {
+            return false;
+        }
+        if (isBadSpaceForStanding(location)) {
+            return false;
+        }
+        return getWorld().getBlock(location.add(0, -1, 0)).getBlockType().getMaterial()
+            .isMovementBlocker();
     }
 
     @Override
@@ -254,9 +282,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     double bottomLimit = BlockTypeUtil.centralBottomLimit(state);
                     double space = level + bottomLimit - freeStart;
                     if (space >= height) {
-                        setPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
-                    return true;
-                }
+                        trySetPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
+                return true;
+            }
                     // Not enough room, reset the free position
                     if (bottomLimit != 1) {
                         freeStart = -1;
@@ -312,9 +340,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     double freeStart = level + topLimit;
                     double space = freeEnd - freeStart;
                     if (space >= height) {
-                        setPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
-                        return true;
-                    }
+                        trySetPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
+                return true;
+            }
                     // Not enough room, reset the free position
                     if (topLimit != 0) {
                         freeEnd = -1;
@@ -577,9 +605,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public void setPosition(Vector3 pos) {
+    public boolean trySetPosition(Vector3 pos) {
         final Location location = getLocation();
-        setPosition(pos, location.getPitch(), location.getYaw());
+        return trySetPosition(pos, location.getPitch(), location.getYaw());
     }
 
     @Override

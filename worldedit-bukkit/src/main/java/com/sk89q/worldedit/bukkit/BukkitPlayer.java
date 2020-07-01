@@ -194,7 +194,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void setPosition(Vector3 pos, float pitch, float yaw) {
+    public void trySetPosition(Vector3 pos, float pitch, float yaw) {
         org.bukkit.World world = player.getWorld();
         if (pos instanceof com.sk89q.worldedit.util.Location) {
             com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
