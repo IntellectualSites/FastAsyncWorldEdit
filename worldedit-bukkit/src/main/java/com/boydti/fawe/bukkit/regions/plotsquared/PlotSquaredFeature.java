@@ -76,9 +76,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
         // If it's going to fail, throw an error now rather than later
         //QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
         //GlobalBlockQueue.IMP.setProvider(provider);
-        HybridPlotManager.REGENERATIVE_CLEAR = false;
+        //HybridPlotManager.REGENERATIVE_CLEAR = false;
         //log.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
-        log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
+        //log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
     }
 
     private void setupRegionManager() throws RuntimeException {
