@@ -13,7 +13,7 @@ public class SingleBlockTypeMask extends ABlockMask {
     public SingleBlockTypeMask(Extent extent, BlockType type) {
         super(extent);
         isAir = type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR;
-            this.internalId = type.getInternalId();
+        this.internalId = type.getInternalId();
     }
 
     @Override
