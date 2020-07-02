@@ -2,14 +2,22 @@ package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
+import com.plotsquared.core.configuration.Settings;
+import com.plotsquared.core.generator.HybridPlotManager;
+import com.plotsquared.core.generator.HybridPlotWorld;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
+import com.plotsquared.core.plot.PlotAreaTerrainType;
+import com.plotsquared.core.plot.PlotAreaType;
+import com.plotsquared.core.plot.PlotManager;
 import com.plotsquared.core.util.RegionManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
@@ -21,7 +29,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Set;
 
 import static org.bukkit.Bukkit.getWorld;
@@ -60,6 +73,75 @@ public class FaweRegionManager extends RegionManager {
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean notifyClear(PlotManager manager) {
+        if (!(manager instanceof HybridPlotManager)) {
+            return false;
+        }
+        final HybridPlotWorld hpw = ((HybridPlotManager) manager).getHybridPlotWorld();
+        return hpw.getType() != PlotAreaType.AUGMENTED || hpw.getTerrain() == PlotAreaTerrainType.NONE;
+    }
+
+    @Override
+    public boolean handleClear(final Plot plot, final Runnable whenDone, final PlotManager manager) {
+        if (!(manager instanceof HybridPlotManager)) {
+            return false;
+        }
+        TaskManager.IMP.async(() -> {
+            synchronized (FaweRegionManager.class) {
+                final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
+                EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()))).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+
+                if (!hybridPlotWorld.PLOT_SCHEMATIC || !Settings.Schematics.PASTE_ON_TOP) {
+                    final BlockState bedrock;
+                    final BlockState air = BlockTypes.AIR.getDefaultState();
+                    if (hybridPlotWorld.PLOT_BEDROCK) {
+                        bedrock = BlockTypes.BEDROCK.getDefaultState();
+                    } else {
+                        bedrock = air;
+                    }
+
+                    final Pattern filling = hybridPlotWorld.MAIN_BLOCK.toPattern();
+                    final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
+
+                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3();
+                    BlockVector3 pos2 = plot.getExtendedTopAbs().getBlockVector3();
+
+                    Region bedrockRegion = new CuboidRegion(pos1.withY(0), pos2.withY(0));
+                    Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));
+                    Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT),
+                        pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
+                    Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
+                        pos2.withY(manager.getWorldHeight()));
+
+                    editSession.setBlocks(bedrockRegion, bedrock);
+                    editSession.setBlocks(fillingRegion, filling);
+                    editSession.setBlocks(floorRegion, plotfloor);
+                    editSession.setBlocks(airRegion, air);
+                }
+
+                if (hybridPlotWorld.PLOT_SCHEMATIC) {
+                    File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
+                    if (!schematicFile.exists()) {
+                        schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schematic");
+                    }
+                    BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(Settings.Schematics.PASTE_ON_TOP ? hybridPlotWorld.SCHEM_Y : 1);
+                    try {
+                        Clipboard clip = ClipboardFormats.findByFile(schematicFile).getReader(new FileInputStream(schematicFile)).read();
+                        clip.paste(editSession, to, true, true, true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                editSession.flushQueue();
+
+                TaskManager.IMP.task(whenDone);
             }
         });
         return true;

@@ -45,7 +45,7 @@ public class PlotSetBiome extends Command {
     }
 
     @Override
-    public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
+    public CompletableFuture<Boolean> execute(final PlotPlayer<?> player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
         checkTrue(plot.isOwner(player.getUUID()) || Permissions
             .hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
