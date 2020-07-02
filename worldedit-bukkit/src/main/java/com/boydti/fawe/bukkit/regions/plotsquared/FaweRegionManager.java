@@ -29,7 +29,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -98,10 +98,10 @@ public class FaweRegionManager extends RegionManager {
                 EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()))).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
                 if (!hybridPlotWorld.PLOT_SCHEMATIC || !Settings.Schematics.PASTE_ON_TOP) {
-                    final BlockState bedrock;
-                    final BlockState air = BlockTypes.AIR.getDefaultState();
+                    final BlockType bedrock;
+                    final BlockType air = BlockTypes.AIR;
                     if (hybridPlotWorld.PLOT_BEDROCK) {
-                        bedrock = BlockTypes.BEDROCK.getDefaultState();
+                        bedrock = BlockTypes.BEDROCK;
                     } else {
                         bedrock = air;
                     }
