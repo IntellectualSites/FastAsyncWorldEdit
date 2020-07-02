@@ -10,7 +10,7 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
 }
 
 repositories {
