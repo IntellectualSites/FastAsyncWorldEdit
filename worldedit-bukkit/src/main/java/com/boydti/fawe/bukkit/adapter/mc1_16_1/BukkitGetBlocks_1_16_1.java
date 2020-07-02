@@ -552,10 +552,13 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
-            return FaweCache.IMP.EMPTY_CHAR_4096;
+            data = new char[4096];
+            Arrays.fill(data, (char) 1);
+            return data;
         }
         if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
             data = new char[4096];
+            Arrays.fill(data, (char) 1);
         }
         DelegateLock lock = BukkitAdapter_1_16_1.applyLock(section);
         synchronized (lock) {
