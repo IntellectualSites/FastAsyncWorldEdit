@@ -1623,10 +1623,30 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int drainArea(BlockVector3 origin, double radius, boolean waterlogged) throws MaxChangedBlocksException {
+        return drainArea(origin, radius, waterlogged, false);
+    }
+
+    /**
+     * Drain nearby pools of water or lava, optionally removed waterlogged states from blocks.
+     *
+     * @param origin the origin to drain from, which will search a 3x3 area
+     * @param radius the radius of the removal, where a value should be 0 or greater
+     * @param waterlogged true to make waterlogged blocks non-waterlogged as well
+     * @param plants true to remove underwater plants
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int drainArea(BlockVector3 origin, double radius, boolean waterlogged, boolean plants) throws MaxChangedBlocksException {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
 
-        Mask liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        Mask liquidMask;
+        if (plants) {
+             liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
+                 BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS);
+        } else {
+            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        }
         if (waterlogged) {
             Map<String, String> stateMap = new HashMap<>();
             stateMap.put("waterlogged", "true");
