@@ -106,15 +106,15 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     default Entity createEntity(Location location, BaseEntity entity) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
         CompoundTag tag = entity.getNbtData();
-            Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
-            map.put("Id", new StringTag(entity.getType().getName()));
-            ListTag pos = (ListTag) map.get("Pos");
-            if (pos != null) {
-                List<Tag> posList = ReflectionUtils.getList(pos.getValue());
-                posList.set(0, new DoubleTag(location.getX() + 0.5));
-                posList.set(1, new DoubleTag(location.getY()));
-                posList.set(2, new DoubleTag(location.getZ() + 0.5));
-            }
+        Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
+        map.put("Id", new StringTag(entity.getType().getName()));
+        ListTag pos = (ListTag) map.get("Pos");
+        if (pos != null) {
+            List<Tag> posList = ReflectionUtils.getList(pos.getValue());
+            posList.set(0, new DoubleTag(location.getX() + 0.5));
+            posList.set(1, new DoubleTag(location.getY()));
+            posList.set(2, new DoubleTag(location.getZ() + 0.5));
+        }
         chunk.setEntity(tag);
         return null;
     }
