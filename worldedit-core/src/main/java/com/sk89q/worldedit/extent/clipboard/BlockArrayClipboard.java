@@ -201,6 +201,11 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
     @Override
+    public List<? extends Entity> getEntities() {
+        return getParent().getEntities();
+    }
+    
+    @Override
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
         return getParent().createEntity(location, entity);
