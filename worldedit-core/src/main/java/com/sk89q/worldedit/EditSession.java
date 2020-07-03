@@ -63,6 +63,7 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -135,6 +136,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1624,13 +1626,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
 
-        Mask liquidMask;
-        // Not thread safe, use hardcoded liquidmask
-//        if (getWorld() != null) {
-//            liquidMask = getWorld().createLiquidMask();
-//        } else {
-//        }
-        liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        Mask liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        if (waterlogged) {
+            Map<String, String> stateMap = new HashMap<>();
+            stateMap.put("waterlogged", "true");
+            liquidMask = new MaskUnion(liquidMask, new BlockStateMask(this, stateMap, true));
+        }
         Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, getWorld().getMaxY()),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
