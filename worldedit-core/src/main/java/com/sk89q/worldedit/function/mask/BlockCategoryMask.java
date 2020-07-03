@@ -37,6 +37,7 @@ public class BlockCategoryMask extends AbstractExtentMask {
         super(extent);
         checkNotNull(category);
         this.category = category;
+        this.category.getAll(); // load category so BlockCategory#contains actually works
     }
 
     @Override
