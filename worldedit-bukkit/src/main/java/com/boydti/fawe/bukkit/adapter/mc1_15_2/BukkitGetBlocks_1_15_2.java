@@ -581,10 +581,13 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
-            return FaweCache.IMP.EMPTY_CHAR_4096;
+            data = new char[4096];
+            Arrays.fill(data, (char) 1);
+            return data;
         }
         if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
             data = new char[4096];
+            Arrays.fill(data, (char) 1);
         }
         DelegateLock lock = BukkitAdapter_1_15_2.applyLock(section);
         synchronized (lock) {
@@ -626,6 +629,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                 }
                                 paletteToBlockChars[paletteVal] = ordinal;
                             }
+                            // Don't read "empty".
+                            if (ordinal == 0) {
+                                ordinal = 1;
+                            }
                             data[i] = ordinal;
                         }
                     } finally {
@@ -651,10 +658,18 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                 val = ordinal(palette.a(i), adapter);
                                 paletteToOrdinal[i] = val;
                             }
+                            // Don't read "empty".
+                            if (val == 0) {
+                                val = 1;
+                            }
                             data[i] = val;
                         }
                     } else {
                         char ordinal = ordinal(palette.a(0), adapter);
+                        // Don't read "empty".
+                        if (ordinal == 0) {
+                            ordinal = 1;
+                        }
                         Arrays.fill(data, ordinal);
                     }
                 } finally {

@@ -65,6 +65,7 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -138,6 +139,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1624,16 +1626,35 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int drainArea(BlockVector3 origin, double radius, boolean waterlogged) throws MaxChangedBlocksException {
+        return drainArea(origin, radius, waterlogged, false);
+    }
+
+    /**
+     * Drain nearby pools of water or lava, optionally removed waterlogged states from blocks.
+     *
+     * @param origin the origin to drain from, which will search a 3x3 area
+     * @param radius the radius of the removal, where a value should be 0 or greater
+     * @param waterlogged true to make waterlogged blocks non-waterlogged as well
+     * @param plants true to remove underwater plants
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int drainArea(BlockVector3 origin, double radius, boolean waterlogged, boolean plants) throws MaxChangedBlocksException {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
 
         Mask liquidMask;
-        // Not thread safe, use hardcoded liquidmask
-//        if (getWorld() != null) {
-//            liquidMask = getWorld().createLiquidMask();
-//        } else {
-//        }
-        liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        if (plants) {
+             liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
+                 BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS);
+        } else {
+            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        }
+        if (waterlogged) {
+            Map<String, String> stateMap = new HashMap<>();
+            stateMap.put("waterlogged", "true");
+            liquidMask = new MaskUnion(liquidMask, new BlockStateMask(this, stateMap, true));
+        }
         Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, getWorld().getMaxY()),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
@@ -2488,8 +2509,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     int yv = (int) (y.getValue() * unit.getY() + zero2.getY());
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());
 
+                    BlockState get;
+                    if (yv >= 0 && yv < 265) {
+                        get = getBlock(xv, yv, zv);
+                    } else {
+                        get = BlockTypes.AIR.getDefaultState();
+                    }
+
                     // read block from world
-                    return setBlock(position, getBlock(xv, yv, zv));
+                    return setBlock(position, get);
                 } catch (EvaluationException e) {
                     throw new RuntimeException(e);
                 }
@@ -2759,6 +2787,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             BlockVector3 tipv = interpol.getPosition(loop).toBlockPoint();
             if (radius == 0) {
                 pattern.apply(this, tipv, tipv);
+                changes++;
             } else {
                 vset.add(tipv);
             }

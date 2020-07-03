@@ -2,11 +2,11 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+
+import java.util.Arrays;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
@@ -23,6 +23,14 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
             blocks[i] = null;
         }
         return true;
+    }
+
+    public char[] update(int layer, char[] data) {
+        if (data == null) {
+            data = new char[4096];
+        }
+        Arrays.fill(data, (char) 1);
+        return data;
     }
 
     @Override

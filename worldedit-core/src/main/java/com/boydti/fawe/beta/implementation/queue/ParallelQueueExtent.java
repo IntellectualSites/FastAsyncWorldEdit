@@ -157,7 +157,9 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         }
         // TODO optimize parallel
         for (BlockVector3 blockVector3 : vset) {
-            pattern.apply(this, blockVector3, blockVector3);
+            if (pattern.apply(this, blockVector3, blockVector3)) {
+                this.changes++;
+            }
         }
         return this.changes;
     }

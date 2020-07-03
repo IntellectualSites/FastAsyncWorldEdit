@@ -10,7 +10,7 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.72"
 }
 
 repositories {
@@ -59,7 +59,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared-Core:5.11.2") {
+    "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
         isTransitive = false
     }
     implementation(kotlin("stdlib-jdk8", "1.3.61"))

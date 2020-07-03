@@ -326,11 +326,13 @@ public class UtilityCommands {
                      @Arg(desc = "The radius to drain")
                          Expression radiusExp,
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
-                         boolean waterlogged) throws WorldEditException {
+                         boolean waterlogged,
+                     @Switch(name = 'p', desc = "Also remove water plants")
+                         boolean plants) throws WorldEditException {
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
-        int affected = editSession.drainArea(session.getPlacementPosition(actor), radius, waterlogged);
+        int affected = editSession.drainArea(session.getPlacementPosition(actor), radius, waterlogged, plants);
         actor.printInfo(TranslatableComponent.of("worldedit.drain.drained", TextComponent.of(affected)));
         return affected;
     }

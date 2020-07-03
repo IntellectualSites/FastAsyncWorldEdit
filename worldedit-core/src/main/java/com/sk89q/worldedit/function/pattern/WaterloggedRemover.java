@@ -45,7 +45,7 @@ public class WaterloggedRemover extends AbstractExtentPattern {
 
         // init
         for (int i = 0; i < remap.length; i++) {
-            BlockState state = remap[i];
+            BlockState state = BlockTypesCache.states[i];
             BlockType type = state.getBlockType();
             if (!type.hasProperty(PropertyKey.WATERLOGGED)) {
                 continue;

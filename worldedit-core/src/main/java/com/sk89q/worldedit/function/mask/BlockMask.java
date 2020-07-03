@@ -184,7 +184,7 @@ public class BlockMask extends ABlockMask {
     }
     @Override
     public boolean test(BlockState state) {
-        return ordinals[state.getOrdinal()];
+        return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() <= 3;
     }
 
     @Override

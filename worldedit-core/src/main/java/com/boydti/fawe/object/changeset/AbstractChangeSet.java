@@ -46,6 +46,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     private final World world;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
+
     protected boolean closed;
     
     public AbstractChangeSet(World world) {

@@ -5,11 +5,11 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.database.DBFunc;
-import com.plotsquared.core.generator.HybridPlotManager;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
@@ -18,7 +18,6 @@ import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
 import com.plotsquared.core.util.RegionManager;
 import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.WEManager;
-import com.plotsquared.core.util.uuid.UUIDHandler;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -76,9 +75,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
         // If it's going to fail, throw an error now rather than later
         //QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
         //GlobalBlockQueue.IMP.setProvider(provider);
-        HybridPlotManager.REGENERATIVE_CLEAR = false;
+        //HybridPlotManager.REGENERATIVE_CLEAR = false;
         //log.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
-        log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
+        //log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
     }
 
     private void setupRegionManager() throws RuntimeException {

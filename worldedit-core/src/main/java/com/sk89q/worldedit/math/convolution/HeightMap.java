@@ -286,7 +286,12 @@ public class HeightMap {
                     if (existing.getBlockType().getMaterial().isMovementBlocker()) {
                         int y0 = newHeight - 1;
                         for (int setY = y0, getY = curHeight - 1; setY >= curHeight; setY--, getY--) {
-                            BlockState get = session.getBlock(xr, getY, zr);
+                            BlockState get;
+                            if (getY >= 0 && getY < 256) {
+                                get = session.getBlock(xr, getY, zr);
+                            } else {
+                                get = BlockTypes.AIR.getDefaultState();
+                            }
                             if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
