@@ -2506,8 +2506,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     int yv = (int) (y.getValue() * unit.getY() + zero2.getY());
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());
 
+                    BlockState get;
+                    if (yv >= 0 && yv < 265) {
+                        get = getBlock(xv, yv, zv);
+                    } else {
+                        get = BlockTypes.AIR.getDefaultState();
+                    }
+
                     // read block from world
-                    return setBlock(position, getBlock(xv, yv, zv));
+                    return setBlock(position, get);
                 } catch (EvaluationException e) {
                     throw new RuntimeException(e);
                 }
