@@ -2756,6 +2756,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             BlockVector3 tipv = interpol.getPosition(loop).toBlockPoint();
             if (radius == 0) {
                 pattern.apply(this, tipv, tipv);
+                changes++;
             } else {
                 vset.add(tipv);
             }
