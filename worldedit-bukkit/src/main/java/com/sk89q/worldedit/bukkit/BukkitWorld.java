@@ -55,6 +55,8 @@ import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.*;
 import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -78,7 +80,8 @@ public class BukkitWorld extends AbstractWorld {
         }
     }
 
-    private final WeakReference<World> worldRef;
+    private WeakReference<World> worldRef;
+    private final String worldNameRef;
     private final WorldNativeAccess<?, ?, ?> worldNativeAccess;
 
     /**
@@ -88,6 +91,7 @@ public class BukkitWorld extends AbstractWorld {
      */
     public BukkitWorld(World world) {
         this.worldRef = new WeakReference<>(world);
+        this.worldNameRef = world.getName();
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             this.worldNativeAccess = adapter.createWorldNativeAccess(world);
@@ -150,7 +154,12 @@ public class BukkitWorld extends AbstractWorld {
      * @return the world
      */
     public World getWorld() {
-        return checkNotNull(worldRef.get(), "The world was unloaded and the reference is unavailable");
+        World tmp = worldRef.get();
+        if (tmp == null) {
+            tmp = Bukkit.getWorld(worldNameRef);
+            if (tmp != null) worldRef = new WeakReference<>(tmp);
+        }
+        return checkNotNull(tmp, "The world was unloaded and the reference is unavailable");
     }
 
     /**
