@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -114,5 +113,41 @@ public abstract class RichParser<E> extends InputParser<E> {
             throw new InputParseException("Invalid bracketing, are you missing a '[' or ']'?");
         }
         return arguments.toArray(new String[0]);
+    }
+
+    /**
+     * Returns a stream of suggestions for positive doubles.
+     *
+     * @param argumentInput the given input to filter with.
+     * @return a stream of suggestions.
+     */
+    protected Stream<String> suggestPositiveDoubles(String argumentInput) {
+        if (argumentInput.isEmpty()) {
+            return Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9");
+        }
+        // if already a valid number, suggest more digits
+        if (isDouble(argumentInput)) {
+            Stream<String> numbers = Stream.of("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+            if (argumentInput.indexOf('.') == -1) {
+                numbers = Stream.concat(numbers, Stream.of("."));
+            }
+            return numbers.map(s -> argumentInput + s);
+        }
+        // no valid input anymore
+        return Stream.empty();
+    }
+
+    private static boolean isDouble(String input) {
+        boolean point = false;
+        for (char c : input.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                if (c == '.' && !point) {
+                    point = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

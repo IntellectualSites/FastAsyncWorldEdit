@@ -69,7 +69,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
         register(new ZAxisMaskParser(worldEdit));
-
+        register(new SimplexMaskParser(worldEdit));
 
     }
 
