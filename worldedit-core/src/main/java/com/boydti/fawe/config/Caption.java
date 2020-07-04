@@ -5,6 +5,7 @@ import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.format.Style;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.Nullable;
@@ -16,9 +17,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Caption {
+
+    private static final Pattern colorCodes = Pattern.compile("&([0-9a-o])");
+
     public static String toString(Component component) {
         return toString(component, WorldEdit.getInstance().getTranslationManager().getDefaultLocale());
     }
@@ -39,9 +44,9 @@ public class Caption {
 
     private static Component color(TextComponent text) {
         String content = text.content();
-        if (content.indexOf('&') != -1) {
+        if (colorCodes.matcher(content).find()) {
             TextComponent legacy = LegacyComponentSerializer.INSTANCE.deserialize(content, '&');
-            legacy = (TextComponent) legacy.style(text.style());
+            legacy.style().merge(text.style(), Style.Merge.Strategy.IF_ABSENT_ON_TARGET);
             if (!text.children().isEmpty()) {
                 text = TextComponent.builder().append(legacy).append(text.children()).build();
             } else {
