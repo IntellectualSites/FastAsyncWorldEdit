@@ -16,6 +16,8 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.FlatRegionFunction;
@@ -24,6 +26,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -108,6 +111,7 @@ public class FaweRegionManager extends RegionManager {
 
                     final Pattern filling = hybridPlotWorld.MAIN_BLOCK.toPattern();
                     final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
+                    final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
                     BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3();
                     BlockVector3 pos2 = plot.getExtendedTopAbs().getBlockVector3();
@@ -119,10 +123,19 @@ public class FaweRegionManager extends RegionManager {
                     Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
                         pos2.withY(manager.getWorldHeight()));
 
-                    editSession.setBlocks(bedrockRegion, bedrock);
-                    editSession.setBlocks(fillingRegion, filling);
-                    editSession.setBlocks(floorRegion, plotfloor);
-                    editSession.setBlocks(airRegion, air);
+                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1, pos2));
+
+                    clipboard.setBlocks(bedrockRegion, bedrock);
+                    clipboard.setBlocks(fillingRegion, filling);
+                    clipboard.setBlocks(floorRegion, plotfloor);
+                    clipboard.setBlocks(airRegion, air);
+                    for (int x = pos1.getX(); x <= pos2.getX(); x ++) {
+                        for (int z = pos1.getX(); z <= pos2.getX(); z ++) {
+                            clipboard.setBiome(BlockVector2.at(x, z), biome);
+                        }
+                    }
+
+                    clipboard.paste(editSession, pos1, true, false, true);
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
