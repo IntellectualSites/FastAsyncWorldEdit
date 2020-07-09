@@ -16,7 +16,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -62,6 +61,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean setCuboids(final PlotArea area, final Set<CuboidRegion> regions, final Pattern blocks, final int minY, final int maxY) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CUBOIDS) {
+            return parent.setCuboids(area, regions, blocks, minY, maxY);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
@@ -83,7 +85,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean notifyClear(PlotManager manager) {
-        if (!(manager instanceof HybridPlotManager)) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         final HybridPlotWorld hpw = ((HybridPlotManager) manager).getHybridPlotWorld();
@@ -92,7 +94,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean handleClear(final Plot plot, final Runnable whenDone, final PlotManager manager) {
-        if (!(manager instanceof HybridPlotManager)) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         TaskManager.IMP.async(() -> {
@@ -123,7 +125,7 @@ public class FaweRegionManager extends RegionManager {
                     Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
                         pos2.withY(manager.getWorldHeight()));
 
-                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1, pos2));
+                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1.withY(0), pos2.withY(255)));
 
                     clipboard.setBlocks(bedrockRegion, bedrock);
                     clipboard.setBlocks(fillingRegion, filling);
@@ -162,6 +164,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            parent.swap(pos1, pos2, pos3, pos4, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
@@ -190,6 +195,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.SET_BIOME) {
+            parent.setBiome(region, extendBiome, biome, world, whenDone);
+        }
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
@@ -210,6 +218,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean copyRegion(final Location pos1, final Location pos2, final Location pos3, final Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            return parent.copyRegion(pos1, pos2, pos3, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
