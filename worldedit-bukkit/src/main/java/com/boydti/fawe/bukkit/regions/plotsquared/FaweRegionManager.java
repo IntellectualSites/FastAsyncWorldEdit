@@ -130,7 +130,7 @@ public class FaweRegionManager extends RegionManager {
                     clipboard.setBlocks(floorRegion, plotfloor);
                     clipboard.setBlocks(airRegion, air);
                     for (int x = pos1.getX(); x <= pos2.getX(); x ++) {
-                        for (int z = pos1.getX(); z <= pos2.getX(); z ++) {
+                        for (int z = pos1.getZ(); z <= pos2.getZ(); z ++) {
                             clipboard.setBiome(BlockVector2.at(x, z), biome);
                         }
                     }
