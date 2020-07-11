@@ -115,17 +115,15 @@ public class FaweRegionManager extends RegionManager {
                     final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
                     final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
-                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3();
-                    BlockVector3 pos2 = plot.getExtendedTopAbs().getBlockVector3();
+                    BlockVector3 pos1 = BlockVector3.ZERO;
+                    BlockVector3 pos2 = BlockVector3.at(hybridPlotWorld.PLOT_WIDTH, 255, hybridPlotWorld.PLOT_WIDTH);
 
-                    Region bedrockRegion = new CuboidRegion(pos1.withY(0), pos2.withY(0));
+                    Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(0));
                     Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));
-                    Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT),
-                        pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
-                    Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
-                        pos2.withY(manager.getWorldHeight()));
+                    Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT), pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
+                    Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1), pos2.withY(manager.getWorldHeight()));
 
-                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1.withY(0), pos2.withY(255)));
+                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1, pos2));
 
                     clipboard.setBlocks(bedrockRegion, bedrock);
                     clipboard.setBlocks(fillingRegion, filling);
@@ -137,7 +135,7 @@ public class FaweRegionManager extends RegionManager {
                         }
                     }
 
-                    clipboard.paste(editSession, pos1, true, false, true);
+                    clipboard.paste(editSession, plot.getBottomAbs().getBlockVector3().withY(0), true, false, true);
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
@@ -172,8 +170,7 @@ public class FaweRegionManager extends RegionManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                    pos1World,-1);
+                WorldEdit.getInstance().getEditSessionFactory().getEditSession(pos1World,-1);
                 EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
@@ -246,11 +243,8 @@ public class FaweRegionManager extends RegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
-                try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false)
-                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
-                    CuboidRegion region = new CuboidRegion(
-                        BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
-                        BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+                try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                    CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
                     editSession.regenerate(region);
                     editSession.flushQueue();
                 }
