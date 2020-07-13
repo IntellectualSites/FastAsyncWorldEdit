@@ -77,7 +77,7 @@ public class WorldEditCommands {
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92"));
+        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
 		
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();
