@@ -22,7 +22,6 @@ package com.sk89q.worldedit.function.operation;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.world.block.BaseBlock;
 

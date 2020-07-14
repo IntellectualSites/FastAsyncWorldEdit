@@ -31,7 +31,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 public class MCAChunk implements IChunk {
     public final boolean[] hasSections = new boolean[16];

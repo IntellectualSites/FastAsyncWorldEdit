@@ -5,11 +5,12 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Memory optimized BlockVector3 Set using a sparsely populated bitset and grouped by chunk section

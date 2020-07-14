@@ -24,7 +24,6 @@ import com.sk89q.worldedit.util.Direction;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
 import javax.annotation.Nullable;
 
 public class DirectionalProperty extends AbstractProperty<Direction> {

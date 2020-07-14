@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.change;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
@@ -15,9 +13,12 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class MutableEntityChange implements Change {
 

@@ -2,6 +2,7 @@ package com.boydti.fawe.object;
 
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

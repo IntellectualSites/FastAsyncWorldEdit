@@ -3,7 +3,7 @@ package com.boydti.fawe.beta.implementation.filter.block;
 import com.sk89q.worldedit.extent.Extent;
 
 /**
- * Filter block with an extent
+ * Filter block with an extent.
  */
 public abstract class AbstractExtentFilterBlock extends FilterBlock {
 

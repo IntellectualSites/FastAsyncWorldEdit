@@ -1,10 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent} Used for getting and setting blocks / biomes

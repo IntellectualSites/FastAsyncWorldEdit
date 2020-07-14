@@ -1,14 +1,14 @@
 package com.boydti.fawe.object.progress;
 
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
-
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import java.util.function.BiConsumer;
 
 /**

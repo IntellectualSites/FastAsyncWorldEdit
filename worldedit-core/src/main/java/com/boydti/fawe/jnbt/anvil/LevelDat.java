@@ -1,6 +1,5 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -9,7 +8,6 @@ import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;

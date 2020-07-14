@@ -19,14 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
@@ -74,15 +66,23 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.Range;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * Commands that operate on regions.

@@ -11,8 +11,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes
 import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockState
 import com.sk89q.worldedit.world.block.BlockTypes
-
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.Future
 
 object NullChunkGet : IChunkGet {

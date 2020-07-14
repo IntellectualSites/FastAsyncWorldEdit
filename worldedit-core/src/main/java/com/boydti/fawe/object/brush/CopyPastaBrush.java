@@ -25,6 +25,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CopyPastaBrush implements Brush, ResettableTool {

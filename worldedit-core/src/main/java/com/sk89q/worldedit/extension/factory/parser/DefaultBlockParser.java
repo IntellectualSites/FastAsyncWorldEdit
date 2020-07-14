@@ -20,13 +20,11 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.boydti.fawe.config.Caption;
-import com.google.common.collect.Maps;
-
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
-
+import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
@@ -58,14 +56,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
+import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
-import com.sk89q.worldedit.world.entity.EntityType;
-import com.sk89q.worldedit.world.entity.EntityTypes;
-
 import java.util.Map;
 import java.util.stream.Stream;
 

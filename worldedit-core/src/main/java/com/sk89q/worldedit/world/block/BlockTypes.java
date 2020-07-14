@@ -25,12 +25,12 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /**
  * Stores a list of common Block String IDs.

@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
@@ -29,7 +27,10 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -45,7 +46,11 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.util.*;
+import com.sk89q.worldedit.util.Identifiable;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -55,6 +60,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,6 +74,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable,
     VirtualWorld {

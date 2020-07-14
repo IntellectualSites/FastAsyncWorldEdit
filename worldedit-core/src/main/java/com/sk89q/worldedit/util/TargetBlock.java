@@ -26,7 +26,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
 

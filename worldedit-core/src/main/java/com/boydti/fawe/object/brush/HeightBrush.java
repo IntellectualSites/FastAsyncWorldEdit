@@ -17,6 +17,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ThreadLocalRandom;

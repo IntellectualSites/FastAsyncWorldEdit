@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.regions;
 
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import com.google.common.primitives.Longs;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -112,9 +111,9 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        return (max.getX() - min.getX() + 1L) *
-                (max.getY() - min.getY() + 1L) *
-                (max.getZ() - min.getZ() + 1L);
+        return (max.getX() - min.getX() + 1L)
+            * (max.getY() - min.getY() + 1L)
+            * (max.getZ() - min.getZ() + 1L);
     }
 
     /**
@@ -220,24 +219,25 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
 
     @Override
     public boolean equals(Object o) {
-        if(o == this) {
+        if (o == this) {
             return true;
         }
-        if(!(o instanceof Region)){
+        if (!(o instanceof Region)) {
             return false;
         }
         Region region = ((Region) o);
-        if(this.getWorld() != region.getWorld()){
-            if(this.getWorld() == null || region.getWorld() == null){
+        if (this.getWorld() != region.getWorld()) {
+            if (this.getWorld() == null || region.getWorld() == null) {
                 return false;
             }
         }
-        if(this.getWorld().equals(region.getWorld())
-        && this.getMinimumPoint().equals(region.getMinimumPoint())
-        && this.getMaximumPoint().equals(region.getMaximumPoint())
-        && this.getVolume() == region.getVolume()){
+        if (this.getWorld().equals(region.getWorld())
+            && this.getMinimumPoint().equals(region.getMinimumPoint())
+            && this.getMaximumPoint().equals(region.getMaximumPoint())
+            && this.getVolume() == region.getVolume()) {
             return true;
         }
         return false;
     }
+
 }

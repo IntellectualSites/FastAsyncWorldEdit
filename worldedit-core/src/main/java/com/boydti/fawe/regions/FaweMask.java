@@ -1,8 +1,6 @@
 package com.boydti.fawe.regions;
 
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.IDelegateRegion;
 import com.sk89q.worldedit.regions.Region;
 

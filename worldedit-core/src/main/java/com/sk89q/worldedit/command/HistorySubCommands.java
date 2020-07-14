@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Caption;
@@ -23,7 +21,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Time;
@@ -43,6 +40,14 @@ import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
+
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -52,13 +57,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
+
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class HistorySubCommands {

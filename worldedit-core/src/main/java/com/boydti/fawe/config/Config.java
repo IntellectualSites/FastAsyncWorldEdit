@@ -1,9 +1,11 @@
 package com.boydti.fawe.config;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.util.StringMan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,8 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Config {
 

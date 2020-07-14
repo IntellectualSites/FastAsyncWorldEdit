@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.HistoryExtent;
@@ -32,7 +29,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
@@ -44,13 +40,15 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.util.List;
-
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -83,7 +81,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-       return extent.getBlock(position.getX(),position.getY(),position.getZ());
+        return extent.getBlock(position.getX(), position.getY(), position.getZ());
     }
 
     /*
@@ -192,8 +190,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T block)
-        throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y,
+        int z, T block) throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }
 
@@ -246,7 +244,7 @@ public class AbstractDelegateExtent implements Extent {
     public int getBrightness(int x, int y, int z) {
         return extent.getBrightness(x, y, z);
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + ":" + (extent == this ? "" : extent.toString());
@@ -267,7 +265,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public @Nullable Operation commit() {
+    public @Nullable
+    Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
         if (extent != this) {

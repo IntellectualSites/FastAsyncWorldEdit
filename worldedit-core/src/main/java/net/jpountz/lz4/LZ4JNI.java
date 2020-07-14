@@ -14,8 +14,9 @@ package net.jpountz.lz4;
  * limitations under the License.
  */
 
-import java.nio.ByteBuffer;
 import net.jpountz.util.Native;
+
+import java.nio.ByteBuffer;
 
 
 /**

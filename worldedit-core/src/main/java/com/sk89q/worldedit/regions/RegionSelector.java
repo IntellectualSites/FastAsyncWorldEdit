@@ -29,12 +29,11 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Region selectors create {@link Region}s from a series of "selected points."

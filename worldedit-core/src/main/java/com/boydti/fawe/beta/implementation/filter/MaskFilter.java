@@ -1,7 +1,7 @@
 package com.boydti.fawe.beta.implementation.filter;
 
-import com.boydti.fawe.beta.implementation.filter.block.DelegateFilter;
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.implementation.filter.block.DelegateFilter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.function.mask.Mask;
 

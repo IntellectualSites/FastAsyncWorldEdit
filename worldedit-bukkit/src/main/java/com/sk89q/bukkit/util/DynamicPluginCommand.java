@@ -22,8 +22,6 @@ package com.sk89q.bukkit.util;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.PermissionsResolverManager;
-import java.util.Arrays;
-import java.util.List;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,8 +29,11 @@ import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
-* An implementation of a dynamically registered {@link org.bukkit.command.Command} attached to a plugin
+* An implementation of a dynamically registered {@link org.bukkit.command.Command} attached to a plugin.
 */
 @SuppressWarnings("deprecation")
 public class DynamicPluginCommand extends org.bukkit.command.Command implements PluginIdentifiableCommand {
@@ -105,7 +106,7 @@ public class DynamicPluginCommand extends org.bukkit.command.Command implements 
                     }
                 }
                 return false;
-            } catch (Throwable ignore) {
+            } catch (Throwable ignored) {
             }
         } else if (PermissionsResolverManager.isInitialized() && sender instanceof OfflinePlayer) {
             for (String permission : permissions) {

@@ -7,7 +7,6 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 
-import javax.annotation.Nullable;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -20,6 +19,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import javax.annotation.Nullable;
 
 public class ImageUtil {
 

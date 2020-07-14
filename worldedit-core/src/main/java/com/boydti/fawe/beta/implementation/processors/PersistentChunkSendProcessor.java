@@ -1,12 +1,10 @@
 package com.boydti.fawe.beta.implementation.processors;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.CombinedBlocks;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.util.MathMan;
@@ -19,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class PersistentChunkSendProcessor extends ChunkSendProcessor {
     private final Long2ObjectLinkedOpenHashMap<Character> current;

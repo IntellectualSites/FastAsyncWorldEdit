@@ -19,11 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
@@ -44,10 +41,8 @@ import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
-
-import java.util.ArrayList;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
@@ -55,20 +50,25 @@ import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.SideEffectBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
-import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * General WorldEdit commands.

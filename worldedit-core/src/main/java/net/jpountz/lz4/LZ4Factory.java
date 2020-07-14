@@ -14,13 +14,13 @@ package net.jpountz.lz4;
  * limitations under the License.
  */
 
+import net.jpountz.util.Native;
+import net.jpountz.util.Utils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import net.jpountz.util.Native;
-import net.jpountz.util.Utils;
-
 
 import static net.jpountz.lz4.LZ4Constants.DEFAULT_COMPRESSION_LEVEL;
 import static net.jpountz.lz4.LZ4Constants.MAX_COMPRESSION_LEVEL;

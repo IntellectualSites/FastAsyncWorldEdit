@@ -6,9 +6,9 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Interface for setting blocks

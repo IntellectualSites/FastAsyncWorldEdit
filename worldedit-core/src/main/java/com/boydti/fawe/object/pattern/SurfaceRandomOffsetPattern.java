@@ -6,6 +6,7 @@ import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {

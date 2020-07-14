@@ -7,10 +7,11 @@ import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import org.jetbrains.annotations.Nullable;
 
 public interface IBatchProcessor {
     /**

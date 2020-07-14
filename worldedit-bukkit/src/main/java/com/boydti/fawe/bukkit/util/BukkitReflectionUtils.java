@@ -8,16 +8,16 @@ import java.lang.reflect.Method;
 
 public class BukkitReflectionUtils {
     /**
-     * prefix of bukkit classes
+     * Prefix of Bukkit classes.
      */
     private static volatile String preClassB = null;
     /**
-     * prefix of minecraft classes
+     * Prefix of Minecraft classes.
      */
     private static volatile String preClassM = null;
 
     /**
-     * check server version and class names
+     * Check server version and class names.
      */
     public static void init() {
         final Server server = Bukkit.getServer();
@@ -50,18 +50,22 @@ public class BukkitReflectionUtils {
      * @return RefClass object
      * @throws RuntimeException if no class found
      */
-    public static ReflectionUtils.RefClass getRefClass(final String... classes) throws RuntimeException {
+    public static ReflectionUtils.RefClass getRefClass(final String... classes)
+        throws RuntimeException {
         if (preClassM == null) {
             init();
         }
         for (String className : classes) {
             try {
-                className = className.replace("{cb}", preClassB).replace("{nms}", preClassM).replace("{nm}", "net.minecraft");
+                className = className.replace("{cb}", preClassB).replace("{nms}", preClassM)
+                    .replace("{nm}", "net.minecraft");
                 return ReflectionUtils.getRefClass(Class.forName(className));
             } catch (final ClassNotFoundException ignored) {
             }
         }
-        throw new RuntimeException("no class found: " + classes[0].replace("{cb}", preClassB).replace("{nms}", preClassM).replace("{nm}", "net.minecraft"));
+        throw new RuntimeException(
+            "no class found: " + classes[0].replace("{cb}", preClassB).replace("{nms}", preClassM)
+                .replace("{nm}", "net.minecraft"));
     }
 
     public static Class<?> getNmsClass(final String name) {

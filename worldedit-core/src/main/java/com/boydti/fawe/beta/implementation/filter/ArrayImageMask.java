@@ -1,7 +1,8 @@
 package com.boydti.fawe.beta.implementation.filter;
 
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.boydti.fawe.beta.FilterBlockMask;
+import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ThreadLocalRandom;
 

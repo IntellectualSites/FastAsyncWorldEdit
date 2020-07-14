@@ -20,12 +20,10 @@
 package com.sk89q.worldedit.world;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -34,14 +32,14 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import java.nio.file.Path;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.weather.WeatherTypes;
-import javax.annotation.Nullable;
 import java.util.PriorityQueue;
+import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of {@link World}.
@@ -106,7 +104,9 @@ public abstract class AbstractWorld implements World {
             taskId = server.schedule(0, 1, () -> {
                 int max = Math.max(1, Math.min(30, effectQueue.size() / 3));
                 for (int i = 0; i < max; ++i) {
-                    if (effectQueue.isEmpty()) return;
+                    if (effectQueue.isEmpty()) {
+                        return;
+                    }
 
                     effectQueue.poll().play();
                 }

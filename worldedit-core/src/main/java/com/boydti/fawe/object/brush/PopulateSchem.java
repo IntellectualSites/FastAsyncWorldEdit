@@ -11,6 +11,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
+
 import java.util.List;
 
 public class PopulateSchem implements Brush {

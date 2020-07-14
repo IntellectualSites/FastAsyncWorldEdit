@@ -20,6 +20,7 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;

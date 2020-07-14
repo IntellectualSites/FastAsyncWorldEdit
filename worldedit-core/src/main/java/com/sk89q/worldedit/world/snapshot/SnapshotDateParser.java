@@ -21,7 +21,6 @@ package com.sk89q.worldedit.world.snapshot;
 
 import java.io.File;
 import java.util.Calendar;
-
 import javax.annotation.Nullable;
 
 /**

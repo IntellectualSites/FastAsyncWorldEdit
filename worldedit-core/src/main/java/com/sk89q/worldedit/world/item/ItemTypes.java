@@ -20,17 +20,13 @@
 package com.sk89q.worldedit.world.item;
 
 import com.boydti.fawe.object.string.JoinedCharSequence;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.block.ItemTypesCache;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Locale;
+import javax.annotation.Nullable;
 
 public final class ItemTypes {
 
@@ -588,6 +584,7 @@ public final class ItemTypes {
     @Nullable public static final ItemType NETHER_STAR = init();
     @Nullable public static final ItemType NETHER_WART = init();
     @Nullable public static final ItemType NETHER_WART_BLOCK = init();
+    @Nullable public static final ItemType NETHERITE_PICKAXE = init();
     @Nullable public static final ItemType NETHERRACK = init();
     @Nullable public static final ItemType NOTE_BLOCK = init();
     @Nullable public static final ItemType OAK_BOAT = init();

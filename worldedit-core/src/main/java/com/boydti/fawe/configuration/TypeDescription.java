@@ -15,9 +15,10 @@
  */
 package org.yaml.snakeyaml;
 
+import org.yaml.snakeyaml.nodes.Tag;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.yaml.snakeyaml.nodes.Tag;
 
 /**
  * Provides additional runtime information necessary to create a custom Java

@@ -1,7 +1,5 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.IChunkExtent;
@@ -19,6 +17,7 @@ import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,6 +37,8 @@ import java.util.stream.IntStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Chunk format: http://minecraft.gamepedia.com/Chunk_format#Entity_format

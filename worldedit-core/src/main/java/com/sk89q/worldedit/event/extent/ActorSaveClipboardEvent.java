@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.event.extent;
 
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -11,7 +10,8 @@ import java.net.URI;
 public class ActorSaveClipboardEvent extends Event implements Cancellable {
     private final Actor actor;
     private final Clipboard clipboard;
-    private final URI source, destination;
+    private final URI source;
+    private final URI destination;
     private boolean cancelled;
 
     public ActorSaveClipboardEvent(Actor actor, Clipboard clipboard, URI source, URI destination) {

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -30,8 +29,10 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * A mode that cycles the data values of supported blocks.
@@ -50,7 +52,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         return player.hasPermission("worldedit.tool.data-cycler");
     }
 
-    private Map<UUID, Property<?>> selectedProperties = new HashMap<>();
+    private final Map<UUID, Property<?>> selectedProperties = new HashMap<>();
 
     private boolean handleCycle(LocalConfiguration config, Player player, LocalSession session,
                                 Location clicked, boolean forward) {
@@ -85,7 +87,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 Property<Object> objProp = (Property<Object>) currentProperty;
                 BlockState newBlock = block.with(objProp, currentProperty.getValues().get(index));
 
-                try (EditSession editSession = session.createEditSession(player, "BlockDataCyler")) {
+                try (EditSession editSession = session.createEditSession(player)) {
                     editSession.disableBuffering();
 
                     try {
@@ -115,12 +117,12 @@ public class BlockDataCyler implements DoubleActionBlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
         return handleCycle(config, player, session, clicked, true);
     }
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
         return handleCycle(config, player, session, clicked, false);
     }
 

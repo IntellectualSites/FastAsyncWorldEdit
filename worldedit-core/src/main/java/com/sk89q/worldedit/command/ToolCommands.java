@@ -19,20 +19,18 @@
 
 package com.sk89q.worldedit.command;
 
-import com.google.common.collect.Collections2;
-
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.InspectBrush;
+import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.command.tool.BlockReplacer;
-import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.DistanceWand;
 import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
 import com.sk89q.worldedit.command.tool.FloodFillTool;
+import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.LongRangeBuildTool;
 import com.sk89q.worldedit.command.tool.NavigationWand;
 import com.sk89q.worldedit.command.tool.QueryTool;
@@ -42,20 +40,21 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.world.item.ItemType;
-import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.item.ItemType;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
 import org.enginehub.piston.CommandMetadata;
 import org.enginehub.piston.CommandParameters;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.part.SubCommandPart;
 
 import java.util.Optional;

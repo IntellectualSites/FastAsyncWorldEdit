@@ -1,6 +1,7 @@
 package com.github.luben.zstd;
 
 import com.github.luben.zstd.util.Native;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +10,9 @@ import java.io.InputStream;
  * InputStream filter that decompresses the data provided
  * by the underlying InputStream using Zstd compression.
  *
+ * <p>
  * It does not support mark/reset methods
- *
+ * </p>
  */
 
 public class ZstdInputStream extends FilterInputStream {
@@ -33,11 +35,16 @@ public class ZstdInputStream extends FilterInputStream {
 
     /* JNI methods */
     private static native long recommendedDInSize();
+
     private static native long recommendedDOutSize();
+
     private static native long createDStream();
-    private static native int  freeDStream(long stream);
-    private native int  initDStream(long stream);
-    private native int  decompressStream(long stream, byte[] dst, int dst_size, byte[] src, int src_size);
+
+    private static native int freeDStream(long stream);
+
+    private native int initDStream(long stream);
+
+    private native int decompressStream(long stream, byte[] dst, int dst_size, byte[] src, int src_size);
 
     // The main constructor / legacy version dispatcher
     public ZstdInputStream(InputStream inStream) throws IOException {
@@ -54,10 +61,11 @@ public class ZstdInputStream extends FilterInputStream {
     }
 
     /**
-     * Don't break on unfinished frames
+     * Don't break on unfinished frames.
      *
-     * Use case: decompressing files that are not
-     * yet finished writing and compressing
+     * <p>
+     * Use case: decompressing files that are not yet finished writing and compressing.
+     * </p>
      */
     public ZstdInputStream setContinuous(boolean b) {
         isContinuous = b;
@@ -76,8 +84,9 @@ public class ZstdInputStream extends FilterInputStream {
 
         // guard against buffer overflows
         if (offset < 0 || len > dst.length - offset) {
-            throw new IndexOutOfBoundsException("Requested length " + len
-                    + " from offset " + offset + " in buffer of size " + dst.length);
+            throw new IndexOutOfBoundsException(
+                "Requested length " + len + " from offset " + offset + " in buffer of size "
+                    + dst.length);
         }
         int dstSize = offset + len;
         dstPos = offset;
@@ -91,7 +100,7 @@ public class ZstdInputStream extends FilterInputStream {
                     if (frameFinished) {
                         return -1;
                     } else if (isContinuous) {
-                        return (int)(dstPos - offset);
+                        return (int) (dstPos - offset);
                     } else {
                         throw new IOException("Read error or truncated source");
                     }
@@ -113,7 +122,7 @@ public class ZstdInputStream extends FilterInputStream {
                 if (Zstd.isError(size)) {
                     throw new IOException("Decompression error: " + Zstd.getErrorName(size));
                 }
-                return (int)(dstPos - offset);
+                return (int) (dstPos - offset);
             }
         }
         return len;

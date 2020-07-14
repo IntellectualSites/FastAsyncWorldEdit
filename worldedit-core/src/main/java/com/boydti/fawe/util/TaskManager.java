@@ -1,15 +1,11 @@
 package com.boydti.fawe.util;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
-
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
@@ -17,6 +13,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public abstract class TaskManager {
 
@@ -25,16 +24,15 @@ public abstract class TaskManager {
     private final ForkJoinPool pool = new ForkJoinPool();
 
     /**
-     * Run a repeating task on the main thread
+     * Run a repeating task on the main thread.
      *
-     * @param runnable
+     * @param runnable the task to run
      * @param interval in ticks
-     * @return
      */
     public abstract int repeat(@NotNull final Runnable runnable, final int interval);
 
     /**
-     * Run a repeating task asynchronously
+     * Run a repeating task asynchronously.
      *
      * @param runnable the task to run
      * @param interval in ticks
@@ -43,34 +41,31 @@ public abstract class TaskManager {
     public abstract int repeatAsync(@NotNull final Runnable runnable, final int interval);
 
     /**
-     * Run a task asynchronously
+     * Run a task asynchronously.
      *
      * @param runnable the task to run
      */
     public abstract void async(@NotNull final Runnable runnable);
 
     /**
-     * Run a task on the main thread
+     * Run a task on the main thread.
      *
      * @param runnable the task to run
      */
     public abstract void task(@NotNull final Runnable runnable);
 
     /**
-     * Get the public ForkJoinPool<br>
+     * Get the public ForkJoinPool.
      * - ONLY SUBMIT SHORT LIVED TASKS<br>
      * - DO NOT USE SLEEP/WAIT/LOCKS IN ANY SUBMITTED TASKS<br>
      *
-     * @return
      */
     public ForkJoinPool getPublicForkJoinPool() {
         return pool;
     }
 
     /**
-     * Run a bunch of tasks in parallel using the shared thread pool
-     *
-     * @param runnables
+     * Run a bunch of tasks in parallel using the shared thread pool.
      */
     public void parallel(Collection<Runnable> runnables) {
         for (Runnable run : runnables) {
@@ -80,7 +75,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a bunch of tasks in parallel
+     * Run a bunch of tasks in parallel.
      *
      * @param runnables  the tasks to run
      * @param numThreads number of threads (null = config.yml parallel threads)
@@ -136,9 +131,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Disable async catching for a specific task
-     *
-     * @param run
+     * Disable async catching for a specific task.
      */
     public void runUnsafe(Runnable run) {
         QueueHandler queue = Fawe.get().getQueueHandler();
@@ -152,7 +145,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task on the current thread or asynchronously
+     * Run a task on the current thread or asynchronously.
      * - If it's already the main thread, it will just call run()
      *
      * @param runnable the task to run
@@ -167,7 +160,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task as soon as possible on the main thread
+     * Run a task as soon as possible on the main thread.
      * - Non blocking if not calling from the main thread
      *
      * @param runnable the task to run
@@ -181,7 +174,7 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task as soon as possible not on the main thread
+     * Run a task as soon as possible not on the main thread.
      *
      * @param runnable the task to run
      * @see Fawe#isMainThread()
@@ -191,9 +184,9 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task on the main thread at the next tick or now async
+     * Run a task on the main thread at the next tick or now async.
      *
-     * @param runnable the task to run. 
+     * @param runnable the task to run.
      * @param async whether the task should run on the main thread
      */
     public void taskSoonMain(@NotNull final Runnable runnable, boolean async) {
@@ -206,7 +199,7 @@ public abstract class TaskManager {
 
 
     /**
-     * Run a task later on the main thread
+     * Run a task later on the main thread.
      *
      * @param runnable the task to run
      * @param delay in ticks
@@ -214,7 +207,7 @@ public abstract class TaskManager {
     public abstract void later(@NotNull final Runnable runnable, final int delay);
 
     /**
-     * Run a task later asynchronously
+     * Run a task later asynchronously.
      *
      * @param runnable the task to run
      * @param delay in ticks
@@ -222,7 +215,7 @@ public abstract class TaskManager {
     public abstract void laterAsync(@NotNull final Runnable runnable, final int delay);
 
     /**
-     * Cancel a task
+     * Cancel a task.
      *
      * @param task the id of the task to cancel
      */
@@ -289,12 +282,9 @@ public abstract class TaskManager {
     }
 
     /**
-     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish:<br>
+     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish.
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
-     *
-     * @param function
-     * @return
      */
     public <T> T syncWhenFree(@NotNull final RunnableVal<T> function) {
         if (Fawe.isMainThread()) {
@@ -309,7 +299,7 @@ public abstract class TaskManager {
     }
     
     /**
-     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish:<br>
+     * Run a task on the main thread when the TPS is high enough, and wait for execution to finish.
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
@@ -325,24 +315,18 @@ public abstract class TaskManager {
     }
 
     /**
-     * Quickly run a task on the main thread, and wait for execution to finish:<br>
+     * Quickly run a task on the main thread, and wait for execution to finish.
      * - Useful if you need to access something from the Bukkit API from another thread<br>
-     * - Usually wait time is around 25ms<br>
-     *
-     * @param function
-     * @return
+     * - Usually wait time is around 25ms
      */
     public <T> T sync(@NotNull final RunnableVal<T> function) {
         return sync((Supplier<T>) function);
     }
 
     /**
-     * Quickly run a task on the main thread, and wait for execution to finish:<br>
+     * Quickly run a task on the main thread, and wait for execution to finish.
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
-     *
-     * @param function
-     * @return
      */
     public <T> T sync(final Supplier<T> function) {
         if (Fawe.isMainThread()) {

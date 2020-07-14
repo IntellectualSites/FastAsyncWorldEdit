@@ -1,7 +1,5 @@
 package com.boydti.fawe;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.beta.implementation.queue.Pool;
@@ -36,6 +34,8 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,7 +54,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.NotNull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
     IMP

@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.registry.state;
 
 import com.boydti.fawe.util.ReflectionUtils;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

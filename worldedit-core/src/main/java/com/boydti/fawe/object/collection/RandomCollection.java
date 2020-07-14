@@ -1,8 +1,8 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.object.random.SimpleRandom;
-import java.util.Map;
 
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

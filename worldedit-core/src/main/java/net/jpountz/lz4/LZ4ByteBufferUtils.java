@@ -17,9 +17,17 @@ package net.jpountz.lz4;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-
-import static net.jpountz.lz4.LZ4Constants.*;
-import static net.jpountz.util.ByteBufferUtils.*;
+import static net.jpountz.lz4.LZ4Constants.COPY_LENGTH;
+import static net.jpountz.lz4.LZ4Constants.LAST_LITERALS;
+import static net.jpountz.lz4.LZ4Constants.ML_BITS;
+import static net.jpountz.lz4.LZ4Constants.ML_MASK;
+import static net.jpountz.lz4.LZ4Constants.RUN_MASK;
+import static net.jpountz.util.ByteBufferUtils.readByte;
+import static net.jpountz.util.ByteBufferUtils.readInt;
+import static net.jpountz.util.ByteBufferUtils.readLong;
+import static net.jpountz.util.ByteBufferUtils.writeByte;
+import static net.jpountz.util.ByteBufferUtils.writeInt;
+import static net.jpountz.util.ByteBufferUtils.writeLong;
 
 enum LZ4ByteBufferUtils {
     ;

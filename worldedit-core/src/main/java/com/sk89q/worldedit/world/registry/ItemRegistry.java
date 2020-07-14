@@ -21,9 +21,9 @@ package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.world.item.ItemType;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import javax.annotation.Nullable;
 
 public interface ItemRegistry {
 

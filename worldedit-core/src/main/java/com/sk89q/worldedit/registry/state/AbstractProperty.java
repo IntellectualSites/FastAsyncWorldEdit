@@ -20,13 +20,12 @@
 package com.sk89q.worldedit.registry.state;
 
 import com.boydti.fawe.util.MathMan;
-
-import static com.google.common.base.Preconditions.checkState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractProperty<T> implements Property<T> {
 

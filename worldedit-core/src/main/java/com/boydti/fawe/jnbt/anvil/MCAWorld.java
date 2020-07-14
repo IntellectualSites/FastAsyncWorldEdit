@@ -2,14 +2,12 @@ package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
@@ -20,9 +18,9 @@ import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

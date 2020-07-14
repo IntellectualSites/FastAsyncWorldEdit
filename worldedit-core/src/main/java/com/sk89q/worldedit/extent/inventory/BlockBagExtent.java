@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extent.inventory;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -29,6 +28,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

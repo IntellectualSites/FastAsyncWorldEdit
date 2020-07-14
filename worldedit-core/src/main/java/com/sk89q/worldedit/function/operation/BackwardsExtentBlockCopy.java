@@ -2,7 +2,6 @@ package com.sk89q.worldedit.function.operation;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
@@ -11,6 +10,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+
 import java.util.List;
 
 public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation {

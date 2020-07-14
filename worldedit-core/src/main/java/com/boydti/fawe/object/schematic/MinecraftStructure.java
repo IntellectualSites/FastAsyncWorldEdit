@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.schematic;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -31,6 +29,8 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     private static final int WARN_SIZE = 32;

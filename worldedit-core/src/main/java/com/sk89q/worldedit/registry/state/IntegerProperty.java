@@ -23,7 +23,6 @@ import com.boydti.fawe.util.StringMan;
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.Nullable;
 
 public class IntegerProperty extends AbstractProperty<Integer> {

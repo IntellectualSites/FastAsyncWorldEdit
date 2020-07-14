@@ -19,14 +19,15 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.noise.NoiseGenerator;
+
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A mask that uses a noise generator and returns true whenever the noise

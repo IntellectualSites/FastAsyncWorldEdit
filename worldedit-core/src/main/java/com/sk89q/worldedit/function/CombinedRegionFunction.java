@@ -19,13 +19,14 @@
 
 package com.sk89q.worldedit.function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Executes several region functions in order.

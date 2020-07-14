@@ -1,9 +1,6 @@
 package com.boydti.fawe.object.changeset;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
@@ -32,7 +29,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,6 +37,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     private final World world;
@@ -48,7 +46,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
 
     protected boolean closed;
-    
+
     public AbstractChangeSet(World world) {
         this.world = world;
     }
@@ -58,7 +56,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public void closeAsync() {
-        if (closed) return;
+        if (closed) {
+            return;
+        }
         closed = true;
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
@@ -157,7 +157,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         }
         for (int layer = 0; layer < 16; layer++) {
-            if (!set.hasSection(layer)) continue;
+            if (!set.hasSection(layer)) {
+                continue;
+            }
             // add each block and tile
             char[] blocksGet = get.load(layer);
             if (blocksGet == null) {
@@ -223,7 +225,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public EditSession toEditSession(Player player, Region[] regions) {
-        EditSessionBuilder builder = new EditSessionBuilder(getWorld()).player(player).autoQueue(false).fastmode(false).checkMemory(false).changeSet(this).limitUnlimited();
+        EditSessionBuilder builder =
+            new EditSessionBuilder(getWorld()).player(player).autoQueue(false).fastmode(false)
+                .checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);
         } else {

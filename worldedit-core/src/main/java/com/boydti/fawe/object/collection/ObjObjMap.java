@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.collection;
 
-import static it.unimi.dsi.fastutil.HashCommon.arraySize;
-
 import java.util.Arrays;
 import javax.annotation.Nonnull;
+
+import static it.unimi.dsi.fastutil.HashCommon.arraySize;
 
 public class ObjObjMap<K, V> {
 

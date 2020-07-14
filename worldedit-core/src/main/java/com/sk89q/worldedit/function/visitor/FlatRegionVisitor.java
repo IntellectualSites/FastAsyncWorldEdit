@@ -20,20 +20,18 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.FlatRegion;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Applies region functions to columns in a {@link FlatRegion}.

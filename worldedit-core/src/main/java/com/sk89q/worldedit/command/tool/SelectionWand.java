@@ -25,7 +25,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;

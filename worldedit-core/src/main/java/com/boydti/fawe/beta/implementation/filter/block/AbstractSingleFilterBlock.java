@@ -82,11 +82,11 @@ public abstract class AbstractSingleFilterBlock extends FilterBlock {
             setFullBlock(block.toBaseBlock());
             return true;
         }
-        return getExtent().setBlock(x,y, z, block);
+        return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x, y, z,biome);
+        return getExtent().setBiome(x, y, z, biome);
     }
 }

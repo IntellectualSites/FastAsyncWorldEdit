@@ -6,7 +6,6 @@ import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEdit;
 
 import java.util.HashMap;
 import java.util.function.Function;

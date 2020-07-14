@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
+
 import java.awt.Color;
 
 public class AverageColorPattern extends AbstractExtentPattern {

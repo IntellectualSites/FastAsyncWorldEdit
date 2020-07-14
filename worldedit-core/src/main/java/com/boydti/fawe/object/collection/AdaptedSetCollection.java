@@ -2,6 +2,8 @@ package com.boydti.fawe.object.collection;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -9,13 +11,10 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * Adapt a collection to a set
- * (It's assumed that the collection is set like, otherwise behavior will be weird)
- *
- * @param <T>
+ * Adapt a collection to a set.
+ * @apiNote It's assumed that the collection is set like, otherwise behavior will be weird
  */
 public class AdaptedSetCollection<T, V> implements Set<V> {
     private final Collection<V> adapted;

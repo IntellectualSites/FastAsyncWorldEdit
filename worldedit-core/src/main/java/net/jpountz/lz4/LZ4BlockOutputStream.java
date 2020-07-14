@@ -16,11 +16,12 @@ package net.jpountz.lz4;
  * This file has been modified for use in the FAWE project.
  */
 
+import net.jpountz.util.SafeUtils;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Checksum;
-import net.jpountz.util.SafeUtils;
 
 /**
  * Streaming LZ4 (not compatible with the LZ4 Frame format).

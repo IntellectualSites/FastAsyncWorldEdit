@@ -19,7 +19,9 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     public int getColor(int color, int slope) {
-        if (slope == 0) return color;
+        if (slope == 0) {
+            return color;
+        }
         double newFactor = (1 - Math.min(1, slope * factor));
         int newRed = (int) (((color >> 16) & 0xFF) * newFactor);
         int newGreen = (int) (((color >> 8) & 0xFF) * newFactor);
@@ -31,9 +33,13 @@ public class AngleColorPattern extends DataAnglePattern {
     public BaseBlock apply(BlockVector3 position) {
         BaseBlock block = extent.getFullBlock(position);
         int slope = getSlope(block, position, extent);
-        if (slope == -1) return block;
+        if (slope == -1) {
+            return block;
+        }
         int color = holder.getTextureUtil().getColor(block.getBlockType());
-        if (color == 0) return block;
+        if (color == 0) {
+            return block;
+        }
         int newColor = getColor(color, slope);
         return holder.getTextureUtil().getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
@@ -60,12 +66,18 @@ public class AngleColorPattern extends DataAnglePattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockState block = get.getBlock(extent);
         int slope = getSlope(block, get, extent);
-        if (slope == -1) return false;
+        if (slope == -1) {
+            return false;
+        }
         int color = holder.getTextureUtil().getColor(block.getBlockType());
-        if (color == 0) return false;
+        if (color == 0) {
+            return false;
+        }
         int newColor = getColor(color, slope);
         BlockType newBlock = holder.getTextureUtil().getNearestBlock(newColor);
-        if (newBlock == null) return false;
+        if (newBlock == null) {
+            return false;
+        }
         return set.setBlock(extent, newBlock.getDefaultState());
     }
 }

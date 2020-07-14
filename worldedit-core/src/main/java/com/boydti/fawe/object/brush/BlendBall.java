@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Arrays;
 
 public class BlendBall implements Brush {

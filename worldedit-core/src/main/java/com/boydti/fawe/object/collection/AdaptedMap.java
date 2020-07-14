@@ -67,7 +67,9 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
     @NotNull
     @Override
     public Set<Entry<K, V>> entrySet() {
-        if (isEmpty()) return Collections.emptySet();
+        if (isEmpty()) {
+            return Collections.emptySet();
+        }
         return new AdaptedSetCollection<>(getParent().entrySet(), new com.google.common.base.Function<Entry<K2, V2>, Entry<K, V>>() {
             private AdaptedPair entry = new AdaptedPair();
             @Override

@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.entity;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
@@ -29,6 +27,8 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a mutable "snapshot" of an entity.

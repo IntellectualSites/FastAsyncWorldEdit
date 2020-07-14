@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.math.convolution;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -32,8 +30,11 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Iterator;
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Allows applications of Kernels onto the region's height map.

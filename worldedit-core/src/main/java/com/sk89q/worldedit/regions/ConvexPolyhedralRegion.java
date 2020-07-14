@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
@@ -33,8 +31,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ConvexPolyhedralRegion extends AbstractRegion {
 

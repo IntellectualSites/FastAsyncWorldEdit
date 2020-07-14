@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
 import com.boydti.fawe.object.function.block.BiomeCopy;
@@ -32,9 +31,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.FastSchematicReader;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;

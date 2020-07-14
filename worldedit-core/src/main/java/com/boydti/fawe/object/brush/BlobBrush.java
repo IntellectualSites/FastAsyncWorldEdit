@@ -10,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlobBrush implements Brush {

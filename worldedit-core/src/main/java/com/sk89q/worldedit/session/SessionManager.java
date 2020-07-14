@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.session;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -29,8 +27,6 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
-import com.sk89q.worldedit.command.tool.NavigationWand;
-import com.sk89q.worldedit.command.tool.SelectionWand;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
@@ -47,7 +43,6 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -57,6 +52,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Session manager for WorldEdit.

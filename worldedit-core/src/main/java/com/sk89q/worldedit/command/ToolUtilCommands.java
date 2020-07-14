@@ -20,12 +20,10 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
 import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.boydti.fawe.object.brush.visualization.VisualMode;
-import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -45,6 +43,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;

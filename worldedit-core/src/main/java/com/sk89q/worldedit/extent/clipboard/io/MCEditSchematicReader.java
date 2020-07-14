@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.google.common.collect.ImmutableList;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -60,11 +58,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.HashSet;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.

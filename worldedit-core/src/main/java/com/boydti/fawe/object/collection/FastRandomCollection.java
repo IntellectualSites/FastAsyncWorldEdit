@@ -2,6 +2,7 @@ package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.util.MathMan;
+
 import java.util.ArrayList;
 import java.util.Map;
 

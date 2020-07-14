@@ -21,16 +21,11 @@ package com.sk89q.worldedit.extent.transform;
 
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Disabled("A platform is currently required to get properties, preventing this test.")
 public class BlockTransformExtentTest {

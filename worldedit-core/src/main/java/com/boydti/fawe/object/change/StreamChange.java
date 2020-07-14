@@ -2,14 +2,15 @@ package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
 
 public interface StreamChange {
     public void flushChanges(FaweOutputStream out) throws IOException;

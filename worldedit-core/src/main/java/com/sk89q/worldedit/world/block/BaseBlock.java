@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
@@ -33,10 +31,12 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
 import java.util.Map;
 import java.util.Objects;
-
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a "snapshot" of a block with NBT Data.

@@ -4,13 +4,14 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.exception.StopExecutionException;
+
 import java.io.File;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.exception.StopExecutionException;
 
 //TODO This class breaks compilation
 //@CommandContainer

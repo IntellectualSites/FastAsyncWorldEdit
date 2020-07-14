@@ -3,10 +3,11 @@ package com.boydti.fawe.configuration.file;
 import com.boydti.fawe.configuration.ConfigurationSection;
 import com.boydti.fawe.configuration.serialization.ConfigurationSerializable;
 import com.boydti.fawe.configuration.serialization.ConfigurationSerialization;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.Representer;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class YamlRepresenter extends Representer {
 

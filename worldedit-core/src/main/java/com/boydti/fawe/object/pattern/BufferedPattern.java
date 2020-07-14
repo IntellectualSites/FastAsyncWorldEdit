@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
 import java.util.UUID;
 
 public class BufferedPattern extends AbstractPattern implements ResettablePattern {

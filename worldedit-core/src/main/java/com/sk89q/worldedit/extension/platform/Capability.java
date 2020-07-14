@@ -19,11 +19,6 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
-
 /**
  * A collection of capabilities that a {@link Platform} may support.
  */

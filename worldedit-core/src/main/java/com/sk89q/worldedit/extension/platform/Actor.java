@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.Fawe;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -173,7 +171,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     boolean runAction(Runnable ifFree, boolean checkFree, boolean async);
 
     /**
-     * Decline any pending actions
+     * Decline any pending actions.
      * @return true if an action was pending
      */
     default boolean decline() {
@@ -186,7 +184,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     }
 
     /**
-     * Confirm any pending actions
+     * Confirm any pending actions.
      * @return true if an action was pending
      */
     default boolean confirm() {
@@ -199,9 +197,9 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     }
 
     /**
-     * Queue an action to run async
+     * Queue an action to run async.
      *
-     * @param run
+     * @param run the action to run
      */
     default void queueAction(Runnable run) {
         runAction(run, false, true);
@@ -227,7 +225,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     }
 
     /**
-     * Attempt to cancel all pending and running actions
+     * Attempt to cancel all pending and running actions.
      * @param close if Extents are closed
      * @return number of cancelled actions
      */
@@ -252,8 +250,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            else {
+            } else {
                 try {
                     world.close(false);
                 } catch (IOException e) {

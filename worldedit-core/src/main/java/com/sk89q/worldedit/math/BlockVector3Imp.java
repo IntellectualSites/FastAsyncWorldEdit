@@ -19,13 +19,6 @@
 
 package com.sk89q.worldedit.math;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import com.google.common.collect.ComparisonChain;
-import com.sk89q.worldedit.math.transform.AffineTransform;
-
-import java.util.Comparator;
-
 /**
  * An immutable 3-dimensional vector.
  */

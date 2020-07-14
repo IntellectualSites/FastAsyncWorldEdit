@@ -10,8 +10,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
-import java.util.Iterator;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 public class FuzzyRegion extends AbstractRegion {
 

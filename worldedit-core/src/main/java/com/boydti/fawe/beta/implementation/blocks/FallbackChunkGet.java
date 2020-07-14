@@ -14,7 +14,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class FallbackChunkGet implements IChunkGet {

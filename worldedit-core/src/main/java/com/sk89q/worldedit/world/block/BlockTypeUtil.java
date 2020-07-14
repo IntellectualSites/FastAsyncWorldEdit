@@ -21,8 +21,6 @@ package com.sk89q.worldedit.world.block;
 
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

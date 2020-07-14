@@ -19,15 +19,11 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.wrappers.AsyncPlayer;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -50,7 +46,11 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -60,8 +60,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages registered {@link Platform}s for WorldEdit. Platforms are

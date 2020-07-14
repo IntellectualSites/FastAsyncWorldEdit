@@ -1,13 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;

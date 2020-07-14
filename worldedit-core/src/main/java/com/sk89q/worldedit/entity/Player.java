@@ -25,7 +25,6 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -43,7 +42,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -53,9 +51,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
+import javax.annotation.Nullable;
 
 /**
  * Represents a player

@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.Fawe;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -13,8 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import org.jetbrains.annotations.NotNull;
 
 public class ReflectionUtils {
 

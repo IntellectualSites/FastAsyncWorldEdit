@@ -23,10 +23,10 @@ import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.WorldEditException;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
+import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.Map;
 
 public class NashornCraftScriptEngine implements CraftScriptEngine {
     private static NashornScriptEngineFactory FACTORY;

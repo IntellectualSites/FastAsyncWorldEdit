@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.world.entity;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
+import javax.annotation.Nullable;
 
 public class EntityTypes {
 

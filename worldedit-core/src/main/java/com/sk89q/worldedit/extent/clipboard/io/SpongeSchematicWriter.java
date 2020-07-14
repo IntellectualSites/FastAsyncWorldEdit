@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -53,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge schematic format.

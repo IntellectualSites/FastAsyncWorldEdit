@@ -37,12 +37,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

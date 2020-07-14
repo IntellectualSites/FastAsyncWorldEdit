@@ -21,12 +21,13 @@
 
 package com.sk89q.worldedit.math.interpolation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A Kochanek-Bartels interpolation; continuous in the 2nd derivative.

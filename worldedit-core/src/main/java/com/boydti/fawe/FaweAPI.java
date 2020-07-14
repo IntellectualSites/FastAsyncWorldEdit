@@ -29,18 +29,14 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.internal.registry.AbstractFactory;
-import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>

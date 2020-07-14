@@ -38,14 +38,14 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.util.function.Function;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

@@ -31,10 +31,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ConfigurationPermissionsResolver implements PermissionsResolver {
-    private YAMLProcessor config;
-    private Map<String, Set<String>> userPermissionsCache;
-    private Set<String> defaultPermissionsCache;
-    private Map<String, Set<String>> userGroups;
+    private final YAMLProcessor config;
+    private final Map<String, Set<String>> userPermissionsCache = new HashMap<>();
+    private final Set<String> defaultPermissionsCache = new HashSet<>();
+    private final Map<String, Set<String>> userGroups = new HashMap<>();
 
     public ConfigurationPermissionsResolver(YAMLProcessor config) {
         this.config = config;
@@ -42,9 +42,10 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
 
     public static YAMLNode generateDefaultPerms(YAMLNode section) {
         section.setProperty("groups.default.permissions", new String[] {
-                "worldedit.reload",
-                "worldedit.selection",
-                "worlds.creative.worldedit.region"});
+            "worldedit.reload",
+            "worldedit.selection",
+            "worlds.creative.worldedit.region"
+        });
         section.setProperty("groups.admins.permissions", new String[] { "*" });
         section.setProperty("users.sk89q.permissions", new String[] { "worldedit" });
         section.setProperty("users.sk89q.groups", new String[] { "admins" });
@@ -53,9 +54,9 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
 
     @Override
     public void load() {
-        userGroups = new HashMap<>();
-        userPermissionsCache = new HashMap<>();
-        defaultPermissionsCache = new HashSet<>();
+        userGroups.clear();
+        userPermissionsCache.clear();
+        defaultPermissionsCache.clear();
 
         Map<String, Set<String>> userGroupPermissions = new HashMap<>();
 

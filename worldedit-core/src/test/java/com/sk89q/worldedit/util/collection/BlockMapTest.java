@@ -19,52 +19,7 @@
 
 package com.sk89q.worldedit.util.collection;
 
-import com.google.common.collect.ImmutableMap;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.extension.platform.PlatformManager;
-import com.sk89q.worldedit.extension.platform.Preference;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.Registry;
-import com.sk89q.worldedit.util.test.VariedVectorGenerator;
-import com.sk89q.worldedit.util.test.VariedVectors;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.registry.BundledRegistries;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.lang.reflect.Field;
-import java.util.AbstractMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @DisplayName("An ordered block map")
 class BlockMapTest {

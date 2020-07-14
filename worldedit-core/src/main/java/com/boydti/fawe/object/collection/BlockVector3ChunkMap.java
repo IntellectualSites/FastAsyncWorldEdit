@@ -4,6 +4,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap;
+
 import java.util.Map;
 
 public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Short, T> {

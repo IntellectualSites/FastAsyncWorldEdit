@@ -22,13 +22,13 @@ package com.sk89q.worldedit.internal.command;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import java.util.Optional;
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.gen.CommandCallListener;
 import org.enginehub.piston.inject.Key;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * Logs called commands to a logger.

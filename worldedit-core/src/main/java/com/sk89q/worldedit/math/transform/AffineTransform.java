@@ -22,6 +22,7 @@ package com.sk89q.worldedit.math.transform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.Vector3;
+
 import java.io.Serializable;
 
 /**
@@ -38,23 +39,32 @@ public class AffineTransform implements Transform, Serializable {
     /**
      * coefficients for x coordinate.
      */
-    private double m00, m01, m02, m03;
+    private final double m00;
+    private final double m01;
+    private final double m02;
+    private double m03;
 
     /**
      * coefficients for y coordinate.
      */
-    private double m10, m11, m12, m13;
+    private final double m10;
+    private final double m11;
+    private final double m12;
+    private double m13;
 
     /**
      * coefficients for z coordinate.
      */
-    private double m20, m21, m22, m23;
+    private final double m20;
+    private final double m21;
+    private final double m22;
+    private double m23;
 
     // ===================================================================
     // constructors
 
     /**
-     * Creates a new affine transform3D set to identity
+     * Creates a new affine transform3D set to identity.
      */
     public AffineTransform() {
         // init to identity matrix
@@ -89,14 +99,11 @@ public class AffineTransform implements Transform, Serializable {
             m22 = coefs[10];
             m23 = coefs[11];
         } else {
-            throw new IllegalArgumentException(
-                    "Input array must have 9 or 12 elements");
+            throw new IllegalArgumentException("Input array must have 9 or 12 elements");
         }
     }
 
-    public AffineTransform(double xx, double yx, double zx, double tx,
-                           double xy, double yy, double zy, double ty, double xz, double yz,
-                           double zz, double tz) {
+    public AffineTransform(double xx, double yx, double zx, double tx, double xy, double yy, double zy, double ty, double xz, double yz, double zz, double tz) {
         m00 = xx;
         m01 = yx;
         m02 = zx;
@@ -116,31 +123,40 @@ public class AffineTransform implements Transform, Serializable {
 
     @Override
     public boolean isIdentity() {
-        if (m00 != 1)
+        if (m00 != 1) {
             return false;
-        if (m11 != 1)
+        }
+        if (m11 != 1) {
             return false;
-        if (m22 != 1)
+        }
+        if (m22 != 1) {
             return false;
-        if (m01 != 0)
+        }
+        if (m01 != 0) {
             return false;
-        if (m02 != 0)
+        }
+        if (m02 != 0) {
             return false;
-        if (m03 != 0)
+        }
+        if (m03 != 0) {
             return false;
-        if (m10 != 0)
+        }
+        if (m10 != 0) {
             return false;
-        if (m12 != 0)
+        }
+        if (m12 != 0) {
             return false;
-        if (m13 != 0)
+        }
+        if (m13 != 0) {
             return false;
-        if (m20 != 0)
+        }
+        if (m20 != 0) {
             return false;
-        if (m21 != 0)
+        }
+        if (m21 != 0) {
             return false;
-        if (m23 != 0)
-            return false;
-        return true;
+        }
+        return m23 == 0;
     }
 
     /**
@@ -148,7 +164,20 @@ public class AffineTransform implements Transform, Serializable {
      * 12 double.
      */
     public double[] coefficients() {
-        return new double[]{m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23};
+        return new double[] {
+            m00,
+            m01,
+            m02,
+            m03,
+            m10,
+            m11,
+            m12,
+            m13,
+            m20,
+            m21,
+            m22,
+            m23
+        };
     }
 
     public boolean isOffAxis() {
@@ -169,8 +198,8 @@ public class AffineTransform implements Transform, Serializable {
      * @return the determinant of the transform.
      */
     private double determinant() {
-        return m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m20 * m12)
-                + m02 * (m10 * m21 - m20 * m11);
+        return m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m20 * m12) + m02 * (m10 * m21
+            - m20 * m11);
     }
 
     /**
@@ -178,24 +207,26 @@ public class AffineTransform implements Transform, Serializable {
      */
     @Override
     public AffineTransform inverse() {
-        if (inverse != null) return inverse;
+        if (inverse != null) {
+            return inverse;
+        }
         double det = this.determinant();
         return new AffineTransform(
-                (m11 * m22 - m21 * m12) / det,
-                (m21 * m02 - m01 * m22) / det,
-                (m01 * m12 - m11 * m02) / det,
-                (m01 * (m22 * m13 - m12 * m23) + m02 * (m11 * m23 - m21 * m13)
-                        - m03 * (m11 * m22 - m21 * m12)) / det,
-                (m20 * m12 - m10 * m22) / det,
-                (m00 * m22 - m20 * m02) / det,
-                (m10 * m02 - m00 * m12) / det,
-                (m00 * (m12 * m23 - m22 * m13) - m02 * (m10 * m23 - m20 * m13)
-                        + m03 * (m10 * m22 - m20 * m12)) / det,
-                (m10 * m21 - m20 * m11) / det,
-                (m20 * m01 - m00 * m21) / det,
-                (m00 * m11 - m10 * m01) / det,
-                (m00 * (m21 * m13 - m11 * m23) + m01 * (m10 * m23 - m20 * m13)
-                        - m03 * (m10 * m21 - m20 * m11)) / det);
+            (m11 * m22 - m21 * m12) / det,
+            (m21 * m02 - m01 * m22) / det,
+            (m01 * m12 - m11 * m02) / det,
+            (m01 * (m22 * m13 - m12 * m23) + m02 * (m11 * m23 - m21 * m13) - m03 * (m11 * m22
+                - m21 * m12)) / det,
+            (m20 * m12 - m10 * m22) / det,
+            (m00 * m22 - m20 * m02) / det,
+            (m10 * m02 - m00 * m12) / det,
+            (m00 * (m12 * m23 - m22 * m13) - m02 * (m10 * m23 - m20 * m13) + m03 * (m10 * m22
+                - m20 * m12)) / det,
+            (m10 * m21 - m20 * m11) / det,
+            (m20 * m01 - m00 * m21) / det,
+            (m00 * m11 - m10 * m01) / det,
+            (m00 * (m21 * m13 - m11 * m23) + m01 * (m10 * m23 - m20 * m13) - m03 * (m10 * m21
+                - m20 * m11)) / det);
     }
 
     // ===================================================================
@@ -221,10 +252,7 @@ public class AffineTransform implements Transform, Serializable {
         double n21 = m20 * that.m01 + m21 * that.m11 + m22 * that.m21;
         double n22 = m20 * that.m02 + m21 * that.m12 + m22 * that.m22;
         double n23 = m20 * that.m03 + m21 * that.m13 + m22 * that.m23 + m23;
-        return new AffineTransform(
-                n00, n01, n02, n03,
-                n10, n11, n12, n13,
-                n20, n21, n22, n23);
+        return new AffineTransform(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23);
     }
 
     /**
@@ -247,10 +275,7 @@ public class AffineTransform implements Transform, Serializable {
         double n21 = that.m20 * m01 + that.m21 * m11 + that.m22 * m21;
         double n22 = that.m20 * m02 + that.m21 * m12 + that.m22 * m22;
         double n23 = that.m20 * m03 + that.m21 * m13 + that.m22 * m23 + that.m23;
-        return new AffineTransform(
-                n00, n01, n02, n03,
-                n10, n11, n12, n13,
-                n20, n21, n22, n23);
+        return new AffineTransform(n00, n01, n02, n03, n10, n11, n12, n13, n20, n21, n22, n23);
     }
 
     public AffineTransform translate(Vector3 vec) {
@@ -268,31 +293,19 @@ public class AffineTransform implements Transform, Serializable {
     public AffineTransform rotateX(double theta) {
         double cot = MathUtils.dCos(theta);
         double sit = MathUtils.dSin(theta);
-        return concatenate(
-                new AffineTransform(
-                        1, 0, 0, 0,
-                        0, cot, -sit, 0,
-                        0, sit, cot, 0));
+        return concatenate(new AffineTransform(1, 0, 0, 0, 0, cot, -sit, 0, 0, sit, cot, 0));
     }
 
     public AffineTransform rotateY(double theta) {
         double cot = MathUtils.dCos(theta);
         double sit = MathUtils.dSin(theta);
-        return concatenate(
-                new AffineTransform(
-                        cot, 0, sit, 0,
-                        0, 1, 0, 0,
-                        -sit, 0, cot, 0));
+        return concatenate(new AffineTransform(cot, 0, sit, 0, 0, 1, 0, 0, -sit, 0, cot, 0));
     }
 
     public AffineTransform rotateZ(double theta) {
         double cot = MathUtils.dCos(theta);
         double sit = MathUtils.dSin(theta);
-        return concatenate(
-                new AffineTransform(
-                        cot, -sit, 0, 0,
-                        sit, cot, 0, 0,
-                        0, 0, 1, 0));
+        return concatenate(new AffineTransform(cot, -sit, 0, 0, sit, cot, 0, 0, 0, 0, 1, 0));
     }
 
     public AffineTransform scale(double s) {
@@ -309,9 +322,15 @@ public class AffineTransform implements Transform, Serializable {
 
     public boolean isScaled(Vector3 vector) {
         boolean flip = false;
-        if (vector.getX() != 0 && m00 < 0) flip = !flip;
-        if (vector.getY() != 0 && m11 < 0) flip = !flip;
-        if (vector.getZ() != 0 && m22 < 0) flip = !flip;
+        if (vector.getX() != 0 && m00 < 0) {
+            flip = !flip;
+        }
+        if (vector.getY() != 0 && m11 < 0) {
+            flip = !flip;
+        }
+        if (vector.getZ() != 0 && m22 < 0) {
+            flip = !flip;
+        }
         return flip;
     }
 

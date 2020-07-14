@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -13,8 +11,11 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RandomFullClipboardPattern extends AbstractPattern {
     private final Extent extent;

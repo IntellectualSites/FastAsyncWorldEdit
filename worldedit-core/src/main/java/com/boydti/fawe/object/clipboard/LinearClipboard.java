@@ -14,11 +14,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Best used when clipboard selections are small, or using legacy formats

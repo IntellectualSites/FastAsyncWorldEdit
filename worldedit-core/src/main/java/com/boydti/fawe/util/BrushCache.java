@@ -1,7 +1,5 @@
 package com.boydti.fawe.util;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sk89q.jnbt.CompoundTag;
@@ -11,6 +9,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;

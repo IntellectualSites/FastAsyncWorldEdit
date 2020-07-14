@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.buffer;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractBufferingExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -30,7 +28,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Buffers changes to an {@link Extent} and allows retrieval of the changed blocks,

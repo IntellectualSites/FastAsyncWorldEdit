@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.IOException;

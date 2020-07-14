@@ -14,15 +14,20 @@ package net.jpountz.lz4;
  * limitations under the License.
  */
 
+import net.jpountz.util.SafeUtils;
+
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.Checksum;
-import net.jpountz.util.SafeUtils;
 
-
-import static net.jpountz.lz4.LZ4BlockOutputStream.*;
+import static net.jpountz.lz4.LZ4BlockOutputStream.COMPRESSION_LEVEL_BASE;
+import static net.jpountz.lz4.LZ4BlockOutputStream.COMPRESSION_METHOD_LZ4;
+import static net.jpountz.lz4.LZ4BlockOutputStream.COMPRESSION_METHOD_RAW;
+import static net.jpountz.lz4.LZ4BlockOutputStream.HEADER_LENGTH;
+import static net.jpountz.lz4.LZ4BlockOutputStream.MAGIC;
+import static net.jpountz.lz4.LZ4BlockOutputStream.MAGIC_LENGTH;
 
 /**
  * {@link InputStream} implementation to decode data written with

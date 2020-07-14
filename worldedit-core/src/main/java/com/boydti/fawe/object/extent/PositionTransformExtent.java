@@ -1,8 +1,6 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -10,6 +8,8 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class PositionTransformExtent extends ResettableExtent {

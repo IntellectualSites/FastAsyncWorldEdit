@@ -1,9 +1,9 @@
 package com.sk89q.worldedit.function.mask;
 
-import javax.annotation.Nullable;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+
+import javax.annotation.Nullable;
 
 public class InverseMask extends AbstractMask {
     private final Mask mask;

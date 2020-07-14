@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Checks whether another mask tests true for a position that is offset

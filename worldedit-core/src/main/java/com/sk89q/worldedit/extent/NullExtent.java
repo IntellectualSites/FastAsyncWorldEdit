@@ -37,7 +37,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.annotation.Nullable;
 
 /**

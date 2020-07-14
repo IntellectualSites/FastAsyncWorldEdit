@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import javax.annotation.Nullable;
 
 public class VisualExtent extends AbstractDelegateExtent {

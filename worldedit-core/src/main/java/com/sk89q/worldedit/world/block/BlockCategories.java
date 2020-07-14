@@ -81,6 +81,7 @@ public final class BlockCategories {
     public static final BlockCategory WOODEN_STAIRS = get("minecraft:wooden_stairs");
     public static final BlockCategory WOODEN_TRAPDOORS = get("minecraft:wooden_trapdoors");
     public static final BlockCategory WOOL = get("minecraft:wool");
+    public static final BlockCategory FIRE = get("minecraft:fire");
 
     private BlockCategories() {
     }

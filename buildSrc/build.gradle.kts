@@ -30,9 +30,9 @@ configurations.all {
     resolutionStrategy {
         // Fabric needs this.
         force(
-            "commons-io:commons-io:2.5",
-            "org.ow2.asm:asm:7.1",
-            "org.ow2.asm:asm-commons:7.1"
+            "commons-io:commons-io:2.6",
+            "org.ow2.asm:asm:8.0.1",
+            "org.ow2.asm:asm-commons:8.0.1"
         )
     }
 }
@@ -48,13 +48,13 @@ val mixinVersion: String = properties.getProperty("mixin.version")
 dependencies {
     implementation(gradleApi())
     implementation("gradle.plugin.net.minecrell:licenser:0.4.1")
-    implementation("org.ajoberstar.grgit:grgit-gradle:3.1.1")
-    implementation("com.github.jengelman.gradle.plugins:shadow:5.1.0")
+    implementation("org.ajoberstar.grgit:grgit-gradle:4.0.2")
+    implementation("com.github.jengelman.gradle.plugins:shadow:5.2.0")
     implementation("net.ltgt.apt-eclipse:net.ltgt.apt-eclipse.gradle.plugin:0.21")
     implementation("net.ltgt.apt-idea:net.ltgt.apt-idea.gradle.plugin:0.21")
-    implementation("org.jfrog.buildinfo:build-info-extractor-gradle:4.9.7")
+    implementation("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.0")
     implementation("gradle.plugin.org.spongepowered:spongegradle:0.9.0")
-    implementation("net.minecraftforge.gradle:ForgeGradle:3.0.168")
+    implementation("net.minecraftforge.gradle:ForgeGradle:3.0.179")
     implementation("net.fabricmc:fabric-loom:$loomVersion")
     implementation("net.fabricmc:sponge-mixin:$mixinVersion")
     implementation("gradle.plugin.com.mendhak.gradlecrowdin:plugin:0.1.0")

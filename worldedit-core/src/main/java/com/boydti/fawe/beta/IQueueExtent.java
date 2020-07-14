@@ -9,11 +9,12 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import org.jetbrains.annotations.Range;
+
 import java.io.Flushable;
 import java.util.Set;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.Range;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which

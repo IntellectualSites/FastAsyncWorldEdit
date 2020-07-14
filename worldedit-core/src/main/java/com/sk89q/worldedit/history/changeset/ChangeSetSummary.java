@@ -2,7 +2,6 @@ package com.sk89q.worldedit.history.changeset;
 
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;

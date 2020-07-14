@@ -1,17 +1,8 @@
 package com.boydti.fawe.wrappers;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.util.EditSessionBuilder;
-import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class LocationMaskedPlayerWrapper extends AsyncPlayer {
     private final boolean allowTeleport;

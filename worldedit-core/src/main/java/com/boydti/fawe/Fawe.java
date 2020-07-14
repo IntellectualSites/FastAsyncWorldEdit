@@ -18,6 +18,9 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,17 +31,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * [ WorldEdit action]

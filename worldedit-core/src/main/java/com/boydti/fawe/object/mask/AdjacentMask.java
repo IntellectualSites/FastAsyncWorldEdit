@@ -7,57 +7,58 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class AdjacentMask extends AbstractMask {
-    private final int min, max;
+    private final int min;
+    private final int max;
     private final Mask mask;
-    private MutableBlockVector3 v;
+    private MutableBlockVector3 vector;
 
     public AdjacentMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
         this.min = requiredMin;
         this.max = requiredMax;
-        this.v = new MutableBlockVector3();
+        this.vector = new MutableBlockVector3();
     }
 
     @Override
     public boolean test(Extent extent, BlockVector3 bv) {
-        v.setComponents(bv);
-        int count = 0;
+        vector.setComponents(bv);
         double x = bv.getX();
         double y = bv.getY();
         double z = bv.getZ();
-        v.mutX(x + 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        vector.mutX(x + 1);
+        int count = 0;
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutX(x);
             return true;
         }
-        v.mutX(x - 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        vector.mutX(x - 1);
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutX(x);
             return true;
         }
-        v.mutX(x);
-        v.mutY(y + 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutY(y);
+        vector.mutX(x);
+        vector.mutY(y + 1);
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutY(y);
             return true;
         }
-        v.mutY(y - 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutY(y);
+        vector.mutY(y - 1);
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutY(y);
             return true;
         }
-        v.mutY(y);
-        v.mutZ(z + 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        vector.mutY(y);
+        vector.mutZ(z + 1);
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutZ(z);
             return true;
         }
-        v.mutZ(z - 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        vector.mutZ(z - 1);
+        if (mask.test(extent, vector) && ++count == min && max >= 8) {
+            vector.mutZ(z);
             return true;
         }
-        v.mutZ(z);
+        vector.mutZ(z);
         return count >= min && count <= max;
     }
 }

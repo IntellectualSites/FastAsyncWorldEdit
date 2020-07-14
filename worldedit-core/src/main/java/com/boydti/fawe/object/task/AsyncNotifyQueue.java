@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.task;
 
 import com.boydti.fawe.Fawe;
+
 import java.io.Closeable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;

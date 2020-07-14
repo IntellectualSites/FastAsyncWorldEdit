@@ -21,6 +21,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
@@ -41,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)

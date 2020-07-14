@@ -17,6 +17,7 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

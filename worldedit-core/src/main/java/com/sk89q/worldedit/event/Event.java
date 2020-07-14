@@ -27,7 +27,7 @@ import com.sk89q.worldedit.WorldEdit;
 public abstract class Event {
 
     /**
-     * Returns true if this event was called and not cancelled
+     * Returns true if this event was called and not cancelled.
      * @return !isCancelled
      */
     public boolean call() {

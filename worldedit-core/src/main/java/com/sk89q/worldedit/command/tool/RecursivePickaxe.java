@@ -28,14 +28,14 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class RecursivePickaxe implements BlockTool {
 
-    private double range;
+    private final double range;
 
     public RecursivePickaxe(double range) {
         this.range = range;
@@ -57,7 +57,7 @@ public class RecursivePickaxe implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
         World world = (World) clicked.getExtent();
         final BlockVector3 pos = clicked.toBlockPoint();
 
@@ -94,7 +94,7 @@ public class RecursivePickaxe implements BlockTool {
             BlockVector3 origin, double size, BlockType initialType, Set<BlockVector3> visited) throws MaxChangedBlocksException {
 
         final double distanceSq = origin.distanceSq(pos);
-        if (distanceSq > size*size || visited.contains(pos)) {
+        if (distanceSq > size * size || visited.contains(pos)) {
             return;
         }
 

@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.OptionalInt;

@@ -1,13 +1,11 @@
 package com.sk89q.worldedit.registry.state;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
