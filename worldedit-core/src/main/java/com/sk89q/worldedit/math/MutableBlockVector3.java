@@ -26,7 +26,9 @@ public class MutableBlockVector3 extends BlockVector3 {
         return setComponents(other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
-    private int x,y,z;
+    private int x;
+    private int y;
+    private int z;
 
     public MutableBlockVector3(int x, int y, int z) {
         this.x = x;

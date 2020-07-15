@@ -109,7 +109,9 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public void flush() {
-        for (IBatchProcessor processor : this.processors) processor.flush();
+        for (IBatchProcessor processor : this.processors) {
+            processor.flush();
+        }
     }
 
     @Override

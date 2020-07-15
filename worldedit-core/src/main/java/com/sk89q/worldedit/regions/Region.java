@@ -232,7 +232,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int maxSection = Math.min(15, getMaximumY() >> 4);
         block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+                return;
+            }
             block = block.initLayer(get, set, layer);
             block.filter(filter, this);
         }
@@ -264,19 +266,25 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter);
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter, yStart, yEnd);
     }

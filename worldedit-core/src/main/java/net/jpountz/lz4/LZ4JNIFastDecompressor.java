@@ -36,7 +36,8 @@ final class LZ4JNIFastDecompressor extends LZ4FastDecompressor {
         SafeUtils.checkRange(dest, destOff, destLen);
         final int result = LZ4JNI.LZ4_decompress_fast(src, null, srcOff, dest, null, destOff, destLen);
         if (result < 0) {
-            throw new LZ4Exception("Error decoding offset " + (srcOff - result) + " of input buffer");
+            throw new LZ4Exception(
+                "Error decoding offset " + (srcOff - result) + " of input buffer");
         }
         return result;
     }
@@ -48,8 +49,10 @@ final class LZ4JNIFastDecompressor extends LZ4FastDecompressor {
         ByteBufferUtils.checkRange(dest, destOff, destLen);
 
         if ((src.hasArray() || src.isDirect()) && (dest.hasArray() || dest.isDirect())) {
-            byte[] srcArr = null, destArr = null;
-            ByteBuffer srcBuf = null, destBuf = null;
+            byte[] srcArr = null;
+            byte[] destArr = null;
+            ByteBuffer srcBuf = null;
+            ByteBuffer destBuf = null;
             if (src.hasArray()) {
                 srcArr = src.array();
                 srcOff += src.arrayOffset();
@@ -67,7 +70,8 @@ final class LZ4JNIFastDecompressor extends LZ4FastDecompressor {
 
             final int result = LZ4JNI.LZ4_decompress_fast(srcArr, srcBuf, srcOff, destArr, destBuf, destOff, destLen);
             if (result < 0) {
-                throw new LZ4Exception("Error decoding offset " + (srcOff - result) + " of input buffer");
+                throw new LZ4Exception(
+                    "Error decoding offset " + (srcOff - result) + " of input buffer");
             }
             return result;
         } else {

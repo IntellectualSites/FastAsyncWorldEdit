@@ -5,13 +5,13 @@ import java.io.InputStream;
 
 public class LZ4InputStream extends InputStream {
 
-    private static LZ4Factory factory = LZ4Factory.fastestInstance();
+    private static final LZ4Factory factory = LZ4Factory.fastestInstance();
 
     private final InputStream inputStream;
-    private final LZ4Decompressor decompressor;
+    private final LZ4FastDecompressor decompressor;
 
-    private byte compressedBuffer[];
-    private byte decompressedBuffer[];
+    private byte[] compressedBuffer;
+    private byte[] decompressedBuffer;
     private int decompressedBufferPosition = 0;
     private int decompressedBufferLength = 0;
 
@@ -20,7 +20,7 @@ public class LZ4InputStream extends InputStream {
     }
 
     public LZ4InputStream(InputStream stream, int size) {
-        this.decompressor = factory.decompressor();
+        this.decompressor = factory.fastDecompressor();
         this.inputStream = stream;
         compressedBuffer = new byte[size];
         decompressedBuffer = new byte[size];
@@ -33,16 +33,18 @@ public class LZ4InputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (ensureBytesAvailableInDecompressedBuffer())
+        if (ensureBytesAvailableInDecompressedBuffer()) {
             return decompressedBuffer[decompressedBufferPosition++] & 0xFF;
+        }
 
         return -1;
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        if (!ensureBytesAvailableInDecompressedBuffer())
+        if (!ensureBytesAvailableInDecompressedBuffer()) {
             return -1;
+        }
 
         int numBytesRemainingToRead = len - off;
 
@@ -116,9 +118,11 @@ public class LZ4InputStream extends InputStream {
     private boolean fillCompressedBuffer(int compressedBufferLength) throws IOException {
         int bytesRead = 0;
         while (bytesRead < compressedBufferLength) {
-            int bytesReadInAttempt = inputStream.read(compressedBuffer, bytesRead, compressedBufferLength - bytesRead);
-            if (bytesReadInAttempt < 0)
+            int bytesReadInAttempt = inputStream.read(compressedBuffer, bytesRead,
+                compressedBufferLength - bytesRead);
+            if (bytesReadInAttempt < 0) {
                 return false;
+            }
             bytesRead += bytesReadInAttempt;
         }
 

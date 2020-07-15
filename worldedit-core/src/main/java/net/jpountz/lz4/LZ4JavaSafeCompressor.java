@@ -35,7 +35,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
         final int srcLimit = srcEnd - LAST_LITERALS;
         final int mflimit = srcEnd - MF_LIMIT;
 
-        int sOff = srcOff, dOff = destOff;
+        int sOff = srcOff;
+        int dOff = destOff;
 
         int anchor = sOff;
 
@@ -110,10 +111,12 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
 
                     // encode match len
                     if (matchLen >= ML_MASK) {
-                        SafeUtils.writeByte(dest, tokenOff, SafeUtils.readByte(dest, tokenOff) | ML_MASK);
+                        SafeUtils.writeByte(dest, tokenOff,
+                            SafeUtils.readByte(dest, tokenOff) | ML_MASK);
                         dOff = LZ4SafeUtils.writeLen(matchLen - ML_MASK, dest, dOff);
                     } else {
-                        SafeUtils.writeByte(dest, tokenOff, SafeUtils.readByte(dest, tokenOff) | matchLen);
+                        SafeUtils.writeByte(dest, tokenOff,
+                            SafeUtils.readByte(dest, tokenOff) | matchLen);
                     }
 
                     // test end of chunk
@@ -123,7 +126,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
                     }
 
                     // fill table
-                    SafeUtils.writeShort(hashTable, hash64k(SafeUtils.readInt(src, sOff - 2)), sOff - 2 - srcOff);
+                    SafeUtils.writeShort(hashTable, hash64k(SafeUtils.readInt(src, sOff - 2)),
+                        sOff - 2 - srcOff);
 
                     // test next position
                     final int h = hash64k(SafeUtils.readInt(src, sOff));
@@ -147,137 +151,13 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
         return dOff - destOff;
     }
 
-    @Override
-    public int compress(byte[] src, final int srcOff, int srcLen, byte[] dest, final int destOff, int maxDestLen) {
-
-        SafeUtils.checkRange(src, srcOff, srcLen);
-        SafeUtils.checkRange(dest, destOff, maxDestLen);
-        final int destEnd = destOff + maxDestLen;
-
-        if (srcLen < LZ4_64K_LIMIT) {
-            return compress64k(src, srcOff, srcLen, dest, destOff, destEnd);
-        }
-
-        final int srcEnd = srcOff + srcLen;
-        final int srcLimit = srcEnd - LAST_LITERALS;
-        final int mflimit = srcEnd - MF_LIMIT;
-
-        int sOff = srcOff, dOff = destOff;
-        int anchor = sOff++;
-
-        final int[] hashTable = new int[HASH_TABLE_SIZE];
-        Arrays.fill(hashTable, anchor);
-
-        main:
-        while (true) {
-
-            // find a match
-            int forwardOff = sOff;
-
-            int ref;
-            int step = 1;
-            int searchMatchNb = 1 << SKIP_STRENGTH;
-            int back;
-            do {
-                sOff = forwardOff;
-                forwardOff += step;
-                step = searchMatchNb++ >>> SKIP_STRENGTH;
-
-                if (forwardOff > mflimit) {
-                    break main;
-                }
-
-                final int h = hash(SafeUtils.readInt(src, sOff));
-                ref = SafeUtils.readInt(hashTable, h);
-                back = sOff - ref;
-                SafeUtils.writeInt(hashTable, h, sOff);
-            } while (back >= MAX_DISTANCE || !LZ4SafeUtils.readIntEquals(src, ref, sOff));
-
-
-            final int excess = LZ4SafeUtils.commonBytesBackward(src, ref, sOff, srcOff, anchor);
-            sOff -= excess;
-            ref -= excess;
-
-            // sequence == refsequence
-            final int runLen = sOff - anchor;
-
-            // encode literal length
-            int tokenOff = dOff++;
-
-            if (dOff + runLen + (2 + 1 + LAST_LITERALS) + (runLen >>> 8) > destEnd) {
-                throw new LZ4Exception("maxDestLen is too small");
-            }
-
-            if (runLen >= RUN_MASK) {
-                SafeUtils.writeByte(dest, tokenOff, RUN_MASK << ML_BITS);
-                dOff = LZ4SafeUtils.writeLen(runLen - RUN_MASK, dest, dOff);
-            } else {
-                SafeUtils.writeByte(dest, tokenOff, runLen << ML_BITS);
-            }
-
-            // copy literals
-            LZ4SafeUtils.wildArraycopy(src, anchor, dest, dOff, runLen);
-            dOff += runLen;
-
-            while (true) {
-                // encode offset
-                SafeUtils.writeShortLE(dest, dOff, back);
-                dOff += 2;
-
-                // count nb matches
-                sOff += MIN_MATCH;
-                final int matchLen = LZ4SafeUtils.commonBytes(src, ref + MIN_MATCH, sOff, srcLimit);
-                if (dOff + (1 + LAST_LITERALS) + (matchLen >>> 8) > destEnd) {
-                    throw new LZ4Exception("maxDestLen is too small");
-                }
-                sOff += matchLen;
-
-                // encode match len
-                if (matchLen >= ML_MASK) {
-                    SafeUtils.writeByte(dest, tokenOff, SafeUtils.readByte(dest, tokenOff) | ML_MASK);
-                    dOff = LZ4SafeUtils.writeLen(matchLen - ML_MASK, dest, dOff);
-                } else {
-                    SafeUtils.writeByte(dest, tokenOff, SafeUtils.readByte(dest, tokenOff) | matchLen);
-                }
-
-                // test end of chunk
-                if (sOff > mflimit) {
-                    anchor = sOff;
-                    break main;
-                }
-
-                // fill table
-                SafeUtils.writeInt(hashTable, hash(SafeUtils.readInt(src, sOff - 2)), sOff - 2);
-
-                // test next position
-                final int h = hash(SafeUtils.readInt(src, sOff));
-                ref = SafeUtils.readInt(hashTable, h);
-                SafeUtils.writeInt(hashTable, h, sOff);
-                back = sOff - ref;
-
-                if (back >= MAX_DISTANCE || !LZ4SafeUtils.readIntEquals(src, ref, sOff)) {
-                    break;
-                }
-
-                tokenOff = dOff++;
-                SafeUtils.writeByte(dest, tokenOff, 0);
-            }
-
-            // prepare next loop
-            anchor = sOff++;
-        }
-
-        dOff = LZ4SafeUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
-        return dOff - destOff;
-    }
-
-
     static int compress64k(ByteBuffer src, int srcOff, int srcLen, ByteBuffer dest, int destOff, int destEnd) {
         final int srcEnd = srcOff + srcLen;
         final int srcLimit = srcEnd - LAST_LITERALS;
         final int mflimit = srcEnd - MF_LIMIT;
 
-        int sOff = srcOff, dOff = destOff;
+        int sOff = srcOff;
+        int dOff = destOff;
 
         int anchor = sOff;
 
@@ -352,10 +232,12 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
 
                     // encode match len
                     if (matchLen >= ML_MASK) {
-                        ByteBufferUtils.writeByte(dest, tokenOff, ByteBufferUtils.readByte(dest, tokenOff) | ML_MASK);
+                        ByteBufferUtils.writeByte(dest, tokenOff,
+                            ByteBufferUtils.readByte(dest, tokenOff) | ML_MASK);
                         dOff = LZ4ByteBufferUtils.writeLen(matchLen - ML_MASK, dest, dOff);
                     } else {
-                        ByteBufferUtils.writeByte(dest, tokenOff, ByteBufferUtils.readByte(dest, tokenOff) | matchLen);
+                        ByteBufferUtils.writeByte(dest, tokenOff,
+                            ByteBufferUtils.readByte(dest, tokenOff) | matchLen);
                     }
 
                     // test end of chunk
@@ -365,7 +247,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
                     }
 
                     // fill table
-                    SafeUtils.writeShort(hashTable, hash64k(ByteBufferUtils.readInt(src, sOff - 2)), sOff - 2 - srcOff);
+                    SafeUtils.writeShort(hashTable, hash64k(ByteBufferUtils.readInt(src, sOff - 2)),
+                        sOff - 2 - srcOff);
 
                     // test next position
                     final int h = hash64k(ByteBufferUtils.readInt(src, sOff));
@@ -390,10 +273,139 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
     }
 
     @Override
+    public int compress(byte[] src, final int srcOff, int srcLen, byte[] dest, final int destOff, int maxDestLen) {
+
+        SafeUtils.checkRange(src, srcOff, srcLen);
+        SafeUtils.checkRange(dest, destOff, maxDestLen);
+        final int destEnd = destOff + maxDestLen;
+
+        if (srcLen < LZ4_64K_LIMIT) {
+            return compress64k(src, srcOff, srcLen, dest, destOff, destEnd);
+        }
+
+        final int srcEnd = srcOff + srcLen;
+        final int srcLimit = srcEnd - LAST_LITERALS;
+        final int mflimit = srcEnd - MF_LIMIT;
+
+        int sOff = srcOff;
+        int dOff = destOff;
+        int anchor = sOff++;
+
+        final int[] hashTable = new int[HASH_TABLE_SIZE];
+        Arrays.fill(hashTable, anchor);
+
+        main:
+        while (true) {
+
+            // find a match
+            int forwardOff = sOff;
+
+            int ref;
+            int step = 1;
+            int searchMatchNb = 1 << SKIP_STRENGTH;
+            int back;
+            do {
+                sOff = forwardOff;
+                forwardOff += step;
+                step = searchMatchNb++ >>> SKIP_STRENGTH;
+
+                if (forwardOff > mflimit) {
+                    break main;
+                }
+
+                final int h = hash(SafeUtils.readInt(src, sOff));
+                ref = SafeUtils.readInt(hashTable, h);
+                back = sOff - ref;
+                SafeUtils.writeInt(hashTable, h, sOff);
+            } while (back >= MAX_DISTANCE || !LZ4SafeUtils.readIntEquals(src, ref, sOff));
+
+
+            final int excess = LZ4SafeUtils.commonBytesBackward(src, ref, sOff, srcOff, anchor);
+            sOff -= excess;
+            ref -= excess;
+
+            // sequence == refsequence
+            final int runLen = sOff - anchor;
+
+            // encode literal length
+            int tokenOff = dOff++;
+
+            if (dOff + runLen + (2 + 1 + LAST_LITERALS) + (runLen >>> 8) > destEnd) {
+                throw new LZ4Exception("maxDestLen is too small");
+            }
+
+            if (runLen >= RUN_MASK) {
+                SafeUtils.writeByte(dest, tokenOff, RUN_MASK << ML_BITS);
+                dOff = LZ4SafeUtils.writeLen(runLen - RUN_MASK, dest, dOff);
+            } else {
+                SafeUtils.writeByte(dest, tokenOff, runLen << ML_BITS);
+            }
+
+            // copy literals
+            LZ4SafeUtils.wildArraycopy(src, anchor, dest, dOff, runLen);
+            dOff += runLen;
+
+            while (true) {
+                // encode offset
+                SafeUtils.writeShortLE(dest, dOff, back);
+                dOff += 2;
+
+                // count nb matches
+                sOff += MIN_MATCH;
+                final int matchLen = LZ4SafeUtils.commonBytes(src, ref + MIN_MATCH, sOff, srcLimit);
+                if (dOff + (1 + LAST_LITERALS) + (matchLen >>> 8) > destEnd) {
+                    throw new LZ4Exception("maxDestLen is too small");
+                }
+                sOff += matchLen;
+
+                // encode match len
+                if (matchLen >= ML_MASK) {
+                    SafeUtils.writeByte(dest, tokenOff,
+                        SafeUtils.readByte(dest, tokenOff) | ML_MASK);
+                    dOff = LZ4SafeUtils.writeLen(matchLen - ML_MASK, dest, dOff);
+                } else {
+                    SafeUtils.writeByte(dest, tokenOff,
+                        SafeUtils.readByte(dest, tokenOff) | matchLen);
+                }
+
+                // test end of chunk
+                if (sOff > mflimit) {
+                    anchor = sOff;
+                    break main;
+                }
+
+                // fill table
+                SafeUtils.writeInt(hashTable, hash(SafeUtils.readInt(src, sOff - 2)), sOff - 2);
+
+                // test next position
+                final int h = hash(SafeUtils.readInt(src, sOff));
+                ref = SafeUtils.readInt(hashTable, h);
+                SafeUtils.writeInt(hashTable, h, sOff);
+                back = sOff - ref;
+
+                if (back >= MAX_DISTANCE || !LZ4SafeUtils.readIntEquals(src, ref, sOff)) {
+                    break;
+                }
+
+                tokenOff = dOff++;
+                SafeUtils.writeByte(dest, tokenOff, 0);
+            }
+
+            // prepare next loop
+            anchor = sOff++;
+        }
+
+        dOff = LZ4SafeUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
+        return dOff - destOff;
+    }
+
+    @Override
     public int compress(ByteBuffer src, final int srcOff, int srcLen, ByteBuffer dest, final int destOff, int maxDestLen) {
 
         if (src.hasArray() && dest.hasArray()) {
-            return compress(src.array(), srcOff + src.arrayOffset(), srcLen, dest.array(), destOff + dest.arrayOffset(), maxDestLen);
+            return compress(src.array(),
+                srcOff + src.arrayOffset(), srcLen, dest.array(),
+                destOff + dest.arrayOffset(), maxDestLen);
         }
         src = ByteBufferUtils.inNativeByteOrder(src);
         dest = ByteBufferUtils.inNativeByteOrder(dest);
@@ -410,7 +422,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
         final int srcLimit = srcEnd - LAST_LITERALS;
         final int mflimit = srcEnd - MF_LIMIT;
 
-        int sOff = srcOff, dOff = destOff;
+        int sOff = srcOff;
+        int dOff = destOff;
         int anchor = sOff++;
 
         final int[] hashTable = new int[HASH_TABLE_SIZE];
@@ -474,7 +487,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
 
                 // count nb matches
                 sOff += MIN_MATCH;
-                final int matchLen = LZ4ByteBufferUtils.commonBytes(src, ref + MIN_MATCH, sOff, srcLimit);
+                final int matchLen = LZ4ByteBufferUtils.commonBytes(src,
+                    ref + MIN_MATCH, sOff, srcLimit);
                 if (dOff + (1 + LAST_LITERALS) + (matchLen >>> 8) > destEnd) {
                     throw new LZ4Exception("maxDestLen is too small");
                 }
@@ -482,10 +496,12 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
 
                 // encode match len
                 if (matchLen >= ML_MASK) {
-                    ByteBufferUtils.writeByte(dest, tokenOff, ByteBufferUtils.readByte(dest, tokenOff) | ML_MASK);
+                    ByteBufferUtils.writeByte(dest, tokenOff,
+                        ByteBufferUtils.readByte(dest, tokenOff) | ML_MASK);
                     dOff = LZ4ByteBufferUtils.writeLen(matchLen - ML_MASK, dest, dOff);
                 } else {
-                    ByteBufferUtils.writeByte(dest, tokenOff, ByteBufferUtils.readByte(dest, tokenOff) | matchLen);
+                    ByteBufferUtils.writeByte(dest, tokenOff,
+                        ByteBufferUtils.readByte(dest, tokenOff) | matchLen);
                 }
 
                 // test end of chunk
@@ -495,7 +511,8 @@ final class LZ4JavaSafeCompressor extends LZ4Compressor {
                 }
 
                 // fill table
-                SafeUtils.writeInt(hashTable, hash(ByteBufferUtils.readInt(src, sOff - 2)), sOff - 2);
+                SafeUtils.writeInt(hashTable, hash(ByteBufferUtils.readInt(src, sOff - 2)),
+                    sOff - 2);
 
                 // test next position
                 final int h = hash(ByteBufferUtils.readInt(src, sOff));

@@ -11,10 +11,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class TemporalExtent extends PassthroughExtent {
-    private int x, y, z = Integer.MAX_VALUE;
+    private int x;
+    private int y;
+    private int z = Integer.MAX_VALUE;
     private BlockStateHolder<?> block = BlockTypes.AIR.getDefaultState();
 
-    private int bx, bz = Integer.MAX_VALUE;
+    private int bx;
+    private int bz = Integer.MAX_VALUE;
     private BiomeType biome = null;
 
     /**

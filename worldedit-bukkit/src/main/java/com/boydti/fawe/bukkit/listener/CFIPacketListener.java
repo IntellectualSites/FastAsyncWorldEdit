@@ -122,7 +122,9 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket() || FaweCache.IMP.CHUNK_FLAG.get().get()) return;
+                if (!event.isServerPacket() || FaweCache.IMP.CHUNK_FLAG.get().get()) {
+                    return;
+                }
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
                     BlockVector3 origin = gen.getOrigin().toBlockPoint();
@@ -147,7 +149,9 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_VELOCITY) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket()) return;
+                if (!event.isServerPacket()) {
+                    return;
+                }
 
                 Player player = event.getPlayer();
                 Location pos = player.getLocation();
@@ -172,7 +176,9 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.POSITION) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket()) return;
+                if (!event.isServerPacket()) {
+                    return;
+                }
 
                 Player player = event.getPlayer();
                 Location pos = player.getLocation();
@@ -202,7 +208,9 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket()) return;
+                if (!event.isServerPacket()) {
+                    return;
+                }
 
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
@@ -260,7 +268,9 @@ public class CFIPacketListener implements Listener {
     private VirtualWorld getGenerator(Player player) {
         BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
         VirtualWorld vw = bukkitPlayer.getSession().getVirtualWorld();
-        if (vw != null) return vw;
+        if (vw != null) {
+            return vw;
+        }
         //        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
 //        if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
 //            return settings.getGenerator();
@@ -272,7 +282,9 @@ public class CFIPacketListener implements Listener {
         PacketContainer packet = event.getPacket();
         StructureModifier<BlockPosition> position = packet.getBlockPositionModifier();
         BlockPosition loc = position.readSafely(0);
-        if (loc == null) return null;
+        if (loc == null) {
+            return null;
+        }
         BlockVector3 origin = generator.getOrigin().toBlockPoint();
         return BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
     }
@@ -282,7 +294,9 @@ public class CFIPacketListener implements Listener {
         if (gen != null) {
             BlockVector3 pt = getRelPos(event, gen);
             if (pt != null) {
-                if (relative) pt = getRelative(event, pt);
+                if (relative) {
+                    pt = getRelative(event, pt);
+                }
                 if (gen.contains(pt)) {
                     event.setCancelled(true);
                     task.run(event, gen, pt);
@@ -295,7 +309,9 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, type) {
             @Override
             public void onPacketReceiving(final PacketEvent event) {
-                if (type.isClient() || event.isServerPacket()) handleBlockEvent(event, relative, task);
+                if (type.isClient() || event.isServerPacket()) {
+                    handleBlockEvent(event, relative, task);
+                }
             }
 
             @Override
@@ -309,7 +325,9 @@ public class CFIPacketListener implements Listener {
         PacketContainer packet = container.getPacket();
         StructureModifier<EnumWrappers.Direction> dirs = packet.getDirections();
         EnumWrappers.Direction dir = dirs.readSafely(0);
-        if (dir == null) return pt;
+        if (dir == null) {
+            return pt;
+        }
         switch (dir.ordinal()) {
             case 0: return pt.add(0, -1, 0);
             case 1: return pt.add(0, 1, 0);

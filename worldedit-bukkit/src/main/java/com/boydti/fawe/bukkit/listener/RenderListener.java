@@ -32,7 +32,9 @@ public class RenderListener implements Listener {
 
             @Override
             public void run() {
-                if (views.isEmpty()) return;
+                if (views.isEmpty()) {
+                    return;
+                }
 
                 long now = System.currentTimeMillis();
                 int tps32 = (int) (Math.round(Fawe.get().getTimer().getTPS()) * 32);
@@ -64,8 +66,9 @@ public class RenderListener implements Listener {
                             setViewDistance(player, Math.max(4, value[0] + 1));
                             long spent = System.currentTimeMillis() - now;
                             if (spent > 5) {
-                                if (spent > 10)
+                                if (spent > 10) {
                                     value[1] = nowTick + 20;
+                                }
                                 return;
                             }
                         }

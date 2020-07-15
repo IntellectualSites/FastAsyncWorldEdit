@@ -158,10 +158,10 @@ public class AnvilCommands {
         name = "deleteallunvisited",
         aliases = {"delunvisited" },
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
     public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
@@ -176,11 +176,11 @@ public class AnvilCommands {
         name = "deleteallunclaimed",
         aliases = {"delallunclaimed" },
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "Supports: WG, P2, GP:\n" +
-            "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "Supports: WG, P2, GP:\n"
+            + "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
     public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
@@ -198,12 +198,12 @@ public class AnvilCommands {
     @Command(
         name = "deleteunclaimed",
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "(Supports: WG, P2, GP):\n" +
-            "Is not claimed\n" +
-            "Has not been occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "(Supports: WG, P2, GP):\n"
+            + "Is not claimed\n"
+            + "Has not been occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
     public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
@@ -221,8 +221,8 @@ public class AnvilCommands {
         name = "deletealloldregions",
         aliases = {"deloldreg" },
         desc = "Delete regions which haven't been accessed in a certain amount of time",
-        descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
-            "(months are not a unit of time) e.g., 8h5m12s\n"
+        descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n"
+            + "(months are not a unit of time) e.g., 8h5m12s\n"
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {
@@ -236,7 +236,6 @@ public class AnvilCommands {
 
     @Command(
         name = "trimallplots",
-
         desc = "Trim chunks in a Plot World",
         descFooter = "Unclaimed chunks will be deleted\nUnmodified chunks will be deleted\n"
     )
@@ -608,11 +607,13 @@ public class AnvilCommands {
     @Command(
         name = "paste",
         desc = "Paste chunks from your anvil clipboard",
-        descFooter = "Paste the chunks from your anvil clipboard.\n" +
-            "The -c flag will align the paste to the chunks."
+        descFooter = "Paste the chunks from your anvil clipboard.\n"
+            + "The -c flag will align the paste to the chunks."
     )
     @CommandPermissions("worldedit.anvil.pastechunks")
-    public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name = 'c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {
+    public void paste(Player player, LocalSession session, EditSession editSession,
+        @Switch(name = 'c', desc = "TODO")
+            boolean alignChunk) throws WorldEditException, IOException {
         //        FawePlayer fp = FawePlayer.wrap(player);  TODO NOT IMPLEMENTED
         //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
         //        if (clipboard == null) {

@@ -64,7 +64,8 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      *
      * @return a block bag, which may be null if none is used
      */
-    public @Nullable BlockBag getBlockBag() {
+    @Nullable
+    public BlockBag getBlockBag() {
         return blockBag;
     }
 
@@ -76,6 +77,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     public void setBlockBag(@Nullable BlockBag blockBag) {
         this.blockBag = blockBag;
     }
+
     /**
      * Gets the list of missing blocks and clears the list for the next
      * operation.

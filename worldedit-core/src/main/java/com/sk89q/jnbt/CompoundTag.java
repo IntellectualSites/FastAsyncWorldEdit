@@ -390,7 +390,9 @@ public class CompoundTag extends Tag {
     @Override
     public Map<String, Object> toRaw() {
         HashMap<String, Object> raw = new HashMap<>();
-        if (this.getValue().isEmpty()) return raw;
+        if (this.getValue().isEmpty()) {
+            return raw;
+        }
         for (Map.Entry<String, Tag> entry : getValue().entrySet()) {
             raw.put(entry.getKey(), entry.getValue().toRaw());
         }

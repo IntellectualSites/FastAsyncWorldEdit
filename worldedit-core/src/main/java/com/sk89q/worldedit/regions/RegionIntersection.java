@@ -205,19 +205,31 @@ public class RegionIntersection extends AbstractRegion {
 
     @Override
     public boolean containsChunk(int chunkX, int chunkZ) {
-        for (Region region : regions) if (region.containsChunk(chunkX, chunkZ)) return true;
+        for (Region region : regions) {
+            if (region.containsChunk(chunkX, chunkZ)) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean contains(int x, int z) {
-        for (Region region : regions) if (region.contains(x, z)) return true;
+        for (Region region : regions) {
+            if (region.contains(x, z)) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean contains(int x, int y, int z) {
-        for (Region region : regions) if (region.contains(x, y, z)) return true;
+        for (Region region : regions) {
+            if (region.contains(x, y, z)) {
+                return true;
+            }
+        }
         return false;
     }
 }

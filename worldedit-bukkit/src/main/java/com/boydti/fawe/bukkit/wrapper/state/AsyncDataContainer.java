@@ -38,7 +38,9 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         CompoundTag tag = root();
         Map<String, Tag> raw;
         if (tag == null) {
-            if (!create) return Collections.emptyMap();
+            if (!create) {
+                return Collections.emptyMap();
+            }
             Map<String, Tag> map = root.getValue();
             map.put("PublicBukkitValues", new CompoundTag(raw = new HashMap<>()));
         } else {
@@ -58,7 +60,9 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(key, "The provided key for the custom value was null");
         Validate.notNull(type, "The provided type for the custom value was null");
         Tag value = get(false).get(key.toString());
-        if (value == null) return type == null;
+        if (value == null) {
+            return type == null;
+        }
         return type.getPrimitiveType() == value.getValue().getClass();
     }
 

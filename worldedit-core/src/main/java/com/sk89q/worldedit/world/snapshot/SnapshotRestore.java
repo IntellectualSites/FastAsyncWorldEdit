@@ -103,8 +103,9 @@ public class SnapshotRestore {
     }
 
     private void checkAndAddBlock(BlockVector3 pos) {
-        if (editSession.getMask() != null && !editSession.getMask().test(editSession, pos))
+        if (editSession.getMask() != null && !editSession.getMask().test(editSession, pos)) {
             return;
+        }
 
         BlockVector2 chunkPos = ChunkStore.toChunk(pos);
 

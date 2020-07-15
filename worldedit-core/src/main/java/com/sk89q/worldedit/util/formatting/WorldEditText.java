@@ -25,6 +25,7 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.config.Config;
 import org.enginehub.piston.config.ConfigHolder;
+import org.enginehub.piston.config.ConfigRenderer;
 import org.enginehub.piston.config.TextConfig;
 import org.enginehub.piston.util.TextHelper;
 
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class WorldEditText {
+    private static final ConfigRenderer RENDERER = ConfigRenderer.getInstance();
     public static final ConfigHolder CONFIG_HOLDER = ConfigHolder.create();
     private static final Method METHOD_APPLY;
 
@@ -53,7 +55,7 @@ public class WorldEditText {
 
     private static Component recursiveReplace(Component input) {
         if (input instanceof TranslatableComponent) {
-            TranslatableComponent tc = (TranslatableComponent)input;
+            TranslatableComponent tc = (TranslatableComponent) input;
             List<Component> args = tc.args();
             if (args != (args = replaceChildren(args))) {
                 input = tc = tc.args(args);

@@ -2,7 +2,8 @@ package com.boydti.fawe.object.string;
 
 public class MutableCharSequence implements CharSequence {
     private String str;
-    private int start, length;
+    private int start;
+    private int length;
 
     private static final ThreadLocal<MutableCharSequence> mutableChar = ThreadLocal.withInitial(MutableCharSequence::new);
 
@@ -58,7 +59,9 @@ public class MutableCharSequence implements CharSequence {
 
     public int indexOf(char c) {
         for (int i = 0; i < length; i++) {
-            if (charAt(i) == c) return i;
+            if (charAt(i) == c) {
+                return i;
+            }
         }
         return -1;
     }
@@ -68,7 +71,9 @@ public class MutableCharSequence implements CharSequence {
         CharSequence anotherString = (CharSequence) obj;
         if (length == anotherString.length()) {
             for (int i = length - 1; i >= 0; i--) {
-                if (charAt(i) != anotherString.charAt(i)) return false;
+                if (charAt(i) != anotherString.charAt(i)) {
+                    return false;
+                }
             }
             return true;
         }

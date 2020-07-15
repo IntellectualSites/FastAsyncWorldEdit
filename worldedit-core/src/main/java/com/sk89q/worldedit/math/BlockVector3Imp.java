@@ -38,7 +38,9 @@ public final class BlockVector3Imp extends BlockVector3 {
         return new BlockVector3Imp(x, y, z);
     }
 
-    private final int x, y, z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     /**
      * Construct an instance.

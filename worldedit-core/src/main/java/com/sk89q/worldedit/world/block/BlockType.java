@@ -57,10 +57,10 @@ public class BlockType implements Keyed, Pattern {
     private final BlockTypesCache.Settings settings;
     private final LazyReference<FuzzyBlockState> emptyFuzzy
         = LazyReference.from(() -> new FuzzyBlockState(this));
-    
+
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
-    
+
     private Integer legacyCombinedId;
     private boolean initItemType;
     private ItemType itemType;
@@ -80,7 +80,7 @@ public class BlockType implements Keyed, Pattern {
         //TODO fix the line below
         this.settings = new BlockTypesCache.Settings(this, id, 0, null);
     }
-    
+
     @Deprecated
     public int getMaxStateId() {
         return settings.permutations;
@@ -133,7 +133,9 @@ public class BlockType implements Keyed, Pattern {
     */
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
-        if (settings.stateOrdinals == null) return settings.defaultState;
+        if (settings.stateOrdinals == null) {
+            return settings.defaultState;
+        }
         return BlockTypesCache.states[settings.stateOrdinals[propertyId]];
     }
 
@@ -177,7 +179,8 @@ public class BlockType implements Keyed, Pattern {
 
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.ordinal();
-        return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
+        return this.settings.propertiesMapArr.length > ordinal
+            ? this.settings.propertiesMapArr[ordinal] != null : false;
     }
 
     public <V> Property<V> getProperty(PropertyKey key) {
@@ -207,8 +210,11 @@ public class BlockType implements Keyed, Pattern {
      * @return All possible states
      */
     public List<BlockState> getAllStates() {
-        if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
-        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
+        if (settings.stateOrdinals == null) {
+            return Collections.singletonList(getDefaultState());
+        }
+        return IntStream.of(settings.stateOrdinals).filter(i -> i
+            != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
     }
 
     /**
@@ -268,9 +274,10 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
+     *
      * <p>
      * DO NOT USE THIS.
-     *
+     * </p>
      * @return legacy id or 0, if unknown
      */
     @Deprecated
@@ -281,9 +288,10 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * The internal index of this type.
+     *
      * <p>
      * This number is not necessarily consistent across restarts.
-     *
+     * </p>
      * @return internal id
      */
     public int getInternalId() {
@@ -330,9 +338,10 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * Gets the legacy data. Needed for legacy reasons.
+     *
      * <p>
      * DO NOT USE THIS.
-     *
+     * </p>
      * @return legacy data or 0, if unknown
      */
     @Deprecated

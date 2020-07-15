@@ -38,7 +38,7 @@ public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation
         for (BlockVector3 pt : destRegion) {
             BlockVector3 copyFrom = transform(inverse, pt);
             if (region.contains(copyFrom)) {
-                if(function.apply(pt)) {
+                if (function.apply(pt)) {
                     affected++;
                 }
             }

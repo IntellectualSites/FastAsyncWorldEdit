@@ -1,15 +1,11 @@
-package com.boydti.fawe.bukkit.adapter.mc1_14;
+package com.boydti.fawe.bukkit.adapter.mc1161;
 
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.minecraft.server.v1_14_R1.Block;
-import net.minecraft.server.v1_14_R1.EnumPistonReaction;
-import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.ITileEntity;
-import net.minecraft.server.v1_14_R1.Material;
-import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import net.minecraft.server.v1_16_R1.*;
+import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
 
-public class BlockMaterial_1_14 implements BlockMaterial {
+public class BlockMaterial1161 implements BlockMaterial {
     private final Block block;
     private final IBlockData defaultState;
     private final Material material;
@@ -17,17 +13,17 @@ public class BlockMaterial_1_14 implements BlockMaterial {
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
 
-    public BlockMaterial_1_14(Block block) {
+    public BlockMaterial1161(Block block) {
         this(block, block.getBlockData());
     }
 
-    public BlockMaterial_1_14(Block block, IBlockData defaultState) {
+    public BlockMaterial1161(Block block, IBlockData defaultState) {
         this.block = block;
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
         this.craftMaterial = craftBlockData.getMaterial();
-        this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "v");
+        this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "at"); //TODO Update Mapping for 1.16.1
     }
 
     public Block getBlock() {
@@ -78,7 +74,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public float getHardness() {
-        return block.strength;
+        return craftBlockData.getState().strength;
     }
 
     @Override
@@ -88,12 +84,12 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public float getSlipperiness() {
-        return block.m();
+        return block.getFrictionFactor();
     }
 
     @Override
     public int getLightValue() {
-        return defaultState.h();
+        return defaultState.f();
     }
 
     @Override
@@ -128,7 +124,8 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public boolean isToolRequired() {
-        return !material.isAlwaysDestroyable();
+        //TODO Removed in 1.16.1 Replacement not found.
+        return true;
     }
 
     @Override
@@ -148,6 +145,6 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public int getMapColor() {
-        return material.i().rgb;
+        return material.h().rgb;
     }
 }

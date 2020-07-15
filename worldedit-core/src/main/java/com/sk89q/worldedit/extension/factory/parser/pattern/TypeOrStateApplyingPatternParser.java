@@ -82,17 +82,27 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
                     worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState());
         } else {
             // states given
-            if (!parts[1].endsWith("]")) throw new InputParseException("State is missing trailing ']'");
+            if (!parts[1].endsWith("]")) {
+                throw new InputParseException("State is missing trailing ']'");
+            }
             final String[] states = parts[1].substring(0, parts[1].length() - 1).split(",");
             Map<String, String> statesToSet = new HashMap<>();
             for (String state : states) {
-                if (state.isEmpty()) throw new InputParseException("Empty part in state");
+                if (state.isEmpty()) {
+                    throw new InputParseException("Empty part in state");
+                }
                 String[] propVal = state.split("=", 2);
-                if (propVal.length != 2) throw new InputParseException("Missing '=' separator");
+                if (propVal.length != 2) {
+                    throw new InputParseException("Missing '=' separator");
+                }
                 final String prop = propVal[0];
-                if (prop.isEmpty()) throw new InputParseException("Empty property in state");
+                if (prop.isEmpty()) {
+                    throw new InputParseException("Empty property in state");
+                }
                 final String value = propVal[1];
-                if (value.isEmpty()) throw new InputParseException("Empty value in state");
+                if (value.isEmpty()) {
+                    throw new InputParseException("Empty value in state");
+                }
                 if (statesToSet.put(prop, value) != null) {
                     throw new InputParseException("Duplicate properties in state");
                 }

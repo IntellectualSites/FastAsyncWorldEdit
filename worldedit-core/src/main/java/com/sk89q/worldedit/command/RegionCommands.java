@@ -657,9 +657,15 @@ public class RegionCommands {
             zero = max.add(min).divide(2);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit = unit.withX(1.0);
-            if (unit.getY() == 0) unit = unit.withY(1.0);
-            if (unit.getZ() == 0) unit = unit.withZ(1.0);
+            if (unit.getX() == 0) {
+                unit = unit.withX(1.0);
+            }
+            if (unit.getY() == 0) {
+                unit = unit.withY(1.0);
+            }
+            if (unit.getZ() == 0) {
+                unit = unit.withZ(1.0);
+            }
         }
 
         final Vector3 unit1 = unit;

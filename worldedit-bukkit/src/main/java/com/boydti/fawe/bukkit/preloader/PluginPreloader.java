@@ -77,7 +77,9 @@ public class PluginPreloader extends PluginBase {
             loaded = region.getChunks();
             Iterator<BlockVector2> iter = loaded.iterator();
 
-            if (!invalidator.get()) return;
+            if (!invalidator.get()) {
+                return;
+            }
             Fawe.get().getQueueHandler().syncWhenFree(() -> {
                 for (; iter.hasNext() && invalidator.get();index++) {
                     BlockVector2 chunk = iter.next();

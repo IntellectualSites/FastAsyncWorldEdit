@@ -1,19 +1,5 @@
 package net.jpountz.util;
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -21,6 +7,7 @@ import java.nio.ByteOrder;
 
 import static net.jpountz.util.Utils.NATIVE_BYTE_ORDER;
 
+@SuppressWarnings("CheckStyle")
 public enum UnsafeUtils {
     ;
 
@@ -65,7 +52,7 @@ public enum UnsafeUtils {
     }
 
     public static void writeByte(byte[] src, int srcOff, byte value) {
-        UNSAFE.putByte(src, BYTE_ARRAY_OFFSET + BYTE_ARRAY_SCALE * srcOff, (byte) value);
+        UNSAFE.putByte(src, BYTE_ARRAY_OFFSET + BYTE_ARRAY_SCALE * srcOff, value);
     }
 
     public static void writeByte(byte[] src, int srcOff, int value) {

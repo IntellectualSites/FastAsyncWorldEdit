@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 /**
  * JNI bindings to the original C implementation of LZ4.
  */
+@SuppressWarnings("CheckStyle")
 enum LZ4JNI {
     ;
 

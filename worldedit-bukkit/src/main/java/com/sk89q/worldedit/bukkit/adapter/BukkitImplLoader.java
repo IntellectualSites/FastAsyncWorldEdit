@@ -97,7 +97,9 @@ public class BukkitImplLoader {
 
                 String className = jarEntry.getName().replaceAll("[/\\\\]+", ".");
 
-                if (!className.startsWith(SEARCH_PACKAGE_DOT) || jarEntry.isDirectory()) continue;
+                if (!className.startsWith(SEARCH_PACKAGE_DOT) || jarEntry.isDirectory()) {
+                    continue;
+                }
 
                 int beginIndex = 0;
                 int endIndex = className.length() - CLASS_SUFFIX.length();

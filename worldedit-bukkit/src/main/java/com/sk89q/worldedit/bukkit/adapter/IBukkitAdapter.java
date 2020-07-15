@@ -254,7 +254,9 @@ public interface IBukkitAdapter {
      */
     default ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
-        if (item instanceof BukkitItemStack) return ((BukkitItemStack) item).getBukkitItemStack();
+        if (item instanceof BukkitItemStack) {
+            return ((BukkitItemStack) item).getBukkitItemStack();
+        }
         return new ItemStack(adapt(item.getType()), item.getAmount());
     }
 

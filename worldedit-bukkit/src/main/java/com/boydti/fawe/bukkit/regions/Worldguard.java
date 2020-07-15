@@ -26,9 +26,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.slf4j.Logger;
+
+import java.util.Locale;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
     private final WorldGuardPlugin worldguard;
+    private final Logger logger = getLogger(Worldguard.class);
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -49,12 +55,12 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     public ProtectedRegion getRegion(LocalPlayer player, Location location) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         if (container == null) {
-            System.out.println("Region capability is not enabled for WorldGuard.");
+            logger.error("Region capability is not enabled for WorldGuard.");
             return null;
         }
         RegionManager manager = container.get(BukkitAdapter.adapt(location.getWorld()));
         if (manager == null) {
-            System.out.println("Region capability is not enabled for that world.");
+            logger.error("Region capability is not enabled for that world.");
             return null;
         }
         final ProtectedRegion global = manager.getRegion("__global__");
@@ -63,7 +69,8 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         }
         final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(location.getX(), location.getY(), location.getZ()));
         //Merge WorldGuardFlag
-        if(player.hasPermission("fawe.worldguardflag") && !regions.testState(player, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK)){
+        if (player.hasPermission("fawe.worldguardflag")
+            && !regions.testState(player, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK)) {
             return null;
         }
         for (ProtectedRegion region : regions) {
@@ -78,9 +85,9 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         //Check if player is the owner of the region, the region's ID contains the player's name (why?), or if the region's owners contains "*".
         if (region.isOwner(localplayer) || region.isOwner(localplayer.getName())) {
             return true;
-        } else if (region.getId().toLowerCase().equals(localplayer.getName().toLowerCase())) {
+        } else if (region.getId().toLowerCase(Locale.ROOT).equals(localplayer.getName().toLowerCase(Locale.ROOT))) {
             return true;
-        } else if (region.getId().toLowerCase().contains(localplayer.getName().toLowerCase() + "//")) {
+        } else if (region.getId().toLowerCase(Locale.ROOT).contains(localplayer.getName().toLowerCase(Locale.ROOT) + "//")) {
             return true;
         } else if (region.isOwner("*")) {
             return true;
@@ -90,8 +97,9 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         if (localplayer.hasPermission("fawe.worldguard.member")) {
             if (region.isMember(localplayer) || region.isMember(localplayer.getName())) {
                 return true;
-            } else
+            } else {
                 return region.isMember("*");
+            }
         }
         return false;
     }
@@ -123,7 +131,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
             }
             return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
-            @Override
+                @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                     return isAllowed(worldguard.wrapPlayer(BukkitAdapter.adapt(player)), myregion);
                 }

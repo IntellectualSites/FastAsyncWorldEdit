@@ -190,7 +190,9 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         Map<BlockVector3, BlockState> blockStates = new HashMap<>();
 
         for (Tag tag : tileEntities) {
-            if (!(tag instanceof CompoundTag)) continue;
+            if (!(tag instanceof CompoundTag)) {
+                continue;
+            }
             CompoundTag t = (CompoundTag) tag;
             Map<String, Tag> values = new HashMap<>(t.getValue());
             String id = t.getString("id");

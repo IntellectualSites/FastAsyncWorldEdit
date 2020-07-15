@@ -58,7 +58,8 @@ final class LZ4JavaSafeSafeDecompressor extends LZ4SafeDecompressor {
 
             final int literalCopyEnd = dOff + literalLen;
 
-            if (literalCopyEnd > destEnd - COPY_LENGTH || sOff + literalLen > srcEnd - COPY_LENGTH) {
+            if (literalCopyEnd > destEnd - COPY_LENGTH
+                || sOff + literalLen > srcEnd - COPY_LENGTH) {
                 if (literalCopyEnd > destEnd) {
                     throw new LZ4Exception();
                 } else if (sOff + literalLen != srcEnd) {
@@ -117,7 +118,9 @@ final class LZ4JavaSafeSafeDecompressor extends LZ4SafeDecompressor {
     public int decompress(ByteBuffer src, final int srcOff, final int srcLen, ByteBuffer dest, final int destOff, int destLen) {
 
         if (src.hasArray() && dest.hasArray()) {
-            return decompress(src.array(), srcOff + src.arrayOffset(), srcLen, dest.array(), destOff + dest.arrayOffset(), destLen);
+            return decompress(src.array(),
+                srcOff + src.arrayOffset(), srcLen, dest.array(),
+                destOff + dest.arrayOffset(), destLen);
         }
         src = ByteBufferUtils.inNativeByteOrder(src);
         dest = ByteBufferUtils.inNativeByteOrder(dest);
@@ -149,7 +152,8 @@ final class LZ4JavaSafeSafeDecompressor extends LZ4SafeDecompressor {
             int literalLen = token >>> ML_BITS;
             if (literalLen == RUN_MASK) {
                 byte len = (byte) 0xFF;
-                while (sOff < srcEnd && (len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
+                while (sOff < srcEnd
+                    && (len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
                     literalLen += 0xFF;
                 }
                 literalLen += len & 0xFF;
@@ -157,7 +161,8 @@ final class LZ4JavaSafeSafeDecompressor extends LZ4SafeDecompressor {
 
             final int literalCopyEnd = dOff + literalLen;
 
-            if (literalCopyEnd > destEnd - COPY_LENGTH || sOff + literalLen > srcEnd - COPY_LENGTH) {
+            if (literalCopyEnd > destEnd - COPY_LENGTH
+                || sOff + literalLen > srcEnd - COPY_LENGTH) {
                 if (literalCopyEnd > destEnd) {
                     throw new LZ4Exception();
                 } else if (sOff + literalLen != srcEnd) {
@@ -187,7 +192,8 @@ final class LZ4JavaSafeSafeDecompressor extends LZ4SafeDecompressor {
             int matchLen = token & ML_MASK;
             if (matchLen == ML_MASK) {
                 byte len = (byte) 0xFF;
-                while (sOff < srcEnd && (len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
+                while (sOff < srcEnd
+                    && (len = ByteBufferUtils.readByte(src, sOff++)) == (byte) 0xFF) {
                     matchLen += 0xFF;
                 }
                 matchLen += len & 0xFF;

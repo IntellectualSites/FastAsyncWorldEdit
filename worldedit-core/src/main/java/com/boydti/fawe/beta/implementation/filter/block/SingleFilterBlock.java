@@ -4,7 +4,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class SingleFilterBlock extends AbstractSingleFilterBlock {
 
-    private int x, y, z;
+    private int x;
+    private int y;
+    private int z;
 
     public SingleFilterBlock init(int x, int y, int z, BaseBlock block) {
         this.x = x;

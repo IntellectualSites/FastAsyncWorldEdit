@@ -409,12 +409,18 @@ public class GeneralCommands {
                 // complexity
                 int min = Integer.parseInt(arguments.get(0));
                 int max = Integer.parseInt(arguments.get(1));
-                if (min < 0 || max > 100) throw new InputParseException("Complexity must be in the range 0-100");
-                if (min != 0 || max != 100) util = new CleanTextureUtil(util, min, max);
+                if (min < 0 || max > 100) {
+                    throw new InputParseException("Complexity must be in the range 0-100");
+                }
+                if (min != 0 || max != 100) {
+                    util = new CleanTextureUtil(util, min, max);
+                }
 
                 randomIndex = 2;
             } else if (arguments.size() == 1 && argLower.equals("true") || argLower.equals("false")) {
-                if (argLower.equals("true")) util = new RandomTextureUtil(util);
+                if (argLower.equals("true")) {
+                    util = new RandomTextureUtil(util);
+                }
                 checkRandomization = false;
             } else {
                 if (argLower.equals("#copy") || argLower.equals("#clipboard")) {
@@ -435,10 +441,14 @@ public class GeneralCommands {
             if (checkRandomization) {
                 if (arguments.size() > randomIndex) {
                     boolean random = Boolean.parseBoolean(arguments.get(randomIndex));
-                    if (random) util = new RandomTextureUtil(util);
+                    if (random) {
+                        util = new RandomTextureUtil(util);
+                    }
                 }
             }
-            if (!(util instanceof CachedTextureUtil)) util = new CachedTextureUtil(util);
+            if (!(util instanceof CachedTextureUtil)) {
+                util = new CachedTextureUtil(util);
+            }
             session.setTextureUtil(util);
             player.print(Caption.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
         }

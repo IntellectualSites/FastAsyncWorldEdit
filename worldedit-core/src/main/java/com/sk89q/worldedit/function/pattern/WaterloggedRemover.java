@@ -39,7 +39,9 @@ public class WaterloggedRemover extends AbstractExtentPattern {
 
     private synchronized BlockState[] getRemap() {
         BlockState[] remap = cache.get();
-        if (remap != null) return remap;
+        if (remap != null) {
+            return remap;
+        }
         cache = new SoftReference<>(remap = new BlockState[BlockTypesCache.states.length]);
 
         // init

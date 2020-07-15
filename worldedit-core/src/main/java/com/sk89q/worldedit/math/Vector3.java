@@ -209,7 +209,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 add(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX += other.getX();
@@ -252,7 +254,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 subtract(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX -= other.getX();
@@ -292,7 +296,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 multiply(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX *= other.getX();

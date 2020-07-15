@@ -38,12 +38,16 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     }
 
     private String fromJson(String jsonInput) {
-        if (jsonInput == null || jsonInput.isEmpty()) return "";
+        if (jsonInput == null || jsonInput.isEmpty()) {
+            return "";
+        }
         return GsonComponentSerializer.INSTANCE.deserialize(jsonInput).toString();
     }
 
     private String toJson(String oldInput) {
-        if (oldInput == null || oldInput.isEmpty()) return "";
+        if (oldInput == null || oldInput.isEmpty()) {
+            return "";
+        }
         return LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of(oldInput));
     }
 
@@ -82,7 +86,9 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         CompoundTag nbt = getNbtData();
         if (nbt != null) {
             String color = nbt.getString("Color").toUpperCase();
-            if (!color.isEmpty()) return DyeColor.valueOf(color);
+            if (!color.isEmpty()) {
+                return DyeColor.valueOf(color);
+            }
         }
         return DyeColor.BLACK;
     }

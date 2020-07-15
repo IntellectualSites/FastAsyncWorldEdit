@@ -50,11 +50,11 @@ public class AnvilChunk13 implements Chunk {
     private int rootX;
     private int rootZ;
 
-    private Map<BlockVector3, Map<String,Tag>> tileEntities;
+    private Map<BlockVector3, Map<String, Tag>> tileEntities;
 
     /**
      * Construct the chunk with a compound tag.
-     * 
+     *
      * @param tag the tag to read
      * @throws DataException on a data error
      */
@@ -159,8 +159,6 @@ public class AnvilChunk13 implements Chunk {
 
     /**
      * Used to load the tile entities.
-     *
-     * @throws DataException
      */
     private void populateTileEntities() throws DataException {
         tileEntities = new HashMap<>();

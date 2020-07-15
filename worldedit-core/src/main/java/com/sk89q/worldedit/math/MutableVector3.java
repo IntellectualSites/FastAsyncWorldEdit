@@ -4,7 +4,9 @@ import com.boydti.fawe.FaweCache;
 
 public class MutableVector3 extends Vector3 {
 
-    private double x, y, z;
+    private double x;
+    private double y;
+    private double z;
 
     public MutableVector3() {
     }

@@ -49,7 +49,9 @@ public interface IBatchProcessor {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
                     int index = (minY & 15) << 8;
-                    for (int i = 0; i < index; i++) arr[i] = 0;
+                    for (int i = 0; i < index; i++) {
+                        arr[i] = 0;
+                    }
                     set.setBlocks(layer, arr);
                 } else {
                     set.setBlocks(layer, null);
@@ -62,7 +64,9 @@ public interface IBatchProcessor {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
                     int index = ((maxY + 1) & 15) << 8;
-                    for (int i = index; i < arr.length; i++) arr[i] = 0;
+                    for (int i = index; i < arr.length; i++) {
+                        arr[i] = 0;
+                    }
                     set.setBlocks(layer, arr);
                 } else {
                     set.setBlocks(layer, null);

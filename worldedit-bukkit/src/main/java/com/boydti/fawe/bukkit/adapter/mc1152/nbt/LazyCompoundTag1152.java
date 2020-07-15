@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt;
+package com.boydti.fawe.bukkit.adapter.mc1152.nbt;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class LazyCompoundTag_1_15_2 extends CompoundTag {
+public class LazyCompoundTag1152 extends CompoundTag {
     private final Supplier<NBTTagCompound> nmsTag;
 
-    public LazyCompoundTag_1_15_2(Supplier<NBTTagCompound> tag) {
+    public LazyCompoundTag1152(Supplier<NBTTagCompound> tag) {
         super(null);
         this.nmsTag = tag;
     }
 
-    public LazyCompoundTag_1_15_2(NBTTagCompound tag) {
+    public LazyCompoundTag1152(NBTTagCompound tag) {
         this(() -> tag);
     }
 
@@ -93,7 +93,7 @@ public class LazyCompoundTag_1_15_2 extends CompoundTag {
             NBTTagList nbtList = (NBTTagList) tag;
             for (NBTBase elem : nbtList) {
                 if (elem instanceof NBTTagCompound) {
-                    list.add(new LazyCompoundTag_1_15_2((NBTTagCompound) elem));
+                    list.add(new LazyCompoundTag1152((NBTTagCompound) elem));
                 } else {
                     list.add(WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(elem));
                 }

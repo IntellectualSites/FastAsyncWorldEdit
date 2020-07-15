@@ -347,7 +347,9 @@ public class EllipsoidRegion extends AbstractRegion {
                 if (remainderZ < 0) {
                     continue;
                 }
-                int diffX, minX, maxX;
+                int diffX;
+                int minX;
+                int maxX;
                 diffX = (int) Math.floor(Math.sqrt(remainderZ));
                 minX = Math.max(0, cx - diffX - bx);
                 maxX = Math.min(15, cx + diffX - bx);
@@ -371,7 +373,8 @@ public class EllipsoidRegion extends AbstractRegion {
 
         int cx1 = Math.abs(bx - cx);
         int cx2 = Math.abs(tx - cx);
-        int cxMax, cxMin;
+        int cxMax;
+        int cxMin;
         cxMin = Math.min(cx1, cx2);
         cxMax = Math.max(cx1, cx2);
         int cxMin2 = cxMin * cxMin;
@@ -379,7 +382,8 @@ public class EllipsoidRegion extends AbstractRegion {
 
         int cz1 = Math.abs(bz - cz);
         int cz2 = Math.abs(tz - cz);
-        int czMax, czMin;
+        int czMax;
+        int czMin;
         czMin = Math.min(cz1, cz2);
         czMax = Math.max(cz1, cz2);
         int czMin2 = czMin * czMin;

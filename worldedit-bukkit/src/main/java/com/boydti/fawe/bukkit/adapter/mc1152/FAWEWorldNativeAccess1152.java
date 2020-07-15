@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_15_2;
+package com.boydti.fawe.bukkit.adapter.mc1152;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -25,18 +25,20 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
-public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
-    private static final int UPDATE = 1, NOTIFY = 2;
+public class FAWEWorldNativeAccess1152
+    implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
+    private static final int UPDATE = 1;
+    private static final int NOTIFY = 2;
 
     private final FAWE_Spigot_v1_15_R2 adapter;
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
 
-    public FAWEWorldNativeAccess_1_15_2(FAWE_Spigot_v1_15_R2 adapter, WeakReference<World> world) {
+    public FAWEWorldNativeAccess1152(FAWE_Spigot_v1_15_R2 adapter, WeakReference<World> world) {
         this.adapter = adapter;
         this.world = world;
     }
@@ -59,8 +61,8 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     public IBlockData toNative(com.sk89q.worldedit.world.block.BlockState state) {
         int stateId = BlockStateIdAccess.getBlockStateId(state);
         return BlockStateIdAccess.isValidInternalId(stateId)
-                ? Block.getByCombinedId(stateId)
-                : ((CraftBlockData) BukkitAdapter.adapt(state)).getState();
+            ? Block.getByCombinedId(stateId)
+            : ((CraftBlockData) BukkitAdapter.adapt(state)).getState();
     }
 
     @Override
@@ -118,9 +120,12 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     }
 
     private static final EnumDirection[] NEIGHBOUR_ORDER = {
-            EnumDirection.WEST, EnumDirection.EAST,
-            EnumDirection.DOWN, EnumDirection.UP,
-            EnumDirection.NORTH, EnumDirection.SOUTH
+        EnumDirection.WEST,
+        EnumDirection.EAST,
+        EnumDirection.DOWN,
+        EnumDirection.UP,
+        EnumDirection.NORTH,
+        EnumDirection.SOUTH
     };
 
     @Override
@@ -168,6 +173,8 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
-        return this.adapter.setBlock(this.getChunk(position.getBlockX() >> 4, position.getBlockZ() >> 4).bukkitChunk, position.getBlockX(), position.getBlockY(), position.getBlockZ(), block, sideEffectSet.shouldApply(SideEffect.LIGHTING));
+        return this.adapter.setBlock(this.getChunk(
+            position.getBlockX() >> 4, position.getBlockZ()
+                >> 4).bukkitChunk, position.getBlockX(), position.getBlockY(), position.getBlockZ(), block, sideEffectSet.shouldApply(SideEffect.LIGHTING));
     }
 }

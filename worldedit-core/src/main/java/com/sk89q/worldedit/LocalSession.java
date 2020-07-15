@@ -244,9 +244,13 @@ public class LocalSession implements TextureHolder {
 
                 } else {
                     int i = name.lastIndexOf('.');
-                    if (i != -1) val = StringMan.toInteger(name, 0, i);
+                    if (i != -1) {
+                        val = StringMan.toInteger(name, 0, i);
+                    }
                 }
-                if (val != null) set.set(val);
+                if (val != null) {
+                    set.set(val);
+                }
                 return false;
             });
         }
@@ -401,7 +405,9 @@ public class LocalSession implements TextureHolder {
         checkNotNull(editSession);
 
         // Don't store anything if no changes were made
-        if (editSession.size() == 0) return;
+        if (editSession.size() == 0) {
+            return;
+        }
         
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
@@ -805,7 +811,9 @@ public class LocalSession implements TextureHolder {
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
      */
     public synchronized void setClipboard(@Nullable ClipboardHolder clipboard) {
-        if (this.clipboard == clipboard) return;
+        if (this.clipboard == clipboard) {
+            return;
+        }
 
         if (this.clipboard != null) {
             if (clipboard == null || !clipboard.contains(this.clipboard.getClipboard())) {
@@ -1040,7 +1048,9 @@ public class LocalSession implements TextureHolder {
     public Tool getTool(BaseItem item, Player player) {
         if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
-            if (tool != null) return tool;
+            if (tool != null) {
+                return tool;
+            }
         }
         loadDefaults(player, false);
         return getTool(item.getType());
@@ -1233,7 +1243,9 @@ public class LocalSession implements TextureHolder {
      * @param actor the actor
      */
     public void tellVersion(Actor actor) {
-        if (hasBeenToldVersion) return;
+        if (hasBeenToldVersion) {
+            return;
+        }
         hasBeenToldVersion = true;
         actor.sendAnnouncements();
     }

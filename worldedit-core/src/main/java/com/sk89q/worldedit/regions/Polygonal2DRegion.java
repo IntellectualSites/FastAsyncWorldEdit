@@ -118,10 +118,18 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         for (BlockVector2 v : points) {
             int x = v.getBlockX();
             int z = v.getBlockZ();
-            if (x < minX) minX = x;
-            if (z < minZ) minZ = z;
-            if (x > maxX) maxX = x;
-            if (z > maxZ) maxZ = z;
+            if (x < minX) {
+                minX = x;
+            }
+            if (z < minZ) {
+                minZ = z;
+            }
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (z > maxZ) {
+                maxZ = z;
+            }
         }
 
         int oldMinY = minY;
@@ -201,7 +209,8 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     @Override
     public long getVolume() {
         long area = 0;
-        int i, j = points.size() - 1;
+        int i;
+        int j = points.size() - 1;
 
         for (i = 0; i < points.size(); ++i) {
             long x = points.get(j).getBlockX() + points.get(i).getBlockX();
@@ -285,10 +294,14 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     public boolean contains(int targetX, int targetZ) {
         boolean inside = false;
         int npoints = points.size();
-        int xNew, zNew;
-        int xOld, zOld;
-        int x1, z1;
-        int x2, z2;
+        int xNew;
+        int zNew;
+        int xOld;
+        int zOld;
+        int x1;
+        int z1;
+        int x2;
+        int z2;
         long crossproduct;
         int i;
 
@@ -317,7 +330,9 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
                 crossproduct = ((long) targetZ - (long) z1) * (long) (x2 - x1)
                         - ((long) z2 - (long) z1) * (long) (targetX - x1);
                 if (crossproduct == 0) {
-                    if ((z1 <= targetZ) == (targetZ <= z2)) return true; //on edge
+                    if ((z1 <= targetZ) == (targetZ <= z2)) {
+                        return true; //on edge
+                    }
                 } else if (crossproduct < 0 && (x1 != targetX)) {
                     inside = !inside;
                 }
@@ -357,10 +372,14 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
 
         boolean inside = false;
         int npoints = points.size();
-        int xNew, zNew;
-        int xOld, zOld;
-        int x1, z1;
-        int x2, z2;
+        int xNew;
+        int zNew;
+        int xOld;
+        int zOld;
+        int x1;
+        int z1;
+        int x2;
+        int z2;
         long crossproduct;
         int i;
 
@@ -389,7 +408,9 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
                 crossproduct = ((long) targetZ - (long) z1) * (long) (x2 - x1)
                         - ((long) z2 - (long) z1) * (long) (targetX - x1);
                 if (crossproduct == 0) {
-                    if ((z1 <= targetZ) == (targetZ <= z2)) return true; //on edge
+                    if ((z1 <= targetZ) == (targetZ <= z2)) {
+                        return true; //on edge
+                    }
                 } else if (crossproduct < 0 && (x1 != targetX)) {
                     inside = !inside;
                 }
@@ -457,7 +478,9 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         while (it.hasNext()) {
             BlockVector2 current = it.next();
             sb.append("(").append(current.getBlockX()).append(", ").append(current.getBlockZ()).append(")");
-            if (it.hasNext()) sb.append(" - ");
+            if (it.hasNext()) {
+                sb.append(" - ");
+            }
         }
         sb.append(" * (").append(minY).append(" - ").append(maxY).append(")");
         return sb.toString();
@@ -482,16 +505,24 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (int x = bx; x <= tx; x++) {
-            if (!contains(x, 0, bz)) return false;
+            if (!contains(x, 0, bz)) {
+                return false;
+            }
         }
         for (int x = bx; x <= tx; x++) {
-            if (!contains(x, 0, tz)) return false;
+            if (!contains(x, 0, tz)) {
+                return false;
+            }
         }
         for (int z = bz; z <= tz; z++) {
-            if (!contains(bx, 0, z)) return false;
+            if (!contains(bx, 0, z)) {
+                return false;
+            }
         }
         for (int z = bz; z <= tz; z++) {
-            if (!contains(tx, 0, z)) return false;
+            if (!contains(tx, 0, z)) {
+                return false;
+            }
         }
         return true;
     }

@@ -106,10 +106,11 @@ public class HeightMap {
             int yTmp = 255;
             for (int z = 0; z < height; ++z) {
                 for (int x = 0; x < width; ++x, index++) {
-                    if (mask != null)
+                    if (mask != null) {
                         yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
-                    else
+                    } else {
                         yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    }
                     switch (yTmp) {
                         case Integer.MIN_VALUE:
                             yTmp = minY;
@@ -182,7 +183,9 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x) {
-                if (this.invalid != null && this.invalid[index]) continue;
+                if (this.invalid != null && this.invalid[index]) {
+                    continue;
+                }
                 int curHeight = this.data[index];
 
                 //Clamp newHeight within the selection area
@@ -204,7 +207,9 @@ public class HeightMap {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int setY = newBlock - 1, getY = curBlock; setY >= curBlock; --setY, getY--) {
                             BlockStateHolder<BlockState> get = session.getBlock(xr, getY, zr);
-                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
+                            if (get != BlockTypes.AIR.getDefaultState()) {
+                                tmpBlock = get;
+                            }
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }
@@ -268,7 +273,9 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
-                if (this.invalid != null && this.invalid[index]) continue;
+                if (this.invalid != null && this.invalid[index]) {
+                    continue;
+                }
 
                 int curHeight = this.data[index];
 
@@ -293,7 +300,9 @@ public class HeightMap {
                             } else {
                                 get = BlockTypes.AIR.getDefaultState();
                             }
-                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
+                            if (get != BlockTypes.AIR.getDefaultState()) {
+                                tmpBlock = get;
+                            }
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }

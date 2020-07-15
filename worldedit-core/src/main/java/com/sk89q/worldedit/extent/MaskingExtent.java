@@ -110,7 +110,9 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public Extent construct(Extent child) {
-        if (child == getExtent()) return this;
+        if (child == getExtent()) {
+            return this;
+        }
         return new MaskingExtent(child, mask);
     }
 }

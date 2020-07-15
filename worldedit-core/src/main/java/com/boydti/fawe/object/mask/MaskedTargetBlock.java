@@ -27,7 +27,9 @@ public class MaskedTargetBlock extends TargetBlock {
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
-                } else if (current.getBlockY() <= 0) break;
+                } else if (current.getBlockY() <= 0) {
+                    break;
+                }
             } else {
                 break;
             }

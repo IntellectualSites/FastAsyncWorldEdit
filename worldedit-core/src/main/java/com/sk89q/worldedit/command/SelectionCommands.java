@@ -559,7 +559,9 @@ public class SelectionCommands {
         }
 
         BlockDistributionResult res = new BlockDistributionResult(distribution, separateStates);
-        if (!actor.isPlayer()) res.formatForConsole();
+        if (!actor.isPlayer()) {
+            res.formatForConsole();
+        }
         actor.print(res.create(page));
     }
 

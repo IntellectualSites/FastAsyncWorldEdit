@@ -66,6 +66,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+
     /**
      * Construct a block with a state.
      *
@@ -108,7 +109,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     /**
-     * Gets a map of state to statevalue
+     * Gets a map of state to statevalue.
      *
      * @return The state map
      */
@@ -197,7 +198,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     /**
      * Checks if the type is the same, and if the matched states are the same.
-     * 
+     *
      * @param o other block
      * @return true if equal
      */
@@ -230,7 +231,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     @Override
     public void applyTileEntity(OutputExtent output, int x, int y, int z) {
         CompoundTag nbt = getNbtData();
-        if (nbt != null) output.setTile(x, y, z, nbt);
+        if (nbt != null) {
+            output.setTile(x, y, z, nbt);
+        }
     }
 
     @Override
@@ -276,11 +279,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public String toString() {
-//        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
-//            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
-//        } else {
-            return blockState.getAsString();
-//        }
+        //        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
+        //            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
+        //        } else {
+        return blockState.getAsString();
+        //        }
     }
 
     public BlockState toBlockState() {

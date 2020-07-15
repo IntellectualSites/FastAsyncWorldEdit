@@ -41,7 +41,8 @@ public class TargetBlock {
     private final Extent world;
 
     private int maxDistance;
-    private double checkDistance, curDistance;
+    private double checkDistance;
+    private double curDistance;
     private BlockVector3 targetPos = BlockVector3.ZERO;
     private Vector3 targetPosDouble = Vector3.ZERO;
     private BlockVector3 prevPos = BlockVector3.ZERO;
@@ -168,7 +169,9 @@ public class TargetBlock {
      */
     public Location getTargetBlock() {
         //noinspection StatementWithEmptyBody
-        while (getNextBlock() != null && !stopMask.test(world, targetPos)) ;
+        while (getNextBlock() != null && !stopMask.test(world, targetPos)) {
+            ;
+        }
         return getCurrentBlock();
     }
 
@@ -180,7 +183,9 @@ public class TargetBlock {
      */
     public Location getSolidTargetBlock() {
         //noinspection StatementWithEmptyBody
-        while (getNextBlock() != null && !solidMask.test(world, targetPos)) ;
+        while (getNextBlock() != null && !solidMask.test(world, targetPos)) {
+            ;
+        }
         return getCurrentBlock();
     }
 
@@ -235,15 +240,18 @@ public class TargetBlock {
     public Location getAnyTargetBlockFace() {
         getAnyTargetBlock();
         Location current = getCurrentBlock();
-        if (current != null)
+        if (current != null) {
             return current.setDirection(current.toVector().subtract(getPreviousBlock().toVector()));
-        else
+        } else {
             return new Location(world, targetPos.toVector3(), Float.NaN, Float.NaN);
+        }
     }
 
     public Location getTargetBlockFace() {
         getTargetBlock();
-        if (getCurrentBlock() == null) return null;
+        if (getCurrentBlock() == null) {
+            return null;
+        }
         return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
     }
 

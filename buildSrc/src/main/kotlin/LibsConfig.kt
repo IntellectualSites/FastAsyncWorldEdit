@@ -41,7 +41,7 @@ fun Project.applyLibrariesConfiguration() {
         val deps = configurations["shade"].incoming.dependencies
                 .filterIsInstance<ModuleDependency>()
                 .map { it.copy() }
-                .map { dependency ->
+                .map { dependency: ModuleDependency ->
                     dependency.artifact {
                         name = dependency.name
                         type = artifactType

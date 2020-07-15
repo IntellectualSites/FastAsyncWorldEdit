@@ -59,7 +59,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
     IMP
-    ; // singleton
+    ;
 
     public final int BLOCKS_PER_LAYER = 4096;
     public final int CHUNK_LAYERS = 16;
@@ -518,7 +518,9 @@ public enum FaweCache implements Trimable {
             }
             list.add(tag);
         }
-        if (clazz == null) clazz = EndTag.class;
+        if (clazz == null) {
+            clazz = EndTag.class;
+        }
         return new ListTag(clazz, list);
     }
 
@@ -532,7 +534,9 @@ public enum FaweCache implements Trimable {
             }
             list.add(tag);
         }
-        if (clazz == null) clazz = EndTag.class;
+        if (clazz == null) {
+            clazz = EndTag.class;
+        }
         return new ListTag(clazz, list);
     }
 

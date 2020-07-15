@@ -1,19 +1,5 @@
 package net.jpountz.lz4;
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import net.jpountz.util.SafeUtils;
 
 import java.io.EOFException;
@@ -36,6 +22,7 @@ import static net.jpountz.lz4.LZ4BlockOutputStream.MAGIC_LENGTH;
  *
  * @see LZ4BlockOutputStream
  */
+@SuppressWarnings("CheckStyle")
 public final class LZ4BlockInputStream extends FilterInputStream {
 
     private final LZ4FastDecompressor decompressor;
@@ -49,12 +36,12 @@ public final class LZ4BlockInputStream extends FilterInputStream {
     /**
      * Create a new {@link InputStream}.
      *
-     * @param in           the {@link InputStream} to poll
+     * @param in the {@link InputStream} to poll
      * @param decompressor the {@link LZ4FastDecompressor decompressor} instance to
-     *                     use
-     * @param checksum     the {@link Checksum} instance to use, must be
-     *                     equivalent to the instance which has been used to
-     *                     write the stream
+     * use
+     * @param checksum the {@link Checksum} instance to use, must be
+     * equivalent to the instance which has been used to
+     * write the stream
      */
     public LZ4BlockInputStream(InputStream in, LZ4FastDecompressor decompressor, Checksum checksum) {
         super(in);
@@ -148,19 +135,17 @@ public final class LZ4BlockInputStream extends FilterInputStream {
         final int token = compressedBuffer[MAGIC_LENGTH] & 0xFF;
         final int compressionMethod = token & 0xF0;
         final int compressionLevel = COMPRESSION_LEVEL_BASE + (token & 0x0F);
-        if (compressionMethod != COMPRESSION_METHOD_RAW && compressionMethod != COMPRESSION_METHOD_LZ4) {
+        if (compressionMethod != COMPRESSION_METHOD_RAW
+            && compressionMethod != COMPRESSION_METHOD_LZ4) {
             throw new IOException("Stream is corrupted");
         }
         final int compressedLen = SafeUtils.readIntLE(compressedBuffer, MAGIC_LENGTH + 1);
         originalLen = SafeUtils.readIntLE(compressedBuffer, MAGIC_LENGTH + 5);
         final int check = SafeUtils.readIntLE(compressedBuffer, MAGIC_LENGTH + 9);
         assert HEADER_LENGTH == MAGIC_LENGTH + 13;
-        if (originalLen > 1 << compressionLevel
-                || originalLen < 0
-                || compressedLen < 0
-                || (originalLen == 0 && compressedLen != 0)
-                || (originalLen != 0 && compressedLen == 0)
-                || (compressionMethod == COMPRESSION_METHOD_RAW && originalLen != compressedLen)) {
+        if (originalLen > 1 << compressionLevel || originalLen < 0 || compressedLen < 0 || (
+            originalLen == 0 && compressedLen != 0) || (originalLen != 0 && compressedLen == 0) || (
+            compressionMethod == COMPRESSION_METHOD_RAW && originalLen != compressedLen)) {
             throw new IOException("Stream is corrupted");
         }
         if (originalLen == 0 && compressedLen == 0) {
@@ -179,7 +164,8 @@ public final class LZ4BlockInputStream extends FilterInputStream {
                 break;
             case COMPRESSION_METHOD_LZ4:
                 if (compressedBuffer.length < originalLen) {
-                    compressedBuffer = new byte[Math.max(compressedLen, compressedBuffer.length * 3 / 2)];
+                    compressedBuffer = new byte[Math.max(compressedLen,
+                        compressedBuffer.length * 3 / 2)];
                 }
                 readFully(compressedBuffer, compressedLen);
                 try {
@@ -235,8 +221,8 @@ public final class LZ4BlockInputStream extends FilterInputStream {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(in=" + in
-                + ", decompressor=" + decompressor + ", checksum=" + checksum + ")";
+        return getClass().getSimpleName() + "(in=" + in + ", decompressor=" + decompressor
+            + ", checksum=" + checksum + ")";
     }
 
 }

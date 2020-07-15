@@ -116,7 +116,9 @@ public class BukkitImageViewer implements ImageViewer {
                                 break;
                             }
                         }
-                        if (!contains) return null;
+                        if (!contains) {
+                            return null;
+                        }
                     }
                 }
             }
@@ -133,11 +135,15 @@ public class BukkitImageViewer implements ImageViewer {
     }
 
     private void view(@Nullable BufferedImage image, @Nullable Drawable drawable) {
-        if (image == null && drawable == null) throw new IllegalArgumentException("An image or drawable must be provided. Both cannot be null");
+        if (image == null && drawable == null) {
+            throw new IllegalArgumentException("An image or drawable must be provided. Both cannot be null");
+        }
         boolean initializing = last == null;
 
         if (this.frames != null) {
-            if (image == null && drawable != null) image = drawable.draw();
+            if (image == null && drawable != null) {
+                image = drawable.draw();
+            }
             last = image;
             int width = frames.length;
             int height = frames[0].length;
@@ -158,7 +164,9 @@ public class BukkitImageViewer implements ImageViewer {
             } else if (player.getInventory().getHeldItemSlot() != slot) {
                 player.getInventory().setHeldItemSlot(slot);
             }
-            if (image == null && drawable != null) image = drawable.draw();
+            if (image == null && drawable != null) {
+                image = drawable.draw();
+            }
             last = image;
             BufferedImage scaled = ImageUtil.getScaledInstance(image, 128, 128, RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
             MapWrapper mapWrapper = mapManager.wrapImage(scaled);
@@ -181,7 +189,9 @@ public class BukkitImageViewer implements ImageViewer {
     }
 
     public void refresh() {
-        if (last != null) view(last, null);
+        if (last != null) {
+            view(last, null);
+        }
     }
 
     @Override

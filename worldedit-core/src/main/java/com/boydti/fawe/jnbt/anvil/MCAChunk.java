@@ -395,9 +395,13 @@ public class MCAChunk implements IChunk {
 
     @Override
     public boolean isEmpty() {
-        if (deleted) return true;
+        if (deleted) {
+            return true;
+        }
         for (boolean hasSection : hasSections) {
-            if (hasSection) return false;
+            if (hasSection) {
+                return false;
+            }
         }
         return true;
     }

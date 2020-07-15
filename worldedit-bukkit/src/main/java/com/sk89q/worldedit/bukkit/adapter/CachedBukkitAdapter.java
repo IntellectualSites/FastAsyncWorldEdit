@@ -25,7 +25,9 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             blockTypes = new int[materials.length];
             for (int i = 0; i < materials.length; i++) {
                 Material material = materials[i];
-                if (material.isLegacy()) continue;
+                if (material.isLegacy()) {
+                    continue;
+                }
                 NamespacedKey key = material.getKey();
                 String id = key.getNamespace() + ":" + key.getKey();
                 if (material.isBlock()) {
@@ -51,7 +53,9 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         try {
             return ItemTypes.get(itemTypes[material.ordinal()]);
         } catch (NullPointerException e) {
-            if (init()) return asItemType(material);
+            if (init()) {
+                return asItemType(material);
+            }
             return ItemTypes.get(itemTypes[material.ordinal()]);
         }
     }
@@ -61,7 +65,9 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         try {
             return BlockTypesCache.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
-            if (init()) return asBlockType(material);
+            if (init()) {
+                return asBlockType(material);
+            }
             throw e;
         }
     }
@@ -79,11 +85,15 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             Material material = blockData.getMaterial();
             BlockType type = BlockTypes.getFromStateId(blockTypes[material.ordinal()]);
             List<? extends Property> propList = type.getProperties();
-            if (propList.size() == 0) return type.getDefaultState();
+            if (propList.size() == 0) {
+                return type.getDefaultState();
+            }
             String properties = blockData.getAsString();
             return BlockState.get(type, properties, type.getDefaultState());
         } catch (NullPointerException e) {
-            if (init()) return adapt(blockData);
+            if (init()) {
+                return adapt(blockData);
+            }
             throw e;
         }
     }

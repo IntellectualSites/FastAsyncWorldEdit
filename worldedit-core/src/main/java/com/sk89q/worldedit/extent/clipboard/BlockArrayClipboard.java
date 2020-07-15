@@ -99,7 +99,6 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public void setOrigin(BlockVector3 origin) {
-//        this.origin = origin;
         getParent().setOrigin(origin.subtract(region.getMinimumPoint()));
     }
 
@@ -116,9 +115,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public BlockState getBlock(BlockVector3 position) {
         if (region.contains(position)) {
-            int x = position.getBlockX()- origin.getX();
-            int y = position.getBlockY()- origin.getY();
-            int z = position.getBlockZ()- origin.getZ();
+            int x = position.getBlockX() - origin.getX();
+            int y = position.getBlockY() - origin.getY();
+            int z = position.getBlockZ() - origin.getZ();
             return getParent().getBlock(x, y, z);
         }
 
@@ -127,10 +126,10 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        if(region.contains(position)) {
-            int x = position.getBlockX()- origin.getX();
-            int y = position.getBlockY()- origin.getY();
-            int z = position.getBlockZ()- origin.getZ();
+        if (region.contains(position)) {
+            int x = position.getBlockX() - origin.getX();
+            int y = position.getBlockY() - origin.getY();
+            int z = position.getBlockZ() - origin.getZ();
             return getParent().getFullBlock(x, y, z);
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -248,7 +247,7 @@ public class BlockArrayClipboard implements Clipboard {
     public Iterator<BlockVector2> iterator2d() {
         MutableBlockVector2 mutable = new MutableBlockVector2();
         return Iterators.transform(getParent().iterator2d(), input ->
-        mutable.setComponents(input.getX() + origin.getX(), input.getZ() + origin.getZ()));
+            mutable.setComponents(input.getX() + origin.getX(), input.getZ() + origin.getZ()));
     }
 
     @Override
@@ -282,8 +281,11 @@ public class BlockArrayClipboard implements Clipboard {
     public static class ClipboardEntity implements Entity {
         private final BaseEntity entity;
         private final Clipboard clipboard;
-        private final double x, y, z;
-        private final float yaw, pitch;
+        private final double x;
+        private final double y;
+        private final double z;
+        private final float yaw;
+        private final float pitch;
 
         public ClipboardEntity(Location loc, BaseEntity entity) {
             this((Clipboard) loc.getExtent(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getYaw(), loc.getPitch(), entity);

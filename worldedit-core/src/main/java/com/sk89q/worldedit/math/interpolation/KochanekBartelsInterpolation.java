@@ -64,8 +64,9 @@ public class KochanekBartelsInterpolation implements Interpolation {
         coeffC = new Vector3[nNodes];
         coeffD = new Vector3[nNodes];
 
-        if (nNodes == 0)
+        if (nNodes == 0) {
             return;
+        }
 
         Node nodeB = nodes.get(0);
         double tensionB = nodeB.getTension();
@@ -125,11 +126,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
      * @return nodes[clamp(0, nodes.length-1)]
      */
     private Vector3 retrieve(int index) {
-        if (index < 0)
+        if (index < 0) {
             return fastRetrieve(0);
+        }
 
-        if (index >= nodes.size())
+        if (index >= nodes.size()) {
             return fastRetrieve(nodes.size()-1);
+        }
 
         return fastRetrieve(index);
     }
@@ -140,11 +143,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public Vector3 getPosition(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= scaling;
 
@@ -166,11 +171,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= scaling;
 
@@ -186,11 +193,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public double arcLength(double positionA, double positionB) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (positionA > positionB)
+        if (positionA > positionB) {
             return arcLength(positionB, positionA);
+        }
 
         positionA *= scaling;
         positionB *= scaling;
@@ -245,11 +254,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         position *= scaling;
 

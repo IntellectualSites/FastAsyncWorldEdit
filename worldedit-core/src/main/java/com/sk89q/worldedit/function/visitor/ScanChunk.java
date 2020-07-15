@@ -63,10 +63,14 @@ public class ScanChunk {
         int Z = z >> 4;
         long pair = pairInt(X, Z);
         long[][] chunk = visits.get(pair);
-        if (chunk == null) return false;
+        if (chunk == null) {
+            return false;
+        }
         int layer = y >> 4;
         long[] section = chunk[layer];
-        if (section == null) return false;
+        if (section == null) {
+            return false;
+        }
         return get(section, getLocalIndex(x & 15, y & 15, z & 15));
     }
 
@@ -178,7 +182,8 @@ public class ScanChunk {
 
             apply(xx + x, yy + y, zz + z);
 
-            int x1 = x, x2 = x;
+            int x1 = x;
+            int x2 = x;
 
             // find start of scan-line
             int i1 = index;
@@ -187,7 +192,9 @@ public class ScanChunk {
                     // queue in west chunk
                     break;
                 }
-                if (get(visit, i1)) break;
+                if (get(visit, i1)) {
+                    break;
+                }
                 // visit
                 set(visit, i1);
 
@@ -204,7 +211,9 @@ public class ScanChunk {
                     // queue in east chunk
                     break;
                 }
-                if (get(visit, i2)) break;
+                if (get(visit, i2)) {
+                    break;
+                }
                 set(visit, i2);
                 i2++;
                 x2++;
@@ -231,7 +240,9 @@ public class ScanChunk {
             boolean empty = true;
             for (int layer = 0; layer < 16; layer++) {
                 char[] queue = queues[layer];
-                if (queue == null) continue;
+                if (queue == null) {
+                    continue;
+                }
                 char index;
                 while ((index = queue[0]) != queue[1]) {
                     queue[0]++;
@@ -246,7 +257,9 @@ public class ScanChunk {
                 continue;
             }
 
-            if (empty) break;
+            if (empty) {
+                break;
+            }
         }
         // empty queues
 

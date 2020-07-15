@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
 
+@SuppressWarnings("CheckStyle")
 public enum ByteBufferUtils {
     ;
 

@@ -34,10 +34,20 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
-    private @Nullable char[] setArr;
+    private @Nullable
+    char[] setArr;
     private SetDelegate delegate;
     // local
-    private int layer, index, x, y, z, xx, yy, zz, chunkX, chunkZ;
+    private int layer;
+    private int index;
+    private int x;
+    private int y;
+    private int z;
+    private int xx;
+    private int yy;
+    private int zz;
+    private int chunkX;
+    private int chunkZ;
 
     public CharFilterBlock(Extent extent) {
         super(extent);
@@ -74,8 +84,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void flood(IChunkGet iget, IChunkSet iset, int layer, Flood flood,
-        FilterBlockMask mask) {
+    public void flood(IChunkGet iget, IChunkSet iset, int layer, Flood flood, FilterBlockMask mask) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
         if (initLayer(iget, iset, layer) != null) { // TODO replace with hasSection
@@ -397,7 +406,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public char getOrdinalChar(Extent orDefault) {
         return getOrdinalChar();
     }
-    
+
     //Set delegate
     private SetDelegate initSet() {
         setArr = set.load(layer);
@@ -413,8 +422,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
 

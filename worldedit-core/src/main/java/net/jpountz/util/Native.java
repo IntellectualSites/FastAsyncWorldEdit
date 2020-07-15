@@ -1,37 +1,27 @@
 package net.jpountz.util;
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
- * This file has been modified for use in the FAWE project.
- */
-
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/** FOR INTERNAL USE ONLY */
+import static org.slf4j.LoggerFactory.getLogger;
+
+@SuppressWarnings("CheckStyle")
 public enum Native {
     ;
 
+
     private enum OS {
         // Even on Windows, the default compiler from cpptasks (gcc) uses .so as a shared lib extension
-        WINDOWS("win32", "so"), LINUX("linux", "so"), MAC("darwin", "dylib"), SOLARIS("solaris", "so");
-        public final String name, libExtension;
+        WINDOWS("win32", "so"),
+        LINUX("linux", "so"),
+        MAC("darwin", "dylib"),
+        SOLARIS("solaris", "so");
+        public final String name;
+        public final String libExtension;
 
-        private OS(String name, String libExtension) {
+        OS(String name, String libExtension) {
             this.name = name;
             this.libExtension = libExtension;
         }
@@ -52,8 +42,7 @@ public enum Native {
         } else if (osName.contains("Solaris") || osName.contains("SunOS")) {
             return OS.SOLARIS;
         } else {
-            throw new UnsupportedOperationException("Unsupported operating system: "
-                + osName);
+            throw new UnsupportedOperationException("Unsupported operating system: " + osName);
         }
     }
 
@@ -72,17 +61,16 @@ public enum Native {
         String tempFolder = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath();
         File dir = new File(tempFolder);
 
-        File[] tempLibFiles = dir.listFiles((dir1, name) ->
-            name.startsWith("liblz4-java-") && !name.endsWith(".lck"));
-        if(tempLibFiles != null) {
-            for(File tempLibFile : tempLibFiles) {
+        File[] tempLibFiles = dir.listFiles((dir1, name) -> name.startsWith("liblz4-java-")
+            && !name.endsWith(".lck"));
+        if (tempLibFiles != null) {
+            for (File tempLibFile : tempLibFiles) {
                 File lckFile = new File(tempLibFile.getAbsolutePath() + ".lck");
-                if(!lckFile.exists()) {
+                if (!lckFile.exists()) {
                     try {
                         tempLibFile.delete();
-                    }
-                    catch(SecurityException e) {
-                        System.err.println("Failed to delete old temp lib" + e.getMessage());
+                    } catch (SecurityException e) {
+                        getLogger(Native.class).error("Failed to delete old temp lib",e);
                     }
                 }
             }
@@ -108,7 +96,9 @@ public enum Native {
         String resourceName = resourceName();
         InputStream is = Native.class.getResourceAsStream(resourceName);
         if (is == null) {
-            throw new UnsupportedOperationException("Unsupported OS/arch, cannot find " + resourceName + ". Please try building from source.");
+            throw new UnsupportedOperationException(
+                "Unsupported OS/arch, cannot find " + resourceName
+                    + ". Please try building from source.");
         }
         File tempLib = null;
         File tempLibLock = null;
@@ -136,12 +126,16 @@ public enum Native {
             if (!loaded) {
                 if (tempLib != null && tempLib.exists()) {
                     if (!tempLib.delete()) {
-                        throw new ExceptionInInitializerError("Cannot unpack liblz4-java / cannot delete a temporary native library " + tempLib);
+                        throw new ExceptionInInitializerError(
+                            "Cannot unpack liblz4-java / cannot delete a temporary native library "
+                                + tempLib);
                     }
                 }
                 if (tempLibLock != null && tempLibLock.exists()) {
                     if (!tempLibLock.delete()) {
-                        throw new ExceptionInInitializerError("Cannot unpack liblz4-java / cannot delete a temporary lock file " + tempLibLock);
+                        throw new ExceptionInInitializerError(
+                            "Cannot unpack liblz4-java / cannot delete a temporary lock file "
+                                + tempLibLock);
                     }
                 }
             } else {

@@ -574,7 +574,9 @@ public class LimitExtent extends PassthroughExtent {
     @Deprecated
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
+        if (block.hasNbtData()) {
+            limit.MAX_BLOCKSTATES();
+        }
         try {
             return getExtent().setBlock(position, block);
         } catch (FaweException e) {
@@ -588,7 +590,9 @@ public class LimitExtent extends PassthroughExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
+        if (block.hasNbtData()) {
+            limit.MAX_BLOCKSTATES();
+        }
         try {
             return getExtent().setBlock(x, y, z, block);
         } catch (FaweException e) {

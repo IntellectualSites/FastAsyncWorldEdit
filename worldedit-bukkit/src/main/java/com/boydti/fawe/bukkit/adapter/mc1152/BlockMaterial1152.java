@@ -1,11 +1,11 @@
-package com.boydti.fawe.bukkit.adapter.mc1_15_2;
+package com.boydti.fawe.bukkit.adapter.mc1152;
 
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 
-public class BlockMaterial_1_15_2 implements BlockMaterial {
+public class BlockMaterial1152 implements BlockMaterial {
     private final Block block;
     private final IBlockData defaultState;
     private final Material material;
@@ -13,11 +13,11 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
 
-    public BlockMaterial_1_15_2(Block block) {
+    public BlockMaterial1152(Block block) {
         this(block, block.getBlockData());
     }
 
-    public BlockMaterial_1_15_2(Block block, IBlockData defaultState) {
+    public BlockMaterial1152(Block block, IBlockData defaultState) {
         this.block = block;
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();

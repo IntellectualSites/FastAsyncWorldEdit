@@ -252,7 +252,9 @@ public class EditSessionBuilder {
     private boolean wrapped;
 
     public EditSessionBuilder compile() {
-        if (compiled) return this;
+        if (compiled) {
+            return this;
+        }
 
         compiled = true;
         wrapped = false;

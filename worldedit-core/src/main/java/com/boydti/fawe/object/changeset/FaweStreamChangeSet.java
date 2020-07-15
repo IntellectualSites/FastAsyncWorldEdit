@@ -129,7 +129,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
         if (mode == 1 || mode == 4) { // small
             posDel = new FaweStreamPositionDelegate() {
-                int lx, ly, lz;
+                int lx;
+                int ly;
+                int lz;
 
                 @Override
                 public void write(OutputStream out, int x, int y, int z) throws IOException {
@@ -169,7 +171,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         } else {
             posDel = new FaweStreamPositionDelegate() {
                 final byte[] buffer = new byte[5];
-                int lx, ly, lz;
+                int lx;
+                int ly;
+                int lz;
 
                 @Override
                 public void write(OutputStream stream, int x, int y, int z) throws IOException {

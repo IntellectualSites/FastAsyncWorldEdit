@@ -835,13 +835,19 @@ public final class BlockTypes {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
 
-        if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
+        if (!input.split("\\[", 2)[0].contains(":")) {
+            input = "minecraft:" + input;
+        }
         BlockType result = BlockType.REGISTRY.get(input);
-        if (result != null) return result;
+        if (result != null) {
+            return result;
+        }
 
         try {
             BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
-            if (block != null) return block.getBlockType();
+            if (block != null) {
+                return block.getBlockType();
+            }
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
         }
 

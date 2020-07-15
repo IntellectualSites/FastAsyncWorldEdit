@@ -88,13 +88,17 @@ public class ListFilters {
                 @Override
                 public File getPath(File root) {
                     File newRoot = new File(root, finalArg);
-                    if (newRoot.exists()) return newRoot;
+                    if (newRoot.exists()) {
+                        return newRoot;
+                    }
                     String firstArg = finalArg.substring(0, finalArg.length() - File.separator.length());
                     if (firstArg.length() > 3 && firstArg.length() <= 16) {
                         UUID fromName = Fawe.imp().getUUID(finalArg);
                         if (fromName != null) {
                             newRoot = new File(root, finalArg);
-                            if (newRoot.exists()) return newRoot;
+                            if (newRoot.exists()) {
+                                return newRoot;
+                            }
                         }
                     }
                     throw new StopExecutionException(TextComponent.of("Cannot find path: " + finalArg));

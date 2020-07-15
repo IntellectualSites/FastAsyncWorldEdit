@@ -67,16 +67,18 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     @Override
     public Vector3 getPosition(double position) {
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         return baseInterpolation.getPosition(arcToParameter(position));
     }
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         return baseInterpolation.get1stDerivative(arcToParameter(position)).normalize().multiply(totalArcLength);
     }
@@ -87,10 +89,13 @@ public class ReparametrisingInterpolation implements Interpolation {
     }
 
     private double arcToParameter(double arc) {
-        if (cache.isEmpty())
+        if (cache.isEmpty()) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (arc > 1) arc = 1;
+        if (arc > 1) {
+            arc = 1;
+        }
         arc *= totalArcLength;
 
         Entry<Double, Double> floorEntry = cache.floorEntry(arc);
@@ -152,8 +157,9 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         return baseInterpolation.getSegment(arcToParameter(position));
     }

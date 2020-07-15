@@ -22,7 +22,6 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -33,6 +32,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
 import com.sk89q.worldedit.event.platform.CommandEvent;
@@ -42,8 +42,8 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
+import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -51,9 +51,6 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -78,20 +75,23 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
@@ -112,6 +112,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private BukkitConfiguration config;
 
     private static Map<String, Plugin> lookupNames;
+
     static {
         // Disable AWE as otherwise both fail to load
         PluginManager manager = Bukkit.getPluginManager();
@@ -142,7 +143,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                     return super.put(key, plugin);
                 }
             });
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     public WorldEditPlugin() {
@@ -167,7 +169,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     @Override
     public void onLoad() {
-        if (INSTANCE != null) return;
+        if (INSTANCE != null) {
+            return;
+        }
         rename();
         INSTANCE = this;
         FaweBukkit imp = new FaweBukkit(this);
@@ -185,8 +189,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
-		
-		fail(() -> PermissionsResolverManager.initialize(INSTANCE), "Failed to initialize permissions resolver");
+
+        fail(() -> PermissionsResolverManager.initialize(INSTANCE), "Failed to initialize permissions resolver");
     }
 
     /**
@@ -194,15 +198,17 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      */
     @Override
     public void onEnable() {
-        if (INSTANCE != null) return;
+        if (INSTANCE != null) {
+            return;
+        }
         onLoad();
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
         // Register CUI
         fail(() -> {
-        getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
-        getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
+            getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
+            getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
         }, "Failed to register CUI");
 
         // Now we can register events
@@ -249,7 +255,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         for (Biome biome : Biome.values()) {
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
             BiomeType biomeType = BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
-            if (bukkitAdapter != null) biomeType.setLegacyId(bukkitAdapter.getInternalBiomeId(biomeType));
+            if (bukkitAdapter != null) {
+                biomeType.setLegacyId(bukkitAdapter.getInternalBiomeId(biomeType));
+            }
         }
         // Block & Item
         /*for (Material material : Material.values()) {
@@ -321,7 +329,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             File pluginsFolder = MainUtil.getJarFile().getParentFile();
 
             for (File file : pluginsFolder.listFiles()) {
-                if (file.length() == 2052) return;
+                if (file.length() == 2052) {
+                    return;
+                }
             }
             Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
             File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
@@ -396,9 +406,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             if (platform instanceof BukkitServerInterface) {
                 log.warn(e.getMessage());
             } else {
-                log.info("WorldEdit could not find a Bukkit adapter for this MC version, " +
-                        "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") " +
-                        "that handles the world editing.");
+                log.info("WorldEdit could not find a Bukkit adapter for this MC version, "
+                    + "but it seems that you have another implementation of WorldEdit installed ("
+                    + platform.getPlatformName() + ") " + "that handles the world editing.");
             }
         }
     }
@@ -439,7 +449,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         File actual = new File(getDataFolder(), name);
         if (!actual.exists()) {
             try (InputStream stream = getResource("defaults/" + name)) {
-                if (stream == null) throw new FileNotFoundException();
+                if (stream == null) {
+                    throw new FileNotFoundException();
+                }
                 copyDefaultConfig(stream, actual, name);
             } catch (IOException e) {
                 getLogger().severe("Unable to read default configuration: " + name);
@@ -516,7 +528,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         BlockBag blockBag = session.getBlockBag(wePlayer);
 
         EditSession editSession = WorldEdit.getInstance().getEditSessionFactory()
-                .getEditSession(wePlayer.getWorld(), session.getBlockChangeLimit(), blockBag, wePlayer);
+            .getEditSession(wePlayer.getWorld(), session.getBlockChangeLimit(), blockBag, wePlayer);
         editSession.enableStandardMode();
 
         return editSession;
@@ -630,9 +642,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private class WorldInitListener implements Listener {
         private boolean loaded = false;
+
         @EventHandler(priority = EventPriority.LOWEST)
         public void onWorldInit(@SuppressWarnings("unused") WorldInitEvent event) {
-            if (loaded) return;
+            if (loaded) {
+                return;
+            }
             loaded = true;
             setupWorldData();
         }
@@ -645,17 +660,23 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         @SuppressWarnings("UnnecessaryFullyQualifiedName")
         @EventHandler(ignoreCancelled = true)
         public void onAsyncTabComplete(com.destroystokyo.paper.event.server.AsyncTabCompleteEvent event) {
-            if (!event.isCommand()) return;
+            if (!event.isCommand()) {
+                return;
+            }
 
             String buffer = event.getBuffer();
             int firstSpace = buffer.indexOf(' ');
-            if (firstSpace < 0) return;
+            if (firstSpace < 0) {
+                return;
+            }
             String label = buffer.substring(0, firstSpace);
             // Strip leading slash, if present.
             label = label.startsWith("/") ? label.substring(1) : label;
             final Optional<org.enginehub.piston.Command> command
-                    = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
-            if (!command.isPresent()) return;
+                = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
+            if (!command.isPresent()) {
+                return;
+            }
 
             CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), buffer);
             getWorldEdit().getEventBus().post(suggestEvent);

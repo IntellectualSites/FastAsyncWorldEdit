@@ -20,7 +20,10 @@ import java.util.Arrays;
 public class ErodeBrush implements Brush {
 
     private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(Direction::toBlockVector).toArray(BlockVector3[]::new);
-    private final int erodeFaces, erodeRecursion, fillFaces, fillRecursion;
+    private final int erodeFaces;
+    private final int erodeRecursion;
+    private final int fillFaces;
+    private final int fillRecursion;
 
     public ErodeBrush() {
         this(2, 1, 5, 1);

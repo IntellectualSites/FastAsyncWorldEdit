@@ -175,9 +175,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Reorder mode for {@link EditSession#setReorderMode(ReorderMode)}.
      * NOT FUNCTIONAL IN FAWE AS OF June 3,2019
      *
+     * <p>
      * MULTI_STAGE = Multi stage reorder, may not be great with mods.
      * FAST = Use the fast mode. Good for mods.
      * NONE = Place blocks without worrying about placement order.
+     * </p>
      */
     public enum ReorderMode {
         MULTI_STAGE("multi"),
@@ -223,7 +225,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         @Nullable BlockBag blockBag, @Nullable EditSessionEvent event) {
         this(new EditSessionBuilder(world).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
-    
+
     /**
      * Construct the object with a maximum number of blocks and a block bag.
      *
@@ -252,7 +254,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * The limit for this specific edit (blocks etc)
+     * The limit for this specific edit (blocks etc).
      *
      * @return The limit
      */
@@ -269,7 +271,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Returns a new limit representing how much of this edit's limit has been used so far
+     * Returns a new limit representing how much of this edit's limit has been used so far.
      *
      * @return Limit remaining
      */
@@ -287,7 +289,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Returns the remaining limits
+     * Returns the remaining limits.
      *
      * @return remaining limits
      */
@@ -296,7 +298,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * The region extent restricts block placements to allowmaxYed regions
+     * The region extent restricts block placements to allowmaxYed regions.
      *
      * @return FaweRegionExtent (may be null)
      */
@@ -308,6 +310,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public Extent getBypassAll() {
         return bypassAll;
     }
+
     public Extent getBypassHistory() {
         return bypassHistory;
     }
@@ -317,7 +320,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Get the Player or null
+     * Get the Player or null.
      *
      * @return the player
      */
@@ -434,7 +437,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     /**
      * Queue certain types of block for better reproduction of those blocks.
      *
-     * Uses {@link ReorderMode#MULTI_STAGE}
      * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
      */
     @Deprecated
@@ -591,7 +593,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Disable history (or re-enable)
+     * Disable history (or re-enable).
      *
      * @param disableHistory whether to  enable or disable.
      */
@@ -835,9 +837,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 return bypassHistory.setBlock(position, block);
             case BEFORE_REORDER:
                 return bypassAll.setBlock(position, block);
+            default:
+                throw new RuntimeException("New enum entry added that is unhandled here");
         }
 
-        throw new RuntimeException("New enum entry added that is unhandled here");
     }
 
     /**
@@ -881,7 +884,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
     }
 
-    @Override @Deprecated
+    @Override
+    @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         if (position.getBlockY() < 0 || position.getBlockY() > 255) {
             return false;
@@ -1034,7 +1038,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (used.MAX_FAILS > 0) {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 player.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
-            } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null){
+            } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
                 player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
             } else {
                 player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
@@ -1082,7 +1086,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
             return true;
-    });
+        });
         Operations.completeBlindly(visitor);
         return this.changes;
     }
@@ -1567,7 +1571,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
 
-        if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
+        if (replacement == null) {
+            replacement = BlockTypes.AIR.getDefaultState();
+        }
         BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
         copy.setSourceFunction(remove); // Remove
 
@@ -1643,8 +1649,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         Mask liquidMask;
         if (plants) {
-             liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
-                 BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS);
+            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
+                BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS);
         } else {
             liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
         }
@@ -1654,9 +1660,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             liquidMask = new MaskUnion(liquidMask, new BlockStateMask(this, stateMap, true));
         }
         Mask mask = new MaskIntersection(
-                new BoundedHeightMask(0, getWorld().getMaxY()),
-                new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
-                liquidMask).withExtent(getExtent());
+            new BoundedHeightMask(0, getWorld().getMaxY()),
+            new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
+            liquidMask).withExtent(getExtent());
         BlockReplace replace;
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
@@ -1781,7 +1787,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
-        double xSqr, zSqr;
+        double xSqr;
+        double zSqr;
         double distanceSq;
         double nextXn = 0;
 
@@ -1904,7 +1911,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         LocalBlockVectorSet set = new LocalBlockVectorSet();
 
         double nextXn = 0;
-        double dx, dy, dz, dxy, dxyz;
+        double dx;
+        double dy;
+        double dz;
+        double dxy;
+        double dxyz;
         forX:
         for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
@@ -1939,22 +1950,30 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                         }
                     }
 
-                    if (Math.abs((x) * nx + (y) * ny + (z) * nz) < threshold)
+                    if (Math.abs((x) * nx + (y) * ny + (z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
-                    if (Math.abs((-x) * nx + (y) * ny + (z) * nz) < threshold)
+                    }
+                    if (Math.abs((-x) * nx + (y) * ny + (z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
-                    if (Math.abs((x) * nx + (-y) * ny + (z) * nz) < threshold)
+                    }
+                    if (Math.abs((x) * nx + (-y) * ny + (z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px + x, py - y, pz + z), block);
-                    if (Math.abs((x) * nx + (y) * ny + (-z) * nz) < threshold)
+                    }
+                    if (Math.abs((x) * nx + (y) * ny + (-z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
-                    if (Math.abs((-x) * nx + (-y) * ny + (z) * nz) < threshold)
+                    }
+                    if (Math.abs((-x) * nx + (-y) * ny + (z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px - x, py - y, pz + z), block);
-                    if (Math.abs((x) * nx + (-y) * ny + (-z) * nz) < threshold)
+                    }
+                    if (Math.abs((x) * nx + (-y) * ny + (-z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px + x, py - y, pz - z), block);
-                    if (Math.abs((-x) * nx + (y) * ny + (-z) * nz) < threshold)
+                    }
+                    if (Math.abs((-x) * nx + (y) * ny + (-z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
-                    if (Math.abs((-x) * nx + (-y) * ny + (-z) * nz) < threshold)
+                    }
+                    if (Math.abs((-x) * nx + (-y) * ny + (-z) * nz) < threshold) {
                         setBlock(mutable.setComponents(px - x, py - y, pz - z), block);
+                    }
                 }
             }
         }
@@ -2044,18 +2063,26 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     yy = py + y;
                     if (yy <= maxY) {
                         this.setBlock(px + x, py + y, pz + z, block);
-                        if (x != 0) this.setBlock(px - x, py + y, pz + z, block);
+                        if (x != 0) {
+                            this.setBlock(px - x, py + y, pz + z, block);
+                        }
                         if (z != 0) {
                             this.setBlock(px + x, py + y, pz - z, block);
-                            if (x != 0) this.setBlock(px - x, py + y, pz - z, block);
+                            if (x != 0) {
+                                this.setBlock(px - x, py + y, pz - z, block);
+                            }
                         }
                     }
                     if (y != 0 && (yy = py - y) >= 0) {
                         this.setBlock(px + x, yy, pz + z, block);
-                        if (x != 0) this.setBlock(px - x, yy, pz + z, block);
+                        if (x != 0) {
+                            this.setBlock(px - x, yy, pz + z, block);
+                        }
                         if (z != 0) {
                             this.setBlock(px + x, yy, pz - z, block);
-                            if (x != 0) this.setBlock(px - x, yy, pz - z, block);
+                            if (x != 0) {
+                                this.setBlock(px - x, yy, pz - z, block);
+                            }
                         }
                     }
                 }
@@ -2108,6 +2135,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+    @Deprecated
     public int thaw(BlockVector3 position, double radius)
             throws MaxChangedBlocksException {
         int affected = 0;
@@ -2158,6 +2186,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+    @Deprecated
     public int simulateSnow(BlockVector3 position, double radius) throws MaxChangedBlocksException {
         int affected = 0;
         double radiusSq = radius * radius;
@@ -2226,6 +2255,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+    @SuppressWarnings("CheckStyle")
     @Deprecated
     public int green(BlockVector3 position, double radius, boolean onlyNormalDirt)
         throws MaxChangedBlocksException {
@@ -2251,7 +2281,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     final BlockType block = getBlockType(x, y, z);
                     switch (block.getInternalId()) {
                         case BlockID.COARSE_DIRT:
-                            if (onlyNormalDirt) break loop;
+                            if (onlyNormalDirt) {
+                                break loop;
+                            }
                         case BlockID.DIRT:
                             this.setBlock(x, y, z, grass);
                             break loop;
@@ -2338,7 +2370,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return the results
      */
     public List<Countable<BlockState>> getBlockDistribution(Region region, boolean separateStates) {
-        if (separateStates) return getBlockDistributionWithData(region);
+        if (separateStates) {
+            return getBlockDistributionWithData(region);
+        }
         List<Countable<BlockType>> normalDistr = getBlockDistribution(region);
         List<Countable<BlockState>> distribution = new ArrayList<>();
         for (Countable<BlockType> count : normalDistr) {
@@ -2357,8 +2391,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param expressionString the expression defining the shape
      * @param hollow whether the shape should be hollow
      * @return number of blocks changed
-     * @throws ExpressionException Thrown when there's a problem during any stage of the expression compilation or evaluation.
-     * @throws MaxChangedBlocksException Thrown when the block limit has been reached
+     * @throws ExpressionException if there is a problem with the expression
+     * @throws MaxChangedBlocksException if the maximum block change limit is exceeded
      */
     public int makeShape(final Region region, final Vector3 zero, final Vector3 unit,
                          final Pattern pattern, final String expressionString, final boolean hollow)
@@ -2377,8 +2411,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param hollow whether the shape should be hollow
      * @param timeout the time, in milliseconds, to wait for each expression evaluation before halting it. -1 to disable
      * @return number of blocks changed
-     * @throws ExpressionException Thrown when there's a problem during any stage of the expression compilation or evaluation.
-     * @throws MaxChangedBlocksException Thrown when the block limit has been reached
+     * @throws ExpressionException if there is a problem with the expression
+     * @throws MaxChangedBlocksException if the maximum block change limit is exceeded
      */
     public int makeShape(final Region region, final Vector3 zero, final Vector3 unit,
                         final Pattern pattern, final String expressionString, final boolean hollow, final int timeout)
@@ -2542,63 +2576,63 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     public int hollowOutRegion(Region region, int thickness, Pattern pattern, Mask mask) {
         try {
-        final Set<BlockVector3> outside = new LocalBlockVectorSet();
+            final Set<BlockVector3> outside = new LocalBlockVectorSet();
 
-        final BlockVector3 min = region.getMinimumPoint();
-        final BlockVector3 max = region.getMaximumPoint();
+            final BlockVector3 min = region.getMinimumPoint();
+            final BlockVector3 max = region.getMaximumPoint();
 
-        final int minX = min.getBlockX();
-        final int minY = min.getBlockY();
-        final int minZ = min.getBlockZ();
-        final int maxX = max.getBlockX();
-        final int maxY = max.getBlockY();
-        final int maxZ = max.getBlockZ();
+            final int minX = min.getBlockX();
+            final int minY = min.getBlockY();
+            final int minZ = min.getBlockZ();
+            final int maxX = max.getBlockX();
+            final int maxY = max.getBlockY();
+            final int maxZ = max.getBlockZ();
 
-        for (int x = minX; x <= maxX; ++x) {
-            for (int y = minY; y <= maxY; ++y) {
-                recurseHollow(region, BlockVector3.at(x, y, minZ), outside, mask);
-                recurseHollow(region, BlockVector3.at(x, y, maxZ), outside, mask);
-            }
-        }
-
-        for (int y = minY; y <= maxY; ++y) {
-            for (int z = minZ; z <= maxZ; ++z) {
-                recurseHollow(region, BlockVector3.at(minX, y, z), outside, mask);
-                recurseHollow(region, BlockVector3.at(maxX, y, z), outside, mask);
-            }
-        }
-
-        for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
-                recurseHollow(region, BlockVector3.at(x, minY, z), outside, mask);
-                recurseHollow(region, BlockVector3.at(x, maxY, z), outside, mask);
+                for (int y = minY; y <= maxY; ++y) {
+                    recurseHollow(region, BlockVector3.at(x, y, minZ), outside, mask);
+                    recurseHollow(region, BlockVector3.at(x, y, maxZ), outside, mask);
+                }
             }
-        }
 
-        for (int i = 1; i < thickness; ++i) {
-            final Set<BlockVector3> newOutside = new LocalBlockVectorSet();
+            for (int y = minY; y <= maxY; ++y) {
+                for (int z = minZ; z <= maxZ; ++z) {
+                    recurseHollow(region, BlockVector3.at(minX, y, z), outside, mask);
+                    recurseHollow(region, BlockVector3.at(maxX, y, z), outside, mask);
+                }
+            }
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    recurseHollow(region, BlockVector3.at(x, minY, z), outside, mask);
+                    recurseHollow(region, BlockVector3.at(x, maxY, z), outside, mask);
+                }
+            }
+
+            for (int i = 1; i < thickness; ++i) {
+                final Set<BlockVector3> newOutside = new LocalBlockVectorSet();
+                outer: for (BlockVector3 position : region) {
+                    for (BlockVector3 recurseDirection : recurseDirections) {
+                        BlockVector3 neighbor = position.add(recurseDirection);
+
+                        if (outside.contains(neighbor)) {
+                            newOutside.add(position);
+                            continue outer;
+                        }
+                    }
+                }
+
+                outside.addAll(newOutside);
+            }
+
             outer: for (BlockVector3 position : region) {
                 for (BlockVector3 recurseDirection : recurseDirections) {
                     BlockVector3 neighbor = position.add(recurseDirection);
-
                     if (outside.contains(neighbor)) {
-                        newOutside.add(position);
                         continue outer;
                     }
                 }
-            }
-
-            outside.addAll(newOutside);
-        }
-
-        outer: for (BlockVector3 position : region) {
-            for (BlockVector3 recurseDirection : recurseDirections) {
-                BlockVector3 neighbor = position.add(recurseDirection);
-                if (outside.contains(neighbor)) {
-                    continue outer;
-                }
-            }
-            this.changes++;
+                this.changes++;
                 pattern.apply(getExtent(), position, position);
             }
         } catch (WorldEditException e) {
@@ -2631,10 +2665,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
         boolean notdrawn = true;
 
-        int x1 = pos1.getBlockX(), y1 = pos1.getBlockY(), z1 = pos1.getBlockZ();
-        int x2 = pos2.getBlockX(), y2 = pos2.getBlockY(), z2 = pos2.getBlockZ();
-        int tipx = x1, tipy = y1, tipz = z1;
-        int dx = Math.abs(x2 - x1), dy = Math.abs(y2 - y1), dz = Math.abs(z2 - z1);
+        int x1 = pos1.getBlockX();
+        int y1 = pos1.getBlockY();
+        int z1 = pos1.getBlockZ();
+        int x2 = pos2.getBlockX();
+        int y2 = pos2.getBlockY();
+        int z2 = pos2.getBlockZ();
+        int tipx = x1;
+        int tipy = y1;
+        int tipz = z1;
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int dz = Math.abs(z2 - z1);
 
         if (dx + dy + dz == 0) {
             vset.add(BlockVector3.at(tipx, tipy, tipz));
@@ -2661,8 +2703,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else if (dMax == dz && notdrawn) {
             for (int domstep = 0; domstep <= dz; domstep++) {
                 tipz = z1 + domstep * (z2 - z1 > 0 ? 1 : -1);
-                tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dz * (y2-y1>0 ? 1 : -1));
-                tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dz * (x2-x1>0 ? 1 : -1));
+                tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dz * (y2 - y1 > 0 ? 1 : -1));
+                tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dz * (x2 - x1 > 0 ? 1 : -1));
 
                 vset.add(BlockVector3.at(tipx, tipy, tipz));
             }
@@ -2702,10 +2744,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             BlockVector3 pos1 = vectors.get(i);
             BlockVector3 pos2 = vectors.get(i + 1);
 
-            int x1 = pos1.getBlockX(), y1 = pos1.getBlockY(), z1 = pos1.getBlockZ();
-            int x2 = pos2.getBlockX(), y2 = pos2.getBlockY(), z2 = pos2.getBlockZ();
-            int tipx = x1, tipy = y1, tipz = z1;
-            int dx = Math.abs(x2 - x1), dy = Math.abs(y2 - y1), dz = Math.abs(z2 - z1);
+            int x1 = pos1.getBlockX();
+            int y1 = pos1.getBlockY();
+            int z1 = pos1.getBlockZ();
+            int x2 = pos2.getBlockX();
+            int y2 = pos2.getBlockY();
+            int z2 = pos2.getBlockZ();
+            int tipx = x1;
+            int tipy = y1;
+            int tipz = z1;
+            int dx = Math.abs(x2 - x1);
+            int dy = Math.abs(y2 - y1);
+            int dz = Math.abs(z2 - z1);
 
             if (dx + dy + dz == 0) {
                 vset.add(BlockVector3.at(tipx, tipy, tipz));
@@ -2732,8 +2782,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             } else /* if (dMax == dz) */ {
                 for (int domstep = 0; domstep <= dz; domstep++) {
                     tipz = z1 + domstep * (z2 - z1 > 0 ? 1 : -1);
-                    tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dz) * (y2-y1>0 ? 1 : -1));
-                    tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dz) * (x2-x1>0 ? 1 : -1));
+                    tipy = (int) Math.round(y1 + domstep * ((double) dy) / ((double) dz) * (y2 - y1 > 0 ? 1 : -1));
+                    tipx = (int) Math.round(x1 + domstep * ((double) dx) / ((double) dz) * (x2 - x1 > 0 ? 1 : -1));
 
                     vset.add(BlockVector3.at(tipx, tipy, tipz));
                 }
@@ -2809,7 +2859,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int ceilrad = (int) Math.ceil(radius);
 
         for (BlockVector3 v : vset) {
-            int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
+            int tipx = v.getBlockX();
+            int tipy = v.getBlockY();
+            int tipz = v.getBlockZ();
 
             for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                 for (int loopy = tipy - ceilrad; loopy <= tipy + ceilrad; loopy++) {
@@ -2831,7 +2883,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
         final int ceilrad = (int) Math.ceil(radius);
         for (BlockVector3 v : vset) {
-            final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
+            final int tipx = v.getBlockX();
+            final int tipy = v.getBlockY();
+            final int tipz = v.getBlockZ();
             for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                 for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                     if (MathMan.hypot(loopx - tipx, 0, loopz - tipz) <= radius) {
@@ -2848,11 +2902,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final LocalBlockVectorSet newset = new LocalBlockVectorSet();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
-            final int x = v.getX(), y = v.getY(), z = v.getZ();
-            if (!(newset.contains(x + 1, y, z) &&
-                    newset.contains(x - 1, y, z) &&
-                    newset.contains(x, y, z + 1) &&
-                    newset.contains(x, y, z - 1))) {
+            final int x = v.getX();
+            final int y = v.getY();
+            final int z = v.getZ();
+            if (!(newset.contains(x + 1, y, z) && newset.contains(x - 1, y, z)
+                && newset.contains(x, y, z + 1) && newset.contains(x, y, z - 1))) {
                 returnset.add(v);
             }
         }
@@ -2864,13 +2918,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final LocalBlockVectorSet newset = new LocalBlockVectorSet();
         newset.addAll(vset);
         for (BlockVector3 v : newset) {
-            final int x = v.getX(), y = v.getY(), z = v.getZ();
-            if (!(newset.contains(x + 1, y, z) &&
-                    newset.contains(x - 1, y, z) &&
-                    newset.contains(x, y + 1, z) &&
-                    newset.contains(x, y - 1, z) &&
-                    newset.contains(x, y, z + 1) &&
-                    newset.contains(x, y, z - 1))) {
+            final int x = v.getX();
+            final int y = v.getY();
+            final int z = v.getZ();
+            if (!(newset.contains(x + 1, y, z)
+                && newset.contains(x - 1, y, z)
+                && newset.contains(x, y + 1, z)
+                && newset.contains(x, y - 1, z)
+                && newset.contains(x, y, z + 1)
+                && newset.contains(x, y, z - 1))) {
                 returnset.add(v);
             }
         }

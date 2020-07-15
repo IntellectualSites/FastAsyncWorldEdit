@@ -141,7 +141,9 @@ public class EntityTypes {
     }
 
     private static String convertEntityId(String id) {
-        if (id.startsWith("minecraft:")) id = id.substring(10);
+        if (id.startsWith("minecraft:")) {
+            id = id.substring(10);
+        }
         switch(id) {
             case "AreaEffectCloud": return "area_effect_cloud";
             case "ArmorStand": return "armor_stand";

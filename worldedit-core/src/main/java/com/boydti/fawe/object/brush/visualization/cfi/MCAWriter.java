@@ -20,7 +20,8 @@ public abstract class MCAWriter implements Extent {
     private final int length;
     private final int width;
     private final int area;
-    private int OX, OZ;
+    private int OX;
+    private int OZ;
 
 
     public MCAWriter(int width, int length, File regionFolder) {

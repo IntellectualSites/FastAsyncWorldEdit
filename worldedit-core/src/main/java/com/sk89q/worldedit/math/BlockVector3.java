@@ -264,7 +264,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 add(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX += other.getX();
@@ -307,7 +309,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 subtract(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX -= other.getX();
@@ -347,7 +351,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 multiply(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX *= other.getX();

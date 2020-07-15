@@ -157,7 +157,9 @@ public class BukkitWorld extends AbstractWorld {
         World tmp = worldRef.get();
         if (tmp == null) {
             tmp = Bukkit.getWorld(worldNameRef);
-            if (tmp != null) worldRef = new WeakReference<>(tmp);
+            if (tmp != null) {
+                worldRef = new WeakReference<>(tmp);
+            }
         }
         return checkNotNull(tmp, "The world was unloaded and the reference is unavailable");
     }

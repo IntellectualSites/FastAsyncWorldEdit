@@ -46,7 +46,9 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             BlockMaterial result = adapter.getMaterial(blockType);
-            if (result != null) return result;
+            if (result != null) {
+                return result;
+            }
         }
         Material mat = BukkitAdapter.adapt(blockType);
         if (mat == null) {
@@ -69,7 +71,9 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             BlockMaterial result = adapter.getMaterial(state);
-            if (result != null) return result;
+            if (result != null) {
+                return result;
+            }
         }
         return super.getMaterial(state);
     }

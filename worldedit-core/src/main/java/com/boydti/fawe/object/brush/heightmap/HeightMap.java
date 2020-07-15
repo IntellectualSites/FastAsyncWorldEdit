@@ -89,7 +89,9 @@ public interface HeightMap {
                         height = tmpY = session.getNearestSurfaceLayer(xx, zz, tmpY, 0, maxY);
                     } else {
                         height = tmpY = session.getNearestSurfaceTerrainBlock(xx, zz, tmpY, 0, maxY);
-                        if (height == -1) continue;
+                        if (height == -1) {
+                            continue;
+                        }
                     }
                     oldData[index] = height;
                     if (height == 0) {
@@ -131,7 +133,9 @@ public interface HeightMap {
                         height = session.getNearestSurfaceLayer(xx, zz, height, 0, maxY);
                     } else {
                         height = session.getNearestSurfaceTerrainBlock(xx, zz, height, 0, maxY);
-                        if (height == -1) continue;
+                        if (height == -1) {
+                            continue;
+                        }
                     }
                     oldData[index] = height;
                     if (height == 0) {

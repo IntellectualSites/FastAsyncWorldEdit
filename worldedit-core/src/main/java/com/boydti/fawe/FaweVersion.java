@@ -1,7 +1,11 @@
 package com.boydti.fawe;
 
 public class FaweVersion {
-    public final int year, month, day, hash, build;
+    public final int year;
+    public final int month;
+    public final int day;
+    public final int hash;
+    public final int build;
 
     public FaweVersion(int year, int month, int day, int hash, int build) {
         this.year = year;
@@ -30,7 +34,8 @@ public class FaweVersion {
         }
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         if (hash == 0 && build == 0) {
             return "FastAsyncWorldEdit-1.16-NoVer-SNAPSHOT";
         } else {

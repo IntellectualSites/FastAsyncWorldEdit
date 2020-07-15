@@ -26,9 +26,8 @@ import static net.jpountz.lz4.LZ4Utils.hashHC;
 final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
 
     public static final LZ4Compressor INSTANCE = new LZ4HCJavaSafeCompressor();
-
-    private final int maxAttempts;
     final int compressionLevel;
+    private final int maxAttempts;
 
     LZ4HCJavaSafeCompressor() {
         this(DEFAULT_COMPRESSION_LEVEL);
@@ -39,12 +38,307 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
         this.compressionLevel = compressionLevel;
     }
 
+    @Override
+    public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
+
+        SafeUtils.checkRange(src, srcOff, srcLen);
+        SafeUtils.checkRange(dest, destOff, maxDestLen);
+
+        final int srcEnd = srcOff + srcLen;
+        final int destEnd = destOff + maxDestLen;
+        final int mfLimit = srcEnd - MF_LIMIT;
+        final int matchLimit = srcEnd - LAST_LITERALS;
+
+        int sOff = srcOff;
+        int dOff = destOff;
+        int anchor = sOff++;
+
+        final HashTable ht = new HashTable(srcOff);
+        final Match match0 = new Match();
+        final Match match1 = new Match();
+        final Match match2 = new Match();
+        final Match match3 = new Match();
+
+        main:
+        while (sOff < mfLimit) {
+            if (!ht.insertAndFindBestMatch(src, sOff, matchLimit, match1)) {
+                ++sOff;
+                continue;
+            }
+
+            // saved, in case we would skip too much
+            copyTo(match1, match0);
+
+            search2:
+            while (true) {
+                assert match1.start >= anchor;
+                if (match1.end() >= mfLimit || !ht.insertAndFindWiderMatch(src,
+                    match1.end() - 2, match1.start + 1, matchLimit, match1.len, match2)) {
+                    // no better match
+                    dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                    anchor = sOff = match1.end();
+                    continue main;
+                }
+
+                if (match0.start < match1.start) {
+                    if (match2.start < match1.start + match0.len) { // empirical
+                        copyTo(match0, match1);
+                    }
+                }
+                assert match2.start > match1.start;
+
+                if (match2.start - match1.start < 3) { // First Match too small : removed
+                    copyTo(match2, match1);
+                    continue search2;
+                }
+
+                search3:
+                while (true) {
+                    if (match2.start - match1.start < OPTIMAL_ML) {
+                        int newMatchLen = match1.len;
+                        if (newMatchLen > OPTIMAL_ML) {
+                            newMatchLen = OPTIMAL_ML;
+                        }
+                        if (match1.start + newMatchLen > match2.end() - MIN_MATCH) {
+                            newMatchLen = match2.start - match1.start + match2.len - MIN_MATCH;
+                        }
+                        final int correction = newMatchLen - (match2.start - match1.start);
+                        if (correction > 0) {
+                            match2.fix(correction);
+                        }
+                    }
+
+                    if (match2.start + match2.len >= mfLimit || !ht.insertAndFindWiderMatch(src,
+                        match2.end() - 3, match2.start, matchLimit, match2.len, match3)) {
+                        // no better match -> 2 sequences to encode
+                        if (match2.start < match1.end()) {
+                            match1.len = match2.start - match1.start;
+                        }
+                        // encode seq 1
+                        dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                        anchor = sOff = match1.end();
+                        // encode seq 2
+                        dOff = LZ4SafeUtils.encodeSequence(src, anchor, match2.start, match2.ref, match2.len, dest, dOff, destEnd);
+                        anchor = sOff = match2.end();
+                        continue main;
+                    }
+
+                    if (match3.start
+                        < match1.end() + 3) { // Not enough space for match 2 : remove it
+                        if (match3.start
+                            >= match1.end()) { // // can write Seq1 immediately ==> Seq2 is removed, so Seq3 becomes Seq1
+                            if (match2.start < match1.end()) {
+                                final int correction = match1.end() - match2.start;
+                                match2.fix(correction);
+                                if (match2.len < MIN_MATCH) {
+                                    copyTo(match3, match2);
+                                }
+                            }
+
+                            dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                            anchor = sOff = match1.end();
+
+                            copyTo(match3, match1);
+                            copyTo(match2, match0);
+
+                            continue search2;
+                        }
+
+                        copyTo(match3, match2);
+                        continue search3;
+                    }
+
+                    // OK, now we have 3 ascending matches; let's write at least the first one
+                    if (match2.start < match1.end()) {
+                        if (match2.start - match1.start < ML_MASK) {
+                            if (match1.len > OPTIMAL_ML) {
+                                match1.len = OPTIMAL_ML;
+                            }
+                            if (match1.end() > match2.end() - MIN_MATCH) {
+                                match1.len = match2.end() - match1.start - MIN_MATCH;
+                            }
+                            final int correction = match1.end() - match2.start;
+                            match2.fix(correction);
+                        } else {
+                            match1.len = match2.start - match1.start;
+                        }
+                    }
+
+                    dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                    anchor = sOff = match1.end();
+
+                    copyTo(match2, match1);
+                    copyTo(match3, match2);
+
+                    continue search3;
+                }
+
+            }
+
+        }
+
+        dOff = LZ4SafeUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
+        return dOff - destOff;
+    }
+
+    @Override
+    public int compress(ByteBuffer src, int srcOff, int srcLen, ByteBuffer dest, int destOff, int maxDestLen) {
+
+        if (src.hasArray() && dest.hasArray()) {
+            return compress(src.array(),
+                srcOff + src.arrayOffset(), srcLen, dest.array(),
+                destOff + dest.arrayOffset(), maxDestLen);
+        }
+        src = ByteBufferUtils.inNativeByteOrder(src);
+        dest = ByteBufferUtils.inNativeByteOrder(dest);
+
+        ByteBufferUtils.checkRange(src, srcOff, srcLen);
+        ByteBufferUtils.checkRange(dest, destOff, maxDestLen);
+
+        final int srcEnd = srcOff + srcLen;
+        final int destEnd = destOff + maxDestLen;
+        final int mfLimit = srcEnd - MF_LIMIT;
+        final int matchLimit = srcEnd - LAST_LITERALS;
+
+        int sOff = srcOff;
+        int dOff = destOff;
+        int anchor = sOff++;
+
+        final HashTable ht = new HashTable(srcOff);
+        final Match match0 = new Match();
+        final Match match1 = new Match();
+        final Match match2 = new Match();
+        final Match match3 = new Match();
+
+        main:
+        while (sOff < mfLimit) {
+            if (!ht.insertAndFindBestMatch(src, sOff, matchLimit, match1)) {
+                ++sOff;
+                continue;
+            }
+
+            // saved, in case we would skip too much
+            copyTo(match1, match0);
+
+            search2:
+            while (true) {
+                assert match1.start >= anchor;
+                if (match1.end() >= mfLimit || !ht.insertAndFindWiderMatch(src,
+                    match1.end() - 2, match1.start + 1, matchLimit, match1.len, match2)) {
+                    // no better match
+                    dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                    anchor = sOff = match1.end();
+                    continue main;
+                }
+
+                if (match0.start < match1.start) {
+                    if (match2.start < match1.start + match0.len) { // empirical
+                        copyTo(match0, match1);
+                    }
+                }
+                assert match2.start > match1.start;
+
+                if (match2.start - match1.start < 3) { // First Match too small : removed
+                    copyTo(match2, match1);
+                    continue search2;
+                }
+
+                search3:
+                while (true) {
+                    if (match2.start - match1.start < OPTIMAL_ML) {
+                        int newMatchLen = match1.len;
+                        if (newMatchLen > OPTIMAL_ML) {
+                            newMatchLen = OPTIMAL_ML;
+                        }
+                        if (match1.start + newMatchLen > match2.end() - MIN_MATCH) {
+                            newMatchLen = match2.start - match1.start + match2.len - MIN_MATCH;
+                        }
+                        final int correction = newMatchLen - (match2.start - match1.start);
+                        if (correction > 0) {
+                            match2.fix(correction);
+                        }
+                    }
+
+                    if (match2.start + match2.len >= mfLimit || !ht.insertAndFindWiderMatch(src,
+                        match2.end() - 3, match2.start, matchLimit, match2.len, match3)) {
+                        // no better match -> 2 sequences to encode
+                        if (match2.start < match1.end()) {
+                            match1.len = match2.start - match1.start;
+                        }
+                        // encode seq 1
+                        dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                        anchor = sOff = match1.end();
+                        // encode seq 2
+                        dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match2.start, match2.ref, match2.len, dest, dOff, destEnd);
+                        anchor = sOff = match2.end();
+                        continue main;
+                    }
+
+                    if (match3.start
+                        < match1.end() + 3) { // Not enough space for match 2 : remove it
+                        if (match3.start
+                            >= match1.end()) { // // can write Seq1 immediately ==> Seq2 is removed, so Seq3 becomes Seq1
+                            if (match2.start < match1.end()) {
+                                final int correction = match1.end() - match2.start;
+                                match2.fix(correction);
+                                if (match2.len < MIN_MATCH) {
+                                    copyTo(match3, match2);
+                                }
+                            }
+
+                            dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                            anchor = sOff = match1.end();
+
+                            copyTo(match3, match1);
+                            copyTo(match2, match0);
+
+                            continue search2;
+                        }
+
+                        copyTo(match3, match2);
+                        continue search3;
+                    }
+
+                    // OK, now we have 3 ascending matches; let's write at least the first one
+                    if (match2.start < match1.end()) {
+                        if (match2.start - match1.start < ML_MASK) {
+                            if (match1.len > OPTIMAL_ML) {
+                                match1.len = OPTIMAL_ML;
+                            }
+                            if (match1.end() > match2.end() - MIN_MATCH) {
+                                match1.len = match2.end() - match1.start - MIN_MATCH;
+                            }
+                            final int correction = match1.end() - match2.start;
+                            match2.fix(correction);
+                        } else {
+                            match1.len = match2.start - match1.start;
+                        }
+                    }
+
+                    dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
+                    anchor = sOff = match1.end();
+
+                    copyTo(match2, match1);
+                    copyTo(match3, match2);
+
+                    continue search3;
+                }
+
+            }
+
+        }
+
+        dOff = LZ4ByteBufferUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
+        return dOff - destOff;
+    }
+
+
     private class HashTable {
         static final int MASK = MAX_DISTANCE - 1;
-        int nextToUpdate;
         private final int base;
         private final int[] hashTable;
         private final short[] chainTable;
+        int nextToUpdate;
 
         HashTable(int base) {
             this.base = base;
@@ -120,7 +414,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
             if (ref >= off - 4 && ref <= off && ref >= base) { // potential repetition
                 if (LZ4SafeUtils.readIntEquals(buf, ref, off)) { // confirmed
                     delta = off - ref;
-                    repl = match.len = MIN_MATCH + LZ4SafeUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    repl = match.len = MIN_MATCH + LZ4SafeUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     match.ref = ref;
                 }
                 ref = next(ref);
@@ -131,7 +426,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
                     break;
                 }
                 if (LZ4SafeUtils.readIntEquals(buf, ref, off)) {
-                    final int matchLen = MIN_MATCH + LZ4SafeUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    final int matchLen = MIN_MATCH + LZ4SafeUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     if (matchLen > match.len) {
                         match.ref = ref;
                         match.len = matchLen;
@@ -170,7 +466,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
                     break;
                 }
                 if (LZ4SafeUtils.readIntEquals(buf, ref, off)) {
-                    final int matchLenForward = MIN_MATCH + LZ4SafeUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    final int matchLenForward = MIN_MATCH + LZ4SafeUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     final int matchLenBackward = LZ4SafeUtils.commonBytesBackward(buf, ref, off, base, startLimit);
                     final int matchLen = matchLenBackward + matchLenForward;
                     if (matchLen > match.len) {
@@ -199,7 +496,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
             if (ref >= off - 4 && ref <= off && ref >= base) { // potential repetition
                 if (LZ4ByteBufferUtils.readIntEquals(buf, ref, off)) { // confirmed
                     delta = off - ref;
-                    repl = match.len = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    repl = match.len = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     match.ref = ref;
                 }
                 ref = next(ref);
@@ -210,7 +508,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
                     break;
                 }
                 if (LZ4ByteBufferUtils.readIntEquals(buf, ref, off)) {
-                    final int matchLen = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    final int matchLen = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     if (matchLen > match.len) {
                         match.ref = ref;
                         match.len = matchLen;
@@ -249,7 +548,8 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
                     break;
                 }
                 if (LZ4ByteBufferUtils.readIntEquals(buf, ref, off)) {
-                    final int matchLenForward = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf, ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
+                    final int matchLenForward = MIN_MATCH + LZ4ByteBufferUtils.commonBytes(buf,
+                        ref + MIN_MATCH, off + MIN_MATCH, matchLimit);
                     final int matchLenBackward = LZ4ByteBufferUtils.commonBytesBackward(buf, ref, off, base, startLimit);
                     final int matchLen = matchLenBackward + matchLenForward;
                     if (matchLen > match.len) {
@@ -265,295 +565,6 @@ final class LZ4HCJavaSafeCompressor extends LZ4Compressor {
         }
 
 
-    }
-
-    @Override
-    public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
-
-        SafeUtils.checkRange(src, srcOff, srcLen);
-        SafeUtils.checkRange(dest, destOff, maxDestLen);
-
-        final int srcEnd = srcOff + srcLen;
-        final int destEnd = destOff + maxDestLen;
-        final int mfLimit = srcEnd - MF_LIMIT;
-        final int matchLimit = srcEnd - LAST_LITERALS;
-
-        int sOff = srcOff;
-        int dOff = destOff;
-        int anchor = sOff++;
-
-        final HashTable ht = new HashTable(srcOff);
-        final Match match0 = new Match();
-        final Match match1 = new Match();
-        final Match match2 = new Match();
-        final Match match3 = new Match();
-
-        main:
-        while (sOff < mfLimit) {
-            if (!ht.insertAndFindBestMatch(src, sOff, matchLimit, match1)) {
-                ++sOff;
-                continue;
-            }
-
-            // saved, in case we would skip too much
-            copyTo(match1, match0);
-
-            search2:
-            while (true) {
-                assert match1.start >= anchor;
-                if (match1.end() >= mfLimit
-                        || !ht.insertAndFindWiderMatch(src, match1.end() - 2, match1.start + 1, matchLimit, match1.len, match2)) {
-                    // no better match
-                    dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                    anchor = sOff = match1.end();
-                    continue main;
-                }
-
-                if (match0.start < match1.start) {
-                    if (match2.start < match1.start + match0.len) { // empirical
-                        copyTo(match0, match1);
-                    }
-                }
-                assert match2.start > match1.start;
-
-                if (match2.start - match1.start < 3) { // First Match too small : removed
-                    copyTo(match2, match1);
-                    continue search2;
-                }
-
-                search3:
-                while (true) {
-                    if (match2.start - match1.start < OPTIMAL_ML) {
-                        int newMatchLen = match1.len;
-                        if (newMatchLen > OPTIMAL_ML) {
-                            newMatchLen = OPTIMAL_ML;
-                        }
-                        if (match1.start + newMatchLen > match2.end() - MIN_MATCH) {
-                            newMatchLen = match2.start - match1.start + match2.len - MIN_MATCH;
-                        }
-                        final int correction = newMatchLen - (match2.start - match1.start);
-                        if (correction > 0) {
-                            match2.fix(correction);
-                        }
-                    }
-
-                    if (match2.start + match2.len >= mfLimit
-                            || !ht.insertAndFindWiderMatch(src, match2.end() - 3, match2.start, matchLimit, match2.len, match3)) {
-                        // no better match -> 2 sequences to encode
-                        if (match2.start < match1.end()) {
-                            match1.len = match2.start - match1.start;
-                        }
-                        // encode seq 1
-                        dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                        anchor = sOff = match1.end();
-                        // encode seq 2
-                        dOff = LZ4SafeUtils.encodeSequence(src, anchor, match2.start, match2.ref, match2.len, dest, dOff, destEnd);
-                        anchor = sOff = match2.end();
-                        continue main;
-                    }
-
-                    if (match3.start < match1.end() + 3) { // Not enough space for match 2 : remove it
-                        if (match3.start >= match1.end()) { // // can write Seq1 immediately ==> Seq2 is removed, so Seq3 becomes Seq1
-                            if (match2.start < match1.end()) {
-                                final int correction = match1.end() - match2.start;
-                                match2.fix(correction);
-                                if (match2.len < MIN_MATCH) {
-                                    copyTo(match3, match2);
-                                }
-                            }
-
-                            dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                            anchor = sOff = match1.end();
-
-                            copyTo(match3, match1);
-                            copyTo(match2, match0);
-
-                            continue search2;
-                        }
-
-                        copyTo(match3, match2);
-                        continue search3;
-                    }
-
-                    // OK, now we have 3 ascending matches; let's write at least the first one
-                    if (match2.start < match1.end()) {
-                        if (match2.start - match1.start < ML_MASK) {
-                            if (match1.len > OPTIMAL_ML) {
-                                match1.len = OPTIMAL_ML;
-                            }
-                            if (match1.end() > match2.end() - MIN_MATCH) {
-                                match1.len = match2.end() - match1.start - MIN_MATCH;
-                            }
-                            final int correction = match1.end() - match2.start;
-                            match2.fix(correction);
-                        } else {
-                            match1.len = match2.start - match1.start;
-                        }
-                    }
-
-                    dOff = LZ4SafeUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                    anchor = sOff = match1.end();
-
-                    copyTo(match2, match1);
-                    copyTo(match3, match2);
-
-                    continue search3;
-                }
-
-            }
-
-        }
-
-        dOff = LZ4SafeUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
-        return dOff - destOff;
-    }
-
-
-    @Override
-    public int compress(ByteBuffer src, int srcOff, int srcLen, ByteBuffer dest, int destOff, int maxDestLen) {
-
-        if (src.hasArray() && dest.hasArray()) {
-            return compress(src.array(), srcOff + src.arrayOffset(), srcLen, dest.array(), destOff + dest.arrayOffset(), maxDestLen);
-        }
-        src = ByteBufferUtils.inNativeByteOrder(src);
-        dest = ByteBufferUtils.inNativeByteOrder(dest);
-
-        ByteBufferUtils.checkRange(src, srcOff, srcLen);
-        ByteBufferUtils.checkRange(dest, destOff, maxDestLen);
-
-        final int srcEnd = srcOff + srcLen;
-        final int destEnd = destOff + maxDestLen;
-        final int mfLimit = srcEnd - MF_LIMIT;
-        final int matchLimit = srcEnd - LAST_LITERALS;
-
-        int sOff = srcOff;
-        int dOff = destOff;
-        int anchor = sOff++;
-
-        final HashTable ht = new HashTable(srcOff);
-        final Match match0 = new Match();
-        final Match match1 = new Match();
-        final Match match2 = new Match();
-        final Match match3 = new Match();
-
-        main:
-        while (sOff < mfLimit) {
-            if (!ht.insertAndFindBestMatch(src, sOff, matchLimit, match1)) {
-                ++sOff;
-                continue;
-            }
-
-            // saved, in case we would skip too much
-            copyTo(match1, match0);
-
-            search2:
-            while (true) {
-                assert match1.start >= anchor;
-                if (match1.end() >= mfLimit
-                        || !ht.insertAndFindWiderMatch(src, match1.end() - 2, match1.start + 1, matchLimit, match1.len, match2)) {
-                    // no better match
-                    dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                    anchor = sOff = match1.end();
-                    continue main;
-                }
-
-                if (match0.start < match1.start) {
-                    if (match2.start < match1.start + match0.len) { // empirical
-                        copyTo(match0, match1);
-                    }
-                }
-                assert match2.start > match1.start;
-
-                if (match2.start - match1.start < 3) { // First Match too small : removed
-                    copyTo(match2, match1);
-                    continue search2;
-                }
-
-                search3:
-                while (true) {
-                    if (match2.start - match1.start < OPTIMAL_ML) {
-                        int newMatchLen = match1.len;
-                        if (newMatchLen > OPTIMAL_ML) {
-                            newMatchLen = OPTIMAL_ML;
-                        }
-                        if (match1.start + newMatchLen > match2.end() - MIN_MATCH) {
-                            newMatchLen = match2.start - match1.start + match2.len - MIN_MATCH;
-                        }
-                        final int correction = newMatchLen - (match2.start - match1.start);
-                        if (correction > 0) {
-                            match2.fix(correction);
-                        }
-                    }
-
-                    if (match2.start + match2.len >= mfLimit
-                            || !ht.insertAndFindWiderMatch(src, match2.end() - 3, match2.start, matchLimit, match2.len, match3)) {
-                        // no better match -> 2 sequences to encode
-                        if (match2.start < match1.end()) {
-                            match1.len = match2.start - match1.start;
-                        }
-                        // encode seq 1
-                        dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                        anchor = sOff = match1.end();
-                        // encode seq 2
-                        dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match2.start, match2.ref, match2.len, dest, dOff, destEnd);
-                        anchor = sOff = match2.end();
-                        continue main;
-                    }
-
-                    if (match3.start < match1.end() + 3) { // Not enough space for match 2 : remove it
-                        if (match3.start >= match1.end()) { // // can write Seq1 immediately ==> Seq2 is removed, so Seq3 becomes Seq1
-                            if (match2.start < match1.end()) {
-                                final int correction = match1.end() - match2.start;
-                                match2.fix(correction);
-                                if (match2.len < MIN_MATCH) {
-                                    copyTo(match3, match2);
-                                }
-                            }
-
-                            dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                            anchor = sOff = match1.end();
-
-                            copyTo(match3, match1);
-                            copyTo(match2, match0);
-
-                            continue search2;
-                        }
-
-                        copyTo(match3, match2);
-                        continue search3;
-                    }
-
-                    // OK, now we have 3 ascending matches; let's write at least the first one
-                    if (match2.start < match1.end()) {
-                        if (match2.start - match1.start < ML_MASK) {
-                            if (match1.len > OPTIMAL_ML) {
-                                match1.len = OPTIMAL_ML;
-                            }
-                            if (match1.end() > match2.end() - MIN_MATCH) {
-                                match1.len = match2.end() - match1.start - MIN_MATCH;
-                            }
-                            final int correction = match1.end() - match2.start;
-                            match2.fix(correction);
-                        } else {
-                            match1.len = match2.start - match1.start;
-                        }
-                    }
-
-                    dOff = LZ4ByteBufferUtils.encodeSequence(src, anchor, match1.start, match1.ref, match1.len, dest, dOff, destEnd);
-                    anchor = sOff = match1.end();
-
-                    copyTo(match2, match1);
-                    copyTo(match3, match2);
-
-                    continue search3;
-                }
-
-            }
-
-        }
-
-        dOff = LZ4ByteBufferUtils.lastLiterals(src, anchor, srcEnd - anchor, dest, dOff, destEnd);
-        return dOff - destOff;
     }
 
 

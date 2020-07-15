@@ -17,7 +17,9 @@ import java.util.List;
 
 public class CatenaryBrush implements Brush, ResettableTool {
 
-    private final boolean shell, select, direction;
+    private final boolean shell;
+    private final boolean select;
+    private final boolean direction;
     private final double slack;
 
     private BlockVector3 pos1;
@@ -78,7 +80,9 @@ public class CatenaryBrush implements Brush, ResettableTool {
     }
 
     public static BlockVector3 getVertex(Vector3 pos1, Vector3 pos2, double lenPercent) {
-        if (lenPercent <= 1) return pos1.add(pos2).divide(2).toBlockPoint();
+        if (lenPercent <= 1) {
+            return pos1.add(pos2).divide(2).toBlockPoint();
+        }
         double curveLen = pos1.distance(pos2) * lenPercent;
         double dy = pos2.getY() - pos1.getY();
         double dx = pos2.getX() - pos1.getX();
@@ -86,7 +90,9 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double dh = Math.sqrt(dx * dx + dz * dz);
         double g = Math.sqrt(curveLen * curveLen - dy * dy) / 2;
         double a = 0.00001;
-        for (;g < a * Math.sinh(dh/(2 * a)); a *= 1.00001);
+        for (;g < a * Math.sinh(dh/(2 * a)); a *= 1.00001) {
+            ;
+        }
         double vertX = (dh-a*Math.log((curveLen + dy)/(curveLen - dy)))/2.0;
         double z = (dh / 2) / a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;

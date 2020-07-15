@@ -98,7 +98,8 @@ public abstract class ChunkListener implements Listener {
 
     protected final Long2ObjectOpenHashMap<Boolean> badChunks = new Long2ObjectOpenHashMap<>();
     private Long2ObjectOpenHashMap<int[]> counter = new Long2ObjectOpenHashMap<>();
-    private int lastX = Integer.MIN_VALUE, lastZ = Integer.MIN_VALUE;
+    private int lastX = Integer.MIN_VALUE;
+    private int lastZ = Integer.MIN_VALUE;
     private int[] lastCount;
 
     public int[] getCount(int cx, int cz) {

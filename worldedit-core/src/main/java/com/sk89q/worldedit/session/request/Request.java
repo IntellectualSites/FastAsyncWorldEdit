@@ -73,9 +73,15 @@ public final class Request {
     }
 
     public @Nullable Extent getExtent() {
-        if (extent != null) return extent;
-        if (editSession != null) return editSession;
-        if (world != null) return world;
+        if (extent != null) {
+            return extent;
+        }
+        if (editSession != null) {
+            return editSession;
+        }
+        if (world != null) {
+            return world;
+        }
         return null;
     }
 

@@ -109,11 +109,15 @@ public class HistorySubCommands {
         checkCommandArgument(radius > 0, "Radius must be >= 0");
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
-        if (other == null) other = player.getUniqueId();
+        if (other == null) {
+            other = player.getUniqueId();
+        }
         if (!other.equals(player.getUniqueId())) {
             player.checkPermission("worldedit.history.undo.other");
         }
-        if (other == Identifiable.EVERYONE) other = null;
+        if (other == Identifiable.EVERYONE) {
+            other = null;
+        }
         Location origin = player.getLocation();
         BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
         BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
@@ -238,11 +242,21 @@ public class HistorySubCommands {
 
         String sizeStr = StringMan.humanReadableByteCountBin(edit.getSizeOnDisk());
         String extra = "";
-        if (biomes) extra += "biomes, ";
-        if (createdEnts) extra += "+entity, ";
-        if (removedEnts) extra += "-entity, ";
-        if (createdTiles) extra += "+tile, ";
-        if (removedTiles) extra += "-tile, ";
+        if (biomes) {
+            extra += "biomes, ";
+        }
+        if (createdEnts) {
+            extra += "+entity, ";
+        }
+        if (removedEnts) {
+            extra += "-entity, ";
+        }
+        if (createdTiles) {
+            extra += "+tile, ";
+        }
+        if (removedTiles) {
+            extra += "-tile, ";
+        }
 
         TranslatableComponent body = Caption.of("fawe.worldedit.history.find.element.more", size, edit.getMinimumPoint(), edit.getMaximumPoint(), extra.trim(), sizeStr);
         Component distr = TextComponent.of("/history distr").clickEvent(ClickEvent.suggestCommand("//history distr " + other + " " + index));
@@ -312,7 +326,9 @@ public class HistorySubCommands {
             player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with //history import )"));
             return;
         }
-        if (other == null && radius == 0 && timeDiff == 0) throw new InsufficientArgumentsException("User must be provided");
+        if (other == null && radius == 0 && timeDiff == 0) {
+            throw new InsufficientArgumentsException("User must be provided");
+        }
         checkCommandArgument(radius > 0, "Radius must be >= 0");
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
@@ -322,11 +338,15 @@ public class HistorySubCommands {
         List<Supplier<? extends ChangeSet>> history = cached == null ? null : cached.get();
 
         if (page == null || history == null) {
-            if (other == null) other = player.getUniqueId();
+            if (other == null) {
+                other = player.getUniqueId();
+            }
             if (!other.equals(player.getUniqueId())) {
                 player.checkPermission("worldedit.history.undo.other");
             }
-            if (other == Identifiable.EVERYONE) other = null;
+            if (other == Identifiable.EVERYONE) {
+                other = null;
+            }
 
             BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
             BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);

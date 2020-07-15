@@ -177,7 +177,9 @@ public class SchematicCommands {
                 if (identifiable instanceof MultiClipboardHolder) {
                     MultiClipboardHolder multi = (MultiClipboardHolder) identifiable;
                     multi.remove(uri);
-                    if (multi.getHolders().isEmpty()) session.setClipboard(null);
+                    if (multi.getHolders().isEmpty()) {
+                        session.setClipboard(null);
+                    }
                 } else {
                     session.setClipboard(null);
                 }
@@ -407,7 +409,9 @@ public class SchematicCommands {
             try {
                 File cached = new File(source.getParentFile(), "." + source.getName() + ".cached");
                 Files.move(source.toPath(), destFile.toPath());
-                if (cached.exists()) Files.move(cached.toPath(), destFile.toPath());
+                if (cached.exists()) {
+                    Files.move(cached.toPath(), destFile.toPath());
+                }
                 player.print(Caption.of("fawe.worldedit.schematic.schematic.move.success" , source, destFile));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -423,7 +427,9 @@ public class SchematicCommands {
         List<File> files = new ArrayList<>();
         for (URI uri : uris) {
             File file = new File(uri);
-            if (file.exists()) files.add(file);
+            if (file.exists()) {
+                files.add(file);
+            }
         }
         return files;
     }
@@ -681,7 +687,9 @@ public class SchematicCommands {
                     }
                 } else {
                     res = Long.compare(f1.lastModified(), f2.lastModified()); // use date if there is a flag
-                    if (sortType == 1) res = -res; // flip date for newest first instead of oldest first
+                    if (sortType == 1) {
+                        res = -res; // flip date for newest first instead of oldest first
+                    }
                 }
                 return res;
             });
@@ -694,7 +702,9 @@ public class SchematicCommands {
     //TODO filtering for directories, global, and private scheamtics needs to be reimplemented here
     private static List<File> getFiles(File root, String filter, ClipboardFormat format) {
         File[] files = root.listFiles();
-        if (files == null) return null;
+        if (files == null) {
+            return null;
+        }
         //Only get the files that match the format parameter
         if (format != null) {
             files = Arrays.stream(files).filter(format::isFormat).toArray(File[]::new);
@@ -703,7 +713,9 @@ public class SchematicCommands {
         for (File f : files) {
             if (f.isDirectory()) {
                 List<File> subFiles = getFiles(f, filter, format);
-                if (subFiles == null) continue; // empty subdir
+                if (subFiles == null) {
+                    continue; // empty subdir
+                }
                 fileList.addAll(subFiles);
             } else {
                 fileList.add(f);

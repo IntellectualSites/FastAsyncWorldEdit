@@ -282,12 +282,24 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();
 
-        if (x < min.getBlockX()) return false;
-        if (x > max.getBlockX()) return false;
-        if (y < min.getBlockY()) return false;
-        if (y > max.getBlockY()) return false;
-        if (z < min.getBlockZ()) return false;
-        if (z > max.getBlockZ()) return false;
+        if (x < min.getBlockX()) {
+            return false;
+        }
+        if (x > max.getBlockX()) {
+            return false;
+        }
+        if (y < min.getBlockY()) {
+            return false;
+        }
+        if (y > max.getBlockY()) {
+            return false;
+        }
+        if (z < min.getBlockZ()) {
+            return false;
+        }
+        if (z > max.getBlockZ()) {
+            return false;
+        }
 
         return containsRaw(position.toVector3());
     }

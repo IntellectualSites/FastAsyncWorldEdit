@@ -307,17 +307,33 @@ public class Location extends Vector3Impl {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Location location = (Location) o;
 
-        if (Double.doubleToLongBits(pitch) != Double.doubleToLongBits(location.pitch)) return false;
-        if (Double.doubleToLongBits(yaw) != Double.doubleToLongBits(location.yaw)) return false;
-        if (this.getX() != location.getX()) return false;
-        if (this.getZ() != location.getZ()) return false;
-        if (this.getY() != location.getY()) return false;
-        if (!extent.equals(location.extent)) return false;
+        if (Double.doubleToLongBits(pitch) != Double.doubleToLongBits(location.pitch)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(yaw) != Double.doubleToLongBits(location.yaw)) {
+            return false;
+        }
+        if (this.getX() != location.getX()) {
+            return false;
+        }
+        if (this.getZ() != location.getZ()) {
+            return false;
+        }
+        if (this.getY() != location.getY()) {
+            return false;
+        }
+        if (!extent.equals(location.extent)) {
+            return false;
+        }
 
         return true;
     }

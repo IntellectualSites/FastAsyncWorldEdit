@@ -55,7 +55,9 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public List<? extends Entity> getEntities() {
-        if (!hasEntities) return new ArrayList<>();
+        if (!hasEntities) {
+            return new ArrayList<>();
+        }
         return getExtent().getEntities(getRegion());
     }
 

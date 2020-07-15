@@ -139,8 +139,11 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
             }
         }
         if (caught != null) {
-            if (caught instanceof RuntimeException) throw (RuntimeException) caught;
-            else throw new RuntimeException(caught);
+            if (caught instanceof RuntimeException) {
+                throw (RuntimeException) caught;
+            } else {
+                throw new RuntimeException(caught);
+            }
         }
     }
 

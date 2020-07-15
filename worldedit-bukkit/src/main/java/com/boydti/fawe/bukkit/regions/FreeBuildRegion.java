@@ -25,8 +25,12 @@ public class FreeBuildRegion extends BukkitMaskManager {
         this.listeners = new ArrayList<>();
         RegisteredListener[] listeners = BlockBreakEvent.getHandlerList().getRegisteredListeners();
         for (RegisteredListener listener : listeners) {
-            if (listener.getPriority() == EventPriority.MONITOR) continue;
-            if (!listener.isIgnoringCancelled()) continue;
+            if (listener.getPriority() == EventPriority.MONITOR) {
+                continue;
+            }
+            if (!listener.isIgnoringCancelled()) {
+                continue;
+            }
             this.listeners.add(listener);
         }
     }
@@ -38,14 +42,20 @@ public class FreeBuildRegion extends BukkitMaskManager {
 
     @Override
     public FaweMask getMask(Player player, MaskType type) {
-        if (type != MaskType.MEMBER) return null;
+        if (type != MaskType.MEMBER) {
+            return null;
+        }
         ArrayList<RegisteredListener> currRegList = new ArrayList<>();
         for (RegisteredListener listener : this.listeners) {
             String name = listener.getPlugin().getName();
-            if (!player.hasPermission("fawe.freebuild." + name.toLowerCase())) continue;
+            if (!player.hasPermission("fawe.freebuild." + name.toLowerCase())) {
+                continue;
+            }
             currRegList.add(listener);
         }
-        if (currRegList.isEmpty()) return null;
+        if (currRegList.isEmpty()) {
+            return null;
+        }
         RegisteredListener[] listeners = currRegList.toArray(new RegisteredListener[0]);
 
         World bukkitWorld = BukkitAdapter.adapt(player.getWorld());
@@ -73,12 +83,15 @@ public class FreeBuildRegion extends BukkitMaskManager {
                         return contains(x, 127, z);
                     }
 
-                    private int lastX = Integer.MIN_VALUE, lastZ = Integer.MIN_VALUE;
+                    private int lastX = Integer.MIN_VALUE;
+                    private int lastZ = Integer.MIN_VALUE;
                     private boolean lastResult;
 
                     @Override
                     public boolean contains(int x, int y, int z) {
-                        if (x == lastX && z == lastZ) return lastResult;
+                        if (x == lastX && z == lastZ) {
+                            return lastResult;
+                        }
                         lastX = x;
                         lastZ = z;
                         event.setCancelled(false);

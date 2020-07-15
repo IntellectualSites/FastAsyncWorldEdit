@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_1;
+package com.boydti.fawe.bukkit.adapter.mc1161;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
-public final class BukkitAdapter_1_16_1 extends NMSAdapter {
+public final class BukkitAdapter1161 extends NMSAdapter {
     /*
     NMS fields
     */
@@ -90,8 +90,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
-            if ((scale & (scale - 1)) != 0)
+            if ((scale & (scale - 1)) != 0) {
                 throw new Error("data type scale not a power of two");
+            }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
         } catch (RuntimeException e) {
             throw e;
@@ -236,7 +237,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
             if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
+                for (int i = 0; i < blockBitArrayEnd; i++) {
+                    blockStates[i] = 0;
+                }
             } else {
                 final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
                 bitArray.fromRaw(blocksCopy);
@@ -258,7 +261,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
                 final BlockState state = BlockTypesCache.states[ordinal];
-                final IBlockData ibd = ((BlockMaterial_1_16_1) state.getMaterial()).getState();
+                final IBlockData ibd = ((BlockMaterial1161) state.getMaterial()).getState();
                 palette.a(ibd);
             }
             try {

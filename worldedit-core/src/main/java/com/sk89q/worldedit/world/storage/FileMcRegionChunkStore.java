@@ -62,7 +62,9 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
         }
 
         try {
-            if (file == null) throw new FileNotFoundException();
+            if (file == null) {
+                throw new FileNotFoundException();
+            }
             return new FileInputStream(file);
         } catch (FileNotFoundException e) {
             throw new MissingChunkException();

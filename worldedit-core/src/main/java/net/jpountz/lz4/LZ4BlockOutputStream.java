@@ -1,21 +1,5 @@
 package net.jpountz.lz4;
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
- * This file has been modified for use in the FAWE project.
- */
-
 import net.jpountz.util.SafeUtils;
 
 import java.io.FilterOutputStream;
@@ -27,20 +11,29 @@ import java.util.zip.Checksum;
  * Streaming LZ4 (not compatible with the LZ4 Frame format).
  * This class compresses data into fixed-size blocks of compressed data.
  * This class uses its own format and is not compatible with the LZ4 Frame format.
-
+ *
  * @see LZ4BlockInputStream
  */
+@SuppressWarnings("CheckStyle")
 public final class LZ4BlockOutputStream extends FilterOutputStream {
 
-    static final byte[] MAGIC = new byte[]{'L', 'Z', '4', 'B', 'l', 'o', 'c', 'k'};
+    static final byte[] MAGIC = new byte[] {
+        'L',
+        'Z',
+        '4',
+        'B',
+        'l',
+        'o',
+        'c',
+        'k'
+    };
     static final int MAGIC_LENGTH = MAGIC.length;
 
-    static final int HEADER_LENGTH =
-            MAGIC_LENGTH // magic bytes
-                    + 1          // token
-                    + 4          // compressed length
-                    + 4          // decompressed length
-                    + 4;         // checksum
+    static final int HEADER_LENGTH = MAGIC_LENGTH // magic bytes
+        + 1          // token
+        + 4          // compressed length
+        + 4          // decompressed length
+        + 4;         // checksum
 
     static final int COMPRESSION_LEVEL_BASE = 10;
     static final int MIN_BLOCK_SIZE = 64;
@@ -50,21 +43,6 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
     static final int COMPRESSION_METHOD_LZ4 = 0x20;
 
     static final int DEFAULT_SEED = 0x9747b28c;
-
-    private static int compressionLevel(int blockSize) {
-        if (blockSize < MIN_BLOCK_SIZE) {
-            throw new IllegalArgumentException("blockSize must be >= " + MIN_BLOCK_SIZE + ", got " + blockSize);
-        } else if (blockSize > MAX_BLOCK_SIZE) {
-            throw new IllegalArgumentException("blockSize must be <= " + MAX_BLOCK_SIZE + ", got " + blockSize);
-        }
-        int compressionLevel = 32 - Integer.numberOfLeadingZeros(blockSize - 1); // ceil of log2
-        assert (1 << compressionLevel) >= blockSize;
-        assert blockSize * 2 > (1 << compressionLevel);
-        compressionLevel = Math.max(0, compressionLevel - COMPRESSION_LEVEL_BASE);
-        assert compressionLevel >= 0 && compressionLevel <= 0x0F;
-        return compressionLevel;
-    }
-
     private final int blockSize;
     private final int compressionLevel;
     private final LZ4Compressor compressor;
@@ -74,20 +52,19 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
     private final boolean syncFlush;
     private boolean finished;
     private int o;
-
     /**
      * Creates a new {@link OutputStream} with configurable block size. Large
      * blocks require more memory at compression and decompression time but
      * should improve the compression ratio.
      *
-     * @param out        the {@link OutputStream} to feed
-     * @param blockSize  the maximum number of bytes to try to compress at once,
-   *                    must be &gt;= 64 and &lt;= 32 M
+     * @param out the {@link OutputStream} to feed
+     * @param blockSize the maximum number of bytes to try to compress at once,
+     * must be &gt;= 64 and &lt;= 32 M
      * @param compressor the {@link LZ4Compressor} instance to use to compress
-   *                    data
-     * @param checksum   the {@link Checksum} instance to use to check data for
-   *                    integrity.
-     * @param syncFlush  true if pending data should also be flushed on {@link #flush()}
+     * data
+     * @param checksum the {@link Checksum} instance to use to check data for
+     * integrity.
+     * @param syncFlush true if pending data should also be flushed on {@link #flush()}
      */
     public LZ4BlockOutputStream(OutputStream out, int blockSize, LZ4Compressor compressor, Checksum checksum, boolean syncFlush) {
         super(out);
@@ -104,17 +81,16 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
         System.arraycopy(MAGIC, 0, compressedBuffer, 0, MAGIC_LENGTH);
     }
 
-  /**
-   * Creates a new instance which checks stream integrity and doesn't sync flush.
-   *
-   * @param out         the {@link OutputStream} to feed
-   * @param blockSize   the maximum number of bytes to try to compress at once,
-   *                    must be &gt;= 64 and &lt;= 32 M
-   * @param compressor  the {@link LZ4Compressor} instance to use to compress
-   *                    data
-   *
-   * @see #LZ4BlockOutputStream(OutputStream, int, LZ4Compressor, Checksum, boolean)
-   */
+    /**
+     * Creates a new instance which checks stream integrity and doesn't sync flush.
+     *
+     * @param out the {@link OutputStream} to feed
+     * @param blockSize the maximum number of bytes to try to compress at once,
+     * must be &gt;= 64 and &lt;= 32 M
+     * @param compressor the {@link LZ4Compressor} instance to use to compress
+     * data
+     * @see #LZ4BlockOutputStream(OutputStream, int, LZ4Compressor, Checksum, boolean)
+     */
     public LZ4BlockOutputStream(OutputStream out, int blockSize, LZ4Compressor compressor) {
         this(out, blockSize, compressor, null, false);
     }
@@ -123,10 +99,9 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
      * Creates a new instance which compresses with the standard LZ4 compression
      * algorithm.
      *
-     * @param out         the {@link OutputStream} to feed
-     * @param blockSize   the maximum number of bytes to try to compress at once,
-     *                    must be &gt;= 64 and &lt;= 32 M
-     *
+     * @param out the {@link OutputStream} to feed
+     * @param blockSize the maximum number of bytes to try to compress at once,
+     * must be &gt;= 64 and &lt;= 32 M
      * @see #LZ4BlockOutputStream(OutputStream, int, LZ4Compressor)
      * @see LZ4Factory#fastCompressor()
      */
@@ -137,12 +112,34 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
     /**
      * Creates a new instance which compresses into blocks of 64 KB.
      *
-     * @param out         the {@link OutputStream} to feed
-     *
+     * @param out the {@link OutputStream} to feed
      * @see #LZ4BlockOutputStream(OutputStream, int)
      */
     public LZ4BlockOutputStream(OutputStream out) {
         this(out, 1 << 16);
+    }
+
+    private static int compressionLevel(int blockSize) {
+        if (blockSize < MIN_BLOCK_SIZE) {
+            throw new IllegalArgumentException(
+                "blockSize must be >= " + MIN_BLOCK_SIZE + ", got " + blockSize);
+        } else if (blockSize > MAX_BLOCK_SIZE) {
+            throw new IllegalArgumentException(
+                "blockSize must be <= " + MAX_BLOCK_SIZE + ", got " + blockSize);
+        }
+        int compressionLevel = 32 - Integer.numberOfLeadingZeros(blockSize - 1); // ceil of log2
+        assert (1 << compressionLevel) >= blockSize;
+        assert blockSize * 2 > (1 << compressionLevel);
+        compressionLevel = Math.max(0, compressionLevel - COMPRESSION_LEVEL_BASE);
+        assert compressionLevel >= 0 && compressionLevel <= 0x0F;
+        return compressionLevel;
+    }
+
+    private static void writeIntLE(int i, byte[] buf, int off) {
+        buf[off++] = (byte) i;
+        buf[off++] = (byte) (i >>> 8);
+        buf[off++] = (byte) (i >>> 16);
+        buf[off++] = (byte) (i >>> 24);
     }
 
     private void ensureNotFinished() {
@@ -227,7 +224,7 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
 
     /**
      * Flushes this compressed {@link OutputStream}.
-     * 
+     * <p>
      * If the stream has been created with <code>syncFlush=true</code>, pending
      * data will be compressed and appended to the underlying {@link OutputStream}
      * before calling {@link OutputStream#flush()} on the underlying stream.
@@ -248,8 +245,8 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
     /**
      * Same as {@link #close()} except that it doesn't close the underlying stream.
      * This can be useful if you want to keep on using the underlying stream.
-   *
-   * @throws IOException if an I/O error occurs.
+     *
+     * @throws IOException if an I/O error occurs.
      */
     public void finish() throws IOException {
         ensureNotFinished();
@@ -264,17 +261,10 @@ public final class LZ4BlockOutputStream extends FilterOutputStream {
         out.flush();
     }
 
-    private static void writeIntLE(int i, byte[] buf, int off) {
-        buf[off++] = (byte) i;
-        buf[off++] = (byte) (i >>> 8);
-        buf[off++] = (byte) (i >>> 16);
-        buf[off++] = (byte) (i >>> 24);
-    }
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(out=" + out + ", blockSize=" + blockSize
-                + ", compressor=" + compressor + ", checksum=" + checksum + ")";
+            + ", compressor=" + compressor + ", checksum=" + checksum + ")";
     }
 
 }

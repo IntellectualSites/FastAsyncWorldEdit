@@ -24,8 +24,8 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.mc1_14.*;
-import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
+import com.boydti.fawe.bukkit.adapter.mc114.*;
+import com.boydti.fawe.bukkit.adapter.mc114.nbt.LazyCompoundTag114;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -97,11 +97,13 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
+            return false;
+        }
         ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
-            BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
+            BlockMaterial114 material = (BlockMaterial114) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
             ibdToStateOrdinal[id] = state.getOrdinalChar();
         }
@@ -111,13 +113,13 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
         Block block = getBlock(blockType);
-        return new BlockMaterial_1_14(block);
+        return new BlockMaterial114(block);
     }
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
-        return new BlockMaterial_1_14(bs.getBlock(), bs);
+        return new BlockMaterial114(bs.getBlock(), bs);
     }
 
     public Block getBlock(BlockType blockType) {
@@ -159,14 +161,14 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
         Chunk nmsChunk = craftChunk.getHandle();
         World nmsWorld = nmsChunk.getWorld();
 
-        IBlockData blockData = ((BlockMaterial_1_14) state.getMaterial()).getState();
+        IBlockData blockData = ((BlockMaterial114) state.getMaterial()).getState();
         ChunkSection[] sections = nmsChunk.getSections();
         int y4 = y >> 4;
         ChunkSection section = sections[y4];
 
         IBlockData existing;
         if (section == null) {
-            existing = ((BlockMaterial_1_14) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
+            existing = ((BlockMaterial114) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
         } else {
             existing = section.getType(x & 15, y & 15, z & 15);
         }
@@ -192,9 +194,13 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                 }
             }
         } else {
-            if (existing == blockData) return true;
+            if (existing == blockData) {
+                return true;
+            }
             if (section == null) {
-                if (blockData.isAir()) return true;
+                if (blockData.isAir()) {
+                    return true;
+                }
                 sections[y4] = section = new ChunkSection(y4 << 4);
             }
             nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
@@ -207,7 +213,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new FAWEWorldNativeAccess_1_14(this,
+        return new FAWEWorldNativeAccess114(this,
                 new WeakReference<>(((CraftWorld) world).getHandle()));
     }
 
@@ -245,7 +251,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
-        BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
+        BlockMaterial114 material = (BlockMaterial114) state.getMaterial();
         IBlockData mcState = material.getCraftBlockData().getState();
         return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
     }
@@ -295,16 +301,16 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
-        BlockMaterial_1_14 material = (BlockMaterial_1_14) state.getMaterial();
+        BlockMaterial114 material = (BlockMaterial114) state.getMaterial();
         return material.getCraftBlockData();
     }
 
-    private MapChunkUtil_1_14 mapUtil = new MapChunkUtil_1_14();
+    private MapChunkUtil114 mapUtil = new MapChunkUtil114();
 
     @Override
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
         WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-        PlayerChunk map = BukkitAdapter_1_14.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
+        PlayerChunk map = BukkitAdapter114.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
         if (map != null && map.hasBeenLoaded()) {
             boolean flag = false;
             PlayerChunk.d players = map.players;
@@ -357,8 +363,8 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public NBTBase fromNative(Tag foreign) {
-        if (foreign instanceof LazyCompoundTag_1_14) {
-            return ((LazyCompoundTag_1_14) foreign).get();
+        if (foreign instanceof LazyCompoundTag114) {
+            return ((LazyCompoundTag114) foreign).get();
         }
         return parent.fromNative(foreign);
     }
@@ -404,11 +410,13 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                 Fawe.get().getQueueHandler().startSet(true);
                 try {
                     SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
-                    extent.init(null, (x, z) -> new BukkitGetBlocks_1_14(freshWorld, x, z) {
+                    extent.init(null, (x, z) -> new BukkitGetBlocks114(freshWorld, x, z) {
                         @Override
                         public Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
                             Chunk cached = nmsWorld.getChunkIfLoaded(chunkX, chunkZ);
-                            if (cached != null) return cached;
+                            if (cached != null) {
+                                return cached;
+                            }
                             Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(
                                 chunkX, chunkZ));
                             while (!future.isDone()) {
@@ -441,7 +449,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
 
     @Override
     public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_14(world, chunkX, chunkZ);
+        return new BukkitGetBlocks114(world, chunkX, chunkZ);
     }
 
     @Override

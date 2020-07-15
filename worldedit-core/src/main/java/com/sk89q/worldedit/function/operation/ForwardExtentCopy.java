@@ -368,8 +368,11 @@ public class ForwardExtentCopy implements Operation {
                 copy = new IntersectRegionFunction(filterFunction, copy);
             }
             if (sourceMask != Masks.alwaysTrue()) {
-                if (maskFunc != null) copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
-                else copy = new RegionMaskingFilter(source, sourceMask, copy);
+                if (maskFunc != null) {
+                    copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
+                } else {
+                    copy = new RegionMaskingFilter(source, sourceMask, copy);
+                }
             }
             if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));

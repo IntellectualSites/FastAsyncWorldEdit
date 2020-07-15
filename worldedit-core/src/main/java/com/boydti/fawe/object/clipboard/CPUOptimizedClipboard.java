@@ -60,7 +60,9 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public void streamBiomes(IntValueReader task) {
-        if (!hasBiomes()) return;
+        if (!hasBiomes()) {
+            return;
+        }
         int index = 0;
         try {
             for (int z = 0; z < getLength(); z++) {

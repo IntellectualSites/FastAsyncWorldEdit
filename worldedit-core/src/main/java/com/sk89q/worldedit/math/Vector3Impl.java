@@ -1,7 +1,9 @@
 package com.sk89q.worldedit.math;
 
 public class Vector3Impl extends Vector3 {
-    private final double x,y,z;
+    private final double x;
+    private final double y;
+    private final double z;
 
     public Vector3Impl(double x, double y, double z) {
         this.x = x;

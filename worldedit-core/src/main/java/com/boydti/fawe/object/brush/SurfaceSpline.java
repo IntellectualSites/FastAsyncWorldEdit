@@ -39,10 +39,14 @@ public class SurfaceSpline implements Brush {
         boolean vis = editSession.getExtent() instanceof VisualExtent;
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
-            if (max == -1) return;
+            if (max == -1) {
+                return;
+            }
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
             editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
-            if (!vis) return;
+            if (!vis) {
+                return;
+            }
         }
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
@@ -64,7 +68,9 @@ public class SurfaceSpline implements Brush {
             final int tipz = (int) tipv.getZ();
             int tipy = MathMan.roundInt(tipv.getY());
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
-            if (tipy == -1) continue;
+            if (tipy == -1) {
+                continue;
+            }
             if (radius == 0) {
                 BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
                 try {
@@ -81,19 +87,25 @@ public class SurfaceSpline implements Brush {
             LocalBlockVectorSet newSet = new LocalBlockVectorSet();
             final int ceilrad = (int) Math.ceil(radius);
             for (BlockVector3 v : vset) {
-                final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
+                final int tipx = v.getBlockX();
+                final int tipy = v.getBlockY();
+                final int tipz = v.getBlockZ();
                 for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                     for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                         if (MathMan.hypot2(loopx - tipx, 0, loopz - tipz) <= radius2) {
                             int y = editSession.getNearestSurfaceTerrainBlock(loopx, loopz, v.getBlockY(), 0, maxY);
-                            if (y == -1) continue;
+                            if (y == -1) {
+                                continue;
+                            }
                             newSet.add(loopx, y, loopz);
                         }
                     }
                 }
             }
             editSession.setBlocks(newSet, pattern);
-            if (!vis) path.clear();
+            if (!vis) {
+                path.clear();
+            }
         }
         editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
     }

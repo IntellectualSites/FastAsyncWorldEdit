@@ -143,7 +143,9 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
         List<? extends Property> propList = type.getProperties();
 
-        if (state.charAt(state.length() - 1) != ']') state = state + "]";
+        if (state.charAt(state.length() - 1) != ']') {
+            state = state + "]";
+        }
         MutableCharSequence charSequence = MutableCharSequence.getTemporal();
         charSequence.setString(state);
 

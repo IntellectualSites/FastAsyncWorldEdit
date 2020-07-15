@@ -352,7 +352,9 @@ public class PlatformManager {
                 }
 
                 virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
-                if (event.isCancelled()) return;
+                if (event.isCancelled()) {
+                    return;
+                }
             }
 
             if (event.getType() == Interaction.HIT) {
@@ -423,7 +425,9 @@ public class PlatformManager {
                 logger.info("virtualWorld was not null in handlePlayerInput()");
             }
             virtual.handlePlayerInput(player,  event);
-            if (event.isCancelled()) return;
+            if (event.isCancelled()) {
+                return;
+            }
         }
 
         try {

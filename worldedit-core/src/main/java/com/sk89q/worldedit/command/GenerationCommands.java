@@ -155,7 +155,9 @@ public class GenerationCommands {
                 int color = finalImage.getRGB(x, z);
                 BlockType block = tu.getNearestBlock(color);
                 count[0]++;
-                if (block != null) return editSession.setBlock(pos, block.getDefaultState());
+                if (block != null) {
+                    return editSession.setBlock(pos, block.getDefaultState());
+                }
                 return false;
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -211,7 +213,8 @@ public class GenerationCommands {
                                int height,
                    @Switch(name = 'h', desc = "Make a hollow cylinder")
                                boolean hollow) throws WorldEditException {
-        final double radiusX, radiusZ;
+        final double radiusX;
+        final double radiusZ;
         switch (radii.size()) {
             case 1:
                 radiusX = radiusZ = Math.max(1, radii.get(0));
@@ -270,7 +273,9 @@ public class GenerationCommands {
             boolean raised,
         @Switch(name = 'h', desc = "Make a hollow sphere")
             boolean hollow) throws WorldEditException {
-        final double radiusX, radiusY, radiusZ;
+        final double radiusX;
+        final double radiusY;
+        final double radiusZ;
         switch (radii.size()) {
             case 1:
                 radiusX = radiusY = radiusZ = Math.max(0, radii.get(0));
@@ -427,9 +432,15 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit = unit.withX(1.0);
-            if (unit.getY() == 0) unit = unit.withY(1.0);
-            if (unit.getZ() == 0) unit = unit.withZ(1.0);
+            if (unit.getX() == 0) {
+                unit = unit.withX(1.0);
+            }
+            if (unit.getY() == 0) {
+                unit = unit.withY(1.0);
+            }
+            if (unit.getZ() == 0) {
+                unit = unit.withZ(1.0);
+            }
         }
 
         final Vector3 unit1 = unit;
@@ -494,9 +505,15 @@ public class GenerationCommands {
             zero = max.add(min).multiply(0.5);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit = unit.withX(1.0);
-            if (unit.getY() == 0) unit = unit.withY(1.0);
-            if (unit.getZ() == 0) unit = unit.withZ(1.0);
+            if (unit.getX() == 0) {
+                unit = unit.withX(1.0);
+            }
+            if (unit.getY() == 0) {
+                unit = unit.withY(1.0);
+            }
+            if (unit.getZ() == 0) {
+                unit = unit.withZ(1.0);
+            }
         }
 
         final Vector3 unit1 = unit;

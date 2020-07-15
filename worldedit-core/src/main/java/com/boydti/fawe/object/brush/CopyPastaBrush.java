@@ -100,7 +100,9 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 transform = transform.rotateY(rotate);
             }
             if (autoRotate) {
-                if (transform == null) transform = new AffineTransform();
+                if (transform == null) {
+                    transform = new AffineTransform();
+                }
                 Location loc = player.getLocation();
                 float yaw = loc.getYaw();
                 float pitch = loc.getPitch();

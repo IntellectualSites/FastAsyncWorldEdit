@@ -183,10 +183,14 @@ public class NMSRelighter implements Relighter {
             }
             for (int lz = 0; lz < blocks.length; lz++) {
                 long[][] m1 = blocks[lz];
-                if (m1 == null) continue;
+                if (m1 == null) {
+                    continue;
+                }
                 for (int lx = 0; lx < m1.length; lx++) {
                     long[] m2 = m1[lx];
-                    if (m2 == null) continue;
+                    if (m2 == null) {
+                        continue;
+                    }
                     for (int i = 0; i < m2.length; i++) {
                         int yStart = i << 6;
                         long value = m2[i];
@@ -305,7 +309,9 @@ public class NMSRelighter implements Relighter {
     }
 
     public void fixLightingSafe(boolean sky) {
-        if (isEmpty()) return;
+        if (isEmpty()) {
+            return;
+        }
         try {
             if (sky) {
                 fixSkyLighting();
@@ -328,7 +334,9 @@ public class NMSRelighter implements Relighter {
 
     public void fixBlockLighting() {
         synchronized (lightQueue) {
-            while (!lightLock.compareAndSet(false, true));
+            while (!lightLock.compareAndSet(false, true)) {
+                ;
+            }
             try {
                 updateBlockLight(this.lightQueue);
             } finally {
@@ -542,21 +550,41 @@ public class NMSRelighter implements Relighter {
                 }
                 byte value = mask[j];
                 if (x != 0 && z != 0) {
-                    if ((value = (byte) Math.max(iChunk.getSkyLight(x - 1, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z - 1) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunk.getSkyLight(x - 1, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z - 1) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else if (x == 0 && z == 0) {
-                    if ((value = (byte) Math.max(iChunkx.getSkyLight(15, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 15) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunkx.getSkyLight(15, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 15) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else if (x == 0) {
-                    if ((value = (byte) Math.max(iChunkx.getSkyLight(15, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z - 1) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunkx.getSkyLight(15, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z - 1) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else {
-                    if ((value = (byte) Math.max(iChunk.getSkyLight(x - 1, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 15) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunk.getSkyLight(x - 1, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 15) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 }
             }
         } else {
@@ -576,21 +604,41 @@ public class NMSRelighter implements Relighter {
                 }
                 byte value = mask[j];
                 if ( x != 15 && z != 15) {
-                    if ((value = (byte) Math.max(iChunk.getSkyLight(x + 1, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z + 1) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunk.getSkyLight(x + 1, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z + 1) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else if (x == 15 && z == 15) {
-                    if ((value = (byte) Math.max(iChunkx.getSkyLight(0, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 0) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunkx.getSkyLight(0, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 0) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else if (x == 15) {
-                    if ((value = (byte) Math.max(iChunkx.getSkyLight(0, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z + 1) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunkx.getSkyLight(0, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunk.getSkyLight(x, y, z + 1) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 } else {
-                    if ((value = (byte) Math.max(iChunk.getSkyLight(x + 1, y, z) - 1, value)) >= 14) ;
-                    else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 0) - 1, value)) >= 14) ;
-                    if (value > mask[j]) iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    if ((value = (byte) Math.max(iChunk.getSkyLight(x + 1, y, z) - 1, value)) >= 14) {
+                        ;
+                    } else if ((value = (byte) Math.max(iChunkz.getSkyLight(x, y, 0) - 1, value)) >= 14) {
+                        ;
+                    }
+                    if (value > mask[j]) {
+                        iChunk.setSkyLight(x, y, z, mask[j] = value);
+                    }
                 }
             }
         }

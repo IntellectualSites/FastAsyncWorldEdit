@@ -68,7 +68,9 @@ public class RegionIterator implements Iterator<BlockVector3> {
 
     @Override
     public BlockVector3 next() {
-        if (!hasNext()) throw new java.util.NoSuchElementException();
+        if (!hasNext()) {
+            throw new java.util.NoSuchElementException();
+        }
 
         BlockVector3 answer = BlockVector3.at(nextX, nextY, nextZ);
 

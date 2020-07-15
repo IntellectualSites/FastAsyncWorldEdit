@@ -201,7 +201,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public void streamBiomes(IntValueReader task) {
-        if (!hasBiomes()) return;
+        if (!hasBiomes()) {
+            return;
+        }
         int index = 0;
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
         try {
@@ -255,7 +257,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     private void closeDirectBuffer(ByteBuffer cb) {
-        if (cb == null || !cb.isDirect()) return;
+        if (cb == null || !cb.isDirect()) {
+            return;
+        }
         // we could use this type cast and call functions without reflection code,
         // but static import from sun.* package is risky for non-SUN virtual machine.
         //try { ((sun.nio.ch.DirectBuffer)cb).cleaner().clean(); } catch (Exception ex) { }

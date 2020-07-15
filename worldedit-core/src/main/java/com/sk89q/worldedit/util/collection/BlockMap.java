@@ -346,8 +346,9 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
         }
 
         public boolean equals(Object o) {
-            if (!(o instanceof Map.Entry))
+            if (!(o instanceof Map.Entry)) {
                 return false;
+            }
             Entry<?, ?> e = (Entry<?, ?>) o;
             if (o instanceof BlockMap.LazyEntry) {
                 @SuppressWarnings("unchecked")

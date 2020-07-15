@@ -92,11 +92,15 @@ public class CombinedBlocks implements IBlocks {
                     BlockVector3 pos = entry.getKey();
                     BlockState block = primary.getBlock(pos.getX(), pos.getY(), pos.getZ());
                     if (block.getBlockType() == BlockTypes.__RESERVED__) {
-                        if (copy == null) copy = new HashMap<>(tiles);
+                        if (copy == null) {
+                            copy = new HashMap<>(tiles);
+                        }
                         copy.put(pos, entry.getValue());
                     }
                 }
-                if (copy != null) return copy;
+                if (copy != null) {
+                    return copy;
+                }
             }
         }
         return tiles;
@@ -116,8 +120,12 @@ public class CombinedBlocks implements IBlocks {
         Set<CompoundTag> joined = primary.getEntities();
         if (primary != secondary) {
             Set<CompoundTag> ents2 = secondary.getEntities();
-            if (joined.isEmpty()) return ents2;
-            if (ents2.isEmpty()) return joined;
+            if (joined.isEmpty()) {
+                return ents2;
+            }
+            if (ents2.isEmpty()) {
+                return joined;
+            }
             joined = new HashSet<>(joined);
             joined.addAll(ents2);
         }

@@ -16,7 +16,9 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
 
     @Override
     public Map<String, Tag> getValue() {
-        if (in != null) decompress();
+        if (in != null) {
+            decompress();
+        }
         return super.getValue();
     }
 

@@ -117,7 +117,9 @@ public final class CFIDrawer {
     }
 
     private final int getBiome(byte[] biomes, int newIndex, int index) {
-        if (newIndex < 0 || newIndex >= biomes.length) newIndex = index;
+        if (newIndex < 0 || newIndex >= biomes.length) {
+            newIndex = index;
+        }
         int biome = biomes[newIndex] & 0xFF;
         return tu.getBiome(biome).grassCombined;
     }
@@ -134,7 +136,9 @@ public final class CFIDrawer {
     }
 
     private int getHeight(byte[] heights, int index, int height) {
-        if (index < 0 || index >= heights.length) return height;
+        if (index < 0 || index >= heights.length) {
+            return height;
+        }
         return heights[index] & 0xFF;
     }
 }

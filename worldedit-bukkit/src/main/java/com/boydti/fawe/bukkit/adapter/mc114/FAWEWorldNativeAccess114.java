@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_14;
+package com.boydti.fawe.bukkit.adapter.mc114;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -29,14 +29,15 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
-public class FAWEWorldNativeAccess_1_14 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
-    private static final int UPDATE = 1, NOTIFY = 2;
+public class FAWEWorldNativeAccess114 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
+    private static final int UPDATE = 1;
+    private static final int NOTIFY = 2;
 
     private final FAWE_Spigot_v1_14_R4 adapter;
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
 
-    public FAWEWorldNativeAccess_1_14(FAWE_Spigot_v1_14_R4 adapter, WeakReference<World> world) {
+    public FAWEWorldNativeAccess114(FAWE_Spigot_v1_14_R4 adapter, WeakReference<World> world) {
         this.adapter = adapter;
         this.world = world;
     }

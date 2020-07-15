@@ -955,13 +955,17 @@ public final class ItemTypes {
         if (!Character.isAlphabetic(input.charAt(0))) {
             try {
                 ItemType legacy = LegacyMapper.getInstance().getItemFromLegacy(input);
-                if (legacy != null) return legacy;
+                if (legacy != null) {
+                    return legacy;
+                }
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
         }
 
-        if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
+        if (!input.split("\\[", 2)[0].contains(":")) {
+            input = "minecraft:" + input;
+        }
         return get(input);
     }
 

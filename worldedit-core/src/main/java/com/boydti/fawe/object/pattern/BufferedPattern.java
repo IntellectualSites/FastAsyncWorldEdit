@@ -24,7 +24,9 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
     public BufferedPattern(Actor actor, Pattern parent) {
         this.uuid = actor.getUniqueId();
         long[] tmp = actor.getMeta("lastActionTime");
-        if (tmp == null) actor.setMeta("lastActionTime", tmp = new long[2]);
+        if (tmp == null) {
+            actor.setMeta("lastActionTime", tmp = new long[2]);
+        }
         actionTime = tmp;
         this.pattern = parent;
         this.timer = Fawe.get().getTimer();

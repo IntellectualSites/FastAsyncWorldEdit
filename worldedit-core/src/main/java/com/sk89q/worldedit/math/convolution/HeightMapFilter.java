@@ -107,7 +107,9 @@ public class HeightMapFilter {
                     int matrixOffset = ky * kw;
                     for (int kx = 0; kx < kw; ++kx) {
                         float f = matrix[matrixOffset + kx];
-                        if (f == 0) continue;
+                        if (f == 0) {
+                            continue;
+                        }
 
                         int offsetX = x + kx - kox;
                         // Clamp coordinates inside data

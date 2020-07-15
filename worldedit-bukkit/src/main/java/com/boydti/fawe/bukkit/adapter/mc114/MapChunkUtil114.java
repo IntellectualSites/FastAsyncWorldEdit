@@ -1,17 +1,17 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_1;
+package com.boydti.fawe.bukkit.adapter.mc114;
 
 import com.boydti.fawe.bukkit.adapter.MapChunkUtil;
-import net.minecraft.server.v1_16_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 
-public class MapChunkUtil_1_16_1 extends MapChunkUtil<PacketPlayOutMapChunk> {
-    public MapChunkUtil_1_16_1() throws NoSuchFieldException {
+public class MapChunkUtil114 extends MapChunkUtil<PacketPlayOutMapChunk> {
+    public MapChunkUtil114() throws NoSuchFieldException {
         fieldX = PacketPlayOutMapChunk.class.getDeclaredField("a");
         fieldZ = PacketPlayOutMapChunk.class.getDeclaredField("b");
         fieldBitMask = PacketPlayOutMapChunk.class.getDeclaredField("c");
         fieldHeightMap = PacketPlayOutMapChunk.class.getDeclaredField("d");
-        fieldChunkData = PacketPlayOutMapChunk.class.getDeclaredField("f");
-        fieldBlockEntities = PacketPlayOutMapChunk.class.getDeclaredField("g");
-        fieldFull = PacketPlayOutMapChunk.class.getDeclaredField("h");
+        fieldChunkData = PacketPlayOutMapChunk.class.getDeclaredField("e");
+        fieldBlockEntities = PacketPlayOutMapChunk.class.getDeclaredField("f");
+        fieldFull = PacketPlayOutMapChunk.class.getDeclaredField("g");
         fieldX.setAccessible(true);
         fieldZ.setAccessible(true);
         fieldBitMask.setAccessible(true);

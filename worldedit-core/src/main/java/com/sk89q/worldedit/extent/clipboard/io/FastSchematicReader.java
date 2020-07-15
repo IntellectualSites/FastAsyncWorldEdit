@@ -80,9 +80,14 @@ public class FastSchematicReader extends NBTSchematicReader {
     private List<Map<String, Object>> tiles;
     private List<Map<String, Object>> entities;
 
-    private int width, height, length;
-    private int offsetX, offsetY, offsetZ;
-    private char[] palette, biomePalette;
+    private int width;
+    private int height;
+    private int length;
+    private int offsetX;
+    private int offsetY;
+    private int offsetZ;
+    private char[] palette;
+    private char[] biomePalette;
     private BlockVector3 min = BlockVector3.ZERO;
 
 
@@ -97,22 +102,30 @@ public class FastSchematicReader extends NBTSchematicReader {
     }
 
     private String fix(String palettePart) {
-        if (fixer == null || dataVersion == -1) return palettePart;
+        if (fixer == null || dataVersion == -1) {
+            return palettePart;
+        }
         return fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, palettePart, dataVersion);
     }
 
     private CompoundTag fixBlockEntity(CompoundTag tag) {
-        if (fixer == null || dataVersion == -1) return tag;
+        if (fixer == null || dataVersion == -1) {
+            return tag;
+        }
         return fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, tag, dataVersion);
     }
 
     private CompoundTag fixEntity(CompoundTag tag) {
-        if (fixer == null || dataVersion == -1) return tag;
+        if (fixer == null || dataVersion == -1) {
+            return tag;
+        }
         return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag, dataVersion);
     }
 
     private String fixBiome(String biomePalettePart) {
-        if(fixer == null || dataVersion == -1) return biomePalettePart;
+        if(fixer == null || dataVersion == -1) {
+            return biomePalettePart;
+        }
         return fixer.fixUp(DataFixer.FixTypes.BIOME, biomePalettePart, dataVersion);
     }
 
@@ -203,8 +216,12 @@ public class FastSchematicReader extends NBTSchematicReader {
             throw new IOException("This schematic version is currently not supported");
         }
 
-        if (blocks != null) blocks.close();
-        if (biomes != null) biomes.close();
+        if (blocks != null) {
+            blocks.close();
+        }
+        if (biomes != null) {
+            biomes.close();
+        }
         blocks = null;
         biomes = null;
 
@@ -280,7 +297,9 @@ public class FastSchematicReader extends NBTSchematicReader {
                 CompoundTag tile = FaweCache.IMP.asTag(tileRaw);
 
                 int[] pos = tile.getIntArray("Pos");
-                int x,y,z;
+                int x;
+                int y;
+                int z;
                 if (pos.length != 3) {
                     if (!tile.containsKey("x") || !tile.containsKey("y") || !tile.containsKey("z")) {
                         return null;

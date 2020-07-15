@@ -1,18 +1,3 @@
-/**
- * Copyright (c) 2008, http://www.snakeyaml.org
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.yaml.snakeyaml;
 
 import org.yaml.snakeyaml.nodes.Tag;
@@ -25,13 +10,13 @@ import java.util.Map;
  * instance.
  */
 public final class TypeDescription {
-    private final Class<? extends Object> type;
+    private final Class<?> type;
     private Tag tag;
-    private Map<String, Class<? extends Object>> listProperties;
-    private Map<String, Class<? extends Object>> keyProperties;
-    private Map<String, Class<? extends Object>> valueProperties;
+    private Map<String, Class<?>> listProperties;
+    private Map<String, Class<?>> keyProperties;
+    private Map<String, Class<?>> valueProperties;
 
-    public TypeDescription(Class<? extends Object> clazz, Tag tag) {
+    public TypeDescription(Class<?> clazz, Tag tag) {
         this.type = clazz;
         this.tag = tag;
         listProperties = new HashMap<>();
@@ -39,11 +24,11 @@ public final class TypeDescription {
         valueProperties = new HashMap<>();
     }
 
-    public TypeDescription(Class<? extends Object> clazz, String tag) {
+    public TypeDescription(Class<?> clazz, String tag) {
         this(clazz, new Tag(tag));
     }
 
-    public TypeDescription(Class<? extends Object> clazz) {
+    public TypeDescription(Class<?> clazz) {
         this(clazz, (Tag) null);
     }
 
@@ -60,8 +45,7 @@ public final class TypeDescription {
     /**
      * Set tag to be used to load or dump the type (class).
      *
-     * @param tag
-     *            local or global tag
+     * @param tag local or global tag
      */
     public void setTag(Tag tag) {
         this.tag = tag;
@@ -72,72 +56,64 @@ public final class TypeDescription {
     }
 
     /**
-     * Get represented type (class)
+     * Get represented type (class).
      *
      * @return type (class) to be described.
      */
-    public Class<? extends Object> getType() {
+    public Class<?> getType() {
         return type;
     }
 
     /**
      * Specify that the property is a type-safe <code>List</code>.
      *
-     * @param property
-     *            name of the JavaBean property
-     * @param type
-     *            class of List values
+     * @param property name of the JavaBean property
+     * @param type class of List values
      */
-    public void putListPropertyType(String property, Class<? extends Object> type) {
+    public void putListPropertyType(String property, Class<?> type) {
         listProperties.put(property, type);
     }
 
     /**
      * Get class of List values for provided JavaBean property.
      *
-     * @param property
-     *            property name
+     * @param property property name
      * @return class of List values
      */
-    public Class<? extends Object> getListPropertyType(String property) {
+    public Class<?> getListPropertyType(String property) {
         return listProperties.get(property);
     }
 
     /**
      * Specify that the property is a type-safe <code>Map</code>.
      *
-     * @param property
-     *            property name of this JavaBean
-     * @param key
-     *            class of keys in Map
-     * @param value
-     *            class of values in Map
+     * @param property property name of this JavaBean
+     * @param key class of keys in Map
+     * @param value class of values in Map
      */
-    public void putMapPropertyType(String property, Class<? extends Object> key,
-                                   Class<? extends Object> value) {
+    public void putMapPropertyType(String property, Class<?> key,
+                                   Class<?> value) {
         keyProperties.put(property, key);
         valueProperties.put(property, value);
     }
 
     /**
-     * Get keys type info for this JavaBean
+     * Get keys type info for this JavaBean.
      *
-     * @param property
-     *            property name of this JavaBean
+     * @param property property name of this JavaBean
      * @return class of keys in the Map
      */
-    public Class<? extends Object> getMapKeyType(String property) {
+    public Class<?> getMapKeyType(String property) {
         return keyProperties.get(property);
     }
 
     /**
-     * Get values type info for this JavaBean
+     * Get values type info for this JavaBean.
      *
-     * @param property
-     *            property name of this JavaBean
+     * @param property property name of this JavaBean
      * @return class of values in the Map
      */
-    public Class<? extends Object> getMapValueType(String property) {
+    public Class<?> getMapValueType(String property) {
         return valueProperties.get(property);
     }
 

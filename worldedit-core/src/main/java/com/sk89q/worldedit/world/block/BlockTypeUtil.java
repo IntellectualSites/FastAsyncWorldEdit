@@ -59,7 +59,9 @@ public class BlockTypeUtil {
             case BlockID.STONE_BRICK_SLAB:
             case BlockID.STONE_SLAB: {
                 String state = (String) block.getState(PropertyKey.TYPE);
-                if (state == null) return 0;
+                if (state == null) {
+                    return 0;
+                }
                 switch (state) {
                     case "double":
                     case "bottom":
@@ -89,7 +91,9 @@ public class BlockTypeUtil {
             case BlockID.OAK_FENCE_GATE:
             case BlockID.SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 1 : 0;
             default:
-                if (type.getMaterial().isMovementBlocker()) return 0;
+                if (type.getMaterial().isMovementBlocker()) {
+                    return 0;
+                }
                 return 1;
         }
     }
@@ -162,7 +166,9 @@ public class BlockTypeUtil {
             case BlockID.STONE_BRICK_SLAB:
             case BlockID.STONE_SLAB: {
                 String state = (String) block.getState(PropertyKey.TYPE);
-                if (state == null) return 0.5;
+                if (state == null) {
+                    return 0.5;
+                }
                 switch (state) {
                     case "bottom":
                         return 0.5;
@@ -204,7 +210,9 @@ public class BlockTypeUtil {
                 if (type.hasProperty(PropertyKey.LAYERS)) {
                     return PropertyGroup.LEVEL.get(block) * 0.0625;
                 }
-                if (!type.getMaterial().isMovementBlocker()) return 0;
+                if (!type.getMaterial().isMovementBlocker()) {
+                    return 0;
+                }
                 return 1;
 
         }

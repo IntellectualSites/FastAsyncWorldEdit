@@ -41,7 +41,6 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -50,27 +49,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class BukkitServerInterface implements MultiUserPlatform {
-    public Server server;
-    public WorldEditPlugin plugin;
-    private CommandRegistration dynamicCommands;
+
+    public final Server server;
+    public final WorldEditPlugin plugin;
+    private final CommandRegistration dynamicCommands;
+    private final LazyReference<Watchdog> watchdog;
     private boolean hookingEvents;
-    private final LazyReference<Watchdog> watchdog = LazyReference.from(() -> {
-        if (plugin.getBukkitImplAdapter() != null) {
-            return plugin.getBukkitImplAdapter().supportsWatchdog()
-                ? new BukkitWatchdog(plugin.getBukkitImplAdapter())
-                : null;
-        }
-        return null;
-    });
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
         this.plugin = plugin;
         this.server = server;
-        dynamicCommands = new CommandRegistration(plugin);
+        this.dynamicCommands = new CommandRegistration(plugin);
+        this.watchdog = LazyReference.from(() -> {
+            if (plugin.getBukkitImplAdapter() != null) {
+                return plugin.getBukkitImplAdapter().supportsWatchdog()
+                    ? new BukkitWatchdog(plugin.getBukkitImplAdapter())
+                    : null;
+            }
+            return null;
+        });
     }
 
     CommandRegistration getDynamicCommands() {
@@ -107,6 +109,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
         if (!type.startsWith("minecraft:")) {
             return false;
         }
+        @SuppressWarnings("deprecation")
         final EntityType entityType = EntityType.fromName(type.substring(10));
         return entityType != null && entityType.isAlive();
     }

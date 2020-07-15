@@ -47,9 +47,13 @@ public class StripNBTExtent extends AbstractDelegateExtent {
     }
 
     public <B extends BlockStateHolder<B>> B stripBlockNBT(B block) {
-        if(!(block instanceof BaseBlock)) return block;
+        if(!(block instanceof BaseBlock)) {
+            return block;
+        }
         BaseBlock localBlock = (BaseBlock)block;
-        if (!localBlock.hasNbtData()) return block;
+        if (!localBlock.hasNbtData()) {
+            return block;
+        }
         CompoundTag nbt = localBlock.getNbtData();
         Map<String, Tag> value = nbt.getValue();
         for (String key : strip) {
@@ -59,7 +63,9 @@ public class StripNBTExtent extends AbstractDelegateExtent {
     }
 
     public <T extends NbtValued> T stripEntityNBT(T entity) {
-        if (!entity.hasNbtData()) return entity;
+        if (!entity.hasNbtData()) {
+            return entity;
+        }
         CompoundTag nbt = entity.getNbtData();
         Map<String, Tag> value = nbt.getValue();
         for (String key : strip) {

@@ -41,7 +41,9 @@ public class Bindings {
     private boolean register(Method method, InjectedValueStore store, CommandManager manager) {
         // Check that it has the binding
         Binding binding = method.getAnnotation(Binding.class);
-        if (binding == null) return false;
+        if (binding == null) {
+            return false;
+        }
         Annotation[] annotations = method.getAnnotations();
 
         // Get the key

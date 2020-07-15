@@ -49,7 +49,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
 
-    private int minX, minY, minZ, maxX, maxY, maxZ;
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
     private BlockVector3 pos1;
     private BlockVector3 pos2;
 
@@ -173,8 +178,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 new CuboidRegion(pos1.withX(max.getX()), pos2.withX(max.getX())),
 
                 // Project to X-Y plane
-                new CuboidRegion(pos1.withZ(min.getZ()).add(BlockVector3.UNIT_X), pos2.withZ(min.getZ()).subtract(BlockVector3.UNIT_X)),
-                new CuboidRegion(pos1.withZ(max.getZ()).add(BlockVector3.UNIT_X), pos2.withZ(max.getZ()).subtract(BlockVector3.UNIT_X)));
+                new CuboidRegion(pos1.withZ(min.getZ()), pos2.withZ(min.getZ())),
+                new CuboidRegion(pos1.withZ(max.getZ()), pos2.withZ(max.getZ())));
     }
 
     @Override
@@ -318,7 +323,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         final int size = (maxX - minX + 1) * (maxZ - minZ + 1);
 
         return new AbstractSet<BlockVector2>() {
-            @NotNull @Override
+            @NotNull
+            @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {
                     final MutableBlockVector2 mutable = new MutableBlockVector2(0, 0);
@@ -396,7 +402,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             public boolean contains(Object o) {
                 if (o instanceof BlockVector2) {
                     BlockVector2 cv = (BlockVector2) o;
-                    return cv.getX() >= minX && cv.getX() <= maxX && cv.getZ() >= minZ && cv.getZ() <= maxZ;
+                    return cv.getX() >= minX && cv.getX() <= maxX && cv.getZ() >= minZ
+                        && cv.getZ() <= maxZ;
                 }
                 return false;
             }
@@ -410,9 +417,12 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
-        for (int x = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS; x <= max.getBlockX() >> ChunkStore.CHUNK_SHIFTS; ++x) {
-            for (int z = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; z <= max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; ++z) {
-                for (int y = min.getBlockY() >> ChunkStore.CHUNK_SHIFTS; y <= max.getBlockY() >> ChunkStore.CHUNK_SHIFTS; ++y) {
+        for (int x = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS;
+            x <= max.getBlockX() >> ChunkStore.CHUNK_SHIFTS; ++x) {
+            for (int z = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS;
+                z <= max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; ++z) {
+                for (int y = min.getBlockY() >> ChunkStore.CHUNK_SHIFTS;
+                    y <= max.getBlockY() >> ChunkStore.CHUNK_SHIFTS; ++y) {
                     chunks.add(BlockVector3.at(x, y, z));
                 }
             }
@@ -429,7 +439,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public boolean contains(int x, int y, int z) {
-        return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
+        return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ
+            && y >= this.minY && y <= this.maxY;
     }
 
     @Override
@@ -546,7 +557,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     if (++nextZ > max.getBlockZ()) {
                         nextZ = min.getBlockZ();
                         if (++nextY > max.getBlockY()) {
-                            if (!hasNext()) throw new NoSuchElementException();
+                            if (!hasNext()) {
+                                throw new NoSuchElementException();
+                            }
                             nextX = max.getBlockX();
                             nextZ = max.getBlockZ();
                             nextY = max.getBlockY();
@@ -574,7 +587,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector2 next() {
-                if (!hasNext()) throw new NoSuchElementException();
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();
@@ -614,7 +629,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     public static boolean contains(CuboidRegion region) {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ()) && region.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ());
+        return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ())
+            && region.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ());
     }
 
     /**
@@ -654,7 +670,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         block = block.initChunk(chunkX, chunkZ);
 
         //Chunk entry is an "interior chunk" in regards to the entire region, so filter the chunk whole instead of partially
-        if ((minX + 15) >> 4 <= chunkX && (maxX - 15) >> 4 >= chunkX && (minZ + 15) >> 4 <= chunkZ && (maxZ - 15) >> 4 >= chunkZ) {
+        if ((minX + 15) >> 4 <= chunkX && (maxX - 15) >> 4 >= chunkX && (minZ + 15) >> 4 <= chunkZ
+            && (maxZ - 15) >> 4 >= chunkZ) {
             filter(chunk, filter, block, get, set, minY, maxY, full);
             return;
         }
@@ -717,12 +734,12 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            int indexY, index;
+            int index;
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
-                        indexY = 0;
+                        int indexY = 0;
                         for (int y = 0; y < 16; y++, indexY += 256) {
                             if (trimZ) {
                                 index = indexY;

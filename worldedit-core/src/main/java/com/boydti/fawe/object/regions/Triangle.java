@@ -93,7 +93,8 @@ public class Triangle {
     private boolean axisTestX01(double a, double b, double fa, double fb) {
         double p0 = a * v0[1] - b * v0[2];
         double p2 = a * v2[1] - b * v2[2];
-        double min, max;
+        double min;
+        double max;
         if (p0 < p2) {
             min = p0;
             max = p2;
@@ -108,7 +109,8 @@ public class Triangle {
     private boolean axisTestX2(double a, double b, double fa, double fb) {
         double p0 = a * v0[1] - b * v0[2];
         double p1 = a * v1[1] - b * v1[2];
-        double min, max;
+        double min;
+        double max;
         if (p0 < p1) {
             min = p0;
             max = p1;
@@ -123,7 +125,8 @@ public class Triangle {
     private boolean axisTestY02(double a, double b, double fa, double fb) {
         double p0 = -a * v0[0] + b * v0[2];
         double p2 = -a * v2[0] + b * v2[2];
-        double min, max;
+        double min;
+        double max;
         if (p0 < p2) {
             min = p0;
             max = p2;
@@ -138,7 +141,8 @@ public class Triangle {
     private boolean axisTestY1(double a, double b, double fa, double fb) {
         double p0 = -a * v0[0] + b * v0[2];
         double p1 = -a * v1[0] + b * v1[2];
-        double min, max;
+        double min;
+        double max;
         if (p0 < p1) {
             min = p0;
             max = p1;
@@ -153,7 +157,8 @@ public class Triangle {
     private boolean axisTestZ12(double a, double b, double fa, double fb) {
         double p1 = a * v1[0] - b * v1[1];
         double p2 = a * v2[0] - b * v2[1];
-        double min, max;
+        double min;
+        double max;
         if (p2 < p1) {
             min = p2;
             max = p1;
@@ -168,7 +173,8 @@ public class Triangle {
     private boolean axisTestZ0(double a, double b, double fa, double fb) {
         double p0 = a * v0[0] - b * v0[1];
         double p1 = a * v1[0] - b * v1[1];
-        double min, max;
+        double min;
+        double max;
         if (p0 < p1) {
             min = p0;
             max = p1;
@@ -182,7 +188,11 @@ public class Triangle {
 
 
     private boolean overlaps(double[] boxcenter, double[] boxhalfsize, double[][] triverts) {
-        double min, max, fex, fey, fez;
+        double min;
+        double max;
+        double fex;
+        double fey;
+        double fez;
         sub(v0, triverts[0], boxcenter);
         sub(v1, triverts[1], boxcenter);
         sub(v2, triverts[2], boxcenter);

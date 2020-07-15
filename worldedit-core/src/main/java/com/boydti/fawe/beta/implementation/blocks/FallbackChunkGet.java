@@ -23,7 +23,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class FallbackChunkGet implements IChunkGet {
-    private final int bx, bz;
+    private final int bx;
+    private final int bz;
     private final Extent extent;
 
     public FallbackChunkGet(Extent extent, int chunkX, int chunkZ) {

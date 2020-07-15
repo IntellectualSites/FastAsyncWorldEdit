@@ -52,7 +52,8 @@ public class CachedMathMan {
     }
 
     protected static float atan2(float y, float x) {
-        float add, mul;
+        float add;
+        float mul;
 
         if (x < 0.0f) {
             if (y < 0.0f) {

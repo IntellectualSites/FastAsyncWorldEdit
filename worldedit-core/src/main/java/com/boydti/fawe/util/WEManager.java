@@ -98,7 +98,9 @@ public class WEManager {
                         }
                     }
                 }
-                if (!removed) return regions.toArray(new Region[0]);
+                if (!removed) {
+                    return regions.toArray(new Region[0]);
+                }
                 masks.clear();
             }
         }
@@ -106,12 +108,16 @@ public class WEManager {
         for (FaweMaskManager manager : managers) {
             if (player.hasPermission("fawe." + manager.getKey())) {
                 try {
-                    if (manager.isExclusive() && !masks.isEmpty()) continue;
+                    if (manager.isExclusive() && !masks.isEmpty()) {
+                        continue;
+                    }
                     final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
                     if (mask != null) {
                         regions.add(mask.getRegion());
                         masks.add(mask);
-                        if (manager.isExclusive()) break;
+                        if (manager.isExclusive()) {
+                            break;
+                        }
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();

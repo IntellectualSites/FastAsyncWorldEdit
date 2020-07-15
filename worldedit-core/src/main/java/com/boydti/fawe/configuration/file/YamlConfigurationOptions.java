@@ -54,8 +54,10 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
 
     /**
      * Sets how much spaces should be used to indent each line.
+     *
      * <p>
      * The minimum value this may be is 2, and the maximum is 9.
+     * </p>
      *
      * @param value New indent
      * @return This object, for chaining

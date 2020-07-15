@@ -5,8 +5,8 @@ import java.io.OutputStream;
 
 public class LZ4OutputStream extends OutputStream {
     private static final LZ4Factory lz4Factory = LZ4Factory.fastestInstance();
-    private final LZ4Compressor compressor;
     private static final int ONE_MEGABYTE = 1048576;
+    private final LZ4Compressor compressor;
     private final byte[] compressionInputBuffer;
     private final byte[] compressionOutputBuffer;
     private final OutputStream underlyingOutputStream;

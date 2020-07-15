@@ -69,7 +69,9 @@ public class StencilBrush extends HeightBrush {
                     dz = MathMan.roundInt(srcPos.getZ());
 
                     int distance = dx * dx + dz * dz;
-                    if (distance > size2 || Math.abs(dx) > 256 || Math.abs(dz) > 256) return false;
+                    if (distance > size2 || Math.abs(dx) > 256 || Math.abs(dz) > 256) {
+                        return false;
+                    }
 
                     double raise = map.getHeight(dx, dz);
                     int val = (int) Math.ceil(raise * scale) + add;

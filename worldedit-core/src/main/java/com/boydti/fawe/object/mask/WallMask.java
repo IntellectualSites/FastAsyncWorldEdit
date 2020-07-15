@@ -7,7 +7,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class WallMask extends AbstractMask {
-    private final int min, max;
+    private final int min;
+    private final int max;
     private final Mask mask;
     private MutableBlockVector3 v;
 

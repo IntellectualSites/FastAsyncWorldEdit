@@ -37,8 +37,10 @@ public class BlockVector2 {
      * A comparator for BlockVector2ds that orders the vectors by rows, with x as the
      * column and z as the row.
      *
+     * <p>
      * For example, if x is the horizontal axis and z is the vertical axis, it
      * sorts like so:
+     * </p>
      *
      * <pre>
      * 0123
@@ -67,14 +69,19 @@ public class BlockVector2 {
                     return ONE;
                 }
                 break;
+            default:
+                break;
         }
         */
         return new BlockVector2(x, z);
     }
 
-    protected int x, z;
+    protected int x;
+    protected int z;
 
-    protected BlockVector2(){}
+    protected BlockVector2() {
+
+    }
 
     /**
      * Construct an instance.
@@ -221,7 +228,8 @@ public class BlockVector2 {
      * @return a new vector
      */
     public BlockVector2 add(BlockVector2... others) {
-        int newX = x, newZ = z;
+        int newX = x;
+        int newZ = z;
 
         for (BlockVector2 other : others) {
             newX += other.x;
@@ -262,7 +270,8 @@ public class BlockVector2 {
      * @return a new vector
      */
     public BlockVector2 subtract(BlockVector2... others) {
-        int newX = x, newZ = z;
+        int newX = x;
+        int newZ = z;
 
         for (BlockVector2 other : others) {
             newX -= other.x;
@@ -300,7 +309,8 @@ public class BlockVector2 {
      * @return a new vector
      */
     public BlockVector2 multiply(BlockVector2... others) {
-        int newX = x, newZ = z;
+        int newX = x;
+        int newZ = z;
 
         for (BlockVector2 other : others) {
             newX *= other.x;
@@ -371,6 +381,7 @@ public class BlockVector2 {
     public BlockVector2 shr(int n) {
         return shr(n, n);
     }
+
     /**
      * Get the length of the vector.
      *
@@ -520,8 +531,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMinimum(BlockVector2 v2) {
         return new BlockVector2(
-                Math.min(x, v2.x),
-                Math.min(z, v2.z)
+            Math.min(x, v2.x),
+            Math.min(z, v2.z)
         );
     }
 
@@ -533,8 +544,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMaximum(BlockVector2 v2) {
         return new BlockVector2(
-                Math.max(x, v2.x),
-                Math.max(z, v2.z)
+            Math.max(x, v2.x),
+            Math.max(z, v2.z)
         );
     }
 

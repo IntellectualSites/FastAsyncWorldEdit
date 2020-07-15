@@ -83,7 +83,9 @@ public class SimplexNoise {
 
     // 2D simplex noise
     public static double noise(double xin, double yin) {
-        double n0, n1, n2; // Noise contributions from the three corners
+        double n0;  // Noise contributions from the three corners
+        double n1;
+        double n2;
         // Skew the input space to determine which simplex cell we're in
         double s = (xin + yin) * F2; // Hairy factor for 2D
         int i = fastfloor(xin + s);
@@ -95,7 +97,8 @@ public class SimplexNoise {
         double y0 = yin - Y0;
         // For the 2D case, the simplex shape is an equilateral triangle.
         // Determine which simplex we are in.
-        int i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+        int i1;  // Offsets for second (middle) corner of simplex in (i,j) coords
+        int j1;
         if (x0 > y0) {
             i1 = 1;
             j1 = 0;
@@ -119,20 +122,23 @@ public class SimplexNoise {
         int gi2 = permMod12[ii + 1 + perm[jj + 1]];
         // Calculate the contribution from the three corners
         double t0 = 0.5 - x0 * x0 - y0 * y0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad3[gi0], x0, y0);  // (x,y) of grad3 used for 2D gradient
         }
         double t1 = 0.5 - x1 * x1 - y1 * y1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
         }
         double t2 = 0.5 - x2 * x2 - y2 * y2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
         }
@@ -144,7 +150,10 @@ public class SimplexNoise {
 
     // 3D simplex noise
     public static double noise(double xin, double yin, double zin) {
-        double n0, n1, n2, n3; // Noise contributions from the four corners
+        double n0;  // Noise contributions from the four corners
+        double n1;
+        double n2;
+        double n3;
         // Skew the input space to determine which simplex cell we're in
         double s = (xin + yin + zin) * F3; // Very nice and simple skew factor for 3D
         int i = fastfloor(xin + s);
@@ -159,8 +168,12 @@ public class SimplexNoise {
         double z0 = zin - Z0;
         // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
         // Determine which simplex we are in.
-        int i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
-        int i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+        int i1;  // Offsets for second corner of simplex in (i,j,k) coords
+        int j1;
+        int k1;
+        int i2;  // Offsets for third corner of simplex in (i,j,k) coords
+        int j2;
+        int k2;
         if (x0 >= y0) {
             if (y0 >= z0) {
                 i1 = 1;
@@ -235,26 +248,30 @@ public class SimplexNoise {
         int gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]];
         // Calculate the contribution from the four corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad3[gi0], x0, y0, z0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad3[gi1], x1, y1, z1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad3[gi2], x2, y2, z2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
-        if (t3 < 0) n3 = 0.0;
-        else {
+        if (t3 < 0) {
+            n3 = 0.0;
+        } else {
             t3 *= t3;
             n3 = t3 * t3 * dot(grad3[gi3], x3, y3, z3);
         }
@@ -267,7 +284,11 @@ public class SimplexNoise {
     // 4D simplex noise, better simplex rank ordering method 2012-03-09
     public static double noise(double x, double y, double z, double w) {
 
-        double n0, n1, n2, n3, n4; // Noise contributions from the five corners
+        double n0;  // Noise contributions from the five corners
+        double n1;
+        double n2;
+        double n3;
+        double n4;
         // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
         double s = (x + y + z + w) * F4; // Factor for 4D skewing
         int i = fastfloor(x + s);
@@ -292,21 +313,48 @@ public class SimplexNoise {
         int ranky = 0;
         int rankz = 0;
         int rankw = 0;
-        if (x0 > y0) rankx++;
-        else ranky++;
-        if (x0 > z0) rankx++;
-        else rankz++;
-        if (x0 > w0) rankx++;
-        else rankw++;
-        if (y0 > z0) ranky++;
-        else rankz++;
-        if (y0 > w0) ranky++;
-        else rankw++;
-        if (z0 > w0) rankz++;
-        else rankw++;
-        int i1, j1, k1, l1; // The integer offsets for the second simplex corner
-        int i2, j2, k2, l2; // The integer offsets for the third simplex corner
-        int i3, j3, k3, l3; // The integer offsets for the fourth simplex corner
+        if (x0 > y0) {
+            rankx++;
+        } else {
+            ranky++;
+        }
+        if (x0 > z0) {
+            rankx++;
+        } else {
+            rankz++;
+        }
+        if (x0 > w0) {
+            rankx++;
+        } else {
+            rankw++;
+        }
+        if (y0 > z0) {
+            ranky++;
+        } else {
+            rankz++;
+        }
+        if (y0 > w0) {
+            ranky++;
+        } else {
+            rankw++;
+        }
+        if (z0 > w0) {
+            rankz++;
+        } else {
+            rankw++;
+        }
+        int i1;  // The integer offsets for the second simplex corner
+        int j1;
+        int k1;
+        int l1;
+        int i2;  // The integer offsets for the third simplex corner
+        int j2;
+        int k2;
+        int l2;
+        int i3;  // The integer offsets for the fourth simplex corner
+        int j3;
+        int k3;
+        int l3;
         // [rankx, ranky, rankz, rankw] is a 4-vector with the numbers 0, 1, 2 and 3
         // in some order. We use a thresholding to set the coordinates in turn.
         // Rank 3 denotes the largest coordinate.
@@ -353,32 +401,37 @@ public class SimplexNoise {
         int gi4 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]] % 32;
         // Calculate the contribution from the five corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad4[gi0], x0, y0, z0, w0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad4[gi1], x1, y1, z1, w1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad4[gi2], x2, y2, z2, w2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
-        if (t3 < 0) n3 = 0.0;
-        else {
+        if (t3 < 0) {
+            n3 = 0.0;
+        } else {
             t3 *= t3;
             n3 = t3 * t3 * dot(grad4[gi3], x3, y3, z3, w3);
         }
         double t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
-        if (t4 < 0) n4 = 0.0;
-        else {
+        if (t4 < 0) {
+            n4 = 0.0;
+        } else {
             t4 *= t4;
             n4 = t4 * t4 * dot(grad4[gi4], x4, y4, z4, w4);
         }
@@ -389,7 +442,10 @@ public class SimplexNoise {
     // Inner class to speed upp gradient computations
     // (In Java, array access is a lot slower than member access)
     private static class Grad {
-        double x, y, z, w;
+        double x;
+        double y;
+        double z;
+        double w;
 
         Grad(double x, double y, double z) {
             this.x = x;

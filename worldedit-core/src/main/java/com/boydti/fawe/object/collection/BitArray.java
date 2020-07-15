@@ -33,7 +33,9 @@ public final class BitArray {
     }
 
     public final void set(int index, int value) {
-        if (longLen == 0) return;
+        if (longLen == 0) {
+            return;
+        }
         int bitIndexStart = index * bitsPerEntry;
         int longIndexStart = bitIndexStart >> 6;
         int localBitIndexStart = bitIndexStart & 63;
@@ -48,7 +50,9 @@ public final class BitArray {
     }
 
     public final int get(int index) {
-        if (longLen == 0) return 0;
+        if (longLen == 0) {
+            return 0;
+        }
         int bitIndexStart = index * bitsPerEntry;
 
         int longIndexStart = bitIndexStart >> 6;

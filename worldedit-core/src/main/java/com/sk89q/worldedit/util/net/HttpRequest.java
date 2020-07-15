@@ -302,7 +302,9 @@ public class HttpRequest implements Closeable {
 
     @Override
     public void close() throws IOException {
-        if (conn != null) conn.disconnect();
+        if (conn != null) {
+            conn.disconnect();
+        }
     }
 
     /**

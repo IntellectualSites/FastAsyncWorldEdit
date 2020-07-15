@@ -43,11 +43,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public Vector3 getPosition(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= nodes.size() - 1;
 
@@ -77,11 +79,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= nodes.size() - 1;
 
@@ -95,11 +99,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public double arcLength(double positionA, double positionB) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (positionA > positionB)
+        if (positionA > positionB) {
             return arcLength(positionB, positionA);
+        }
 
         positionA *= nodes.size() - 1;
         positionB *= nodes.size() - 1;
@@ -143,11 +149,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         position *= nodes.size() - 1;
 

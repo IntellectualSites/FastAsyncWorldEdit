@@ -82,7 +82,9 @@ public final class BundledBlockData {
             JsonPrimitive primitive = (JsonPrimitive) json;
             if (primitive.isString()) {
                 String value = primitive.getAsString();
-                if (value.charAt(0) == '#') return Integer.parseInt(value.substring(1), 16);
+                if (value.charAt(0) == '#') {
+                    return Integer.parseInt(value.substring(1), 16);
+                }
                 return Integer.parseInt(value);
             }
             return primitive.getAsInt();
