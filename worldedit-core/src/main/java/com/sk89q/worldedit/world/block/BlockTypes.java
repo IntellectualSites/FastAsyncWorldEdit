@@ -659,6 +659,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType SEAGRASS = init();
     @Nullable public static final BlockType SHROOMLIGHT = init();
     @Nullable public static final BlockType SHULKER_BOX = init();
+    @Deprecated @Nullable public static final BlockType SIGN = init();
     @Nullable public static final BlockType SKELETON_SKULL = init();
     @Nullable public static final BlockType SKELETON_WALL_SKULL = init();
     @Nullable public static final BlockType SLIME_BLOCK = init();
@@ -751,6 +752,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType TWISTING_VINES_PLANT = init();
     @Nullable public static final BlockType VINE = init();
     @Nullable public static final BlockType VOID_AIR = init();
+    @Deprecated @Nullable public static final BlockType WALL_SIGN = init();
     @Nullable public static final BlockType WALL_TORCH = init();
     @Nullable public static final BlockType WARPED_BUTTON = init();
     @Nullable public static final BlockType WARPED_DOOR = init();
@@ -804,10 +806,6 @@ public final class BlockTypes {
     @Nullable public static final BlockType YELLOW_WOOL = init();
     @Nullable public static final BlockType ZOMBIE_HEAD = init();
     @Nullable public static final BlockType ZOMBIE_WALL_HEAD = init();
-
-    // deprecated
-    @Deprecated @Nullable public static BlockType SIGN = OAK_SIGN;
-    @Deprecated @Nullable public static BlockType WALL_SIGN = OAK_WALL_SIGN;
 
     private static Field[] fieldsTmp;
     private static JoinedCharSequence joined;

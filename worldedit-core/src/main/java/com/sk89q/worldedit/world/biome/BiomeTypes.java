@@ -23,10 +23,12 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 
 /**
- * Stores a list of common Biome String IDs.
+ * Stores a list of common {@link BiomeType BiomeTypes}.
+ *
+ * @see BiomeType
  */
+@SuppressWarnings("unused")
 public final class BiomeTypes {
-
     @Nullable public static final BiomeType BADLANDS = get("minecraft:badlands");
     @Nullable public static final BiomeType BADLANDS_PLATEAU = get("minecraft:badlands_plateau");
     @Nullable public static final BiomeType BAMBOO_JUNGLE = get("minecraft:bamboo_jungle");
@@ -74,7 +76,7 @@ public final class BiomeTypes {
     @Nullable public static final BiomeType MOUNTAINS = get("minecraft:mountains");
     @Nullable public static final BiomeType MUSHROOM_FIELD_SHORE = get("minecraft:mushroom_field_shore");
     @Nullable public static final BiomeType MUSHROOM_FIELDS = get("minecraft:mushroom_fields");
-    @Deprecated @Nullable public static final BiomeType NETHER = get("minecraft:nether");
+    @Nullable @Deprecated public static final BiomeType NETHER = get("minecraft:nether");
     @Nullable public static final BiomeType NETHER_WASTES = get("minecraft:nether_wastes");
     @Nullable public static final BiomeType OCEAN = get("minecraft:ocean");
     @Nullable public static final BiomeType PLAINS = get("minecraft:plains");
@@ -132,7 +134,11 @@ public final class BiomeTypes {
         return BiomeType.REGISTRY.getByInternalId(internalId);
     }
 
-    public static @Nullable BiomeType get(final String id) {
+    /**
+     * Gets the {@link BiomeType} associated with the given id.
+     */
+    @Nullable
+    public static BiomeType get(String id) {
         return BiomeType.REGISTRY.get(id);
     }
 
