@@ -22,8 +22,13 @@ package com.sk89q.worldedit.world.entity;
 import java.util.Locale;
 import javax.annotation.Nullable;
 
-public class EntityTypes {
-
+/**
+ * Stores a list of common {@link EntityType EntityTypes}.
+ *
+ * @see EntityType
+ */
+@SuppressWarnings("unused")
+public final class EntityTypes {
     @Nullable public static final EntityType AREA_EFFECT_CLOUD = get("minecraft:area_effect_cloud");
     @Nullable public static final EntityType ARMOR_STAND = get("minecraft:armor_stand");
     @Nullable public static final EntityType ARROW = get("minecraft:arrow");
@@ -130,20 +135,26 @@ public class EntityTypes {
     @Nullable public static final EntityType ZOGLIN = get("minecraft:zoglin");
     @Nullable public static final EntityType ZOMBIE = get("minecraft:zombie");
     @Nullable public static final EntityType ZOMBIE_HORSE = get("minecraft:zombie_horse");
-    @Nullable @Deprecated public static final EntityType ZOMBIE_PIGMAN = get("minecraft:zombie_pigman");
+    @Deprecated @Nullable public static final EntityType ZOMBIE_PIGMAN = get("minecraft:zombie_pigman");
     @Nullable public static final EntityType ZOMBIE_VILLAGER = get("minecraft:zombie_villager");
     @Nullable public static final EntityType ZOMBIFIED_PIGLIN = get("minecraft:zombified_piglin");
 
     private EntityTypes() {
     }
 
-    public static @Nullable EntityType get(final String id) {
+    /**
+     * Gets the {@link EntityType} associated with the given id.
+     */
+    @Nullable
+    public static EntityType get(String id) {
         return EntityType.REGISTRY.get(id);
     }
 
     private static String convertEntityId(String id) {
-        if (id.startsWith("minecraft:")) id = id.substring(10);
-        switch(id) {
+        if (id.startsWith("minecraft:")) {
+            id = id.substring(10);
+        }
+        switch (id) {
             case "AreaEffectCloud": return "area_effect_cloud";
             case "ArmorStand": return "armor_stand";
             case "CaveSpider": return "cave_spider";
