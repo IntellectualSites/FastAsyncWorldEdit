@@ -47,23 +47,23 @@ public final class BrushCache {
         }
         StringTag json = (StringTag) nbt.getValue().get("weBrushJson");
         // TODO: Ping @MattBDev to reimplement 2020-02-04
-//        if (json != null) {
-//            try {
-//                if (RECURSION.get() != null) return null;
-//                RECURSION.set(true);
-//
-//                BrushTool tool = BrushTool.fromString(player, session, json.getValue());
-//                tool.setHolder(item);
-//                brushCache.put(key, tool);
-//                return tool;
-//            } catch (Exception throwable) {
-//                getLogger(BrushCache.class).debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue(), throwable);
-//                item.setNbtData(null);
-//                brushCache.remove(key);
-//            } finally {
-//                RECURSION.remove();
-//            }
-//        }
+        //        if (json != null) {
+        //            try {
+        //                if (RECURSION.get() != null) return null;
+        //                RECURSION.set(true);
+        //
+        //                BrushTool tool = BrushTool.fromString(player, session, json.getValue());
+        //                tool.setHolder(item);
+        //                brushCache.put(key, tool);
+        //                return tool;
+        //            } catch (Exception throwable) {
+        //                getLogger(BrushCache.class).debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue(), throwable);
+        //                item.setNbtData(null);
+        //                brushCache.remove(key);
+        //            } finally {
+        //                RECURSION.remove();
+        //            }
+        //        }
         return null;
     }
 

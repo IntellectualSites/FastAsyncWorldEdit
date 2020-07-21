@@ -15,6 +15,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class Scroll implements ScrollTool {
     private BrushTool tool;
@@ -32,7 +33,7 @@ public abstract class Scroll implements ScrollTool {
 
     public static Scroll fromArguments(BrushTool tool, Player player, LocalSession session, String actionArgs, boolean message) {
         String[] split = actionArgs.split(" ");
-        Action mode = Action.valueOf(split[0].toUpperCase());
+        Action mode = Action.valueOf(split[0].toUpperCase(Locale.ROOT));
         List<String> args = Arrays.asList(Arrays.copyOfRange(split, 1, split.length));
         return fromArguments(tool, player, session, mode, args, message);
     }
@@ -48,7 +49,7 @@ public abstract class Scroll implements ScrollTool {
             case CLIPBOARD:
                 if (arguments.size() != 2) {
                     if (message) {
-                        player.print(Caption.of("fawe.error.command.syntax" , "clipboard [file]"));
+                        player.print(Caption.of("fawe.error.command.syntax", "clipboard [file]"));
                     }
                     return null;
                 }
@@ -65,7 +66,7 @@ public abstract class Scroll implements ScrollTool {
             case MASK:
                 if (arguments.size() < 2) {
                     if (message) {
-                        player.print(Caption.of("fawe.error.command.syntax" , "mask [mask 1] [mask 2] [mask 3]..."));
+                        player.print(Caption.of("fawe.error.command.syntax", "mask [mask 1] [mask 2] [mask 3]..."));
                     }
                     return null;
                 }
@@ -78,7 +79,7 @@ public abstract class Scroll implements ScrollTool {
             case PATTERN:
                 if (arguments.size() < 2) {
                     if (message) {
-                        player.print(Caption.of("fawe.error.command.syntax" , "pattern [pattern 1] [pattern 2] [pattern 3]..."));
+                        player.print(Caption.of("fawe.error.command.syntax", "pattern [pattern 1] [pattern 2] [pattern 3]..."));
                     }
                     return null;
                 }

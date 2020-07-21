@@ -20,7 +20,7 @@ public class ChunkCache<T extends Trimable> implements IChunkCache<T> {
     }
 
     /**
-     * Get or create the IGetBlocks
+     * Get or create the IGetBlocks.
      *
      * @return cached IGetBlocks
      */

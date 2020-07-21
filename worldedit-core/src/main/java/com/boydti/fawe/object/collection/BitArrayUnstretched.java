@@ -48,13 +48,13 @@ public final class BitArrayUnstretched {
         int longIndexStart = bitIndexStart >> 6;
 
         int localBitIndexStart = bitIndexStart & 63;
-        return (int)(this.data[longIndexStart] >>> localBitIndexStart & mask);
+        return (int) (this.data[longIndexStart] >>> localBitIndexStart & mask);
     }
 
     public int getLength() {
         return longLen;
     }
-    
+
     public final void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
@@ -64,9 +64,8 @@ public final class BitArrayUnstretched {
         int arrI = 0;
         long l = 0;
         for (int i = 0; i < longLen; i++) {
-            int lastVal;
             for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
-                lastVal = arr[arrI++];
+                int lastVal = arr[arrI++];
                 l |= ((long) lastVal << localStart);
             }
             localStart = 0;
@@ -88,9 +87,8 @@ public final class BitArrayUnstretched {
         int arrI = 0;
         for (int i = 0; i < longLen; i++) {
             long l = data[i];
-            char lastVal;
             for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
-                lastVal = (char) (l >>> localStart & this.mask);
+                char lastVal = (char) (l >>> localStart & this.mask);
                 buffer[arrI++] = lastVal;
             }
             localStart = 0;
@@ -107,9 +105,8 @@ public final class BitArrayUnstretched {
         int arrI = 0;
         for (int i = 0; i < longLen; i++) {
             long l = data[i];
-            char lastVal;
             for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
-                lastVal = (char) (l >>> localStart & this.mask);
+                char lastVal = (char) (l >>> localStart & this.mask);
                 buffer[arrI++] = lastVal;
             }
             localStart = 0;

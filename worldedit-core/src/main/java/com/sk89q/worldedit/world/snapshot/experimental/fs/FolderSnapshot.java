@@ -83,8 +83,8 @@ public class FolderSnapshot implements Snapshot {
                 .filter(Files::isRegularFile)
                 .anyMatch(p -> {
                     String fileName = p.getFileName().toString();
-                    return fileName.startsWith("r") &&
-                        (fileName.endsWith(".mca") || fileName.endsWith(".mcr"));
+                    return fileName.startsWith("r")
+                        && (fileName.endsWith(".mca") || fileName.endsWith(".mcr"));
                 })) {
                 return folder;
             }
@@ -95,7 +95,8 @@ public class FolderSnapshot implements Snapshot {
     private final SnapshotInfo info;
     private final Path folder;
     private final AtomicReference<Object> regionFolder = new AtomicReference<>();
-    private final @Nullable Closer closeCallback;
+    @Nullable
+    private final Closer closeCallback;
 
     public FolderSnapshot(SnapshotInfo info, Path folder, @Nullable Closer closeCallback) {
         this.info = info;

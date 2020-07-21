@@ -378,7 +378,7 @@ public class HttpRequest implements Closeable {
     /**
      * Used with {@link #bodyForm(Form)}.
      */
-    public final static class Form {
+    public static final class Form {
         public final List<String> elements = new ArrayList<>();
 
         private Form() {

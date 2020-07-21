@@ -159,6 +159,8 @@ public class SplineBrush implements Brush, ResettableTool {
                 return null;
             case 2:
                 return null;
+            default:
+                break;
         }
 
         // Calc full 3x3 covariance matrix, excluding symmetries:

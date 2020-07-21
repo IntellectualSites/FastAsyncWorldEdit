@@ -26,7 +26,9 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.RegistryItem;
+import com.sk89q.worldedit.util.GuavaUtil;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.ItemMaterial;
@@ -37,11 +39,24 @@ public class ItemType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
 
-    private String id;
-    private String name;
-    private final LazyReference<ItemMaterial> itemMaterial
-            = LazyReference.from(() -> WorldEdit.getInstance().getPlatformManager()
-            .queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().getMaterial(this));
+    private final String id;
+    @SuppressWarnings("deprecation")
+    private final LazyReference<String> name = LazyReference.from(() -> {
+        String name = GuavaUtil.firstNonNull(
+            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                .getRegistries().getItemRegistry().getName(this),
+            ""
+        );
+        return name.isEmpty() ? getId() : name;
+    });
+    private final LazyReference<Component> richName = LazyReference.from(() ->
+        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getItemRegistry().getRichName(this)
+    );
+    private final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
+        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getItemRegistry().getMaterial(this)
+    );
     private BlockType blockType;
     private boolean initBlockType;
     private BaseItem defaultState;
@@ -57,6 +72,10 @@ public class ItemType implements RegistryItem, Keyed {
     @Override
     public String getId() {
         return this.id;
+    }
+
+    public Component getRichName() {
+        return richName.getValue();
     }
 
     private int internalId;
@@ -75,16 +94,11 @@ public class ItemType implements RegistryItem, Keyed {
      * Gets the name of this item, or the ID if the name cannot be found.
      *
      * @return The name, or ID
+     * @deprecated Names are translatable now, use {@link #getRichName()}.
      */
+    @Deprecated
     public String getName() {
-        if (name == null) {
-            name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries()
-                    .getItemRegistry().getName(this);
-            if (name == null) {
-                name = "";
-            }
-        }
-        return name.isEmpty() ? getId() : name;
+        return name.getValue();
     }
 
 

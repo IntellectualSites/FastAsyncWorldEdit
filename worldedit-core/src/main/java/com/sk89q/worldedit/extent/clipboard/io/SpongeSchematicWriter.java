@@ -155,10 +155,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                         values.remove("z");
 
                         values.put("Id", new StringTag(block.getNbtId()));
-                        values.put("Pos", new IntArrayTag(new int[]{
-                                x,
-                                y,
-                                z
+                        values.put("Pos", new IntArrayTag(new int[] {
+                            x,
+                            y,
+                            z
                         }));
 
                         tileEntities.add(new CompoundTag(values));

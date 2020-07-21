@@ -25,7 +25,7 @@ public class Triangle {
     private final double[] vmax = new double[3];
 
     private final BlockVector3 normalVec;
-    private final double b;
+    private final double maxDotProduct;
 
     public Triangle(BlockVector3 pos1, BlockVector3 pos2, BlockVector3 pos3) {
         verts[0] = new double[]{pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ()};
@@ -35,13 +35,13 @@ public class Triangle {
         radius[1] = RADIUS;
         radius[2] = RADIUS;
         this.normalVec = pos2.subtract(pos1).cross(pos3.subtract(pos1)).normalize();
-        this.b = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)),
+        this.maxDotProduct = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)),
             this.normalVec.dot(pos3));
     }
 
     public boolean above(BlockVector3 pt) {
         Preconditions.checkNotNull(pt);
-        return this.normalVec.dot(pt) > this.b;
+        return this.normalVec.dot(pt) > this.maxDotProduct;
     }
 
     public Edge getEdge(int index) {

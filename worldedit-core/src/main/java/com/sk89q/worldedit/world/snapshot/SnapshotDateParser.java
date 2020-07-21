@@ -30,7 +30,7 @@ public interface SnapshotDateParser {
 
     /**
      * Attempt to detect a date from a file.
-     * 
+     *
      * @param file the file
      * @return date or null
      */

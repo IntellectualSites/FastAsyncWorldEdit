@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -306,7 +307,7 @@ public class MCAChunk implements IChunk {
                                 String valueStr = value.toString();
                                 if (Character.isUpperCase(valueStr.charAt(0))) {
                                     System.out.println("Invalid uppercase value " + value);
-                                    valueStr = valueStr.toLowerCase();
+                                    valueStr = valueStr.toLowerCase(Locale.ROOT);
                                 }
                                 out.writeNamedTag(key, valueStr);
                             }

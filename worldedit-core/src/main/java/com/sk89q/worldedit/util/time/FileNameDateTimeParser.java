@@ -65,11 +65,11 @@ public class FileNameDateTimeParser implements SnapshotDateTimeParser {
     private static final String SEP = "[ \\-_:]";
 
     private static final Pattern BASIC_FILTER = Pattern.compile(
-        "^(?<year>\\d{4})" + SEP + "(?<month>\\d{1,2})" + SEP + "(?<day>\\d{1,2})" +
+        "^(?<year>\\d{4})" + SEP + "(?<month>\\d{1,2})" + SEP + "(?<day>\\d{1,2})"
             // Optionally:
-            "(?:" + "[ \\-_:T]" +
-            "(?<hour>\\d{1,2})" + SEP + "(?<minute>\\d{1,2})" + SEP + "(?<second>\\d{1,2})" +
-            ")?"
+            + "(?:" + "[ \\-_:T]"
+            + "(?<hour>\\d{1,2})" + SEP + "(?<minute>\\d{1,2})" + SEP + "(?<second>\\d{1,2})"
+            + ")?"
     );
 
     private FileNameDateTimeParser() {

@@ -3,6 +3,12 @@ package com.boydti.fawe.bukkit.wrapper.state;
 import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import org.apache.commons.lang.Validate;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,13 +16,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import org.apache.commons.lang.Validate;
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 
 public final class AsyncDataContainer implements PersistentDataContainer {
     private final CompoundTag root;
@@ -110,7 +109,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
             return false;
         } else {
             Map<String, Tag> myRawMap = this.getRaw();
-            Map<String, Tag> theirRawMap = ((AsyncDataContainer)obj).getRaw();
+            Map<String, Tag> theirRawMap = ((AsyncDataContainer) obj).getRaw();
             return Objects.equals(myRawMap, theirRawMap);
         }
     }

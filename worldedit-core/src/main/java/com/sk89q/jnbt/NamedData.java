@@ -3,7 +3,7 @@ package com.sk89q.jnbt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Some data with a name
+ * Some data with a name.
  */
 public class NamedData<T> {
     private final String name;

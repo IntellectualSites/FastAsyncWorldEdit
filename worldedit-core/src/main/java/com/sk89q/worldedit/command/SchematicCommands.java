@@ -116,8 +116,8 @@ public class SchematicCommands {
     }
 
     @Command(
-            name = "loadall",
-            desc = "Load multiple clipboards (paste will randomly choose one)"
+        name = "loadall",
+        desc = "Load multiple clipboards (paste will randomly choose one)"
     )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
@@ -130,14 +130,14 @@ public class SchematicCommands {
                         boolean randomRotate) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
+            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
             return;
         }
         try {
             MultiClipboardHolder all = ClipboardFormats.loadAllFromInput(player, filename, null, true);
             if (all != null) {
                 session.addClipboard(all);
-                player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded" , filename));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -145,8 +145,8 @@ public class SchematicCommands {
     }
 
     @Command(
-            name = "clear",
-            desc = "Clear your clipboard"
+        name = "clear",
+        desc = "Clear your clipboard"
     )
     @CommandPermissions({"worldedit.clipboard.clear", "worldedit.schematic.clear"})
     public void clear(Player player, LocalSession session) throws WorldEditException {
@@ -155,8 +155,8 @@ public class SchematicCommands {
     }
 
     @Command(
-            name = "unload",
-            desc = "Remove a clipboard from your multi-clipboard"
+        name = "unload",
+        desc = "Remove a clipboard from your multi-clipboard"
     )
     @CommandPermissions({"worldedit.clipboard.clear", "worldedit.schematic.clear"})
     public void unload(Player player, LocalSession session, String fileName) throws WorldEditException {
@@ -187,9 +187,9 @@ public class SchematicCommands {
                 return;
             }
         }
-        player.print(Caption.of("fawe.worldedit.clipboard.clipboard.uri.not.found" , fileName));
+        player.print(Caption.of("fawe.worldedit.clipboard.clipboard.uri.not.found", fileName));
     }
-    
+
     @Command(
         name = "load",
         desc = "Load a schematic into your clipboard"
@@ -269,7 +269,7 @@ public class SchematicCommands {
                 uri = file.toURI();
             }
             format.hold(actor, uri, in);
-            actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded" , filename));
+            actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
         } catch (IllegalArgumentException e) {
             actor.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
@@ -291,15 +291,15 @@ public class SchematicCommands {
     )
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
     public void save(Actor actor, LocalSession session,
-                     @Arg(desc = "File name.")
-                         String filename,
-                     @Arg(desc = "Format name.", def = "sponge")
-                         String formatName,
-                     @Switch(name = 'f', desc = "Overwrite an existing file.")
-                         boolean allowOverwrite,
-                     @Switch(name = 'g', desc = "//TODO")
-                         boolean global
-        ) throws WorldEditException {
+        @Arg(desc = "File name.")
+            String filename,
+        @Arg(desc = "Format name.", def = "sponge")
+            String formatName,
+        @Switch(name = 'f', desc = "Overwrite an existing file.")
+            boolean allowOverwrite,
+        @Switch(name = 'g', desc = "//TODO")
+            boolean global
+    ) throws WorldEditException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
         File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
@@ -398,7 +398,7 @@ public class SchematicCommands {
         for (File source : sources) {
             File destFile = new File(destDir, source.getName());
             if (destFile.exists()) {
-                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.exists" , destFile));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.exists", destFile));
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && (!MainUtil.isInSubDirectory(dir, destFile) || !MainUtil.isInSubDirectory(dir, source)) && !player.hasPermission("worldedit.schematic.delete.other")) {
@@ -412,7 +412,7 @@ public class SchematicCommands {
                 if (cached.exists()) {
                     Files.move(cached.toPath(), destFile.toPath());
                 }
-                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.success" , source, destFile));
+                player.print(Caption.of("fawe.worldedit.schematic.schematic.move.success", source, destFile));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -458,7 +458,7 @@ public class SchematicCommands {
             actor.printInfo(TextComponent.of(builder.toString()));
         }
     }
-    
+
     @Command(
         name = "list",
         aliases = {"all", "ls"},
@@ -467,18 +467,18 @@ public class SchematicCommands {
     )
     @CommandPermissions("worldedit.schematic.list")
     public void list(Actor actor, LocalSession session,
-                     @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
-                         int page,
-                     @Switch(name = 'd', desc = "Sort by date, oldest first")
-                         boolean oldFirst,
-                     @Switch(name = 'n', desc = "Sort by date, newest first")
-                         boolean newFirst,
-                     @ArgFlag(name = 'f', desc = "Restricts by format.", def = "")
-                         String formatName,
-                     @Arg(name = "filter", desc = "Filter for schematics", def = "all")
-                         String filter,
-                     Arguments arguments
-                    ) throws WorldEditException {
+        @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
+            int page,
+        @Switch(name = 'd', desc = "Sort by date, oldest first")
+            boolean oldFirst,
+        @Switch(name = 'n', desc = "Sort by date, newest first")
+            boolean newFirst,
+        @ArgFlag(name = 'f', desc = "Restricts by format.", def = "")
+            String formatName,
+        @Arg(name = "filter", desc = "Filter for schematics", def = "all")
+            String filter,
+        Arguments arguments
+    ) throws WorldEditException {
         if (oldFirst && newFirst) {
             throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
         }
@@ -508,7 +508,7 @@ public class SchematicCommands {
 
         Function<URI, Boolean> isLoaded = multi == null ? f -> false : multi::contains;
 
-        List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
+        List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded::apply,
             (name, path, type, loaded) -> {
                 TextColor color = TextColor.GRAY;
                 switch (type) {
@@ -520,6 +520,8 @@ public class SchematicCommands {
                         break;
                     case DIRECTORY:
                         color = TextColor.GOLD;
+                        break;
+                    default:
                         break;
                 }
 
@@ -634,7 +636,7 @@ public class SchematicCommands {
                         writer.write(target);
                     }
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
-                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved" , file.getName()));
+                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", file.getName()));
                 } else {
                     actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
                 }
@@ -666,7 +668,7 @@ public class SchematicCommands {
         @Override
         public Component call() throws Exception {
             ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
-            List<File> fileList = getFiles(rootDir,filter,format);
+            List<File> fileList = getFiles(rootDir, filter, format);
 
             if (fileList == null || fileList.isEmpty()) {
                 return ErrorFormat.wrap("No schematics found.");
@@ -763,7 +765,7 @@ public class SchematicCommands {
                 actor.printError(TranslatableComponent.of("worldedit.schematic.delete.failed", TextComponent.of(filename)));
                 continue;
             }
-            actor.print(Caption.of("worldedit.schematic.delete.deleted" , filename));
+            actor.print(Caption.of("worldedit.schematic.delete.deleted", filename));
         }
     }
 

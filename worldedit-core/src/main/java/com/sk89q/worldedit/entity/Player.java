@@ -55,7 +55,7 @@ import java.io.File;
 import javax.annotation.Nullable;
 
 /**
- * Represents a player
+ * Represents a player.
  */
 public interface Player extends Entity, Actor {
 
@@ -356,9 +356,7 @@ public interface Player extends Entity, Actor {
     void setSelection(Region region);
 
     /**
-     * Get the player's current selection (or null)
-     *
-     * @return
+     * Get the player's current selection (or null).
      */
     default Region getSelection() {
         try {
@@ -369,9 +367,7 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Set the player's WorldEdit selection
-     *
-     * @param selector
+     * Set the player's WorldEdit selection.
      */
     default void setSelection(RegionSelector selector) {
         getSession().setRegionSelector(getWorld(), selector);
@@ -388,10 +384,10 @@ public interface Player extends Entity, Actor {
         if (virtual != null) {
             return virtual;
         }
-//        CFICommands.CFISettings cfi = getMeta("CFISettings");
-//        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
-//            return cfi.getGenerator();
-//        }
+        //        CFICommands.CFISettings cfi = getMeta("CFISettings");
+        //        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
+        //            return cfi.getGenerator();
+        //        }
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
@@ -411,7 +407,7 @@ public interface Player extends Entity, Actor {
     void sendTitle(Component title, Component sub);
 
     /**
-     * Loads any history items from disk: - Should already be called if history on disk is enabled
+     * Loads any history items from disk: - Should already be called if history on disk is enabled.
      */
     default void loadClipboardFromDisk() {
         File file = MainUtil.getFile(Fawe.imp().getDirectory(),

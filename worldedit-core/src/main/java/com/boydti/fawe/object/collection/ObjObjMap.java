@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.collection;
 
+import org.jetbrains.annotations.Range;
+
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 
@@ -11,34 +13,39 @@ public class ObjObjMap<K, V> {
     private static final Object REMOVED_KEY = new Object();
 
     /**
-     * Keys and values
+     * Keys and values.
      */
     private Object[] m_data;
 
     /**
-     * Value for the null key (if inserted into a map)
+     * Value for the null key (if inserted into a map).
      */
     private Object m_nullValue;
     private boolean m_hasNull;
 
     /**
-     * Fill factor, must be between (0 and 1)
+     * Fill factor, must be between (0 and 1).
      */
+    @Range(from = 0, to = 1)
     private final float m_fillFactor;
+
     /**
-     * We will resize a map once it reaches this size
+     * We will resize a map once it reaches this size.
      */
     private int m_threshold;
+
     /**
-     * Current map size
+     * Current map size.
      */
     private int m_size;
+
     /**
-     * Mask to calculate the original position
+     * Mask to calculate the original position.
      */
     private int m_mask;
+
     /**
-     * Mask to wrap the actual array pointer
+     * Mask to wrap the actual array pointer.
      */
     private int m_mask2;
 
@@ -51,32 +58,34 @@ public class ObjObjMap<K, V> {
         }
         final int capacity = arraySize(size, fillFactor);
         m_mask = capacity - 1;
-        m_mask2 = capacity * 2 - 1;
+        m_mask2 = (capacity << 1) - 1;
         m_fillFactor = fillFactor;
 
-        m_data = new Object[capacity * 2];
+        m_data = new Object[(capacity << 1)];
         Arrays.fill(m_data, FREE_KEY);
 
         m_threshold = (int) (capacity * fillFactor);
     }
 
-    public V get(@Nonnull K key) {
-//        if ( key == null )
-//            return (V) m_nullValue; //we null it on remove, so safe not to check a flag here
+    public V get(
+        @Nonnull
+            K key) {
+        //        if ( key == null )
+        //            return (V) m_nullValue; //we null it on remove, so safe not to check a flag here
 
         int ptr = (key.hashCode() & m_mask) << 1;
         Object k = m_data[ptr];
 
-//        if ( k == FREE_KEY )
-//            return null;  //end of chain already
-        if (k == key) {//we check FREE and REMOVED prior to this call
+        //        if ( k == FREE_KEY )
+        //            return null;  //end of chain already
+        if (k == key) { //we check FREE and REMOVED prior to this call
             return (V) m_data[ptr + 1];
         }
         while (true) {
             ptr = ptr + 2 & m_mask2; //that's next index
             k = m_data[ptr];
-//            if ( k == FREE_KEY )
-//                return null;
+            //            if ( k == FREE_KEY )
+            //                return null;
             if (k == key) {
                 return (V) m_data[ptr + 1];
             }
@@ -91,7 +100,7 @@ public class ObjObjMap<K, V> {
         int ptr = getStartIndex(key) << 1;
         Object k = m_data[ptr];
 
-        if (k == FREE_KEY) {//end of chain already
+        if (k == FREE_KEY) { //end of chain already
             m_data[ptr] = key;
             m_data[ptr + 1] = value;
             if (m_size >= m_threshold) {

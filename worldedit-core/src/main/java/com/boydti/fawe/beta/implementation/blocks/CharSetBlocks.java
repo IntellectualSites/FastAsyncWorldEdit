@@ -23,6 +23,7 @@ import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }
@@ -36,7 +37,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private boolean fastMode = false;
     private int bitMask = -1;
 
-    private CharSetBlocks() {}
+    private CharSetBlocks() {
+    }
 
     @Override
     public void recycle() {
@@ -201,7 +203,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(),0, position.getZ(), biome);
+        return setBiome(position.getX(), 0, position.getZ(), biome);
     }
 
     @Override

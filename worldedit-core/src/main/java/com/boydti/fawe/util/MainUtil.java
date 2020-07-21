@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
@@ -125,21 +126,18 @@ public class MainUtil {
         try {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult
-                visitFile(Path file, BasicFileAttributes attrs) {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     onEach.accept(file, attrs);
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
-                public FileVisitResult
-                visitFileFailed(Path file, IOException exc) {
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
-                public FileVisitResult
-                postVisitDirectory(Path dir, IOException exc) {
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
                     return FileVisitResult.CONTINUE;
                 }
             });
@@ -231,8 +229,8 @@ public class MainUtil {
         if (changeSet instanceof FaweStreamChangeSet) {
             FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
             return fscs.getSizeOnDisk() + fscs.getSizeInMemory();
-//        } else if (changeSet instanceof CPUOptimizedChangeSet) {
-//            return changeSet.size() + 32;
+            //        } else if (changeSet instanceof CPUOptimizedChangeSet) {
+            //            return changeSet.size() + 32;
         } else if (changeSet != null) {
             return changeSet.size() * 128;
         } else {
@@ -385,12 +383,18 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
-        return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
+    public static URL upload(UUID uuid, String file, String extension,
+        @NotNull
+        final RunnableVal<OutputStream> writeTask) {
+        return upload(Settings.IMP.WEB.URL,
+            uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
-    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
-        String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
+    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension,
+        @NotNull
+        final RunnableVal<OutputStream> writeTask) {
+        String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension :
+            "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
         final String website;
         if (!save) {
@@ -406,16 +410,21 @@ public class MainUtil {
             URLConnection con = new URL(website).openConnection();
             con.setDoOutput(true);
             con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-            try (OutputStream output = con.getOutputStream(); PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true)) {
+            try (OutputStream output = con.getOutputStream();
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true)) {
                 String crlf = "\r\n";
                 writer.append("--" + boundary).append(crlf);
                 writer.append("Content-Disposition: form-data; name=\"param\"").append(crlf);
-                writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.displayName()).append(crlf);
+                writer.append("Content-Type: text/plain; charset="
+                    + StandardCharsets.UTF_8.displayName()).append(crlf);
                 String param = "value";
                 writer.append(crlf).append(param).append(crlf).flush();
                 writer.append("--" + boundary).append(crlf);
-                writer.append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"').append(crlf);
-                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(filename)).append(crlf);
+                writer.append(
+                    "Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename
+                        + '"').append(crlf);
+                writer.append("Content-Type: "
+                    + URLConnection.guessContentTypeFromName(filename)).append(crlf);
                 writer.append("Content-Transfer-Encoding: binary").append(crlf);
                 writer.append(crlf).flush();
                 OutputStream nonClosable = new AbstractDelegateOutputStream(new BufferedOutputStream(output)) {
@@ -481,8 +490,9 @@ public class MainUtil {
             }
             File tempFile = File.createTempFile(UUID.randomUUID().toString(), ".tmp", parent);
             tempFile.deleteOnExit();
-            try (InputStream is = url.openStream(); ReadableByteChannel rbc = Channels.newChannel(is);
-                 FileOutputStream fos = new FileOutputStream(tempFile)) {
+            try (InputStream is = url.openStream();
+                ReadableByteChannel rbc = Channels.newChannel(is);
+                FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             }
             Files.copy(tempFile.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -505,12 +515,12 @@ public class MainUtil {
     }
 
     public static Thread[] getThreads() {
-        ThreadGroup rootGroup = Thread.currentThread( ).getThreadGroup( );
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
         ThreadGroup parentGroup;
-        while ( ( parentGroup = rootGroup.getParent() ) != null ) {
+        while ((parentGroup = rootGroup.getParent()) != null) {
             rootGroup = parentGroup;
         }
-        Thread[] threads = new Thread[ rootGroup.activeCount() ];
+        Thread[] threads = new Thread[rootGroup.activeCount()];
         if (threads.length != 0) {
             while (rootGroup.enumerate(threads, true) == threads.length) {
                 threads = new Thread[threads.length * 2];
@@ -527,8 +537,10 @@ public class MainUtil {
             }
             destFile.createNewFile();
         }
-        try (FileInputStream fIn = new FileInputStream(sourceFile); FileChannel source = fIn.getChannel();
-             FileOutputStream fOut = new FileOutputStream(destFile); FileChannel destination = fOut.getChannel()) {
+        try (FileInputStream fIn = new FileInputStream(sourceFile);
+            FileChannel source = fIn.getChannel();
+            FileOutputStream fOut = new FileOutputStream(destFile);
+            FileChannel destination = fOut.getChannel()) {
             long transferred = 0;
             long bytes = source.size();
             while (transferred < bytes) {
@@ -578,7 +590,8 @@ public class MainUtil {
             if (newFile.exists()) {
                 return newFile;
             }
-            try (InputStream stream = Fawe.class.getResourceAsStream(resource.startsWith("/") ? resource : "/" + resource)) {
+            try (InputStream stream = Fawe.class.getResourceAsStream(
+                resource.startsWith("/") ? resource : "/" + resource)) {
                 byte[] buffer = new byte[2048];
                 if (stream == null) {
                     try (ZipInputStream zis = new ZipInputStream(new FileInputStream(jar))) {
@@ -655,7 +668,9 @@ public class MainUtil {
         return res;
     }
 
-    public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
+    public static File resolve(File dir, String filename,
+        @Nullable
+            ClipboardFormat format, boolean allowDir) {
         if (format != null) {
             if (!filename.matches(".*\\.[\\w].*")) {
                 filename = filename + "." + format.getPrimaryFileExtension();
@@ -669,7 +684,8 @@ public class MainUtil {
             }
         }
         for (ClipboardFormat f : ClipboardFormats.getAll()) {
-            File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getPrimaryFileExtension()));
+            File file = MainUtil.resolveRelative(new File(dir,
+                filename + "." + f.getPrimaryFileExtension()));
             if (file.exists()) {
                 return file;
             }
@@ -705,7 +721,7 @@ public class MainUtil {
     }
 
     /**
-     * The int[] will be in the form: [chunkx, chunkz, pos1x, pos1z, pos2x, pos2z, isedge] and will represent the bottom and top parts of the chunk
+     * The int[] will be in the form: [chunkx, chunkz, pos1x, pos1z, pos2x, pos2z, isedge] and will represent the bottom and top parts of the chunk.
      */
     public static void chunkTaskSync(RegionWrapper region, final RunnableVal<int[]> task) {
         final int p1x = region.minX;
@@ -763,7 +779,7 @@ public class MainUtil {
             }
             return newInnerArray;
         } else {
-            return arr;//can't deep copy an opac object??
+            return arr; //can't deep copy an opac object??
         }
     }
 
@@ -801,11 +817,12 @@ public class MainUtil {
         return toreturn.toString().trim();
     }
 
+    @SuppressWarnings("CheckStyle")
     public static long timeToSec(String string) {
         if (MathMan.isInteger(string)) {
             return Long.parseLong(string);
         }
-        string = string.toLowerCase().trim().toLowerCase();
+        string = string.trim().toLowerCase(Locale.ROOT);
         if (string.equalsIgnoreCase("false")) {
             return 0;
         }
@@ -843,6 +860,8 @@ public class MainUtil {
                 case "sec":
                 case "s":
                     time += nums;
+                default:
+                    break;
             }
         }
         return time;

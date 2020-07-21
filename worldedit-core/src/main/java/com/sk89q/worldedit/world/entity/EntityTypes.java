@@ -136,7 +136,8 @@ public class EntityTypes {
     private EntityTypes() {
     }
 
-    public static @Nullable EntityType get(final String id) {
+    @Nullable
+    public static EntityType get(final String id) {
         return EntityType.REGISTRY.get(id);
     }
 
@@ -144,7 +145,7 @@ public class EntityTypes {
         if (id.startsWith("minecraft:")) {
             id = id.substring(10);
         }
-        switch(id) {
+        switch (id) {
             case "AreaEffectCloud": return "area_effect_cloud";
             case "ArmorStand": return "armor_stand";
             case "CaveSpider": return "cave_spider";

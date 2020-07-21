@@ -35,8 +35,8 @@ public class ListFilters {
     }
 
     @Command(
-            name = "all",
-            desc = "List both public and private schematics"
+        name = "all",
+        desc = "List both public and private schematics"
     )
     public Filter all() {
         return new Filter() {
@@ -48,18 +48,22 @@ public class ListFilters {
     }
 
     @Command(
-            name = "local",
-            aliases = {"me", "mine", "private"},
-            desc = "List your personal schematics"
+        name = "local",
+        aliases = {
+            "me",
+            "mine",
+            "private"
+        },
+        desc = "List your personal schematics"
     )
     public Filter local() {
         return new Filter();
     }
 
     @Command(
-            name = "global",
-            aliases = {"public"},
-            desc = "List public schematics"
+        name = "global",
+        aliases = { "public" },
+        desc = "List public schematics"
     )
     public Filter global() {
         return new Filter() {
@@ -76,8 +80,9 @@ public class ListFilters {
     }
 
     @Command(
-            name = "*", //TODO NOT IMPLEMENTED originally this was left blank but doing so causes a major compilation error
-            desc = "wildcard"
+        name = "*",
+        //TODO NOT IMPLEMENTED originally this was left blank but doing so causes a major compilation error
+        desc = "wildcard"
     )
     public Filter wildcard(Actor actor, File root, String arg) {
         arg = arg.replace("/", File.separator);
@@ -91,7 +96,8 @@ public class ListFilters {
                     if (newRoot.exists()) {
                         return newRoot;
                     }
-                    String firstArg = finalArg.substring(0, finalArg.length() - File.separator.length());
+                    String firstArg = finalArg.substring(0,
+                        finalArg.length() - File.separator.length());
                     if (firstArg.length() > 3 && firstArg.length() <= 16) {
                         UUID fromName = Fawe.imp().getUUID(finalArg);
                         if (fromName != null) {
@@ -101,7 +107,8 @@ public class ListFilters {
                             }
                         }
                     }
-                    throw new StopExecutionException(TextComponent.of("Cannot find path: " + finalArg));
+                    throw new StopExecutionException(TextComponent.of(
+                        "Cannot find path: " + finalArg));
                 }
             };
         } else {

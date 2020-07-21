@@ -422,7 +422,7 @@
 //        Request.request().setExtent(generator);
 //
 //        Set<BlockType> blocks;
-//        switch (argOpt.toLowerCase()) {
+//        switch (argOpt.toLowerCase(Locale.ROOT)) {
 //            case "true":
 //            case "*": {
 //                generator.setTextureUtil(Fawe.get().getTextureUtil());
@@ -819,7 +819,7 @@
 //            TextComponent.of("/cfi randomization " + !rand)));
 //        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<");
 //        builder.append(newline());
-//        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase() + "]")
+//        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase(Locale.ROOT) + "]")
 //            .clickEvent(ClickEvent.runCommand(
 //                "/cfi randomization " + !rand)).hoverEvent(HoverEvent.showText(
 //                TextComponent.of("/cfi randomization " + !rand))));

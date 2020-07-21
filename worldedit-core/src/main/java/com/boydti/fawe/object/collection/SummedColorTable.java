@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 /**
- * Efficient blur / average color over an image
+ * Efficient blur / average color over an image.
  */
 public class SummedColorTable {
     private final long[] reds;
@@ -193,14 +193,10 @@ public class SummedColorTable {
         /* top left value is itself */
         if (index == 0) {
             return curr;
-        }
-        /* top row */
-        else if (row == 0 && col != 0) {
+        } else if (row == 0 && col != 0) { //top row
             leftSum = summed[index - 1];
             return curr + leftSum;
-        }
-        /* left-most column */
-        else if (row != 0 && col == 0) {
+        } else if (row != 0 && col == 0) { //left-most column
             topSum = summed[index - width];
             return curr + topSum;
         } else {
@@ -218,14 +214,10 @@ public class SummedColorTable {
         /* top left value is itself */
         if (index == 0) {
             return curr;
-        }
-        /* top row */
-        else if (row == 0 && col != 0) {
+        } else if (row == 0 && col != 0) { //Top Row
             leftSum = summed[index - 1];
             return curr + leftSum;
-        }
-        /* left-most column */
-        else if (row != 0 && col == 0) {
+        } else if (row != 0 && col == 0) { //left-most column
             topSum = summed[index - width];
             return curr + topSum;
         } else {

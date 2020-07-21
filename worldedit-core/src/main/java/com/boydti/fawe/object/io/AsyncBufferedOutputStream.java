@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * written asynchronously to disk once it is really available.
  * <p>
  * This class is thread-safe.
- * <p>
+ * </p>
  * The error handling (as all stream ops are done asynchronously) is done during
  * write and close. Exceptions on the asynchronous thread will be thrown to the
  * caller either while writing or closing this stream.

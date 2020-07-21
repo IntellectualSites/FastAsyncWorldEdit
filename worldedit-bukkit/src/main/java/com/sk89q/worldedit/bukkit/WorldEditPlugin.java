@@ -250,6 +250,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
     }
 
+    @SuppressWarnings({ "deprecation", "unchecked" })
     private void initializeRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {

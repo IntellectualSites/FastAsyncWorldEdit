@@ -39,7 +39,7 @@ public class BlockMaskBuilder {
     private static final Operator LESS_EQUAL = (a, b) -> a <= b;
     private static final Operator NOT = (a, b) -> a != b;
 
-    private final static long[] ALL = new long[0];
+    private static final long[] ALL = new long[0];
 
     private interface Operator {
         boolean test(int left, int right);
@@ -161,8 +161,7 @@ public class BlockMaskBuilder {
                         boolean filtered = false;
                         if (type != null) {
                             filtered = filterRegexOrOperator(type, key, operator, charSequence);
-                        }
-                        else {
+                        } else {
                             for (BlockType myType : blockTypeList) {
                                 filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
                             }
@@ -203,6 +202,8 @@ public class BlockMaskBuilder {
                         if (extra) {
                             i++;
                         }
+                        //CHECKSTYLE:OFF
+                        //noinspection CheckStyle
                         switch (c) {
                             case '~':
                                 operator = EQUAL_OR_NULL;
@@ -220,6 +221,7 @@ public class BlockMaskBuilder {
                                 operator = extra ? GREATER_EQUAL : GREATER;
                                 break;
                         }
+                        //CHECKSTYLE:ON
                         if (charSequence.length() > 0 || key == null) {
                             key = PropertyKey.get(charSequence);
                             if (key == null) {

@@ -15,16 +15,16 @@ import java.util.Set;
 /**
  * Memory optimized BlockVector3 Set using a sparsely populated bitset and grouped by chunk section
  * Note on spaghetti code / duplication
- *  - Uses a minimum of 1 bit per entry
- *  - 99.9% of the time there are no if checks on get/clear
- *  - Grouping / iteration is by chunk section, and the y>z>x order
+ * - Uses a minimum of 1 bit per entry
+ * - 99.9% of the time there are no if checks on get/clear
+ * - Grouping / iteration is by chunk section, and the y>z>x order
  */
 public final class MemBlockSet extends BlockSet {
-    public final static int BITS_PER_WORD = 6;
-    public final static int WORDS = FaweCache.IMP.BLOCKS_PER_LAYER >> BITS_PER_WORD;
-    public final static IRow NULL_ROW_X = new NullRowX();
-    public final static IRow NULL_ROW_Z = new NullRowZ();
-    public final static IRow NULL_ROW_Y = new NullRowY();
+    public static final int BITS_PER_WORD = 6;
+    public static final int WORDS = FaweCache.IMP.BLOCKS_PER_LAYER >> BITS_PER_WORD;
+    public static final IRow NULL_ROW_X = new NullRowX();
+    public static final IRow NULL_ROW_Z = new NullRowZ();
+    public static final IRow NULL_ROW_Y = new NullRowY();
     public final IRow[] rows;
     public final MutableBlockVector3 mutable;
 
@@ -94,8 +94,8 @@ public final class MemBlockSet extends BlockSet {
                 return new Iterator<BlockVector2>() {
                     private MutableBlockVector2 mutable = new MutableBlockVector2();
                     private boolean hasNext;
-                    private int X;
-                    private int Z;
+                    private int chunkX;
+                    private int chunkZ;
                     private int setX;
                     private int setZ;
 
@@ -104,21 +104,21 @@ public final class MemBlockSet extends BlockSet {
                     }
 
                     private void init() {
-                        for (;X < rows.length; X++) {
-                            IRow nullRowX = rows[X];
+                        for (; chunkX < rows.length; chunkX++) {
+                            IRow nullRowX = rows[chunkX];
                             if (nullRowX instanceof RowX) {
                                 RowX rowx = (RowX) nullRowX;
-                                for (;Z < rowx.rows.length; Z++) {
-                                    IRow nullRowZ = rowx.rows[Z];
+                                for (; chunkZ < rowx.rows.length; chunkZ++) {
+                                    IRow nullRowZ = rowx.rows[chunkZ];
                                     if (nullRowZ instanceof RowZ) {
-                                        setX = X;
-                                        setZ = Z;
-                                        Z++;
+                                        setX = chunkX;
+                                        setZ = chunkZ;
+                                        chunkZ++;
                                         hasNext = true;
                                         return;
                                     }
                                 }
-                                Z = 0;
+                                chunkZ = 0;
                             }
                         }
                         hasNext = false;
@@ -186,9 +186,9 @@ public final class MemBlockSet extends BlockSet {
                 return new Iterator<BlockVector3>() {
                     private MutableBlockVector3 mutable = new MutableBlockVector3();
                     private boolean hasNext;
-                    private int X;
-                    private int Z;
-                    private int Y;
+                    private int chunkX;
+                    private int chunkZ;
+                    private int chunkY;
                     private int setX;
                     private int setY;
                     private int setZ;
@@ -198,28 +198,28 @@ public final class MemBlockSet extends BlockSet {
                     }
 
                     private void init() {
-                        for (;X < rows.length; X++) {
-                            IRow nullRowX = rows[X];
+                        for (; chunkX < rows.length; chunkX++) {
+                            IRow nullRowX = rows[chunkX];
                             if (nullRowX instanceof RowX) {
                                 RowX rowx = (RowX) nullRowX;
-                                for (;Z < rowx.rows.length; Z++) {
-                                    IRow nullRowZ = rowx.rows[Z];
+                                for (; chunkZ < rowx.rows.length; chunkZ++) {
+                                    IRow nullRowZ = rowx.rows[chunkZ];
                                     if (nullRowZ instanceof RowZ) {
                                         RowZ rowz = (RowZ) nullRowZ;
-                                        for (;Y < rowz.rows.length;Y++) {
-                                            IRow nullRowY = rowz.rows[Y];
+                                        for (; chunkY < rowz.rows.length; chunkY++) {
+                                            IRow nullRowY = rowz.rows[chunkY];
                                             if (nullRowY instanceof RowY) {
-                                                setX = X;
-                                                setY = Y;
-                                                setZ = Z;
-                                                Z++;
+                                                setX = chunkX;
+                                                setY = chunkY;
+                                                setZ = chunkZ;
+                                                chunkZ++;
                                                 hasNext = true;
                                             }
                                         }
-                                        Y = 0;
+                                        chunkY = 0;
                                     }
                                 }
-                                Z = 0;
+                                chunkZ = 0;
                             }
                         }
                         hasNext = false;
@@ -232,7 +232,8 @@ public final class MemBlockSet extends BlockSet {
 
                     @Override
                     public BlockVector3 next() {
-                        mutable.setComponents(setX + getBlockOffsetX(), setY, setZ + getBlockOffsetX());
+                        mutable.setComponents(
+                            setX + getBlockOffsetX(), setY, setZ + getBlockOffsetX());
                         init();
                         return mutable;
                     }
@@ -280,7 +281,8 @@ public final class MemBlockSet extends BlockSet {
                     if (rowx instanceof RowX) {
                         IRow rowz = ((RowX) rowx).rows[other.getZ()];
                         if (rowz instanceof RowZ) {
-                            return ((RowZ) rowz).rows[other.getY() - getChunkOffsetZ()] instanceof RowY;
+                            return ((RowZ) rowz).rows[other.getY()
+                                - getChunkOffsetZ()] instanceof RowY;
                         }
                     }
                 }
@@ -398,7 +400,7 @@ public final class MemBlockSet extends BlockSet {
             }
             RowX rowx = (RowX) nullRowX;
             outer:
-            for (int Z = rowx.rows.length - 1; Z >= maxChunkZ ; Z--) {
+            for (int Z = rowx.rows.length - 1; Z >= maxChunkZ; Z--) {
                 IRow nullRowZ = rowx.rows[Z];
                 if (!(nullRowZ instanceof RowZ)) {
                     continue;
@@ -447,7 +449,7 @@ public final class MemBlockSet extends BlockSet {
             int tx = (X << 4);
             RowX rowx = (RowX) nullRowX;
             long or = 0;
-            for (int Z = rowx.rows.length - 1; Z >= 0 ; Z--) {
+            for (int Z = rowx.rows.length - 1; Z >= 0; Z--) {
                 IRow nullRowZ = rowx.rows[Z];
                 if (!(nullRowZ instanceof RowZ)) {
                     continue;
@@ -460,7 +462,8 @@ public final class MemBlockSet extends BlockSet {
                     }
                     RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
-                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
+                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48)
+                        & 0xFFFF);
                     if (highestBit(or) == 15) {
                         return tx + 15;
                     }
@@ -546,7 +549,8 @@ public final class MemBlockSet extends BlockSet {
                     }
                     RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
-                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
+                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48)
+                        & 0xFFFF);
                     if (lowestBit(or) == 0) {
                         return bx;
                     }
@@ -709,7 +713,7 @@ public final class MemBlockSet extends BlockSet {
             @Override
             public BlockVector3 next() {
                 final long lowBit = Long.lowestOneBit(bitBuffer);
-                final int bitIndex = Long.bitCount(lowBit-1);
+                final int bitIndex = Long.bitCount(lowBit - 1);
                 mutable.setComponents((bx) + (bitIndex & 15), yy, (zz) + (bitIndex));
                 bitBuffer = bitBuffer ^ lowBit;
                 nextLong();
@@ -806,20 +810,28 @@ public final class MemBlockSet extends BlockSet {
         void apply(int x, int y, int z);
     }
 
+
     public interface IRow {
-        default boolean get(IRow[] rows, int x, int y, int z) { return false; }
+        default boolean get(IRow[] rows, int x, int y, int z) {
+            return false;
+        }
+
         void set(IRow[] rows, int x, int y, int z);
+
         default boolean add(IRow[] rows, int x, int y, int z) {
             set(rows, x, y, z);
             return true;
         }
+
         default boolean remove(IRow[] rows, int x, int y, int z) {
             remove(rows, x, y, z);
             return false;
         }
+
         default void clear(IRow[] rows, int x, int y, int z) {
         }
     }
+
 
     public static final class NullRowX implements IRow {
         @Override
@@ -830,6 +842,7 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
+
     public static final class NullRowZ implements IRow {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
@@ -839,6 +852,7 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
+
     public static final class NullRowY implements IRow {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
@@ -847,6 +861,7 @@ public final class MemBlockSet extends BlockSet {
             row.set(parent, x, y, z);
         }
     }
+
 
     public static final class RowX implements IRow {
         private final IRow[] rows;
@@ -883,6 +898,7 @@ public final class MemBlockSet extends BlockSet {
             return this.rows[z >> 4].remove(this.rows, x, y, z);
         }
     }
+
 
     public static final class RowZ implements IRow {
         public final IRow[] rows;
@@ -922,7 +938,7 @@ public final class MemBlockSet extends BlockSet {
         }
 
         public boolean isEmpty() {
-            for (IRow row :rows) {
+            for (IRow row : rows) {
                 if (row instanceof RowY) {
                     return false;
                 }
@@ -940,6 +956,7 @@ public final class MemBlockSet extends BlockSet {
             }
         }
     }
+
 
     public static final class RowY implements IRow {
         private final long[] bits;

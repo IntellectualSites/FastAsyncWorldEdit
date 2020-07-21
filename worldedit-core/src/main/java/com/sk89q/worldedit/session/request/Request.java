@@ -36,11 +36,16 @@ public final class Request {
 
     private static final CleanableThreadLocal<Request> threadLocal = new CleanableThreadLocal<>(Request::new);
 
-    private @Nullable World world;
-    private @Nullable Actor actor;
-    private @Nullable LocalSession session;
-    private @Nullable EditSession editSession;
-    private @Nullable Extent extent;
+    @Nullable
+    private World world;
+    @Nullable
+    private Actor actor;
+    @Nullable
+    private LocalSession session;
+    @Nullable
+    private EditSession editSession;
+    @Nullable
+    private Extent extent;
     private boolean valid;
 
     private Request() {
@@ -55,7 +60,8 @@ public final class Request {
      *
      * @return the world, which may be null
      */
-    public @Nullable World getWorld() {
+    @Nullable
+    public World getWorld() {
         return world;
     }
 
@@ -72,7 +78,8 @@ public final class Request {
         this.extent = extent;
     }
 
-    public @Nullable Extent getExtent() {
+    @Nullable
+    public Extent getExtent() {
         if (extent != null) {
             return extent;
         }
@@ -99,7 +106,8 @@ public final class Request {
      *
      * @return the session, which may be null
      */
-    public @Nullable LocalSession getSession() {
+    @Nullable
+    public LocalSession getSession() {
         return session;
     }
 
@@ -117,7 +125,8 @@ public final class Request {
      *
      * @return the edit session, which may be null
      */
-    public @Nullable EditSession getEditSession() {
+    @Nullable
+    public EditSession getEditSession() {
         return editSession;
     }
 

@@ -36,7 +36,7 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
  */
 public class TreePlanter implements BlockTool {
 
-    private TreeGenerator.TreeType treeType;
+    private final TreeGenerator.TreeType treeType;
 
     public TreePlanter(TreeGenerator.TreeType treeType) {
         this.treeType = treeType;

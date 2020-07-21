@@ -54,26 +54,26 @@ public class TargetBlock {
     private Mask solidMask;
 
     /**
-     * Constructor requiring a player, uses default values
+     * Constructor requiring a player, uses default values.
      *
      * @param player player to work with
      */
     public TargetBlock(Player player) {
-        this(player, 300, 0.2);
+        this.world = player.getWorld();
+        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(),
+                300, 1.65, 0.2);
+        this.stopMask = new ExistingBlockMask(world);
+        this.solidMask = new SolidBlockMask(world);
     }
 
     /**
-     * Constructor requiring a player, max distance and a checking distance
+     * Constructor requiring a player, max distance and a checking distance.
      *
      * @param player Player to work with
      * @param maxDistance how far it checks for blocks
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
-        this(player, player.getWorld(), maxDistance, checkDistance);
-    }
-
-    public TargetBlock(Player player, Extent extent, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
         this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
         this.stopMask = new ExistingBlockMask(world);
@@ -109,27 +109,27 @@ public class TargetBlock {
     }
 
     /**
-     * Set the values, all constructors uses this function
+     * Set the values, all constructors uses this function.
      *
      * @param loc location of the view
-     * @param xRotation the X rotation
-     * @param yRotation the Y rotation
+     * @param rotationX the X rotation
+     * @param rotationY the Y rotation
      * @param maxDistance how far it checks for blocks
      * @param viewHeight where the view is positioned in y-axis
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
-    private void setValues(Vector3 loc, double xRotation, double yRotation, int maxDistance, double viewHeight, double checkDistance) {
+    private void setValues(Vector3 loc, double rotationX, double rotationY, int maxDistance, double viewHeight, double checkDistance) {
         this.maxDistance = maxDistance;
         this.checkDistance = checkDistance;
         this.curDistance = 0;
-        xRotation = (xRotation + 90) % 360;
-        yRotation *= -1;
+        rotationX = (rotationX + 90) % 360;
+        rotationY *= -1;
 
-        double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
+        double h = (checkDistance * Math.cos(Math.toRadians(rotationY)));
 
-        offset = Vector3.at((h * Math.cos(Math.toRadians(xRotation))),
-                            (checkDistance * Math.sin(Math.toRadians(yRotation))),
-                            (h * Math.sin(Math.toRadians(xRotation))));
+        offset = Vector3.at((h * Math.cos(Math.toRadians(rotationX))),
+                            (checkDistance * Math.sin(Math.toRadians(rotationY))),
+                            (h * Math.sin(Math.toRadians(rotationX))));
 
         targetPosDouble = loc.add(0, viewHeight, 0);
         targetPos = targetPosDouble.toBlockPoint();
@@ -170,7 +170,6 @@ public class TargetBlock {
     public Location getTargetBlock() {
         //noinspection StatementWithEmptyBody
         while (getNextBlock() != null && !stopMask.test(world, targetPos)) {
-            ;
         }
         return getCurrentBlock();
     }
@@ -184,13 +183,12 @@ public class TargetBlock {
     public Location getSolidTargetBlock() {
         //noinspection StatementWithEmptyBody
         while (getNextBlock() != null && !solidMask.test(world, targetPos)) {
-            ;
         }
         return getCurrentBlock();
     }
 
     /**
-     * Get next block
+     * Get next block.
      *
      * @return next block position
      */
@@ -216,7 +214,7 @@ public class TargetBlock {
     }
 
     /**
-     * Returns the current block along the line of vision
+     * Returns the current block along the line of vision.
      *
      * @return block position
      */
@@ -229,7 +227,7 @@ public class TargetBlock {
     }
 
     /**
-     * Returns the previous block in the aimed path
+     * Returns the previous block in the aimed path.
      *
      * @return block position
      */

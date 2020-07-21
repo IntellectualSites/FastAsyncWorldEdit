@@ -40,6 +40,7 @@ public class BukkitBlockCategoryRegistry implements BlockCategoryRegistry {
         String[] split = category.split(":");
         String namespace = split.length > 1 ? split[0] : "minecraft";
         String key =  split.length > 1 ? split[1] : category;
+        @SuppressWarnings("deprecation")
         Tag<Material> tag = Bukkit.getTag(Tag.REGISTRY_BLOCKS, new NamespacedKey(namespace, key), Material.class);
         return getFromBukkitTag(tag);
     }

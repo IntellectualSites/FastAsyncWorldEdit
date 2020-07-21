@@ -59,9 +59,9 @@ public class BabelScriptTranspiler implements ScriptTranspiler {
         Scriptable babel = BABEL.getScope();
         executeBabel = contextFactory.call(ctx -> {
             ctx.setOptimizationLevel(9);
-            String execBabelSource = "function(source) {\n" +
-                "return Babel.transform(source, { presets: ['env'] }).code;\n" +
-                "}\n";
+            String execBabelSource = "function(source) {\n"
+                + "return Babel.transform(source, { presets: ['env'] }).code;\n"
+                + "}\n";
             return ctx.compileFunction(
                 babel, execBabelSource, "<execute-babel>", 1, null
             );

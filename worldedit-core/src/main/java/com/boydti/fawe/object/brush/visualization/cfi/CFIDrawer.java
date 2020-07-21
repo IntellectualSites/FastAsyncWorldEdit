@@ -45,7 +45,7 @@ public final class CFIDrawer {
             int start = i * size;
             int end = Math.min(heights.length, start + size);
             pool.submit((Runnable) () -> {
-                for (int index = start; index < end; index ++) {
+                for (int index = start; index < end; index++) {
                     int height = (heights[index] & 0xFF);
                     char ordinal;
                     if ((ordinal = overlay[index]) == 0) {
@@ -105,11 +105,11 @@ public final class CFIDrawer {
         int c0 = tu.getBiome(biomes[index] & 0xFF).grassCombined;
         int c2 = getBiome(biomes, index + 1 + width, index);
         int c1 = getBiome(biomes, index - 1 - width, index);
-//        int c3 = getBiome(biomes, index + width, index);
-//        int c4 = getBiome(biomes, index - width, index);
-        int r = ((c0 >> 16) & 0xFF) + ((c1 >> 16) & 0xFF) + ((c2 >> 16) & 0xFF);// + ((c3 >> 16) & 0xFF) + ((c4 >> 16) & 0xFF);
-        int g = ((c0 >> 8) & 0xFF) + ((c1 >> 8) & 0xFF) + ((c2 >> 8) & 0xFF);// + ((c3 >> 8) & 0xFF) + ((c4 >> 8) & 0xFF);
-        int b = ((c0) & 0xFF) + ((c1) & 0xFF) + ((c2) & 0xFF);// + ((c3) & 0xFF) + ((c4) & 0xFF);
+        //        int c3 = getBiome(biomes, index + width, index);
+        //        int c4 = getBiome(biomes, index - width, index);
+        int r = ((c0 >> 16) & 0xFF) + ((c1 >> 16) & 0xFF) + ((c2 >> 16) & 0xFF); // + ((c3 >> 16) & 0xFF) + ((c4 >> 16) & 0xFF);
+        int g = ((c0 >> 8) & 0xFF) + ((c1 >> 8) & 0xFF) + ((c2 >> 8) & 0xFF); // + ((c3 >> 8) & 0xFF) + ((c4 >> 8) & 0xFF);
+        int b = ((c0) & 0xFF) + ((c1) & 0xFF) + ((c2) & 0xFF); // + ((c3) & 0xFF) + ((c4) & 0xFF);
         r = r * 85 >> 8;
         g = g * 85 >> 8;
         b = b * 85 >> 8;
@@ -126,12 +126,12 @@ public final class CFIDrawer {
 
     private int getSlope(byte[] heights, int width, int index, int height) {
         return (
-                + getHeight(heights, index + 1, height)
-//                + getHeight(heights, index + width, height)
-                        + getHeight(heights, index + width + 1, height)
-                        - getHeight(heights, index - 1, height)
-//                - getHeight(heights, index - width, height)
-                        - getHeight(heights, index - width - 1, height)
+            + getHeight(heights, index + 1, height)
+                //                + getHeight(heights, index + width, height)
+                + getHeight(heights, index + width + 1, height)
+                - getHeight(heights, index - 1, height)
+                //                - getHeight(heights, index - width, height)
+                - getHeight(heights, index - width - 1, height)
         );
     }
 

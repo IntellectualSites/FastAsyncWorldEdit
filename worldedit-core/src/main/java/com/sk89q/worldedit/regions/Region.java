@@ -28,6 +28,8 @@ import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -85,11 +87,16 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     /**
      * Get the number of blocks in the region.
      *
-     * <p>Note: This method <b>must</b> be overridden.</p>
-     *
      * @return number of blocks
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
      */
+    @NonAbstractForCompatibility(
+        delegateName = "getArea",
+        delegateParams = {}
+    )
     default long getVolume() {
+        DeprecationUtil.checkDelegatingOverride(getClass());
         // TODO Remove default status when getArea is removed.
         try {
             if (getClass().getMethod("getArea").getDeclaringClass().equals(Region.class)) {
@@ -134,7 +141,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Expand the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void expand(BlockVector3... changes) throws RegionOperationException;
 
@@ -142,7 +149,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Contract the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void contract(BlockVector3... changes) throws RegionOperationException;
 
@@ -150,7 +157,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Shift the region.
      *
      * @param change the change
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void shift(BlockVector3 change) throws RegionOperationException;
 
@@ -184,7 +191,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     Set<BlockVector2> getChunks();
 
     /**
-     * Return a list of 16*16*16 chunks in a region
+     * Return a list of 16*16*16 chunks in a region.
      *
      * @return the chunk cubes this region overlaps with
      */
@@ -290,14 +297,14 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     default boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
-        return contains(bx, by, bz) &&
-                contains(bx, by, tz) &&
-                contains(tx, by, bz) &&
-                contains(tx, by, tz) &&
-                contains(bx, ty, bz) &&
-                contains(bx, ty, tz) &&
-                contains(tx, ty, bz) &&
-                contains(tx, ty, tz);
+        return contains(bx, by, bz)
+            && contains(bx, by, tz)
+            && contains(tx, by, bz)
+            && contains(tx, by, tz)
+            && contains(bx, ty, bz)
+            && contains(bx, ty, tz)
+            && contains(tx, ty, bz)
+            && contains(tx, ty, tz);
     }
 
     default boolean containsChunk(int chunkX, int chunkZ) {

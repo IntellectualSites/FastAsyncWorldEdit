@@ -95,7 +95,7 @@ public interface BlockMaterial {
     int getLightValue();
 
     /**
-     * Get the opacity of the block
+     * Get the opacity of the block.
      * @return opacity
      */
     int getLightOpacity();
@@ -159,14 +159,14 @@ public interface BlockMaterial {
     boolean isTranslucent();
 
     /**
-     * Gets whether the block has a container (Item container)
+     * Gets whether the block has a container (Item container).
      *
      * @return If it has a container
      */
     boolean hasContainer();
 
     /**
-     * Get the map color
+     * Get the map color.
      * @return or 0
      */
     int getMapColor();

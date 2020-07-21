@@ -55,12 +55,12 @@ public final class ChunkDeleter {
     private static final Logger logger = LoggerFactory.getLogger(ChunkDeleter.class);
 
     private static final Comparator<BlockVector2> chunkSorter = Comparator.comparing(
-            pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32);
+        pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32);
 
     private static Gson chunkDeleterGson = new GsonBuilder()
-            .registerTypeAdapter(BlockVector2.class, new BlockVector2Adapter())
-            .setPrettyPrinting()
-            .create();
+        .registerTypeAdapter(BlockVector2.class, new BlockVector2Adapter())
+        .setPrettyPrinting()
+        .create();
 
     public static ChunkDeletionInfo readInfo(Path chunkFile) throws IOException, JsonSyntaxException {
         String json = new String(Files.readAllBytes(chunkFile), StandardCharsets.UTF_8);
@@ -86,8 +86,8 @@ public final class ChunkDeleter {
         long start = System.currentTimeMillis();
         if (chunkDeleter.runDeleter()) {
             logger.info("Successfully deleted {} matching chunks (out of {}, taking {} ms).",
-                    chunkDeleter.getDeletedChunkCount(), chunkDeleter.getDeletionsRequested(),
-                    System.currentTimeMillis() - start);
+                chunkDeleter.getDeletedChunkCount(), chunkDeleter.getDeletionsRequested(),
+                System.currentTimeMillis() - start);
             if (deleteOnSuccess) {
                 boolean deletedFile = false;
                 try {
@@ -95,13 +95,13 @@ public final class ChunkDeleter {
                 } catch (IOException ignored) {
                 }
                 if (!deletedFile) {
-                    logger.warn("Chunk deletion file could not be cleaned up. This may have unintended consequences" +
-                            " on next startup, or if /delchunks is used again.");
+                    logger.warn("Chunk deletion file could not be cleaned up. This may have unintended consequences"
+                        + " on next startup, or if /delchunks is used again.");
                 }
             }
         } else {
-            logger.error("Error occurred while deleting chunks. " +
-                    "If world errors occur, stop the server and restore the *.bak backup files.");
+            logger.error("Error occurred while deleting chunks. "
+                + "If world errors occur, stop the server and restore the *.bak backup files.");
         }
     }
 
@@ -158,10 +158,10 @@ public final class ChunkDeleter {
         Path worldPath = Paths.get(chunkBatch.worldPath);
         if (chunkBatch.chunks != null) {
             return chunkBatch.chunks.stream()
-                    .collect(Collectors.groupingBy(RegionFilePos::new))
-                    .entrySet().stream().collect(Collectors.toMap(
-                            e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
-                            e -> e.getValue().stream().sorted(chunkSorter)));
+                .collect(Collectors.groupingBy(RegionFilePos::new))
+                .entrySet().stream().collect(Collectors.toMap(
+                    e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
+                    e -> e.getValue().stream().sorted(chunkSorter)));
         } else {
             final BlockVector2 minChunk = chunkBatch.minChunk;
             final BlockVector2 maxChunk = chunkBatch.maxChunk;
@@ -184,17 +184,17 @@ public final class ChunkDeleter {
                     int maxX = Math.min(Math.max(startX, endX), maxChunk.getBlockX());
                     int maxZ = Math.min(Math.max(startZ, endZ), maxChunk.getBlockZ());
                     Stream<BlockVector2> stream = Stream.iterate(BlockVector2.at(minX, minZ),
-                            bv2 -> {
-                                int nextX = bv2.getBlockX();
-                                int nextZ = bv2.getBlockZ();
-                                if (++nextX > maxX) {
-                                    nextX = minX;
-                                    if (++nextZ > maxZ) {
-                                        return null;
-                                    }
+                        bv2 -> {
+                            int nextX = bv2.getBlockX();
+                            int nextZ = bv2.getBlockZ();
+                            if (++nextX > maxX) {
+                                nextX = minX;
+                                if (++nextZ > maxZ) {
+                                    return null;
                                 }
-                                return BlockVector2.at(nextX, nextZ);
-                            });
+                            }
+                            return BlockVector2.at(nextX, nextZ);
+                        });
                     groupedChunks.put(regionPath, stream);
                 }
             }
@@ -207,8 +207,8 @@ public final class ChunkDeleter {
             return (r, p) -> true;
         }
         return deletionPredicates.stream()
-                .map(this::createPredicate)
-                .reduce(BiPredicate::and)
+            .map(this::createPredicate)
+            .reduce(BiPredicate::and)
                 .orElse((r, p) -> true);
     }
 

@@ -65,9 +65,9 @@ import java.util.stream.Collectors;
 public class ToolCommands {
 
     public static void register(CommandRegistrationHandler registration,
-                                CommandManager commandManager,
-                                CommandManagerService commandManagerService,
-                                WorldEdit worldEdit) {
+        CommandManager commandManager,
+        CommandManagerService commandManagerService,
+        WorldEdit worldEdit) {
         // Collect the tool commands
         CommandManager collect = commandManagerService.newCommandManager();
 
@@ -88,8 +88,8 @@ public class ToolCommands {
                 ).build();
             }
             commandManager.register(CommandUtil.deprecate(
-                command, "Global tool names cause conflicts " +
-                "and will be removed in WorldEdit 8", ToolCommands::asNonGlobal
+                command, "Global tool names cause conflicts "
+                    + "and will be removed in WorldEdit 8", ToolCommands::asNonGlobal
             ));
         }
 
@@ -114,7 +114,7 @@ public class ToolCommands {
     }
 
     private static String asNonGlobal(org.enginehub.piston.Command oldCommand,
-                                      CommandParameters oldParameters) {
+        CommandParameters oldParameters) {
         String name = Optional.ofNullable(oldParameters.getMetadata())
             .map(CommandMetadata::getCalledName)
             .filter(n -> !n.startsWith("/"))
@@ -172,9 +172,9 @@ public class ToolCommands {
     }
 
     @Command(
-            name = "inspect",
-            aliases = { "/inspect" },
-            desc = "Inspect edits within a radius"
+        name = "inspect",
+        aliases = { "/inspect" },
+        desc = "Inspect edits within a radius"
     )
     @CommandPermissions("worldedit.tool.inspect")
     public void inspectBrush(Player player, LocalSession session) throws WorldEditException {
@@ -185,13 +185,12 @@ public class ToolCommands {
 
     @Command(
         name = "tree",
-        aliases = { "/tree" },
         desc = "Tree generator tool"
     )
     @CommandPermissions("worldedit.tool.tree")
     public void tree(Player player, LocalSession session,
-                     @Arg(desc = "Type of tree to generate", def = "tree")
-                     TreeGenerator.TreeType type) throws WorldEditException {
+        @Arg(desc = "Type of tree to generate", def = "tree")
+            TreeGenerator.TreeType type) throws WorldEditException {
 
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
         session.setTool(player, new TreePlanter(type));
@@ -200,13 +199,12 @@ public class ToolCommands {
 
     @Command(
         name = "repl",
-        aliases = { "/repl" },
         desc = "Block replacer tool"
     )
     @CommandPermissions("worldedit.tool.replacer")
     public void repl(Player player, LocalSession session,
-                     @Arg(desc = "The pattern of blocks to place")
-                         Pattern pattern) throws WorldEditException {
+        @Arg(desc = "The pattern of blocks to place")
+            Pattern pattern) throws WorldEditException {
 
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
         session.setTool(player, new BlockReplacer(pattern));
@@ -215,7 +213,6 @@ public class ToolCommands {
 
     @Command(
         name = "cycler",
-        aliases = { "/cycler" },
         desc = "Block data cycler tool"
     )
     @CommandPermissions("worldedit.tool.data-cycler")
@@ -228,15 +225,15 @@ public class ToolCommands {
 
     @Command(
         name = "floodfill",
-        aliases = { "flood", "/flood", "/floodfill" },
+        aliases = { "flood" },
         desc = "Flood fill tool"
     )
     @CommandPermissions("worldedit.tool.flood-fill")
     public void floodFill(Player player, LocalSession session,
-                          @Arg(desc = "The pattern to flood fill")
-                              Pattern pattern,
-                          @Arg(desc = "The range to perform the fill")
-                              int range) throws WorldEditException {
+        @Arg(desc = "The pattern to flood fill")
+            Pattern pattern,
+        @Arg(desc = "The range to perform the fill")
+            int range) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -252,7 +249,6 @@ public class ToolCommands {
 
     @Command(
         name = "deltree",
-        aliases = { "/deltree" },
         desc = "Floating tree remover tool"
     )
     @CommandPermissions("worldedit.tool.deltree")
@@ -265,7 +261,6 @@ public class ToolCommands {
 
     @Command(
         name = "farwand",
-        aliases = { "/warwand" },
         desc = "Wand at a distance tool"
     )
     @CommandPermissions("worldedit.tool.farwand")
@@ -282,10 +277,10 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.lrbuild")
     public void longrangebuildtool(Player player, LocalSession session,
-                                   @Arg(desc = "Pattern to set on left-click")
-                                       Pattern primary,
-                                   @Arg(desc = "Pattern to set on right-click")
-                                       Pattern secondary) throws WorldEditException {
+        @Arg(desc = "Pattern to set on left-click")
+            Pattern primary,
+        @Arg(desc = "Pattern to set on right-click")
+            Pattern secondary) throws WorldEditException {
 
         final ItemType itemType = player.getItemInHand(HandSide.MAIN_HAND).getType();
         session.setTool(player, new LongRangeBuildTool(primary, secondary));

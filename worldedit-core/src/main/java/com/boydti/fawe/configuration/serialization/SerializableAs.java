@@ -10,13 +10,16 @@ import java.lang.annotation.Target;
  * stored as.
  * If this is not present on a {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable} class, it
  * will use the fully qualified name of the class.
+ *
  * <p>
  * This value will be stored in the configuration so that the configuration
  * deserialization can determine what type it is.
+ * </p>
+ *
  * <p>
  * Using this annotation on any other class than a {@link
  * com.boydti.fawe.configuration.serialization.ConfigurationSerializable} will have no effect.
- *
+ * </p>
  * @see com.boydti.fawe.configuration.serialization.ConfigurationSerialization#registerClass(Class, String)
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -27,7 +30,7 @@ public @interface SerializableAs {
      * <p>
      * This name MUST be unique. We recommend using names such as
      * "MyPluginThing" instead of "Thing".
-     *
+     * </p>
      * @return Name to serialize the class as.
      */
     String value();

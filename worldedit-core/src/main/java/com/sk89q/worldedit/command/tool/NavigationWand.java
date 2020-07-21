@@ -28,25 +28,25 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public enum NavigationWand implements DoubleActionTraceTool {
-  INSTANCE;
+    INSTANCE;
 
-  @Override
-  public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-      if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
-           return false;
-      }
-      final int maxDist = config.navigationWandMaxDistance;
-      if (maxDist <= 0) {
-          return false;
-      }
-      Location pos = player.getSolidBlockTrace(maxDist);
-      if (pos != null) {
-          player.findFreePosition(pos);
-      } else {
-          player.printError(TranslatableComponent.of("worldedit.jumpto.none"));
-      }
-      return true;
-  }
+    @Override
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
+            return false;
+        }
+        final int maxDist = config.navigationWandMaxDistance;
+        if (maxDist <= 0) {
+            return false;
+        }
+        Location pos = player.getSolidBlockTrace(maxDist);
+        if (pos != null) {
+            player.findFreePosition(pos);
+        } else {
+            player.printError(TranslatableComponent.of("worldedit.jumpto.none"));
+        }
+        return true;
+    }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {

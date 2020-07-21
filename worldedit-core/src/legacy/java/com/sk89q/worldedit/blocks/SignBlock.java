@@ -36,7 +36,7 @@ public class SignBlock extends BaseBlock {
 
     private String[] text;
 
-    private static String EMPTY =  "{\"text\":\"\"}";
+    private static final String EMPTY =  "{\"text\":\"\"}";
 
     /**
      * Construct the sign with text.

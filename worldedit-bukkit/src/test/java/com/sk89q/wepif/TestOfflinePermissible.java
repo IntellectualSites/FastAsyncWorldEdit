@@ -30,6 +30,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,11 +38,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 public class TestOfflinePermissible implements OfflinePlayer, Permissible {
+    private final UUID randomUuid = UUID.randomUUID();
     private boolean op;
-    private UUID randomUuid = UUID.randomUUID();
 
     private final Map<String, Boolean> assignedPermissions = new HashMap<>();
 
@@ -202,7 +202,7 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public void incrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
-        
+
     }
 
     @Override

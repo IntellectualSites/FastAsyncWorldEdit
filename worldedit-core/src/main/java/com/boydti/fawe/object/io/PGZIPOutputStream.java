@@ -35,7 +35,7 @@ public class PGZIPOutputStream extends FilterOutputStream {
 
 
     // private static final Logger LOG = LoggerFactory.getLogger(PGZIPOutputStream.class);
-    private final static int GZIP_MAGIC = 0x8b1f;
+    private static final int GZIP_MAGIC = 0x8b1f;
 
     // todo: remove after block guessing is implemented
     // array list that contains the block sizes

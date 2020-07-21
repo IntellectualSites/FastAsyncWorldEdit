@@ -66,8 +66,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     private RandomAccessFile raf;
 
     private boolean deleted;
-    private int X;
-    private int Z;
+    private int chunkX;
+    private int chunkZ;
     private MCAChunk[] chunks;
     private boolean[] chunkInitialized;
     private Object[] locks;
@@ -120,8 +120,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         deleted = false;
         Arrays.fill(chunkInitialized, false);
         readLocations = false;
-        this.X = mcrX;
-        this.Z = mcrZ;
+        this.chunkX = mcrX;
+        this.chunkZ = mcrZ;
         this.file = file;
         if (!file.exists()) {
             throw new FileNotFoundException(file.getName());
@@ -130,23 +130,24 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     public MCAFile init(World world, int mcrX, int mcrZ) throws FileNotFoundException {
-        return init(new File(world.getStoragePath().toFile(), File.separator + "regions" + File.separator + "r." + mcrX + "." + mcrZ + ".mca"));
+        return init(new File(world.getStoragePath().toFile(),
+            File.separator + "regions" + File.separator + "r." + mcrX + "." + mcrZ + ".mca"));
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return BlockVector3.at(this.X << 9, 0, this.Z << 9);
+        return BlockVector3.at(this.chunkX << 9, 0, this.chunkZ << 9);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return BlockVector3.at((this.X << 9) + 511, FaweCache.IMP.WORLD_MAX_Y, (this.Z << 9) + 511);
+        return BlockVector3.at((this.chunkX << 9) + 511, FaweCache.IMP.WORLD_MAX_Y, (this.chunkZ << 9) + 511);
     }
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-//        final IChunk chunk = getChunk(x >> 4, z >> 4);
-//        return chunk.setTile(x & 15, y, z & 15, tile);
+        //        final IChunk chunk = getChunk(x >> 4, z >> 4);
+        //        return chunk.setTile(x & 15, y, z & 15, tile);
         return false;
     }
 
@@ -196,12 +197,12 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         return deleted;
     }
 
-    public int getX() {
-        return X;
+    public int getChunkX() {
+        return chunkX;
     }
 
-    public int getZ() {
-        return Z;
+    public int getChunkZ() {
+        return chunkZ;
     }
 
     public RandomAccessFile getRandomAccessFile() {
@@ -264,7 +265,9 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     private MCAChunk readChunk(MCAChunk chunk, int i) throws IOException {
-        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF))) << 12;
+        int offset =
+            (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2]
+                & 0xFF))) << 12;
         if (offset == 0) {
             return null;
         }
@@ -277,10 +280,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     /**
-     * CX, CZ, OFFSET, SIZE
+     * CX, CZ, OFFSET, SIZE.
      *
-     * @param onEach
-     * @throws IOException
      */
     public void forEachSortedChunk(RunnableVal4<Integer, Integer, Integer, Integer> onEach) throws IOException {
         char[] offsets = new char[(int) (raf.length() / 4096) - 2];
@@ -288,7 +289,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         char i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF))) - 2;
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
+                    locations[i + 2] & 0xFF))) - 2;
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     if (offset < offsets.length) {
@@ -312,14 +314,12 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         }
     }
 
-    /**
-     * @param onEach cx, cz, offset, size
-     */
     public void forEachChunk(RunnableVal4<Integer, Integer, Integer, Integer> onEach) {
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
+                    locations[i + 2] & 0xFF)));
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     onEach.run(x, z, offset << 12, size << 12);
@@ -332,12 +332,13 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
+                    locations[i + 2] & 0xFF)));
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     try {
                         onEach.accept(getChunk(x, z));
-                    } catch (Throwable ignore) {
+                    } catch (Throwable ignored) {
                     }
                 }
             }
@@ -346,7 +347,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
 
     public int getOffset(int cx, int cz) {
         int i = getIndex(cx, cz);
-        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
+        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
+            locations[i + 2] & 0xFF)));
         return offset << 12;
     }
 
@@ -387,9 +389,6 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         return nis;
     }
 
-    /**
-     * @param onEach chunk
-     */
     public void forEachCachedChunk(Consumer<MCAChunk> onEach) {
         for (int i = 0; i < chunks.length; i++) {
             MCAChunk chunk = chunks[i];
@@ -495,7 +494,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     /**
-     * Write the chunk to the file
+     * Write the chunk to the file.
+     *
      * @param wait - If the flush method needs to wait for the pool
      */
     public void flush(boolean wait) {
@@ -534,32 +534,32 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                     }
                 }
             }
-//
-//            forEachCachedChunk(chunk -> {
-//                if (chunk.isModified() || chunk.isDeleted()) {
-//                    modified[0] = true;
-//                    chunk.setLastUpdate(now);
-//                    if (!chunk.isDeleted()) {
-//                        MCAFile.this.pool.submit(() -> {
-//                            try {
-//                                byte[] compressed = toBytes(chunk);
-//                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
-//                                Int2ObjectOpenHashMap map;
-//                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
-//                                    map = append;
-//                                } else {
-//                                    map = compressedMap;
-//                                }
-//                                synchronized (map) {
-//                                    map.put(pair, compressed);
-//                                }
-//                            } catch (Throwable e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
-//                    }
-//                }
-//            });
+            //
+            //            forEachCachedChunk(chunk -> {
+            //                if (chunk.isModified() || chunk.isDeleted()) {
+            //                    modified[0] = true;
+            //                    chunk.setLastUpdate(now);
+            //                    if (!chunk.isDeleted()) {
+            //                        MCAFile.this.pool.submit(() -> {
+            //                            try {
+            //                                byte[] compressed = toBytes(chunk);
+            //                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
+            //                                Int2ObjectOpenHashMap map;
+            //                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
+            //                                    map = append;
+            //                                } else {
+            //                                    map = compressedMap;
+            //                                }
+            //                                synchronized (map) {
+            //                                    map.put(pair, compressed);
+            //                                }
+            //                            } catch (Throwable e) {
+            //                                e.printStackTrace();
+            //                            }
+            //                        });
+            //                    }
+            //                }
+            //            });
 
             if (!modified) {
                 // Not modified, do nothing
@@ -662,7 +662,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                             if (cached == null || !cached.isModified()) {
                                 FastByteArrayInputStream tmp = getChunkCompressedBytes(nextOffset2);
                                 byte[] nextBytes = Arrays.copyOf(tmp.array, tmp.length);
-                                relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ & 31)), nextBytes);
+                                relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ
+                                    & 31)), nextBytes);
                             }
                             int nextSize = MathMan.unpairY(nextLoc) << 12;
                             end += nextSize;

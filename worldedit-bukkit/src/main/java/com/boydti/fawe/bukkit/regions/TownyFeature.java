@@ -38,7 +38,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                 if (block.getResident().equals(resident)) {
                     return true;
                 }
-            } catch (NotRegisteredException ignore) {}
+            } catch (NotRegisteredException ignored) {
+            }
             Town town = block.getTown();
             if (town.isMayor(resident)) {
                 return true;
@@ -54,7 +55,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     return true;
                 }
             }
-        } catch (NotRegisteredException ignore) {}
+        } catch (NotRegisteredException ignored) {
+        }
         return false;
     }
 
@@ -76,9 +78,9 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
             if (isMember) {
                 final Chunk chunk = location.getChunk();
                 final BlockVector3 pos1 = BlockVector3
-                    .at(chunk.getX() * 16, 0, chunk.getZ() * 16);
+                    .at(chunk.getX() << 4, 0, chunk.getZ() << 4);
                 final BlockVector3 pos2 = BlockVector3.at(
-                    chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
+                    (chunk.getX() << 4) + 15, 156, (chunk.getZ() << 4)
                         + 15);
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {
                     @Override
@@ -87,7 +89,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     }
                 };
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 }

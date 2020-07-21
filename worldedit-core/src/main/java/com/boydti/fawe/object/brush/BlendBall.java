@@ -21,7 +21,7 @@ public class BlendBall implements Brush {
         int ty = position.getBlockY();
         int tz = position.getBlockZ();
 
-//        Map<BlockState, Integer> frequency = Maps.newHashMap();
+        //        Map<BlockState, Integer> frequency = Maps.newHashMap();
         int[] frequency = new int[BlockTypes.size()];
 
         int maxY = editSession.getMaximumPoint().getBlockY();

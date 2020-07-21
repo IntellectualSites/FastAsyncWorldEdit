@@ -86,7 +86,7 @@ public class SchematicReader implements ClipboardReader {
     private NBTInputStream inputStream;
     private InputStream rootStream;
 
-//    private final DataFixer fixer; TODO
+    //    private final DataFixer fixer; TODO
 
     private FastByteArrayOutputStream idOut = new FastByteArrayOutputStream();
     private FastByteArrayOutputStream dataOut = new FastByteArrayOutputStream();
@@ -251,7 +251,7 @@ public class SchematicReader implements ClipboardReader {
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
-        try (InputStream dataIn = new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays()));InputStream idIn = new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays()))) {
+        try (InputStream dataIn = new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())); InputStream idIn = new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays()))) {
             if (addOut != null) {
                 try (FaweInputStream addIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(addOut.toByteArrays())))) {
                     if (clipboard instanceof LinearClipboard) {

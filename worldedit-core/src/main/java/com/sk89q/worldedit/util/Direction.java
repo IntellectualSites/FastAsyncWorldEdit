@@ -25,6 +25,7 @@ import com.sk89q.worldedit.math.Vector3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
@@ -73,7 +74,7 @@ public enum Direction {
     static {
         for (Direction dir : Direction.values()) {
             map.put(dir.name(), dir);
-            map.put(dir.name().toLowerCase(), dir);
+            map.put(dir.name().toLowerCase(Locale.ROOT), dir);
         }
     }
 

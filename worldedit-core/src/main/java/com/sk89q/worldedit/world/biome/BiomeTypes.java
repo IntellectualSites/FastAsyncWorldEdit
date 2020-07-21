@@ -132,7 +132,8 @@ public final class BiomeTypes {
         return BiomeType.REGISTRY.getByInternalId(internalId);
     }
 
-    public static @Nullable BiomeType get(final String id) {
+    @Nullable
+    public static BiomeType get(final String id) {
         return BiomeType.REGISTRY.get(id);
     }
 

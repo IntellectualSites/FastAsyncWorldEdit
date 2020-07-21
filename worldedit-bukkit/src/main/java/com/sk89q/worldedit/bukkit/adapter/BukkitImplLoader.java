@@ -47,15 +47,15 @@ public class BukkitImplLoader {
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
-            "\n**********************************************\n" +
-            "** This WorldEdit version does not fully support your version of Bukkit.\n" +
-            "**\n" +
-            "** When working with blocks or undoing, chests will be empty, signs\n" +
-            "** will be blank, and so on. There will be no support for entity\n" +
-            "** and block property-related functions.\n" +
-            "**\n" +
-            "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n" +
-            "**********************************************\n";
+        "\n**********************************************\n"
+            + "** This WorldEdit version does not fully support your version of Bukkit.\n"
+            + "**\n"
+            + "** When working with blocks or undoing, chests will be empty, signs\n"
+            + "** will be blank, and so on. There will be no support for entity\n"
+            + "** and block property-related functions.\n"
+            + "**\n"
+            + "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n"
+            + "**********************************************\n";
 
     /**
      * Create a new instance.
@@ -157,31 +157,31 @@ public class BukkitImplLoader {
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
         for (String className : adapterCandidates) {
-            System.out.println("Candidate: " + className);
+            log.debug("Candidate: " + className);
             try {
                 Class<?> cls = Class.forName(className);
-                if (cls.isSynthetic()){
-                    System.out.println(className + " is synthetic, continuing");
+                if (cls.isSynthetic()) {
+                    log.debug(className + " is synthetic, continuing");
                     continue;
-                }else{
-                    System.out.println(className + " is not synthetic");
+                } else {
+                    log.debug(className + " is not synthetic");
                 }
                 if (BukkitImplAdapter.class.isAssignableFrom(cls)) {
-                    System.out.println(className + " is assignable from BukkitImplAdapter, returning");
+                    log.debug(className + " is assignable from BukkitImplAdapter, returning");
                     return (BukkitImplAdapter) cls.newInstance();
-                }else{
-                    System.out.println(className + " is NOT assignable from BukkitImplAdapter, returning");
+                } else {
+                    log.error(className + " is NOT assignable from BukkitImplAdapter, returning");
                 }
             } catch (ClassNotFoundException e) {
-                log.warn("Failed to load the Bukkit adapter class '" + className +
-                        "' that is not supposed to be missing", e);
+                log.warn("Failed to load the Bukkit adapter class '" + className
+                    + "' that is not supposed to be missing", e);
             } catch (IllegalAccessException e) {
-                log.warn("Failed to load the Bukkit adapter class '" + className +
-                        "' that is not supposed to be raising this error", e);
+                log.warn("Failed to load the Bukkit adapter class '" + className
+                    + "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
                 if (className.equals(customCandidate)) {
                     log.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
-                }else{
+                } else {
                     log.warn(className + " is not custom candidate.", e);
                 }
             }

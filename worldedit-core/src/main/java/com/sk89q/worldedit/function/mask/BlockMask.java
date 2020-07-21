@@ -182,6 +182,7 @@ public class BlockMask extends ABlockMask {
     public Collection<BaseBlock> getBlocks() {
         return Collections.emptyList(); //TODO Not supported in FAWE yet
     }
+
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() <= 3;

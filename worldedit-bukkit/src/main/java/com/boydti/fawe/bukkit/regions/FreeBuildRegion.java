@@ -9,13 +9,15 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.RegisteredListener;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class FreeBuildRegion extends BukkitMaskManager {
     private final ArrayList<RegisteredListener> listeners;
@@ -48,7 +50,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
         ArrayList<RegisteredListener> currRegList = new ArrayList<>();
         for (RegisteredListener listener : this.listeners) {
             String name = listener.getPlugin().getName();
-            if (!player.hasPermission("fawe.freebuild." + name.toLowerCase())) {
+            if (!player.hasPermission("fawe.freebuild." + name.toLowerCase(Locale.ROOT))) {
                 continue;
             }
             currRegList.add(listener);
@@ -69,9 +71,10 @@ public class FreeBuildRegion extends BukkitMaskManager {
 
         return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
-        @Override
+            @Override
             public boolean isValid(Player player, MaskType type) {
-                return bukkitWorld == BukkitAdapter.adapt(player.getWorld()) && type == MaskType.MEMBER;
+                return bukkitWorld == BukkitAdapter.adapt(player.getWorld())
+                    && type == MaskType.MEMBER;
             }
 
             @Override

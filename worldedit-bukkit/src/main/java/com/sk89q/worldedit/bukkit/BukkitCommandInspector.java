@@ -19,13 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
-
 import com.sk89q.bukkit.util.CommandInspector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
-import java.util.Optional;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.enginehub.piston.CommandManager;
@@ -33,9 +29,12 @@ import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MapBackedValueStore;
 import org.slf4j.Logger;
-
-import java.util.Locale;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 class BukkitCommandInspector implements CommandInspector {
 

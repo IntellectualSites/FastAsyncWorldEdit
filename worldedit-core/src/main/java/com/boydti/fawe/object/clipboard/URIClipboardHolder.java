@@ -24,6 +24,7 @@ public class URIClipboardHolder extends ClipboardHolder {
     }
 
     /**
+     * Returns a URI for this ClipboardHolder.
      * @deprecated If a holder has multiple sources, this will return an empty URI
      * @return The original source of this clipboard (usually a file or url)
      */

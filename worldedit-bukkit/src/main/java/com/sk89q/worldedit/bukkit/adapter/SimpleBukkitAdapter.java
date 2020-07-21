@@ -22,7 +22,7 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
     }
 
     /**
-     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
+     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder.
      *
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData

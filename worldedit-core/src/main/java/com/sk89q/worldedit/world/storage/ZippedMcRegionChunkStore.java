@@ -48,6 +48,8 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
      *
      * @param zipFile the ZIP file
      * @param folder the folder
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedMcRegionChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -61,6 +63,8 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
      * be detected.
      *
      * @param zipFile the ZIP file
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedMcRegionChunkStore(File zipFile) throws IOException, ZipException {
         this.zipFile = zipFile;

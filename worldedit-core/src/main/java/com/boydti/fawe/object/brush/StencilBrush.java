@@ -48,15 +48,17 @@ public class StencilBrush extends HeightBrush {
         map.setSize(size);
         int cutoff = onlyWhite ? maxY : 0;
         final SolidBlockMask solid = new SolidBlockMask(editSession);
-        
+
         Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
-        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
+        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(
+            pitch - 90).inverse();
 
         double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
+
             @Override
             public boolean test(Extent extent, BlockVector3 vector) {
                 if (solid.test(vector)) {

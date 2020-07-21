@@ -1,3 +1,5 @@
+//CHECKSTYLE:OFF
+
 package net.jpountz.util;
 
 import java.nio.ByteOrder;

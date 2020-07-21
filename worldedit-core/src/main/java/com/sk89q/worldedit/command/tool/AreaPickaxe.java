@@ -36,7 +36,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
  */
 public class AreaPickaxe implements BlockTool {
 
-    private int range;
+    private final int range;
 
     public AreaPickaxe(int range) {
         this.range = range;
@@ -67,7 +67,7 @@ public class AreaPickaxe implements BlockTool {
 
             try {
                 for (int x = ox - range; x <= ox + range; ++x) {
-					for (int y = oy - range; y <= oy + range; ++y) {
+                    for (int y = oy - range; y <= oy + range; ++y) {
                         for (int z = oz - range; z <= oz + range; ++z) {
                             if (!initialType.equals(editSession.getBlock(x, y, z).getBlockType())) {
                                 continue;

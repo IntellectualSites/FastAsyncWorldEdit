@@ -31,7 +31,7 @@ public class FluidType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
 
-    private String id;
+    private final String id;
 
     public FluidType(String id) {
         this.id = id;

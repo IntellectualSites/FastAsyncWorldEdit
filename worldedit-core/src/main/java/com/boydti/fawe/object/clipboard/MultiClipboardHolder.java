@@ -149,9 +149,10 @@ public class MultiClipboardHolder extends URIClipboardHolder {
         if (available == null) {
             cached = available = getClipboards().toArray(new Clipboard[0]);
         }
-        switch (available.length) {
-            case 0: return EmptyClipboard.INSTANCE;
-            case 1: return available[0];
+        if (available.length == 0) {
+            return EmptyClipboard.INSTANCE;
+        } else if (available.length == 1) {
+            return available[0];
         }
 
         int index = ThreadLocalRandom.current().nextInt(available.length);

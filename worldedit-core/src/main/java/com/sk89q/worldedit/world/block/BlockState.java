@@ -36,6 +36,7 @@ import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -54,13 +55,17 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState>, Pattern {
-    private final int internalId;
     private final int ordinal;
     private final char ordinalChar;
     private final BlockType blockType;
     private BlockMaterial material;
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
+
+    /**
+     * The internal ID of the block state.
+     */
+    private int internalId = BlockStateIdAccess.invalidId();
 
     protected BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
@@ -71,10 +76,8 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given internal id
-     * @param combinedId
-     * @deprecated magic number
-     * @return BlockState
+     * Returns a temporary BlockState for a given internal id.
+     * @deprecated Magic Number
      */
 
     @Deprecated
@@ -88,7 +91,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
+     * Returns a temporary BlockState for a given type and string.
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
@@ -97,7 +100,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
+     * Returns a temporary BlockState for a given type and string.
      *  - It's faster if a BlockType is provided compared to parsing the string
      * @param type BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
@@ -108,7 +111,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
+     * Returns a temporary BlockState for a given type and string.
      *  - It's faster if a BlockType is provided compared to parsing the string
      * @param type BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
@@ -224,6 +227,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BlockType getBlockType() {
         return this.blockType;
     }
+
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setBlock(extent, this);
@@ -244,8 +248,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * The internal id with no type information
-     * @return
+     * The internal id with no type information.
      */
     @Deprecated
     @Override

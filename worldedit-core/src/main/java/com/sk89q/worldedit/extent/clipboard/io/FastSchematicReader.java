@@ -123,7 +123,7 @@ public class FastSchematicReader extends NBTSchematicReader {
     }
 
     private String fixBiome(String biomePalettePart) {
-        if(fixer == null || dataVersion == -1) {
+        if (fixer == null || dataVersion == -1) {
             return biomePalettePart;
         }
         return fixer.fixUp(DataFixer.FixTypes.BIOME, biomePalettePart, dataVersion);

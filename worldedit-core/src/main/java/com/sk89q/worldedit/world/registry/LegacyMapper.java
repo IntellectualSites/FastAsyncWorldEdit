@@ -64,9 +64,9 @@ public final class LegacyMapper {
     private final BiMap<Integer, ItemType> itemMap = HashBiMap.create();
     private Map<String, String> blockEntries = new HashMap<>();
     private Map<String, BlockState> stringToBlockMap = new HashMap<>();
-    private Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
-    private Map<String, ItemType> stringToItemMap = new HashMap<>();
-    private Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
+    private final Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
+    private final Map<String, ItemType> stringToItemMap = new HashMap<>();
+    private final Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
 
     /**
      * Create a new instance.
@@ -122,7 +122,7 @@ public final class LegacyMapper {
                     try {
                         String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
                         state = blockFactory.parseFromInput(newEntry, parserContext).toImmutableState();
-                    } catch (InputParseException e) {
+                    } catch (InputParseException ignored) {
                     }
                 }
 
@@ -130,7 +130,7 @@ public final class LegacyMapper {
                 if (state == null) {
                     try {
                         state = blockFactory.parseFromInput(value, parserContext).toImmutableState();
-                    } catch (InputParseException e) {
+                    } catch (InputParseException ignored) {
                     }
                 }
 

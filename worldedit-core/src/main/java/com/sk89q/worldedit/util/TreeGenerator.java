@@ -170,13 +170,13 @@ public class TreeGenerator {
 
     private static final Random RANDOM = new Random();
 
-     /**
+    /**
      * Makes a terrible looking pine tree.
      *
      * @param basePosition the base position
      */
     private static void makePineTree(EditSession editSession, BlockVector3 basePosition)
-            throws MaxChangedBlocksException {
+        throws MaxChangedBlocksException {
         int trunkHeight = (int) Math.floor(Math.random() * 2) + 3;
         int height = (int) Math.floor(Math.random() * 5) + 8;
 
@@ -252,7 +252,7 @@ public class TreeGenerator {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     private static <B extends BlockStateHolder<B>> boolean setChanceBlockIfAir(EditSession session, BlockVector3 position, B block, double probability)
-            throws MaxChangedBlocksException {
+        throws MaxChangedBlocksException {
         return Math.random() <= probability && setBlockIfAir(session, position, block);
     }
 

@@ -97,7 +97,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         wandItem = getString("wand-item", wandItem);
         try {
             wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).getId();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
         superPickaxeManyDrop = getBool("super-pickaxe-many-drop-items", superPickaxeManyDrop);
@@ -107,7 +107,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         navigationWand = getString("nav-wand-item", navigationWand);
         try {
             navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).getId();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
         navigationUseGlass = getBool("nav-use-glass", navigationUseGlass);

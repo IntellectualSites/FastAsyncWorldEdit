@@ -24,11 +24,9 @@ public interface Filter {
     }
 
     /**
-     * Do something with the IChunk<br> - Return null if you don't want to filter blocks<br> -
-     * Return the chunk if you do want to filter blocks<br>
+     * Do something with the IChunk.
      *
-     * @param chunk
-     * @return
+     * @return return null if you don't want to filter blocks, otherwise return the chunk
      */
     default <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         return chunk;
@@ -39,10 +37,10 @@ public interface Filter {
     }
 
     /**
-     * Make changes to the block here<br> - e.g., block.setId(...)<br> - Note: Performance is
+     * Make changes to the block here<.
+     * br> - e.g., block.setId(...)<br> - Note: Performance is
      * critical here<br>
      *
-     * @param block
      */
     default void applyBlock(FilterBlock block) {
     }

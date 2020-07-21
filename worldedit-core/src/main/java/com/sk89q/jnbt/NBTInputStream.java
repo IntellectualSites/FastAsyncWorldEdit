@@ -159,7 +159,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_COMPOUND: {
                 // readDataPayload
                 depth++;
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
@@ -168,6 +168,7 @@ public final class NBTInputStream implements Closeable {
                     readTagPaylodLazy(childType, depth + 1);
                 }
             }
+            //noinspection CheckStyle
             case NBTConstants.TYPE_INT_ARRAY: {
                 is.skipBytes(is.readInt() << 2);
                 return;
@@ -323,7 +324,7 @@ public final class NBTInputStream implements Closeable {
                         valueReader.apply(i, entry);
                     }
                 }
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
@@ -336,6 +337,7 @@ public final class NBTInputStream implements Closeable {
                     }
                 }
             }
+            //noinspection CheckStyle
             case NBTConstants.TYPE_BYTE_ARRAY: {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_BYTE);
@@ -461,7 +463,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return null;
                 }
@@ -504,6 +506,7 @@ public final class NBTInputStream implements Closeable {
                     tagMap.put(name, value);
                 }
             }
+            //noinspection CheckStyle
             case NBTConstants.TYPE_INT_ARRAY: {
                 length = is.readInt();
                 return readIntArrayRaw(length);
@@ -527,7 +530,8 @@ public final class NBTInputStream implements Closeable {
             int toRead = Math.min(length << 2, buf.length);
             is.readFully(buf, 0, toRead);
             for (int i = 0; i < toRead; i += 4, index++) {
-                data[index] = ((buf[i] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + ((buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
+                data[index] = ((buf[i] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + (
+                    (buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
             }
             length -= toRead;
         }
@@ -544,7 +548,10 @@ public final class NBTInputStream implements Closeable {
             int toRead = Math.min(length << 3, buf.length);
             is.readFully(buf, 0, toRead);
             for (int i = 0; i < toRead; i += 8, index++) {
-                data[index] = (((long) buf[i] << 56) | ((long) (buf[i + 1] & 255) << 48) | ((long) (buf[i + 2] & 255) << 40) | ((long) (buf[i + 3] & 255) << 32) | ((long) (buf[i + 4] & 255) << 24) | ((buf[i + 5] & 255) << 16) | ((buf[i + 6] & 255) << 8) | (buf[i + 7] & 255));
+                data[index] = (((long) buf[i] << 56) | ((long) (buf[i + 1] & 255) << 48) | (
+                    (long) (buf[i + 2] & 255) << 40) | ((long) (buf[i + 3] & 255) << 32) | (
+                    (long) (buf[i + 4] & 255) << 24) | ((buf[i + 5] & 255) << 16) | (
+                    (buf[i + 6] & 255) << 8) | (buf[i + 7] & 255));
             }
             length -= toRead;
         }

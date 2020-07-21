@@ -51,7 +51,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
-    protected static transient final NumberFormat NUMBER_FORMAT;
+    protected static final transient NumberFormat NUMBER_FORMAT;
     protected transient CylinderRegion region;
 
     static {

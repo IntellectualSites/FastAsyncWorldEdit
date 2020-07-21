@@ -67,8 +67,8 @@ public final class SnapshotInfo implements Comparable<SnapshotInfo> {
             return false;
         }
         SnapshotInfo that = (SnapshotInfo) o;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(dateTime, that.dateTime);
+        return Objects.equals(name, that.name)
+            && Objects.equals(dateTime, that.dateTime);
     }
 
     @Override
@@ -78,10 +78,10 @@ public final class SnapshotInfo implements Comparable<SnapshotInfo> {
 
     @Override
     public String toString() {
-        return "SnapshotInfo{" +
-            "name='" + name + '\'' +
-            ",date=" + dateTime +
-            '}';
+        return "SnapshotInfo{"
+            + "name='" + name + '\''
+            + ",date=" + dateTime
+            + '}';
     }
 
     @Override

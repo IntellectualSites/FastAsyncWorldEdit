@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -9,10 +7,13 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     private int[] itemTypes;
@@ -43,7 +44,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     }
 
     /**
-     * Converts a Material to a ItemType
+     * Converts a Material to a ItemType.
      *
      * @param material The material
      * @return The itemtype
@@ -73,7 +74,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData
+     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData.
      *
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState

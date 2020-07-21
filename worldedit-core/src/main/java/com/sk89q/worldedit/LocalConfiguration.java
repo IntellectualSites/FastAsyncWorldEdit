@@ -100,7 +100,7 @@ public abstract class LocalConfiguration {
 
     protected String[] getDefaultDisallowedBlocks() {
         List<BlockType> blockTypes = Lists.newArrayList(
-                /*
+            /*
                 BlockTypes.OAK_SAPLING,
                 BlockTypes.JUNGLE_SAPLING,
                 BlockTypes.DARK_OAK_SAPLING,
@@ -172,11 +172,6 @@ public abstract class LocalConfiguration {
      */
     public abstract void load();
 
-    /**
-     *
-     * @param holder
-     * @return true if block is not permitted
-     */
     public boolean checkDisallowedBlocks(BlockStateHolder holder) {
         if (disallowedBlocks.isEmpty()) {
             return false;
@@ -240,7 +235,7 @@ public abstract class LocalConfiguration {
                 data = Byte.parseByte(splitter[1]);
             }
             item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
 
         return item;

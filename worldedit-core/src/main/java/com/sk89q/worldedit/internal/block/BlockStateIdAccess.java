@@ -42,6 +42,7 @@ public final class BlockStateIdAccess {
 
     public interface BlockStateInternalId {
         int getInternalId(BlockState blockState);
+
         void setInternalId(BlockState blockState, int internalId);
     }
 
@@ -52,6 +53,7 @@ public final class BlockStateIdAccess {
     }
 
     /**
+     * An invalid internal ID, for verification purposes.
      * @return an internal ID which is never valid
      */
     public static int invalidId() {
@@ -67,7 +69,9 @@ public final class BlockStateIdAccess {
         //return blockStateInternalId.getInternalId(holder);
     }
 
-    public static @Nullable BlockState getBlockStateById(int id) {
+    @Nullable
+    public static BlockState getBlockStateById(int id) {
+        int test = id / 10000;
         return BlockState.getFromOrdinal(id);
     }
 

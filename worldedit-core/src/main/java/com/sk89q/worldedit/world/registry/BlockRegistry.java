@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -38,11 +39,22 @@ public interface BlockRegistry {
      * Gets the name for the given block.
      *
      * @param blockType the block
+     * @return The name
+     */
+    Component getRichName(BlockType blockType);
+
+    /**
+     * Gets the name for the given block.
+     *
+     * @param blockType the block
      * @return The name, or null if it's unknown
+     * @deprecated Names are now translatable, use {@link #getRichName(BlockType)}.
      */
     @Deprecated
     @Nullable
-    String getName(BlockType blockType);
+    default String getName(BlockType blockType) {
+        return getRichName(blockType).toString();
+    }
 
     /**
      * Get the material for the given block.
@@ -75,7 +87,7 @@ public interface BlockRegistry {
     OptionalInt getInternalBlockStateId(BlockState state);
 
     /**
-     * Register all blocks
+     * Register all blocks.
      */
     default Collection<String> values() {
         return Collections.emptyList();

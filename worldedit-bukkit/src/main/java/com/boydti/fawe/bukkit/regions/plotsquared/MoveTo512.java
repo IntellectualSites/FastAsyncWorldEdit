@@ -180,7 +180,7 @@ public class MoveTo512 /*extends Command*/ {
 //            Location bot = plot.getBottomAbs();
 //            Location top = plot.getTopAbs();
 //
-//            int oX = roadPosLower - bot.getX() + 1;
+//            int oX = roadPosLower - bot.getChunkX() + 1;
 //            int oZ = roadPosLower - bot.getZ() + 1;
 //
 //            { // Move
@@ -222,7 +222,7 @@ public class MoveTo512 /*extends Command*/ {
 //                        int otherBCZ = (obz) >> 4;
 //                        int otherTCX = (otx) >> 4;
 //                        int otherTCZ = (otz) >> 4;
-//                        int cx = newChunk.getX();
+//                        int cx = newChunk.getChunkX();
 //                        int cz = newChunk.getZ();
 //                        int cbx = (cx << 4) - oX;
 //                        int cbz = (cz << 4) - oZ;

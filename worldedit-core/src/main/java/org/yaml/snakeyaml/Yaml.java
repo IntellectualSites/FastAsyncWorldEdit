@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 /**
  * Public YAML interface. Each Thread must have its own instance.
  */
+@SuppressWarnings("CheckStyle")
 public class Yaml {
     protected final Resolver resolver;
     private String name;
@@ -212,19 +213,19 @@ public class Yaml {
     /**
      * <p>
      * Serialize a Java object into a YAML string. Override the default root tag
-     * with <code>rootTag</code>.
+     * with {@code rootTag}.
      * </p>
      *
      * <p>
-     * This method is similar to <code>Yaml.dump(data)</code> except that the
+     * This method is similar to {@code Yaml.dump(data)} except that the
      * root tag for the whole document is replaced with the given tag. This has
      * two main uses.
      * </p>
      *
      * <p>
      * First, if the root tag is replaced with a standard YAML tag, such as
-     * <code>Tag.MAP</code>, then the object will be dumped as a map. The root
-     * tag will appear as <code>!!map</code>, or blank (implicit !!map).
+     * {@code Tag.MAP}, then the object will be dumped as a map. The root
+     * tag will appear as {@code !!map}, or blank (implicit !!map).
      * </p>
      *
      * <p>
@@ -237,12 +238,11 @@ public class Yaml {
      * @param data Java object to be serialized to YAML
      * @param rootTag the tag for the whole YAML document. The tag should be Tag.MAP
      * for a JavaBean to make the tag disappear (to use implicit tag
-     * !!map). If <code>null</code> is provided then the standard tag
+     * !!map). If {@code null} is provided then the standard tag
      * with the full class name is used.
      * @param flowStyle flow style for the whole document. See Chapter 10. Collection
-     * Styles http://yaml.org/spec/1.1/#id930798. If
-     * <code>null</code> is provided then the flow style from
-     * DumperOptions is used.
+     * Styles http://yaml.org/spec/1.1/#id930798. If {@code null}
+     * is provided then the flow style from DumperOptions is used.
      * @return YAML String
      */
     public String dumpAs(Object data, Tag rootTag, FlowStyle flowStyle) {
@@ -261,11 +261,11 @@ public class Yaml {
     /**
      * <p>
      * Serialize a Java object into a YAML string. Override the default root tag
-     * with <code>Tag.MAP</code>.
+     * with {@code Tag.MAP}.
      * </p>
      * <p>
-     * This method is similar to <code>Yaml.dump(data)</code> except that the
-     * root tag for the whole document is replaced with <code>Tag.MAP</code> tag
+     * This method is similar to {@code Yaml.dump(data)} except that the
+     * root tag for the whole document is replaced with {@code Tag.MAP} tag
      * (implicit !!map).
      * </p>
      * <p>
@@ -307,7 +307,7 @@ public class Yaml {
             return events;
         }
 
-        public void emit(Event event) throws IOException {
+        public void emit(Event event) {
             events.add(event);
         }
     }
@@ -324,8 +324,7 @@ public class Yaml {
     }
 
     /**
-     * Parse the only YAML document in a stream and produce the corresponding
-     * Java object.
+     * Parse the only YAML document in a stream and produce the corresponding Java object.
      *
      * @param io data to load from (BOM is respected and removed)
      * @return parsed object
@@ -335,8 +334,7 @@ public class Yaml {
     }
 
     /**
-     * Parse the only YAML document in a stream and produce the corresponding
-     * Java object.
+     * Parse the only YAML document in a stream and produce the corresponding Java object.
      *
      * @param io data to load from (BOM must not be present)
      * @return parsed object
@@ -346,8 +344,7 @@ public class Yaml {
     }
 
     /**
-     * Parse the only YAML document in a stream and produce the corresponding
-     * Java object.
+     * Parse the only YAML document in a stream and produce the corresponding Java object.
      *
      * @param <T> Class is defined by the second argument
      * @param io data to load from (BOM must not be present)
@@ -374,8 +371,7 @@ public class Yaml {
     }
 
     /**
-     * Parse the only YAML document in a stream and produce the corresponding
-     * Java object.
+     * Parse the only YAML document in a stream and produce the corresponding Java object.
      *
      * @param <T> Class is defined by the second argument
      * @param input data to load from (BOM is respected and removed)

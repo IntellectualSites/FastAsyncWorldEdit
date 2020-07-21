@@ -2,7 +2,7 @@ package com.sk89q.worldedit.math.transform;
 
 import com.sk89q.worldedit.math.Vector3;
 
-public class RoundedTransform implements Transform{
+public class RoundedTransform implements Transform {
     private final Transform transform;
 
     public RoundedTransform(Transform transform) {

@@ -286,7 +286,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 stateString = blockAndExtraData[0].substring(stateStart + 1, blockAndExtraData[0].length() - 1);
             }
             String[] stateProperties = EMPTY_STRING_ARRAY;
-            if(stateString != null) {
+            if (stateString != null) {
                 stateProperties = stateString.split(",");
             }
             if (typeString.isEmpty()) {
@@ -385,7 +385,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
         // Check if the item is allowed
         BlockType blockType = state.getBlockType();
-        
+
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (actor != null && !actor.hasPermission("worldedit.anyblock")

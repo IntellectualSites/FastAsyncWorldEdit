@@ -10,44 +10,44 @@ public class WallMask extends AbstractMask {
     private final int min;
     private final int max;
     private final Mask mask;
-    private MutableBlockVector3 v;
+    private MutableBlockVector3 blockVector3;
 
     public WallMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
         this.min = requiredMin;
         this.max = requiredMax;
-        this.v = new MutableBlockVector3();
+        this.blockVector3 = new MutableBlockVector3();
     }
 
     @Override
     public boolean test(Extent extent, BlockVector3 bv) {
-        v.setComponents(bv);
+        blockVector3.setComponents(bv);
         int count = 0;
-        double x = v.getX();
-        double y = v.getY();
-        double z = v.getZ();
-        v.mutX(x + 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        double x = blockVector3.getX();
+        double y = blockVector3.getY();
+        double z = blockVector3.getZ();
+        blockVector3.mutX(x + 1);
+        if (mask.test(extent, blockVector3) && ++count == min && max >= 8) {
+            blockVector3.mutX(x);
             return true;
         }
-        v.mutX(x - 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        blockVector3.mutX(x - 1);
+        if (mask.test(extent, blockVector3) && ++count == min && max >= 8) {
+            blockVector3.mutX(x);
             return true;
         }
-        v.mutX(x);
-        v.mutZ(z + 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        blockVector3.mutX(x);
+        blockVector3.mutZ(z + 1);
+        if (mask.test(extent, blockVector3) && ++count == min && max >= 8) {
+            blockVector3.mutZ(z);
             return true;
         }
-        v.mutZ(z - 1);
-        if (mask.test(extent, v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        blockVector3.mutZ(z - 1);
+        if (mask.test(extent, blockVector3) && ++count == min && max >= 8) {
+            blockVector3.mutZ(z);
             return true;
         }
-        v.mutZ(z);
+        blockVector3.mutZ(z);
         return count >= min && count <= max;
     }
 }

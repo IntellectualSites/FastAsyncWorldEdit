@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
@@ -45,17 +43,13 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
+import com.sk89q.worldedit.world.WorldUnloadedException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import java.lang.ref.WeakReference;
-import java.nio.file.Path;
-import java.util.*;
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
@@ -69,14 +63,30 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
 
+import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class BukkitWorld extends AbstractWorld {
 
     private static final Logger logger = WorldEdit.logger;
 
     private static final Map<Integer, Effect> effects = new HashMap<>();
+
     static {
         for (Effect effect : Effect.values()) {
-            effects.put(effect.getId(), effect);
+            @SuppressWarnings("deprecation")
+            int id = effect.getId();
+            effects.put(id, effect);
         }
     }
 
@@ -189,7 +199,16 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public Path getStoragePath() {
-        return getWorld().getWorldFolder().toPath();
+        Path worldFolder = getWorld().getWorldFolder().toPath();
+        switch (getWorld().getEnvironment()) {
+            case NETHER:
+                return worldFolder.resolve("DIM-1");
+            case THE_END:
+                return worldFolder.resolve("DIM1");
+            case NORMAL:
+            default:
+                return worldFolder;
+        }
     }
 
     @Override
@@ -301,7 +320,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     /**
-     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes
+     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes.
      */
     private static final EnumMap<TreeGenerator.TreeType, TreeType> treeTypeMapping =
             new EnumMap<>(TreeGenerator.TreeType.class);
@@ -338,6 +357,9 @@ public class BukkitWorld extends AbstractWorld {
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         World world = getWorld();
         TreeType bukkitType = toBukkitTreeType(type);
+        if (bukkitType == TreeType.CHORUS_PLANT) {
+            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
+        }
         return type != null && world.generateTree(BukkitAdapter.adapt(world, pt), bukkitType,
                 new EditSessionBlockChangeDelegate(editSession));
     }
@@ -351,12 +373,12 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
-        int X = pt.getBlockX() >> 4;
-        int Z = pt.getBlockZ() >> 4;
+        int chunkX = pt.getBlockX() >> 4;
+        int chunkZ = pt.getBlockZ() >> 4;
         if (Fawe.isMainThread()) {
-            world.getChunkAt(X, Z);
+            world.getChunkAt(chunkX, chunkZ);
         } else {
-            PaperLib.getChunkAtAsync(world, X, Z, true);
+            PaperLib.getChunkAtAsync(world, chunkX, chunkZ, true);
         }
     }
 
@@ -387,6 +409,7 @@ public class BukkitWorld extends AbstractWorld {
         return getWorld().getMaxHeight() - 1;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void fixAfterFastMode(Iterable<BlockVector2> chunks) {
         World world = getWorld();
@@ -490,8 +513,8 @@ public class BukkitWorld extends AbstractWorld {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
-                    logger.warn("Tried to set a corrupt tile entity at " + position.toString() +
-                        ": " + ((BaseBlock) block).getNbtData(), e);
+                    logger.warn("Tried to set a corrupt tile entity at " + position.toString()
+                        + ": " + ((BaseBlock) block).getNbtData(), e);
                 } else {
                     logger.warn("Failed to set block via adapter, falling back to generic", e);
                 }
@@ -550,7 +573,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
-        return setBlock(BlockVector3.at(x,y,z), block);
+        return setBlock(BlockVector3.at(x, y, z), block);
     }
 
     @Override
@@ -560,12 +583,12 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return setBiome(BlockVector2.at(x,z), biome);
+        return setBiome(BlockVector2.at(x, z), biome);
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
-        getWorld().refreshChunk(X, Z);
+    public void refreshChunk(int chunkX, int chunkZ) {
+        getWorld().refreshChunk(chunkX, chunkZ);
     }
 
     @Override

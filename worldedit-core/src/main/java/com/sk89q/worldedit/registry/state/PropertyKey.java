@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * This class will be generated at runtime - these are just example values
+ * This class will be generated at runtime - these are just example values.
  */
 public enum PropertyKey {
     // TODO FIXME Generate this at runtime
@@ -70,22 +70,19 @@ public enum PropertyKey {
     SIGNAL_FIRE,
     HANGING,
     HAS_BOOK,
-    BOTTOM,
-
-
-
-    ;
+    BOTTOM;
 
     private final String id;
 
     PropertyKey() {
-        this.id = name().toLowerCase();
+        this.id = name().toLowerCase(Locale.ROOT);
     }
 
     private static final Map<String, PropertyKey> keys = new HashMap<>();
+
     static {
         for (PropertyKey key : values()) {
-            keys.put(key.name().toLowerCase(), key);
+            keys.put(key.name().toLowerCase(Locale.ROOT), key);
         }
     }
 
@@ -98,7 +95,8 @@ public enum PropertyKey {
     }
 
     /**
-     * Get or create the property key
+     * Get or create the property key.
+     *
      * @param id The name of the property (e.g., `waterlogged`)
      * @return PropertyKey enum
      */
@@ -108,12 +106,13 @@ public enum PropertyKey {
             property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase(Locale.ROOT));
             if (property.getId() == null) {
                 try {
-                    ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase());
+                    ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase(Locale.ROOT));
                 } catch (Throwable e) {
-                    throw new RuntimeException("Could not register property with an id of " + id , e);
+                    throw new RuntimeException(
+                        "Could not register property with an id of " + id, e);
                 }
             }
-            keys.put(property.name().toLowerCase(), property);
+            keys.put(property.name().toLowerCase(Locale.ROOT), property);
         }
         return property;
     }

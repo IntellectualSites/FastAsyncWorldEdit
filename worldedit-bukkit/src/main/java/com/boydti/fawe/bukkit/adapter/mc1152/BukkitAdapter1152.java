@@ -50,20 +50,20 @@ public final class BukkitAdapter1152 extends NMSAdapter {
     /*
     NMS fields
     */
-    public final static Field fieldBits;
-    public final static Field fieldPalette;
-    public final static Field fieldSize;
+    public static final Field fieldBits;
+    public static final Field fieldPalette;
+    public static final Field fieldSize;
 
-    public final static Field fieldFluidCount;
-    public final static Field fieldTickingBlockCount;
-    public final static Field fieldNonEmptyBlockCount;
+    public static final Field fieldFluidCount;
+    public static final Field fieldTickingBlockCount;
+    public static final Field fieldNonEmptyBlockCount;
 
-    private final static Field fieldDirtyCount;
-    private final static Field fieldDirtyBits;
+    private static final Field fieldDirtyCount;
+    private static final Field fieldDirtyBits;
 
-    private final static MethodHandle methodGetVisibleChunk;
+    private static final MethodHandle methodGetVisibleChunk;
 
-    public final static MethodHandle methodSetLightNibbleArray;
+    public static final MethodHandle methodSetLightNibbleArray;
 
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
@@ -146,17 +146,17 @@ public final class BukkitAdapter1152 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
+    public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
+        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(chunkX, chunkZ);
         if (nmsChunk != null) {
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            return nmsWorld.getChunkAt(X, Z);
+            return nmsWorld.getChunkAt(chunkX, chunkZ);
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
-            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
+            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
                 return chunk.getHandle();
@@ -165,20 +165,20 @@ public final class BukkitAdapter1152 extends NMSAdapter {
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
+        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
     }
 
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         try {
-            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
+            return (PlayerChunk) methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
         } catch (Throwable thr) {
             throw new RuntimeException(thr);
         }
     }
 
-    public static void sendChunk(WorldServer nmsWorld, int X, int Z, int mask, boolean lighting) {
-        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
+    public static void sendChunk(WorldServer nmsWorld, int chunkX, int chunkZ, int mask, boolean lighting) {
+        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (playerChunk == null) {
             return;
         }
@@ -199,7 +199,7 @@ public final class BukkitAdapter1152 extends NMSAdapter {
                     fieldDirtyCount.set(playerChunk, 64);
 
                     if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
+                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
                         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
                         playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
                             p.playerConnection.sendPacket(packet);
@@ -269,7 +269,7 @@ public final class BukkitAdapter1152 extends NMSAdapter {
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
             final DataPalette<IBlockData> palette;
-//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
+            //                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
             palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
 
             // set palette

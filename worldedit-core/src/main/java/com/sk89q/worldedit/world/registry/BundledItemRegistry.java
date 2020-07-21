@@ -19,6 +19,10 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.translation.TranslationManager;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
@@ -33,8 +37,26 @@ public class BundledItemRegistry implements ItemRegistry {
         return BundledItemData.getInstance().findById(itemType.getId());
     }
 
+    @Override
+    public Component getRichName(ItemType itemType) {
+        BundledItemData.ItemEntry itemEntry = getEntryById(itemType);
+        if (itemEntry != null && !itemEntry.localizedName.equals("Air")) {
+            // This is more likely to be "right", but not translated
+            // Some vanilla MC items have overrides so we need this name here
+            // Most platforms should be overriding this anyways, so it likely doesn't matter
+            // too much!
+            return TextComponent.of(itemEntry.localizedName);
+        }
+        return TranslatableComponent.of(
+            TranslationManager.makeTranslationKey("item", itemType.getId())
+        );
+    }
+
     @Nullable
     @Override
+    @Deprecated
+    // dumb_intellij.jpg
+    @SuppressWarnings("deprecation")
     public String getName(ItemType itemType) {
         BundledItemData.ItemEntry itemEntry = getEntryById(itemType);
         if (itemEntry != null) {

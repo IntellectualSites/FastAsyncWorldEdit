@@ -49,23 +49,32 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Handles translations for the plugin.
  *
+ * <p>
  * These should be in the following format:
  * plugin.component.message[.meta]*
+ * </p>
  *
+ * <p>
  * Where,
  * plugin = worldedit
  * component = The part of the plugin, eg expand
  * message = A descriptor for which message, eg, expanded
  * meta = Any extra information such as plural/singular (Can have none to infinite)
+ * </p>
  */
 public class TranslationManager {
 
     private static final Gson gson = new GsonBuilder().create();
     private static final Type STRING_MAP_TYPE = new TypeToken<Map<String, String>>() {}.getType();
 
+    public static String makeTranslationKey(String type, String id) {
+        String[] parts = id.split(":", 2);
+        return type + '.' + parts[0] + '.' + parts[1].replace('/', '.');
+    }
+
     private final Map<Locale, Map<String, String>> translationMap = new ConcurrentHashMap<>();
     private final FriendlyComponentRenderer<Locale> friendlyComponentRenderer = FriendlyComponentRenderer.from(
-            (locale, key) -> new MessageFormat(getTranslationMap(locale).getOrDefault(key, key), locale));
+        (locale, key) -> new MessageFormat(getTranslationMap(locale).getOrDefault(key, key), locale));
     private Locale defaultLocale = Locale.ENGLISH;
 
     private final WorldEdit worldEdit;
@@ -126,7 +135,8 @@ public class TranslationManager {
         if (!locale.equals(defaultLocale)) {
             baseTranslations.putAll(getTranslationMap(defaultLocale));
         }
-        Optional<Map<String, String>> langData = loadTranslationFile(locale.getLanguage() + "-" + locale.getCountry() + "/strings.json");
+        Optional<Map<String, String>> langData = loadTranslationFile(
+            locale.getLanguage() + "-" + locale.getCountry() + "/strings.json");
         if (!langData.isPresent()) {
             langData = loadTranslationFile(locale.getLanguage() + "/strings.json");
         }
@@ -137,7 +147,7 @@ public class TranslationManager {
         }
         if (locale.equals(defaultLocale)) {
             translationMap.put(Locale.ENGLISH, loadTranslationFile("strings.json").orElseThrow(
-                    () -> new RuntimeException("Failed to load WorldEdit strings!")
+                () -> new RuntimeException("Failed to load WorldEdit strings!")
             ));
             return true;
         }

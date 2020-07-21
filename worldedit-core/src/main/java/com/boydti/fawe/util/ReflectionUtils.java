@@ -270,7 +270,7 @@ public class ReflectionUtils {
 
 
     /**
-     * get RefClass object by real class
+     * Get RefClass object by real class.
      *
      * @param clazz class
      * @return RefClass based on passed class
@@ -290,27 +290,16 @@ public class ReflectionUtils {
             this.clazz = clazz;
         }
 
-        /**
-         * get passed class
-         *
-         * @return class
-         */
         public Class<?> getRealClass() {
             return this.clazz;
         }
 
-        /**
-         * see {@link Class#isInstance(Object)}
-         *
-         * @param object the object to check
-         * @return true if object is an instance of this class
-         */
         public boolean isInstance(Object object) {
             return this.clazz.isInstance(object);
         }
 
         /**
-         * get existing method by name and types
+         * Get existing method by name and types.
          *
          * @param name name
          * @param types method parameters. can be Class or RefClass
@@ -341,7 +330,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * get existing constructor by types
+         * Get existing constructor by types.
          *
          * @param types parameters. can be Class or RefClass
          * @return RefMethod object
@@ -371,7 +360,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find method by type parameters
+         * find method by type parameters.
          *
          * @param types parameters. can be Class or RefClass
          * @return RefMethod object
@@ -409,7 +398,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find method by name
+         * find method by name.
          *
          * @param names possible names of method
          * @return RefMethod object
@@ -430,7 +419,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find method by return value
+         * find method by return value.
          *
          * @param type type of returned value
          * @return RefMethod
@@ -441,7 +430,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find method by return value
+         * find method by return value.
          *
          * @param type type of returned value
          * @return RefMethod
@@ -463,7 +452,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find constructor by number of arguments
+         * find constructor by number of arguments.
          *
          * @param number number of arguments
          * @return RefConstructor
@@ -482,7 +471,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * get field by name
+         * get field by name.
          *
          * @param name field name
          * @return RefField
@@ -501,7 +490,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find field by type
+         * find field by type.
          *
          * @param type field type
          * @return RefField
@@ -512,7 +501,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * find field by type
+         * find field by type.
          *
          * @param type field type
          * @return RefField
@@ -535,7 +524,7 @@ public class ReflectionUtils {
     }
 
     /**
-     * Method wrapper
+     * Method wrapper.
      */
     public static class RefMethod {
 
@@ -546,29 +535,20 @@ public class ReflectionUtils {
             method.setAccessible(true);
         }
 
-        /**
-         * @return passed method
-         */
         public Method getRealMethod() {
             return this.method;
         }
 
-        /**
-         * @return owner class of method
-         */
         public RefClass getRefClass() {
             return new RefClass(this.method.getDeclaringClass());
         }
 
-        /**
-         * @return class of method return type
-         */
         public RefClass getReturnRefClass() {
             return new RefClass(this.method.getReturnType());
         }
 
         /**
-         * apply method to object
+         * apply method to object.
          *
          * @param e object to which the method is applied
          * @return RefExecutor with method call(...)
@@ -578,7 +558,7 @@ public class ReflectionUtils {
         }
 
         /**
-         * call static method
+         * call static method.
          *
          * @param params sent parameters
          * @return return value
@@ -593,14 +573,14 @@ public class ReflectionUtils {
 
         public class RefExecutor {
 
-            final Object e;
+            final Object executor;
 
-            public RefExecutor(Object e) {
-                this.e = e;
+            public RefExecutor(Object executor) {
+                this.executor = executor;
             }
 
             /**
-             * apply method for selected object
+             * apply method for selected object.
              *
              * @param params sent parameters
              * @return return value
@@ -608,7 +588,7 @@ public class ReflectionUtils {
              */
             public Object call(Object... params) {
                 try {
-                    return RefMethod.this.method.invoke(this.e, params);
+                    return RefMethod.this.method.invoke(this.executor, params);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -617,7 +597,7 @@ public class ReflectionUtils {
     }
 
     /**
-     * Constructor wrapper
+     * Constructor wrapper.
      */
     public static class RefConstructor {
 
@@ -628,22 +608,16 @@ public class ReflectionUtils {
             constructor.setAccessible(true);
         }
 
-        /**
-         * @return passed constructor
-         */
         public Constructor<?> getRealConstructor() {
             return this.constructor;
         }
 
-        /**
-         * @return owner class of method
-         */
         public RefClass getRefClass() {
             return new RefClass(this.constructor.getDeclaringClass());
         }
 
         /**
-         * create new instance with constructor
+         * Create a new instance with constructor.
          *
          * @param params parameters for constructor
          * @return new object
@@ -667,29 +641,20 @@ public class ReflectionUtils {
             field.setAccessible(true);
         }
 
-        /**
-         * @return passed field
-         */
         public Field getRealField() {
             return this.field;
         }
 
-        /**
-         * @return owner class of field
-         */
         public RefClass getRefClass() {
             return new RefClass(this.field.getDeclaringClass());
         }
 
-        /**
-         * @return type of field
-         */
         public RefClass getFieldRefClass() {
             return new RefClass(this.field.getType());
         }
 
         /**
-         * Apply field for object
+         * Apply a field for object.
          *
          * @param e applied object
          * @return RefExecutor with getter and setter
@@ -700,33 +665,33 @@ public class ReflectionUtils {
 
         public class RefExecutor {
 
-            final Object e;
+            final Object executor;
 
-            public RefExecutor(Object e) {
-                this.e = e;
+            public RefExecutor(Object executor) {
+                this.executor = executor;
             }
 
             /**
-             * Set field value for applied object
+             * Set field value for applied object.
              *
              * @param param value
              */
             public void set(Object param) {
                 try {
-                    RefField.this.field.set(this.e, param);
+                    RefField.this.field.set(this.executor, param);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
             /**
-             * Get field value for the applied object..
+             * Get field value for the applied object.
              *
              * @return value of field
              */
             public Object get() {
                 try {
-                    return RefField.this.field.get(this.e);
+                    return RefField.this.field.get(this.executor);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

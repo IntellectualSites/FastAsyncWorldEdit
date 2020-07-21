@@ -8,23 +8,25 @@ import java.io.RandomAccessFile;
 
 /**
  * A positionable file output stream.
+ *
  * <p>
  * Threading Design : [x] Single Threaded  [ ] Threadsafe  [ ] Immutable  [ ] Isolated
+ * </p>
  */
 
 public class RandomFileOutputStream extends OutputStream {
 
-// *****************************************************************************
-// INSTANCE PROPERTIES
-// *****************************************************************************
+    // *****************************************************************************
+    // INSTANCE PROPERTIES
+    // *****************************************************************************
 
     protected RandomAccessFile randomFile;                             // the random file to write to
     protected boolean sync;                                   // whether to synchronize every write
     protected boolean closeParent;
 
-// *****************************************************************************
-// INSTANCE CONSTRUCTION/INITIALIZATION/FINALIZATION, OPEN/CLOSE
-// *****************************************************************************
+    // *****************************************************************************
+    // INSTANCE CONSTRUCTION/INITIALIZATION/FINALIZATION, OPEN/CLOSE
+    // *****************************************************************************
 
     public RandomFileOutputStream(String fnm) throws IOException {
         this(fnm, false);
@@ -59,9 +61,9 @@ public class RandomFileOutputStream extends OutputStream {
         this.closeParent = closeParent;
     }
 
-// *****************************************************************************
-// INSTANCE METHODS - OUTPUT STREAM IMPLEMENTATION
-// *****************************************************************************
+    // *****************************************************************************
+    // INSTANCE METHODS - OUTPUT STREAM IMPLEMENTATION
+    // *****************************************************************************
 
     @Override
     public void write(int val) throws IOException {
@@ -101,9 +103,9 @@ public class RandomFileOutputStream extends OutputStream {
         }
     }
 
-// *****************************************************************************
-// INSTANCE METHODS - RANDOM ACCESS EXTENSIONS
-// *****************************************************************************
+    // *****************************************************************************
+    // INSTANCE METHODS - RANDOM ACCESS EXTENSIONS
+    // *****************************************************************************
 
     public long getFilePointer() throws IOException {
         return randomFile.getFilePointer();

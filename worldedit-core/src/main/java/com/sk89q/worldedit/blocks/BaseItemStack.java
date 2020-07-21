@@ -65,7 +65,7 @@ public class BaseItemStack extends BaseItem {
 
     /**
      * Get the number of items in the stack.
-     * 
+     *
      * @return the amount
      */
     public int getAmount() {
@@ -74,7 +74,7 @@ public class BaseItemStack extends BaseItem {
 
     /**
      * Set the amount of items in the stack.
-     * 
+     *
      * @param amount the amount to set
      */
     public void setAmount(int amount) {

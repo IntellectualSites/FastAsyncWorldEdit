@@ -3,8 +3,8 @@ package com.boydti.fawe.util;
 public class MathMan {
 
     /**
-     * Optimized for i elem 0,65536 (characters)
-     * @param i
+     * Optimized for i elem 0,65536 (characters).
+     * @param i unsigned int
      * @return square root
      */
     public static int usqrt(int i) {
@@ -200,8 +200,7 @@ public class MathMan {
         return ((b1 & 0xFF)
                 + ((b2 & 0x7F) << 8)
                 + ((b3 & 0xFF) << 15)
-                + ((b4 & 0xFF) << 23))
-                ;
+                + ((b4 & 0xFF) << 23));
     }
 
     public static int pairSearchCoords(int x, int y) {
@@ -304,11 +303,7 @@ public class MathMan {
     }
 
     /**
-     * Returns [x, y, z]
-     *
-     * @param yaw
-     * @param pitch
-     * @return
+     * Returns [x, y, z].
      */
     public static float[] getDirection(float yaw, float pitch) {
         double pitch_sin = Math.sin(pitch);
@@ -320,12 +315,7 @@ public class MathMan {
     }
 
     /**
-     * Returns [ pitch, yaw ]
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * Returns [ pitch, yaw ].
      */
     public static float[] getPitchAndYaw(float x, float y, float z) {
         float distance = sqrtApprox((z * z) + (x * x));
@@ -341,7 +331,7 @@ public class MathMan {
     }
 
     public static double sqrtApprox(double d) {
-        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1l << 52)) >> 1) + (1l << 61));
+        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1L << 52)) >> 1) + (1L << 61));
     }
 
     public static float invSqrt(float x) {
@@ -411,7 +401,7 @@ public class MathMan {
         return x % y;
     }
 
-    public static boolean isPowerOfTwo(int x) {
-        return (x & (x - 1)) == 0;
+    public static boolean isPowerOfTwo(int i) {
+        return (i & (i - 1)) == 0;
     }
 }

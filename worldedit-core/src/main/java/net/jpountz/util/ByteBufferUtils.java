@@ -4,10 +4,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
 
+//CHECKSTYLE:OFF
 @SuppressWarnings("CheckStyle")
 public enum ByteBufferUtils {
     ;
-
+    //CHECKSTYLE:ON
     public static void checkRange(ByteBuffer buf, int off, int len) {
         SafeUtils.checkLength(len);
         if (len > 0) {

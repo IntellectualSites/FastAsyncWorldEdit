@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The BlockVectorSet is a Memory optimized Set for storing BlockVectors
+ * The BlockVectorSet is a Memory optimized Set for storing BlockVectors.
  * - Internally it uses a map of Index->LocalBlockVectorSet
  * - All BlockVectors must be a valid world coordinate: y=[0,255],x=[-30000000,30000000],z=[-30000000,30000000]
  * - This will use ~8 bytes for every 64 BlockVectors (about 800x less than a HashSet)

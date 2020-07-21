@@ -35,10 +35,12 @@ public class CFIChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+    }
 
     @Override
-    public void closeAsync() {}
+    public void closeAsync() {
+    }
 
     @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {

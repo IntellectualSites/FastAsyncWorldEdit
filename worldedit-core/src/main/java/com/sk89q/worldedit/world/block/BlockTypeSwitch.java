@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 public class BlockTypeSwitch<T> implements Function<BlockType, T> {
     private final T[] tasks;
+
     protected BlockTypeSwitch(T[] tasks) {
         this.tasks = tasks;
     }

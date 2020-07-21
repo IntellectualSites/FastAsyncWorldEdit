@@ -39,6 +39,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -97,7 +98,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         int liveDataVersion = platform.getDataVersion();
 
         if (schematicVersion == 1) {
-            dataVersion = 1631; // this is a relatively safe assumption unless someone imports a schematic from 1.12, e.g. sponge 7.1-
+            dataVersion = Constants.DATA_VERSION_MC_1_13_2; // this is a relatively safe assumption unless someone imports a schematic from 1.12, e.g. sponge 7.1-
             fixer = platform.getDataFixer();
             return readVersion1(schematicTag);
         } else if (schematicVersion == 2) {
@@ -128,7 +129,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             CompoundTag schematicTag = getBaseTag();
             Map<String, Tag> schematic = schematicTag.getValue();
             if (schematicVersion == 1) {
-                return OptionalInt.of(1631);
+                return OptionalInt.of(Constants.DATA_VERSION_MC_1_13_2);
             } else if (schematicVersion == 2) {
                 return OptionalInt.of(requireTag(schematic, "DataVersion", IntTag.class).getValue());
             }
@@ -321,8 +322,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             }
             BiomeType biome = BiomeTypes.get(key);
             if (biome == null) {
-                log.warn("Unknown biome type :" + key +
-                        " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+                log.warn("Unknown biome type :" + key
+                    + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
             }
             Tag idTag = palettePart.getValue();
             if (!(idTag instanceof IntTag)) {

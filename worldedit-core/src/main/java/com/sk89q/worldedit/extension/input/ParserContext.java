@@ -36,10 +36,14 @@ import javax.annotation.Nullable;
  */
 public class ParserContext {
 
-    private @Nullable Extent extent;
-    private @Nullable LocalSession session;
-    private @Nullable World world;
-    private @Nullable Actor actor;
+    @Nullable
+    private Extent extent;
+    @Nullable
+    private LocalSession session;
+    @Nullable
+    private World world;
+    @Nullable
+    private Actor actor;
     private boolean restricted = true;
     private boolean tryLegacy = true;
     private boolean preferringWildcard;
@@ -71,7 +75,8 @@ public class ParserContext {
      *
      * @return an extent
      */
-    public @Nullable Extent getExtent() {
+    @Nullable
+    public Extent getExtent() {
         return extent;
     }
 
@@ -89,7 +94,8 @@ public class ParserContext {
      *
      * @return a session
      */
-    public @Nullable LocalSession getSession() {
+    @Nullable
+    public LocalSession getSession() {
         return session;
     }
 
@@ -107,7 +113,8 @@ public class ParserContext {
      *
      * @return a world
      */
-    public @Nullable World getWorld() {
+    @Nullable
+    public World getWorld() {
         return world;
     }
 
@@ -126,7 +133,8 @@ public class ParserContext {
      *
      * @return an actor, or null
      */
-    public @Nullable Actor getActor() {
+    @Nullable
+    public Actor getActor() {
         return actor;
     }
 

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -66,12 +67,12 @@ public class StringMan {
     public static String humanReadableByteCountBin(long bytes) {
         long b = bytes == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytes);
         return b < 1024L ? bytes + " B"
-                : b <= 0xfffccccccccccccL >> 40 ? String.format("%.1f KiB", bytes / 0x1p10)
-                : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
-                : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
-                : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
-                : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
-                : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
+            : b <= 0xfffccccccccccccL >> 40 ? String.format("%.1f KiB", bytes / 0x1p10)
+            : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
+            : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
+            : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
+            : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
+            : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
     }
 
     public static String prettyFormat(double d) {
@@ -81,10 +82,10 @@ public class StringMan {
         if (d == Double.MAX_VALUE || d == Double.POSITIVE_INFINITY) {
             return "∞";
         }
-        if(d == (long) d) {
-            return String.format("%d",(long)d);
+        if (d == (long) d) {
+            return String.format("%d", (long) d);
         } else {
-            return String.format("%s",d);
+            return String.format("%s", d);
         }
     }
 
@@ -95,21 +96,31 @@ public class StringMan {
             case '{':
             case '<':
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 
     public static char getMatchingBracket(char c) {
         switch (c) {
-            case '[': return ']';
-            case '(': return ')';
-            case '{': return '}';
-            case '<': return '>';
-            case ']': return '[';
-            case ')': return '(';
-            case '}': return '{';
-            case '>': return '<';
-            default: return c;
+            case '[':
+                return ']';
+            case '(':
+                return ')';
+            case '{':
+                return '}';
+            case '<':
+                return '>';
+            case ']':
+                return '[';
+            case ')':
+                return '(';
+            case '}':
+                return '{';
+            case '>':
+                return '<';
+            default:
+                return c;
         }
     }
 
@@ -161,8 +172,7 @@ public class StringMan {
     }
 
     public static String toProperCase(String s) {
-        return s.substring(0, 1).toUpperCase() +
-                s.substring(1);
+        return s.substring(0, 1).toUpperCase(Locale.ROOT) + s.substring(1);
     }
 
     public static List<String> split(String input, char delim) {
@@ -286,8 +296,7 @@ public class StringMan {
     public static boolean isAlphanumeric(String str) {
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
-            if (c < 0x30 || c >= 0x3a && c <= 0x40 || c > 0x5a && c <= 0x60 ||
-                c > 0x7a) {
+            if (c < 0x30 || c >= 0x3a && c <= 0x40 || c > 0x5a && c <= 0x60 || c > 0x7a) {
                 return false;
             }
         }
@@ -363,6 +372,7 @@ public class StringMan {
 
                 char bj = item.charAt(j++);
                 if (sequentail) {
+                    //noinspection CheckStyle
                     switch (bj) {
                         case ':':
                         case '_':
@@ -469,8 +479,7 @@ public class StringMan {
         if (char0 == '-') {
             negative = true;
             start++;
-        }
-        else {
+        } else {
             negative = false;
         }
         for (int i = start; i < end; i++) {
@@ -525,8 +534,8 @@ public class StringMan {
     }
 
     public static boolean isEqualIgnoreCase(String a, String b) {
-        return a == b ||
-            a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
+        return a == b
+            || a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
     }
 
     public static String repeat(String s, int n) {

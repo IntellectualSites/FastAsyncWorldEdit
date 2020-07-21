@@ -7,12 +7,17 @@ import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
 public class RollbackOptimizedHistory extends DiskStorageHistory {
+
+    public static final Logger logger = LoggerFactory.getLogger(RollbackOptimizedHistory.class);
+
     private long time;
 
     private int minX;
@@ -32,7 +37,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         super(world, uuid);
         this.time = System.currentTimeMillis();
     }
-    
+
     public RollbackOptimizedHistory(World world, UUID uuid, int index, long time, long size, CuboidRegion region, String command) {
         super(world, uuid, index);
         this.time = time;
@@ -45,7 +50,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        System.out.println("Size " + size);
+        logger.debug("Size " + size);
     }
 
     public long getTime() {

@@ -23,18 +23,17 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
 import com.sk89q.worldedit.world.registry.PassthroughBlockMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalInt;
+import javax.annotation.Nullable;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
@@ -85,6 +84,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
         return OptionalInt.empty();
     }
+
     @Nullable
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
@@ -104,6 +104,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             this.material = bukkitMaterial;
         }
 
+        @SuppressWarnings("deprecation")
         public int getId() {
             return material.getId();
         }
@@ -130,6 +131,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             return material.isBurnable();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean isTranslucent() {
             return material.isTransparent();

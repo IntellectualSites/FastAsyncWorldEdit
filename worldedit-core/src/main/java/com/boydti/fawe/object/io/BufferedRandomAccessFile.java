@@ -1,21 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.boydti.fawe.object.io;
 
 import java.io.File;
@@ -26,16 +8,17 @@ import java.util.Arrays;
 
 
 /**
- * A <code>BufferedRandomAccessFile</code> is like a
- * <code>RandomAccessFile</code>, but it uses a private buffer so that most
+ * A {@code BufferedRandomAccessFile} is like a
+ * {@code RandomAccessFile}, but it uses a private buffer so that most
  * operations do not require a disk access.
- * <P>
  *
+ * <p>
  * Note: The operations on this class are unmonitored. Also, the correct
- * functioning of the <code>RandomAccessFile</code> methods that are not
+ * functioning of the {@code RandomAccessFile} methods that are not
  * overridden here relies on the implementation of those methods in the
  * superclass.
  * Author : Avinash Lakshman ( alakshman@facebook.com) & Prashant Malik ( pmalik@facebook.com )
+ * </p>
  */
 
 public class BufferedRandomAccessFile extends RandomAccessFile {
@@ -111,8 +94,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
      */
 
     /**
-     * Open a new <code>BufferedRandomAccessFile</code> on <code>file</code>
-     * in mode <code>mode</code>, which should be "r" for reading only, or
+     * Open a new {@code BufferedRandomAccessFile} on {@code file}
+     * in mode {@code mode}, which should be "r" for reading only, or
      * "rw" for reading and writing.
      */
     public BufferedRandomAccessFile(File file, String mode) throws IOException {
@@ -126,8 +109,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
 
     /**
-     * Open a new <code>BufferedRandomAccessFile</code> on the file named
-     * <code>name</code> in mode <code>mode</code>, which should be "r" for
+     * Open a new {@code BufferedRandomAccessFile} on the file named
+     * {@code name} in mode {@code mode}, which should be "r" for
      * reading only, or "rw" for reading and writing.
      */
     public BufferedRandomAccessFile(String name, String mode) throws IOException {

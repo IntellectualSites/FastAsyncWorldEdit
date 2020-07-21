@@ -89,7 +89,8 @@ public class EditSessionEvent extends Event implements Cancellable {
      *
      * @return the actor, which may be null if unavailable
      */
-    public @Nullable Actor getActor() {
+    @Nullable
+    public Actor getActor() {
         return actor;
     }
 
@@ -98,7 +99,8 @@ public class EditSessionEvent extends Event implements Cancellable {
      *
      * @return the world
      */
-    public @Nullable World getWorld() {
+    @Nullable
+    public World getWorld() {
         return world;
     }
 

@@ -149,7 +149,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
-        
+
     @Override
     public boolean isQueueEnabled() {
         throw reason;
@@ -171,7 +171,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
+    public boolean regenerateChunk(int x, int z,
+        @Nullable
+            BiomeType type,
+        @Nullable
+            Long seed) {
         throw reason;
     }
 
@@ -182,18 +186,18 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public boolean contains(int x, int z) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public boolean contains(int x, int y, int z) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public Collection<Region> getRegions() {
@@ -273,13 +277,13 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
@@ -303,8 +307,8 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {

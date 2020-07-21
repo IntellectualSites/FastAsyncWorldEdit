@@ -20,8 +20,8 @@ public abstract class MCAWriter implements Extent {
     private final int length;
     private final int width;
     private final int area;
-    private int OX;
-    private int OZ;
+    private int ox;
+    private int oz;
 
 
     public MCAWriter(int width, int length, File regionFolder) {
@@ -48,24 +48,21 @@ public abstract class MCAWriter implements Extent {
     }
 
     /**
-     * Set the MCA file offset (each mca file is 512 blocks)
+     * Set the MCA file offset (each mca file is 512 blocks).
      * - A negative value will shift the map negative
      * - This only applies to generation, not block get/set
-     *
-     * @param mcaOX
-     * @param mcaOZ
      */
     public void setMCAOffset(int mcaOX, int mcaOZ) {
-        OX = mcaOX << 9;
-        OZ = mcaOZ << 9;
+        ox = mcaOX << 9;
+        oz = mcaOZ << 9;
     }
 
     public int getOffsetX() {
-        return OX;
+        return ox;
     }
 
     public int getOffsetZ() {
-        return OZ;
+        return oz;
     }
 
     public final int getArea() {
@@ -80,7 +77,7 @@ public abstract class MCAWriter implements Extent {
         return new CleanableThreadLocal<>(() -> {
             MCAChunk chunk = new MCAChunk();
             Arrays.fill(chunk.blocks, (char) BlockID.AIR);
-//                Arrays.fill(chunk.skyLight, (byte) 255);
+            //Arrays.fill(chunk.skyLight, (byte) 255);
             return chunk;
         });
     }
@@ -92,11 +89,11 @@ public abstract class MCAWriter implements Extent {
         final ForkJoinPool pool = new ForkJoinPool();
         int tcx = (width - 1) >> 4;
         int tcz = (length - 1) >> 4;
-        try (CleanableThreadLocal<MCAChunk> chunkStore = createCache()){
+        try (CleanableThreadLocal<MCAChunk> chunkStore = createCache()) {
             final ThreadLocal<byte[]> byteStore1 = ThreadLocal.withInitial(() -> new byte[500000]);
             final ThreadLocal<byte[]> byteStore2 = ThreadLocal.withInitial(() -> new byte[500000]);
             final ThreadLocal<Deflater> deflateStore = ThreadLocal
-                    .withInitial(() -> new Deflater(Deflater.BEST_SPEED, false));
+                .withInitial(() -> new Deflater(Deflater.BEST_SPEED, false));
             byte[] fileBuf = new byte[1 << 16];
             int mcaXMin = 0;
             int mcaZMin = 0;
@@ -107,7 +104,9 @@ public abstract class MCAWriter implements Extent {
 
             for (int mcaZ = mcaXMin; mcaZ <= mcaZMax; mcaZ++) {
                 for (int mcaX = mcaXMin; mcaX <= mcaXMax; mcaX++) {
-                    File file = new File(folder, "r." + (mcaX + (getOffsetX() >> 9)) + "." + (mcaZ + (getOffsetZ() >> 9)) + ".mca");
+                    File file = new File(folder,
+                        "r." + (mcaX + (getOffsetX() >> 9)) + "." + (mcaZ + (getOffsetZ() >> 9))
+                            + ".mca");
                     if (!file.exists()) {
                         file.createNewFile();
                     }
@@ -136,13 +135,15 @@ public abstract class MCAWriter implements Extent {
                                         chunk = write(chunk, csx, cex, csz, cez);
                                         if (chunk != null) {
                                             // Generation offset
-                                            chunk.setPosition(fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
+                                            chunk.setPosition(
+                                                fcx + (getOffsetX() >> 4),
+                                                fcz + (getOffsetZ() >> 4));
 
                                             // Compress
                                             FastByteArrayOutputStream uncompressed = chunk.toBytes(byteStore1.get());
                                             int len = uncompressed.length;
                                             uncompressed.reset();
-                                            MainUtil.compress(uncompressed.array, len , byteStore2.get(), uncompressed, deflateStore.get());
+                                            MainUtil.compress(uncompressed.array, len, byteStore2.get(), uncompressed, deflateStore.get());
                                             byte[] clone = Arrays.copyOf(uncompressed.array, uncompressed.length);
 
                                             // TODO optimize (avoid cloning) by add a synchronized block and write to the RAF here instead of below
@@ -161,7 +162,8 @@ public abstract class MCAWriter implements Extent {
                             int totalLength = 8192;
                             for (byte[] compressedBytes : compressed) {
                                 if (compressedBytes != null) {
-                                    int blocks = ((4095 + compressedBytes.length + 5) / 4096) * 4096;
+                                    int blocks = ((4095 + compressedBytes.length + 5) / 4096)
+                                        * 4096;
                                     totalLength += blocks;
                                 }
                             }

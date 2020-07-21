@@ -146,8 +146,8 @@ public class PolyhedralRegion extends AbstractRegion {
         if (minimumPoint == null) {
             minimumPoint = maximumPoint = vertex;
         } else {
-//            minimumPoint = new MutableBlockVector3(minimumPoint.getMinimum(vertex));
-//            maximumPoint = new MutableBlockVector3(maximumPoint.getMaximum(vertex));
+            //            minimumPoint = new MutableBlockVector3(minimumPoint.getMinimum(vertex));
+            //            maximumPoint = new MutableBlockVector3(maximumPoint.getMaximum(vertex));
             minimumPoint = minimumPoint.getMinimum(vertex);
             maximumPoint = maximumPoint.getMaximum(vertex);
         }
@@ -167,6 +167,8 @@ public class PolyhedralRegion extends AbstractRegion {
                 triangles.add((new Triangle(v[0], v[size - 2], v[size - 1])));
                 triangles.add((new Triangle(v[0], v[size - 1], v[size - 2])));
                 return true;
+            default:
+                break;
         }
         final Set<Edge> borderEdges = new LinkedHashSet<>();
         for (Iterator<Triangle> it = triangles.iterator(); it.hasNext(); ) {

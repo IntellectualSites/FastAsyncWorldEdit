@@ -820,6 +820,7 @@ public final class BlockTypes {
         CharSequence fullName = joined.init(BlockType.REGISTRY.getDefaultNamespace(), ':', name);
         return BlockType.REGISTRY.getMap().get(fullName);
     }
+
     static {
         fieldsTmp = null;
         joined = null;
@@ -848,7 +849,7 @@ public final class BlockTypes {
             if (block != null) {
                 return block.getBlockType();
             }
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypesCache.values)

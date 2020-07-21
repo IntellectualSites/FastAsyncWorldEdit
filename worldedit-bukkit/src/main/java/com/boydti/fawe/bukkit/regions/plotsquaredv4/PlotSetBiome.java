@@ -24,20 +24,24 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import org.bukkit.Bukkit;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bukkit.Bukkit;
 
 @CommandDeclaration(
-        command = "generatebiome",
-        permission = "plots.generatebiome",
-        category = CommandCategory.APPEARANCE,
-        requiredType = RequiredType.NONE,
-        description = "Generate a biome in your plot",
-        aliases = {"bg", "gb"},
-        usage = "/plots generatebiome <biome>"
+    command = "generatebiome",
+    permission = "plots.generatebiome",
+    category = CommandCategory.APPEARANCE,
+    requiredType = RequiredType.NONE,
+    description = "Generate a biome in your plot",
+    aliases = {
+        "bg",
+        "gb"
+    },
+    usage = "/plots generatebiome <biome>"
 )
 public class PlotSetBiome extends Command {
     public PlotSetBiome() {
@@ -60,9 +64,10 @@ public class PlotSetBiome extends Command {
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
             String biomes = StringMan
-                    .join(BiomeType.REGISTRY.values(), Captions.BLOCK_LIST_SEPARATOR.getTranslated());
+                .join(BiomeType.REGISTRY.values(), Captions.BLOCK_LIST_SEPARATOR.getTranslated());
             Captions.NEED_BIOME.send(player);
-            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
+            MainUtil.sendMessage(player,
+                Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
             return CompletableFuture.completedFuture(false);
         }
         confirm.run(this, () -> {
@@ -73,12 +78,12 @@ public class PlotSetBiome extends Command {
             plot.addRunning();
             TaskManager.IMP.async(() -> {
                 EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
-                        .autoQueue(false)
-                        .checkMemory(false)
-                        .allowedRegionsEverywhere()
-                        .player(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
-                        .limitUnlimited()
-                        .build();
+                    .autoQueue(false)
+                    .checkMemory(false)
+                    .allowedRegionsEverywhere()
+                    .player(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
+                    .limitUnlimited()
+                    .build();
                 long seed = ThreadLocalRandom.current().nextLong();
                 for (CuboidRegion region : regions) {
                     session.regenerate(region, biome, seed);

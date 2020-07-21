@@ -36,10 +36,35 @@ public final class Constants {
 
     static {
         NO_COPY_ENTITY_NBT_FIELDS = Collections.unmodifiableList(Arrays.asList(
-                "UUIDLeast", "UUIDMost", // Bukkit and Vanilla
+                "UUIDLeast", "UUIDMost", "UUID", // Bukkit and Vanilla
                 "WorldUUIDLeast", "WorldUUIDMost", // Bukkit and Vanilla
                 "PersistentIDMSB", "PersistentIDLSB" // Forge
         ));
     }
+
+    /**
+     * The DataVersion for Minecraft 1.13
+     */
+    public static final int DATA_VERSION_MC_1_13 = 1519;
+
+    /**
+     * The DataVersion for Minecraft 1.13.2
+     */
+    public static final int DATA_VERSION_MC_1_13_2 = 1631;
+
+    /**
+     * The DataVersion for Minecraft 1.16
+     */
+    public static final int DATA_VERSION_MC_1_14 = 1952;
+
+    /**
+     * The DataVersion for Minecraft 1.16
+     */
+    public static final int DATA_VERSION_MC_1_15 = 2225;
+
+    /**
+     * The DataVersion for Minecraft 1.16
+     */
+    public static final int DATA_VERSION_MC_1_16 = 2566;
 
 }

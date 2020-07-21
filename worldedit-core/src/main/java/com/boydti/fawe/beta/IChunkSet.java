@@ -11,7 +11,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
- * Interface for setting blocks
+ * Interface for setting blocks.
  */
 public interface IChunkSet extends IBlocks, OutputExtent {
 
@@ -63,16 +63,18 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     }
 
     // Default to avoid tricky child classes. We only need it in a few cases anyway.
-    default void setFastMode(boolean fastMode){}
+    default void setFastMode(boolean fastMode) {
+    }
 
     default boolean isFastMode() {
         return false;
     }
 
     // Allow setting for bitmask for flushing lighting. Default to avoid tricky child classes.
-    default void setBitMask(int bitMask){}
+    default void setBitMask(int bitMask) {
+    }
 
-    default int getBitMask(){
+    default int getBitMask() {
         return -1;
     }
 

@@ -31,14 +31,16 @@ public class BlockTypeUtil {
         return centralTopLimit(type.getDefaultState());
     }
 
-    public static double centralBottomLimit(BlockStateHolder block) {
+    @SuppressWarnings("checkstyle:MissingSwitchDefault")
+    public static <B extends BlockStateHolder<B>> double centralBottomLimit(B block) {
         checkNotNull(block);
         BlockType type = block.getBlockType();
         switch (type.getInternalId()) {
             case BlockID.CREEPER_WALL_HEAD:
             case BlockID.DRAGON_WALL_HEAD:
             case BlockID.PLAYER_WALL_HEAD:
-            case BlockID.ZOMBIE_WALL_HEAD: return 0.25;
+            case BlockID.ZOMBIE_WALL_HEAD:
+                return 0.25;
             case BlockID.ACACIA_SLAB:
             case BlockID.BIRCH_SLAB:
             case BlockID.BRICK_SLAB:
@@ -58,7 +60,7 @@ public class BlockTypeUtil {
             case BlockID.SPRUCE_SLAB:
             case BlockID.STONE_BRICK_SLAB:
             case BlockID.STONE_SLAB: {
-                String state = (String) block.getState(PropertyKey.TYPE);
+                String state = block.getState(PropertyKey.TYPE);
                 if (state == null) {
                     return 0;
                 }
@@ -68,6 +70,8 @@ public class BlockTypeUtil {
                         return 0;
                     case "top":
                         return 0.5;
+                    default:
+                        return 0;
                 }
             }
             case BlockID.ACACIA_TRAPDOOR:
@@ -89,7 +93,8 @@ public class BlockTypeUtil {
             case BlockID.DARK_OAK_FENCE_GATE:
             case BlockID.JUNGLE_FENCE_GATE:
             case BlockID.OAK_FENCE_GATE:
-            case BlockID.SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 1 : 0;
+            case BlockID.SPRUCE_FENCE_GATE:
+                return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 1 : 0;
             default:
                 if (type.getMaterial().isMovementBlocker()) {
                     return 0;
@@ -104,7 +109,7 @@ public class BlockTypeUtil {
      * @param block the block
      * @return the y offset
      */
-    public static double centralTopLimit(BlockStateHolder block) {
+    public static <B extends BlockStateHolder<B>> double centralTopLimit(B block) {
         checkNotNull(block);
         BlockType type = block.getBlockType();
         switch (type.getInternalId()) {
@@ -123,29 +128,39 @@ public class BlockTypeUtil {
             case BlockID.PURPLE_BED:
             case BlockID.RED_BED:
             case BlockID.WHITE_BED:
-            case BlockID.YELLOW_BED: return 0.5625;
-            case BlockID.BREWING_STAND: return 0.875;
-            case BlockID.CAKE: return (block.getState(PropertyKey.BITES) == (Integer) 6) ? 0 : 0.4375;
-            case BlockID.CAULDRON: return 0.3125;
-            case BlockID.COCOA: return 0.750;
-            case BlockID.ENCHANTING_TABLE: return 0.75;
-            case BlockID.END_PORTAL_FRAME: return block.getState(PropertyKey.EYE) == Boolean.TRUE ? 1 : 0.8125;
+            case BlockID.YELLOW_BED:
+                return 0.5625;
+            case BlockID.BREWING_STAND:
+                return 0.875;
+            case BlockID.CAKE:
+                return (block.getState(PropertyKey.BITES) == (Integer) 6) ? 0 : 0.4375;
+            case BlockID.CAULDRON:
+                return 0.3125;
+            case BlockID.COCOA:
+                return 0.750;
+            case BlockID.ENCHANTING_TABLE:
+                return 0.75;
+            case BlockID.END_PORTAL_FRAME:
+                return block.getState(PropertyKey.EYE) == Boolean.TRUE ? 1 : 0.8125;
             case BlockID.CREEPER_HEAD:
             case BlockID.DRAGON_HEAD:
             case BlockID.PISTON_HEAD:
             case BlockID.PLAYER_HEAD:
-            case BlockID.ZOMBIE_HEAD: return 0.5;
+            case BlockID.ZOMBIE_HEAD:
+                return 0.5;
             case BlockID.CREEPER_WALL_HEAD:
             case BlockID.DRAGON_WALL_HEAD:
             case BlockID.PLAYER_WALL_HEAD:
-            case BlockID.ZOMBIE_WALL_HEAD: return 0.75;
+            case BlockID.ZOMBIE_WALL_HEAD:
+                return 0.75;
             case BlockID.ACACIA_FENCE:
             case BlockID.BIRCH_FENCE:
             case BlockID.DARK_OAK_FENCE:
             case BlockID.JUNGLE_FENCE:
             case BlockID.NETHER_BRICK_FENCE:
             case BlockID.OAK_FENCE:
-            case BlockID.SPRUCE_FENCE: return 1.5;
+            case BlockID.SPRUCE_FENCE:
+                return 1.5;
             case BlockID.ACACIA_SLAB:
             case BlockID.BIRCH_SLAB:
             case BlockID.BRICK_SLAB:
@@ -165,7 +180,7 @@ public class BlockTypeUtil {
             case BlockID.SPRUCE_SLAB:
             case BlockID.STONE_BRICK_SLAB:
             case BlockID.STONE_SLAB: {
-                String state = (String) block.getState(PropertyKey.TYPE);
+                String state = block.getState(PropertyKey.TYPE);
                 if (state == null) {
                     return 0.5;
                 }
@@ -175,17 +190,27 @@ public class BlockTypeUtil {
                     case "top":
                     case "double":
                         return 1;
+                    default:
+                        return 0.5;
                 }
             }
-            case BlockID.LILY_PAD: return 0.015625;
-            case BlockID.REPEATER: return 0.125;
-            case BlockID.SOUL_SAND: return 0.875;
+            case BlockID.LILY_PAD:
+                return 0.015625;
+            case BlockID.REPEATER:
+                return 0.125;
+            case BlockID.SOUL_SAND:
+                return 0.875;
             case BlockID.COBBLESTONE_WALL:
-            case BlockID.MOSSY_COBBLESTONE_WALL: return 1.5;
-            case BlockID.FLOWER_POT: return 0.375;
-            case BlockID.COMPARATOR: return 0.125;
-            case BlockID.DAYLIGHT_DETECTOR: return 0.375;
-            case BlockID.HOPPER: return 0.625;
+            case BlockID.MOSSY_COBBLESTONE_WALL:
+                return 1.5;
+            case BlockID.FLOWER_POT:
+                return 0.375;
+            case BlockID.COMPARATOR:
+                return 0.125;
+            case BlockID.DAYLIGHT_DETECTOR:
+                return 0.375;
+            case BlockID.HOPPER:
+                return 0.625;
             case BlockID.ACACIA_TRAPDOOR:
             case BlockID.BIRCH_TRAPDOOR:
             case BlockID.DARK_OAK_TRAPDOOR:
@@ -205,7 +230,8 @@ public class BlockTypeUtil {
             case BlockID.DARK_OAK_FENCE_GATE:
             case BlockID.JUNGLE_FENCE_GATE:
             case BlockID.OAK_FENCE_GATE:
-            case BlockID.SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 0 : 1.5;
+            case BlockID.SPRUCE_FENCE_GATE:
+                return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 0 : 1.5;
             default:
                 if (type.hasProperty(PropertyKey.LAYERS)) {
                     return PropertyGroup.LEVEL.get(block) * 0.0625;

@@ -27,7 +27,7 @@ public class EntityType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<EntityType> REGISTRY = new NamespacedRegistry<>("entity type");
 
-    private String id;
+    private final String id;
 
     public EntityType(String id) {
         // If it has no namespace, assume minecraft.

@@ -38,7 +38,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();
     }
-    
+
     @Override
     public boolean hasBiomes() {
         return biomes != null;

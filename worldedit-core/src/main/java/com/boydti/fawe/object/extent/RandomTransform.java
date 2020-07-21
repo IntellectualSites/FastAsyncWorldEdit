@@ -58,9 +58,11 @@ public class RandomTransform extends SelectTransform {
 
     /**
      * Add a pattern to the weight list of patterns.
+     *
      * <p>
-     * <p>The probability for the pattern added is chance / max where max is
-     * the sum of the probabilities of all added patterns.</p>
+     * The probability for the pattern added is chance / max where max is
+     * the sum of the probabilities of all added patterns.
+     * </p>
      *
      * @param extent the extent
      * @param chance the chance, which can be any positive number

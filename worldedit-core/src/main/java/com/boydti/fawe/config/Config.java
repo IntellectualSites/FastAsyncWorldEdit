@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Config {
@@ -32,12 +33,8 @@ public class Config {
     }
 
     /**
-     * Get the value for a node<br>
-     * Probably throws some error if you try to get a non existent key
-     *
-     * @param key
-     * @param <T>
-     * @return
+     * Get the value for a node.
+     * Probably throws some error if you try to get a non-existent key.
      */
     private <T> T get(String key, Class root) {
         String[] split = key.split("\\.");
@@ -57,7 +54,7 @@ public class Config {
     }
 
     /**
-     * Set the value of a specific node<br>
+     * Set the value of a specific node.
      * Probably throws some error if you supply non existing keys or invalid values
      *
      * @param key   config node
@@ -103,9 +100,7 @@ public class Config {
     }
 
     /**
-     * Set all values in the file (load first to avoid overwriting)
-     *
-     * @param file
+     * Set all values in the file (load first to avoid overwriting).
      */
     public void save(File file) {
         Class<? extends Config> root = getClass();
@@ -127,7 +122,7 @@ public class Config {
     }
 
     /**
-     * Indicates that a field should be instantiated / created
+     * Indicates that a field should be instantiated / created.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
@@ -135,7 +130,7 @@ public class Config {
     }
 
     /**
-     * Indicates that a field cannot be modified
+     * Indicates that a field cannot be modified.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
@@ -143,7 +138,7 @@ public class Config {
     }
 
     /**
-     * Creates a comment
+     * Creates a comment.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
@@ -152,7 +147,7 @@ public class Config {
     }
 
     /**
-     * The names of any default blocks
+     * The names of any default blocks.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
@@ -161,7 +156,7 @@ public class Config {
     }
 
     /**
-     * Any field or class with is not part of the config
+     * Any field or class with is not part of the config.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
@@ -171,6 +166,7 @@ public class Config {
     @Ignore // This is not part of the config
     public static class ConfigBlock<T> {
 
+        @SuppressWarnings("CheckStyle")
         private HashMap<String, T> INSTANCES = new HashMap<>();
 
         public T remove(String key) {
@@ -199,10 +195,7 @@ public class Config {
     }
 
     /**
-     * Get the static fields in a section
-     *
-     * @param clazz
-     * @return
+     * Get the static fields in a section.
      */
     private Map<String, Object> getFields(Class clazz) {
         HashMap<String, Object> map = new HashMap<>();
@@ -317,10 +310,9 @@ public class Config {
     }
 
     /**
-     * Get the field for a specific config node
+     * Get the field for a specific config node.
      *
      * @param split the node (split by period)
-     * @return
      */
     private Field getField(String[] split, Class root) {
         Object instance = getInstance(split, root);
@@ -331,12 +323,11 @@ public class Config {
     }
 
     /**
-     * Get the field for a specific config node and instance<br>
+     * Get the field for a specific config node and instance.
      * Note: As expiry can have multiple blocks there will be multiple instances
      *
      * @param split    the node (split by period)
      * @param instance the instance
-     * @return
      */
     private Field getField(String[] split, Object instance) {
         try {
@@ -344,7 +335,7 @@ public class Config {
             setAccessible(field);
             return field;
         } catch (Throwable ignored) {
-                log.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
+            log.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
             return null;
         }
     }
@@ -352,13 +343,13 @@ public class Config {
     private Object getInstance(Object instance, Class clazz) throws IllegalAccessException, InstantiationException {
         try {
             Field instanceField = clazz.getDeclaredField(clazz.getSimpleName());
-        } catch (Throwable ignore) {
+        } catch (Throwable ignored) {
         }
         return clazz.newInstance();
     }
 
     /**
-     * Get the instance for a specific config node
+     * Get the instance for a specific config node.
      *
      * @param split the node (split by period)
      * @return The instance or null
@@ -407,7 +398,7 @@ public class Config {
                             clazz = found;
                             split = Arrays.copyOfRange(split, 2, split.length);
                             continue;
-                        } catch (NoSuchFieldException ignore) {
+                        } catch (NoSuchFieldException ignored) {
                         }
                         if (found != null) {
                             split = Arrays.copyOfRange(split, 1, split.length);
@@ -425,31 +416,21 @@ public class Config {
     }
 
     /**
-     * Translate a node to a java field name
-     *
-     * @param node
-     * @return
+     * Translate a node to a java field name.
      */
     private String toFieldName(String node) {
-        return node.toUpperCase().replaceAll("-", "_");
+        return node.toUpperCase(Locale.ROOT).replaceAll("-", "_");
     }
 
     /**
-     * Translate a field to a config node
-     *
-     * @param field
-     * @return
+     * Translate a field to a config node.
      */
     private String toNodeName(String field) {
-        return field.toLowerCase().replace("_", "-");
+        return field.toLowerCase(Locale.ROOT).replace("_", "-");
     }
 
     /**
-     * Set some field to be accessible
-     *
-     * @param field
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
+     * Set some field to be accessible.
      */
     private void setAccessible(Field field) throws NoSuchFieldException, IllegalAccessException {
         field.setAccessible(true);

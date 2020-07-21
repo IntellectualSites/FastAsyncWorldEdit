@@ -39,6 +39,7 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -126,6 +127,8 @@ public class EditSessionBuilder {
     }
 
     /**
+     * TODO Description for method.
+     *
      * @param disk If it should be stored on disk
      * @param uuid The uuid to store it under (if on disk)
      * @param compression Compression level (0-9)
@@ -217,13 +220,13 @@ public class EditSessionBuilder {
             return new NullExtent(extent, FaweCache.MANUAL);
         }
         final Extent toReturn = event.getExtent();
-        if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
+        if (toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
             return new NullExtent(toReturn, FaweCache.MANUAL);
         }
         if (toReturn != extent) {
-            String className = toReturn.getClass().getName().toLowerCase();
+            String className = toReturn.getClass().getName().toLowerCase(Locale.ROOT);
             for (String allowed : Settings.IMP.EXTENT.ALLOWED_PLUGINS) {
-                if (className.contains(allowed.toLowerCase())) {
+                if (className.contains(allowed.toLowerCase(Locale.ROOT))) {
                     this.wrapped = true;
                     return toReturn;
                 }
@@ -292,7 +295,7 @@ public class EditSessionBuilder {
                 throw FaweCache.LOW_MEMORY;
             }
         }
-//        this.originalLimit = limit;
+        //        this.originalLimit = limit;
         this.blockBag = limit.INVENTORY_MODE != 0 ? blockBag : null;
         this.limit = limit.copy();
 
@@ -317,12 +320,12 @@ public class EditSessionBuilder {
             Extent root = extent;
             if (combineStages == null) {
                 combineStages =
-                        // If it's enabled in the settings
-                        Settings.IMP.HISTORY.COMBINE_STAGES
-                                // If fast placement is disabled, it's slower to perform a copy on each chunk
-                                && this.limit.FAST_PLACEMENT
-                                // If the edit uses items from the inventory we can't use a delayed task
-                                && this.blockBag == null;
+                    // If it's enabled in the settings
+                    Settings.IMP.HISTORY.COMBINE_STAGES
+                        // If fast placement is disabled, it's slower to perform a copy on each chunk
+                        && this.limit.FAST_PLACEMENT
+                        // If the edit uses items from the inventory we can't use a delayed task
+                        && this.blockBag == null;
             }
             extent = this.bypassAll = wrapExtent(extent, eventBus, event, EditSession.Stage.BEFORE_CHANGE);
             this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
@@ -335,8 +338,8 @@ public class EditSessionBuilder {
                         } else {
                             changeSet = new DiskStorageHistory(world, uuid);
                         }
-//                    } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
-//                        changeSet = new CPUOptimizedChangeSet(world);
+                        //                    } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
+                        //                        changeSet = new CPUOptimizedChangeSet(world);
                     } else {
                         if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
                             System.out.println("TODO add CPUOptimizedChangeSet");
@@ -360,9 +363,9 @@ public class EditSessionBuilder {
                         this.extent = extent.enableHistory(changeSet);
                     } else {
                         this.extent = new HistoryExtent(extent, changeSet);
-//                        if (this.blockBag != null) {
-//                            this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
-//                        }
+                        //                        if (this.blockBag != null) {
+                        //                            this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
+                        //                        }
                     }
                 }
             }
@@ -383,7 +386,7 @@ public class EditSessionBuilder {
                     }
                 }
             } else {
-//                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
+                //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
             IBatchProcessor limitProcessor = regionExtent;
             if (limit != null && !limit.isUnlimited()) {

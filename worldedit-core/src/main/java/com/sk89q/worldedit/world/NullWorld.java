@@ -99,6 +99,7 @@ public class NullWorld extends AbstractWorld {
     public BiomeType getBiome(BlockVector2 position) {
         return BiomeTypes.THE_VOID;
     }
+
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return BiomeTypes.THE_VOID;
@@ -156,7 +157,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
+    public void refreshChunk(int chunkX, int chunkZ) {
 
     }
 
@@ -167,6 +168,11 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
+        return BlockTypes.AIR.getDefaultState();
+    }
+
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState();
     }
 
@@ -216,7 +222,9 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+    public void sendFakeChunk(
+        @Nullable
+            Player player, ChunkPacket packet) {
 
     }
 }

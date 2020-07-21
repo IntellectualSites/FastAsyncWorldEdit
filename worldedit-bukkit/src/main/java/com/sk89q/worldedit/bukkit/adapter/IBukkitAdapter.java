@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
@@ -25,8 +23,6 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
-import java.util.Locale;
-
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,6 +30,10 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public interface IBukkitAdapter {
 
@@ -93,7 +93,7 @@ public interface IBukkitAdapter {
                 position.getX(), position.getY(), position.getZ());
     }
 
-    default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position){
+    default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
         return adapt(world, position.toVector3());
     }
 

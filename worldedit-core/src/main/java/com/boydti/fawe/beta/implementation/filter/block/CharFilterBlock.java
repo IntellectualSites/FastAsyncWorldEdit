@@ -34,7 +34,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
-    private @Nullable
+    @Nullable
+    private
     char[] setArr;
     private SetDelegate delegate;
     // local

@@ -116,7 +116,8 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
+            EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
     private final TranslationManager translationManager = new TranslationManager(this);
 
@@ -580,7 +581,9 @@ public final class WorldEdit {
             for (Map.Entry<BlockType, Integer> blockTypeIntegerEntry : missingBlocks.entrySet()) {
                 str.append((blockTypeIntegerEntry.getKey()).getName());
 
-                str.append(" [Amt: ").append(blockTypeIntegerEntry.getValue()).append("]");
+                str.append(" [Amt: ")
+                    .append(String.valueOf(blockTypeIntegerEntry.getValue()))
+                    .append("]");
 
                 ++i;
 

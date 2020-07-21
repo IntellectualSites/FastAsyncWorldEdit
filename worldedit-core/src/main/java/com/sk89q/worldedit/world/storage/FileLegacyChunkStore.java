@@ -24,7 +24,6 @@ import com.sk89q.worldedit.world.DataException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -32,7 +31,7 @@ import java.io.InputStream;
  */
 public class FileLegacyChunkStore extends LegacyChunkStore {
 
-    private File path;
+    private final File path;
 
     /**
      * Create an instance. The passed path is the folder to read the
@@ -51,11 +50,10 @@ public class FileLegacyChunkStore extends LegacyChunkStore {
      * @param f2 the second part of the pathname
      * @param name the name of the file
      * @return an input stream
-     * @throws DataException
-     * @throws IOException
+     * @throws DataException if there is an error getting data for this chunk
      */
     @Override
-    protected InputStream getInputStream(String f1, String f2, String name) throws DataException, IOException {
+    protected InputStream getInputStream(String f1, String f2, String name) throws DataException {
         String file = f1 + File.separator + f2 + File.separator + name;
         try {
             return new FileInputStream(new File(path, file));

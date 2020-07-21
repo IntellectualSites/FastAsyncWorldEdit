@@ -43,7 +43,8 @@ public final class FluidTypes {
         return FluidType.REGISTRY.register(fluid.getId(), fluid);
     }
 
-    public static @Nullable FluidType get(final String id) {
+    @Nullable
+    public static FluidType get(final String id) {
         return FluidType.REGISTRY.get(id);
     }
 }

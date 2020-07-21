@@ -208,6 +208,7 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
              - the two world formats described above, inside the directory
            - a timestamped archive, identified by <stamp>.ext, that can have
              - the same as timestamped directory, but inside the archive.
+
            All archives may have a root directory with the same name as the archive,
            minus the extensions. Due to extension detection methods, this won't work properly
            with some files, e.g. world.qux.zip/world.qux is invalid, but world.qux.zip/world isn't.

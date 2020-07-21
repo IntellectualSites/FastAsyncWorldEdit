@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
  * chunks (that has to implemented by the platform e.g., Bukkit)
  * <p>
  * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)} }
+ * </p>
  */
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
@@ -115,8 +116,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     /**
-     * Initialize the queue
-     *
+     * Initialize the queue.
      */
     @Override
     public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
@@ -158,10 +158,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     /**
-     * Submit without first checking that it has been removed from the chunk map
-     *
-     * @param chunk
-     * @return
+     * Submit without first checking that it has been removed from the chunk map.
      */
     private <V extends Future<V>> V submitUnchecked(IQueueChunk chunk) {
         if (chunk.isEmpty()) {
@@ -171,10 +168,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
 
         if (Fawe.isMainThread()) {
-            V result = (V)chunk.call();
-            if (result == null){
+            V result = (V) chunk.call();
+            if (result == null) {
                 return (V) (Future) Futures.immediateFuture(null);
-            }else{
+            } else {
                 return result;
             }
         }
@@ -204,11 +201,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     /**
-     * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the
-     * coordinates
+     * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the coordinates.
      *
-     * @param chunkX
-     * @param chunkZ
+     * @param chunkX the x coordinate
+     * @param chunkZ the z coordinate
      * @return IChunk
      */
     private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {

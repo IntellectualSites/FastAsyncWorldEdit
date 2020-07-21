@@ -116,7 +116,7 @@ public class LocalSession implements TextureHolder {
     // Session related
     private transient RegionSelector selector = new CuboidRegionSelector();
     private transient boolean placeAtPos1 = false;
-    private transient List<Object> history = Collections.synchronizedList(new LinkedList<Object>() {
+    private final transient List<Object> history = Collections.synchronizedList(new LinkedList<Object>() {
         @Override
         public Object get(int index) {
             Object value = super.get(index);
@@ -136,7 +136,7 @@ public class LocalSession implements TextureHolder {
     private transient ClipboardHolder clipboard;
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-    private transient final Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
+    private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -408,7 +408,7 @@ public class LocalSession implements TextureHolder {
         if (editSession.size() == 0) {
             return;
         }
-        
+
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
@@ -430,7 +430,7 @@ public class LocalSession implements TextureHolder {
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
                 // TODO NOT IMPLEMENTED
-//                return new AnvilHistory(currentWorld.getName(), specific);
+                // return new AnvilHistory(currentWorld.getName(), specific);
             } else {
                 return new DiskStorageHistory(currentWorld, this.uuid, (Integer) o);
             }
@@ -562,9 +562,9 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed((Player)actor)
-                    .player((Player)actor)
-                    .blockBag(getBlockBag((Player)actor))
+                    .limitUnprocessed((Player) actor)
+                    .player((Player) actor)
+                    .blockBag(getBlockBag((Player) actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
                 setDirty();
@@ -582,7 +582,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Performs a redo
+     * Performs a redo.
      *
      * @param newBlockBag a new block bag
      * @param actor the actor
@@ -601,9 +601,9 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed((Player)actor)
-                    .player((Player)actor)
-                    .blockBag(getBlockBag((Player)actor))
+                    .limitUnprocessed((Player) actor)
+                    .player((Player) actor)
+                    .blockBag(getBlockBag((Player) actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
@@ -726,7 +726,8 @@ public class LocalSession implements TextureHolder {
         return selector.getRegion();
     }
 
-    public @Nullable VirtualWorld getVirtualWorld() {
+    @Nullable
+    public VirtualWorld getVirtualWorld() {
         synchronized (dirty) {
             return virtual;
         }
@@ -824,6 +825,8 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
+     * Check if tool control is enabled.
+     *
      * @return true always - see deprecation notice
      * @deprecated The wand is now a tool that can be bound/unbound.
      */
@@ -833,6 +836,8 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
+     * Set if tool control is enabled.
+     *
      * @param toolControl unused - see deprecation notice
      * @deprecated The wand is now a tool that can be bound/unbound.
      */
@@ -987,7 +992,8 @@ public class LocalSession implements TextureHolder {
      *
      * @return the snapshot
      */
-    public @Nullable Snapshot getSnapshotExperimental() {
+    @Nullable
+    public Snapshot getSnapshotExperimental() {
         return snapshotExperimental;
     }
 
@@ -1400,7 +1406,7 @@ public class LocalSession implements TextureHolder {
         String[] split = text.split("\\|", 2);
         if (split.length > 1 && split[0].equalsIgnoreCase("v")) { // enough fields and right message
             if (split[1].length() > 4) {
-                this.failedCuiAttempts ++;
+                this.failedCuiAttempts++;
                 return;
             }
 
@@ -1409,7 +1415,7 @@ public class LocalSession implements TextureHolder {
                 version = Integer.parseInt(split[1]);
             } catch (NumberFormatException e) {
                 WorldEdit.logger.warn("Error while reading CUI init message: " + e.getMessage());
-                this.failedCuiAttempts ++;
+                this.failedCuiAttempts++;
                 return;
             }
             setCUISupport(true);
@@ -1437,7 +1443,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Gets the client's CUI protocol version
+     * Gets the client's CUI protocol version.
      *
      * @return the CUI version
      */
@@ -1446,7 +1452,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Sets the client's CUI protocol version
+     * Sets the client's CUI protocol version.
      *
      * @param cuiVersion the CUI version
      */
@@ -1542,7 +1548,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Sets the side effect applier for this session
+     * Sets the side effect applier for this session.
      *
      * @param sideEffectSet the side effect applier
      */
@@ -1628,7 +1634,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Get the TextureUtil currently being used
+     * Get the TextureUtil currently being used.
      */
     @Override
     public TextureUtil getTextureUtil() {
@@ -1643,7 +1649,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Get the preferred wand item for this user, or {@code null} to use the default
+     * Get the preferred wand item for this user, or {@code null} to use the default.
      * @return item id of wand item, or {@code null}
      */
     public String getWandItem() {
@@ -1651,7 +1657,7 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Get the preferred navigation wand item for this user, or {@code null} to use the default
+     * Get the preferred navigation wand item for this user, or {@code null} to use the default.
      * @return item id of nav wand item, or {@code null}
      */
     public String getNavWandItem() {

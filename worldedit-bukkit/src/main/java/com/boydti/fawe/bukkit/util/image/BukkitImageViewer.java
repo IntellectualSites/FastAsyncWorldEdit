@@ -3,11 +3,6 @@ package com.boydti.fawe.bukkit.util.image;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.boydti.fawe.util.image.ImageViewer;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Collection;
-import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +19,12 @@ import org.inventivetalent.mapmanager.controller.MapController;
 import org.inventivetalent.mapmanager.controller.MultiMapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
 import org.inventivetalent.mapmanager.wrapper.MapWrapper;
+
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Collection;
+import javax.annotation.Nullable;
 
 public class BukkitImageViewer implements ImageViewer {
     private final MapManager mapManager;

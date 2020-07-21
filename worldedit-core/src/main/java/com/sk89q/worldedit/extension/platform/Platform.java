@@ -90,7 +90,8 @@ public interface Platform {
      *
      * @return the watchdog service, or {@code null} if none
      */
-    default @Nullable Watchdog getWatchdog() {
+    @Nullable
+    default Watchdog getWatchdog() {
         return null;
     }
 

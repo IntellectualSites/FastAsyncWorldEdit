@@ -55,10 +55,10 @@ import javax.annotation.Nullable;
  * FaweAPI.[some method]
  */
 public class FaweAPI {
+
     /**
-     * Offers a lot of options for building an EditSession
+     * Offers a lot of options for building an EditSession.
      *
-     * @param world
      * @return A new EditSessionBuilder
      * @see EditSessionBuilder
      */
@@ -67,26 +67,11 @@ public class FaweAPI {
     }
 
     /**
-     * The TaskManager has some useful methods for doing things asynchronously
-     *
-     * @return TaskManager
+     * The TaskManager has some useful methods for doing things asynchronously.
      */
     public static TaskManager getTaskManager() {
         return TaskManager.IMP;
     }
-
-//    /**
-//     * Add a custom transform for use in
-//     *
-//     * @param methods The class with a bunch of transform methods
-//     * @return true if the transform was registered
-//     * @see com.sk89q.worldedit.command.TransformCommands
-//     */
-//    public static boolean registerTransforms(Object methods) {
-//        DefaultTransformParser parser = Fawe.get().getTransformParser();
-//        if (parser != null) parser.register(methods);
-//        return parser != null;
-//    }
 
     /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
@@ -149,7 +134,7 @@ public class FaweAPI {
     }
 
     /**
-     * Check if the server has more than the configured low memory threshold
+     * Check if the server has more than the configured low memory threshold.
      *
      * @return True if the server has limited memory
      */
@@ -158,10 +143,7 @@ public class FaweAPI {
     }
 
     /**
-     * Get a player's allowed WorldEdit region
-     *
-     * @param player
-     * @return
+     * Get a player's allowed WorldEdit region.
      */
     public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
@@ -172,14 +154,12 @@ public class FaweAPI {
      * - The extent must be the one being used by an EditSession, otherwise an error may be thrown <br>
      * - Insert an extent into the EditSession using the EditSessionEvent: http://wiki.sk89q.com/wiki/WorldEdit/API/Hooking_EditSession <br>
      *
-     * @param extent
-     * @param reason
      * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
     public static void cancelEdit(AbstractDelegateExtent extent, Component reason) {
         try {
             WEManager.IMP.cancelEdit(extent, new FaweException(reason));
-        } catch (WorldEditException ignore) {
+        } catch (WorldEditException ignored) {
         }
     }
 
@@ -188,10 +168,7 @@ public class FaweAPI {
     }
 
     /**
-     * Get the DiskStorageHistory object representing a File
-     *
-     * @param file
-     * @return
+     * Get the DiskStorageHistory object representing a File.
      */
     public static DiskStorageHistory getChangeSetFromFile(File file) {
         if (!file.exists() || file.isDirectory()) {
@@ -200,7 +177,7 @@ public class FaweAPI {
         if (Settings.IMP.HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
         }
-        if (!file.getName().toLowerCase().endsWith(".bd")) {
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
             throw new IllegalArgumentException("Not a BD file!");
         }
         String[] path = file.getPath().split(File.separator);
@@ -280,7 +257,7 @@ public class FaweAPI {
             return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
         RegionWrapper bounds = new RegionWrapper(origin.getBlockX() - radius, origin.getBlockX() + radius, origin.getBlockZ() - radius, origin.getBlockZ() + radius);
-        RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
+        Region boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
         for (File file : files) {
@@ -312,10 +289,6 @@ public class FaweAPI {
     /**
      * The DiskStorageHistory class is what FAWE uses to represent the undo on disk.
      *
-     * @param world
-     * @param uuid
-     * @param index
-     * @return
      * @see DiskStorageHistory#toEditSession(Player)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
@@ -323,12 +296,8 @@ public class FaweAPI {
     }
 
     /**
-     * Compare two versions
+     * Compare two versions.
      *
-     * @param version
-     * @param major
-     * @param minor
-     * @param minor2
      * @return true if version is >= major, minor, minor2
      */
     public static boolean checkVersion(final int[] version, final int major, final int minor, final int minor2) {
@@ -391,26 +360,19 @@ public class FaweAPI {
     }
 
     /**
-     * Have a task run when the server is low on memory (configured threshold)
-     *
-     * @param run
+     * Have a task run when the server is low on memory (configured threshold).
      */
     public static void addMemoryLimitedTask(Runnable run) {
         MemUtil.addMemoryLimitedTask(run);
     }
 
     /**
-     * Have a task run when the server is no longer low on memory (configured threshold)
-     *
-     * @param run
+     * Have a task run when the server is no longer low on memory (configured threshold).
      */
     public static void addMemoryPlentifulTask(Runnable run) {
         MemUtil.addMemoryPlentifulTask(run);
     }
 
-    /**
-     * @return Map of translation ket to value
-     */
     public static Map<String, String> getTranslations(Locale locale) {
         return WorldEdit.getInstance().getTranslationManager().getTranslationMap(locale);
     }

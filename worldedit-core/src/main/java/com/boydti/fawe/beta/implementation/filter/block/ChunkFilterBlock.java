@@ -11,7 +11,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 
 /**
- * Filter block implementation which uses chunks
+ * Filter block implementation which uses chunks.
  * - First call initChunk
  * - Then for each layer, call initLayer
  * - Then use whatever filter method you want, to iterate over the blocks in that layer
@@ -23,21 +23,14 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
     }
 
     /**
-     * Initialize with chunk coordinates
+     * Initialize with chunk coordinates.
      *  - The layer must also be initialized
-     * @param chunkX
-     * @param chunkZ
-     * @return
      */
     public abstract ChunkFilterBlock initChunk(int chunkX, int chunkZ);
 
     /**
-     * Initialize a chunk layer
+     * Initialize a chunk layer.
      *  - The chunk coordinates must also be initialized first
-     * @param iget
-     * @param iset
-     * @param layer
-     * @return
      */
     public abstract ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer);
 
@@ -46,55 +39,33 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
 
 
     /**
-     * Filter a single block
-     * @param filter
-     * @param x
-     * @param y
-     * @param z
+     * Filter a single block.
      */
     public abstract void filter(Filter filter, int x, int y, int z);
 
     /**
-     * Filter a cuboid region
-     * @param filter
-     * @param minX
-     * @param minY
-     * @param minZ
-     * @param maxX
-     * @param maxY
-     * @param maxZ
+     * Filter a cuboid region.
      */
     public abstract void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY,
         int maxZ);
 
     /**
-     * Filter everything in the layer
-     * @param filter
+     * Filter everything in the layer.
      */
     public abstract void filter(Filter filter);
 
     /**
-     * Filter everything between y layers
-     * @param filter
-     * @param yStart
-     * @param yEnd
+     * Filter everything between y layers.
      */
     public abstract void filter(Filter filter, int yStart, int yEnd);
 
     /**
-     * Filter with a region
-     * @param filter
-     * @param region
+     * Filter with a region.
      */
     public abstract void filter(Filter filter, Region region);
 
     /**
-     * Filter with a chunk object
-     * @param chunk
-     * @param get
-     * @param set
-     * @param filter
-     * @return
+     * Filter with a chunk object.
      */
     public final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter) {
         initChunk(chunk.getX(), chunk.getZ());
@@ -108,14 +79,7 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
     }
 
     /**
-     * Filter a chunk with a region / filter
-     * @param chunk
-     * @param get
-     * @param set
-     * @param filter
-     * @param region
-     * @param full
-     * @return
+     * Filter a chunk with a region / filter.
      */
     public final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter, Region region, boolean full) {
         if (region != null) {

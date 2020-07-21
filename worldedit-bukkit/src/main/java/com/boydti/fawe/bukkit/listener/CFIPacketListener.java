@@ -22,17 +22,10 @@ import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.block.BlockState;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.List;
-
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,10 +33,12 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
- * The CFIPacketListener handles packets for editing the VirtualWorld
+ * The CFIPacketListener handles packets for editing the VirtualWorld.
  * The generator is a virtual world which only the creator can see
  *  - The virtual world is displayed inside the current world
  *  - Block/Chunk/Movement packets need to be handled properly
@@ -272,9 +267,9 @@ public class CFIPacketListener implements Listener {
             return vw;
         }
         //        CFICommands.CFISettings settings = bukkitPlayer.getMeta("CFISettings");
-//        if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
-//            return settings.getGenerator();
-//        }
+        //        if (settings != null && settings.hasGenerator() && settings.getGenerator().hasPacketViewer()) {
+        //            return settings.getGenerator();
+        //        }
         return null;
     }
 

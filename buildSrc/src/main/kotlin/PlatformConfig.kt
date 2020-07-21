@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.CoreJavadocOptions
@@ -31,6 +32,18 @@ fun Project.applyPlatformAndCoreConfiguration() {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    tasks
+        .withType<JavaCompile>()
+        .matching { it.name == "compileJava" || it.name == "compileTestJava" }
+        .configureEach {
+            val disabledLint = listOf(
+                "processing", "path", "fallthrough", "serial"
+            )
+            //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
+            options.isDeprecation = false
+            options.encoding = "UTF-8"
+        }
 
 //    configure<CheckstyleExtension> {
 //        configFile = rootProject.file("config/checkstyle/checkstyle.xml")

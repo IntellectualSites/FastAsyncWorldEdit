@@ -3,11 +3,11 @@ package com.boydti.fawe.object.brush;
 import com.boydti.fawe.object.brush.scroll.Scroll;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.command.tool.brush.Brush;
-import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
 import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.util.auth.Subject;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -254,7 +254,7 @@ public class BrushSettings {
         return scrollAction;
     }
 
-    public boolean canUse(Actor actor) {
+    public boolean canUse(Subject actor) {
         Set<String> perms = getPermissions();
         for (String perm : perms) {
             if (actor.hasPermission(perm)) {

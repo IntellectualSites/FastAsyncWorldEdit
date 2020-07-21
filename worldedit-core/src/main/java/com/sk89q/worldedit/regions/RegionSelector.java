@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -144,19 +146,17 @@ public interface RegionSelector {
     /**
      * Get the number of blocks inside the region.
      *
-     * <p>Note: This method <b>must</b> be overridden.</p>
-     *
      * @return number of blocks, or -1 if undefined
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
      */
+    @NonAbstractForCompatibility(
+        delegateName = "getArea",
+        delegateParams = {}
+    )
     default long getVolume() {
-        // TODO Remove default once getArea is removed
-        try {
-            if (getClass().getMethod("getArea").getDeclaringClass().equals(RegionSelector.class)) {
-                throw new IllegalStateException("Class " + getClass().getName() + " must override getVolume.");
-            }
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        }
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
         return getArea();
     }
 
@@ -185,7 +185,7 @@ public interface RegionSelector {
     @Deprecated
     default List<String> getInformationLines() {
         return Lists.newArrayList();
-    };
+    }
 
     /**
      * Get lines of information about the selection.
@@ -199,10 +199,7 @@ public interface RegionSelector {
     }
 
     /**
-     * Get the vertices
-     *
-     * @return
-     * @throws IncompleteRegionException
+     * Get the vertices.
      */
     default List<BlockVector3> getVertices() throws IncompleteRegionException {
         return Collections.singletonList(getPrimaryPosition());

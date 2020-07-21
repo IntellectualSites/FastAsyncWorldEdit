@@ -501,8 +501,6 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Flush output.
-     *
-     * @throws IOException
      */
     @Override
     public void flush() throws IOException {

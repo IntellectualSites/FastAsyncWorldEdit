@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.listener;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Settings;
@@ -45,6 +43,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 import org.slf4j.Logger;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public abstract class ChunkListener implements Listener {
 
     private final Logger logger = getLogger(ChunkListener.class);
@@ -59,8 +59,8 @@ public abstract class ChunkListener implements Listener {
             Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
             plm.registerEvents(this, plugin);
             try {
-                plm.registerEvents(new ChunkListener_8Plus(this), plugin);
-            } catch (Throwable ignore) {
+                plm.registerEvents(new ChunkListener8Plus(this), plugin);
+            } catch (Throwable ignored) {
             }
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
@@ -251,14 +251,6 @@ public abstract class ChunkListener implements Listener {
                 return;
             }
         }
-//        switch (event.getChangedType()) {
-//            case AIR:
-//            case CAVE_AIR:
-//            case VOID_AIR:
-//                break;
-//            case REDSTONE_WIRE::
-//                return;
-//        }
         Exception e = new Exception();
         int depth = getDepth(e);
         if (depth >= 256) {
@@ -355,9 +347,7 @@ public abstract class ChunkListener implements Listener {
     }
 
     /**
-     * Prevent FireWorks from loading chunks
-     *
-     * @param event
+     * Prevent FireWorks from loading chunks.
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkLoad(ChunkLoadEvent event) {

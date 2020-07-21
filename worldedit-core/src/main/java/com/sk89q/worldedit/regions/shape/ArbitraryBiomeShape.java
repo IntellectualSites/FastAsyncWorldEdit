@@ -43,8 +43,7 @@ public abstract class ArbitraryBiomeShape {
     public ArbitraryBiomeShape(Region extent) {
         if (extent instanceof FlatRegion) {
             this.extent = (FlatRegion) extent;
-        }
-        else {
+        } else {
             // TODO: polygonize
             this.extent = new CuboidRegion(extent.getWorld(), extent.getMinimumPoint(), extent.getMaximumPoint());
         }
@@ -66,7 +65,7 @@ public abstract class ArbitraryBiomeShape {
     }
 
 
-    /**
+    /*
      * Cache entries:
      * null = unknown
      * OUTSIDE = outside
@@ -88,7 +87,7 @@ public abstract class ArbitraryBiomeShape {
         final int index = (z - cacheOffsetZ) + (x - cacheOffsetX) * cacheSizeZ;
 
         final BiomeType cacheEntry = cache[index];
-        if (cacheEntry == null) {// unknown, fetch material
+        if (cacheEntry == null) { // unknown, fetch material
             final BiomeType material = getBiome(x, z, baseBiome);
             if (material == null) {
                 // outside

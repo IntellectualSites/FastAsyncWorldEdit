@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation.lighting;
 
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
@@ -32,7 +33,7 @@ public class NMSRelighter implements Relighter {
     private final Map<Long, Integer> chunksToSend;
     private final ConcurrentLinkedQueue<RelightSkyEntry> extentdSkyToRelight = new ConcurrentLinkedQueue<>();
 
-    private final Map<Long, long[][][] /* z y x */ > lightQueue;
+    private final Map<Long, long[][][] /* z y x */> lightQueue;
     private final AtomicBoolean lightLock = new AtomicBoolean(false);
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
 
@@ -65,7 +66,7 @@ public class NMSRelighter implements Relighter {
     }
 
     /**
-     * Utility method to reduce duplicated code to ensure values are written to long[][][] without NPEs
+     * Utility method to reduce duplicated code to ensure values are written to long[][][] without NPEs.
      *
      * @param x x coordinate
      * @param y y coordinate
@@ -81,7 +82,7 @@ public class NMSRelighter implements Relighter {
         if (m2 == null) {
             m2 = m1[x] = new long[4];
         }
-        long value = m2[y >> 6] |= 1l << y;
+        long value = m2[y >> 6] |= 1L << y;
     }
 
     public void addLightUpdate(int x, int y, int z) {
@@ -353,7 +354,7 @@ public class NMSRelighter implements Relighter {
             int bitMask = entry.getValue();
             int x = MathMan.unpairIntX(pair);
             int z = MathMan.unpairIntY(pair);
-            ChunkHolder chunk = (ChunkHolder) queue.getOrCreateChunk(x, z);
+            IChunkSet chunk = queue.getOrCreateChunk(x, z);
             chunk.setBitMask(bitMask);
             iter.remove();
         }
@@ -414,6 +415,9 @@ public class NMSRelighter implements Relighter {
                     }
                 }
             }
+            break;
+            default:
+                break;
         }
     }
 
@@ -506,6 +510,8 @@ public class NMSRelighter implements Relighter {
                             }
                             iChunk.setSkyLight(x, y, z, value);
                             continue;
+                        default:
+                            break;
                     }
                     chunk.smooth = true;
                     iChunk.setSkyLight(x, y, z, value);

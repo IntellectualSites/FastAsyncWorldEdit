@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.chunk.AnvilChunk;
 import com.sk89q.worldedit.world.chunk.AnvilChunk13;
+import com.sk89q.worldedit.world.chunk.AnvilChunk16;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.chunk.OldChunk;
 
@@ -96,11 +97,14 @@ public class ChunkStoreHelper {
         }
         final Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         final int currentDataVersion = platform.getDataVersion();
-        if (tag.getValue().containsKey("Sections") &&  dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
+        if (tag.getValue().containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
             final DataFixer dataFixer = platform.getDataFixer();
             if (dataFixer != null) {
                 return new AnvilChunk13((CompoundTag) dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag, dataVersion).getValue().get("Level"));
             }
+        }
+        if (dataVersion >= 2566) {
+            return new AnvilChunk16(tag);
         }
         if (dataVersion >= DATA_VERSION_MC_1_13) {
             return new AnvilChunk13(tag);

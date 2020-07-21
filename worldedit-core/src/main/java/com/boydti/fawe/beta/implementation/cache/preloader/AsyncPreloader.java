@@ -69,7 +69,8 @@ public class AsyncPreloader implements Preloader, Runnable {
                     update.notify();
                 }
             }
-        } catch (IncompleteRegionException ignore){}
+        } catch (IncompleteRegionException ignored) {
+        }
     }
 
     @Override

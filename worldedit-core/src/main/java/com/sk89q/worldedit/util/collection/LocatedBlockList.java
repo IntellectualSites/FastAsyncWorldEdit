@@ -65,7 +65,8 @@ public class LocatedBlockList implements Iterable<LocatedBlock> {
         return blocks.containsKey(location);
     }
 
-    public @Nullable BaseBlock get(BlockVector3 location) {
+    @Nullable
+    public BaseBlock get(BlockVector3 location) {
         return blocks.get(location);
     }
 

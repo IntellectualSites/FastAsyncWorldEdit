@@ -140,7 +140,8 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param location the location
      * @return a reference to the created entity, or null if the entity could not be created
      */
-    default @Nullable Entity createEntity(Location location, BaseEntity entity) {
+    @Nullable
+    default Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
 
@@ -348,7 +349,7 @@ public interface Extent extends InputExtent, OutputExtent {
             }
         }
         int result = state ? failedMin : failedMax;
-        if(result > 0 && !ignoreAir) {
+        if (result > 0 && !ignoreAir) {
             block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }

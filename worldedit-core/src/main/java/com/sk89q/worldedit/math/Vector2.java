@@ -44,6 +44,8 @@ public final class Vector2 {
                     return ONE;
                 }
                 break;
+            default:
+                break;
         }
         return new Vector2(x, z);
     }
@@ -422,7 +424,7 @@ public final class Vector2 {
             Math.max(z, v2.z)
         );
     }
-    
+
     public static BlockVector2 toBlockPoint(double x, double z) {
         return BlockVector2.at(x, z);
     }

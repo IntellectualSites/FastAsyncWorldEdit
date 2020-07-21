@@ -70,7 +70,7 @@ public class TextureUtil implements TextureHolder {
      * https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp
      */
     protected BiomeColor[] validBiomes;
-    private BiomeColor[] biomes = new BiomeColor[]{
+    private BiomeColor[] biomes = new BiomeColor[] {
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
         new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
@@ -333,7 +333,8 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(252, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),};
+        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+    };
     private BlockType[] layerBuffer = new BlockType[2];
 
     public TextureUtil() throws FileNotFoundException {
@@ -458,10 +459,7 @@ public class TextureUtil implements TextureHolder {
     }
 
     /**
-     * Returns the block combined ids as an array
-     *
-     * @param color
-     * @return
+     * Returns the block combined ids as an array.
      */
     public BlockType[] getNearestLayer(int color) {
         int[] closest = null;
@@ -508,11 +506,7 @@ public class TextureUtil implements TextureHolder {
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
         blockAndBiomeIdOutput[1] = (char) biome.id;
-        if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
-            color)) {
-            return true;
-        }
-        return false;
+        return colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor, color);
     }
 
     public int getBiomeMix(int[] biomeIdsOutput, int color) {
@@ -631,7 +625,6 @@ public class TextureUtil implements TextureHolder {
                                 mods.add(modId);
                             }
                         }
-                        continue;
                     }
                     String modelsDir = "assets/%1$s/models/block/%2$s.json";
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
@@ -654,7 +647,7 @@ public class TextureUtil implements TextureHolder {
                         String modelFileName = String.format(modelsDir, nameSpace, name);
                         ZipEntry entry = getEntry(zipFile, modelFileName);
                         if (entry == null) {
-                            System.out.println("Cannot find " + modelFileName + " in " + file);
+                            getLogger(TextureUtil.class).warn("Cannot find " + modelFileName + " in " + file);
                             continue;
                         }
 
@@ -692,7 +685,7 @@ public class TextureUtil implements TextureHolder {
 
                         BufferedImage image = readImage(zipFile, textureFileName);
                         if (image == null) {
-                            System.out.println("Cannot find " + textureFileName);
+                            getLogger(TextureUtil.class).warn("Cannot find " + textureFileName);
                             continue;
                         }
                         int color = ImageUtil.getColor(image);
@@ -874,7 +867,7 @@ public class TextureUtil implements TextureHolder {
     }
 
     /**
-     * Assumes the top layer is a transparent color and the bottom is opaque
+     * Assumes the top layer is a transparent color, and the bottom is opaque.
      */
     public int combineTransparency(int top, int bottom) {
         int alpha1 = (top >> 24) & 0xFF;
@@ -902,7 +895,10 @@ public class TextureUtil implements TextureHolder {
                     if (!hasAlpha(colorOther)) {
                         int combinedOther = validBlockIds[j];
                         int combinedColor = combineTransparency(color, colorOther);
-                        colorLayerMap.put(combinedColor, new int[]{combined, combinedOther});
+                        colorLayerMap.put(combinedColor, new int[] {
+                            combined,
+                            combinedOther
+                        });
                     }
                 }
             }

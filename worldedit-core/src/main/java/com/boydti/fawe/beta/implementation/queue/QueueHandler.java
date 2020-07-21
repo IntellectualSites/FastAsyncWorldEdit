@@ -34,7 +34,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Supplier;
 
 /**
- * Class which handles all the queues {@link IQueueExtent}
+ * Class which handles all the queues {@link IQueueExtent}.
  */
 @SuppressWarnings("UnstableApiUsage")
 public abstract class QueueHandler implements Trimable, Runnable {
@@ -47,9 +47,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private final Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkGetCache = new HashMap<>();
     private final CleanableThreadLocal<IQueueExtent<IQueueChunk>> queuePool = new CleanableThreadLocal<>(QueueHandler.this::create);
+
     /**
-     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
-     * server
+     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the server.
      */
     private long last;
     private long allocate = 50;
@@ -230,17 +230,14 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public <T extends Future<T>> T submit(IQueueChunk<T> chunk) {
-//        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
-//            return (T) forkJoinPoolSecondary.submit(chunk);
-//        }
+        //        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
+        //            return (T) forkJoinPoolSecondary.submit(chunk);
+        //        }
         return (T) blockingExecutor.submit(chunk);
     }
 
     /**
-     * Get or create the WorldChunkCache for a world
-     *
-     * @param world
-     * @return
+     * Get or create the WorldChunkCache for a world.
      */
     public IChunkCache<IChunkGet> getOrCreateWorldCache(World world) {
         world = WorldWrapper.unwrap(world);

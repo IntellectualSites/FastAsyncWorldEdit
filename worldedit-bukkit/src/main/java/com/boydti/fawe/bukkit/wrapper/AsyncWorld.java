@@ -92,8 +92,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * @param parent    Parent world
-     * @param autoQueue
+     * Create a wrapper to use a world in an async context. Not recommended for public use.
+     * @param parent Parent world
      * @deprecated use {@link #wrap(World)} instead
      */
     @Deprecated
@@ -106,8 +106,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * @param parent
-     * @param extent
+     * Create a wrapper to use a world in an async context. Not recommended for public use.
+     * @param parent Parent world
      * @deprecated use {@link #wrap(World)} instead
      */
     @Deprecated
@@ -119,9 +119,6 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     /**
      * Wrap a world for async usage.
-     *
-     * @param world
-     * @return
      */
     public static AsyncWorld wrap(World world) {
         if (world instanceof AsyncWorld) {
@@ -140,13 +137,9 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * Create a world async (untested)
-     * - Only optimized for 1.10
-     *
-     * @param creator
-     * @return
+     * Create a world async (untested).
      */
-    public synchronized static AsyncWorld create(final WorldCreator creator) {
+    public static synchronized AsyncWorld create(final WorldCreator creator) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         @Nullable World world = adapter.createWorld(creator);
         return wrap(world);

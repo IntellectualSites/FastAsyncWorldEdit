@@ -22,7 +22,7 @@ public interface StreamChange {
     default void flushChanges(File file) throws IOException {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
             try (LZ4BlockOutputStream compressed = new LZ4BlockOutputStream(out)) {
-//                compressed.setLevel(Deflater.BEST_SPEED);
+                //                compressed.setLevel(Deflater.BEST_SPEED);
                 try (FaweOutputStream fos = new FaweOutputStream(compressed)) {
                     flushChanges(fos);
                 }

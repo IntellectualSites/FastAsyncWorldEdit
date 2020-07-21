@@ -54,6 +54,8 @@ public abstract class Vector3 {
                     return ONE;
                 }
                 break;
+            default:
+                break;
         }
         */
         return new Vector3Impl(x, y, z);
@@ -75,6 +77,7 @@ public abstract class Vector3 {
      *
      * <p>
      * Useful for sorting by chunk block storage order.
+     * </p>
      */
     public static Comparator<Vector3> sortByCoordsYzx() {
         return YzxOrderComparator.YZX_ORDER;

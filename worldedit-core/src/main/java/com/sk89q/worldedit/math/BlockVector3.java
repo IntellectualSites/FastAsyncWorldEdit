@@ -80,9 +80,9 @@ public abstract class BlockVector3 {
     }
 
     public static boolean isLongPackable(BlockVector3 location) {
-        return isHorizontallyInBounds(location.getX()) &&
-            isHorizontallyInBounds(location.getZ()) &&
-            0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+        return isHorizontallyInBounds(location.getX())
+            && isHorizontallyInBounds(location.getZ())
+            && 0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
     }
 
     public static void checkLongPackable(BlockVector3 location) {
@@ -110,6 +110,7 @@ public abstract class BlockVector3 {
      *
      * <p>
      * Useful for sorting by chunk block storage order.
+     * </p>
      */
     public static Comparator<BlockVector3> sortByCoordsYzx() {
         return YzxOrderComparator.YZX_ORDER;

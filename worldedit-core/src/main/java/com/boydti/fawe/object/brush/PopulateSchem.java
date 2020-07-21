@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class PopulateSchem implements Brush {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         new MaskTraverser(mask).reset(editSession);
         int size1 = MathMan.roundInt(size);
-        CuboidRegion cuboid = new CuboidRegion(editSession.getWorld(), position.subtract(size1, size1, size1), position.add(size1, size1, size1));
+        Region cuboid = new CuboidRegion(editSession.getWorld(), position.subtract(size1, size1, size1), position.add(size1, size1, size1));
         try {
             editSession.addSchems(cuboid, mask, clipboards, rarity, randomRotate);
         } catch (WorldEditException e) {

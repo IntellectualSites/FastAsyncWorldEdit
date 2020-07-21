@@ -18,8 +18,7 @@ public class CombinedBlocks implements IBlocks {
     private final int addMask;
 
     /**
-     * @param secondary
-     * @param primary
+     * TODO Description needed.
      * @param addMask - bitMask for force sending sections, else 0 to send the primary ones
      */
     public CombinedBlocks(IBlocks secondary, IBlocks primary, int addMask) {

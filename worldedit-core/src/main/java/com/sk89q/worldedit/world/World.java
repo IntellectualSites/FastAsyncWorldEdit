@@ -324,11 +324,11 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     /**
-     * Refresh a specific chunk
+     * Refresh a specific chunk.
      * Note: only 0 is guaranteed to send all tiles / entities
      * Note: Only 65535 is guaranteed to send all blocks
-     * @param chunkX
-     * @param chunkZ
+     * @param chunkX the x coordinate
+     * @param chunkZ the y coordinate
      */
     void refreshChunk(final int chunkX, final int chunkZ);
 
@@ -336,7 +336,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     IChunkGet get(int x, int z);
 
     /**
-     * Send a fake chunk to a player/s
+     * Send a fake chunk to a player.
      * @param player may be null to send to everyone
      * @param packet the chunk packet
      */

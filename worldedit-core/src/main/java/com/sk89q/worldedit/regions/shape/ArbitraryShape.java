@@ -34,18 +34,22 @@ public abstract class ArbitraryShape {
 
     protected final Region extent;
 
-    private int cacheOffsetX;
-    private int cacheOffsetY;
-    private int cacheOffsetZ;
-    private int cacheSizeX;
-    private int cacheSizeY;
-    private int cacheSizeZ;
+    private final int cacheOffsetX;
+    private final int cacheOffsetY;
+    private final int cacheOffsetZ;
+    private final int cacheSizeX;
+    private final int cacheSizeY;
+    private final int cacheSizeZ;
 
     /**
-     * Cache entires:
+     * Cache for expression results.
+     *
+     * <p>
+     * Cache entries:
      * 0 = unknown
      * -1 = outside
      * 1 = inside
+     * </p>
      */
     private final byte[] cache;
 
@@ -88,7 +92,7 @@ public abstract class ArbitraryShape {
      * @param pattern The pattern to generate default materials from.
      * @param hollow Specifies whether to generate a hollow shape.
      * @return number of affected blocks.
-     * @throws MaxChangedBlocksException
+     * @throws MaxChangedBlocksException if the maximum blocks changed is exceeded
      */
     public int generate(EditSession editSession, Pattern pattern, boolean hollow) throws MaxChangedBlocksException {
         int affected = 0;

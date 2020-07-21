@@ -74,9 +74,7 @@ public class ClipboardFormats {
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
-                WorldEdit.logger.warn(
-                    format.getClass().getName() + " cannot override existing alias '" + lowKey
-                        + "' used by " + old.getClass().getName());
+                WorldEdit.logger.warn(format.getClass().getName() + " cannot override existing alias '" + lowKey + "' used by " + old.getClass().getName());
             }
         }
         for (String ext : format.getFileExtensions()) {
@@ -126,7 +124,7 @@ public class ClipboardFormats {
     }
 
     /**
-     * Detect the format using the given extension
+     * Detect the format using the given extension.
      *
      * @param extension the extension
      * @return the format, otherwise null if one cannot be detected
@@ -195,8 +193,7 @@ public class ClipboardFormats {
             return null;
         }
         File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ?
-            new File(working, player.getUniqueId().toString()) : working;
+        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
         File f;
         if (input.startsWith("#")) {
             String[] extensions;

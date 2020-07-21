@@ -19,24 +19,23 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEdit;
-
 import com.sk89q.worldedit.extension.platform.AbstractNonPlayerActor;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
-import java.util.UUID;
-
-import java.util.Locale;
-import javax.annotation.Nullable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import java.util.Locale;
+import java.util.UUID;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitCommandSender extends AbstractNonPlayerActor {
 
@@ -45,8 +44,8 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
      */
     private static final UUID DEFAULT_ID = UUID.fromString("a233eb4b-4cab-42cd-9fd9-7e7b9a3f74be");
 
-    private CommandSender sender;
-    private WorldEditPlugin plugin;
+    private final CommandSender sender;
+    private final WorldEditPlugin plugin;
 
     public BukkitCommandSender(WorldEditPlugin plugin, CommandSender sender) {
         checkNotNull(plugin);
@@ -68,6 +67,7 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
     }
 
     @Override
+    @Deprecated
     public void printRaw(String msg) {
         for (String part : msg.split("\n")) {
             sender.sendMessage(part);
@@ -75,28 +75,32 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
     }
 
     @Override
+    @Deprecated
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7d" + part);
+            sender.sendMessage("§d" + part);
         }
     }
 
     @Override
+    @Deprecated
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A77" + part);
+            sender.sendMessage("§7" + part);
         }
     }
 
     @Override
+    @Deprecated
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            sender.sendMessage("\u00A7c" + part);
+            sender.sendMessage("§c" + part);
         }
     }
+
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));
+        TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
     }
 
     @Override

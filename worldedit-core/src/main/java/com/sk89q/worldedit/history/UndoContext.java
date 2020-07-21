@@ -39,7 +39,8 @@ public class UndoContext {
      *
      * @return an extent or null
      */
-    public @Nullable Extent getExtent() {
+    @Nullable
+    public Extent getExtent() {
         return extent;
     }
 

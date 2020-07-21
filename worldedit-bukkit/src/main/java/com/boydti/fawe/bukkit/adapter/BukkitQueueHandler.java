@@ -1,23 +1,26 @@
 package com.boydti.fawe.bukkit.adapter;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import co.aikar.timings.Timings;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
-import java.lang.reflect.Method;
 import org.spigotmc.AsyncCatcher;
+
+import java.lang.reflect.Method;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class BukkitQueueHandler extends QueueHandler {
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 
     private static Method methodCheck;
+
     static {
         try {
             methodCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
             methodCheck.setAccessible(true);
-        } catch (Throwable ignore){}
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

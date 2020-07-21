@@ -478,7 +478,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         new ExtentTraverser(this).setNext(transform);
     }
 
-    public @Nullable ResettableExtent getTransform() {
+    @Nullable
+    public ResettableExtent getTransform() {
         ExtentTraverser<ResettableExtent> traverser = new ExtentTraverser<>(getExtent()).find(ResettableExtent.class);
         if (traverser != null) {
             return traverser.get();

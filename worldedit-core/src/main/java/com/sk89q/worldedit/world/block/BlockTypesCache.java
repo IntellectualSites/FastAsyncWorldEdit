@@ -31,7 +31,7 @@ public class BlockTypesCache {
                     Settings
      -----------------------------------------------------
      */
-    protected final static class Settings {
+    protected static final class Settings {
         protected final int internalId;
         protected final BlockState defaultState;
         protected final AbstractProperty<?>[] propertiesMapArr;
@@ -166,8 +166,8 @@ public class BlockTypesCache {
     public static final int BIT_OFFSET; // Used internally
     protected static final int BIT_MASK; // Used internally
 
-//    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
-//    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", $REGISTRY);
+    //    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
+    //    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", $REGISTRY);
 
     public static final BlockType[] values;
     public static final BlockState[] states;

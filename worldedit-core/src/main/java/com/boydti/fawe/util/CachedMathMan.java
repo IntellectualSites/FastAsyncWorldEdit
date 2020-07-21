@@ -21,6 +21,7 @@ public class CachedMathMan {
     }
 
     private static float[] ANGLES = new float[65536];
+
     static {
         for (int i = 0; i < 65536; ++i) {
             ANGLES[i] = (float) Math.sin((double) i * Math.PI * 2.0D / 65536.0D);
@@ -28,6 +29,7 @@ public class CachedMathMan {
     }
 
     private static char[] SQRT = new char[65536];
+
     static {
         for (int i = 0; i < SQRT.length; i++) {
             SQRT[i] = (char) Math.round(Math.sqrt(i));
@@ -35,8 +37,8 @@ public class CachedMathMan {
     }
 
     /**
-     * Optimized for i elem 0,65536 (characters)
-     * @param i
+     * Optimized for i elem 0,65536 (characters).
+     *
      * @return square root
      */
     protected static int usqrt(int i) {
