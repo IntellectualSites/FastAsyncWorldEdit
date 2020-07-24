@@ -105,19 +105,18 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         return AdaptedMap.immutable(nmsTiles, posNms2We, nmsTile2We);
     }
 
-    @Override
-    public int getSkyLight(int x, int y, int z) {
+    @Override public int getSkyLight(int x, int y, int z) {
         int layer = y >> 4;
         if (skyLight[layer] == null) {
             SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
-               byte[] a = new byte[2048];
-               // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
-               Arrays.fill(a, (byte) 15);
-               nibbleArray = new NibbleArray(a);
-               ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibbleArray, true);
+                byte[] a = new byte[2048];
+                // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
+                Arrays.fill(a, (byte) 15);
+                nibbleArray = new NibbleArray(a);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibbleArray, true);
             }
             skyLight[layer] = nibbleArray;
         }
@@ -125,21 +124,20 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         return skyLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
     }
 
-    @Override
-    public int getEmmittedLight(int x, int y, int z) {
+    @Override public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
-        if (skyLight[layer] == null) {
+        if (blockLight[layer] == null) {
             SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
-               byte[] a = new byte[2048];
-               // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
-               Arrays.fill(a, (byte) 15);
-               nibbleArray = new NibbleArray(a);
-               ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.BLOCK, sectionPosition, nibbleArray, true);
+                byte[] a = new byte[2048];
+                // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
+                Arrays.fill(a, (byte) 15);
+                nibbleArray = new NibbleArray(a);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.BLOCK, sectionPosition, nibbleArray, true);
             }
-            skyLight[layer] = nibbleArray;
+            blockLight[layer] = nibbleArray;
         }
         long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
