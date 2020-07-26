@@ -78,12 +78,12 @@ public class MutableEntityChange implements Change {
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();
-        int x = MathMan.roundInt(pos.get(0).getValue());
-        int y = MathMan.roundInt(pos.get(1).getValue());
-        int z = MathMan.roundInt(pos.get(2).getValue());
+        double x = pos.get(0).getValue();
+        double y = pos.get(1).getValue();
+        double z = pos.get(2).getValue();
         Extent extent = context.getExtent();
         Location location = new Location(extent, x, y, z, 0, 0);
-        String id = tag.getString("id");
+        String id = tag.getString("Id");
         EntityType type = EntityTypes.parse(id);
         BaseEntity entity = new BaseEntity(type, tag);
         context.getExtent().createEntity(location, entity);
