@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -435,6 +436,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     @Override
     public List<? extends Entity> getEntities() {
         return new ArrayList<>(entities);
+    }
+    
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return new ArrayList<>(entities.stream().filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList()));
     }
 
     @Override

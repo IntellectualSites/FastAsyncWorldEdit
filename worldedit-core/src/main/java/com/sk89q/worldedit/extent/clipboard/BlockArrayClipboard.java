@@ -45,6 +45,7 @@ import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.stream.Collectors;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
@@ -197,18 +198,49 @@ public class BlockArrayClipboard implements Clipboard {
     public List<? extends Entity> getEntities(Region region) {
         region = region.clone();
         region.shift(BlockVector3.ZERO.subtract(origin));
-        return getParent().getEntities(region);
+        return getParent().getEntities(region).stream().map(e ->
+        {
+            if (e instanceof ClipboardEntity) {
+                ClipboardEntity ce = (ClipboardEntity) e;
+                Location oldloc = ce.getLocation();
+                Location loc = new Location(oldloc.getExtent(),
+                                            oldloc.getX() + origin.getBlockX(),
+                                            oldloc.getY() + origin.getBlockY(),
+                                            oldloc.getZ() + origin.getBlockZ(),
+                                            oldloc.getYaw(), oldloc.getPitch());
+                return new ClipboardEntity(loc, ce.entity);
+            }
+            return e;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public List<? extends Entity> getEntities() {
-        return getParent().getEntities();
+        return getParent().getEntities().stream().map(e ->
+        {
+            if (e instanceof ClipboardEntity) {
+                ClipboardEntity ce = (ClipboardEntity) e;
+                Location oldloc = ce.getLocation();
+                Location loc = new Location(oldloc.getExtent(),
+                                            oldloc.getX() + origin.getBlockX(),
+                                            oldloc.getY() + origin.getBlockY(),
+                                            oldloc.getZ() + origin.getBlockZ(),
+                                            oldloc.getYaw(), oldloc.getPitch());
+                return new ClipboardEntity(loc, ce.entity);
+            }
+            return e;
+        }).collect(Collectors.toList());
     }
     
     @Override
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
-        return getParent().createEntity(location, entity);
+        Location l = new Location(location.getExtent(),
+                                  location.getX() - origin.getBlockX(),
+                                  location.getY() - origin.getBlockY(),
+                                  location.getZ() - origin.getBlockZ(),
+                                  location.getYaw(), location.getPitch());
+        return getParent().createEntity(l, entity);
     }
 
     @Override
