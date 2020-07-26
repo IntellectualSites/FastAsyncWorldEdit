@@ -124,9 +124,9 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
             pos = new ListTag(DoubleTag.class, posList);
             map.put("Pos", pos);
         }
-        posList.set(0, new DoubleTag(location.getX() + 0.5));
+        posList.set(0, new DoubleTag(location.getX()));
         posList.set(1, new DoubleTag(location.getY()));
-        posList.set(2, new DoubleTag(location.getZ() + 0.5));
+        posList.set(2, new DoubleTag(location.getZ()));
         
         //set new uuid
         UUID newuuid = UUID.randomUUID();

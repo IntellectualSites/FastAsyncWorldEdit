@@ -323,7 +323,7 @@ public class BlockArrayClipboard implements Clipboard {
         private final float yaw, pitch;
 
         public ClipboardEntity(Location loc, BaseEntity entity) {
-            this((Clipboard) loc.getExtent(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getYaw(), loc.getPitch(), entity);
+            this((Clipboard) loc.getExtent(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), entity);
         }
 
         public ClipboardEntity(Clipboard clipboard, double x, double y, double z, float yaw, float pitch, BaseEntity entity) {
