@@ -29,7 +29,6 @@ import com.sk89q.worldedit.util.io.file.ArchiveNioSupports;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotDatabase;

@@ -1,7 +1,8 @@
 package com.sk89q.worldedit.entity;
 
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 public interface MapMetadatable extends Metadatable {
 

@@ -1,16 +1,17 @@
 package com.boydti.fawe.object.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Uses a random pattern of a weighted list of patterns.

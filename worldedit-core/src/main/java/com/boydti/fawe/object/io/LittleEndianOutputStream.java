@@ -1,11 +1,12 @@
 package com.boydti.fawe.object.io;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.DataOutput;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UTFDataFormatException;
-import org.jetbrains.annotations.NotNull;
 
 public class LittleEndianOutputStream extends FilterOutputStream implements DataOutput {
 

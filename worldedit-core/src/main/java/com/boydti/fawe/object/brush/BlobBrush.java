@@ -10,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlobBrush implements Brush {
@@ -74,10 +75,12 @@ public class BlobBrush implements Brush {
             MutableVector3 mutable = new MutableVector3();
             double roughness = 1 - sphericity;
             for (int xr = -sizeInt; xr <= sizeInt; xr++) {
-                mutable.mutX(xr);
                 for (int yr = -sizeInt; yr <= sizeInt; yr++) {
-                    mutable.mutY(yr);
                     for (int zr = -sizeInt; zr <= sizeInt; zr++) {
+                        // pt == mutable as it's a MutableVector3
+                        // so it must be set each time
+                        mutable.mutX(xr);
+                        mutable.mutY(yr);
                         mutable.mutZ(zr);
                         Vector3 pt = transform.apply(mutable);
                         int x = MathMan.roundInt(pt.getX());

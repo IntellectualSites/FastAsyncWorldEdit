@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.plugins.ide.idea.model.IdeaModel
 import com.mendhak.gradlecrowdin.DownloadTranslationsTask
 import com.mendhak.gradlecrowdin.UploadSourceFileTask
+import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -94,15 +94,13 @@ plugins.withId("idea") {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir("src/main/java")
-            srcDir("src/legacy/java")
-        }
-        resources {
-            srcDir("src/main/resources")
-        }
+sourceSets.named("main") {
+    java {
+        srcDir("src/main/java")
+        srcDir("src/legacy/java")
+    }
+    resources {
+        srcDir("src/main/resources")
     }
 }
 
@@ -147,7 +145,7 @@ if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
         }
     }
 
-    tasks.named("classes").configure {
+    tasks.named("classes") {
         dependsOn("crowdinDownload")
     }
 }

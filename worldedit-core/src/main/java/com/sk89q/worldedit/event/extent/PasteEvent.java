@@ -19,15 +19,16 @@
 
 package com.sk89q.worldedit.event.extent;
 
-import static com.sk89q.worldedit.EditSession.Stage;
-
 import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import java.net.URI;
+
+import static com.sk89q.worldedit.EditSession.Stage;
 
 public class PasteEvent extends Event implements Cancellable {
 

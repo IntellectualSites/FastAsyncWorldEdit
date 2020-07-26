@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;

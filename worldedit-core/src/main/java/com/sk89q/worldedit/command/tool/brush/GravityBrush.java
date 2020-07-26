@@ -23,12 +23,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.LocatedBlock;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.util.collection.LocatedBlockList;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 

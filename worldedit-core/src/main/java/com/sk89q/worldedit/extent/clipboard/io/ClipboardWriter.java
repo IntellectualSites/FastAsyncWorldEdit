@@ -24,9 +24,9 @@ import com.sk89q.jnbt.FloatTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;

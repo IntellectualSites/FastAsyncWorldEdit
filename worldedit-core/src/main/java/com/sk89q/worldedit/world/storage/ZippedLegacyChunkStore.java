@@ -35,7 +35,7 @@ import java.util.zip.ZipFile;
  */
 public class ZippedLegacyChunkStore extends LegacyChunkStore {
 
-    private ZipFile zip;
+    private final ZipFile zip;
     private String folder;
 
     /**
@@ -45,8 +45,6 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
      *
      * @param zipFile the zip file
      * @param folder the folder
-     * @throws IOException
-     * @throws ZipException
      */
     public ZippedLegacyChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.folder = folder;
@@ -59,8 +57,6 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
      * be detected.
      *
      * @param zipFile the zip file
-     * @throws IOException
-     * @throws ZipException
      */
     public ZippedLegacyChunkStore(File zipFile) throws IOException, ZipException {
         zip = new ZipFile(zipFile);
@@ -73,8 +69,6 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
      * @param f2 the second part of the path
      * @param name the name of the file
      * @return an input stream
-     * @throws IOException
-     * @throws DataException
      */
     @Override
     protected InputStream getInputStream(String f1, String f2, String name) throws IOException, DataException {

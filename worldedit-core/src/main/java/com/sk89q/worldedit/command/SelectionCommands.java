@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
@@ -43,7 +40,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -84,17 +80,21 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
-import java.io.File;
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
+
+import java.io.File;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 /**
  * Selection commands.

@@ -14,10 +14,10 @@ package net.jpountz.util;
  * limitations under the License.
  */
 
-import java.lang.reflect.Field;
-import java.nio.ByteOrder;
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
+import java.nio.ByteOrder;
 
 import static net.jpountz.util.Utils.NATIVE_BYTE_ORDER;
 

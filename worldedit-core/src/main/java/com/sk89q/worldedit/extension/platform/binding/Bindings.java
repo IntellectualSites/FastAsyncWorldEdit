@@ -1,13 +1,7 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.internal.annotation.Selection;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandManager;
@@ -17,14 +11,14 @@ import org.enginehub.piston.converter.SuccessfulConversion;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
-import org.enginehub.piston.util.ValueProvider;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class Bindings {
 

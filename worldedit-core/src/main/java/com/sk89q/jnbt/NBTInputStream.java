@@ -36,10 +36,12 @@ import java.util.Map;
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
  * object.
- * 
- * <p>The NBT format was created by Markus Persson, and the specification may be
- * found at <a href="http://www.minecraft.net/docs/NBT.txt">
- * http://www.minecraft.net/docs/NBT.txt</a>.</p>
+ *
+ * <p>
+ * The NBT format was created by Markus Persson, and the specification may be
+ * found at <a href="https://minecraft.gamepedia.com/NBT_format">
+ * https://minecraft.gamepedia.com/NBT_format</a>.
+ * </p>
  */
 public final class NBTInputStream implements Closeable {
 
@@ -48,7 +50,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Creates a new {@code NBTInputStream}, which will source its data
      * from the specified input stream.
-     * 
+     *
      * @param is the input stream
      */
     public NBTInputStream(InputStream is) {
@@ -61,7 +63,7 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads an NBT tag from the stream.
-     * 
+     *
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
      */
@@ -89,7 +91,9 @@ public final class NBTInputStream implements Closeable {
     public void readNamedTagLazy(StreamDelegate scope) throws IOException {
         try {
             int type = is.readByte();
-            if (type == NBTConstants.TYPE_END) return;
+            if (type == NBTConstants.TYPE_END) {
+                return;
+            }
 
             StreamDelegate child = scope.get(is);
             if (child != null) {
@@ -540,7 +544,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return new EndTag();
                 }
@@ -569,6 +573,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_LIST:
                 int childType = is.readByte();
                 length = is.readInt();
+
                 List<Tag> tagList = new ArrayList<>();
                 for (int i = 0; i < length; ++i) {
                     Tag tag = readTagPayload(childType, depth + 1);
@@ -590,6 +595,7 @@ public final class NBTInputStream implements Closeable {
                         tagMap.put(namedTag.getName(), tag);
                     }
                 }
+
                 return new CompoundTag(tagMap);
             case NBTConstants.TYPE_INT_ARRAY:
                 length = is.readInt();

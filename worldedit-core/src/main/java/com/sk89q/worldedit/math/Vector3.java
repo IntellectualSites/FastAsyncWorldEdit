@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.math;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.boydti.fawe.util.MathMan;
 import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.Comparator;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * An immutable 3-dimensional vector.

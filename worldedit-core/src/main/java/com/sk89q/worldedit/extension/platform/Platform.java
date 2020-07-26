@@ -27,11 +27,10 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
 
-import javax.annotation.Nullable;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * Represents a platform that WorldEdit has been implemented for.
@@ -177,5 +176,10 @@ public interface Platform {
      */
     Map<Capability, Preference> getCapabilities();
 
+    /**
+     * Get a set of {@link SideEffect}s supported by this platform.
+     *
+     * @return A set of supported side effects
+     */
     Set<SideEffect> getSupportedSideEffects();
 }

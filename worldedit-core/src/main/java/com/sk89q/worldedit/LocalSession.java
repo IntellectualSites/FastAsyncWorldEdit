@@ -36,7 +36,6 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.google.common.collect.Lists;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
@@ -81,7 +80,6 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

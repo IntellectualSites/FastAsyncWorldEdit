@@ -22,6 +22,7 @@ package com.sk89q.jnbt;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

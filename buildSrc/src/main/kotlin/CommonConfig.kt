@@ -10,7 +10,7 @@ fun Project.applyCommonConfiguration() {
         mavenLocal()
         maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
         maven { url = uri("https://plotsquared.com/mvn/") }
-        maven { url = uri("https://maven.sk89q.com/repo/") }
+        maven { url = uri("https://maven.enginehub.org/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
         maven { url = uri("https://repo.destroystokyo.com/repository/maven-public") }
@@ -21,7 +21,7 @@ fun Project.applyCommonConfiguration() {
     }
     configurations.all {
         resolutionStrategy {
-            cacheChangingModulesFor(5, "minutes")
+            cacheChangingModulesFor(5, "MINUTES")
         }
     }
 }

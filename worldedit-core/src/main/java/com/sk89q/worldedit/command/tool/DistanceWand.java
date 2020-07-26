@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
@@ -29,6 +28,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 /**
  * A wand that can be used at a distance.
@@ -42,7 +42,9 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location target = getTarget(player);
-        if (target == null) return true;
+        if (target == null) {
+            return true;
+        }
 
         RegionSelector selector = session.getRegionSelector(player.getWorld());
         BlockVector3 blockPoint = target.toVector().toBlockPoint();
@@ -55,7 +57,9 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location target = getTarget(player);
-        if (target == null) return true;
+        if (target == null) {
+            return true;
+        }
 
         RegionSelector selector = session.getRegionSelector(player.getWorld());
         BlockVector3 blockPoint = target.toVector().toBlockPoint();

@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-
 import static com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabaseTest.CHUNK_POS;
 import static com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabaseTest.CHUNK_TAG;
 import static com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabaseTest.TIME_ONE;

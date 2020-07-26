@@ -1,19 +1,14 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
-import java.util.List;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
@@ -21,6 +16,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class AsyncBlockState implements BlockState {
 
@@ -165,7 +162,8 @@ public class AsyncBlockState implements BlockState {
     @Override
     public void setRawData(byte data) {
         int combinedId = getTypeId() + (data << BlockTypesCache.BIT_OFFSET);
-        state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock(state.getNbtData());
+        state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId)
+            .toBaseBlock(state.getNbtData());
         this.blockData = BukkitAdapter.adapt(state);
     }
 

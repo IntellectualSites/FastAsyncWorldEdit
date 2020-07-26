@@ -1,12 +1,13 @@
 package com.boydti.fawe.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extension.input.InputParseException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SuggestInputParseException extends InputParseException {
 

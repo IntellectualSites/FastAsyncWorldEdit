@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
 import java.util.SplittableRandom;
 
 public class RandomOffsetPattern extends AbstractPattern {

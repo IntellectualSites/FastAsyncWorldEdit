@@ -46,12 +46,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 public final class LegacyMapper {
 

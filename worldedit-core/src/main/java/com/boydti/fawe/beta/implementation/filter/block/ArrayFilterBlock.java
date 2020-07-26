@@ -8,6 +8,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+
 import javax.annotation.Nullable;
 
 public class ArrayFilterBlock extends AbstractExtentFilterBlock {

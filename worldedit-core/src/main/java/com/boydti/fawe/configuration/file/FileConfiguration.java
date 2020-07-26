@@ -3,6 +3,7 @@ package com.boydti.fawe.configuration.file;
 import com.boydti.fawe.configuration.Configuration;
 import com.boydti.fawe.configuration.InvalidConfigurationException;
 import com.boydti.fawe.configuration.MemoryConfiguration;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

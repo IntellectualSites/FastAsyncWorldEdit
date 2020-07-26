@@ -19,13 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
@@ -76,8 +73,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks

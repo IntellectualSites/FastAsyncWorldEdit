@@ -2,12 +2,16 @@
 
 package net.jpountz.lz4;
 
-import java.nio.ByteBuffer;
 import net.jpountz.util.ByteBufferUtils;
 import net.jpountz.util.SafeUtils;
 
+import java.nio.ByteBuffer;
 
-import static net.jpountz.lz4.LZ4Constants.*;
+import static net.jpountz.lz4.LZ4Constants.COPY_LENGTH;
+import static net.jpountz.lz4.LZ4Constants.MIN_MATCH;
+import static net.jpountz.lz4.LZ4Constants.ML_BITS;
+import static net.jpountz.lz4.LZ4Constants.ML_MASK;
+import static net.jpountz.lz4.LZ4Constants.RUN_MASK;
 
 /**
  * Decompressor.

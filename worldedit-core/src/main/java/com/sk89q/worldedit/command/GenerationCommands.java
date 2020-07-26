@@ -18,16 +18,10 @@
  */
 
 package com.sk89q.worldedit.command;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
@@ -58,16 +52,23 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
+
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 /**
  * Commands for the generation of shapes and other objects.

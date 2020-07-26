@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.Resettable;
-import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 

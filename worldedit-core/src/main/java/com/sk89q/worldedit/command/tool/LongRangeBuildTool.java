@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -32,6 +31,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
@@ -39,8 +39,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
  */
 public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTool {
 
-    private Pattern primary;
-    private Pattern secondary;
+    private final Pattern primary;
+    private final Pattern secondary;
 
     public LongRangeBuildTool(Pattern secondary, Pattern primary) {
         super("worldedit.tool.lrbuild");
@@ -56,7 +56,9 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
-        if (pos == null) return false;
+        if (pos == null) {
+            return false;
+        }
         BlockBag bag = session.getBlockBag(player);
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
@@ -84,7 +86,9 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
-        if (pos == null) return false;
+        if (pos == null) {
+            return false;
+        }
         BlockBag bag = session.getBlockBag(player);
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {

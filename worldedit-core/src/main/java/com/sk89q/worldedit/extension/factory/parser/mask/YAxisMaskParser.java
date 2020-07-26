@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.function.mask.XAxisMask;
 import com.boydti.fawe.function.mask.YAxisMask;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;

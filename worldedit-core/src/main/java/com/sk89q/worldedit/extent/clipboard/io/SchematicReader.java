@@ -19,12 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.jnbt.streamer.InfoReader;
-import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
 import com.boydti.fawe.object.FaweInputStream;
@@ -48,8 +43,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -61,6 +54,9 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -68,8 +64,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Reads schematic files based that are compatible with MCEdit and other editors.

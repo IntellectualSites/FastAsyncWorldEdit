@@ -16,6 +16,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.FlatRegionFunction;
@@ -24,6 +25,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -41,7 +43,7 @@ import static org.bukkit.Bukkit.getWorld;
 
 public class FaweRegionManager extends RegionManager {
 
-    private RegionManager parent;
+    private final RegionManager parent;
 
     public FaweRegionManager(RegionManager parent) {
         this.parent = parent;
@@ -59,6 +61,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean setCuboids(final PlotArea area, final Set<CuboidRegion> regions, final Pattern blocks, final int minY, final int maxY) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CUBOIDS) {
+            return parent.setCuboids(area, regions, blocks, minY, maxY);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
@@ -80,7 +85,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean notifyClear(PlotManager manager) {
-        if (!(manager instanceof HybridPlotManager)) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         final HybridPlotWorld hpw = ((HybridPlotManager) manager).getHybridPlotWorld();
@@ -89,7 +94,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean handleClear(final Plot plot, final Runnable whenDone, final PlotManager manager) {
-        if (!(manager instanceof HybridPlotManager)) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         TaskManager.IMP.async(() -> {
@@ -108,21 +113,29 @@ public class FaweRegionManager extends RegionManager {
 
                     final Pattern filling = hybridPlotWorld.MAIN_BLOCK.toPattern();
                     final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
+                    final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
-                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3();
-                    BlockVector3 pos2 = plot.getExtendedTopAbs().getBlockVector3();
+                    BlockVector3 pos1 = BlockVector3.ZERO;
+                    BlockVector3 pos2 = BlockVector3.at(hybridPlotWorld.PLOT_WIDTH - 1, 255, hybridPlotWorld.PLOT_WIDTH - 1);
 
-                    Region bedrockRegion = new CuboidRegion(pos1.withY(0), pos2.withY(0));
+                    Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(0));
                     Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));
-                    Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT),
-                        pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
-                    Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
-                        pos2.withY(manager.getWorldHeight()));
+                    Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT), pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
+                    Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1), pos2.withY(manager.getWorldHeight()));
 
-                    editSession.setBlocks(bedrockRegion, bedrock);
-                    editSession.setBlocks(fillingRegion, filling);
-                    editSession.setBlocks(floorRegion, plotfloor);
-                    editSession.setBlocks(airRegion, air);
+                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1, pos2));
+
+                    clipboard.setBlocks(bedrockRegion, bedrock);
+                    clipboard.setBlocks(fillingRegion, filling);
+                    clipboard.setBlocks(floorRegion, plotfloor);
+                    clipboard.setBlocks(airRegion, air);
+                    for (int x = pos1.getX(); x <= pos2.getX(); x ++) {
+                        for (int z = pos1.getZ(); z <= pos2.getZ(); z ++) {
+                            clipboard.setBiome(BlockVector2.at(x, z), biome);
+                        }
+                    }
+
+                    clipboard.paste(editSession, plot.getBottomAbs().getBlockVector3().withY(0), true, false, true);
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
@@ -149,13 +162,15 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            parent.swap(pos1, pos2, pos3, pos4, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                    pos1World,-1);
+                WorldEdit.getInstance().getEditSessionFactory().getEditSession(pos1World,-1);
                 EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
@@ -177,6 +192,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.SET_BIOME) {
+            parent.setBiome(region, extendBiome, biome, world, whenDone);
+        }
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
@@ -197,6 +215,9 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean copyRegion(final Location pos1, final Location pos2, final Location pos3, final Runnable whenDone) {
+        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            return parent.copyRegion(pos1, pos2, pos3, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
@@ -222,11 +243,8 @@ public class FaweRegionManager extends RegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
-                try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false)
-                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
-                    CuboidRegion region = new CuboidRegion(
-                        BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
-                        BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+                try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                    CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
                     editSession.regenerate(region);
                     editSession.flushQueue();
                 }

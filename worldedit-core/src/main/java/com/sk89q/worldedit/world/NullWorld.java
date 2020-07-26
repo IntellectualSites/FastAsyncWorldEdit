@@ -20,10 +20,10 @@
 package com.sk89q.worldedit.world;
 
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.blocks.NullChunkGet;
-import com.sk89q.jnbt.CompoundTag;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -48,10 +48,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * A null implementation of {@link World} that drops all changes and

@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.util.function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Function;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Provides a Levenshtein distance between a given string and each string

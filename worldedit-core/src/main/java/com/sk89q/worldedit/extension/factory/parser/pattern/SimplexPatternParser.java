@@ -22,19 +22,7 @@ public class SimplexPatternParser extends RichParser<Pattern> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         if (index == 0) {
-            if (argumentInput.isEmpty()) {
-                return Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9");
-            }
-            // if already a valid number, suggest more digits
-            if (isDouble(argumentInput)) {
-                Stream<String> numbers = Stream.of("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-                if (argumentInput.indexOf('.') == -1) {
-                    numbers = Stream.concat(numbers, Stream.of("."));
-                }
-                return numbers.map(s -> argumentInput + s);
-            }
-            // no valid input anymore
-            return Stream.empty();
+            return suggestPositiveDoubles(argumentInput);
         }
         if (index == 1) {
             return worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
@@ -57,19 +45,5 @@ public class SimplexPatternParser extends RichParser<Pattern> {
         } else {
             throw new InputParseException("Pattern " + inner.getClass().getSimpleName() + " cannot be used with #simplex");
         }
-    }
-
-    private static boolean isDouble(String input) {
-        boolean point = false;
-        for (char c : input.toCharArray()) {
-            if (!Character.isDigit(c)) {
-                if (c == '.' && !point) {
-                    point = true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }

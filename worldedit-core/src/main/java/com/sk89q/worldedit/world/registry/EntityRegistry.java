@@ -23,9 +23,9 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import javax.annotation.Nullable;
 
 /**
  * Provides information on entities.

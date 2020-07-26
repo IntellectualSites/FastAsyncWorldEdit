@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
@@ -50,6 +48,8 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,7 +59,8 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Specifies an object that implements something suitable as a "clipboard."

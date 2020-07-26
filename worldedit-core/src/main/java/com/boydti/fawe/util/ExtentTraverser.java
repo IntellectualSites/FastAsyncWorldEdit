@@ -2,10 +2,9 @@ package com.boydti.fawe.util;
 
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-
-import org.jetbrains.annotations.NotNull;
 
 public class ExtentTraverser<T extends Extent> {
     private final T root;

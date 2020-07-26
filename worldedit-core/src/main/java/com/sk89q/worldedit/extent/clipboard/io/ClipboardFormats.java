@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
@@ -36,6 +34,7 @@ import com.google.common.io.Files;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +58,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class ClipboardFormats {
 
     private static final Map<String, ClipboardFormat> aliasMap = new HashMap<>();
@@ -73,7 +74,9 @@ public class ClipboardFormats {
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
-                WorldEdit.logger.warn(format.getClass().getName() + " cannot override existing alias '" + lowKey + "' used by " + old.getClass().getName());
+                WorldEdit.logger.warn(
+                    format.getClass().getName() + " cannot override existing alias '" + lowKey
+                        + "' used by " + old.getClass().getName());
             }
         }
         for (String ext : format.getFileExtensions()) {
@@ -124,6 +127,7 @@ public class ClipboardFormats {
 
     /**
      * Detect the format using the given extension
+     *
      * @param extension the extension
      * @return the format, otherwise null if one cannot be detected
      */
@@ -132,8 +136,8 @@ public class ClipboardFormats {
         checkNotNull(extension);
 
         Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
-        for(Map.Entry<String, ClipboardFormat> entry : entries) {
-            if(entry.getKey().equalsIgnoreCase(extension)) {
+        for (Map.Entry<String, ClipboardFormat> entry : entries) {
+            if (entry.getKey().equalsIgnoreCase(extension)) {
                 return entry.getValue();
             }
         }
@@ -142,6 +146,8 @@ public class ClipboardFormats {
     }
 
     /**
+     * A mapping from extensions to formats.
+     *
      * @return a multimap from a file extension to the potential matching formats.
      */
     public static Multimap<String, ClipboardFormat> getFileExtensionMap() {
@@ -170,21 +176,27 @@ public class ClipboardFormats {
         LocalConfiguration config = worldEdit.getConfiguration();
         if (input.startsWith("url:")) {
             if (!player.hasPermission("worldedit.schematic.load.web")) {
-                if (message) player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.web"));
+                if (message) {
+                    player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.web"));
+                }
                 return null;
             }
             URL base = new URL(Settings.IMP.WEB.URL);
-            input = new URL(base, "uploads/" + input.substring(4) + "." + format.getPrimaryFileExtension()).toString();
+            input = new URL(base, "uploads/" + input.substring(4) + "."
+                + format.getPrimaryFileExtension()).toString();
         }
         if (input.startsWith("http")) {
             return null;
         }
-        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
+        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+            && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find()
+            && !player.hasPermission("worldedit.schematic.load.other")) {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
             return null;
         }
         File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
+        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ?
+            new File(working, player.getUniqueId().toString()) : working;
         File f;
         if (input.startsWith("#")) {
             String[] extensions;
@@ -195,12 +207,18 @@ public class ClipboardFormats {
             }
             f = player.openFileOpenDialog(extensions);
             if (f == null || !f.exists()) {
-                if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                if (message) {
+                    player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                }
                 return null;
             }
         } else {
-            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
-                if (message) player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+                && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find()
+                && !player.hasPermission("worldedit.schematic.load.other")) {
+                if (message) {
+                    player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
+                }
                 return null;
             }
             if (format == null && input.matches(".*\\.[\\w].*")) {
@@ -216,18 +234,24 @@ public class ClipboardFormats {
             }
         }
         if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-            if (message) player.printError("Schematic " + input + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
+            if (message) {
+                player.printError(
+                    "Schematic " + input + " does not exist! (" + ((f != null) && f.exists()) + "|"
+                        + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
+            }
             return null;
         }
         if (format == null && f.isFile()) {
             format = findByFile(f);
             if (format == null) {
-                player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , f.getName()));
+                player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", f.getName()));
                 return null;
             }
         }
         if (!f.exists()) {
-            if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
+            if (message) {
+                player.print(Caption.of("fawe.error.schematic.not.found", input));
+            }
             return null;
         }
         if (!f.isDirectory()) {
@@ -237,7 +261,9 @@ public class ClipboardFormats {
         }
         URIClipboardHolder[] clipboards = loadAllFromDirectory(f);
         if (clipboards.length < 1) {
-            if (message) player.print(Caption.of("fawe.error.schematic.not.found" , input));
+            if (message) {
+                player.print(Caption.of("fawe.error.schematic.not.found", input));
+            }
             return null;
         }
         return new MultiClipboardHolder(f.toURI(), clipboards);
@@ -290,7 +316,9 @@ public class ClipboardFormats {
         LazyClipboardHolder[] arr = clipboards.toArray(new LazyClipboardHolder[0]);
         try {
             MultiClipboardHolder multi = new MultiClipboardHolder(url.toURI());
-            for (LazyClipboardHolder h : arr) multi.add(h);
+            for (LazyClipboardHolder h : arr) {
+                multi.add(h);
+            }
             return multi;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

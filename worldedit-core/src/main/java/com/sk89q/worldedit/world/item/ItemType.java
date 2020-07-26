@@ -29,7 +29,6 @@ import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.ItemMaterial;
 
 import javax.annotation.Nullable;

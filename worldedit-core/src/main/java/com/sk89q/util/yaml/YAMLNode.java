@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 
 /**
@@ -62,7 +61,7 @@ public class YAMLNode {
 
     /**
      * Gets a property at a location. This will either return an Object
-     * or null, with null meaning no configuration value exists at
+     * or null, with null meaning that no configuration value exists at
      * that location. This could potentially return a default value (not yet
      * implemented) as defined by a plugin, if this is a plugin-tied
      * configuration.
@@ -274,7 +273,9 @@ public class YAMLNode {
     public Vector3 getVector(String path, Vector3 def) {
         Vector3 v = getVector(path);
         if (v == null) {
-            if (writeDefaults) setProperty(path, def);
+            if (writeDefaults) {
+                setProperty(path, def);
+            }
             return def;
         }
         return v;
@@ -292,7 +293,9 @@ public class YAMLNode {
     public String getString(String path, String def) {
         String o = getString(path);
         if (o == null) {
-            if (writeDefaults) setProperty(path, def);
+            if (writeDefaults) {
+                setProperty(path, def);
+            }
             return def;
         }
         return o;
@@ -329,7 +332,9 @@ public class YAMLNode {
     public int getInt(String path, int def) {
         Integer o = castInt(getProperty(path));
         if (o == null) {
-            if (writeDefaults) setProperty(path, def);
+            if (writeDefaults) {
+                setProperty(path, def);
+            }
             return def;
         } else {
             return o;
@@ -367,7 +372,9 @@ public class YAMLNode {
     public double getDouble(String path, double def) {
         Double o = castDouble(getProperty(path));
         if (o == null) {
-            if (writeDefaults) setProperty(path, def);
+            if (writeDefaults) {
+                setProperty(path, def);
+            }
             return def;
         } else {
             return o;
@@ -403,7 +410,9 @@ public class YAMLNode {
     public boolean getBoolean(String path, boolean def) {
         Boolean o = castBoolean(getProperty(path));
         if (o == null) {
-            if (writeDefaults) setProperty(path, def);
+            if (writeDefaults) {
+                setProperty(path, def);
+            }
             return def;
         } else {
             return o;
@@ -419,7 +428,9 @@ public class YAMLNode {
      */
     @SuppressWarnings("unchecked")
     public List<String> getKeys(String path) {
-        if (path == null) return new ArrayList<>(root.keySet());
+        if (path == null) {
+            return new ArrayList<>(root.keySet());
+        }
         Object o = getProperty(path);
         if (o == null) {
             return null;
@@ -464,7 +475,9 @@ public class YAMLNode {
     public List<String> getStringList(String path, List<String> def) {
         List<Object> raw = getList(path);
         if (raw == null) {
-            if (writeDefaults && def != null) setProperty(path, def);
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
             return def != null ? def : new ArrayList<>();
         }
 
@@ -494,7 +507,9 @@ public class YAMLNode {
     public List<Integer> getIntList(String path, List<Integer> def) {
         List<Object> raw = getList(path);
         if (raw == null) {
-            if (writeDefaults && def != null) setProperty(path, def);
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
             return def != null ? def : new ArrayList<>();
         }
 
@@ -523,7 +538,9 @@ public class YAMLNode {
     public List<Double> getDoubleList(String path, List<Double> def) {
         List<Object> raw = getList(path);
         if (raw == null) {
-            if (writeDefaults && def != null) setProperty(path, def);
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
             return def != null ? def : new ArrayList<>();
         }
 
@@ -552,7 +569,9 @@ public class YAMLNode {
     public List<Boolean> getBooleanList(String path, List<Boolean> def) {
         List<Object> raw = getList(path);
         if (raw == null) {
-            if (writeDefaults && def != null) setProperty(path, def);
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
             return def != null ? def : new ArrayList<>();
         }
 
@@ -672,7 +691,9 @@ public class YAMLNode {
     public List<YAMLNode> getNodeList(String path, List<YAMLNode> def) {
         List<Object> raw = getList(path);
         if (raw == null) {
-            if (writeDefaults && def != null) setProperty(path, def);
+            if (writeDefaults && def != null) {
+                setProperty(path, def);
+            }
             return def != null ? def : new ArrayList<>();
         }
 

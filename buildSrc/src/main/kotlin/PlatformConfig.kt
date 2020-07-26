@@ -22,7 +22,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "idea")
     apply(plugin = "maven")
-    //apply(plugin = "checkstyle")
+//    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
     ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
@@ -34,7 +34,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 //    configure<CheckstyleExtension> {
 //        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-//        toolVersion = "7.6.1"
+//        toolVersion = "8.34"
 //    }
 
     tasks.withType<Test>().configureEach {

@@ -1,15 +1,16 @@
 package com.boydti.fawe.object.collection;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.io.serialize.Serialize;
 import com.boydti.fawe.util.MainUtil;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Records changes made through the {@link #setByte(int, byte)} or {@link #setInt(int, int)} method<br/>

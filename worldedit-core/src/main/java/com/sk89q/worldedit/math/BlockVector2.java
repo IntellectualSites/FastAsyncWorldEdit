@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.math;
 
 import com.sk89q.worldedit.math.transform.AffineTransform;
+
 import java.util.Comparator;
 
 /**

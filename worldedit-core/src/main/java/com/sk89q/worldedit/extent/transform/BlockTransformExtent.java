@@ -18,23 +18,6 @@
  */
 
 package com.sk89q.worldedit.extent.transform;
-import static com.sk89q.worldedit.util.Direction.ASCENDING_EAST;
-import static com.sk89q.worldedit.util.Direction.ASCENDING_NORTH;
-import static com.sk89q.worldedit.util.Direction.ASCENDING_SOUTH;
-import static com.sk89q.worldedit.util.Direction.ASCENDING_WEST;
-import static com.sk89q.worldedit.util.Direction.DOWN;
-import static com.sk89q.worldedit.util.Direction.EAST;
-import static com.sk89q.worldedit.util.Direction.Flag;
-import static com.sk89q.worldedit.util.Direction.NORTH;
-import static com.sk89q.worldedit.util.Direction.NORTHEAST;
-import static com.sk89q.worldedit.util.Direction.NORTHWEST;
-import static com.sk89q.worldedit.util.Direction.SOUTH;
-import static com.sk89q.worldedit.util.Direction.SOUTHEAST;
-import static com.sk89q.worldedit.util.Direction.SOUTHWEST;
-import static com.sk89q.worldedit.util.Direction.UP;
-import static com.sk89q.worldedit.util.Direction.WEST;
-import static com.sk89q.worldedit.util.Direction.findClosest;
-import static com.sk89q.worldedit.util.Direction.values;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.jnbt.ByteTag;
@@ -57,6 +40,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,10 +51,24 @@ import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-import com.sk89q.worldedit.world.block.BlockTypesCache;
-import org.jetbrains.annotations.NotNull;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_EAST;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_NORTH;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_SOUTH;
+import static com.sk89q.worldedit.util.Direction.ASCENDING_WEST;
+import static com.sk89q.worldedit.util.Direction.DOWN;
+import static com.sk89q.worldedit.util.Direction.EAST;
+import static com.sk89q.worldedit.util.Direction.Flag;
+import static com.sk89q.worldedit.util.Direction.NORTH;
+import static com.sk89q.worldedit.util.Direction.NORTHEAST;
+import static com.sk89q.worldedit.util.Direction.NORTHWEST;
+import static com.sk89q.worldedit.util.Direction.SOUTH;
+import static com.sk89q.worldedit.util.Direction.SOUTHEAST;
+import static com.sk89q.worldedit.util.Direction.SOUTHWEST;
+import static com.sk89q.worldedit.util.Direction.UP;
+import static com.sk89q.worldedit.util.Direction.WEST;
+import static com.sk89q.worldedit.util.Direction.findClosest;
+import static com.sk89q.worldedit.util.Direction.values;
 
 /**
  * Transforms blocks themselves (but not their position) according to a

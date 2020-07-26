@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.config.Settings;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;

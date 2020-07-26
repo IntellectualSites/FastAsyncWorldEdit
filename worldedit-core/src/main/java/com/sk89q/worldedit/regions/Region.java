@@ -35,7 +35,6 @@ import com.sk89q.worldedit.world.World;
 
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 
 /**

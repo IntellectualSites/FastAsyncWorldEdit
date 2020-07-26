@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -37,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A mask that checks whether blocks at the given positions are matched by

@@ -5,6 +5,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.session.ClipboardHolder;
+
 import java.util.List;
 
 public class ScrollClipboard extends Scroll {

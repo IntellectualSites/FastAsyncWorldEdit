@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+
 import java.util.Arrays;
 
 public class AngleMask extends SolidBlockMask implements ResettableMask {
@@ -58,7 +59,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected transient boolean lastValue;
 
     public int getHeight(Extent extent, int x, int y, int z) {
-//        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
+        //        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
         try {
             int rx = x - cacheBotX + 16;
             int rz = z - cacheBotZ + 16;
@@ -92,19 +93,33 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         double slope;
         boolean aboveMin;
         lastY = y;
-        slope = Math.abs(getHeight(extent, x + distance, y, z) - getHeight(extent, x -distance, y, z)) * ADJACENT_MOD;
+        slope =
+            Math.abs(getHeight(extent, x + distance, y, z) - getHeight(extent, x - distance, y, z))
+                * ADJACENT_MOD;
         if (checkFirst) {
             if (slope >= min) {
                 return lastValue = true;
             }
-            slope = Math.max(slope, Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(extent, x + distance, y, z + distance) - getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(extent, x - distance, y, z + distance) - getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance))
+                * ADJACENT_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
+                    x - distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
+                    x + distance, y, z - distance)) * DIAGONAL_MOD);
             return lastValue = (slope >= min);
         } else {
-            slope = Math.max(slope, Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(extent, x + distance, y, z + distance) - getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(getHeight(extent, x - distance, y, z + distance) - getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance))
+                * ADJACENT_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
+                    x - distance, y, z - distance)) * DIAGONAL_MOD);
+            slope = Math.max(slope, Math.abs(
+                getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
+                    x + distance, y, z - distance)) * DIAGONAL_MOD);
             return lastValue = (slope >= min && slope <= max);
         }
     }
@@ -142,14 +157,18 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
             int height = getHeight(extent, x, y, z);
-            if (y <= height) return overlay ? (lastValue && y == height) : lastValue;
+            if (y <= height) {
+                return overlay ? (lastValue && y == height) : lastValue;
+            }
         }
 
         if (!mask.test(extent, x, y, z)) {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !mask.test(extent, x, y + 1, z)) return lastValue = false;
+            if (y < 255 && !mask.test(extent, x, y + 1, z)) {
+                return lastValue = false;
+            }
         } else if (!adjacentAir(extent, vector)) {
             return false;
         }

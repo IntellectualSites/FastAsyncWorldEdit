@@ -1,10 +1,8 @@
 package com.boydti.fawe.bukkit.wrapper;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
-import java.util.function.Supplier;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
@@ -15,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class AsyncChunk implements Chunk {
 
@@ -68,11 +67,14 @@ public class AsyncChunk implements Chunk {
     }
 
     @Override
-    public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome, boolean includeBiomeTempRain) {
+    public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome,
+        boolean includeBiomeTempRain) {
         if (Fawe.isMainThread()) {
-            return world.getChunkAt(x, z).getChunkSnapshot(includeMaxblocky, includeBiome, includeBiomeTempRain);
+            return world.getChunkAt(x, z)
+                .getChunkSnapshot(includeMaxblocky, includeBiome, includeBiomeTempRain);
         }
-        return whenLoaded(() -> world.getChunkAt(x, z).getChunkSnapshot(includeBiome, includeBiome, includeBiomeTempRain));
+        return whenLoaded(() -> world.getChunkAt(x, z)
+            .getChunkSnapshot(includeBiome, includeBiome, includeBiomeTempRain));
     }
 
     private <T> T whenLoaded(Supplier<T> task) {

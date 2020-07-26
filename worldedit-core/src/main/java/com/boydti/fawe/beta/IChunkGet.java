@@ -2,13 +2,10 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.InputExtent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 

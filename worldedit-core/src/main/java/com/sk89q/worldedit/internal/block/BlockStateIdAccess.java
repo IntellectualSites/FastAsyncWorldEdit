@@ -23,9 +23,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import javax.annotation.Nullable;
 import java.util.BitSet;
 import java.util.OptionalInt;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
 

@@ -9,6 +9,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import java.io.InputStream;
 
 public class FlattenBrush extends HeightBrush {

@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.collection;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
-import org.jetbrains.annotations.NotNull;
 
 
 /**

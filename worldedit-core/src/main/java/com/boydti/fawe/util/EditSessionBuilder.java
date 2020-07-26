@@ -9,13 +9,22 @@ import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.HistoryExtent;
+import com.boydti.fawe.object.NullChangeSet;
+import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
-import com.boydti.fawe.object.extent.*;
+import com.boydti.fawe.object.extent.FaweRegionExtent;
+import com.boydti.fawe.object.extent.MultiRegionExtent;
+import com.boydti.fawe.object.extent.NullExtent;
+import com.boydti.fawe.object.extent.SingleRegionExtent;
+import com.boydti.fawe.object.extent.SlowExtent;
+import com.boydti.fawe.object.extent.StripNBTExtent;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -30,8 +39,8 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

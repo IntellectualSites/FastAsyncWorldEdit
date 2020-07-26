@@ -20,9 +20,10 @@
 package com.sk89q.worldedit.extent;
 
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -77,17 +78,48 @@ public interface InputExtent {
      *
      * @param position the (x, z) location to check the biome at
      * @return the biome at the location
+     * @deprecated Biomes in Minecraft are 3D now, use {@link InputExtent#getBiome(BlockVector3)}
      */
+    @Deprecated
     default BiomeType getBiome(BlockVector2 position) {
         return getBiomeType(position.getX(), 0, position.getZ());
     }
 
     default BiomeType getBiomeType(int x, int y, int z) {
-        return getBiome(MutableBlockVector2.get(x, z));
+        return getBiome(MutableBlockVector3.get(x, y, z));
     }
 
     /**
-     * Get the light level at the given location
+     * Get the biome at the given location.
+     *
+     * <p>
+     *     If there is no biome available, then the ocean biome should be
+     *     returned.
+     * </p>
+     *
+     * <p>
+     *     As implementation varies per Minecraft version, this may not exactly get
+     *     this positions biome. On versions prior to 1.15, this will get the entire
+     *     column. On later versions it will get the 4x4x4 cube's biome.
+     * </p>
+     *
+     * @param position the (x, y, z) location to check the biome at
+     * @return the biome at the location
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(
+        delegateName = "getBiome",
+        delegateParams = { BlockVector2.class }
+    )
+    default BiomeType getBiome(BlockVector3 position) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
+        return getBiome(position.toBlockVector2());
+    }
+
+    /**
+     * Get the light level at the given location.
      *
      * @param position location
      * @return the light level at the location
@@ -101,7 +133,7 @@ public interface InputExtent {
     }
 
     /**
-     * Get the sky light level at the given location
+     * Get the sky light level at the given location.
      *
      * @param position location
      * @return the sky light level at the location

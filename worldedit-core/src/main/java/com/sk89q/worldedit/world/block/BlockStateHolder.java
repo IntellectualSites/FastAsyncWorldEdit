@@ -23,17 +23,16 @@ import com.boydti.fawe.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
-
 import com.sk89q.worldedit.function.pattern.Pattern;
-import java.util.Locale;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
-import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 

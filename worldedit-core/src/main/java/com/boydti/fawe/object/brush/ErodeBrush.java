@@ -14,6 +14,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.util.Arrays;
 
 public class ErodeBrush implements Brush {

@@ -3,16 +3,20 @@ package com.boydti.fawe.configuration.file;
 import com.boydti.fawe.configuration.Configuration;
 import com.boydti.fawe.configuration.ConfigurationSection;
 import com.boydti.fawe.configuration.InvalidConfigurationException;
+import com.sk89q.worldedit.util.YAMLConfiguration;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.representer.Representer;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * An implementation of {@link com.boydti.fawe.configuration.Configuration} which saves all files in Yaml.
@@ -27,12 +31,16 @@ public class YamlConfiguration extends FileConfiguration {
 
     /**
      * Creates a new {@link com.boydti.fawe.configuration.file.YamlConfiguration}, loading from the given file.
+     *
      * <p>
      * Any errors loading the Configuration will be logged and then ignored.
      * If the specified input is not a valid config, a blank config will be
      * returned.
+     * </p>
+     *
      * <p>
      * The encoding used may follow the system dependent default.
+     * </p>
      *
      * @param file Input file
      * @return Resulting configuration
@@ -71,10 +79,12 @@ public class YamlConfiguration extends FileConfiguration {
 
     /**
      * Creates a new {@link com.boydti.fawe.configuration.file.YamlConfiguration}, loading from the given reader.
+     *
      * <p>
      * Any errors loading the Configuration will be logged and then ignored.
      * If the specified input is not a valid config, a blank config will be
      * returned.
+     * </p>
      *
      * @param reader input
      * @return resulting configuration
@@ -90,8 +100,7 @@ public class YamlConfiguration extends FileConfiguration {
         try {
             config.load(reader);
         } catch (final IOException | InvalidConfigurationException ex) {
-            System.out.println("Cannot load configuration from stream");
-            ex.printStackTrace();
+            getLogger(YAMLConfiguration.class).error("Cannot load configuration from stream", ex);
         }
 
         return config;

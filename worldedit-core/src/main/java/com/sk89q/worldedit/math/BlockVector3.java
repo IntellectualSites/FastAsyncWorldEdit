@@ -18,20 +18,21 @@
  */
 
 package com.sk89q.worldedit.math;
-import static com.sk89q.worldedit.math.BitMath.mask;
-import static com.sk89q.worldedit.math.BitMath.unpackX;
-import static com.sk89q.worldedit.math.BitMath.unpackY;
-import static com.sk89q.worldedit.math.BitMath.unpackZ;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-
-import static com.google.common.base.Preconditions.checkArgument;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import java.util.Comparator;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.math.BitMath.mask;
+import static com.sk89q.worldedit.math.BitMath.unpackX;
+import static com.sk89q.worldedit.math.BitMath.unpackY;
+import static com.sk89q.worldedit.math.BitMath.unpackZ;
 
 /**
  * An immutable 3-dimensional vector.

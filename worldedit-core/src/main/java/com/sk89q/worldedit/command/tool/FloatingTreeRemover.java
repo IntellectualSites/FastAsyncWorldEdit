@@ -19,9 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -32,24 +30,26 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Set;
 
 /**
  * A pickaxe mode that removes floating treetops (logs and leaves not connected
- * to anything else)
+ * to anything else).
  */
 public class FloatingTreeRemover implements BlockTool {
-    private int rangeSq;
+    private final int rangeSq;
 
     public FloatingTreeRemover() {
-        rangeSq = 100*100;
+        rangeSq = 100 * 100;
     }
 
     @Override
@@ -68,7 +68,8 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-            Player player, LocalSession session, Location clicked) {
+                              Player player, LocalSession session, Location clicked,
+                              @Nullable Direction face) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
@@ -102,7 +103,7 @@ public class FloatingTreeRemover implements BlockTool {
         return true;
     }
 
-    private BlockVector3[] recurseDirections = {
+    private final BlockVector3[] recurseDirections = {
             Direction.NORTH.toBlockVector(),
             Direction.EAST.toBlockVector(),
             Direction.SOUTH.toBlockVector(),
@@ -139,7 +140,8 @@ public class FloatingTreeRemover implements BlockTool {
 
                     if (visited.add(next)) {
                         BlockState state = world.getBlock(next);
-                        if (state.getBlockType().getMaterial().isAir() || state.getBlockType() == BlockTypes.SNOW) {
+                        if (state.getBlockType().getMaterial().isAir()
+                            || state.getBlockType() == BlockTypes.SNOW) {
                             continue;
                         }
                         if (isTreeBlock(state.getBlockType())) {
@@ -147,7 +149,8 @@ public class FloatingTreeRemover implements BlockTool {
                         } else {
                             // we hit something solid - evaluate where we came from
                             final BlockType currentType = world.getBlock(current).getBlockType();
-                            if (!BlockCategories.LEAVES.contains(currentType) && currentType != BlockTypes.VINE) {
+                            if (!BlockCategories.LEAVES.contains(currentType)
+                                && currentType != BlockTypes.VINE) {
                                 // log/shroom touching a wall/the ground => this is not a floating tree, bail out
                                 return null;
                             }

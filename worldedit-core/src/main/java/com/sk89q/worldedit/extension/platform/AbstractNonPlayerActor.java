@@ -65,8 +65,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
 
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
-    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
-    (thread, throwable) -> {
+    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue((thread, throwable) -> {
         while (throwable.getCause() != null) {
             throwable = throwable.getCause();
         }
@@ -83,11 +82,11 @@ public abstract class AbstractNonPlayerActor implements Actor {
     });
 
     /**
-     * Run a task either async, or on the current thread
+     * Run a task either async, or on the current thread.
      *
-     * @param ifFree
+     * @param ifFree the task to run if free
      * @param checkFree Whether to first check if a task is running
-     * @param async
+     * @param async TODO Description
      * @return false if the task was ran or queued
      */
     @Override

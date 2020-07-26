@@ -19,17 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.boydti.fawe.util.ReflectionUtils.as;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.config.Caption;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.MathMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -57,11 +52,21 @@ import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -69,8 +74,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static com.google.common.base.Preconditions.checkArgument;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -86,14 +89,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.boydti.fawe.util.ReflectionUtils.as;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 //import com.boydti.fawe.object.schematic.visualizer.SchemVis;
 

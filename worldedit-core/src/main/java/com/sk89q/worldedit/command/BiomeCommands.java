@@ -19,17 +19,14 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
-import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -51,20 +48,24 @@ import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
-import java.util.List;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 /**
  * Implements biome-related commands such as "/biomelist".
@@ -88,30 +89,29 @@ public class BiomeCommands {
                           @ArgFlag(name = 'p', desc = "Page number.", def = "1")
                               int page) {
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
-                    .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
+            BiomeRegistry biomeRegistry =
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries().getBiomeRegistry();
 
-            PaginationBox paginationBox = PaginationBox.fromStrings("Available Biomes", "/biomelist -p %page%",
-                    BiomeType.REGISTRY.values().stream()
-                            .map(biomeType -> {
-                                String id = biomeType.getId();
-                                final BiomeData data = biomeRegistry.getData(biomeType);
-                                if (data != null) {
-                                    String name = data.getName();
-                                    return id + " (" + name + ")";
-                                } else {
-                                    return id;
-                                }
-                            })
-                            .collect(Collectors.toList()));
-             return paginationBox.create(page);
+            PaginationBox paginationBox = PaginationBox
+                .fromStrings("Available Biomes", "/biomelist -p %page%",
+                    BiomeType.REGISTRY.values().stream().map(biomeType -> {
+                        String id = biomeType.getId();
+                        final BiomeData data = biomeRegistry.getData(biomeType);
+                        if (data != null) {
+                            String name = data.getName();
+                            return id + " (" + name + ")";
+                        } else {
+                            return id;
+                        }
+                    }).collect(Collectors.toList()));
+            return paginationBox.create(page);
         }, (Component) null);
     }
 
     @Command(
         name = "biomeinfo",
         desc = "Get the biome of the targeted block.",
-        aliases = { "/biomeinfo" },
         descFooter = "By default, uses all blocks in your selection."
     )
     @CommandPermissions("worldedit.biome.info")

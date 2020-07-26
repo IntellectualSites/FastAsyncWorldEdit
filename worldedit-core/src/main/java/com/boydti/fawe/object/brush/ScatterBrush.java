@@ -10,13 +10,14 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -51,7 +52,7 @@ public class ScatterBrush implements Brush {
 
         final int distance = Math.min((int) size, this.distance);
 
-        RecursiveVisitor visitor = new RecursiveVisitor(new MaskUnion(radius, surface).withExtent(editSession), function -> true);
+        RecursiveVisitor visitor = new RecursiveVisitor(new MaskIntersection(radius, surface).withExtent(editSession), function -> true);
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);

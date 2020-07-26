@@ -2,6 +2,7 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
+
 import javax.annotation.Nullable;
 
 public interface IDelegateFilter extends Filter {

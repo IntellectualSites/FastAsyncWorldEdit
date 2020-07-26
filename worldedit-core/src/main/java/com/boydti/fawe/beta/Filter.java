@@ -1,10 +1,10 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
+
+import javax.annotation.Nullable;
 
 /**
  * A filter is an interface used for setting blocks.

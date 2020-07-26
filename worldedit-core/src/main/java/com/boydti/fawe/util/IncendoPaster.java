@@ -6,14 +6,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sk89q.worldedit.util.paste.Paster;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -230,7 +241,7 @@ public final class IncendoPaster implements Paster {
         b.append("OS Arch: ").append(System.getProperty("os.arch")).append('\n');
         b.append("# Okay :D Great. You are now ready to create your bug report!");
         b.append("\n# You can do so at https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
-        b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
+        b.append("\n# or via our Discord at https://discord.gg/KxkjDVg");
         incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
 
         try {

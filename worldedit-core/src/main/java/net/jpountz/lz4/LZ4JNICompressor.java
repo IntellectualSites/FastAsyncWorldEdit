@@ -14,11 +14,11 @@ package net.jpountz.lz4;
  * limitations under the License.
  */
 
+import java.nio.ByteBuffer;
+
 import static net.jpountz.util.ByteBufferUtils.checkNotReadOnly;
 import static net.jpountz.util.ByteBufferUtils.checkRange;
 import static net.jpountz.util.SafeUtils.checkRange;
-
-import java.nio.ByteBuffer;
 
 /**
  * Fast {@link LZ4Compressor} implemented with JNI bindings to the original C

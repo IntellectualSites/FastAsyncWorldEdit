@@ -1,7 +1,5 @@
 package com.boydti.fawe.util;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.filter.block.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
@@ -9,7 +7,6 @@ import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -21,6 +18,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +42,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 // TODO FIXME
 public class TextureUtil implements TextureHolder {

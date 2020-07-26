@@ -21,8 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
-import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
@@ -37,11 +35,18 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
+import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
-import com.sk89q.worldedit.util.formatting.component.MessageBox;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -52,11 +57,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
 
 @CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
 public class WorldEditCommands {
@@ -77,7 +77,7 @@ public class WorldEditCommands {
     public void version(Actor actor) {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92"));
+        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
 		
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();

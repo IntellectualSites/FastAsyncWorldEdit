@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation.filter;
 
 import com.boydti.fawe.beta.Filter;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

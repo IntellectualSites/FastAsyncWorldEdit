@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.history.changeset;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -31,6 +29,8 @@ import com.sk89q.worldedit.regions.Region;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores all {@link Change}s in an {@link ArrayList}.

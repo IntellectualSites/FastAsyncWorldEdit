@@ -20,17 +20,15 @@
 package com.sk89q.worldedit.util.time;
 
 import com.google.common.collect.Streams;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.io.file.MorePaths;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nullable;
 
 /**
  * Parses date-times by looking at the file name. File names without a time

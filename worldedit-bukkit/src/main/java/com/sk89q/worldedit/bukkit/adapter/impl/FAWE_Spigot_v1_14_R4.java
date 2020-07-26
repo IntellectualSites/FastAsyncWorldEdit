@@ -406,10 +406,11 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
                     SingleThreadQueueExtent extent = new SingleThreadQueueExtent();
                     extent.init(null, (x, z) -> new BukkitGetBlocks_1_14(freshWorld, x, z) {
                         @Override
-                        public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-                            Chunk cached = nmsWorld.getChunkIfLoaded(X, Z);
+                        public Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
+                            Chunk cached = nmsWorld.getChunkIfLoaded(chunkX, chunkZ);
                             if (cached != null) return cached;
-                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
+                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(
+                                chunkX, chunkZ));
                             while (!future.isDone()) {
                                 // this feels so dirty
                                 freshWorld.getChunkProvider().runTasks();

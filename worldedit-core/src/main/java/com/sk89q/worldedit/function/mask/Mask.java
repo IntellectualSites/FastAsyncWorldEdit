@@ -26,8 +26,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.request.Request;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
 
 /**

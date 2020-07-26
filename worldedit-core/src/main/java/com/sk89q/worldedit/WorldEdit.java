@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.sk89q.worldedit.event.platform.Interaction.HIT;
-import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
-
+import com.google.common.base.Throwables;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -44,6 +44,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.internal.expression.invoke.ReturnException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
@@ -68,6 +69,9 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,8 +88,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.event.platform.Interaction.HIT;
+import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
 
 /**
  * The entry point and container for a working implementation of WorldEdit.
@@ -111,8 +116,7 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
-            EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
     private final TranslationManager translationManager = new TranslationManager(this);
 
@@ -288,7 +292,9 @@ public final class WorldEdit {
      * @throws FilenameException thrown if the filename is invalid
      */
     private File getSafeFile(@Nullable Actor actor, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
-        if (extensions != null && (extensions.length == 1 && extensions[0] == null)) extensions = null;
+        if (extensions != null && (extensions.length == 1 && extensions[0] == null)) {
+            extensions = null;
+        }
 
         File f;
 
@@ -388,7 +394,7 @@ public final class WorldEdit {
      * Checks to see if the specified radius is within bounds.
      *
      * @param radius the radius
-     * @throws MaxRadiusException
+     * @throws MaxRadiusException if the radius is bigger than the configured radius
      */
     public void checkMaxRadius(double radius) throws MaxRadiusException {
         if (getConfiguration().maxRadius > 0 && radius > getConfiguration().maxRadius) {
@@ -400,7 +406,7 @@ public final class WorldEdit {
      * Checks to see if the specified brush radius is within bounds.
      *
      * @param radius the radius
-     * @throws MaxBrushRadiusException
+     * @throws MaxBrushRadiusException if the radius is bigger than the configured radius
      */
     public void checkMaxBrushRadius(double radius) throws MaxBrushRadiusException {
         if (getConfiguration().maxBrushRadius > 0 && radius > getConfiguration().maxBrushRadius) {
@@ -474,6 +480,38 @@ public final class WorldEdit {
         throw new UnknownDirectionException(dir.name());
     }
 
+    private static final Map<String, Direction> NAME_TO_DIRECTION_MAP;
+
+    static {
+        SetMultimap<Direction, String> directionNames = HashMultimap.create();
+        for (Direction direction : Direction.valuesOf(
+            Direction.Flag.CARDINAL | Direction.Flag.UPRIGHT
+        )) {
+            String name = direction.name().toLowerCase(Locale.ROOT);
+            for (int i = 1; i <= name.length(); i++) {
+                directionNames.put(direction, name.substring(0, i));
+            }
+        }
+        ImmutableMap.Builder<String, Direction> nameToDirectionMap = ImmutableMap.builder();
+        for (Direction direction : directionNames.keySet()) {
+            directionNames.get(direction).forEach(name ->
+                nameToDirectionMap.put(name, direction)
+            );
+        }
+        for (Direction direction : ImmutableList.of(Direction.NORTH, Direction.SOUTH)) {
+            for (Direction diagonal : ImmutableList.of(Direction.WEST, Direction.EAST)) {
+                for (String dirName : directionNames.get(direction)) {
+                    for (String diagName : directionNames.get(diagonal)) {
+                        nameToDirectionMap.put(dirName + diagName, Direction.valueOf(
+                            direction.name() + diagonal.name()
+                        ));
+                    }
+                }
+            }
+        }
+        NAME_TO_DIRECTION_MAP = nameToDirectionMap.build();
+    }
+
     /**
      * Get the direction vector for a player's direction.
      *
@@ -483,68 +521,32 @@ public final class WorldEdit {
      * @throws UnknownDirectionException thrown if the direction is not known, or a relative direction is used with null player
      */
     private Direction getPlayerDirection(@Nullable Player player, String dirStr) throws UnknownDirectionException {
-        final Direction dir;
-
-        switch (dirStr.charAt(0)) {
-        case 'w':
-            dir = Direction.WEST;
-            break;
-
-        case 'e':
-            dir = Direction.EAST;
-            break;
-
-        case 's':
-            if (dirStr.indexOf('w') > 0) {
-                return Direction.SOUTHWEST;
-            }
-
-            if (dirStr.indexOf('e') > 0) {
-                return Direction.SOUTHEAST;
-            }
-            dir = Direction.SOUTH;
-            break;
-
-        case 'n':
-            if (dirStr.indexOf('w') > 0) {
-                return Direction.NORTHWEST;
-            }
-
-            if (dirStr.indexOf('e') > 0) {
-                return Direction.NORTHEAST;
-            }
-            dir = Direction.NORTH;
-            break;
-
-        case 'u':
-            dir = Direction.UP;
-            break;
-
-        case 'd':
-            dir = Direction.DOWN;
-            break;
-
-        case 'm': // me
-        case 'f': // forward
-            dir = getDirectionRelative(player, 0);
-            break;
-
-        case 'b': // back
-            dir = getDirectionRelative(player, 180);
-            break;
-
-        case 'l': // left
-            dir = getDirectionRelative(player, -90);
-            break;
-
-        case 'r': // right
-            dir = getDirectionRelative(player, 90);
-            break;
-
-        default:
-            throw new UnknownDirectionException(dirStr);
+        Direction byName = NAME_TO_DIRECTION_MAP.get(dirStr);
+        if (byName != null) {
+            return byName;
         }
-        return dir;
+        switch (dirStr) {
+            case "m":
+            case "me":
+            case "f":
+            case "forward":
+                return getDirectionRelative(player, 0);
+
+            case "b":
+            case "back":
+                return getDirectionRelative(player, 180);
+
+            case "l":
+            case "left":
+                return getDirectionRelative(player, -90);
+
+            case "r":
+            case "right":
+                return getDirectionRelative(player, 90);
+
+            default:
+                throw new UnknownDirectionException(dirStr);
+        }
     }
 
     private Direction getDirectionRelative(Player player, int yawOffset) throws UnknownDirectionException {
@@ -622,8 +624,21 @@ public final class WorldEdit {
      * @param clicked the clicked block
      * @return false if you want the action to go through
      */
+    @Deprecated
     public boolean handleBlockRightClick(Player player, Location clicked) {
-        BlockInteractEvent event = new BlockInteractEvent(player, clicked, OPEN);
+        return handleBlockRightClick(player, clicked, null);
+    }
+
+    /**
+     * Called on right click.
+     *
+     * @param player the player
+     * @param clicked the clicked block
+     * @param face The clicked face
+     * @return false if you want the action to go through
+     */
+    public boolean handleBlockRightClick(Player player, Location clicked, @Nullable Direction face) {
+        BlockInteractEvent event = new BlockInteractEvent(player, clicked, face, OPEN);
         getEventBus().post(event);
         return event.isCancelled();
     }
@@ -635,8 +650,21 @@ public final class WorldEdit {
      * @param clicked the clicked block
      * @return false if you want the action to go through
      */
+    @Deprecated
     public boolean handleBlockLeftClick(Player player, Location clicked) {
-        BlockInteractEvent event = new BlockInteractEvent(player, clicked, HIT);
+        return handleBlockLeftClick(player, clicked, null);
+    }
+
+    /**
+     * Called on left click.
+     *
+     * @param player the player
+     * @param clicked the clicked block
+     * @param face The clicked face
+     * @return false if you want the action to go through
+     */
+    public boolean handleBlockLeftClick(Player player, Location clicked, @Nullable Direction face) {
+        BlockInteractEvent event = new BlockInteractEvent(player, clicked, face, HIT);
         getEventBus().post(event);
         return event.isCancelled();
     }
@@ -708,8 +736,11 @@ public final class WorldEdit {
         try {
             engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
-            player.printError(TranslatableComponent.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
-            logger.warn("Failed to execute script", e);
+            // non-exceptional return check
+            if (!(Throwables.getRootCause(e) instanceof ReturnException)) {
+                player.printError(TranslatableComponent.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
+                logger.warn("Failed to execute script", e);
+            }
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {

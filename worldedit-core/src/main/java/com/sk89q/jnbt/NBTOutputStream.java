@@ -21,8 +21,6 @@ package com.sk89q.jnbt;
 
 import com.boydti.fawe.object.io.LittleEndianOutputStream;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -32,13 +30,17 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * This class writes <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * {@code Tag} objects to an underlying {@code OutputStream}.
  *
- * <p>The NBT format was created by Markus Persson, and the specification may be
- * found at <a href="http://www.minecraft.net/docs/NBT.txt">
- * http://www.minecraft.net/docs/NBT.txt</a>.</p>
+ * <p>
+ * The NBT format was created by Markus Persson, and the specification may be
+ * found at <a href="https://minecraft.gamepedia.com/NBT_format">
+ * https://minecraft.gamepedia.com/NBT_format</a>.
+ * </p>
  */
 public final class NBTOutputStream extends OutputStream implements Closeable, DataOutput {
 
@@ -167,12 +169,12 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     public void writeNamedTagName(String name, int type) throws IOException {
-//        byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
+        //        byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
 
         os.writeByte(type);
         os.writeUTF(name);
-//        os.writeShort(nameBytes.length);
-//        os.write(nameBytes);
+        //        os.writeShort(nameBytes.length);
+        //        os.write(nameBytes);
     }
 
     public void writeLazyCompoundTag(String name, LazyWrite next) throws IOException {

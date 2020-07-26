@@ -32,11 +32,13 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -45,8 +47,8 @@ import java.util.Set;
  */
 public class FloodFillTool implements BlockTool {
 
-    private int range;
-    private Pattern pattern;
+    private final int range;
+    private final Pattern pattern;
 
     public FloodFillTool(int range, Pattern pattern) {
         this.range = range;
@@ -59,7 +61,7 @@ public class FloodFillTool implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
         World world = (World) clicked.getExtent();
 
         BlockVector3 origin = clicked.toVector().toBlockPoint();

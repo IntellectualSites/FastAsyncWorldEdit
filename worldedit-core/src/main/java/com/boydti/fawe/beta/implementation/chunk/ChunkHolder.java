@@ -19,11 +19,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.jetbrains.annotations.Range;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks

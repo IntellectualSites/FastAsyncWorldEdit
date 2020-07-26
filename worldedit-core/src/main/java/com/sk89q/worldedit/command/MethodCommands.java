@@ -1,9 +1,10 @@
 package com.sk89q.worldedit.command;
 
 import com.sk89q.worldedit.command.argument.Arguments;
-import java.util.Optional;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
+
+import java.util.Optional;
 
 public class MethodCommands {
 

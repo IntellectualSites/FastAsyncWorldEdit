@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.object.random.SimpleRandom;
+
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;

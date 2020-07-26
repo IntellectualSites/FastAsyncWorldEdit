@@ -31,9 +31,9 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrappedException;
 
-import javax.script.ScriptException;
 import java.io.StringReader;
 import java.util.Map;
+import javax.script.ScriptException;
 
 public class RhinoCraftScriptEngine implements CraftScriptEngine {
 

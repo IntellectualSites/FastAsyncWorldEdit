@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 

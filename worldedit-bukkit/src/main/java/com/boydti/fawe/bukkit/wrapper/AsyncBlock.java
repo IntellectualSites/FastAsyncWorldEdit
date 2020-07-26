@@ -9,10 +9,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import java.util.Collections;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,8 +29,8 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import org.jetbrains.annotations.Nullable;
 
 public class AsyncBlock implements Block {
 
@@ -72,27 +70,33 @@ public class AsyncBlock implements Block {
         return world.getBlock(x, y, z).getBlockType().getInternalId();
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncBlock getRelative(int modX, int modY, int modZ) {
         return new AsyncBlock(world, x + modX, y + modY, z + modZ);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncBlock getRelative(BlockFace face) {
         return this.getRelative(face.getModX(), face.getModY(), face.getModZ());
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncBlock getRelative(BlockFace face, int distance) {
-        return this.getRelative(face.getModX() * distance, face.getModY() * distance, face.getModZ() * distance);
+        return this.getRelative(face.getModX() * distance, face.getModY() * distance,
+            face.getModZ() * distance);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Material getType() {
         return getBlockData().getMaterial();
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public BlockData getBlockData() {
         return BukkitAdapter.adapt(world.getBlock(x, y, z));
     }
@@ -137,7 +141,8 @@ public class AsyncBlock implements Block {
         return (byte) 15;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncWorld getWorld() {
         return world;
     }
@@ -157,14 +162,15 @@ public class AsyncBlock implements Block {
         return z;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Location getLocation() {
         return new Location(world, x, y, z);
     }
 
     @Override
     public Location getLocation(Location loc) {
-        if(loc != null) {
+        if (loc != null) {
             loc.setWorld(this.getWorld());
             loc.setX(this.x);
             loc.setY(this.y);
@@ -173,7 +179,8 @@ public class AsyncBlock implements Block {
         return loc;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncChunk getChunk() {
         return world.getChunkAt(x >> 4, z >> 4);
     }
@@ -219,7 +226,8 @@ public class AsyncBlock implements Block {
         return null;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public AsyncBlockState getState() {
         BaseBlock state = world.getFullBlock(x, y, z);
         switch (state.getBlockType().getInternalId()) {
@@ -247,7 +255,8 @@ public class AsyncBlock implements Block {
         return getState();
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Biome getBiome() {
         return world.getAdapter().adapt(world.getBiomeType(x, y, z));
     }
@@ -339,13 +348,15 @@ public class AsyncBlock implements Block {
     public boolean breakNaturally(@NotNull ItemStack tool, boolean value) {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
     }
-    
-    @NotNull @Override
+
+    @NotNull
+    @Override
     public Collection<ItemStack> getDrops() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops());
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Collection<ItemStack> getDrops(@NotNull ItemStack tool) {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops(tool));
     }
@@ -355,7 +366,8 @@ public class AsyncBlock implements Block {
         this.getUnsafeBlock().setMetadata(metadataKey, newMetadataValue);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public List<MetadataValue> getMetadata(@NotNull String metadataKey) {
         return this.getUnsafeBlock().getMetadata(metadataKey);
     }
@@ -376,11 +388,13 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public RayTraceResult rayTrace(@NotNull Location arg0, @NotNull Vector arg1, double arg2, @NotNull FluidCollisionMode arg3) {
+    public RayTraceResult rayTrace(@NotNull Location arg0, @NotNull Vector arg1, double arg2,
+        @NotNull FluidCollisionMode arg3) {
         return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public BoundingBox getBoundingBox() {
         return this.getUnsafeBlock().getBoundingBox();
     }

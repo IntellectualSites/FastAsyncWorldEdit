@@ -2,6 +2,7 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
+
 import java.util.Arrays;
 
 public class ExtentHeightCacher extends PassthroughExtent {

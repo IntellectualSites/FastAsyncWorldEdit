@@ -51,10 +51,10 @@ version = String.format("%s-%s", rootVersion, buildNumber)
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
     ext["gitCommitHash"] = try {
-        (ext["grgit"] as Grgit?)?.head()?.abbreviatedId
+        extensions.getByName<Grgit>("grgit").head()?.abbreviatedId
     } catch (e: Exception) {
         logger.warn("Error getting commit hash", e)
 
-        "no_git_id"
+        "no.git.id"
     }
 }

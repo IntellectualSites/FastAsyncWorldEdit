@@ -5,7 +5,6 @@
 //import com.boydti.fawe.beta.IChunk;
 //import com.boydti.fawe.beta.IQueueExtent;
 //import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 //import com.boydti.fawe.object.*;
 //import com.boydti.fawe.object.brush.visualization.ImmutableVirtualWorld;
 //import com.boydti.fawe.object.clipboard.LazyClipboardHolder;

@@ -5,8 +5,8 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.entity.EntityType;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 
 public class LazyBaseEntity extends BaseEntity {
     private Supplier<CompoundTag> saveTag;

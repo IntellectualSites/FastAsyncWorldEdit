@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.regions.plotsquaredv4;
 
 import static org.bukkit.Bukkit.getWorld;
 
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
@@ -49,6 +50,9 @@ public class FaweChunkManager extends ChunkManager {
 
     @Override
     public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
+        if (!Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            parent.swap(pos1, pos2, pos3, pos4, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweChunkManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
@@ -77,6 +81,9 @@ public class FaweChunkManager extends ChunkManager {
 
     @Override
     public boolean copyRegion(final Location pos1, final Location pos2, final Location pos3, final Runnable whenDone) {
+        if (!Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+            return parent.copyRegion(pos1, pos2, pos3, whenDone);
+        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));

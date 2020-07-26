@@ -2,6 +2,7 @@ package com.boydti.fawe.config;
 
 import com.boydti.fawe.object.FaweLimit;
 import com.sk89q.worldedit.extension.platform.Actor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +15,6 @@ public class Settings extends Config {
 
     @Ignore
     public boolean PROTOCOL_SUPPORT_FIX = false;
-    @Ignore
-    public boolean PLOTSQUARED_HOOK = true;
 
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
@@ -47,6 +46,8 @@ public class Settings extends Config {
     public int MAX_MEMORY_PERCENT = 95;
 
     @Create
+    public ENABLED_COMPONENTS ENABLED_COMPONENTS;
+    @Create
     public CLIPBOARD CLIPBOARD;
     @Create
     public LIGHTING LIGHTING;
@@ -54,6 +55,8 @@ public class Settings extends Config {
     public TICK_LIMITER TICK_LIMITER;
     @Create
     public WEB WEB;
+    @Create
+    public PLOTSQUARED_INTEGRATION PLOTSQUARED_INTEGRATION;
     @Create
     public EXTENT EXTENT;
     @Create
@@ -67,11 +70,16 @@ public class Settings extends Config {
     @Create
     public REGION_RESTRICTIONS_OPTIONS REGION_RESTRICTIONS_OPTIONS;
     @Create
-    public ENABLED_COMPONENTS ENABLED_COMPONENTS;
+    public ConfigBlock<LIMITS> LIMITS;
 
     @Comment("Enable or disable core components")
     public static final class ENABLED_COMPONENTS {
         public boolean COMMANDS = true;
+        @Comment({
+            "Disable the FAWE-PlotSquared hook to take over most intense P2 queueing",
+            "Specific aspects can be turned on and off further below"
+        })
+        public boolean PLOTSQUARED_HOOK = true;
     }
 
     @Comment("Paths for various directories")
@@ -102,10 +110,6 @@ public class Settings extends Config {
         })
         public String MODE = "MEMBER";
     }
-
-
-    @Create // This value will be generated automatically
-    public ConfigBlock<LIMITS> LIMITS;
 
     @Comment({
             "The \"default\" limit group affects those without a specific limit permission.",
@@ -386,6 +390,13 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
+    }
+
+    public static class PLOTSQUARED_INTEGRATION {
+        public boolean CLEAR = true;
+        public boolean CUBOIDS = true;
+        public boolean COPY_AND_SWAP = true;
+        public boolean SET_BIOME = true;
     }
 
     public static class WEB {

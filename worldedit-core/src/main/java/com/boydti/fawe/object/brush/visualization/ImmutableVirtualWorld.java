@@ -13,6 +13,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
+
 import javax.annotation.Nullable;
 
 public abstract class ImmutableVirtualWorld implements VirtualWorld {

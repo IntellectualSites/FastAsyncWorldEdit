@@ -5,7 +5,6 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -24,7 +23,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.*;
+import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -34,9 +37,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 public class WorldWrapper extends AbstractWorld {
 

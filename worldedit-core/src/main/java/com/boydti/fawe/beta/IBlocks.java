@@ -11,11 +11,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
+import org.jetbrains.annotations.Range;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
-import org.jetbrains.annotations.Range;
 
 /**
  * A shared interface for IGetBlocks and ISetBlocks

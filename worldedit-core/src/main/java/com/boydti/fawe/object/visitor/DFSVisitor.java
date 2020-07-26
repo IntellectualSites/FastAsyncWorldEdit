@@ -11,6 +11,7 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;

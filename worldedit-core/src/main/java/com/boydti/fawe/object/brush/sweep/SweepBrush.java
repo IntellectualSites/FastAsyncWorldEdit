@@ -20,6 +20,7 @@ import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
