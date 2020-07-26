@@ -37,11 +37,6 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        getExtent().removeEntity(x, y, z, uuid);
-    }
-
-    @Override
     public boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
         return getExtent().regenerateChunk(x, z, type, seed);
     }

@@ -269,7 +269,6 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
 
     private void removeEntity(Entity entity) {
         entity.die();
-        entity.valid = false;
     }
 
     public Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
@@ -449,17 +448,12 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                             if (type != null) {
                                 Entity entity = type.a(nmsWorld);
                                 if (entity != null) {
-                                    UUID uuid = entity.getUniqueID();
-                                    entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
-                                    entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
-                                    if (nativeTag != null) {
-                                        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-                                        final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
-                                        for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                            tag.remove(name);
-                                        }
-                                        entity.f(tag);
+                                    BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+                                    final NBTTagCompound tag = (NBTTagCompound) adapter.fromNative(nativeTag);
+                                    for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                        tag.remove(name);
                                     }
+                                    entity.f(tag);
                                     entity.setLocation(x, y, z, yaw, pitch);
                                     nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }

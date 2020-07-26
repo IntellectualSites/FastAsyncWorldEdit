@@ -4,7 +4,10 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.IntArrayTag;
+import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
@@ -16,8 +19,10 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.jetbrains.annotations.Range;
 
 public interface IChunkExtent<T extends IChunk> extends Extent {
@@ -108,14 +113,47 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         CompoundTag tag = entity.getNbtData();
         Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
         map.put("Id", new StringTag(entity.getType().getName()));
+        
+        //Set pos
         ListTag pos = (ListTag) map.get("Pos");
+        List<Tag> posList;
         if (pos != null) {
-            List<Tag> posList = ReflectionUtils.getList(pos.getValue());
-            posList.set(0, new DoubleTag(location.getX() + 0.5));
-            posList.set(1, new DoubleTag(location.getY()));
-            posList.set(2, new DoubleTag(location.getZ() + 0.5));
+            posList = ReflectionUtils.getList(pos.getValue());
+        } else {
+            posList = new ArrayList<>();
+            pos = new ListTag(DoubleTag.class, posList);
+            map.put("Pos", pos);
         }
+        posList.set(0, new DoubleTag(location.getX() + 0.5));
+        posList.set(1, new DoubleTag(location.getY()));
+        posList.set(2, new DoubleTag(location.getZ() + 0.5));
+        
+        //set new uuid
+        UUID newuuid = UUID.randomUUID();
+        IntArrayTag uuid = (IntArrayTag) map.get("UUID");
+        int[] uuidArray;
+        if (uuid != null) {
+            uuidArray = uuid.getValue();
+        } else {
+            uuidArray = new int[4];
+            uuid = new IntArrayTag(uuidArray);
+            map.put("UUID", uuid);
+        }
+        uuidArray[0] = (int) (newuuid.getMostSignificantBits() >> 32);
+        uuidArray[1] = (int) newuuid.getMostSignificantBits();
+        uuidArray[2] = (int) (newuuid.getLeastSignificantBits() >> 32);
+        uuidArray[3] = (int) newuuid.getLeastSignificantBits();
+        
+        map.put("UUIDMost", new LongTag(newuuid.getMostSignificantBits()));
+        map.put("UUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
+        
         chunk.setEntity(tag);
         return null;
+    }
+
+    @Override
+    default void removeEntity(int x, int y, int z, UUID uuid) {
+        final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
+        chunk.removeEntity(uuid);
     }
 }
