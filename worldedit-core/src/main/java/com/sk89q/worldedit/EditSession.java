@@ -150,6 +150,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+import java.util.UUID;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -3089,6 +3090,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
+    public List<? extends Entity> getEntities() {
+        return world.getEntities();
+    }
+    
+    @Override
     public List<? extends Entity> getEntities(Region region) {
         return world.getEntities(region);
     }
@@ -3097,6 +3103,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public Entity createEntity(Location location, BaseEntity entity){
         try {
             return this.getExtent().createEntity(location, entity);
+        } catch (WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
+    }
+
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid)
+    {
+        try {
+            this.getExtent().removeEntity(x, y, z, uuid);
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
