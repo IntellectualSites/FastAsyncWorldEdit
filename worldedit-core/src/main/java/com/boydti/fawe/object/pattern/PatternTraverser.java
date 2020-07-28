@@ -32,7 +32,7 @@ public class PatternTraverser {
                     Field field = current.getDeclaredField("extent");
                     field.setAccessible(true);
                     field.set(pattern, newExtent);
-                } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
+                } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignored) {
                 }
             }
             try {
@@ -40,21 +40,21 @@ public class PatternTraverser {
                 field.setAccessible(true);
                 Object next = field.get(pattern);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("mask");
                 field.setAccessible(true);
                 Object next = field.get(pattern);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("material");
                 field.setAccessible(true);
                 Pattern next = (Pattern) field.get(pattern);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("patterns");
@@ -63,7 +63,7 @@ public class PatternTraverser {
                 for (Pattern next : patterns) {
                     reset(next, newExtent);
                 }
-            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignored) {
             }
             current = current.getSuperclass();
         }

@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * The LocalPartitionedBlockVector2DSet is a Memory and CPU optimized Set for storing Vector2Ds which are all in a local region
+ * The LocalPartitionedBlockVector2DSet is a Memory and CPU optimized Set for storing Vector2Ds which are all in a local region.
  * - All Vector2Ds must be within x[0,32768), y[0,32768)
  * - This will use 8 bytes for every 64 Vector2Ds (about 800x less than a HashSet)
  */
@@ -57,13 +57,13 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
         if (radius <= 0 || size == 1) {
             return contains(x, y);
         }
-//        int centerIndex = MathMan.pairSearchCoords(x, y);
+        //        int centerIndex = MathMan.pairSearchCoords(x, y);
         int length = (radius << 1) + 1;
         if (size() < length * length) {
             int index = -1;
             int count = 0;
             while ((index = set.nextSetBit(index + 1)) != -1) {
-//                if (index == centerIndex) continue;
+                //                if (index == centerIndex) continue;
                 int curx = MathMan.unpairSearchCoordsX(index);
                 int cury = MathMan.unpairSearchCoordsY(index);
                 if (Math.abs(curx - x) <= radius && Math.abs(cury - y) <= radius) {
@@ -81,7 +81,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
                 int index = MathMan.pairSearchCoords(cx << 4, cy << 4) - 1;
                 int endIndex = index + 256;
                 while ((index = set.nextSetBit(index + 1)) != -1 && index <= endIndex) {
-//                    if (index == centerIndex) continue;
+                    //                    if (index == centerIndex) continue;
                     int curx = MathMan.unpairSearchCoordsX(index);
                     int cury = MathMan.unpairSearchCoordsY(index);
                     if (Math.abs(curx - x) <= radius && Math.abs(cury - y) <= radius) {

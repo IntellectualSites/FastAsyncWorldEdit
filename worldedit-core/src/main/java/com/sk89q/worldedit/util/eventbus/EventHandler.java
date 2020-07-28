@@ -97,9 +97,9 @@ public abstract class EventHandler implements Comparable<EventHandler> {
 
     @Override
     public String toString() {
-        return "EventHandler{" +
-                "priority=" + priority +
-                '}';
+        return "EventHandler{"
+            + "priority=" + priority
+            + '}';
     }
 
 }

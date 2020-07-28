@@ -33,8 +33,8 @@ public class ClipboardSpline extends Spline {
 
     /**
      * Constructor without position-correction. Use this constructor for an interpolation implementation which does not need position-correction.
-     * <p>
-     * Be advised that currently subsequent changes to the interpolation parameters may not be supported.
+     *
+     * @apiNote Be advised that currently subsequent changes to the interpolation parameters may not be supported.
      * @param editSession     The EditSession which will be used when pasting the clipboard content
      * @param clipboardHolder The clipboard that will be pasted along the spline
      * @param interpolation   An implementation of the interpolation algorithm used to calculate the curve
@@ -45,6 +45,7 @@ public class ClipboardSpline extends Spline {
 
     /**
      * Constructor with position-correction. Use this constructor for an interpolation implementation that needs position-correction.
+     *
      * <p>
      * Some interpolation implementations calculate the position on the curve (used by {@link #pastePosition(double)})
      * based on an equidistant distribution of the nodes on the curve. For example: on a spline with 5 nodes position 0.0 would refer
@@ -54,8 +55,9 @@ public class ClipboardSpline extends Spline {
      * This means that the distance between two positions used to paste the clipboard (e.g., 0.75 - 0.5 = 0.25) on the curve
      * will always amount to that part of the length (e.g., 40 units) of the curve. In this example it would amount to
      * 0.25 × 40 = 10 units of curve length between these two positions.
-     * <p>
-     * Be advised that currently subsequent changes to the interpolation parameters may not be supported.
+     * </p>
+     *
+     * @apiNote Be advised that currently subsequent changes to the interpolation parameters may not be supported.
      * @param editSession     The EditSession which will be used when pasting the clipboard content
      * @param clipboardHolder The clipboard that will be pasted along the spline
      * @param interpolation   An implementation of the interpolation algorithm used to calculate the curve
@@ -71,7 +73,7 @@ public class ClipboardSpline extends Spline {
 
         Region region = clipboard.getRegion();
         BlockVector3 origin = clipboard.getOrigin();
-//        center = region.getCenter().setY(origin.getY() - 1);
+        //        center = region.getCenter().setY(origin.getY() - 1);
         center = region.getCenter().withY(origin.getY() - 1).toBlockPoint();
         this.centerOffset = center.subtract(center.round());
         this.center = center.subtract(centerOffset);

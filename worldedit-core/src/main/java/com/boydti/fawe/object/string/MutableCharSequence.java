@@ -17,7 +17,8 @@ public class MutableCharSequence implements CharSequence {
         this.length = length;
     }
 
-    public MutableCharSequence() {}
+    public MutableCharSequence() {
+    }
 
     public void setSubstring(int start, int end) {
         this.start = start;

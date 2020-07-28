@@ -113,8 +113,10 @@ public class HttpRequest implements Closeable {
 
     /**
      * Execute the request.
-     * <p/>
+     *
+     * <p>
      * After execution, {@link #close()} should be called.
+     * </p>
      *
      * @return this object
      * @throws java.io.IOException on I/O error
@@ -155,8 +157,9 @@ public class HttpRequest implements Closeable {
                 out.close();
             }
 
-            inputStream = conn.getResponseCode() == HttpURLConnection.HTTP_OK ?
-                    conn.getInputStream() : conn.getErrorStream();
+            inputStream = conn.getResponseCode() == HttpURLConnection.HTTP_OK
+                ? conn.getInputStream()
+                : conn.getErrorStream();
 
             successful = true;
         } finally {
@@ -223,8 +226,9 @@ public class HttpRequest implements Closeable {
      *
      * @return the buffered response
      * @throws java.io.IOException  on I/O error
+     * @throws InterruptedException on interruption
      */
-    public BufferedResponse returnContent() throws IOException {
+    public BufferedResponse returnContent() throws IOException, InterruptedException {
         if (inputStream == null) {
             throw new IllegalArgumentException("No input stream available");
         }
@@ -247,17 +251,15 @@ public class HttpRequest implements Closeable {
      * @param file the file
      * @return this object
      * @throws java.io.IOException  on I/O error
+     * @throws InterruptedException on interruption
      */
-    public HttpRequest saveContent(File file) throws IOException {
-        Closer closer = Closer.create();
+    public HttpRequest saveContent(File file) throws IOException, InterruptedException {
 
-        try {
+        try (Closer closer = Closer.create()) {
             FileOutputStream fos = closer.register(new FileOutputStream(file));
             BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
 
             saveContent(bos);
-        } finally {
-            closer.close();
         }
 
         return this;
@@ -269,8 +271,9 @@ public class HttpRequest implements Closeable {
      * @param out the output stream
      * @return this object
      * @throws java.io.IOException  on I/O error
+     * @throws InterruptedException on interruption
      */
-    public HttpRequest saveContent(OutputStream out) throws IOException {
+    public HttpRequest saveContent(OutputStream out) throws IOException, InterruptedException {
         BufferedInputStream bis;
 
         try {
@@ -393,8 +396,8 @@ public class HttpRequest implements Closeable {
          */
         public Form add(String key, String value) {
             try {
-                elements.add(URLEncoder.encode(key, "UTF-8") +
-                        "=" + URLEncoder.encode(value, "UTF-8"));
+                elements.add(URLEncoder.encode(key, "UTF-8")
+                    + "=" + URLEncoder.encode(value, "UTF-8"));
                 return this;
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -465,16 +468,12 @@ public class HttpRequest implements Closeable {
          * @throws InterruptedException on interruption
          */
         public BufferedResponse saveContent(File file) throws IOException, InterruptedException {
-            Closer closer = Closer.create();
-            file.getParentFile().mkdirs();
-
-            try {
+            try (Closer closer = Closer.create()) {
+                file.getParentFile().mkdirs();
                 FileOutputStream fos = closer.register(new FileOutputStream(file));
                 BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
 
                 saveContent(bos);
-            } finally {
-                closer.close();
             }
 
             return this;

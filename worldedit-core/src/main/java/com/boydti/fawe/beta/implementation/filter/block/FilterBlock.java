@@ -12,7 +12,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import javax.annotation.Nullable;
 
 /**
- * A class representing a block with a position
+ * A class representing a block with a position.
  *  - Used for optimized block operations to avoid lookups
  */
 public abstract class FilterBlock extends BlockVector3 implements Extent, TileEntityBlock {

@@ -1033,6 +1033,7 @@ public final class ItemTypes {
             throw e;
         }
     }
+
     static {
         fieldsTmp = null;
         joined = null;

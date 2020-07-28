@@ -68,7 +68,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         this.get = (CharGetBlocks) iget;
         this.layer = layer;
         if (!iget.hasSection(layer)) {
-            getArr = FaweCache.IMP.EMPTY_CHAR_4096;
+            getArr = FaweCache.IMP.emptyChar4096;
         } else {
             getArr = iget.load(layer);
         }

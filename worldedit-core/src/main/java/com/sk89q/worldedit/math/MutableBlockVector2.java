@@ -8,7 +8,8 @@ public class MutableBlockVector2 extends BlockVector2 {
         return MUTABLE_CACHE.get().setComponents(x, z);
     }
 
-    public MutableBlockVector2() {}
+    public MutableBlockVector2() {
+    }
 
     public MutableBlockVector2(int x, int z) {
         super(x, z);

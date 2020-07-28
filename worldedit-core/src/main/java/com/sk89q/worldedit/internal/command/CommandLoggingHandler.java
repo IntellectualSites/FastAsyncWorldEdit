@@ -92,7 +92,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
             return;
         }
 
-        builder.append("WorldEdit: ").append(actor.getName());
+        builder.append("FAWE: ").append(actor.getName());
         builder.append(" (in \"").append(world.getName()).append("\")");
 
         builder.append(": ").append(parameters.getMetadata().getCalledName());

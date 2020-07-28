@@ -118,7 +118,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
                     if (methodRemove != null) {
                         try {
                             methodRemove.invoke(tlm, instance);
-                        } catch (Throwable ignore) {
+                        } catch (Throwable ignored) {
                         }
                     }
                 } catch (NoSuchMethodException e) {
@@ -154,16 +154,17 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
                 Object entry = Array.get(table, i);
                 if (entry != null) {
                     // Get a reference to the thread local object and remove it from the table
-                    ThreadLocal threadLocal = (ThreadLocal)referentField.get(entry);
+                    ThreadLocal threadLocal = (ThreadLocal) referentField.get(entry);
                     clean(threadLocal);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // We will tolerate an exception here and just log it
             throw new IllegalStateException(e);
         }
     }
 
+    @SuppressWarnings("CheckStyle")
     @Override
     protected void finalize() throws Throwable {
         clean(this);

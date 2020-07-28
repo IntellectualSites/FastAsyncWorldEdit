@@ -73,10 +73,10 @@ class LegacySnapshotCommands {
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
+                    WorldEdit.logger.info("FAWE found no snapshots: looked in: "
                         + dir.getCanonicalPath());
                 } catch (IOException e) {
-                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
+                    WorldEdit.logger.info("FAWE found no snapshots: looked in "
                         + "(NON-RESOLVABLE PATH - does it exist?): "
                         + dir.getPath());
                 }

@@ -39,91 +39,101 @@ import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
 
 /**
- * [ WorldEdit action]
- *  |
+ * [ WorldEdit action].
+ * |
  * \|/
  * [ EditSession ] - The change is processed (area restrictions, change limit, block type)
- *  |
+ * |
  * \|/
  * [Block change] - A block change from some location
- *  |
+ * |
  * \|/
  * [ Set Queue ] - The SetQueue manages the implementation specific queue
- *  |
+ * |
  * \|/
  * [ Fawe Queue] - A queue of chunks - check if the queue has the chunk for a change
- *  |
+ * |
  * \|/
  * [ Fawe Chunk Implementation ] - Otherwise create a new FaweChunk object which is a wrapper around the Chunk object
- *  |
+ * |
  * \|/
  * [ Execution ] - When done, the queue then sets the blocks for the chunk, performs lighting updates and sends the chunk packet to the clients
+ *
  * <p>
  * Why it's faster:
- * - The chunk is modified directly rather than through the API
- * \ Removes some overhead, and means some processing can be done async
- * - Lighting updates are performed on the chunk level rather than for every block
- * \ e.g., A blob of stone: only the visible blocks need to have the lighting calculated
- * - Block changes are sent with a chunk packet
- * \ A chunk packet is generally quicker to create and smaller for large world edits
- * - No physics updates
- * \ Physics updates are slow, and are usually performed on each block
- * - Block data shortcuts
- * \ Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)
- * - Remove redundant extents
- * \ Up to 11 layers of extents can be removed
- * - History bypassing
- * \ FastMode bypasses history and means blocks in the world don't need to be checked and recorded
+ * </p>
+ * <ul>
+ * <li>The chunk is modified directly rather than through the API.
+ * <ul>
+ *     <li>Removes some overhead, and means some processing can be done async</li>
+ * </ul></li>
+ * <li> Lighting updates are performed on the chunk level rather than for every block <ul>
+ *     <li>e.g., A blob of stone: only the visible blocks need to have the lighting calculated</li>
+ * </ul> </li>
+ * <li> Block changes are sent with a chunk packet.
+ * <ul>
+ *     <li>A chunk packet is generally quicker to create and smaller for large world edits</li>
+ * </ul>
+ * </li>
+ * <li> No physics updates.
+ * <ul>
+ * <li>Physics updates are slow, and are usually performed on each block</li>
+ * </ul></li>
+ * <li> Block data shortcuts <ul>
+ * <li>Some known blocks don't need to have the data set or accessed (e.g., air is never going to have data)</li>
+ * </ul></li>
+ * <li> Remove redundant extents
+ * <ul>
+ * <li>Up to 11 layers of extents can be removed</li>
+ * </ul>
+ * </li>
+ * <li> History bypassing.
+ * <ul>
+ * <li>FastMode bypasses history and means blocks in the world don't need to be checked and recorded</li>
+ * </ul>
+ * </li>
+ * </ul>
  */
 public class Fawe {
 
     private static final Logger log = LoggerFactory.getLogger(Fawe.class);
 
     /**
-     * The FAWE instance;
+     * The FAWE instance.
      */
     private static Fawe INSTANCE;
 
-    /**
-     * TPS timer
-     */
+    //TPS Timer
     private final FaweTimer timer;
     private FaweVersion version;
     private VisualQueue visualQueue;
     private TextureUtil textures;
     // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    private DefaultTransformParser transformParser;
+    //    private DefaultTransformParser transformParser;
 
     private QueueHandler queueHandler;
 
     /**
-     * Get the implementation specific class
-     *
-     * @return
+     * Get the implementation specific class.
      */
     @SuppressWarnings("unchecked")
     public static <T extends IFawe> T imp() {
-        return INSTANCE != null ? (T) INSTANCE.IMP : null;
+        return INSTANCE != null ? (T) INSTANCE.imp : null;
     }
 
     /**
-     * Get the implementation independent class
-     *
-     * @return
+     * Get the implementation independent class.
      */
     public static Fawe get() {
         return INSTANCE;
     }
 
     /**
-     * Setup Fawe
-     *
-     * @param implementation
-     * @throws InstanceAlreadyExistsException
+     * Setup Fawe.
      */
     public static void set(final IFawe implementation) throws InstanceAlreadyExistsException, IllegalArgumentException {
         if (INSTANCE != null) {
-            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + INSTANCE.IMP);
+            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + INSTANCE.imp);
         }
         if (implementation == null) {
             throw new IllegalArgumentException("Implementation may not be null.");
@@ -133,16 +143,14 @@ public class Fawe {
 
     public static void debugPlain(String s) {
         if (INSTANCE != null) {
-            INSTANCE.IMP.debug(s);
+            INSTANCE.imp.debug(s);
         } else {
             System.out.println(s);
         }
     }
 
     /**
-     * Write something to the console
-     *
-     * @param s
+     * Write something to the console.
      */
     public static void debug(String s) {
         Actor actor = Request.request().getActor();
@@ -154,7 +162,7 @@ public class Fawe {
     }
 
     /**
-     * Write something to the console
+     * Write something to the console.
      *
      * @param c The Component to be printed
      */
@@ -167,25 +175,22 @@ public class Fawe {
         debugPlain(c.toString());
     }
 
-    /**
-     * The platform specific implementation
-     */
-    private final IFawe IMP;
+    private final IFawe imp;
     private Thread thread;
 
     private Fawe(final IFawe implementation) {
         INSTANCE = this;
-        this.IMP = implementation;
+        this.imp = implementation;
         this.thread = Thread.currentThread();
         /*
          * Implementation dependent stuff
          */
         this.setupConfigs();
-        TaskManager.IMP = this.IMP.getTaskManager();
+        TaskManager.IMP = this.imp.getTaskManager();
 
         TaskManager.IMP.async(() -> {
-            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
-            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(MainUtil.getFile(imp.getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(MainUtil.getFile(imp.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
         });
 
         /*
@@ -198,10 +203,11 @@ public class Fawe {
         TaskManager.IMP.later(() -> {
             try {
                 // TODO: Ping @MattBDev to reimplement 2020-02-04
-//                transformParser = new DefaultTransformParser(getWorldEdit());
+                //                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
-                WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-            } catch (Throwable ignored) {}
+                WEManager.IMP.managers.addAll(Fawe.this.imp.getMaskManagers());
+            } catch (Throwable ignored) {
+            }
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
@@ -214,7 +220,7 @@ public class Fawe {
         if (queueHandler == null) {
             synchronized (this) {
                 if (queueHandler == null) {
-                    queueHandler = IMP.getQueueHandler();
+                    queueHandler = imp.getQueueHandler();
                 }
             }
         }
@@ -222,9 +228,9 @@ public class Fawe {
     }
 
     // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    public DefaultTransformParser getTransformParser() {
-//        return transformParser;
-//    }
+    //    public DefaultTransformParser getTransformParser() {
+    //        return transformParser;
+    //    }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
         // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util
@@ -257,32 +263,25 @@ public class Fawe {
     }
 
     /**
-     * The FaweTimer is a useful class for monitoring TPS
-     *
-     * @return FaweTimer
+     * The FaweTimer is a useful class for monitoring TPS.
      */
     public FaweTimer getTimer() {
         return timer;
     }
 
     /**
-     * The visual queue is used to queue visualizations
-     *
-     * @return
+     * The visual queue is used to queue visualizations.
      */
     public VisualQueue getVisualQueue() {
         return visualQueue;
     }
 
     /**
-     * The FAWE version
+     * The FAWE version.
      * - Unofficial jars may be lacking version information
-     *
-     * @return FaweVersion
      */
     @Nullable
-    public
-    FaweVersion getVersion() {
+    public FaweVersion getVersion() {
         return version;
     }
 
@@ -293,8 +292,8 @@ public class Fawe {
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
-        File file = new File(this.IMP.getDirectory(), "config.yml");
-        Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
+        File file = new File(this.imp.getDirectory(), "config.yml");
+        Settings.IMP.PLATFORM = imp.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -305,7 +304,8 @@ public class Fawe {
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.16/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignored) {
+        }
         try {
             Settings.IMP.reload(file);
         } catch (Throwable e) {
@@ -402,9 +402,7 @@ public class Fawe {
     }
 
     /**
-     * Get the main thread
-     *
-     * @return
+     * Get the main thread.
      */
     public Thread getMainThread() {
         return this.thread;
@@ -415,9 +413,7 @@ public class Fawe {
     }
 
     /**
-     * Sets the main thread to the current thread
-     *
-     * @return
+     * Sets the main thread to the current thread.
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();

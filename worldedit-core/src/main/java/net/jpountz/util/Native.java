@@ -11,7 +11,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 public enum Native {
     ;
 
-
     private enum OS {
         // Even on Windows, the default compiler from cpptasks (gcc) uses .so as a shared lib extension
         WINDOWS("win32", "so"),
@@ -70,7 +69,7 @@ public enum Native {
                     try {
                         tempLibFile.delete();
                     } catch (SecurityException e) {
-                        getLogger(Native.class).error("Failed to delete old temp lib",e);
+                        getLogger(Native.class).error("Failed to delete old temp lib", e);
                     }
                 }
             }

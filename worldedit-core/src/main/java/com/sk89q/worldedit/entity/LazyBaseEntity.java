@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 public class LazyBaseEntity extends BaseEntity {
     private Supplier<CompoundTag> saveTag;
+
     public LazyBaseEntity(EntityType type, Supplier<CompoundTag> saveTag) {
         super(type, null);
         this.saveTag = saveTag;

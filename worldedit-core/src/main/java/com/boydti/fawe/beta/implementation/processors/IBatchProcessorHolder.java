@@ -7,15 +7,14 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 
 /**
- * Holds a batch processor
+ * Holds a batch processor.
  * (Join and remove operations affect the held processor)
  */
 public interface IBatchProcessorHolder extends IBatchProcessor {
     IBatchProcessor getProcessor();
 
     /**
-     * set the held processor
-     * @param set
+     * set the held processor.
      */
     void setProcessor(IBatchProcessor set);
 

@@ -36,8 +36,8 @@ public class ColorUtil {
                 return c < 0f
                     ? c % 360f + 360f
                     : c > 360f
-                        ? c % 360f
-                        : c;
+                    ? c % 360f
+                    : c;
         }
 
         throw new IllegalArgumentException("Invalid color specification");
@@ -103,9 +103,9 @@ public class ColorUtil {
         } else {
             Color col = null;
             try {
-                Field field = Color.class.getField(color.toLowerCase());
+                Field field = Color.class.getField(color.toLowerCase(Locale.ROOT));
                 col = (Color) field.get(null);
-            } catch (Throwable ignore) {
+            } catch (Throwable ignored) {
             }
             if (col != null) {
                 return col;

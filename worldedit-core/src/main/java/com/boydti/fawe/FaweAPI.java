@@ -74,7 +74,7 @@ public class FaweAPI {
     }
 
     /**
-     * You can either use a IQueueExtent or an EditSession to change blocks<br>
+     * You can either use a IQueueExtent or an EditSession to change blocks.
      * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
      * Remember to commit when you're done!<br>
@@ -103,7 +103,7 @@ public class FaweAPI {
     }
 
     /**
-     * Upload the clipboard to the configured web interface
+     * Upload the clipboard to the configured web interface.
      *
      * @param clipboard The clipboard (may not be null)
      * @param format    The format to use (some formats may not be supported)
@@ -306,7 +306,7 @@ public class FaweAPI {
 
 
     /**
-     * Fix the lighting in a selection<br>
+     * Fix the lighting in a selection.
      * - First removes all lighting, then relights
      * - Relights in parallel (if enabled) for best performance<br>
      * - Also resends chunks<br>

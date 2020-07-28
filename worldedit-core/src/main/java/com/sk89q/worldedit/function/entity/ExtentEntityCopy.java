@@ -107,8 +107,8 @@ public class ExtentEntityCopy implements EntityFunction {
             }
             Vector3 newDirection;
 
-            newDirection = transform.isIdentity() ?
-                    entity.getLocation().getDirection()
+            newDirection = transform.isIdentity()
+                ? entity.getLocation().getDirection()
                     : transform.apply(location.getDirection()).subtract(transform.apply(Vector3.ZERO)).normalize();
             newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
 

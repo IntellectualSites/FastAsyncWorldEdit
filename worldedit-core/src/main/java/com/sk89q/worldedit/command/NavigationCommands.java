@@ -68,7 +68,7 @@ public class NavigationCommands {
 
     @Command(
         name = "ascend",
-        aliases = { "asc" },
+        aliases = { "asc", "/asc", "/ascend" },
         desc = "Go up a floor"
     )
     @CommandPermissions("worldedit.navigation.ascend")
@@ -91,7 +91,7 @@ public class NavigationCommands {
 
     @Command(
         name = "descend",
-        aliases = { "desc" },
+        aliases = { "desc", "/desc", "/descend" },
         desc = "Go down a floor"
     )
     @CommandPermissions("worldedit.navigation.descend")
@@ -114,7 +114,7 @@ public class NavigationCommands {
 
     @Command(
         name = "ceil",
-        aliases = { "ceiling" },
+        aliases = { "ceiling", "/ceil" },
         desc = "Go to the ceiling"
     )
     @CommandPermissions("worldedit.navigation.ceiling")
@@ -138,6 +138,7 @@ public class NavigationCommands {
 
     @Command(
         name = "thru",
+        aliases = { "/thru" },
         desc = "Pass through walls"
     )
     @CommandPermissions("worldedit.navigation.thru.command")
@@ -151,7 +152,7 @@ public class NavigationCommands {
 
     @Command(
         name = "jumpto",
-        aliases = { "j" },
+        aliases = { "j", "/jumpto", "/j" },
         desc = "Teleport to a location"
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
@@ -174,6 +175,7 @@ public class NavigationCommands {
 
     @Command(
         name = "up",
+        aliases = { "/up" },
         desc = "Go upwards some distance"
     )
     @CommandPermissions("worldedit.navigation.up")

@@ -163,7 +163,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             // add each block and tile
             char[] blocksGet = get.load(layer);
             if (blocksGet == null) {
-                blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
+                blocksGet = FaweCache.IMP.emptyChar4096;
             }
             char[] blocksSet = set.load(layer);
 

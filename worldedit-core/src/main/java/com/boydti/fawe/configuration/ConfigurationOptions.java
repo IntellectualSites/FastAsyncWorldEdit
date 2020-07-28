@@ -1,8 +1,7 @@
 package com.boydti.fawe.configuration;
 
 /**
- * Various settings for controlling the input and output of a {@link
- * com.boydti.fawe.configuration.Configuration}
+ * Various settings for controlling the input and output of a {@link Configuration}.
  */
 public class ConfigurationOptions {
     private char pathSeparator = '.';
@@ -14,7 +13,7 @@ public class ConfigurationOptions {
     }
 
     /**
-     * Returns the {@link com.boydti.fawe.configuration.Configuration} that this object is responsible for.
+     * Returns the {@link Configuration} that this object is responsible for.
      *
      * @return Parent configuration
      */
@@ -23,11 +22,12 @@ public class ConfigurationOptions {
     }
 
     /**
-     * Gets the char that will be used to separate {@link
-     * com.boydti.fawe.configuration.ConfigurationSection}s
+     * Gets the char that will be used to separate {@link ConfigurationSection}s.
+     *
      * <p>
-     * This value does not affect how the {@link com.boydti.fawe.configuration.Configuration} is stored,
+     * This value does not affect how the {@link Configuration} is stored,
      * only in how you access the data. The default value is '.'.
+     * </p>
      *
      * @return Path separator
      */
@@ -36,31 +36,33 @@ public class ConfigurationOptions {
     }
 
     /**
-     * Sets the char that will be used to separate {@link
-     * com.boydti.fawe.configuration.ConfigurationSection}s
+     * Sets the char that will be used to separate {@link ConfigurationSection}s.
+     *
      * <p>
-     * This value does not affect how the {@link com.boydti.fawe.configuration.Configuration} is stored,
+     * This value does not affect how the {@link Configuration} is stored,
      * only in how you access the data. The default value is '.'.
+     * </p>
      *
      * @param value Path separator
      * @return This object, for chaining
      */
-    public com.boydti.fawe.configuration.ConfigurationOptions pathSeparator(final char value) {
+    public ConfigurationOptions pathSeparator(final char value) {
         pathSeparator = value;
         return this;
     }
 
     /**
-     * Checks if the {@link com.boydti.fawe.configuration.Configuration} should copy values from its default
-     * {@link com.boydti.fawe.configuration.Configuration} directly.
+     * Checks if the {@link Configuration} should copy values from its default
+     * {@link Configuration} directly.
+     *
      * <p>
      * If this is true, all values in the default Configuration will be
      * directly copied, making it impossible to distinguish between values
      * that were set and values that are provided by default. As a result,
-     * {@link com.boydti.fawe.configuration.ConfigurationSection#contains(String)} will always
+     * {@link ConfigurationSection#contains(String)} will always
      * return the same value as {@link
-     * com.boydti.fawe.configuration.ConfigurationSection#isSet(String)}. The default value is
-     * false.
+     * ConfigurationSection#isSet(String)}. The default value is false.
+     * </p>
      *
      * @return Whether or not defaults are directly copied
      */
@@ -69,21 +71,22 @@ public class ConfigurationOptions {
     }
 
     /**
-     * Sets if the {@link com.boydti.fawe.configuration.Configuration} should copy values from its default
-     * {@link com.boydti.fawe.configuration.Configuration} directly.
+     * Sets if the {@link Configuration} should copy values from its default
+     * {@link Configuration} directly.
+     *
      * <p>
      * If this is true, all values in the default Configuration will be
      * directly copied, making it impossible to distinguish between values
      * that were set and values that are provided by default. As a result,
-     * {@link com.boydti.fawe.configuration.ConfigurationSection#contains(String)} will always
+     * {@link ConfigurationSection#contains(String)} will always
      * return the same value as {@link
-     * com.boydti.fawe.configuration.ConfigurationSection#isSet(String)}. The default value is
-     * false.
+     * ConfigurationSection#isSet(String)}. The default value is false.
+     * </p>
      *
      * @param value Whether or not defaults are directly copied
      * @return This object, for chaining
      */
-    public com.boydti.fawe.configuration.ConfigurationOptions copyDefaults(final boolean value) {
+    public ConfigurationOptions copyDefaults(final boolean value) {
         copyDefaults = value;
         return this;
     }

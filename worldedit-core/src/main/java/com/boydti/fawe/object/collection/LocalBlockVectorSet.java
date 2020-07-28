@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * The LocalBlockVectorSet is a Memory and CPU optimized Set for storing BlockVectors which are all in a local region
+ * The LocalBlockVectorSet is a Memory and CPU optimized Set for storing BlockVectors which are all in a local region.
  * - All vectors must be in a 2048 * 2048 area centered around the first entry
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
@@ -119,7 +119,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return null;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Iterator<BlockVector3> iterator() {
         return new Iterator<BlockVector3>() {
             int index = set.nextSetBit(0);
@@ -155,12 +156,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         };
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Object[] toArray() {
         return toArray((Object[]) null);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public <T> T[] toArray(T[] array) {
         int size = size();
         if (array == null || array.length < size) {

@@ -147,7 +147,7 @@ public class TranslationManager {
         }
         if (locale.equals(defaultLocale)) {
             translationMap.put(Locale.ENGLISH, loadTranslationFile("strings.json").orElseThrow(
-                () -> new RuntimeException("Failed to load WorldEdit strings!")
+                () -> new RuntimeException("Failed to load FAWE strings!")
             ));
             return true;
         }

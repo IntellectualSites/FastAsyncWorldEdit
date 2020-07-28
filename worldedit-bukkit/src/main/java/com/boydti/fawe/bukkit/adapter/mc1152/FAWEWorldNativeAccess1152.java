@@ -3,7 +3,7 @@ package com.boydti.fawe.bukkit.adapter.mc1152;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWESpigotV115R2;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -34,11 +34,11 @@ public class FAWEWorldNativeAccess1152
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
-    private final FAWE_Spigot_v1_15_R2 adapter;
+    private final FAWESpigotV115R2 adapter;
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
 
-    public FAWEWorldNativeAccess1152(FAWE_Spigot_v1_15_R2 adapter, WeakReference<World> world) {
+    public FAWEWorldNativeAccess1152(FAWESpigotV115R2 adapter, WeakReference<World> world) {
         this.adapter = adapter;
         this.world = world;
     }

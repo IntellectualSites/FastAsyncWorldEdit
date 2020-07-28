@@ -21,7 +21,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWESpigotV114R4;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -617,7 +617,7 @@ public class BukkitGetBlocks114 extends CharGetBlocks {
             Arrays.fill(data, (char) 1);
             return data;
         }
-        if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
+        if (data == null || data == FaweCache.IMP.emptyChar4096) {
             data = new char[4096];
             Arrays.fill(data, (char) 1);
         }
@@ -627,8 +627,8 @@ public class BukkitGetBlocks114 extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                FAWE_Spigot_v1_14_R4 adapter =
-                    ((FAWE_Spigot_v1_14_R4) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                FAWESpigotV114R4 adapter =
+                    ((FAWESpigotV114R4) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitAdapter114.fieldBits.get(blocks);
@@ -647,8 +647,8 @@ public class BukkitGetBlocks114 extends CharGetBlocks {
                     num_palette = ((DataPaletteHash<IBlockData>) palette).b();
                 } else {
                     num_palette = 0;
-                    int[] paletteToBlockInts = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-                    char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                    int[] paletteToBlockInts = FaweCache.IMP.paletteToBlock.get();
+                    char[] paletteToBlockChars = FaweCache.IMP.paletteToBlockChar.get();
                     try {
                         for (int i = 0; i < 4096; i++) {
                             char paletteVal = data[i];
@@ -678,7 +678,7 @@ public class BukkitGetBlocks114 extends CharGetBlocks {
                     return data;
                 }
 
-                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                char[] paletteToOrdinal = FaweCache.IMP.paletteToBlockChar.get();
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {
@@ -719,7 +719,7 @@ public class BukkitGetBlocks114 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_14_R4 adapter) {
+    private final char ordinal(IBlockData ibd, FAWESpigotV114R4 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {

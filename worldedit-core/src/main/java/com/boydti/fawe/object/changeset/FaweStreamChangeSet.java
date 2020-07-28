@@ -40,7 +40,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public FaweStreamChangeSet(World world) {
         this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
     }
-    
+
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
         super(world);
         this.compression = compression;
@@ -676,17 +676,17 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             return new Iterator<Change>() {
                 Iterator<Change>[] iterators = new Iterator[]{tileCreate, tileRemove, entityCreate, entityRemove, blockChange, biomeChange};
-                int i = 0;
+                int i1 = 0;
                 Iterator<Change> current = iterators[0];
 
                 @Override
                 public boolean hasNext() {
                     if (current.hasNext()) {
                         return true;
-                    } else if (i >= iterators.length - 1) {
+                    } else if (i1 >= iterators.length - 1) {
                         return false;
                     } else {
-                        current = iterators[++i];
+                        current = iterators[++i1];
                     }
                     return hasNext();
                 }
@@ -701,10 +701,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     try {
                         return current.next();
                     } catch (Throwable ignore) {
-                        if (i >= iterators.length - 1) {
+                        if (i1 >= iterators.length - 1) {
                             throw new NoSuchElementException("End of iterator");
                         }
-                        current = iterators[++i];
+                        current = iterators[++i1];
                         return next();
                     }
                 }

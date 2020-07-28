@@ -13,9 +13,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Records changes made through the {@link #setByte(int, byte)} or {@link #setInt(int, int)} method<br/>
+ * Records changes made through the {@link #setByte(int, byte)} or {@link #setInt(int, int)} method.
  * If you are editing the raw data, use {@link #record(Runnable)}
- * @param <T>
  */
 public final class DifferentialArray<T> implements DifferentialCollection<T> {
     private final byte[] dataBytes;

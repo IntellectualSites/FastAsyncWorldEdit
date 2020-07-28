@@ -11,11 +11,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.jetbrains.annotations.Range;
 
 public interface IChunkExtent<T extends IChunk> extends Extent {
+
     /**
-     * Get the IChunk at a position (and cache it if it's not already)
+     * Get the IChunk at a position (and cache it if it's not already).
      *
-     * @param chunkX
-     * @param chunkZ
      * @return IChunk
      */
     T getOrCreateChunk(int chunkX, int chunkZ);

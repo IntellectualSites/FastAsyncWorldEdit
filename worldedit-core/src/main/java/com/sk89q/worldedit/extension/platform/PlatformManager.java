@@ -104,7 +104,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.info("Got request to register " + platform.getClass() + " with WorldEdit ["
+        logger.info("Got request to register " + platform.getClass() + " with FAWE ["
             + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
@@ -143,7 +143,7 @@ public class PlatformManager {
 
         if (removed) {
             logger.info(
-                "Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
+                "Unregistering " + platform.getClass().getCanonicalName() + " from FAWE");
 
             boolean choosePreferred = false;
 
@@ -184,7 +184,7 @@ public class PlatformManager {
                 // Use the first available if preferences have not been decided yet.
                 if (platforms.isEmpty()) {
                     // No platforms registered, this is being called too early!
-                    throw new NoCapablePlatformException("No platforms have been registered yet! Please wait until WorldEdit is initialized.");
+                    throw new NoCapablePlatformException("No platforms have been registered yet! Please wait until FAWE is initialized.");
                 }
                 return platforms.get(0);
             }

@@ -43,7 +43,7 @@ public class RegionVisitor implements Operation {
     private int affected = 0;
 
     /**
-     * @deprecated Use other constructors which will preload chunks during iteration
+     * Use other constructors which will preload chunks during iteration.
      */
     @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {

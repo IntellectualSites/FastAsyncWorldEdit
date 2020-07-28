@@ -1,8 +1,7 @@
 package com.boydti.fawe.configuration;
 
 /**
- * Various settings for controlling the input and output of a {@link
- * com.boydti.fawe.configuration.MemoryConfiguration}
+ * Various settings for controlling the input and output of a {@link MemoryConfiguration}.
  */
 public class MemoryConfigurationOptions extends ConfigurationOptions {
     protected MemoryConfigurationOptions(final MemoryConfiguration configuration) {

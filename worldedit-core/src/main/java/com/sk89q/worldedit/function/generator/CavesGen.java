@@ -12,6 +12,9 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * FAWE Cave Generator.
+ */
 public class CavesGen extends GenBase {
 
     private boolean evenCaveDistribution = false;

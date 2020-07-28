@@ -5,6 +5,7 @@ import java.util.Map;
 public class MutablePair<K, V> implements Map.Entry<K, V> {
     private K key;
     private V value;
+
     @Override
     public K getKey() {
         return key;
@@ -17,9 +18,8 @@ public class MutablePair<K, V> implements Map.Entry<K, V> {
 
     @Override
     public V setValue(V value) {
-        V old = value;
         this.value = value;
-        return old;
+        return value;
     }
 
     public void setKey(K key) {

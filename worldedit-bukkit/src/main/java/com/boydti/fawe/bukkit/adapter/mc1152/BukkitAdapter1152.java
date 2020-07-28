@@ -227,10 +227,10 @@ public final class BukkitAdapter1152 extends NMSAdapter {
         if (set == null) {
             return newChunkSection(layer);
         }
-        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        final int[] blockToPalette = FaweCache.IMP.blockToPalette.get();
+        final int[] paletteToBlock = FaweCache.IMP.paletteToBlock.get();
+        final long[] blockStates = FaweCache.IMP.blockStates.get();
+        final int[] blocksCopy = FaweCache.IMP.sectionBlocks.get();
         try {
             int[] num_palette_buffer = new int[1];
             Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();

@@ -75,7 +75,7 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
     }
 
     /**
-     * Writes out a {@code byte} to the underlying output stream
+     * Writes out a {@code byte} to the underlying output stream.
      *
      * @param      b   the {@code byte} value to be written.
      * @exception  IOException  if the underlying stream throws an IOException.
@@ -120,7 +120,7 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
 
     /**
      * Writes a four-byte {@code int} to the underlying output stream
-     * in little endian order, low byte first, high byte last
+     * in little endian order, low byte first, high byte last.
      *
      * @param      i   the {@code int} to be written.
      * @exception  IOException  if the underlying stream throws an IOException.
@@ -138,7 +138,7 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
 
     /**
      * Writes an eight-byte {@code long} to the underlying output stream
-     * in little endian order, low byte first, high byte last
+     * in little endian order, low byte first, high byte last.
      *
      * @param      l   the {@code long} to be written.
      * @exception  IOException  if the underlying stream throws an IOException.
@@ -250,7 +250,7 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
         int numchars = s.length();
         int numbytes = 0;
 
-        for (int i = 0 ; i < numchars ; i++) {
+        for (int i = 0; i < numchars; i++) {
             int c = s.charAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {
                 numbytes++;
@@ -267,18 +267,16 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
 
         out.write((numbytes >>> 8) & 0xFF);
         out.write(numbytes & 0xFF);
-        for (int i = 0 ; i < numchars ; i++) {
+        for (int i = 0; i < numchars; i++) {
             int c = s.charAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {
                 out.write(c);
-            }
-            else if (c > 0x07FF) {
+            } else if (c > 0x07FF) {
                 out.write(0xE0 | ((c >> 12) & 0x0F));
                 out.write(0x80 | ((c >>  6) & 0x3F));
                 out.write(0x80 | (c & 0x3F));
                 written += 2;
-            }
-            else {
+            } else {
                 out.write(0xC0 | ((c >>  6) & 0x1F));
                 out.write(0x80 | (c & 0x3F));
                 written += 1;

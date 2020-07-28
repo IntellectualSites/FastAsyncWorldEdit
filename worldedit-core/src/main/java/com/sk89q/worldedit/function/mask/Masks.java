@@ -43,7 +43,7 @@ public final class Masks {
     }
 
     /**
-     * Return a 3D mask that always returns true;
+     * Return a 3D mask that always returns true.
      *
      * @return a mask
      */
@@ -56,7 +56,7 @@ public final class Masks {
     }
 
     /**
-     * Return a 2D mask that always returns true;
+     * Return a 2D mask that always returns true.
      *
      * @return a mask
      */

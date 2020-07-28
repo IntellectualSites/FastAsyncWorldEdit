@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.math.convolution;
 
 /**
- * A linear Kernel generator (all cells weight the same)
+ * A linear Kernel generator (all cells weight the same).
  */
 public class LinearKernel extends Kernel {
 
@@ -33,7 +33,6 @@ public class LinearKernel extends Kernel {
         float[] data = new float[diameter * diameter];
 
         for (int i = 0; i < data.length; data[i++] = 1.0f / data.length) {
-            ;
         }
 
         return data;

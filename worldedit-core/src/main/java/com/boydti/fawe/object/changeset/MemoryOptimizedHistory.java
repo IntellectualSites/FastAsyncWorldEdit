@@ -13,7 +13,7 @@ import com.sk89q.worldedit.world.World;
 import java.io.IOException;
 
 /**
- * ChangeSet optimized for low memory usage
+ * ChangeSet optimized for low memory usage.
  * - No disk usage
  * - High CPU usage
  * - Low memory usage

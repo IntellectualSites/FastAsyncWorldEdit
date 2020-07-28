@@ -40,30 +40,30 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     private Connection connection;
 
     @Language("SQLite")
-    private String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `{0}edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))";
+    private String createTable = "CREATE TABLE IF NOT EXISTS `{0}edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))";
     @Language("SQLite")
-    private String UPDATE_TABLE1 = "ALTER TABLE `{0}edits` ADD COLUMN `command` VARCHAR";
+    private String updateTable1 = "ALTER TABLE `{0}edits` ADD COLUMN `command` VARCHAR";
     @Language("SQLite")
-    private String UPDATE_TABLE2 = "alter table `{0}edits` add size int default 0 not null";
+    private String updateTable2 = "alter table `{0}edits` add size int default 0 not null";
     @Language("SQLite")
-    private String INSERT_EDIT = "INSERT OR REPLACE INTO `{0}edits` (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+    private String insertEdit = "INSERT OR REPLACE INTO `{0}edits` (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
     @Language("SQLite")
-    private String PURGE = "DELETE FROM `{0}edits` WHERE `time`<?";
+    private String purge = "DELETE FROM `{0}edits` WHERE `time`<?";
     @Language("SQLite")
-    private String GET_EDITS_USER = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+    private String getEditsUser = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
     @Language("SQLite")
-    private String GET_EDITS_USER_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
+    private String getEditsUserAsc = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
     @Language("SQLite")
-    private String GET_EDITS = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
+    private String getEdits = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
     @Language("SQLite")
-    private String GET_EDITS_ASC = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id` ";
+    private String getEditsAsc = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id` ";
     @Language("SQLite")
-    private String GET_EDIT_USER = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
+    private String getEditUser = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
     @Language("SQLite")
-    private String DELETE_EDITS_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
+    private String deleteEditsUser = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
     @Language("SQLite")
-    private String DELETE_EDIT_USER = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
+    private String deleteEditUser = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
 
     private ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
 
@@ -77,18 +77,18 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         connection = openConnection();
 
         // update vars
-        CREATE_TABLE = CREATE_TABLE.replace("{0}", prefix);
-        UPDATE_TABLE1 = UPDATE_TABLE1.replace("{0}", prefix);
-        UPDATE_TABLE2 = UPDATE_TABLE2.replace("{0}", prefix);
-        INSERT_EDIT = INSERT_EDIT.replace("{0}", prefix);
-        PURGE = PURGE.replace("{0}", prefix);
-        GET_EDITS_USER = GET_EDITS_USER.replace("{0}", prefix);
-        GET_EDITS_USER_ASC = GET_EDITS_USER_ASC.replace("{0}", prefix);
-        GET_EDITS = GET_EDITS.replace("{0}", prefix);
-        GET_EDITS_ASC = GET_EDITS_ASC.replace("{0}", prefix);
-        GET_EDIT_USER = GET_EDIT_USER.replace("{0}", prefix);
-        DELETE_EDITS_USER = DELETE_EDITS_USER.replace("{0}", prefix);
-        DELETE_EDIT_USER = DELETE_EDIT_USER.replace("{0}", prefix);
+        createTable = createTable.replace("{0}", prefix);
+        updateTable1 = updateTable1.replace("{0}", prefix);
+        updateTable2 = updateTable2.replace("{0}", prefix);
+        insertEdit = insertEdit.replace("{0}", prefix);
+        purge = purge.replace("{0}", prefix);
+        getEditsUser = getEditsUser.replace("{0}", prefix);
+        getEditsUserAsc = getEditsUserAsc.replace("{0}", prefix);
+        getEdits = getEdits.replace("{0}", prefix);
+        getEditsAsc = getEditsAsc.replace("{0}", prefix);
+        getEditUser = getEditUser.replace("{0}", prefix);
+        deleteEditsUser = deleteEditsUser.replace("{0}", prefix);
+        deleteEditUser = deleteEditUser.replace("{0}", prefix);
 
         try {
             init().get();
@@ -104,15 +104,15 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public Future<Boolean> init() {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(CREATE_TABLE)) {
+            try (PreparedStatement stmt = connection.prepareStatement(createTable)) {
                 stmt.executeUpdate();
             }
-            try (PreparedStatement stmt = connection.prepareStatement(UPDATE_TABLE1)) {
+            try (PreparedStatement stmt = connection.prepareStatement(updateTable1)) {
                 stmt.executeUpdate();
             } catch (SQLException ignore) {
                 // Already updated
             }
-            try (PreparedStatement stmt = connection.prepareStatement(UPDATE_TABLE2)) {
+            try (PreparedStatement stmt = connection.prepareStatement(updateTable2)) {
                 stmt.executeUpdate();
             } catch (SQLException ignore) {
                 //Already updated
@@ -123,7 +123,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public Future<Integer> delete(UUID uuid, int id) {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(DELETE_EDIT_USER)) {
+            try (PreparedStatement stmt = connection.prepareStatement(deleteEditUser)) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 return stmt.executeUpdate();
@@ -135,7 +135,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         @NotNull
             UUID uuid, int id) {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(GET_EDIT_USER)) {
+            try (PreparedStatement stmt = connection.prepareStatement(getEditUser)) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 ResultSet result = stmt.executeQuery();
@@ -175,7 +175,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         long now = System.currentTimeMillis() / 1000;
         final int then = (int) (now - diff);
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(PURGE)) {
+            try (PreparedStatement stmt = connection.prepareStatement(purge)) {
                 stmt.setInt(1, then);
                 return stmt.executeUpdate();
             }
@@ -192,8 +192,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         Future<Integer> future = call(() -> {
             try {
                 int count = 0;
-                String stmtStr = ascending ? uuid == null ? GET_EDITS_ASC : GET_EDITS_USER_ASC :
-                    uuid == null ? GET_EDITS : GET_EDITS_USER;
+                String stmtStr = ascending ? uuid == null ? getEditsAsc : getEditsUserAsc :
+                    uuid == null ? getEdits : getEditsUser;
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());
@@ -217,7 +217,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     } while (result.next());
                 }
                 if (delete && uuid != null) {
-                    try (PreparedStatement stmt = connection.prepareStatement(DELETE_EDITS_USER)) {
+                    try (PreparedStatement stmt = connection.prepareStatement(deleteEditsUser)) {
                         stmt.setInt(1, (int) (minTime / 1000));
                         stmt.setInt(2, pos1.getBlockX());
                         stmt.setInt(3, pos2.getBlockX());
@@ -259,7 +259,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         RollbackOptimizedHistory[] copy = IntStream.range(0, size)
             .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
 
-        try (PreparedStatement stmt = connection.prepareStatement(INSERT_EDIT)) {
+        try (PreparedStatement stmt = connection.prepareStatement(insertEdit)) {
             // `player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
             for (RollbackOptimizedHistory change : copy) {
                 UUID uuid = change.getUUID();

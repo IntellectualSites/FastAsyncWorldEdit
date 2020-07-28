@@ -559,8 +559,8 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                         value -= arg;
                         break;
                     default:
-                        throw ExpressionHelper.evalException(ctx, "Invalid text for assign expr: " +
-                            ctx.assignmentOperator().getText());
+                        throw ExpressionHelper.evalException(ctx, "Invalid text for assign expr: "
+                            + ctx.assignmentOperator().getText());
                 }
             }
             variable.setValue(value);

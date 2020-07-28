@@ -23,6 +23,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -42,7 +43,7 @@ public abstract class PaginationBox extends MessageBox {
     private int currentPage = -1;
 
     /**
-     * Creates a Paginated component
+     * Creates a Paginated component.
      *
      * @param title The title
      */
@@ -68,7 +69,7 @@ public abstract class PaginationBox extends MessageBox {
     }
 
     /**
-     * Creates a Paginated component
+     * Creates a Paginated component.
      *
      * @param title The title
      * @param pageCommand The command to run to switch page, with %page% representing page number
@@ -79,7 +80,7 @@ public abstract class PaginationBox extends MessageBox {
         if (pageCommand != null && !pageCommand.contains("%page%")) {
             if (pageCommand.contains("-p ")) {
                 pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
-            } else{
+            } else {
                 pageCommand = pageCommand + " -p %page%";
             }
         }
@@ -92,7 +93,7 @@ public abstract class PaginationBox extends MessageBox {
         }
         int pageCount = (int) Math.ceil(getComponentsSize() / (double) componentsPerPage);
         if (page < 1 || page > pageCount) {
-            throw new InvalidComponentException("Invalid page number.");
+            throw new InvalidComponentException(TranslatableComponent.of("worldedit.error.invalid-page"));
         }
         currentPage = page;
         final int lastComp = Math.min(page * componentsPerPage, getComponentsSize());

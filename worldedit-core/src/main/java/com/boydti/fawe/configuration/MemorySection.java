@@ -21,9 +21,11 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
     /**
      * Creates an empty MemorySection for use as a root {@link com.boydti.fawe.configuration.Configuration}
      * section.
+     *
      * <p>
      * Note that calling this without being yourself a {@link com.boydti.fawe.configuration.Configuration}
      * will throw an exception!
+     * </p>
      *
      * @throws IllegalStateException Thrown if this is not a {@link
      *                               com.boydti.fawe.configuration.Configuration} root.
@@ -124,9 +126,11 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
     /**
      * Creates a full path to the given {@link com.boydti.fawe.configuration.ConfigurationSection} from its
      * root {@link com.boydti.fawe.configuration.Configuration}.
+     *
      * <p>
      * You may use this method for any given {@link com.boydti.fawe.configuration.ConfigurationSection}, not
      * only {@link com.boydti.fawe.configuration.MemorySection}.
+     * </p>
      *
      * @param section Section to create a path for.
      * @param key     Name of the specified section.
@@ -139,9 +143,11 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
     /**
      * Creates a relative path to the given {@link com.boydti.fawe.configuration.ConfigurationSection} from
      * the given relative section.
+     *
      * <p>
      * You may use this method for any given {@link com.boydti.fawe.configuration.ConfigurationSection}, not
      * only {@link com.boydti.fawe.configuration.MemorySection}.
+     * </p>
      *
      * @param section    Section to create a path for.
      * @param key        Name of the specified section.
@@ -842,7 +848,7 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
     @Override
     public String toString() {
         Configuration root = getRoot();
-        return getClass().getSimpleName() + "[path='" + getCurrentPath() + "', root='" + (root == null ? null : root.getClass().getSimpleName()) +
-                "']";
+        return getClass().getSimpleName() + "[path='" + getCurrentPath() + "', root='" + (root == null ? null : root.getClass().getSimpleName())
+            + "']";
     }
 }

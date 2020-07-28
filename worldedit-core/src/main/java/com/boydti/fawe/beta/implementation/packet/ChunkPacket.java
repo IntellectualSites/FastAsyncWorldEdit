@@ -64,7 +64,7 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
             synchronized (this) {
                 if (sectionBytes == null) {
                     IBlocks tmpChunk = getChunk();
-                    byte[] buf = FaweCache.IMP.BYTE_BUFFER_8192.get();
+                    byte[] buf = FaweCache.IMP.byteBuffer8192.get();
                     sectionBytes = tmpChunk.toByteArray(buf, tmpChunk.getBitMask(), this.full, Fawe.imp().isChunksStretched());
                 }
                 tmp = sectionBytes;
@@ -85,7 +85,7 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
     @Override
     @Deprecated
     public byte[] get() {
-        return apply(FaweCache.IMP.BYTE_BUFFER_8192.get());
+        return apply(FaweCache.IMP.byteBuffer8192.get());
     }
 
     public CompoundTag getHeightMap() {

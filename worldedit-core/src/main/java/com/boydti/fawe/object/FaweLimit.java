@@ -219,17 +219,17 @@ public class FaweLimit {
     }
 
     public boolean isUnlimited() {
-        return MAX_CHANGES == Integer.MAX_VALUE &&
-                MAX_FAILS == Integer.MAX_VALUE &&
-                MAX_CHECKS == Integer.MAX_VALUE &&
-                MAX_ITERATIONS == Integer.MAX_VALUE &&
-                MAX_BLOCKSTATES == Integer.MAX_VALUE &&
-                MAX_ENTITIES == Integer.MAX_VALUE &&
-                MAX_HISTORY == Integer.MAX_VALUE &&
-                INVENTORY_MODE == 0 &&
-                SPEED_REDUCTION == 0 &&
-                FAST_PLACEMENT &&
-                (STRIP_NBT == null || STRIP_NBT.isEmpty());
+        return MAX_CHANGES == Integer.MAX_VALUE
+            && MAX_FAILS == Integer.MAX_VALUE
+            && MAX_CHECKS == Integer.MAX_VALUE
+            && MAX_ITERATIONS == Integer.MAX_VALUE
+            && MAX_BLOCKSTATES == Integer.MAX_VALUE
+            && MAX_ENTITIES == Integer.MAX_VALUE
+            && MAX_HISTORY == Integer.MAX_VALUE
+            && INVENTORY_MODE == 0
+            && SPEED_REDUCTION == 0
+            && FAST_PLACEMENT
+            && (STRIP_NBT == null || STRIP_NBT.isEmpty());
     }
 
     public void set(FaweLimit limit) {

@@ -118,7 +118,7 @@
 ////                                    () -> {
 ////                                        if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
 ////                                        return dispatcher.getAliases().stream().filter(
-////                                                s -> s.startsWith(command.toLowerCase())
+////                                                s -> s.startsWith(command.toLowerCase(Locale.ROOT))
 ////                                        ).collect(Collectors.toList());
 ////                                    }
 ////                            );

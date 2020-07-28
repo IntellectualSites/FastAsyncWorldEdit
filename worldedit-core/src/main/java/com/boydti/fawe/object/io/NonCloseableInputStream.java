@@ -10,6 +10,7 @@ public class NonCloseableInputStream extends InputStream {
     public NonCloseableInputStream(InputStream parent) {
         this.parent = parent;
     }
+
     @Override
     public int read() throws IOException {
         return parent.read();

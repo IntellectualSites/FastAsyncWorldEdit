@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.util;
 
 import com.boydti.fawe.util.ReflectionUtils;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;

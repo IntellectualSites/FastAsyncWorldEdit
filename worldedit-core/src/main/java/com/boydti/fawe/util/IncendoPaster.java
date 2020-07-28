@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Single class paster for the Incendo paste service
+ * Single class paster for the Incendo paste service.
  *
  * @author Sauilitired
  */
@@ -37,11 +37,12 @@ import java.util.concurrent.TimeUnit;
 public final class IncendoPaster implements Paster {
 
     /**
-     * Upload service URL
+     * Upload service URL.
      */
     public static final String UPLOAD_PATH = "https://athion.net/ISPaster/paste/upload";
+
     /**
-     * Valid paste applications
+     * Valid paste applications.
      */
     public static final Collection<String>
         VALID_APPLICATIONS = Arrays
@@ -51,7 +52,7 @@ public final class IncendoPaster implements Paster {
     private final String pasteApplication;
 
     /**
-     * Construct a new paster
+     * Construct a new paster.
      *
      * @param pasteApplication The application that is sending the paste
      */
@@ -73,7 +74,8 @@ public final class IncendoPaster implements Paster {
 
     private final class PasteTask implements Callable<URL> {
 
-        private PasteTask(String content) {}
+        private PasteTask(String content) {
+        }
 
         @Override
         public URL call() throws Exception {
@@ -83,7 +85,7 @@ public final class IncendoPaster implements Paster {
     }
 
     /**
-     * Get an immutable collection containing all the files that have been added to this paster
+     * Get an immutable collection containing all the files that have been added to this paster.
      *
      * @return Unmodifiable collection
      */
@@ -92,7 +94,7 @@ public final class IncendoPaster implements Paster {
     }
 
     /**
-     * Add a file to the paster
+     * Add a file to the paster.
      *
      * @param file File to paste
      */
@@ -111,7 +113,7 @@ public final class IncendoPaster implements Paster {
     }
 
     /**
-     * Create a JSON string from the submitted information
+     * Create a JSON string from the submitted information.
      *
      * @return compiled JSON string
      */
@@ -141,7 +143,7 @@ public final class IncendoPaster implements Paster {
     }
 
     /**
-     * Upload the paste and return the status message
+     * Upload the paste and return the status message.
      *
      * @return Status message
      * @throws Throwable any and all exceptions
@@ -175,7 +177,7 @@ public final class IncendoPaster implements Paster {
     }
 
     /**
-     * Simple class that represents a paste file
+     * Simple class that represents a paste file.
      */
     public static class PasteFile {
 
@@ -183,7 +185,7 @@ public final class IncendoPaster implements Paster {
         private final String content;
 
         /**
-         * Construct a new paste file
+         * Construct a new paste file.
          *
          * @param fileName File name, cannot be empty, nor null
          * @param content File content, cannot be empty, nor null
@@ -200,7 +202,7 @@ public final class IncendoPaster implements Paster {
         }
 
         /**
-         * Get the file name
+         * Get the file name.
          *
          * @return File name
          */
@@ -209,7 +211,7 @@ public final class IncendoPaster implements Paster {
         }
 
         /**
-         * Get the file content as a single string
+         * Get the file content as a single string.
          *
          * @return File content
          */

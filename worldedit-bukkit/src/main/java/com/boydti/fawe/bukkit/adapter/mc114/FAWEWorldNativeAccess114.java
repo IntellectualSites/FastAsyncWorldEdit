@@ -3,7 +3,7 @@ package com.boydti.fawe.bukkit.adapter.mc114;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_14_R4;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWESpigotV114R4;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -25,19 +25,19 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class FAWEWorldNativeAccess114 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
-    private final FAWE_Spigot_v1_14_R4 adapter;
+    private final FAWESpigotV114R4 adapter;
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
 
-    public FAWEWorldNativeAccess114(FAWE_Spigot_v1_14_R4 adapter, WeakReference<World> world) {
+    public FAWEWorldNativeAccess114(FAWESpigotV114R4 adapter, WeakReference<World> world) {
         this.adapter = adapter;
         this.world = world;
     }
@@ -119,9 +119,9 @@ public class FAWEWorldNativeAccess114 implements WorldNativeAccess<Chunk, IBlock
     }
 
     private static final EnumDirection[] NEIGHBOUR_ORDER = {
-            EnumDirection.WEST, EnumDirection.EAST,
-            EnumDirection.DOWN, EnumDirection.UP,
-            EnumDirection.NORTH, EnumDirection.SOUTH
+        EnumDirection.WEST, EnumDirection.EAST,
+        EnumDirection.DOWN, EnumDirection.UP,
+        EnumDirection.NORTH, EnumDirection.SOUTH
     };
 
     @Override

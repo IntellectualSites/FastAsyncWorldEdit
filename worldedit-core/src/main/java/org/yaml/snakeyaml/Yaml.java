@@ -1,5 +1,6 @@
 package org.yaml.snakeyaml;
 
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.composer.Composer;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
@@ -301,7 +302,7 @@ public class Yaml {
     }
 
     private static class SilentEmitter implements Emitable {
-        private List<Event> events = new ArrayList<>(100);
+        private final List<Event> events = new ArrayList<>(100);
 
         public List<Event> getEvents() {
             return events;
@@ -394,8 +395,7 @@ public class Yaml {
      * objects. The documents are parsed only when the iterator is invoked.
      *
      * @param yaml YAML data to load from (BOM must not be present)
-     * @return an iterator over the parsed Java objects in this String in proper
-     * sequence
+     * @return an iterator over the parsed Java objects in this String in proper sequence
      */
     public Iterable<Object> loadAll(Reader yaml) {
         Composer composer = new Composer(new ParserImpl(new StreamReader(yaml)), resolver);
@@ -434,8 +434,7 @@ public class Yaml {
      * documents are parsed only when the iterator is invoked.
      *
      * @param yaml YAML data to load from (BOM must not be present)
-     * @return an iterator over the parsed Java objects in this String in proper
-     * sequence
+     * @return an iterator over the parsed Java objects in this String in proper sequence
      */
     public Iterable<Object> loadAll(String yaml) {
         return loadAll(new StringReader(yaml));
@@ -446,8 +445,7 @@ public class Yaml {
      * objects. The documents are parsed only when the iterator is invoked.
      *
      * @param yaml YAML data to load from (BOM is respected and ignored)
-     * @return an iterator over the parsed Java objects in this stream in proper
-     * sequence
+     * @return an iterator over the parsed Java objects in this stream in proper sequence
      */
     public Iterable<Object> loadAll(InputStream yaml) {
         return loadAll(new UnicodeReader(yaml));
@@ -459,8 +457,7 @@ public class Yaml {
      *
      * @param yaml YAML document
      * @return parsed root Node for the specified YAML document
-     * @see <a href="http://yaml.org/spec/1.1/#id859333">Figure 3.1. Processing
-     * Overview</a>
+     * @see <a href="http://yaml.org/spec/1.1/#id859333">Figure 3.1. Processing Overview</a>
      */
     public Node compose(Reader yaml) {
         Composer composer = new Composer(new ParserImpl(new StreamReader(yaml)), resolver);
@@ -513,8 +510,7 @@ public class Yaml {
      *
      * @param tag tag to assign to the node
      * @param regexp regular expression to match against
-     * @param first a sequence of possible initial characters or null (which means
-     * any).
+     * @param first a sequence of possible initial characters or null (which means any).
      */
     public void addImplicitResolver(Tag tag, Pattern regexp, String first) {
         resolver.addImplicitResolver(tag, regexp, first);
@@ -527,8 +523,7 @@ public class Yaml {
 
     /**
      * Get a meaningful name. It simplifies debugging in a multi-threaded
-     * environment. If nothing is set explicitly the address of the instance is
-     * returned.
+     * environment. If nothing is set explicitly the address of the instance is returned.
      *
      * @return human readable name
      */
@@ -571,12 +566,13 @@ public class Yaml {
     }
 
     private static class EventIterable implements Iterable<Event> {
-        private Iterator<Event> iterator;
+        private final Iterator<Event> iterator;
 
         public EventIterable(Iterator<Event> iterator) {
             this.iterator = iterator;
         }
 
+        @NotNull
         public Iterator<Event> iterator() {
             return iterator;
         }

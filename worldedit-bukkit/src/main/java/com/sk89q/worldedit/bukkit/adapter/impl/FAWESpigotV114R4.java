@@ -111,7 +111,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
+public final class FAWESpigotV114R4 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_14_R4 parent;
     private char[] ibdToStateOrdinal;
 
@@ -119,7 +119,7 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public FAWE_Spigot_v1_14_R4() throws NoSuchFieldException, NoSuchMethodException {
+    public FAWESpigotV114R4() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new Spigot_v1_14_R4();
     }
 
@@ -300,8 +300,9 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
     }
 
     /**
-     * @deprecated
-     * Method unused. Use #adaptToChar(IBlockData).
+     * No longer recommended.
+     *
+     * @deprecated Method unused. Use #adaptToChar(IBlockData).
      */
     @Deprecated
     public int adaptToInt(IBlockData ibd) {
@@ -351,20 +352,20 @@ public final class FAWE_Spigot_v1_14_R4 extends CachedBukkitAdapter implements I
             EntityPlayer checkPlayer = player == null ? null : ((CraftPlayer) player).getHandle();
             stream.filter(entityPlayer -> checkPlayer == null || entityPlayer == checkPlayer)
                 .forEach(entityPlayer -> {
-                synchronized (packet) {
-                    PacketPlayOutMapChunk nmsPacket = (PacketPlayOutMapChunk) packet.getNativePacket();
-                    if (nmsPacket == null) {
-                        nmsPacket = mapUtil.create( this, packet);
-                        packet.setNativePacket(nmsPacket);
+                    synchronized (packet) {
+                        PacketPlayOutMapChunk nmsPacket = (PacketPlayOutMapChunk) packet.getNativePacket();
+                        if (nmsPacket == null) {
+                            nmsPacket = mapUtil.create( this, packet);
+                            packet.setNativePacket(nmsPacket);
+                        }
+                        try {
+                            FaweCache.IMP.chunkFlag.get().set(true);
+                            entityPlayer.playerConnection.sendPacket(nmsPacket);
+                        } finally {
+                            FaweCache.IMP.chunkFlag.get().set(false);
+                        }
                     }
-                    try {
-                        FaweCache.IMP.CHUNK_FLAG.get().set(true);
-                        entityPlayer.playerConnection.sendPacket(nmsPacket);
-                    } finally {
-                        FaweCache.IMP.CHUNK_FLAG.get().set(false);
-                    }
-                }
-            });
+                });
         }
     }
 

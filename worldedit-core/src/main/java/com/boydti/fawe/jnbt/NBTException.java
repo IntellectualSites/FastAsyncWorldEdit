@@ -6,9 +6,7 @@ public class NBTException extends RuntimeException {
     }
 
     /**
-     * Faster exception throwing if you don't fill the stacktrace
-     *
-     * @return
+     * Faster exception throwing if you don't fill the stacktrace.
      */
     @Override
     public Throwable fillInStackTrace() {

@@ -58,17 +58,16 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
-    IMP
-    ;
+    IMP;
 
-    public final int BLOCKS_PER_LAYER = 4096;
-    public final int CHUNK_LAYERS = 16;
-    public final int WORLD_HEIGHT = CHUNK_LAYERS << 4;
-    public final int WORLD_MAX_Y = WORLD_HEIGHT - 1;
+    public final int blocksPerLayer = 4096;
+    public final int chunkLayers = 16;
+    public final int worldHeight = chunkLayers << 4;
+    public final int worldMaxY = worldHeight - 1;
 
-    public final char[] EMPTY_CHAR_4096 = new char[4096];
+    public final char[] emptyChar4096 = new char[4096];
 
-    private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
+    private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> registeredPools = new IdentityHashMap<>();
 
     /*
     Palette buffers / cache
@@ -79,21 +78,21 @@ public enum FaweCache implements Trimable {
         if (aggressive) {
             CleanableThreadLocal.cleanAll();
         } else {
-            CHUNK_FLAG.clean();
-            BYTE_BUFFER_8192.clean();
-            BLOCK_TO_PALETTE.clean();
-            PALETTE_TO_BLOCK.clean();
-            BLOCK_STATES.clean();
-            SECTION_BLOCKS.clean();
-            PALETTE_CACHE.clean();
-            PALETTE_TO_BLOCK_CHAR.clean();
-            INDEX_STORE.clean();
+            chunkFlag.clean();
+            byteBuffer8192.clean();
+            blockToPalette.clean();
+            paletteToBlock.clean();
+            blockStates.clean();
+            sectionBlocks.clean();
+            paletteCache.clean();
+            paletteToBlockChar.clean();
+            indexStore.clean();
 
-            MUTABLE_VECTOR3.clean();
-            MUTABLE_BLOCKVECTOR3.clean();
-            SECTION_BITS_TO_CHAR.clean();
+            mutableVector3.clean();
+            mutableBlockvector3.clean();
+            sectionBitsToChar.clean();
         }
-        for (Entry<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> entry : REGISTERED_POOLS.entrySet()) {
+        for (Entry<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> entry : registeredPools.entrySet()) {
             Pool<? extends IChunkSet> pool = entry.getValue();
             pool.clear();
         }
@@ -109,7 +108,7 @@ public enum FaweCache implements Trimable {
         } else {
             pool = cache::get;
         }
-        Pool<? extends IChunkSet> previous = REGISTERED_POOLS.putIfAbsent(clazz, pool);
+        Pool<? extends IChunkSet> previous = registeredPools.putIfAbsent(clazz, pool);
         if (previous != null) {
             throw new IllegalStateException("Previous key");
         }
@@ -119,7 +118,9 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(
+                @NotNull
+                    T key) {
                 return withInitial.get();
             }
         });
@@ -128,7 +129,9 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(
+                @NotNull
+                    T key) {
                 return withInitial.apply(key);
             }
         });
@@ -152,63 +155,67 @@ public enum FaweCache implements Trimable {
     /*
     thread cache
      */
-    public final CleanableThreadLocal<AtomicBoolean> CHUNK_FLAG = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
+    public final CleanableThreadLocal<AtomicBoolean> chunkFlag = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
 
-    public final CleanableThreadLocal<long[]> LONG_BUFFER_1024 = new CleanableThreadLocal<>(() -> new long[1024]);
+    public final CleanableThreadLocal<long[]> longBuffer1024 = new CleanableThreadLocal<>(() -> new long[1024]);
 
-    public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
+    public final CleanableThreadLocal<byte[]> byteBuffer8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
 
-    public final VariableThreadLocal BYTE_BUFFER_VAR = new VariableThreadLocal();
+    public final VariableThreadLocal byteBufferVar = new VariableThreadLocal();
 
-    public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
+    public final CleanableThreadLocal<int[]> blockToPalette = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypesCache.states.length];
         Arrays.fill(result, Integer.MAX_VALUE);
         return result;
     });
 
-    public final CleanableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new CleanableThreadLocal<>(() -> new char[4096]);
+    public final CleanableThreadLocal<char[]> sectionBitsToChar = new CleanableThreadLocal<>(() -> new char[4096]);
 
-    public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK = new CleanableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
+    public final CleanableThreadLocal<int[]> paletteToBlock = new CleanableThreadLocal<>(() -> new int[
+        Character.MAX_VALUE + 1]);
 
-    public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
+    public final CleanableThreadLocal<char[]> paletteToBlockChar = new CleanableThreadLocal<>(
         () -> new char[Character.MAX_VALUE + 1], a -> {
-            Arrays.fill(a, Character.MAX_VALUE);
-        }
+        Arrays.fill(a, Character.MAX_VALUE);
+    }
     );
 
-    public final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<>(() -> new long[2048]);
+    public final CleanableThreadLocal<long[]> blockStates = new CleanableThreadLocal<>(() -> new long[2048]);
 
-    public final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<>(() -> new int[4096]);
+    public final CleanableThreadLocal<int[]> sectionBlocks = new CleanableThreadLocal<>(() -> new int[4096]);
 
-    public final CleanableThreadLocal<int[]> INDEX_STORE = new CleanableThreadLocal<>(() -> new int[256]);
+    public final CleanableThreadLocal<int[]> indexStore = new CleanableThreadLocal<>(() -> new int[256]);
 
-    public final CleanableThreadLocal<int[]> HEIGHT_STORE = new CleanableThreadLocal<>(() -> new int[256]);
+    public final CleanableThreadLocal<int[]> heightStore = new CleanableThreadLocal<>(() -> new int[256]);
+
 
     /**
-     * Holds data for a palette used in a chunk section
+     * Holds data for a palette used in a chunk section.
      */
     public static final class Palette {
         public int bitsPerEntry;
 
         public int paletteToBlockLength;
+
         /**
-         * Reusable buffer array, MUST check paletteToBlockLength for actual length
+         * Reusable buffer array, MUST check paletteToBlockLength for actual length.
          */
         public int[] paletteToBlock;
 
         public int blockStatesLength;
+
         /**
-         * Reusable buffer array, MUST check blockStatesLength for actual length
+         * Reusable buffer array, MUST check blockStatesLength for actual length.
          */
         public long[] blockStates;
     }
 
-    private final CleanableThreadLocal<Palette> PALETTE_CACHE = new CleanableThreadLocal<>(Palette::new);
+
+    private final CleanableThreadLocal<Palette> paletteCache = new CleanableThreadLocal<>(Palette::new);
 
     /**
-     * Convert raw char array to palette
-     * @param layerOffset
-     * @param blocks
+     * Convert raw char array to palette.
+     *
      * @return palette
      */
     public Palette toPalette(int layerOffset, char[] blocks) {
@@ -216,9 +223,8 @@ public enum FaweCache implements Trimable {
     }
 
     /**
-     * Convert raw int array to palette
-     * @param layerOffset
-     * @param blocks
+     * Convert raw int array to palette.
+     *
      * @return palette
      */
     public Palette toPalette(int layerOffset, int[] blocks) {
@@ -226,10 +232,10 @@ public enum FaweCache implements Trimable {
     }
 
     private Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
-        int[] blockToPalette = BLOCK_TO_PALETTE.get();
-        int[] paletteToBlock = PALETTE_TO_BLOCK.get();
-        long[] blockStates = BLOCK_STATES.get();
-        int[] blocksCopy = SECTION_BLOCKS.get();
+        int[] blockToPalette = this.blockToPalette.get();
+        int[] paletteToBlock = this.paletteToBlock.get();
+        long[] blockStates = this.blockStates.get();
+        int[] blocksCopy = sectionBlocks.get();
 
         try {
             int num_palette = 0;
@@ -251,7 +257,7 @@ public enum FaweCache implements Trimable {
                     int ordinal = blocksInts[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-//                        BlockState state = BlockTypesCache.states[ordinal];
+                        //                        BlockState state = BlockTypesCache.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -284,7 +290,7 @@ public enum FaweCache implements Trimable {
             }
 
             // Construct palette
-            Palette palette = PALETTE_CACHE.get();
+            Palette palette = paletteCache.get();
             palette.bitsPerEntry = bitsPerEntry;
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
@@ -301,9 +307,8 @@ public enum FaweCache implements Trimable {
     }
 
     /**
-     * Convert raw int array to unstretched palette (1.16)
-     * @param layerOffset
-     * @param blocks
+     * Convert raw int array to unstretched palette (1.16).
+     *
      * @return palette
      */
     public Palette toPaletteUnstretched(int layerOffset, char[] blocks) {
@@ -311,9 +316,8 @@ public enum FaweCache implements Trimable {
     }
 
     /**
-     * Convert raw int array to unstretched palette (1.16)
-     * @param layerOffset
-     * @param blocks
+     * Convert raw int array to unstretched palette (1.16).
+     *
      * @return palette
      */
     public Palette toPaletteUnstretched(int layerOffset, int[] blocks) {
@@ -321,10 +325,10 @@ public enum FaweCache implements Trimable {
     }
 
     private Palette toPaletteUnstretched(int layerOffset, int[] blocksInts, char[] blocksChars) {
-        int[] blockToPalette = BLOCK_TO_PALETTE.get();
-        int[] paletteToBlock = PALETTE_TO_BLOCK.get();
-        long[] blockStates = BLOCK_STATES.get();
-        int[] blocksCopy = SECTION_BLOCKS.get();
+        int[] blockToPalette = this.blockToPalette.get();
+        int[] paletteToBlock = this.paletteToBlock.get();
+        long[] blockStates = this.blockStates.get();
+        int[] blocksCopy = sectionBlocks.get();
 
         try {
             int num_palette = 0;
@@ -380,7 +384,7 @@ public enum FaweCache implements Trimable {
             }
 
             // Construct palette
-            Palette palette = PALETTE_CACHE.get();
+            Palette palette = paletteCache.get();
             palette.bitsPerEntry = bitsPerEntry;
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
@@ -400,9 +404,9 @@ public enum FaweCache implements Trimable {
      * Vector cache
      */
 
-    public CleanableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new CleanableThreadLocal<>(MutableBlockVector3::new);
+    public CleanableThreadLocal<MutableBlockVector3> mutableBlockvector3 = new CleanableThreadLocal<>(MutableBlockVector3::new);
 
-    public CleanableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new CleanableThreadLocal<MutableVector3>(MutableVector3::new) {
+    public CleanableThreadLocal<MutableVector3> mutableVector3 = new CleanableThreadLocal<MutableVector3>(MutableVector3::new) {
         @Override
         public MutableVector3 init() {
             return new MutableVector3();
@@ -547,9 +551,9 @@ public enum FaweCache implements Trimable {
         int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
         return new ThreadPoolExecutor(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS, queue
-                , Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy()) {
+            0L, TimeUnit.MILLISECONDS, queue,
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.CallerRunsPolicy()) {
             protected void afterExecute(Runnable r, Throwable t) {
                 try {
                     super.afterExecute(r, t);

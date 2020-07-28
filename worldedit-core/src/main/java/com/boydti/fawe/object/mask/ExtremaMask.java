@@ -36,14 +36,14 @@ public class ExtremaMask extends AngleMask {
         return lastValue = (slope > min && slope < max);
     }
 
-    private int getHeight(Extent extent, int base, int x, int y, int z, int OX, int OZ, int iterations) {
+    private int getHeight(Extent extent, int base, int x, int y, int z, int ox, int oz, int iterations) {
         int sign = 0;
         int lastHeight1 = base;
         int lastHeight2 = base;
 
-        int cox = OX;
-        int coz = OZ;
-        for (int i = 0; i < iterations; i++, cox += OX, coz += OZ) {
+        int cox = ox;
+        int coz = oz;
+        for (int i = 0; i < iterations; i++, cox += ox, coz += oz) {
             int x1 = x + cox;
             int z1 = z + coz;
             int x2 = x - cox;

@@ -148,7 +148,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a Bukkit Material form a WorldEdit ItemType
+     * Create a Bukkit Material form a WorldEdit ItemType.
      *
      * @param itemType The WorldEdit ItemType
      * @return The Bukkit Material
@@ -162,7 +162,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a Bukkit Material form a WorldEdit BlockType
+     * Create a Bukkit Material form a WorldEdit BlockType.
      *
      * @param blockType The WorldEdit BlockType
      * @return The Bukkit Material
@@ -184,7 +184,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Converts a Material to a BlockType
+     * Converts a Material to a BlockType.
      *
      * @param material The material
      * @return The blocktype
@@ -205,7 +205,7 @@ public interface IBukkitAdapter {
 
 
     /**
-     * Converts a Material to a ItemType
+     * Converts a Material to a ItemType.
      *
      * @param material The material
      * @return The itemtype
@@ -215,7 +215,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData
+     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData.
      *
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
@@ -226,7 +226,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
+     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder.
      *
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
@@ -236,7 +236,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BaseItemStack from a Bukkit ItemStack
+     * Create a WorldEdit BaseItemStack from a Bukkit ItemStack.
      *
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BaseItemStack
@@ -247,7 +247,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a Bukkit ItemStack from a WorldEdit BaseItemStack
+     * Create a Bukkit ItemStack from a WorldEdit BaseItemStack.
      *
      * @param item The WorldEdit BaseItemStack
      * @return The Bukkit ItemStack
@@ -269,6 +269,7 @@ public interface IBukkitAdapter {
     default BukkitPlayer adapt(Player player) {
         return WorldEditPlugin.getInstance().wrapPlayer(player);
     }
+
     /**
      * Create a Bukkit Player from a WorldEdit Player.
      *
@@ -295,7 +296,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Checks equality between a WorldEdit BlockType and a Bukkit Material
+     * Checks equality between a WorldEdit BlockType and a Bukkit Material.
      *
      * @param blockType The WorldEdit BlockType
      * @param type The Bukkit Material
@@ -338,7 +339,7 @@ public interface IBukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BlockStateHolder from a Bukkit ItemStack
+     * Create a WorldEdit BlockStateHolder from a Bukkit ItemStack.
      *
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BlockState

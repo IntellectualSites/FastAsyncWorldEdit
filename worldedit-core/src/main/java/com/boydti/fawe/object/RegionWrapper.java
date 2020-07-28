@@ -14,9 +14,13 @@ public class RegionWrapper extends CuboidRegion {
     public int minZ;
     public int maxZ;
 
+    //CheckStyle:OFF
+    @SuppressWarnings("CheckStyle")
     public static RegionWrapper GLOBAL() {
         return GLOBAL;
     }
+
+    //CheckStyle:ON
 
     public RegionWrapper(final int minX, final int maxX, final int minZ, final int maxZ) {
         this(minX, maxX, 0, 255, minZ, maxZ);

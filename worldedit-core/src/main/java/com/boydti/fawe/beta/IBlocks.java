@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
- * A shared interface for IGetBlocks and ISetBlocks
+ * A shared interface for IGetBlocks and ISetBlocks.
  */
 public interface IBlocks extends Trimable {
 
@@ -38,7 +38,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
+        return IntStream.range(0, FaweCache.IMP.chunkLayers).filter(this::hasSection)
             .map(layer -> (1 << layer)).sum();
     }
 
@@ -59,7 +59,7 @@ public interface IBlocks extends Trimable {
             .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         try (FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
-            for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+            for (int layer = 0; layer < FaweCache.IMP.chunkLayers; layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) {
                     continue;
                 }
@@ -84,7 +84,7 @@ public interface IBlocks extends Trimable {
                 sectionWriter.writeShort(nonEmpty); // non empty
                 FaweCache.Palette palette;
                 if (stretched) {
-                     palette = FaweCache.IMP.toPalette(0, ids);
+                    palette = FaweCache.IMP.toPalette(0, ids);
                 } else {
                     palette = FaweCache.IMP.toPaletteUnstretched(0, ids);
                 }

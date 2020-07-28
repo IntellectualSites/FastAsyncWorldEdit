@@ -97,14 +97,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     )
     default long getVolume() {
         DeprecationUtil.checkDelegatingOverride(getClass());
-        // TODO Remove default status when getArea is removed.
-        try {
-            if (getClass().getMethod("getArea").getDeclaringClass().equals(Region.class)) {
-                throw new IllegalStateException("Class " + getClass().getName() + " must override getVolume.");
-            }
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        }
+
         return getArea();
     }
 

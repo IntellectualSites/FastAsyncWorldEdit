@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class SlowExtent extends AbstractDelegateExtent {
-    private long THRESHOLD = 50 * 1000000; // 1 tick
+    private long threshold = 50 * 1000000; // 1 tick
     private final long nanos;
     private long increment;
 
@@ -24,7 +24,7 @@ public class SlowExtent extends AbstractDelegateExtent {
 
     public void delay() {
         increment += nanos;
-        if (increment >= THRESHOLD) {
+        if (increment >= threshold) {
             long wait = increment / 1000000;
             if (!Fawe.isMainThread()) {
                 try {

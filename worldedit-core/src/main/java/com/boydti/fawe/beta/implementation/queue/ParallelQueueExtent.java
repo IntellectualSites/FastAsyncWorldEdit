@@ -183,10 +183,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     /**
-     * Lazily copy a region
-     *
-     * @param region
-     * @return
+     * Lazily copy a region.
      */
     @Override
     public Clipboard lazyCopy(Region region) {

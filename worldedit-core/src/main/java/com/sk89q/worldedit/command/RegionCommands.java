@@ -539,7 +539,7 @@ public class RegionCommands {
         @Switch(name = 'm', desc = "Only fall within the vertical selection")
             boolean notFullHeight) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
-        player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
+        player.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
     }
 
     @Command(

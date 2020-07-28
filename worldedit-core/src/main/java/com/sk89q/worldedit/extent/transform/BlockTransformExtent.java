@@ -42,6 +42,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,13 +78,15 @@ import static com.sk89q.worldedit.util.Direction.values;
  */
 public class BlockTransformExtent extends ResettableExtent {
 
+    private static final Logger log = LoggerFactory.getLogger(BlockTransformExtent.class);
+
     private Transform transform;
 
     private Transform transformInverse;
-    private int[] BLOCK_ROTATION_BITMASK;
-    private int[][] BLOCK_TRANSFORM;
-    private int[][] BLOCK_TRANSFORM_INVERSE;
-    private int[] ALL = new int[0];
+    private int[] blockRotationBitmask;
+    private int[][] blockTransform;
+    private int[][] blockTransformInverse;
+    private int[] all = new int[0];
 
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
@@ -149,7 +153,7 @@ public class BlockTransformExtent extends ResettableExtent {
                         case 2:
                             return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
                         default:
-                            System.out.println("Invalid " + property.getName() + " " + property.getValues());
+                            log.error("Invalid " + property.getName() + " " + property.getValues());
                             return null;
                     }
                 case FACING: {
@@ -181,7 +185,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                     continue;
                                 default:
-                                    System.out.println("Unknown direction " + value);
+                                    log.error("Unknown direction " + value);
                                     result.add(0L);
                             }
                         }
@@ -221,7 +225,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     directions.add(combine(NORTHEAST));
                                     break;
                                 default:
-                                    System.out.println("Unknown direction " + value);
+                                    log.error("Unknown direction " + value);
                                     directions.add(0L);
                             }
                         }
@@ -387,23 +391,23 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     private void cache() {
-        BLOCK_ROTATION_BITMASK = new int[BlockTypes.size()];
-        BLOCK_TRANSFORM = new int[BlockTypes.size()][];
-        BLOCK_TRANSFORM_INVERSE = new int[BlockTypes.size()][];
-        for (int i = 0; i < BLOCK_TRANSFORM.length; i++) {
-            BLOCK_TRANSFORM[i] = ALL;
-            BLOCK_TRANSFORM_INVERSE[i] = ALL;
+        blockRotationBitmask = new int[BlockTypes.size()];
+        blockTransform = new int[BlockTypes.size()][];
+        blockTransformInverse = new int[BlockTypes.size()][];
+        for (int i = 0; i < blockTransform.length; i++) {
+            blockTransform[i] = all;
+            blockTransformInverse[i] = all;
             BlockType type = BlockTypes.get(i);
             int bitMask = 0;
             for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
                 if (isDirectional(property)) {
-                    BLOCK_TRANSFORM[i] = null;
-                    BLOCK_TRANSFORM_INVERSE[i] = null;
+                    blockTransform[i] = null;
+                    blockTransformInverse[i] = null;
                     bitMask |= property.getBitMask();
                 }
             }
             if (bitMask != 0) {
-                BLOCK_ROTATION_BITMASK[i] = bitMask;
+                blockRotationBitmask[i] = bitMask;
             }
         }
     }
@@ -473,14 +477,14 @@ public class BlockTransformExtent extends ResettableExtent {
     private BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
         int typeId = state.getInternalBlockTypeId();
         int[] arr = transformArray[typeId];
-        if (arr == ALL) {
+        if (arr == all) {
             return state;
         }
         if (arr == null) {
             arr = transformArray[typeId] = new int[state.getBlockType().getMaxStateId() + 1];
             Arrays.fill(arr, -1);
         }
-        int mask = BLOCK_ROTATION_BITMASK[typeId];
+        int mask = blockRotationBitmask[typeId];
         int internalId = state.getInternalId();
 
         int maskedId = internalId & mask;
@@ -503,7 +507,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return transformed.toBaseBlock();
     }
 
-    protected final BlockStateHolder transformInverse(BlockStateHolder block) {
+    protected final <T extends BlockStateHolder<T>> BlockStateHolder transformInverse(T block) {
         BlockState transformed = transformInverse(block.toImmutableState());
         if (block.hasNbtData()) {
             return transformBaseBlockNBT(transformed, block.getNbtData(), transformInverse);
@@ -512,11 +516,11 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     public final BlockState transform(BlockState block) {
-        return transform(block, BLOCK_TRANSFORM, transform);
+        return transform(block, blockTransform, transform);
     }
 
     private BlockState transformInverse(BlockState block) {
-        return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
+        return transform(block, blockTransformInverse, transformInverse);
     }
 
     @Override

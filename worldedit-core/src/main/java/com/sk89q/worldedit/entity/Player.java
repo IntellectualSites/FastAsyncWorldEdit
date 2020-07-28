@@ -392,7 +392,7 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Unregister this player (deletes all metadata etc) - Usually called on logout
+     * Unregister this player (deletes all metadata etc) - Usually called on logout.
      */
     default void unregister() {
         cancel(true);

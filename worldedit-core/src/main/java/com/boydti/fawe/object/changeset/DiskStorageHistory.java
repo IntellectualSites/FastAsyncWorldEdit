@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * Store the change on disk
+ * Store the change on disk.
  * - High disk usage
  * - Moderate CPU usage
  * - Minimal memory usage
@@ -65,13 +65,13 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         super(world);
         init(uuid, world.getName());
     }
-    
+
     private void init(UUID uuid, String worldName) {
         File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
         int max = MainUtil.getMaxFileId(folder);
         init(uuid, max);
     }
-    
+
     public DiskStorageHistory(World world, UUID uuid, int index) {
         super(world);
         init(uuid, index);
@@ -83,7 +83,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         this.index = i;
         initFiles(folder);
     }
-    
+
     private void initFiles(File folder) {
         nbtfFile = new File(folder, index + ".nbtf");
         nbttFile = new File(folder, index + ".nbtt");
@@ -102,7 +102,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     @Override
     public void delete() {
-//        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
+        //        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
         deleteFiles();
         if (Settings.IMP.HISTORY.USE_DATABASE) {
             RollbackDatabase db = DBHandler.IMP.getDatabase(getWorld());

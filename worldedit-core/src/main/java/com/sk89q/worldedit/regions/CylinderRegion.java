@@ -32,6 +32,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.geom.Polygons;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
 import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.math.BigDecimal;
@@ -54,7 +55,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     private boolean hasY = false;
 
     /**
-     * Construct the region
+     * Construct the region.
      */
     public CylinderRegion() {
         this((World) null);
@@ -116,7 +117,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Sets the main center point of the region
+     * Sets the main center point of the region.
      *
      * @param center the center point
      */
@@ -125,7 +126,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Returns the radius of the cylinder
+     * Returns the radius of the cylinder.
      *
      * @return the radius along the X and Z axes
      */
@@ -134,7 +135,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Sets the radius of the cylinder
+     * Sets the radius of the cylinder.
      *
      * @param radius the radius along the X and Z axes
      */
@@ -144,7 +145,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Extends the radius to be at least the given radius
+     * Extends the radius to be at least the given radius.
      *
      * @param minRadius the minimum radius
      */
@@ -233,7 +234,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         }
 
         if ((diff.getBlockX() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException("Cylinders changes must be even for each horizontal dimensions.");
+            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.cylinder.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();
@@ -250,10 +251,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     /**
      * Expand the region.
-     * Expand the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
      */
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
@@ -274,7 +273,6 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * Contract the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
      */
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
@@ -375,10 +373,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Returns string representation in the format
+     * Returns string representation in the format.
      * "(centerX, centerZ) - (radiusX, radiusZ) - (minY, maxY)"
-     *
-     * @return string
      */
     @Override
     public String toString() {

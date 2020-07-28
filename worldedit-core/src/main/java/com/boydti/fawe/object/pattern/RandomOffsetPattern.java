@@ -20,7 +20,7 @@ public class RandomOffsetPattern extends AbstractPattern {
     private transient int dy2;
     private transient int dz2;
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
-    private transient SplittableRandom r;
+    private transient SplittableRandom splittableRandom;
 
     public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
         this.pattern = pattern;
@@ -30,23 +30,23 @@ public class RandomOffsetPattern extends AbstractPattern {
         this.dx2 = dx * 2 + 1;
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;
-        this.r = new SplittableRandom();
+        this.splittableRandom = new SplittableRandom();
 
     }
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
+        mutable.mutX((position.getX() + splittableRandom.nextInt(dx2) - dx));
+        mutable.mutY((position.getY() + splittableRandom.nextInt(dy2) - dy));
+        mutable.mutZ((position.getZ() + splittableRandom.nextInt(dz2) - dz));
         return pattern.apply(mutable);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
+        mutable.mutX((set.getX() + splittableRandom.nextInt(dx2) - dx));
+        mutable.mutY((set.getY() + splittableRandom.nextInt(dy2) - dy));
+        mutable.mutZ((set.getZ() + splittableRandom.nextInt(dz2) - dz));
         return pattern.apply(extent, get, mutable);
     }
 }

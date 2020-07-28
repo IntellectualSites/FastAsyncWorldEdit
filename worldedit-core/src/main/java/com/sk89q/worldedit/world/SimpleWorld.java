@@ -67,7 +67,9 @@ public interface SimpleWorld extends World {
     @Override
     <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pt, B block) throws WorldEditException;
 
-    @Nullable @Override default Path getStoragePath() {
+    @Nullable
+    @Override
+    default Path getStoragePath() {
         return null;
     }
 
@@ -100,7 +102,6 @@ public interface SimpleWorld extends World {
     default void fixLighting(Iterable<BlockVector2> chunks) {
     }
 
-//    @Override
     default boolean playEffect(BlockVector3 position, int type, int data) {
         return false;
     }

@@ -78,7 +78,7 @@ public abstract class DFSVisitor implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         //        MutableBlockVector3 mutable = new MutableBlockVector3();
-//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
+        //        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         IntTriple[] dirs = getIntDirections();
 
         while (!queue.isEmpty()) {
@@ -88,17 +88,17 @@ public abstract class DFSVisitor implements Operation {
             if (visited.containsKey(from)) {
                 continue;
             }
-//            mutable.mutX(from.getX());
-//            mutable.mutY(from.getY());
-//            mutable.mutZ(from.getZ());
+            //            mutable.mutX(from.getX());
+            //            mutable.mutY(from.getY());
+            //            mutable.mutZ(from.getZ());
             BlockVector3 bv = BlockVector3.at(from.getX(), from.getY(), from.getZ());
             function.apply(bv);
             int countAdd = 0;
             int countAttempt = 0;
             for (IntTriple direction : dirs) {
-//                mutable2.mutX(from.getX() + direction.x);
-//                mutable2.mutY(from.getY() + direction.y);
-//                mutable2.mutZ(from.getZ() + direction.z);
+                //                mutable2.mutX(from.getX() + direction.x);
+                //                mutable2.mutY(from.getY() + direction.y);
+                //                mutable2.mutZ(from.getZ() + direction.z);
                 BlockVector3 bv2 = BlockVector3
                     .at(from.getX() + direction.getX(), from.getY() + direction.getY(),
                         from.getZ() + direction.getZ());

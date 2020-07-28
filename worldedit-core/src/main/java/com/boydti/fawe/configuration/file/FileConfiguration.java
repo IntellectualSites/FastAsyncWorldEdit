@@ -16,20 +16,19 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * This is a base class for all File based implementations of {@link
- * com.boydti.fawe.configuration.Configuration}
+ * This is a base class for all File based implementations of {@link Configuration}.
  */
 public abstract class FileConfiguration extends MemoryConfiguration {
 
     /**
-     * Creates an empty {@link com.boydti.fawe.configuration.file.FileConfiguration} with no default values.
+     * Creates an empty {@link FileConfiguration} with no default values.
      */
     public FileConfiguration() {
     }
 
     /**
-     * Creates an empty {@link com.boydti.fawe.configuration.file.FileConfiguration} using the specified {@link
-     * com.boydti.fawe.configuration.Configuration} as a source for all default values.
+     * Creates an empty {@link FileConfiguration} using the specified {@link
+     * Configuration} as a source for all default values.
      *
      * @param defaults Default value provider
      */
@@ -38,17 +37,21 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Saves this {@link com.boydti.fawe.configuration.file.FileConfiguration} to the specified location.
+     * Saves this {@link FileConfiguration} to the specified location.
+     *
      * <p>
      * If the file does not exist, it will be created. If already exists, it
      * will be overwritten. If it cannot be overwritten or created, an
      * exception will be thrown.
+     * </p>
+     *
      * <p>
      * This method will save using the system default encoding, or possibly
      * using UTF8.
+     * </p>
      *
      * @param file File to save to.
-     * @throws java.io.IOException      Thrown when the given file cannot be written to for
+     * @throws IOException      Thrown when the given file cannot be written to for
      *                                  any reason.
      * @throws IllegalArgumentException Thrown when file is null.
      */
@@ -66,17 +69,21 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Saves this {@link com.boydti.fawe.configuration.file.FileConfiguration} to the specified location.
+     * Saves this {@link FileConfiguration} to the specified location.
+     *
      * <p>
      * If the file does not exist, it will be created. If already exists, it
      * will be overwritten. If it cannot be overwritten or created, an
      * exception will be thrown.
+     * </p>
+     *
      * <p>
      * This method will save using the system default encoding, or possibly
      * using UTF8.
+     * </p>
      *
      * @param file File to save to.
-     * @throws java.io.IOException      Thrown when the given file cannot be written to for
+     * @throws IOException      Thrown when the given file cannot be written to for
      *                                  any reason.
      * @throws IllegalArgumentException Thrown when file is null.
      */
@@ -89,28 +96,31 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Saves this {@link com.boydti.fawe.configuration.file.FileConfiguration} to a string, and returns it.
+     * Saves this {@link FileConfiguration} to a string, and returns it.
      *
      * @return String containing this configuration.
      */
     public abstract String saveToString();
 
     /**
-     * Loads this {@link com.boydti.fawe.configuration.file.FileConfiguration} from the specified location.
+     * Loads this {@link FileConfiguration} from the specified location.
+     *
      * <p>
      * All the values contained within this configuration will be removed,
      * leaving only settings and defaults, and the new values will be loaded
      * from the given file.
+     * </p>
+     *
      * <p>
      * If the file cannot be loaded for any reason, an exception will be
      * thrown.
-     * <p>
+     * </p>
      *
      * @param file File to load from.
      * @throws java.io.FileNotFoundException                               Thrown when the given file cannot be
      *                                                                     opened.
-     * @throws java.io.IOException                                         Thrown when the given file cannot be read.
-     * @throws com.boydti.fawe.configuration.InvalidConfigurationException Thrown when the given file is not
+     * @throws IOException                                         Thrown when the given file cannot be read.
+     * @throws InvalidConfigurationException Thrown when the given file is not
      *                                                                     a valid Configuration.
      * @throws IllegalArgumentException                                    Thrown when file is null.
      */
@@ -125,15 +135,17 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Loads this {@link com.boydti.fawe.configuration.file.FileConfiguration} from the specified reader.
+     * Loads this {@link FileConfiguration} from the specified reader.
+     *
      * <p>
      * All the values contained within this configuration will be removed,
      * leaving only settings and defaults, and the new values will be loaded
      * from the given stream.
+     * </p>
      *
      * @param reader the reader to load from
-     * @throws java.io.IOException                                         thrown when underlying reader throws an IOException
-     * @throws com.boydti.fawe.configuration.InvalidConfigurationException thrown when the reader does not
+     * @throws IOException                                         thrown when underlying reader throws an IOException
+     * @throws InvalidConfigurationException thrown when the reader does not
      *                                                                     represent a valid Configuration
      * @throws IllegalArgumentException                                    thrown when reader is null
      */
@@ -154,20 +166,23 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Loads this {@link com.boydti.fawe.configuration.file.FileConfiguration} from the specified location.
+     * Loads this {@link FileConfiguration} from the specified location.
+     *
      * <p>
      * All the values contained within this configuration will be removed,
      * leaving only settings and defaults, and the new values will be loaded
      * from the given file.
+     * </p>
+     *
      * <p>
-     * If the file cannot be loaded for any reason, an exception will be
-     * thrown.
+     * If the file cannot be loaded for any reason, an exception will be thrown.
+     * </p>
      *
      * @param file File to load from.
      * @throws java.io.FileNotFoundException                               Thrown when the given file cannot be
      *                                                                     opened.
-     * @throws java.io.IOException                                         Thrown when the given file cannot be read.
-     * @throws com.boydti.fawe.configuration.InvalidConfigurationException Thrown when the given file is not
+     * @throws IOException                                         Thrown when the given file cannot be read.
+     * @throws InvalidConfigurationException Thrown when the given file is not
      *                                                                     a valid Configuration.
      * @throws IllegalArgumentException                                    Thrown when file is null.
      */
@@ -180,29 +195,36 @@ public abstract class FileConfiguration extends MemoryConfiguration {
     }
 
     /**
-     * Loads this {@link com.boydti.fawe.configuration.file.FileConfiguration} from the specified string, as
+     * Loads this {@link FileConfiguration} from the specified string, as
      * opposed to from file.
+     *
      * <p>
      * All the values contained within this configuration will be removed,
      * leaving only settings and defaults, and the new values will be loaded
      * from the given string.
+     * </p>
+     *
      * <p>
      * If the string is invalid in any way, an exception will be thrown.
+     * </p>
      *
      * @param contents Contents of a Configuration to load.
-     * @throws com.boydti.fawe.configuration.InvalidConfigurationException Thrown if the specified string is
+     * @throws InvalidConfigurationException Thrown if the specified string is
      *                                                                     invalid.
      * @throws IllegalArgumentException                                    Thrown if contents is null.
      */
     public abstract void loadFromString(String contents) throws InvalidConfigurationException;
 
     /**
-     * Compiles the header for this {@link com.boydti.fawe.configuration.file.FileConfiguration} and returns the
+     * Compiles the header for this {@link FileConfiguration} and returns the
      * result.
+     *
      * <p>
      * This will use the header from {@link #options()} -> {@link
-     * com.boydti.fawe.configuration.file.FileConfigurationOptions#header()}, respecting the rules of {@link
-     * com.boydti.fawe.configuration.file.FileConfigurationOptions#copyHeader()} if set.
+     * FileConfigurationOptions#header()}, respecting the rules of {@link
+     * FileConfigurationOptions#copyHeader()} if set.
+     * </p>
+     *
      *
      * @return Compiled header
      */

@@ -23,7 +23,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final int dy2;
     private final int dz2;
     private final MutableBlockVector3 mutable;
-    private SplittableRandom r;
+    private SplittableRandom splittableRandom;
 
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
@@ -42,15 +42,15 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         this.dx2 = dx * 2 + 1;
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;
-        this.r = new SplittableRandom();
+        this.splittableRandom = new SplittableRandom();
         this.mutable = new MutableBlockVector3();
     }
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        mutable.mutX(position.getX() + r.nextInt(dx2) - dx);
-        mutable.mutY(position.getY() + r.nextInt(dy2) - dy);
-        mutable.mutZ(position.getZ() + r.nextInt(dz2) - dz);
+        mutable.mutX(position.getX() + splittableRandom.nextInt(dx2) - dx);
+        mutable.mutY(position.getY() + splittableRandom.nextInt(dy2) - dy);
+        mutable.mutZ(position.getZ() + splittableRandom.nextInt(dz2) - dz);
         BaseBlock block = pattern.apply(mutable);
         if (block.getMaterial().isSolid()) {
             return block;
@@ -60,9 +60,9 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
-        mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
-        mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
+        mutable.mutX(set.getX() + splittableRandom.nextInt(dx2) - dx);
+        mutable.mutY(set.getY() + splittableRandom.nextInt(dy2) - dy);
+        mutable.mutZ(set.getZ() + splittableRandom.nextInt(dz2) - dz);
         BaseBlock block = pattern.apply(mutable);
         if (block.getMaterial().isSolid()) {
             return pattern.apply(extent, get, mutable);

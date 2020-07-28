@@ -14,12 +14,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 public interface IBatchProcessor {
+
     /**
-     * Process a chunk that has been set
-     * @param chunk
-     * @param get
-     * @param set
-     * @return
+     * Process a chunk that has been set.
      */
     IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
 
@@ -28,18 +25,13 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Convert this processor into an Extent based processor instead of a queue batch based on
-     * @param child
-     * @return
+     * Convert this processor into an Extent based processor instead of a queue batch based on.
      */
     @Nullable
     Extent construct(Extent child);
 
     /**
-     * Utility method to trim a chunk based on min and max Y
-     * @param set
-     * @param minY
-     * @param maxY
+     * Utility method to trim a chunk based on minY and maxY.
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY) {
@@ -59,7 +51,7 @@ public interface IBatchProcessor {
             }
         }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+        for (int layer = maxLayer; layer < FaweCache.IMP.chunkLayers; layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
@@ -92,9 +84,7 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Utility method to trim entity and blocks with a provided contains function
-     * @param set
-     * @param contains
+     * Utility method to trim entity and blocks with a provided contains function.
      * @return false if chunk is empty of NBT
      */
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
@@ -111,21 +101,17 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Join two processors and return the result
-     * @param other
-     * @return
+     * Join two processors and return the result.
      */
     default IBatchProcessor join(IBatchProcessor other) {
         return MultiBatchProcessor.of(this, other);
     }
 
-    default void flush() {}
+    default void flush() {
+    }
 
     /**
-     * Return a new processor after removing all are instances of a specified class
-     * @param clazz
-     * @param <T>
-     * @return
+     * Return a new processor after removing all are instances of a specified class.
      */
     default <T extends IBatchProcessor> IBatchProcessor remove(Class<T> clazz) {
         if (clazz.isInstance(this)) {

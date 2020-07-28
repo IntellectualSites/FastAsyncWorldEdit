@@ -127,6 +127,7 @@ public class ToolCommands {
         session.setTool(player, null);
         player.printInfo(TranslatableComponent.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
+
     private final WorldEdit we;
 
     public ToolCommands(WorldEdit we) {
@@ -225,7 +226,7 @@ public class ToolCommands {
 
     @Command(
         name = "floodfill",
-        aliases = { "flood" },
+        aliases = { "flood", "/flood", "/floodfill" },
         desc = "Flood fill tool"
     )
     @CommandPermissions("worldedit.tool.flood-fill")

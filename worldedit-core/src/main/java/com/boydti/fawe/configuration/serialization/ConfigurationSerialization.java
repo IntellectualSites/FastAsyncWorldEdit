@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * Utility class for storing and retrieving classes for {@link Configuration}.
  */
@@ -26,12 +27,15 @@ public class ConfigurationSerialization {
     /**
      * Attempts to deserialize the given arguments into a new instance of the
      * given class.
+     *
      * <p>
-     * <p>The class must implement {@link ConfigurationSerializable}, including
+     * The class must implement {@link ConfigurationSerializable}, including
      * the extra methods as specified in the javadoc of
-     * ConfigurationSerializable.</p>
+     * ConfigurationSerializable.
+     * </p>
+     *
      * <p>
-     * <p>If a new instance could not be made, an example being the class not
+     * If a new instance could not be made, an example being the class not
      * fully implementing the interface, null will be returned.</p>
      *
      * @param args  Arguments for deserialization
@@ -43,14 +47,13 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Attempts to deserialize the given arguments into a new instance of the
-     * <p>
-     * given class.
+     * Attempts to deserialize the given arguments into a new instance of the given class.
+     *
      * <p>
      * The class must implement {@link ConfigurationSerializable}, including
      * the extra methods as specified in the javadoc of
      * ConfigurationSerializable.</p>
-     * <p>
+     *
      * <p>
      * If a new instance could not be made, an example being the class not
      * fully implementing the interface, null will be returned.</p>
@@ -110,7 +113,7 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Unregisters the specified alias to a {@link ConfigurationSerializable}
+     * Unregisters the specified alias to a {@link ConfigurationSerializable}.
      *
      * @param alias Alias to unregister
      */

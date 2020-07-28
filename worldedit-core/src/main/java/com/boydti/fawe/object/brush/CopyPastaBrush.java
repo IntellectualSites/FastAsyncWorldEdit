@@ -91,7 +91,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
             int blocks = builder.size();
-            player.print(Caption.of("fawe.worldedit.copy.command.copy" , blocks));
+            player.print(Caption.of("fawe.worldedit.copy.command.copy", blocks));
         } else {
             AffineTransform transform = null;
             if (randomRotate) {

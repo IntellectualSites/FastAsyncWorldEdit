@@ -73,6 +73,7 @@ public interface OutputExtent {
      * @param biome the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
      */
+    @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
         return setBiome(position.getX(), 0, position.getBlockZ(), biome);
     }
@@ -83,7 +84,7 @@ public interface OutputExtent {
     }
 
     /**
-     * Set the light value
+     * Set the light value.
      *
      * @param position position of the block
      * @param value light level to set
@@ -92,10 +93,11 @@ public interface OutputExtent {
         setBlockLight(position.getX(), position.getY(), position.getZ(), value);
     }
 
-    default void setBlockLight(int x, int y, int z, int value) {}
+    default void setBlockLight(int x, int y, int z, int value) {
+    }
 
     /**
-     * Set the sky light value
+     * Set the sky light value.
      *
      * @param position position of the block
      * @param value light level to set
@@ -104,7 +106,8 @@ public interface OutputExtent {
         setSkyLight(position.getX(), position.getY(), position.getZ(), value);
     }
 
-    default void setSkyLight(int x, int y, int z, int value) {}
+    default void setSkyLight(int x, int y, int z, int value) {
+    }
 
     /**
      * Return an {@link Operation} that should be called to tie up loose ends

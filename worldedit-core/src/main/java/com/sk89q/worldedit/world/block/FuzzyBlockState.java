@@ -32,7 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A Fuzzy BlockState. Used for partial matching.
  *
+ * <p>
  * Immutable, construct with {@link FuzzyBlockState.Builder}.
+ * </p>
  */
 public class FuzzyBlockState extends BlockState {
 
@@ -124,14 +126,14 @@ public class FuzzyBlockState extends BlockState {
     }
 
     /**
-     * Builder for FuzzyBlockState
+     * Builder for FuzzyBlockState.
      */
     public static class Builder {
         private BlockType type;
-        private Map<Property<?>, Object> values = new HashMap<>();
+        private final Map<Property<?>, Object> values = new HashMap<>();
 
         /**
-         * The type of the Fuzzy BlockState
+         * The type of the Fuzzy BlockState.
          *
          * @param type The type
          * @return The builder, for chaining
@@ -143,7 +145,7 @@ public class FuzzyBlockState extends BlockState {
         }
 
         /**
-         * The type of the Fuzzy BlockState
+         * The type of the Fuzzy BlockState.
          *
          * @param state The state
          * @return The builder, for chaining
@@ -155,7 +157,7 @@ public class FuzzyBlockState extends BlockState {
         }
 
         /**
-         * Adds a property to the fuzzy BlockState
+         * Adds a property to the fuzzy BlockState.
          *
          * @param property The property
          * @param value The value

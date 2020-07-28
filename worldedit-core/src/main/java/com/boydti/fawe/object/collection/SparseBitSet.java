@@ -136,9 +136,11 @@ public class SparseBitSet implements Cloneable, Serializable {
      * represented by a long value, and is at bit position <code>i % 64</code>
      * within that word (where bit position 0 refers to the least significant bit
      * and 63 refers to the most significant bit).
+     *
      * <p>
      * The words are organized into blocks, and the blocks are accessed by two
      * additional levels of array indexing.
+     * </p>
      */
     protected transient long[][][] bits;
 
@@ -173,9 +175,11 @@ public class SparseBitSet implements Cloneable, Serializable {
      * 4 "levels". Respectively (from the least significant end), level4, the
      * address within word, the address within a level3 block, the address within
      * a level2 area, and the level1 address of that area within the set.
+     *
      * <p>
      * LEVEL4 is the number of bits of the level4 address (number of bits need
      * to address the bits in a long)
+     * </p>
      */
     protected static final int LEVEL4 = 6;
 
@@ -801,12 +805,15 @@ public class SparseBitSet implements Cloneable, Serializable {
      * Returns a hash code value for this bit set. The hash code depends only on
      * which bits have been set within this <code>SparseBitSet</code>. The
      * algorithm used to compute it may be described as follows.
+     *
      * <p>
      * Suppose the bits in the <code>SparseBitSet</code> were to be stored in an
      * array of <code>long</code> integers called, say, <code>bits</code>, in such
      * a manner that bit <code>i</code> is set in the <code>SparseBitSet</code>
      * (for nonnegative values of  <code>i</code>) if and only if the expression
-     * <pre>
+     * </p>
+     *
+     *  <pre>
      *  ((i&gt;&gt;6) &lt; bits.length) &amp;&amp; ((bits[i&gt;&gt;6] &amp; (1L &lt;&lt; (bit &amp; 0x3F))) != 0)
      *  </pre>
      * is true. Then the following definition of the <code>hashCode</code> method
@@ -967,9 +974,11 @@ public class SparseBitSet implements Cloneable, Serializable {
      * Returns the index of the first bit that is set to <code>true</code> that
      * occurs on or after the specified starting index. If no such it exists then
      * -1 is returned.
+     *
      * <p>
      * To iterate over the <code>true</code> bits in a <code>SparseBitSet
      * sbs</code>, use the following loop:
+     * </p>
      *
      * <pre>
      *  for( int i = sbbits.nextSetBit(0); i &gt;= 0; i = sbbits.nextSetBit(i+1) )
@@ -1129,7 +1138,9 @@ public class SparseBitSet implements Cloneable, Serializable {
         /*  This is the word from which the search begins. */
         final int w = i >> SHIFT3;
         int w1 = w >> SHIFT1;
-        int w2, w3, w4;
+        int w2;
+        int w3;
+        int w4;
         /*  But if its off the end of the array, start from the very end. */
         if (w1 > aSize) {
             w1 = aSize;
@@ -1361,10 +1372,12 @@ public class SparseBitSet implements Cloneable, Serializable {
      * references that can be held by the top level array, Level2 areas in use,
      * Level3 blocks in use,, Level2 pool size, Level3 pool size, and the
      * Compaction count.
+     *
      * <p>
      * This method is intended for diagnostic use (as it is relatively expensive
      * in time), but can be useful in understanding an application's use of a
      * <code>SparseBitSet</code>.
+     * </p>
      *
      * @param values an array for the individual results (if not null)
      * @return a String detailing the statistics of the bit set
@@ -1513,10 +1526,12 @@ public class SparseBitSet implements Cloneable, Serializable {
      * The default default value is 2 (which means sequences of three or more
      * bits set are shown as a subsequence, and all other set bits are listed
      * individually).
+     *
      * <p>
      * Note: this value will be passed to <code>SparseBitSet</code>s that
      * may be created within or as a result of the operations on this bit set,
      * or, for static methods, from the value belonging to the first parameter.
+     * </p>
      *
      * @param count the maximum count of a run of bits that are shown as
      * individual entries in a <code>toString</code>() conversion.
@@ -1755,7 +1770,6 @@ public class SparseBitSet implements Cloneable, Serializable {
      * operation
      * @param op the AbstractStrategy class defining the operation to be
      * executed
-     * @throws IndexOutOfBoundsException
      * @see AbstractStrategy
      * @since 1.6
      */
@@ -1843,7 +1857,7 @@ public class SparseBitSet implements Cloneable, Serializable {
                 on just the references to the blocks could be wrong. */
             if ((!haveA2 && !haveB2 && f_op_f_eq_f
                 || !haveA2 && f_op_x_eq_f || !haveB2 && x_op_f_eq_f)
-                && notFirstBlock && u1 != v1) {//nested if!
+                && notFirstBlock && u1 != v1) { //nested if!
                 if (u1 < aLength1) {
                     a1[u1] = null;
                 }
@@ -1884,9 +1898,7 @@ public class SparseBitSet implements Cloneable, Serializable {
                         if (notFirstBlock && notLastBlock) {
                             if (x_op_f_eq_x && !haveB3) {
                                 isZero = op.isZeroBlock(a3);
-                            }
-                            // b block is null, just check a block
-                            else {
+                            } else { // b block is null, just check a block
                                 isZero = op.block(base3, 0, LENGTH3, a3, b3);
                             }
                         }
@@ -2051,9 +2063,6 @@ public class SparseBitSet implements Cloneable, Serializable {
         s.writeInt(cache.hash);
     }
 
-    /**
-     * serialVersionUID
-     */
     private static final long serialVersionUID = -6663013367427929992L;
 
     /**
@@ -2117,10 +2126,12 @@ public class SparseBitSet implements Cloneable, Serializable {
      * created by the <i>statistics</i>() method. The values of the corresponding
      * statistics are <code>int</code>s, except for the loadFactor and
      * Average_chain_length values, which are <code>float</code>s.
+     *
      * <p>
      * An array of <code>String</code>s may be obtained containing a
      * representation of each of these values. An element of such an array, say,
      * <code>values</code>, may be accessed, for example, by:
+     * </p>
      * <pre>
      *      values[SparseBitSet.statistics.Buckets_available.ordinal()]</pre>
      *
@@ -2252,9 +2263,11 @@ public class SparseBitSet implements Cloneable, Serializable {
      * <i>setScanner</i>() method of the main <code>SparseBitSet</code> class
      * essentially finds matching level3 blocks, and then calls the strategy to
      * do the appropriate operation on each of the elements of the block.
+     *
      * <p>
      * The symbolic constants control optimisation paths in the
      * <i>setScanner</i>() method of the main <code>SparseBitSet</code> class.
+     * </p>
      *
      * @see SparseBitSet#setScanner(int i, int j,
      * SparseBitSet b, AbstractStrategy op)
@@ -2302,8 +2315,7 @@ public class SparseBitSet implements Cloneable, Serializable {
         /**
          * Properties of this strategy.
          *
-         * @return the int containing the bits representing the properties of
-         * this strategy
+         * @return the int containing the bits representing the properties of this strategy
          * @since 1.6
          */
         protected abstract int properties();
@@ -2390,6 +2402,7 @@ public class SparseBitSet implements Cloneable, Serializable {
      * And of two sets. Where the <i>a</i> set is zero, it remains zero (i.e.,
      * without entries or with zero words). Similarly, where the <i>b</i> set is
      * zero, the <i>a</i> becomes zero (i.e., without entries).
+     *
      * <p>
      * If level1 of the <i>a</i> set is longer than level1 of the bit set
      * <i>b</i>, then the unmatched virtual "entries" of the <i>b</i> set (beyond
@@ -2399,6 +2412,7 @@ public class SparseBitSet implements Cloneable, Serializable {
      * entries that could match entries in the bit set<i>b</i>. This clearing of
      * the remainder of the <i>a</i> set is accomplished by selecting both
      * <i>F_OP_X_EQ_F</i> and <i>X_OP_F_EQ_F</i>.
+     * </p>
      *
      * <pre>
      *  and| 0 1

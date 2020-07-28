@@ -44,7 +44,7 @@ public final class CFIDrawer {
         for (int i = 0; i < parallelism; i++) {
             int start = i * size;
             int end = Math.min(heights.length, start + size);
-            pool.submit((Runnable) () -> {
+            pool.submit(() -> {
                 for (int index = start; index < end; index++) {
                     int height = (heights[index] & 0xFF);
                     char ordinal;
@@ -126,7 +126,7 @@ public final class CFIDrawer {
 
     private int getSlope(byte[] heights, int width, int index, int height) {
         return (
-            + getHeight(heights, index + 1, height)
+            +getHeight(heights, index + 1, height)
                 //                + getHeight(heights, index + width, height)
                 + getHeight(heights, index + width + 1, height)
                 - getHeight(heights, index - 1, height)

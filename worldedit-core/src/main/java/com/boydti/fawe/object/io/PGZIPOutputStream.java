@@ -112,13 +112,13 @@ public class PGZIPOutputStream extends FilterOutputStream {
      */
     private void writeHeader() throws IOException {
         out.write(new byte[]{
-                (byte) GZIP_MAGIC, // ID1: Magic number (little-endian short)
-                (byte) (GZIP_MAGIC >> 8), // ID2: Magic number (little-endian short)
-                Deflater.DEFLATED, // CM: Compression method
-                0, // FLG: Flags (byte)
-                0, 0, 0, 0, // MTIME: Modification time (int)
-                0, // XFL: Extra flags
-                3 // OS: Operating system (3 = Linux)
+            (byte) GZIP_MAGIC, // ID1: Magic number (little-endian short)
+            (byte) (GZIP_MAGIC >> 8), // ID2: Magic number (little-endian short)
+            Deflater.DEFLATED, // CM: Compression method
+            0, // FLG: Flags (byte)
+            0, 0, 0, 0, // MTIME: Modification time (int)
+            0, // XFL: Extra flags
+            3 // OS: Operating system (3 = Linux)
         });
     }
 

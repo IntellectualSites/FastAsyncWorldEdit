@@ -72,9 +72,7 @@ public interface Mask {
     }
 
     /**
-     * Returns null if no optimization took place
-     * otherwise a new/same mask
-     * @return
+     * Returns null if no optimization took place otherwise a new/same mask.
      */
     @Nullable
     default Mask tryOptimize() {

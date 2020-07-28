@@ -70,7 +70,7 @@ public class Snapshot implements Comparable<Snapshot> {
     public ChunkStore getChunkStore() throws IOException, DataException {
         ChunkStore chunkStore = internalGetChunkStore();
 
-        logger.info("WorldEdit: Using " + chunkStore.getClass().getCanonicalName()
+        logger.info("FAWE: Using " + chunkStore.getClass().getCanonicalName()
                 + " for loading snapshot '" + file.getAbsolutePath() + "'");
 
         return chunkStore;

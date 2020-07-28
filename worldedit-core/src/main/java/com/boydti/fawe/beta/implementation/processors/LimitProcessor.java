@@ -11,6 +11,7 @@ import com.sk89q.worldedit.extent.Extent;
 public class LimitProcessor implements IBatchProcessor {
     private final FaweLimit limit;
     private final IBatchProcessor parent;
+
     public LimitProcessor(FaweLimit limit, IBatchProcessor parent) {
         this.limit = limit;
         this.parent = parent;

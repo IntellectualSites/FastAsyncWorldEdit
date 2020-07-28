@@ -49,7 +49,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         try {
             config.load();
         } catch (IOException e) {
-            logger.warn("Error loading WorldEdit configuration", e);
+            logger.warn("Error loading FAWE configuration", e);
         }
 
         profile = config.getBoolean("debug", profile);

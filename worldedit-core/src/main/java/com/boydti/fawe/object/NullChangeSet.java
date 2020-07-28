@@ -2,7 +2,6 @@ package com.boydti.fawe.object;
 
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -15,7 +14,7 @@ public class NullChangeSet extends AbstractChangeSet {
     public NullChangeSet(World world) {
         super(world);
     }
-    
+
     @Override
     public final void close() {
     }
@@ -48,11 +47,6 @@ public class NullChangeSet extends AbstractChangeSet {
     @Override
     public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
 
-    }
-
-    @Override
-    public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
-        return getIterator(redo);
     }
 
     @Override

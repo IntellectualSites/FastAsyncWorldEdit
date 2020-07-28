@@ -25,7 +25,8 @@ public interface IFawe {
         return null;
     }
 
-    public default void registerPacketListener() {}
+    default void registerPacketListener() {
+    }
 
     String getPlatform();
 

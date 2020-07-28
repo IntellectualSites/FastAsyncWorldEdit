@@ -21,7 +21,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWESpigotV115R2;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -110,7 +110,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
         BiomeStorage index = getChunk().getBiomeIndex();
         BiomeBase base = null;
         if (y == -1) {
-            for (y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
+            for (y = 0; y < FaweCache.IMP.worldHeight; y++) {
                 base = index.getBiome(x >> 2, y >> 2, z >> 2);
                 if (base != null) {
                     break;
@@ -391,7 +391,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
                             if (biome != null) {
                                 final Biome craftBiome = BukkitAdapter.adapt(biome);
                                 BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
-                                for (int y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
+                                for (int y = 0; y < FaweCache.IMP.worldHeight; y++) {
                                     currentBiomes.setBiome(x >> 2, y >> 2, z >> 2, nmsBiome);
                                 }
                             }
@@ -604,7 +604,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
             Arrays.fill(data, (char) 1);
             return data;
         }
-        if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
+        if (data == null || data == FaweCache.IMP.emptyChar4096) {
             data = new char[4096];
             Arrays.fill(data, (char) 1);
         }
@@ -614,7 +614,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                FAWE_Spigot_v1_15_R2 adapter = ((FAWE_Spigot_v1_15_R2) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                FAWESpigotV115R2 adapter = ((FAWESpigotV115R2) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitAdapter1152.fieldBits.get(blocks);
@@ -632,8 +632,8 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
                     num_palette = ((DataPaletteHash<IBlockData>) palette).b();
                 } else {
                     num_palette = 0;
-                    int[] paletteToBlockInts = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-                    char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                    int[] paletteToBlockInts = FaweCache.IMP.paletteToBlock.get();
+                    char[] paletteToBlockChars = FaweCache.IMP.paletteToBlockChar.get();
                     try {
                         for (int i = 0; i < 4096; i++) {
                             char paletteVal = data[i];
@@ -663,7 +663,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
                     return data;
                 }
 
-                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                char[] paletteToOrdinal = FaweCache.IMP.paletteToBlockChar.get();
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {
@@ -704,7 +704,7 @@ public class BukkitGetBlocks1152 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_15_R2 adapter) {
+    private final char ordinal(IBlockData ibd, FAWESpigotV115R2 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {

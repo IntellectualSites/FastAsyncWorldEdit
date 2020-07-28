@@ -153,7 +153,8 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param z the z coordinate
      * @param uuid the unique identifier of the entity
      */
-    default void removeEntity(int x, int y, int z, UUID uuid) {}
+    default void removeEntity(int x, int y, int z, UUID uuid) {
+    }
 
     /*
     Queue based methods
@@ -499,10 +500,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Lazily copy a region
-     *
-     * @param region
-     * @return
+     * Lazily copy a region.
      */
     default Clipboard lazyCopy(Region region) {
         WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
@@ -685,9 +683,8 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     /**
-     * Have an extent processed
+     * Have an extent processed.
      *  - Either block (Extent) processing or chunk processing
-     * @param processor
      * @return processed Extent
      */
     default Extent addProcessor(IBatchProcessor processor) {

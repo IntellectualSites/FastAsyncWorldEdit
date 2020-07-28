@@ -16,7 +16,6 @@ public interface Filter {
      *
      * @param chunkX the x coordinate in the chunk
      * @param chunkZ the z coordinate in the chunk
-     * @return
      */
     default boolean appliesChunk(@Range(from = 0, to = 15) int chunkX,
         @Range(from = 0, to = 15) int chunkZ) {
@@ -47,15 +46,13 @@ public interface Filter {
 
     /**
      * Do something with the IChunk after block filtering.
-     *
-     * @param chunk
      */
     default void finishChunk(IChunk chunk) {
     }
 
     /**
      * Fork this for use by another thread - Typically filters are simple and don't need to create
-     * another copy to be thread safe here
+     * another copy to be thread safe here.
      *
      * @return this
      */

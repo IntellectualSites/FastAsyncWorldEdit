@@ -30,8 +30,8 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     private final Vector3 unit;
     private final Vector3 zero2;
-    private Vector3 current = new MutableVector3(Vector3.ZERO);
-    private Extent extent;
+    private Vector3 current = MutableVector3.ZERO;
+    private final Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
         this((Extent) editSession, unit, zero);
@@ -52,31 +52,37 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
         return current.add(x, y, z);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockType(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockData(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockTypeAbs(double x, double y, double z) {
         return extent.getBlock(BlockVector3.at(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockDataAbs(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockTypeRel(double x, double y, double z) {
         return extent.getBlock(toWorldRel(x, y, z).toBlockPoint()).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockDataRel(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;

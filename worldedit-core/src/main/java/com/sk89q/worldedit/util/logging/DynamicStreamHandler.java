@@ -73,7 +73,7 @@ public class DynamicStreamHandler extends StreamHandler {
             handler.setFilter(filter);
             try {
                 handler.setEncoding(encoding);
-            } catch (UnsupportedEncodingException ignore) {
+            } catch (UnsupportedEncodingException ignored) {
             }
             handler.setLevel(level);
         }

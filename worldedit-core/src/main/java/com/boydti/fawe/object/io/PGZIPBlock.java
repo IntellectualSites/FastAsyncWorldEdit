@@ -4,13 +4,13 @@ import java.util.concurrent.Callable;
 
 public class PGZIPBlock implements Callable<byte[]> {
     public PGZIPBlock(final PGZIPOutputStream parent) {
-        STATE = new PGZIPThreadLocal(parent);
+        state = new PGZIPThreadLocal(parent);
     }
 
     /**
      * This ThreadLocal avoids the recycling of a lot of memory, causing lumpy performance.
      */
-    protected final ThreadLocal<PGZIPState> STATE;
+    protected final ThreadLocal<PGZIPState> state;
     public static final int SIZE = 64 * 1024;
     // private final int index;
     protected final byte[] in = new byte[SIZE];
@@ -26,7 +26,7 @@ public class PGZIPBlock implements Callable<byte[]> {
     public byte[] call() throws Exception {
         // LOG.info("Processing " + this + " on " + Thread.currentThread());
 
-        PGZIPState state = STATE.get();
+        PGZIPState state = this.state.get();
         // ByteArrayOutputStream buf = new ByteArrayOutputStream(in.length);   // Overestimate output size required.
         // DeflaterOutputStream def = newDeflaterOutputStream(buf);
         state.def.reset();

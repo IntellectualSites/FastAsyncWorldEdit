@@ -8,7 +8,8 @@ import com.sk89q.worldedit.world.registry.ItemRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
 
 public final class ItemTypesCache {
-    public static void init() {}
+    public static void init() {
+    }
 
     static {
         Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS);

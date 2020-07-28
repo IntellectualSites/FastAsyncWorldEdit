@@ -37,7 +37,7 @@ public class LinearInterpolation implements Interpolation {
     @Override
     public void setNodes(List<Node> nodes) {
         checkNotNull(nodes);
-        
+
         this.nodes = nodes;
     }
 
@@ -124,19 +124,15 @@ public class LinearInterpolation implements Interpolation {
      */
     private double arcLengthRecursive(int indexA, double remainderA, int indexB, double remainderB) {
         switch (indexB - indexA) {
-        case 0:
-            return arcLengthRecursive(indexA, remainderA, remainderB);
-
-        case 1:
-            // This case is merely a speed-up for a very common case
-            return
-                    arcLengthRecursive(indexA, remainderA, 1.0) +
-                    arcLengthRecursive(indexB, 0.0, remainderB);
-
-        default:
-            return
-                    arcLengthRecursive(indexA, remainderA, indexB - 1, 1.0) +
-                    arcLengthRecursive(indexB, 0.0, remainderB);
+            case 0:
+                return arcLengthRecursive(indexA, remainderA, remainderB);
+            case 1:
+                // This case is merely a speed-up for a very common case
+                return arcLengthRecursive(indexA, remainderA, 1.0)
+                    + arcLengthRecursive(indexB, 0.0, remainderB);
+            default:
+                return arcLengthRecursive(indexA, remainderA, indexB - 1, 1.0)
+                    + arcLengthRecursive(indexB, 0.0, remainderB);
         }
     }
 

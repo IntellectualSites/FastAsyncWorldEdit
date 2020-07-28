@@ -56,7 +56,7 @@ public class RemoteScript {
         this.dependencies = ImmutableList.copyOf(dependencies);
     }
 
-    private synchronized void ensureCached() throws IOException {
+    private synchronized void ensureCached() throws IOException, InterruptedException {
         if (!Files.exists(cacheDir)) {
             Files.createDirectories(cacheDir);
         }
@@ -90,6 +90,8 @@ public class RemoteScript {
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 

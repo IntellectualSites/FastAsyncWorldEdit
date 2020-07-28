@@ -20,7 +20,7 @@ public class CombinedBlockCopy implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-//        BlockStateHolder block = source.getBlock(position);
+        //        BlockStateHolder block = source.getBlock(position);
         BaseBlock block = source.getFullBlock(position);
         function.apply(position);
         return destination.setBlock(position, block);

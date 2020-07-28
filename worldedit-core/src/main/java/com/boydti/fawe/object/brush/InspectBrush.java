@@ -24,6 +24,8 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,6 +33,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class InspectBrush extends BrushTool {
+
+    private static final Logger log = LoggerFactory.getLogger(InspectBrush.class);
 
     /**
      * Construct the tool.
@@ -62,13 +66,13 @@ public class InspectBrush extends BrushTool {
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
-            System.out.println("No tool control");
+            log.warn("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable",
                 "history.use-database (Import with /history import )"));
-            System.out.println("No db");
+            log.warn("No db");
             return false;
         }
         try {
@@ -107,12 +111,12 @@ public class InspectBrush extends BrushTool {
                     player.print(msg);
                 }
             }
-            player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+            player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer", count));
         } catch (IOException e) {
-            System.out.println("IOE");
+            log.error("IOE");
             throw new RuntimeException(e);
         } catch (Throwable e) {
-            System.out.println("E throw");
+            log.error("E throw", e);
         }
         return true;
     }

@@ -3,10 +3,6 @@ package com.boydti.fawe.bukkit.listener;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.TaskManager;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,11 +15,16 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class RenderListener implements Listener {
 
     private final Map<UUID, int[]> views = new ConcurrentHashMap<>();
     private Iterator<Map.Entry<UUID, int[]>> entrySet;
-    private int OFFSET = 6;
+    private int offset = 6;
 
     public RenderListener(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -41,15 +42,15 @@ public class RenderListener implements Listener {
                 long diff = now - last;
                 last = now;
                 if (diff > 75) {
-                    OFFSET = diff > 100 ? 0 : 4;
+                    offset = diff > 100 ? 0 : 4;
                     return;
                 }
                 int timeOut;
                 if (diff < 55 && tps32 > 608) {
-                    OFFSET = 8;
+                    offset = 8;
                     timeOut = 2;
                 } else {
-                    OFFSET = 1 + (tps32 / 102400);
+                    offset = 1 + (tps32 / 102400);
                     timeOut = 162 - (tps32 / 2560);
                 }
                 if (entrySet == null || !entrySet.hasNext()) {
@@ -116,7 +117,8 @@ public class RenderListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        if (from.getBlockX() >> OFFSET != to.getBlockX() >> OFFSET || from.getBlockZ() >> OFFSET != to.getBlockZ() >> OFFSET) {
+        if (from.getBlockX() >> offset != to.getBlockX() >> offset
+            || from.getBlockZ() >> offset != to.getBlockZ() >> offset) {
             Player player = event.getPlayer();
             int currentView = getViewDistance(player);
             setViewDistance(player, Math.max(currentView - 1, 1));

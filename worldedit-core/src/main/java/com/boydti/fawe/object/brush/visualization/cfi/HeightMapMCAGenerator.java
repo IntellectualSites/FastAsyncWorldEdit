@@ -159,11 +159,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public boolean isModified() {
-        return blocks.isModified() ||
-            heights.isModified() ||
-            biomes.isModified() ||
-            overlay != null && overlay.isModified() ||
-            !primitives.equals(oldPrimitives);
+        return blocks.isModified()
+            || heights.isModified()
+            || biomes.isModified()
+            || overlay != null && overlay.isModified()
+            || !primitives.equals(oldPrimitives);
     }
 
     private void resetPrimitives() throws CloneNotSupportedException {
@@ -230,7 +230,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private ImageViewer viewer;
     // Used for visualizing the world by sending chunk packets
     // These three variables should be set together
-//    private IQueueExtent packetQueue;
+    //    private IQueueExtent packetQueue;
     private Player player;
     private BlockVector2 chunkOffset = BlockVector2.ZERO;
     private EditSession editSession;
@@ -756,7 +756,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
-        throws WorldEditException{
+        throws WorldEditException {
         return SideEffectSet.none().getSideEffectsToApply();
     }
 
@@ -893,6 +893,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     @Override
     public Path getStoragePath() {
         return getFolder().toPath();
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
     }
 
     @Override
@@ -1686,12 +1691,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         char[] floor = this.floor.get();
         char[] overlay = this.overlay != null ? this.overlay.get() : null;
         try {
-            int[] indexes = FaweCache.IMP.INDEX_STORE.get();
+            int[] indexes = FaweCache.IMP.indexStore.get();
 
             int index;
             int maxY = 0;
             int minY = Integer.MAX_VALUE;
-            int[] heightMap = FaweCache.IMP.HEIGHT_STORE.get();
+            int[] heightMap = FaweCache.IMP.heightStore.get();
             int globalIndex;
             for (int z = csz; z <= cez; z++) {
                 globalIndex = z * getWidth() + csx;

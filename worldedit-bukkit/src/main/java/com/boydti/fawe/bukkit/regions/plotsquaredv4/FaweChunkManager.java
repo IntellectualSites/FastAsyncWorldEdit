@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.regions.plotsquaredv4;
 
-import static org.bukkit.Bukkit.getWorld;
-
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
@@ -18,7 +16,10 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+
 import java.util.concurrent.CompletableFuture;
+
+import static org.bukkit.Bukkit.getWorld;
 
 public class FaweChunkManager extends ChunkManager {
 
@@ -59,7 +60,7 @@ public class FaweChunkManager extends ChunkManager {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
                 WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                    pos1World,-1);
+                    pos1World, -1);
                 EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));

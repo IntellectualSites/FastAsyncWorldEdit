@@ -21,16 +21,16 @@ public class OreGen implements Resource {
     private final Mask mask;
     private MutableBlockVector3 mutable = new MutableBlockVector3();
 
-    private final double ONE_2 = 1 / 2F;
-    private final double ONE_8 = 1 / 8F;
-    private final double ONE_16 = 1 / 16F;
+    private final double one2 = 1 / 2F;
+    private final double one8 = 1 / 8F;
+    private final double one16 = 1 / 16F;
 
     public int laced = 0;
 
     public OreGen(Extent extent, Mask mask, Pattern pattern, int size, int minY, int maxY) {
         this.maxSize = size;
-        this.maxSizeO8 = size * ONE_8;
-        this.maxSizeO16 = size * ONE_16;
+        this.maxSizeO8 = size * one8;
+        this.maxSizeO16 = size * one16;
         this.sizeInverse = 1.0 / size;
         this.minY = minY;
         this.maxY = maxY;
@@ -73,8 +73,8 @@ public class OreGen implements Resource {
             double d11 = (sif + 1.0) * d10 + 1.0;
             double d12 = (sif + 1.0) * d10 + 1.0;
 
-            double d11o2 = d11 * ONE_2;
-            double d12o2 = d12 * ONE_2;
+            double d11o2 = d11 * one2;
+            double d12o2 = d12 * one2;
 
             int minX = MathMan.floorZero(d7 - d11o2);
             int minY = Math.max(1, MathMan.floorZero(d8 - d12o2));

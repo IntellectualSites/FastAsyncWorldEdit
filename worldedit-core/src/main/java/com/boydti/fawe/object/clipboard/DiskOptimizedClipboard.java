@@ -56,7 +56,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static int HEADER_SIZE = 14;
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
-    
+
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
 
@@ -113,7 +113,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public URI getURI() {
         return file.toURI();
@@ -366,7 +366,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             int diskIndex = HEADER_SIZE + (index << 1);
             char ordinal = byteBuffer.getChar(diskIndex);
             return BlockState.getFromOrdinal(ordinal);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (IndexOutOfBoundsException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -99,6 +99,7 @@ public class ForwardExtentCopy implements Operation {
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
         this(source, region, region.getMinimumPoint(), destination, to);
     }
+
     private FlatRegionVisitor lastBiomeVisitor;
     private EntityVisitor lastEntityVisitor;
     private int affectedBiomeCols;

@@ -75,6 +75,7 @@ public class PropertyGroup<G, A> {
 
     private final G defaultValue;
     private final PropertyFunction[] states;
+
     private PropertyGroup(PropertyFunction[] states, G defaultValue) {
         this.states = states;
         this.defaultValue = defaultValue;

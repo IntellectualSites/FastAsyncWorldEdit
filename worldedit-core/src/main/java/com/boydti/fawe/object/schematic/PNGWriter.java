@@ -103,9 +103,9 @@ public class PNGWriter implements ClipboardWriter {
                     mutableTop.mutY(y + 1);
                     mutableRight.mutY(y);
                     mutableLeft.mutY(y);
-                    if (!clipboard.getBlock(mutableTop).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableRight).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableLeft).getBlockType().getMaterial().isAir() ) {
+                    if (!clipboard.getBlock(mutableTop).getBlockType().getMaterial().isAir()
+                        && !clipboard.getBlock(mutableRight).getBlockType().getMaterial().isAir()
+                        && !clipboard.getBlock(mutableLeft).getBlockType().getMaterial().isAir()) {
                         continue;
                     }
                     double cpy = cpy2 - dpxi[y - y0];

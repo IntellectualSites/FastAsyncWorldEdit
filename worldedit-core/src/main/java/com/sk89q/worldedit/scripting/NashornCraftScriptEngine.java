@@ -58,8 +58,8 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
             bindings.put(entry.getKey(), entry.getValue());
         }
 
-       try {
-           return engine.eval(script, bindings);
+        try {
+            return engine.eval(script, bindings);
         } catch (Error e) {
             e.printStackTrace();
             throw new ScriptException(e.getMessage());

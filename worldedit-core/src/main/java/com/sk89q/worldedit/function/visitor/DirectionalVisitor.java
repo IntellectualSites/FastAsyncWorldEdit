@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Visits adjacent points on the same X-Z plane as long as the points
  * pass the given mask, and then executes the provided region
  * function on the entire column.
- * <p>
+ *
  * <p>This is used by {@code //fill}.</p>
  */
 public class DirectionalVisitor extends RecursiveVisitor {

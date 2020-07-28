@@ -117,7 +117,7 @@ public class CFIPacketListener implements Listener {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket() || FaweCache.IMP.CHUNK_FLAG.get().get()) {
+                if (!event.isServerPacket() || FaweCache.IMP.chunkFlag.get().get()) {
                     return;
                 }
                 VirtualWorld gen = getGenerator(event);

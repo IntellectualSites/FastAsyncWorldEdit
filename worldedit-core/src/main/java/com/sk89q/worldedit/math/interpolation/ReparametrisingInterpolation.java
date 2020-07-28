@@ -47,7 +47,7 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     public ReparametrisingInterpolation(Interpolation baseInterpolation) {
         checkNotNull(baseInterpolation);
-        
+
         this.baseInterpolation = baseInterpolation;
     }
 
@@ -145,8 +145,7 @@ public class ReparametrisingInterpolation implements Interpolation {
                 // search between left and mid
                 rightArc = midArc;
                 rightParameter = midParameter;
-            }
-            else {
+            } else {
                 // search between mid and right
                 leftArc = midArc;
                 leftParameter = midParameter;

@@ -10,7 +10,7 @@ public class FaweException extends RuntimeException {
     // DEBUG
     public static final FaweException _enableQueue = new FaweException("enableQueue");
     public static final FaweException _disableQueue = new FaweException("disableQueue");
-    
+
     private final Component message;
 
     public FaweException(String reason) {
@@ -42,9 +42,7 @@ public class FaweException extends RuntimeException {
     }
 
     /**
-     * Faster exception throwing/handling if you don't fill the stacktrace
-     *
-     * @return
+     * Faster exception throwing/handling if you don't fill the stacktrace.
      */
     @Override
     public Throwable fillInStackTrace() {

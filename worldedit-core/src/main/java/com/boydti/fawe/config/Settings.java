@@ -1,4 +1,4 @@
-//CHECKSTYLE:OFF
+//CheckStyle:OFF
 
 package com.boydti.fawe.config;
 

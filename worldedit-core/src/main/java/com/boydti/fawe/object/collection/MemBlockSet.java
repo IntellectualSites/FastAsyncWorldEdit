@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public final class MemBlockSet extends BlockSet {
     public static final int BITS_PER_WORD = 6;
-    public static final int WORDS = FaweCache.IMP.BLOCKS_PER_LAYER >> BITS_PER_WORD;
+    public static final int WORDS = FaweCache.IMP.blocksPerLayer >> BITS_PER_WORD;
     public static final IRow NULL_ROW_X = new NullRowX();
     public static final IRow NULL_ROW_Z = new NullRowZ();
     public static final IRow NULL_ROW_Y = new NullRowY();
@@ -376,8 +376,8 @@ public final class MemBlockSet extends BlockSet {
                                     maxy = y + 1;
                                 }
                                 by = (Y << 4) + y;
-                                if (by == FaweCache.IMP.WORLD_MAX_Y) {
-                                    return FaweCache.IMP.WORLD_MAX_Y;
+                                if (by == FaweCache.IMP.worldMaxY) {
+                                    return FaweCache.IMP.worldMaxY;
                                 }
                                 break outer;
                             }
@@ -904,7 +904,7 @@ public final class MemBlockSet extends BlockSet {
         public final IRow[] rows;
 
         public RowZ() {
-            this.rows = new IRow[FaweCache.IMP.CHUNK_LAYERS];
+            this.rows = new IRow[FaweCache.IMP.chunkLayers];
             reset();
         }
 
@@ -951,7 +951,7 @@ public final class MemBlockSet extends BlockSet {
         }
 
         public void reset() {
-            for (int i = 0; i < FaweCache.IMP.CHUNK_LAYERS; i++) {
+            for (int i = 0; i < FaweCache.IMP.chunkLayers; i++) {
                 rows[i] = NULL_ROW_Y;
             }
         }

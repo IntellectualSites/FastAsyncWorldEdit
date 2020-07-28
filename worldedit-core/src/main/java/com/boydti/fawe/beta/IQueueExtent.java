@@ -16,10 +16,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
-/**
- * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
- * uses chunks
- */
+//TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which uses chunks
 public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, IChunkExtent<T>, IBatchProcessorHolder {
 
     @Override
@@ -28,47 +25,37 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     }
 
     /**
-     * Must ensure that it is enqueued with QueueHandler
+     * Must ensure that it is enqueued with QueueHandler.
      */
     @Override
     void enableQueue();
 
     /**
-     * Must ensure it is not in the queue handler (i.e. does not change blocks in the world)
+     * Must ensure it is not in the queue handler (i.e. does not change blocks in the world).
      */
     @Override
     void disableQueue();
 
 
     /**
-     * Initialize the queue (for reusability)
-     * @param extent
-     * @param get
-     * @param set
+     * Initialize the queue (for reusability).
      */
     void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 
     /**
-     * Get the cached get object
+     * Get the cached get object.
      *  - Faster than getting it using NMS and allows for wrapping
-     * @param x
-     * @param z
-     * @return
      */
     IChunkGet getCachedGet(@Range(from = 0, to = 15) int x, @Range(from = 0, to = 15) int z);
 
     /**
-     * Get the cached chunk set object
-     * @param chunkX
-     * @param chunkZ
-     * @return
+     * Get the cached chunk set object.
      */
     IChunkSet getCachedSet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
 
     /**
-     * Submit the chunk so that it's changes are applied to the world
+     * Submit the chunk so that it's changes are applied to the world.
      *
-     * @param chunk
      * @return result
      */
     <V extends Future<V>> V submit(T chunk);
@@ -80,7 +67,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(30000000, FaweCache.IMP.WORLD_MAX_Y, 30000000);
+        return BlockVector3.at(30000000, FaweCache.IMP.worldMaxY, 30000000);
     }
 
     void setFastMode(boolean fastMode);
@@ -90,7 +77,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     /**
      * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
      * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
-     * #wrap(T)}
+     * #wrap(T)}.
      *
      * @param isFull true if a more optimized chunk should be returned
      * @return a more optimized chunk object
@@ -100,7 +87,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     /**
      * Wrap the chunk object (i.e., for region restrictions / limits etc.)
      *
-     * @param root
      * @return wrapped chunk
      */
     default T wrap(T root) {
@@ -115,15 +101,14 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     }
 
     /**
-     * Flush all changes to the world - Best to call this async so it doesn't hang the server
+     * Flush all changes to the world - Best to call this async so it doesn't hang the server.
      */
     @Override
     void flush();
 
     /**
-     * A filter block is used to iterate over blocks / positions
+     * A filter block is used to iterate over blocks / positions.
      *  - Essentially combines BlockVector3, Extent and BlockState functions in a way that avoids lookups
-     * @return
      */
     ChunkFilterBlock initFilterBlock();
 

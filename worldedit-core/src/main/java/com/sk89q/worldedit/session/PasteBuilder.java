@@ -83,7 +83,6 @@ public class PasteBuilder {
      * This provides a more flexible alternative to {@link #ignoreAirBlocks(boolean)}, for example
      * one might want to ignore structure void if copying a Minecraft Structure, etc.
      *
-     * @param sourceMask
      * @return this builder instance
      */
     public PasteBuilder maskSource(Mask sourceMask) {
@@ -109,7 +108,6 @@ public class PasteBuilder {
      * Set whether the copy should include source entities.
      * Note that this is true by default for legacy reasons.
      *
-     * @param copyEntities
      * @return this builder instance
      */
     public PasteBuilder copyEntities(boolean copyEntities) {
@@ -120,13 +118,13 @@ public class PasteBuilder {
     /**
      * Set whether the copy should include source biomes (if available).
      *
-     * @param copyBiomes
      * @return this builder instance
      */
     public PasteBuilder copyBiomes(boolean copyBiomes) {
         this.copyBiomes = copyBiomes;
         return this;
     }
+
     public PasteBuilder filter(RegionFunction function) {
         this.canApply = function;
         return this;

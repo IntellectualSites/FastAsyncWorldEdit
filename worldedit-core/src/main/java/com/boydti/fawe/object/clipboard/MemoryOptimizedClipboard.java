@@ -273,7 +273,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             int y = index / getArea();
-            int newI = index- y * getArea();
+            int newI = index - y * getArea();
             int z = newI / getWidth();
             int x = newI - z * getWidth();
             setTile(x, y, z, block.getNbtData());

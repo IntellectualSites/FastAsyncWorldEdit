@@ -76,14 +76,14 @@ public class FlattenedClipboardTransform {
                         new AffineTransform().translate(original.getOrigin()));
 
         Vector3[] corners = new Vector3[] {
-                minimum,
-                maximum,
-                minimum.withX(maximum.getX()),
-                minimum.withY(maximum.getY()),
-                minimum.withZ(maximum.getZ()),
-                maximum.withX(minimum.getX()),
-                maximum.withY(minimum.getY()),
-                maximum.withZ(minimum.getZ()) };
+            minimum,
+            maximum,
+            minimum.withX(maximum.getX()),
+            minimum.withY(maximum.getY()),
+            minimum.withZ(maximum.getZ()),
+            maximum.withX(minimum.getX()),
+            maximum.withY(minimum.getY()),
+            maximum.withZ(minimum.getZ()) };
 
         for (int i = 0; i < corners.length; i++) {
             corners[i] = transformAround.apply(corners[i]);

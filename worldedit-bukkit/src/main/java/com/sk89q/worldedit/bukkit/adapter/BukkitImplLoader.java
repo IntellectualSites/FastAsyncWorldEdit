@@ -48,7 +48,7 @@ public class BukkitImplLoader {
 
     private static final String LOAD_ERROR_MESSAGE =
         "\n**********************************************\n"
-            + "** This WorldEdit version does not fully support your version of Bukkit.\n"
+            + "** This FAWE version does not fully support your version of Bukkit.\n"
             + "**\n"
             + "** When working with blocks or undoing, chests will be empty, signs\n"
             + "** will be blank, and so on. There will be no support for entity\n"

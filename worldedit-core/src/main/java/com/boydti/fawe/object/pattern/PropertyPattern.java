@@ -123,7 +123,7 @@ public class PropertyPattern extends AbstractExtentPattern {
 
                 int existingOrdinal = transformed[state.getOrdinal()];
                 int existing = BlockTypesCache.states[existingOrdinal].getInternalId();
-                        //states[statesIndex] << BlockTypesCache.BIT_OFFSET;
+                //states[statesIndex] << BlockTypesCache.BIT_OFFSET;
                 BlockState newState = state.withPropertyId(property.modifyIndex(existing, index) >> BlockTypesCache.BIT_OFFSET);
                 transformed[state.getOrdinal()] = newState.getOrdinal();
             }

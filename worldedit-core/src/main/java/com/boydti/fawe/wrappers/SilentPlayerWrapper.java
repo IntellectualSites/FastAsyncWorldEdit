@@ -4,7 +4,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.formatting.text.Component;
 
 /**
- * Avoids printing any messages
+ * Avoids printing any messages.
  */
 public class SilentPlayerWrapper extends AsyncPlayer {
     public SilentPlayerWrapper(Player parent) {

@@ -114,7 +114,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
+public final class FAWESpigotV115R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_15_R2 parent;
     private char[] ibdToStateOrdinal;
 
@@ -122,7 +122,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public FAWE_Spigot_v1_15_R2() throws NoSuchFieldException, NoSuchMethodException {
+    public FAWESpigotV115R2() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new Spigot_v1_15_R2();
     }
 
@@ -179,8 +179,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         org.bukkit.block.Block bukkitBlock = location.getBlock();
         BlockState state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
         if (state.getBlockType().getMaterial().hasContainer()) {
-
-        // Read the NBT data
+            // Read the NBT data
             TileEntity te = chunk.a(blockPos, Chunk.EnumTileEntityState.CHECK);
             if (te != null) {
                 NBTTagCompound tag = new NBTTagCompound();
@@ -218,7 +217,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
 
         nmsChunk.removeTileEntity(blockPos); // Force delete the old tile entity
 
-        CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
+        CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock) state).getNbtData() : null;
         if (nativeTag != null || existing instanceof TileEntityBlock) {
             nmsWorld.setTypeAndData(blockPos, blockData, 0);
             // remove tile
@@ -309,8 +308,9 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     }
 
     /**
-     * @deprecated
-     * Method unused. Use #adaptToChar(IBlockData).
+     * No longer recommended.
+     *
+     * @deprecated Method unused. Use #adaptToChar(IBlockData).
      */
     @Deprecated
     public int adaptToInt(IBlockData ibd) {
@@ -367,10 +367,10 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
                                 packet.setNativePacket(nmsPacket);
                             }
                             try {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(true);
+                                FaweCache.IMP.chunkFlag.get().set(true);
                                 entityPlayer.playerConnection.sendPacket(nmsPacket);
                             } finally {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(false);
+                                FaweCache.IMP.chunkFlag.get().set(false);
                             }
                         }
                     });

@@ -200,7 +200,7 @@ public class WorldEditCommands {
 
     @Command(
         name = "help",
-        desc = "Displays help for WorldEdit commands"
+        desc = "Displays help for FAWE commands"
     )
     @CommandPermissions(value = "worldedit.help", queued = false)
     public void help(Actor actor,

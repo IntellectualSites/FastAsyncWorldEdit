@@ -258,8 +258,8 @@ public final class FastBitSet {
                 index++;
             }
             final long lowBit = Long.lowestOneBit(bitBuffer);
-            final int bitIndex = Long.bitCount(lowBit-1);
-            value = ((index-1)<<6)+bitIndex;
+            final int bitIndex = Long.bitCount(lowBit - 1);
+            value = ((index - 1) << 6) + bitIndex;
             bitBuffer = bitBuffer ^ lowBit;
             return true;
         }

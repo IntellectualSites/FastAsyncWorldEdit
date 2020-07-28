@@ -60,8 +60,7 @@ public enum Direction {
     ASCENDING_NORTH(Vector3.at(0, 1, -1), Flag.ASCENDING_CARDINAL, 3 + 18, 1 + 18),
     ASCENDING_EAST(Vector3.at(1, 1, 0), Flag.ASCENDING_CARDINAL, 0 + 18, 2 + 18),
     ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18),
-    ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18),
-    ;
+    ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18);
 
     private final Vector3 direction;
     private final int flags;
@@ -274,9 +273,9 @@ public enum Direction {
                 return Optional.of(SOUTHEAST);
             case 15:
                 return Optional.of(SOUTH_SOUTHEAST);
+            default:
+                return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     public OptionalInt toRotationIndex() {
@@ -313,8 +312,9 @@ public enum Direction {
                 return OptionalInt.of(14);
             case SOUTH_SOUTHEAST:
                 return OptionalInt.of(15);
+            default:
+                return OptionalInt.empty();
         }
-        return OptionalInt.empty();
     }
 
     /**

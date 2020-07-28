@@ -43,7 +43,6 @@ dependencies {
     "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
     "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
-    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
     "api"("com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false

@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A mask that evaluates an expression.
- * <p>
+ *
  * <p>Expressions are evaluated as {@code true} if they return a value
  * greater than {@code 0}.</p>
  */

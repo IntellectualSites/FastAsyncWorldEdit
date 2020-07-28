@@ -32,6 +32,7 @@ public class FallbackChunkGet implements IChunkGet {
         this.bx = chunkX << 4;
         this.bz = chunkZ << 4;
     }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         return extent.getFullBlock(bx + x, y, bz + z);
@@ -161,7 +162,7 @@ public class FallbackChunkGet implements IChunkGet {
 
     @Override
     public char[] load(int layer) {
-        char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
+        char[] arr = FaweCache.IMP.sectionBitsToChar.get();
         int by = layer << 4;
         for (int y = 0, i = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {

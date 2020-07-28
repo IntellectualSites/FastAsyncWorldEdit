@@ -1,3 +1,5 @@
+//CheckStyle:OFF
+
 package com.boydti.fawe.object.collection;
 
 import org.jetbrains.annotations.NotNull;
@@ -22,21 +24,26 @@ import java.util.concurrent.locks.ReentrantLock;
  * {@link SoftReference SoftReference}s.  (Contrast this with the JDK's
  * {@link WeakHashMap WeakHashMap}, which uses weak references for its <em>keys</em>, which is of little value if you
  * want the cache to auto-resize itself based on memory constraints).
- * <p/>
+ *
+ * <p>
  * Having the values wrapped by soft references allows the cache to automatically reduce its size based on memory
  * limitations and garbage collection.  This ensures that the cache will not cause memory leaks by holding strong
  * references to all of its values.
- * <p/>
+ * </p>
+ *
+ * <p>
  * This class is a generics-enabled Map based on initial ideas from Heinz Kabutz's and Sydney Redelinghuys's
  * <a href="http://www.javaspecialists.eu/archive/Issue015.html">publicly posted version (with their approval)</a>, with
  * continued modifications.  It was copied from the <a href="http://shiro.apache.org">Apache Shiro</a> framework.
- * <p/>
+ * </p>
+ *
  * This implementation is thread-safe and usable in concurrent environments.
  *
  * @see SoftReference
  * @see <a href="http://shiro.apache.org">Apache Shiro</a>
  * @since 0.8
  */
+@SuppressWarnings("CheckStyle")
 public class SoftHashMap<K, V> implements Map<K, V> {
 
     /**

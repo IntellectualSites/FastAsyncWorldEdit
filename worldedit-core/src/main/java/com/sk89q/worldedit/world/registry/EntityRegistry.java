@@ -45,7 +45,7 @@ public interface EntityRegistry {
     }
 
     /**
-     * Register all entities
+     * Register all entities.
      */
     default Collection<String> registerEntities() {
         return Collections.emptyList();

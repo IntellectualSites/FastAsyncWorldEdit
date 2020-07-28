@@ -25,6 +25,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.chunk.AnvilChunk;
@@ -103,10 +104,10 @@ public class ChunkStoreHelper {
                 return new AnvilChunk13((CompoundTag) dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag, dataVersion).getValue().get("Level"));
             }
         }
-        if (dataVersion >= 2566) {
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
             return new AnvilChunk16(tag);
         }
-        if (dataVersion >= DATA_VERSION_MC_1_13) {
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_13) {
             return new AnvilChunk13(tag);
         }
 

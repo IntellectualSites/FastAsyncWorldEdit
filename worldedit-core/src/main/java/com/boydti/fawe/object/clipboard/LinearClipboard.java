@@ -44,16 +44,16 @@ public abstract class LinearClipboard extends SimpleClipboard {
     public abstract BiomeType getBiome(int index);
 
     /**
-     * The locations provided are relative to the clipboard min
-     *
-     * @param task
+     * The locations provided are relative to the clipboard min.
      */
     public abstract void streamBiomes(IntValueReader task);
 
     public abstract Collection<CompoundTag> getTileEntities();
 
-    public void flush() {}
+    public void flush() {
+    }
 
+    @SuppressWarnings("checkstyle:NoFinalizer")
     @Override
     protected void finalize() {
         close();
@@ -114,6 +114,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
             index++;
             return this;
         }
+
         @Override
         public BaseBlock getFullBlock() {
             return LinearClipboard.this.getFullBlock(index);

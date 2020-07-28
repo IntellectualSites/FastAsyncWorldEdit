@@ -124,7 +124,7 @@ public class ConsumeBindings extends Bindings {
             uuid = Fawe.imp().getUUID(argument);
         }
         if (uuid == null) {
-            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found" , argument)));
+            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found", argument)));
         }
         return uuid;
     }
@@ -217,8 +217,8 @@ public class ConsumeBindings extends Bindings {
             }
         } else {
             throw new InputParseException(
-                    "This command takes a 'default' biome if one is not set, except there is no particular " +
-                            "biome that should be 'default', so the command should not be taking a default biome");
+                    "This command takes a 'default' biome if one is not set, except there is no particular "
+                        + "biome that should be 'default', so the command should not be taking a default biome");
         }
     }
 }

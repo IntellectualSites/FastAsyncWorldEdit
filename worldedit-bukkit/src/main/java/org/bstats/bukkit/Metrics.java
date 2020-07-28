@@ -1,3 +1,5 @@
+//CHECKSTYLE:OFF
+
 package org.bstats.bukkit;
 
 import com.google.gson.JsonArray;
@@ -37,56 +39,19 @@ import javax.net.ssl.HttpsURLConnection;
  * bStats collects some data for plugin authors.
  * <p>
  * Check out https://bStats.org/ to learn more about bStats!
- * </p>
  */
-@SuppressWarnings({
-                      "WeakerAccess",
-                      "unused"
-                  })
+@SuppressWarnings({"WeakerAccess", "unused", "CheckStyle"})
 public class Metrics {
 
     static {
         // You can use the property to disable the check in your test environment
-        if (System.getProperty("bstats.relocatecheck") == null
-            || !System.getProperty("bstats.relocatecheck").equals("false")) {
+        if (System.getProperty("bstats.relocatecheck") == null || !System.getProperty("bstats.relocatecheck").equals("false")) {
             // Maven's Relocate is clever and changes strings, too. So we have to use this little "trick" ... :D
             final String defaultPackage = new String(
-                new byte[] {
-                    'o',
-                    'r',
-                    'g',
-                    '.',
-                    'b',
-                    's',
-                    't',
-                    'a',
-                    't',
-                    's',
-                    '.',
-                    'b',
-                    'u',
-                    'k',
-                    'k',
-                    'i',
-                    't'
-                });
-            final String examplePackage = new String(new byte[] {
-                'y',
-                'o',
-                'u',
-                'r',
-                '.',
-                'p',
-                'a',
-                'c',
-                'k',
-                'a',
-                'g',
-                'e'
-            });
+                    new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's', '.', 'b', 'u', 'k', 'k', 'i', 't'});
+            final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
             // We want to make sure nobody just copy & pastes the example and use the wrong package names
-            if (Metrics.class.getPackage().getName().equals(defaultPackage)
-                || Metrics.class.getPackage().getName().equals(examplePackage)) {
+            if (Metrics.class.getPackage().getName().equals(defaultPackage) || Metrics.class.getPackage().getName().equals(examplePackage)) {
                 throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
             }
         }
@@ -126,7 +91,8 @@ public class Metrics {
      * Class constructor.
      *
      * @param plugin The plugin which stats should be submitted.
-     * @param pluginId The id of the plugin. It can be found at <a href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
+     * @param pluginId The id of the plugin.
+     *                 It can be found at <a href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
      */
     public Metrics(Plugin plugin, int pluginId) {
         if (plugin == null) {
@@ -156,15 +122,14 @@ public class Metrics {
 
             // Inform the server owners about bStats
             config.options().header(
-                "bStats collects some data for plugin authors like how many servers are using their plugins.\n"
-                    + "To honor their work, you should not disable it.\n"
-                    + "This has nearly no effect on the server performance!\n"
-                    + "Check out https://bStats.org/ to learn more :)"
+                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
+                            "To honor their work, you should not disable it.\n" +
+                            "This has nearly no effect on the server performance!\n" +
+                            "Check out https://bStats.org/ to learn more :)"
             ).copyDefaults(true);
             try {
                 config.save(configFile);
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) { }
         }
 
         // Load the data
@@ -182,8 +147,7 @@ public class Metrics {
                     service.getField("B_STATS_VERSION"); // Our identifier :)
                     found = true; // We aren't the first
                     break;
-                } catch (NoSuchFieldException ignored) {
-                }
+                } catch (NoSuchFieldException ignored) { }
             }
             // Register our service
             Bukkit.getServicesManager().register(Metrics.class, this, plugin, ServicePriority.Normal);
@@ -347,11 +311,9 @@ public class Metrics {
                                 }
                             }
                         }
-                    } catch (NullPointerException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
-                    }
+                    } catch (NullPointerException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) { }
                 }
-            } catch (NoSuchFieldException ignored) {
-            }
+            } catch (NoSuchFieldException ignored) { }
         }
 
         data.add("plugins", pluginData);
@@ -364,8 +326,7 @@ public class Metrics {
             } catch (Exception e) {
                 // Something went wrong! :(
                 if (logFailedRequests) {
-                    plugin.getLogger().log(Level.WARNING,
-                        "Could not submit plugin stats of " + plugin.getName(), e);
+                    plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
                 }
             }
         }).start();
@@ -442,7 +403,7 @@ public class Metrics {
     /**
      * Represents a custom chart.
      */
-    public abstract static class CustomChart {
+    public static abstract class CustomChart {
 
         // The id of the chart
         final String chartId;
@@ -471,8 +432,7 @@ public class Metrics {
                 chart.add("data", data);
             } catch (Throwable t) {
                 if (logFailedRequests) {
-                    Bukkit.getLogger().log(Level.WARNING,
-                        "Failed to get data for custom chart with id " + chartId, t);
+                    Bukkit.getLogger().log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
                 }
                 return null;
             }
@@ -482,7 +442,6 @@ public class Metrics {
         protected abstract JsonObject getChartData() throws Exception;
 
     }
-
 
     /**
      * Represents a custom simple pie.
@@ -514,7 +473,6 @@ public class Metrics {
             return data;
         }
     }
-
 
     /**
      * Represents a custom advanced pie.
@@ -559,7 +517,6 @@ public class Metrics {
             return data;
         }
     }
-
 
     /**
      * Represents a custom drilldown pie.
@@ -610,7 +567,6 @@ public class Metrics {
         }
     }
 
-
     /**
      * Represents a custom single line chart.
      */
@@ -642,7 +598,6 @@ public class Metrics {
         }
 
     }
-
 
     /**
      * Represents a custom multi line chart.
@@ -689,7 +644,6 @@ public class Metrics {
 
     }
 
-
     /**
      * Represents a custom simple bar chart.
      */
@@ -727,7 +681,6 @@ public class Metrics {
         }
 
     }
-
 
     /**
      * Represents a custom advanced bar chart.

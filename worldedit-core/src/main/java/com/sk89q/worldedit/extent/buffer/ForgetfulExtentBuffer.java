@@ -145,23 +145,23 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         if (min2d == null) {
             min2d = BlockVector2.at(x, z);
         } else {
-            min2d = min2d.getMinimum(BlockVector2.at(x,z));
+            min2d = min2d.getMinimum(BlockVector2.at(x, z));
         }
 
         // Update maximum
         if (max2d == null) {
-            max2d = BlockVector2.at(x,z);
+            max2d = BlockVector2.at(x, z);
         } else {
-            max2d = max2d.getMaximum(BlockVector2.at(x,z));
+            max2d = max2d.getMaximum(BlockVector2.at(x, z));
         }
 
-        if (biomeMask.test(getExtent(), BlockVector2.at(x,z))) {
-            biomeBuffer.put(BlockVector2.at(x,z), biome);
+        if (biomeMask.test(getExtent(), BlockVector2.at(x, z))) {
+            biomeBuffer.put(BlockVector2.at(x, z), biome);
             return true;
         } else {
             return getExtent().setBiome(x, y, z, biome);
-        }    }
-
+        }
+    }
 
     @Override
     public BaseBlock apply(BlockVector3 pos) {

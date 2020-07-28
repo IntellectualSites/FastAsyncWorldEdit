@@ -266,8 +266,8 @@ public class GeneralCommands {
     @Command(
         name = "/watchdog",
         desc = "Changes watchdog hook state.",
-        descFooter = "This is dependent on platform implementation. " +
-            "Not all platforms support watchdog hooks, or contain a watchdog."
+        descFooter = "This is dependent on platform implementation. "
+            + "Not all platforms support watchdog hooks, or contain a watchdog."
     )
     @CommandPermissions("worldedit.watchdog")
     public void watchdog(Actor actor, LocalSession session,
@@ -386,10 +386,10 @@ public class GeneralCommands {
     }
 
     @Command(
-            name = "/gtexture",
-            aliases = {"gtexture"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
-            desc = "Set the global mask"
+        name = "/gtexture",
+        aliases = {"gtexture"},
+        descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
+        desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
     public void gtexture(Player player, World worldArg, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
@@ -450,15 +450,15 @@ public class GeneralCommands {
                 util = new CachedTextureUtil(util);
             }
             session.setTextureUtil(util);
-            player.print(Caption.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
+            player.print(Caption.of("fawe.worldedit.general.texture.set", StringMan.join(arguments, " ")));
         }
     }
 
     @Command(
-            name = "/gsmask",
-            aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
-            desc = "Set the global source mask",
-            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
+        name = "/gsmask",
+        aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
+        desc = "Set the global source mask",
+        descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
@@ -472,9 +472,9 @@ public class GeneralCommands {
 
 
     @Command(
-            name = "/gtransform",
-            aliases = {"gtransform"},
-            desc = "Set the global transform"
+        name = "/gtransform",
+        aliases = {"gtransform"},
+        desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
@@ -487,9 +487,9 @@ public class GeneralCommands {
     }
 
     @Command(
-            name = "/tips",
-            aliases = {"tips"},
-            desc = "Toggle FAWE tips"
+        name = "/tips",
+        aliases = { "tips" },
+        desc = "Toggle FAWE tips"
     )
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
