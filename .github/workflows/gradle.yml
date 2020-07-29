@@ -3,10 +3,10 @@ name: Java CI
 on:
   push:
     branches:
-    - '1.15'
+    - '1.16'
   pull_request:
     branches:
-    - '1.15'
+    - '1.16'
  
 jobs:
   test:

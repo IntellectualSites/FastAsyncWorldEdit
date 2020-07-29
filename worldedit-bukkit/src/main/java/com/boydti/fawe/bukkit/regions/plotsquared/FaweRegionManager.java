@@ -43,7 +43,7 @@ import static org.bukkit.Bukkit.getWorld;
 
 public class FaweRegionManager extends RegionManager {
 
-    private RegionManager parent;
+    private final RegionManager parent;
 
     public FaweRegionManager(RegionManager parent) {
         this.parent = parent;
@@ -116,7 +116,7 @@ public class FaweRegionManager extends RegionManager {
                     final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
                     BlockVector3 pos1 = BlockVector3.ZERO;
-                    BlockVector3 pos2 = BlockVector3.at(hybridPlotWorld.PLOT_WIDTH, 255, hybridPlotWorld.PLOT_WIDTH);
+                    BlockVector3 pos2 = BlockVector3.at(hybridPlotWorld.PLOT_WIDTH - 1, 255, hybridPlotWorld.PLOT_WIDTH - 1);
 
                     Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(0));
                     Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));

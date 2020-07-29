@@ -207,7 +207,8 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 world = Bukkit.getWorld(((World) extent).getName());
             }
         }
-        return player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
+        org.bukkit.World finalWorld = world;
+        return TaskManager.IMP.sync(() -> player.teleport(new Location(finalWorld, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch)));
     }
 
     @Override

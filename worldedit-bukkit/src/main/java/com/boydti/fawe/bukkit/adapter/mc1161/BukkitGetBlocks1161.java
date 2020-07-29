@@ -164,7 +164,7 @@ public class BukkitGetBlocks1161 extends CharGetBlocks {
     @Override
     public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
-        if (skyLight[layer] == null) {
+        if (blockLight[layer] == null) {
             SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
@@ -175,7 +175,7 @@ public class BukkitGetBlocks1161 extends CharGetBlocks {
                 nibbleArray = new NibbleArray(a);
                 ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.BLOCK, sectionPosition, nibbleArray, true);
             }
-            skyLight[layer] = nibbleArray;
+            blockLight[layer] = nibbleArray;
         }
         long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
