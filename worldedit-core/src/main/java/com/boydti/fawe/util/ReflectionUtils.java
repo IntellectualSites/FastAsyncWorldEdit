@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class ReflectionUtils {
 
@@ -88,8 +87,7 @@ public class ReflectionUtils {
             return list;
         }
     }
-    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
-    
+
     public static Object getHandle(Object wrapper) {
         final Method getHandle = makeMethod(wrapper.getClass(), "getHandle");
         return callMethod(getHandle, wrapper);
