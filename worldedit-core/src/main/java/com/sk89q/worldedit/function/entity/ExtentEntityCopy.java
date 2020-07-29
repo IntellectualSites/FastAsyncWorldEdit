@@ -37,7 +37,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.jnbt.LongTag;
 import java.util.UUID;
 
 /**
@@ -124,7 +123,6 @@ public class ExtentEntityCopy implements EntityFunction {
 
             // Remove
             if (isRemoving() && success) {
-                //todo remove from source with Extent i guess? im confused now
                 UUID uuid = null;
                 if (tag.containsKey("UUID")) {
                     int[] arr = tag.getIntArray("UUID");
