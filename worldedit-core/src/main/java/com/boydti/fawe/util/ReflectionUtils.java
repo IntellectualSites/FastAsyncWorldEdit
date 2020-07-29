@@ -90,19 +90,6 @@ public class ReflectionUtils {
     }
     private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
     
-    public static <T, V> Map<T, V> getMap(Map<T, V> map) {
-        try {
-            Class<? extends Map> clazz = map.getClass();
-            if (clazz != UNMODIFIABLE_MAP) return map;
-            Field m = clazz.getDeclaredField("m");
-            m.setAccessible(true);
-            return (Map<T, V>) m.get(map);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return map;
-        }
-    }
-    
     public static Object getHandle(Object wrapper) {
         final Method getHandle = makeMethod(wrapper.getClass(), "getHandle");
         return callMethod(getHandle, wrapper);

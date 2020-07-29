@@ -22,17 +22,12 @@ package com.sk89q.worldedit.bukkit.adapter.impl;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IQueueChunk;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.*;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
-import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -42,7 +37,6 @@ import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
@@ -55,7 +49,6 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World.Environment;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
@@ -65,22 +58,17 @@ import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.jnbt.StringTag;
 
 public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R1 parent;
@@ -244,7 +232,11 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
             Supplier<CompoundTag> saveTag = () -> {
                 NBTTagCompound tag = new NBTTagCompound();
                 readEntityIntoTag(mcEntity, tag);
-                return (CompoundTag) toNative(tag);
+                
+                //add Id for AbstractChangeSet to work
+                CompoundTag natve = (CompoundTag) toNative(tag);
+                natve.getValue().put("Id", new StringTag(id));
+                return natve;
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
