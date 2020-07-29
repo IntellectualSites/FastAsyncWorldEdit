@@ -113,8 +113,7 @@ final class LZ4JavaSafeFastDecompressor extends LZ4FastDecompressor {
     public int decompress(ByteBuffer src, final int srcOff, ByteBuffer dest, final int destOff, int destLen) {
 
         if (src.hasArray() && dest.hasArray()) {
-            return decompress(src.array(),
-                srcOff + src.arrayOffset(), dest.array(), destOff + dest.arrayOffset(), destLen);
+            return decompress(src.array(), srcOff + src.arrayOffset(), dest.array(), destOff + dest.arrayOffset(), destLen);
         }
         src = ByteBufferUtils.inNativeByteOrder(src);
         dest = ByteBufferUtils.inNativeByteOrder(dest);

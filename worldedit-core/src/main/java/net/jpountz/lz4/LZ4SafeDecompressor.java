@@ -1,5 +1,7 @@
 package net.jpountz.lz4;
 
+
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -11,8 +13,7 @@ import java.util.Arrays;
  * {@link LZ4FastDecompressor} but do not require the size of the original data to
  * be known.
  */
-@SuppressWarnings("CheckStyle")
-public abstract class LZ4SafeDecompressor {
+public abstract class LZ4SafeDecompressor implements LZ4UnknownSizeDecompressor {
 
     /**
      * Decompress <code>src[srcOff:srcLen]</code> into

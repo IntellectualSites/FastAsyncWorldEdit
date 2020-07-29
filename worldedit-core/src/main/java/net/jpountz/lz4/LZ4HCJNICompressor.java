@@ -1,5 +1,7 @@
 package net.jpountz.lz4;
 
+
+
 import net.jpountz.util.ByteBufferUtils;
 import net.jpountz.util.SafeUtils;
 
@@ -44,10 +46,8 @@ final class LZ4HCJNICompressor extends LZ4Compressor {
         ByteBufferUtils.checkRange(dest, destOff, maxDestLen);
 
         if ((src.hasArray() || src.isDirect()) && (dest.hasArray() || dest.isDirect())) {
-            byte[] srcArr = null;
-            byte[] destArr = null;
-            ByteBuffer srcBuf = null;
-            ByteBuffer destBuf = null;
+            byte[] srcArr = null, destArr = null;
+            ByteBuffer srcBuf = null, destBuf = null;
             if (src.hasArray()) {
                 srcArr = src.array();
                 srcOff += src.arrayOffset();

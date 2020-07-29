@@ -1,5 +1,7 @@
 package net.jpountz.lz4;
 
+
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -7,9 +9,7 @@ import java.util.Arrays;
  * LZ4 compressor.
  * <p>
  * Instances of this class are thread-safe.
- * </p>
  */
-@SuppressWarnings("CheckStyle")
 public abstract class LZ4Compressor {
 
     /**

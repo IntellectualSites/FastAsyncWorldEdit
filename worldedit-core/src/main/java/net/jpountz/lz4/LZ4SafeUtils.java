@@ -1,5 +1,7 @@
 package net.jpountz.lz4;
 
+
+
 import net.jpountz.util.SafeUtils;
 
 import static net.jpountz.lz4.LZ4Constants.LAST_LITERALS;
@@ -7,7 +9,6 @@ import static net.jpountz.lz4.LZ4Constants.ML_BITS;
 import static net.jpountz.lz4.LZ4Constants.ML_MASK;
 import static net.jpountz.lz4.LZ4Constants.RUN_MASK;
 
-@SuppressWarnings("CheckStyle")
 enum LZ4SafeUtils {
     ;
 
@@ -20,13 +21,12 @@ enum LZ4SafeUtils {
     }
 
     static boolean readIntEquals(byte[] buf, int i, int j) {
-        return buf[i] == buf[j] && buf[i + 1] == buf[j + 1] && buf[i + 2] == buf[j + 2]
-            && buf[i + 3] == buf[j + 3];
+        return buf[i] == buf[j] && buf[i + 1] == buf[j + 1] && buf[i + 2] == buf[j + 2] && buf[i + 3] == buf[j + 3];
     }
 
     static void safeIncrementalCopy(byte[] dest, int matchOff, int dOff, int matchLen) {
-        if (matchLen >= 0) {
-            System.arraycopy(dest, matchOff, dest, dOff, matchLen);
+        for (int i = 0; i < matchLen; ++i) {
+            dest[dOff + i] = dest[matchOff + i];
         }
     }
 
@@ -39,7 +39,9 @@ enum LZ4SafeUtils {
     }
 
     static void copy8Bytes(byte[] src, int sOff, byte[] dest, int dOff) {
-        System.arraycopy(src, sOff, dest, dOff, 8);
+        for (int i = 0; i < 8; ++i) {
+            dest[dOff + i] = src[sOff + i];
+        }
     }
 
     static int commonBytes(byte[] b, int o1, int o2, int limit) {
@@ -115,20 +117,21 @@ enum LZ4SafeUtils {
     }
 
     static int lastLiterals(byte[] src, int sOff, int srcLen, byte[] dest, int dOff, int destEnd) {
+        final int runLen = srcLen;
 
-        if (dOff + srcLen + 1 + (srcLen + 255 - RUN_MASK) / 255 > destEnd) {
+        if (dOff + runLen + 1 + (runLen + 255 - RUN_MASK) / 255 > destEnd) {
             throw new LZ4Exception();
         }
 
-        if (srcLen >= RUN_MASK) {
+        if (runLen >= RUN_MASK) {
             dest[dOff++] = (byte) (RUN_MASK << ML_BITS);
-            dOff = writeLen(srcLen - RUN_MASK, dest, dOff);
+            dOff = writeLen(runLen - RUN_MASK, dest, dOff);
         } else {
-            dest[dOff++] = (byte) (srcLen << ML_BITS);
+            dest[dOff++] = (byte) (runLen << ML_BITS);
         }
         // copy literals
-        System.arraycopy(src, sOff, dest, dOff, srcLen);
-        dOff += srcLen;
+        System.arraycopy(src, sOff, dest, dOff, runLen);
+        dOff += runLen;
 
         return dOff;
     }
@@ -142,17 +145,8 @@ enum LZ4SafeUtils {
         return dOff;
     }
 
-    static void copyTo(Match m1, Match m2) {
-        m2.len = m1.len;
-        m2.start = m1.start;
-        m2.ref = m1.ref;
-    }
-
-
     static class Match {
-        int start;
-        int ref;
-        int len;
+        int start, ref, len;
 
         void fix(int correction) {
             start += correction;
@@ -163,6 +157,12 @@ enum LZ4SafeUtils {
         int end() {
             return start + len;
         }
+    }
+
+    static void copyTo(Match m1, Match m2) {
+        m2.len = m1.len;
+        m2.start = m1.start;
+        m2.ref = m1.ref;
     }
 
 }

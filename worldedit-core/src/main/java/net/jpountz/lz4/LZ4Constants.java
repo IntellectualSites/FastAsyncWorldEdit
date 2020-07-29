@@ -1,7 +1,8 @@
 package net.jpountz.lz4;
 
 
-@SuppressWarnings("CheckStyle")
+
+
 enum LZ4Constants {
     ;
 

@@ -1,11 +1,12 @@
 package net.jpountz.lz4;
 
+
+
 import static net.jpountz.lz4.LZ4Constants.HASH_LOG;
 import static net.jpountz.lz4.LZ4Constants.HASH_LOG_64K;
 import static net.jpountz.lz4.LZ4Constants.HASH_LOG_HC;
 import static net.jpountz.lz4.LZ4Constants.MIN_MATCH;
 
-@SuppressWarnings("CheckStyle")
 public enum LZ4Utils {
     ;
 
@@ -32,17 +33,8 @@ public enum LZ4Utils {
         return (i * -1640531535) >>> ((MIN_MATCH * 8) - HASH_LOG_HC);
     }
 
-    public static void copyTo(Match m1, Match m2) {
-        m2.len = m1.len;
-        m2.start = m1.start;
-        m2.ref = m1.ref;
-    }
-
-
     public static class Match {
-        int start;
-        int ref;
-        int len;
+        int start, ref, len;
 
         void fix(int correction) {
             start += correction;
@@ -53,6 +45,12 @@ public enum LZ4Utils {
         int end() {
             return start + len;
         }
+    }
+
+    public static void copyTo(Match m1, Match m2) {
+        m2.len = m1.len;
+        m2.start = m1.start;
+        m2.ref = m1.ref;
     }
 
 }

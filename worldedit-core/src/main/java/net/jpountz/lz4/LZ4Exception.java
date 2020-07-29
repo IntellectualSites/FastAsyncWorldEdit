@@ -1,5 +1,7 @@
 package net.jpountz.lz4;
 
+
+
 /**
  * LZ4 compression or decompression error.
  */

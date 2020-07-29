@@ -2,16 +2,16 @@ package net.jpountz.lz4;
 
 import java.nio.ByteBuffer;
 
+
+
 /**
  * LZ4 decompressor that requires the size of the original input to be known.
  * Use {@link LZ4SafeDecompressor} if you only know the size of the
  * compressed stream.
- *
  * <p>
  * Instances of this class are thread-safe.
- * </p>
  */
-public abstract class LZ4FastDecompressor {
+public abstract class LZ4FastDecompressor implements LZ4Decompressor {
 
     /**
      * Decompress <code>src[srcOff:]</code> into <code>dest[destOff:destOff+destLen]</code>
