@@ -1,11 +1,9 @@
 package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.IntArrayTag;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.StringTag;
@@ -111,39 +109,24 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     @Override
     default Entity createEntity(Location location, BaseEntity entity) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        CompoundTag tag = entity.getNbtData();
-        Map<String, Tag> map = new HashMap<>(tag.getValue()); //do not modify original entity data
+        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
         map.put("Id", new StringTag(entity.getType().getName()));
         
         //Set pos
-        ListTag pos = (ListTag) map.get("Pos");
-        List<Tag> posList;
-        if (pos != null) {
-            posList = ReflectionUtils.getList(pos.getValue());
-        } else {
-            posList = new ArrayList<>();
-            pos = new ListTag(DoubleTag.class, posList);
-            map.put("Pos", pos);
-        }
-        posList.set(0, new DoubleTag(location.getX()));
-        posList.set(1, new DoubleTag(location.getY()));
-        posList.set(2, new DoubleTag(location.getZ()));
+        List<DoubleTag> posList = new ArrayList<>();
+        posList.add(new DoubleTag(location.getX()));
+        posList.add(new DoubleTag(location.getY()));
+        posList.add(new DoubleTag(location.getZ()));
+        map.put("Pos", new ListTag(DoubleTag.class, posList));
         
         //set new uuid
         UUID newuuid = UUID.randomUUID();
-        IntArrayTag uuid = (IntArrayTag) map.get("UUID");
-        int[] uuidArray;
-        if (uuid != null) {
-            uuidArray = uuid.getValue();
-        } else {
-            uuidArray = new int[4];
-            uuid = new IntArrayTag(uuidArray);
-            map.put("UUID", uuid);
-        }
+        int[] uuidArray = new int[4];
         uuidArray[0] = (int) (newuuid.getMostSignificantBits() >> 32);
         uuidArray[1] = (int) newuuid.getMostSignificantBits();
         uuidArray[2] = (int) (newuuid.getLeastSignificantBits() >> 32);
         uuidArray[3] = (int) newuuid.getLeastSignificantBits();
+        map.put("UUID", new IntArrayTag(uuidArray));
         
         map.put("UUIDMost", new LongTag(newuuid.getMostSignificantBits()));
         map.put("UUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
@@ -151,7 +134,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         map.put("PersistentIDMSB", new LongTag(newuuid.getMostSignificantBits()));
         map.put("PersistentIDLSB", new LongTag(newuuid.getLeastSignificantBits()));
         
-        chunk.setEntity(tag);
+        chunk.setEntity(new CompoundTag(map));
         return new IChunkEntity(this, location, newuuid, entity);
     }
 
