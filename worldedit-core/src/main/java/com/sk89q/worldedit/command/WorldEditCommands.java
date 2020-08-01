@@ -132,8 +132,7 @@ public class WorldEditCommands {
     }
 
     @Command(
-        name = "report",
-        aliases = { "debugpaste" },
+        name = "debugpaste",
         desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)

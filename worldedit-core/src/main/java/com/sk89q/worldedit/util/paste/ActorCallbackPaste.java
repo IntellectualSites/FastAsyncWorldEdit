@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util.paste;
 
-import com.boydti.fawe.util.IncendoPaster;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -31,7 +30,7 @@ import java.util.concurrent.Callable;
 
 public final class ActorCallbackPaste {
 
-    private static final Paster paster = new IncendoPaster("fastasyncworldedit");
+    private static final Paster paster = new EngineHubPaste();
 
     private ActorCallbackPaste() {
     }
