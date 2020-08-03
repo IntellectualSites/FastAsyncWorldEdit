@@ -96,7 +96,6 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double z = (dh / 2) / a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;
         double vertY = a * 1 + oY;
-        return pos1.add(pos2.subtract(pos1).multiply(
-            vertX / dh).add(0, vertY, 0)).round().toBlockPoint();
+        return pos1.add(pos2.subtract(pos1).multiply(vertX / dh).add(0, vertY, 0)).round().toBlockPoint();
     }
 }

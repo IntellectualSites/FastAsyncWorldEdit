@@ -104,8 +104,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.info("Got request to register " + platform.getClass() + " with FAWE ["
-            + super.toString() + "]");
+        logger.info("Got request to register " + platform.getClass() + " with FAWE [" + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
@@ -116,12 +115,9 @@ public class PlatformManager {
             if (!firstSeenVersion.equals(platform.getVersion())) {
                 logger.warn(
                     "Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
-                        +
-                        "If these two versions are truly different, then you may run into unexpected crashes and errors.",
-                    new Object[] {
-                        firstSeenVersion,
-                        platform.getVersion()
-                    });
+                        + "If these two versions are truly different, then you may run into unexpected crashes and errors.",
+                    firstSeenVersion,
+                    platform.getVersion());
             }
         } else {
             firstSeenVersion = platform.getVersion();
@@ -142,8 +138,7 @@ public class PlatformManager {
         boolean removed = platforms.remove(platform);
 
         if (removed) {
-            logger.info(
-                "Unregistering " + platform.getClass().getCanonicalName() + " from FAWE");
+            logger.info("Unregistering " + platform.getClass().getCanonicalName() + " from FAWE");
 
             boolean choosePreferred = false;
 
@@ -188,8 +183,7 @@ public class PlatformManager {
                 }
                 return platforms.get(0);
             }
-            throw new NoCapablePlatformException(
-                "No platform was found supporting " + capability.name());
+            throw new NoCapablePlatformException("No platform was found supporting " + capability.name());
         }
     }
 
@@ -206,8 +200,7 @@ public class PlatformManager {
         }
 
         // Fire configuration event
-        if (preferences.containsKey(Capability.CONFIGURATION)
-            && configured.compareAndSet(false, true)) {
+        if (preferences.containsKey(Capability.CONFIGURATION) && configured.compareAndSet(false, true)) {
             worldEdit.getEventBus().post(new ConfigurationLoadEvent(queryCapability(Capability.CONFIGURATION).getConfiguration()));
         }
     }

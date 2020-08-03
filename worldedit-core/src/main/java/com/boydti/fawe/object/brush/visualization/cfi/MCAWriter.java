@@ -135,9 +135,7 @@ public abstract class MCAWriter implements Extent {
                                         chunk = write(chunk, csx, cex, csz, cez);
                                         if (chunk != null) {
                                             // Generation offset
-                                            chunk.setPosition(
-                                                fcx + (getOffsetX() >> 4),
-                                                fcz + (getOffsetZ() >> 4));
+                                            chunk.setPosition(fcx + (getOffsetX() >> 4), fcz + (getOffsetZ() >> 4));
 
                                             // Compress
                                             FastByteArrayOutputStream uncompressed = chunk.toBytes(byteStore1.get());
@@ -162,8 +160,7 @@ public abstract class MCAWriter implements Extent {
                             int totalLength = 8192;
                             for (byte[] compressedBytes : compressed) {
                                 if (compressedBytes != null) {
-                                    int blocks = ((4095 + compressedBytes.length + 5) / 4096)
-                                        * 4096;
+                                    int blocks = ((4095 + compressedBytes.length + 5) / 4096) * 4096;
                                     totalLength += blocks;
                                 }
                             }

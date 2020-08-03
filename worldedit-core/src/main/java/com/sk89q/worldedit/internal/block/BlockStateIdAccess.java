@@ -71,7 +71,6 @@ public final class BlockStateIdAccess {
 
     @Nullable
     public static BlockState getBlockStateById(int id) {
-        int test = id / 10000;
         return BlockState.getFromOrdinal(id);
     }
 

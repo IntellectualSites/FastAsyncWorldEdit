@@ -108,8 +108,7 @@ public enum PropertyKey {
                 try {
                     ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase(Locale.ROOT));
                 } catch (Throwable e) {
-                    throw new RuntimeException(
-                        "Could not register property with an id of " + id, e);
+                    throw new RuntimeException("Could not register property with an id of " + id, e);
                 }
             }
             keys.put(property.name().toLowerCase(Locale.ROOT), property);

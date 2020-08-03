@@ -81,18 +81,12 @@ public class HistorySubCommands {
     public synchronized void rerun(Player player, World world, RollbackDatabase database,
         @AllowedRegion
             Region[] allowedRegions,
-        @ArgFlag(name = 'u',
-                 desc = "String user",
-                 def = "me")
+        @ArgFlag(name = 'u', desc = "String user", def = "me")
             UUID other,
-        @ArgFlag(name = 'r',
-                 def = "0",
-                 desc = "radius")
-        @Range(from = 0,
-               to = Integer.MAX_VALUE) int radius,
-        @ArgFlag(name = 't',
-                 desc = "Time e.g. 20s",
-                 def = "0")
+        @ArgFlag(name = 'r', def = "0", desc = "radius")
+        @Range(from = 0, to = Integer.MAX_VALUE)
+            int radius,
+        @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
         @Time
             long timeDiff) throws WorldEditException {
         rollback(player, world, database, allowedRegions, other, radius, timeDiff, true);
@@ -293,9 +287,7 @@ public class HistorySubCommands {
         return PaginationBox.fromStrings("Edits:", pageCommand, histories, new Function<Supplier<? extends ChangeSet>, Component>() {
             @NotNull
             @Override
-            public Component apply(
-                @Nullable
-                    Supplier<? extends ChangeSet> input) {
+            public Component apply(@Nullable Supplier<? extends ChangeSet> input) {
                 ChangeSet edit = input.get();
 
                 if (edit instanceof RollbackOptimizedHistory) {
@@ -309,10 +301,8 @@ public class HistorySubCommands {
                     BlockVector3 pos1 = rollback.getMinimumPoint();
                     BlockVector3 pos2 = rollback.getMaximumPoint();
 
-                    double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(
-                        pos2.getX() - origin.getX()));
-                    double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(
-                        pos2.getZ() - origin.getZ()));
+                    double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
+                    double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
                     int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
                     BlockVector2 dirVec = BlockVector2.at(
@@ -320,8 +310,7 @@ public class HistorySubCommands {
                         rollback.getOriginZ() - origin.getZ());
                     Direction direction = Direction.findClosest(dirVec.toVector3(), Direction.Flag.ALL);
 
-                    long seconds =
-                        (System.currentTimeMillis() - rollback.getBDFile().lastModified()) / 1000;
+                    long seconds = (System.currentTimeMillis() - rollback.getBDFile().lastModified()) / 1000;
                     String timeStr = MainUtil.secToTime(seconds);
 
                     int size = edit.size();
@@ -352,24 +341,16 @@ public class HistorySubCommands {
     )
     @CommandPermissions("worldedit.history.find")
     public synchronized void find(Player player, World world, RollbackDatabase database, Arguments arguments,
-        @ArgFlag(name = 'u',
-                 def = "",
-                 desc = "String user")
+        @ArgFlag(name = 'u', def = "", desc = "String user")
             UUID other,
-        @ArgFlag(name = 'r',
-                 def = "0",
-                 desc = "radius")
-        @Range(from = 0,
-               to = Integer.MAX_VALUE) Integer radius,
-        @ArgFlag(name = 't',
-                 desc = "Time e.g. 20s",
-                 def = "0")
+        @ArgFlag(name = 'r', def = "0", desc = "radius")
+        @Range(from = 0, to = Integer.MAX_VALUE)
+            int radius,
+        @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
         @Time
-            Long timeDiff,
-        @ArgFlag(name = 'p',
-                 desc = "Page to view.",
-                 def = "")
-            Integer page) throws WorldEditException {
+            long timeDiff,
+        @ArgFlag(name = 'p', desc = "Page to view.")
+            int page) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable", "history.use-database (Import with //history import )"));
             return;
@@ -385,7 +366,7 @@ public class HistorySubCommands {
         Reference<List<Supplier<? extends ChangeSet>>> cached = player.getMeta(pageCommand);
         List<Supplier<? extends ChangeSet>> history = cached == null ? null : cached.get();
 
-        if (page == null || history == null) {
+        if (history == null) {
             if (other == null) {
                 other = player.getUniqueId();
             }
@@ -422,15 +403,13 @@ public class HistorySubCommands {
         @Arg(desc = "Player uuid/name")
             UUID other,
         @Arg(desc = "edit index")
-            Integer index,
-        @ArgFlag(name = 'p',
-                 desc = "Page to view.",
-                 def = "")
-            Integer page) throws ExecutionException, InterruptedException {
+            int index,
+        @ArgFlag(name = 'p', desc = "Page to view.")
+            int page) throws ExecutionException, InterruptedException {
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
         Reference<PaginationBox> cached = player.getMeta(pageCommand);
         PaginationBox pages = cached == null ? null : cached.get();
-        if (page == null || pages == null) {
+        if (pages == null) {
             RollbackOptimizedHistory edit = database.getEdit(other, index).get();
             SimpleChangeSetSummary summary = edit.summarize(null, false);
             if (summary != null) {
@@ -452,17 +431,15 @@ public class HistorySubCommands {
     public void list(Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
         @Arg(desc = "Player uuid/name")
             UUID other,
-        @ArgFlag(name = 'p',
-                 desc = "Page to view.",
-                 def = "")
-            Integer page) {
+        @ArgFlag(name = 'p', desc = "Page to view.")
+            int page) {
         int index = session.getHistoryIndex();
         List<Supplier<? extends ChangeSet>> history = Lists.transform(session.getHistory(), (Function<ChangeSet, Supplier<ChangeSet>>) input -> () -> input);
         Location origin = player.getLocation();
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
         Reference<PaginationBox> cached = player.getMeta(pageCommand);
         PaginationBox pages = cached == null ? null : cached.get();
-        if (page == null || pages == null) {
+        if (pages == null) {
             pages = list(database, pageCommand, history, origin.toBlockPoint());
             page = 1;
         }

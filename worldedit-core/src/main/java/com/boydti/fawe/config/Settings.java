@@ -544,8 +544,7 @@ public class Settings extends Config {
                 limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
                 limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
                 if (limit.STRIP_NBT == null) {
-                    limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() :
-                        new HashSet<>(newLimit.STRIP_NBT);
+                    limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
                 } else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {
                     limit.STRIP_NBT = Collections.emptySet();
                 } else {

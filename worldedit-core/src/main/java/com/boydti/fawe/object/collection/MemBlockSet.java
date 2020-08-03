@@ -232,8 +232,7 @@ public final class MemBlockSet extends BlockSet {
 
                     @Override
                     public BlockVector3 next() {
-                        mutable.setComponents(
-                            setX + getBlockOffsetX(), setY, setZ + getBlockOffsetX());
+                        mutable.setComponents(setX + getBlockOffsetX(), setY, setZ + getBlockOffsetX());
                         init();
                         return mutable;
                     }
@@ -281,8 +280,7 @@ public final class MemBlockSet extends BlockSet {
                     if (rowx instanceof RowX) {
                         IRow rowz = ((RowX) rowx).rows[other.getZ()];
                         if (rowz instanceof RowZ) {
-                            return ((RowZ) rowz).rows[other.getY()
-                                - getChunkOffsetZ()] instanceof RowY;
+                            return ((RowZ) rowz).rows[other.getY() - getChunkOffsetZ()] instanceof RowY;
                         }
                     }
                 }
@@ -462,8 +460,7 @@ public final class MemBlockSet extends BlockSet {
                     }
                     RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
-                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48)
-                        & 0xFFFF);
+                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
                     if (highestBit(or) == 15) {
                         return tx + 15;
                     }
@@ -549,8 +546,7 @@ public final class MemBlockSet extends BlockSet {
                     }
                     RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
-                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48)
-                        & 0xFFFF);
+                    or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
                     if (lowestBit(or) == 0) {
                         return bx;
                     }

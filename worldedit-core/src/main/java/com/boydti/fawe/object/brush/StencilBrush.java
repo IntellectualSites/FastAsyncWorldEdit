@@ -52,8 +52,7 @@ public class StencilBrush extends HeightBrush {
         Location loc = editSession.getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
-        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(
-            pitch - 90).inverse();
+        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
 
         double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {

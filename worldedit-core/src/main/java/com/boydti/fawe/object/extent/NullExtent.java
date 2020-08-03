@@ -171,11 +171,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z,
-        @Nullable
-            BiomeType type,
-        @Nullable
-            Long seed) {
+    public boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
         throw reason;
     }
 

@@ -118,9 +118,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(
-                @NotNull
-                    T key) {
+            public V load(@NotNull T key) {
                 return withInitial.get();
             }
         });
@@ -129,9 +127,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(
-                @NotNull
-                    T key) {
+            public V load(@NotNull T key) {
                 return withInitial.apply(key);
             }
         });

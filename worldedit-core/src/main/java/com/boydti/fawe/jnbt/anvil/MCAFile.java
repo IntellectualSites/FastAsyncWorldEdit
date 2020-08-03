@@ -265,9 +265,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     private MCAChunk readChunk(MCAChunk chunk, int i) throws IOException {
-        int offset =
-            (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2]
-                & 0xFF))) << 12;
+        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF))) << 12;
         if (offset == 0) {
             return null;
         }
@@ -289,8 +287,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         char i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
-                    locations[i + 2] & 0xFF))) - 2;
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF))) - 2;
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     if (offset < offsets.length) {
@@ -318,8 +315,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
-                    locations[i + 2] & 0xFF)));
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     onEach.run(x, z, offset << 12, size << 12);
@@ -332,8 +328,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
-                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
-                    locations[i + 2] & 0xFF)));
+                int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
                 int size = locations[i + 3] & 0xFF;
                 if (size != 0) {
                     try {
@@ -347,8 +342,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
 
     public int getOffset(int cx, int cz) {
         int i = getIndex(cx, cz);
-        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((
-            locations[i + 2] & 0xFF)));
+        int offset = (((locations[i] & 0xFF) << 16) + ((locations[i + 1] & 0xFF) << 8) + ((locations[i + 2] & 0xFF)));
         return offset << 12;
     }
 
@@ -662,8 +656,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                             if (cached == null || !cached.isModified()) {
                                 FastByteArrayInputStream tmp = getChunkCompressedBytes(nextOffset2);
                                 byte[] nextBytes = Arrays.copyOf(tmp.array, tmp.length);
-                                relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ
-                                    & 31)), nextBytes);
+                                relocate.put(MathMan.pair((short) (nextCX & 31), (short) (nextCZ & 31)), nextBytes);
                             }
                             int nextSize = MathMan.unpairY(nextLoc) << 12;
                             end += nextSize;

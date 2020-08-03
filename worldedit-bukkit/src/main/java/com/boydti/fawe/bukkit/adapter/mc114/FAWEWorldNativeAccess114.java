@@ -119,9 +119,12 @@ public class FAWEWorldNativeAccess114 implements WorldNativeAccess<Chunk, IBlock
     }
 
     private static final EnumDirection[] NEIGHBOUR_ORDER = {
-        EnumDirection.WEST, EnumDirection.EAST,
-        EnumDirection.DOWN, EnumDirection.UP,
-        EnumDirection.NORTH, EnumDirection.SOUTH
+        EnumDirection.WEST,
+        EnumDirection.EAST,
+        EnumDirection.DOWN,
+        EnumDirection.UP,
+        EnumDirection.NORTH,
+        EnumDirection.SOUTH
     };
 
     @Override

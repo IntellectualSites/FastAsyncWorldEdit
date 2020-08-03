@@ -2137,8 +2137,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @Deprecated
-    public int thaw(BlockVector3 position, double radius)
-            throws MaxChangedBlocksException {
+    public int thaw(BlockVector3 position, double radius) throws MaxChangedBlocksException {
         int affected = 0;
         double radiusSq = radius * radius;
 

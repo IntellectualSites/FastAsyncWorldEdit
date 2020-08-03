@@ -29,8 +29,7 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
-public class FAWEWorldNativeAccess1152
-    implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
+public class FAWEWorldNativeAccess1152 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
@@ -173,8 +172,6 @@ public class FAWEWorldNativeAccess1152
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
-        return this.adapter.setBlock(this.getChunk(
-            position.getBlockX() >> 4, position.getBlockZ()
-                >> 4).bukkitChunk, position.getBlockX(), position.getBlockY(), position.getBlockZ(), block, sideEffectSet.shouldApply(SideEffect.LIGHTING));
+        return this.adapter.setBlock(this.getChunk(position.getBlockX() >> 4, position.getBlockZ() >> 4).bukkitChunk, position.getBlockX(), position.getBlockY(), position.getBlockZ(), block, sideEffectSet.shouldApply(SideEffect.LIGHTING));
     }
 }

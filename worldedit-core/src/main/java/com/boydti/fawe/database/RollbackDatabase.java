@@ -131,9 +131,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         });
     }
 
-    public Future<RollbackOptimizedHistory> getEdit(
-        @NotNull
-            UUID uuid, int id) {
+    public Future<RollbackOptimizedHistory> getEdit(@NotNull UUID uuid, int id) {
         return call(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(getEditUser)) {
                 stmt.setBytes(1, toBytes(uuid));

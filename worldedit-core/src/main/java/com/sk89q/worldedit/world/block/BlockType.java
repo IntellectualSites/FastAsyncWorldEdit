@@ -112,6 +112,7 @@ public class BlockType implements Keyed, Pattern {
      *
      * @return The name, or ID
      */
+    @Deprecated
     public String getName() {
         String name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this);
         if (name == null) {
@@ -213,8 +214,7 @@ public class BlockType implements Keyed, Pattern {
         if (settings.stateOrdinals == null) {
             return Collections.singletonList(getDefaultState());
         }
-        return IntStream.of(settings.stateOrdinals).filter(i -> i
-            != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
     }
 
     /**
@@ -278,6 +278,7 @@ public class BlockType implements Keyed, Pattern {
      * <p>
      * DO NOT USE THIS.
      * </p>
+     *
      * @return legacy id or 0, if unknown
      */
     @Deprecated
@@ -296,6 +297,32 @@ public class BlockType implements Keyed, Pattern {
      */
     public int getInternalId() {
         return this.settings.internalId;
+    }
+
+    @Deprecated
+    public int getLegacyId() {
+        return computeLegacy(0);
+    }
+
+    /**
+     * Gets the legacy data. Needed for legacy reasons.
+     *
+     * <p>
+     * DO NOT USE THIS.
+     * </p>
+     *
+     * @return legacy data or 0, if unknown
+     */
+    @Deprecated
+    public int getLegacyData() {
+        return computeLegacy(1);
+    }
+
+    private int computeLegacy(int index) {
+        if (this.legacyCombinedId == null) {
+            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
+        }
+        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 
     @Override
@@ -329,30 +356,5 @@ public class BlockType implements Keyed, Pattern {
 
     public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
-    }
-
-    @Deprecated
-    public int getLegacyId() {
-        return computeLegacy(0);
-    }
-
-    /**
-     * Gets the legacy data. Needed for legacy reasons.
-     *
-     * <p>
-     * DO NOT USE THIS.
-     * </p>
-     * @return legacy data or 0, if unknown
-     */
-    @Deprecated
-    public int getLegacyData() {
-        return computeLegacy(1);
-    }
-
-    private int computeLegacy(int index) {
-        if (this.legacyCombinedId == null) {
-            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
-        }
-        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 }

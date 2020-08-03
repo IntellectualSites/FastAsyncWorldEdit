@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.collection;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
-import javax.annotation.Nonnull;
 
 import static it.unimi.dsi.fastutil.HashCommon.arraySize;
 
@@ -67,9 +67,7 @@ public class ObjObjMap<K, V> {
         m_threshold = (int) (capacity * fillFactor);
     }
 
-    public V get(
-        @Nonnull
-            K key) {
+    public V get(@NotNull K key) {
         //        if ( key == null )
         //            return (V) m_nullValue; //we null it on remove, so safe not to check a flag here
 
