@@ -155,9 +155,10 @@ public class ExtentEntityCopy implements EntityFunction {
                     uuid = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
                 }
                 if (uuid != null) {
-                    Extent src = source != null ? source : entity.getExtent();
-                    if (src != null) {
-                        src.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
+                    if (source != null) {
+                        source.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
+                    } else {
+                        entity.remove();
                     }
                 }
             }
