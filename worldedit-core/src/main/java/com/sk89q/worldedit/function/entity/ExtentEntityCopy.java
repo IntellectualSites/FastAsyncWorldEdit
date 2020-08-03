@@ -60,6 +60,28 @@ public class ExtentEntityCopy implements EntityFunction {
      * @param to the destination position
      * @param transform the transformation to apply to both position and orientation
      */
+    @Deprecated
+    public ExtentEntityCopy(Vector3 from, Extent destination, Vector3 to, Transform transform) {
+        checkNotNull(from);
+        checkNotNull(destination);
+        checkNotNull(to);
+        checkNotNull(transform);
+        this.source = null;
+        this.destination = destination;
+        this.from = from;
+        this.to = to;
+        this.transform = transform;
+    }
+    
+    /**
+     * Create a new instance.
+     *
+     * @param source the source {@code Extent}
+     * @param from the from position
+     * @param destination the destination {@code Extent}
+     * @param to the destination position
+     * @param transform the transformation to apply to both position and orientation
+     */
     public ExtentEntityCopy(Extent source, Vector3 from, Extent destination, Vector3 to, Transform transform) {
         checkNotNull(source);
         checkNotNull(from);
@@ -132,8 +154,12 @@ public class ExtentEntityCopy implements EntityFunction {
                 } else if (tag.containsKey("PersistentIDMSB")) {
                     uuid = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
                 }
-                if (uuid != null)
-                    source.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
+                if (uuid != null) {
+                    Extent src = source != null ? source : entity.getExtent();
+                    if (src != null) {
+                        src.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
+                    }
+                }
             }
 
             return success;
