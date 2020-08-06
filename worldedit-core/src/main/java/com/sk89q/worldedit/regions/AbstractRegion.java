@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class AbstractRegion extends AbstractSet<BlockVector3> implements Region {
@@ -226,12 +227,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
             return false;
         }
         Region region = ((Region) o);
-        if (this.getWorld() != region.getWorld()) {
-            if (this.getWorld() == null || region.getWorld() == null) {
-                return false;
-            }
-        }
-        if (this.getWorld().equals(region.getWorld())
+
+        if (Objects.equals(this.getWorld(), region.getWorld())
             && this.getMinimumPoint().equals(region.getMinimumPoint())
             && this.getMaximumPoint().equals(region.getMaximumPoint())
             && this.getVolume() == region.getVolume()) {
