@@ -14,10 +14,7 @@ repositories {
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
     maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
-    maven {
-        this.name = "JitPack"
-        this.url = uri("https://jitpack.io")
-    }
+    maven { url = uri("https://jitpack.io")}
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public/") }
     maven {
         name = "ProtocolLib Repo"
@@ -57,8 +54,7 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    "implementation"("com.github.InventivetalentDev:MapManager:1.7.8-SNAPSHOT") { isTransitive = false }
-
+    "implementation"("com.github.InventivetalentDev:MapManager:1.7.+") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
