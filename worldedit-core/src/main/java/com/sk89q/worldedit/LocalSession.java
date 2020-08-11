@@ -167,6 +167,7 @@ public class LocalSession implements TextureHolder {
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
     private transient boolean hasBeenToldVersion;
+    private transient boolean tracingActions;
 
     // Saved properties
     private String lastScript;
@@ -641,6 +642,14 @@ public class LocalSession implements TextureHolder {
 
     public void setTickingWatchdog(boolean tickingWatchdog) {
         this.tickingWatchdog = tickingWatchdog;
+    }
+
+    public boolean isTracingActions() {
+        return tracingActions;
+    }
+
+    public void setTracingActions(boolean tracingActions) {
+        this.tracingActions = tracingActions;
     }
 
     /**

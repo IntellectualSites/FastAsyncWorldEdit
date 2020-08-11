@@ -51,6 +51,9 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+
+//TODO Migrate all logic to com.sk89q.worldedit.EditSessionBuilder
+@Deprecated(forRemoval = true)
 public class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -73,6 +76,7 @@ public class EditSessionBuilder {
     private RelightMode relightMode;
     private Relighter relighter;
     private Boolean wnaMode;
+    private boolean tracing;
 
     /**
      * An EditSession builder<br>
@@ -476,9 +480,16 @@ public class EditSessionBuilder {
     public boolean isWNAMode() {
         return wnaMode;
     }
+    public boolean isTracing() {
+        return tracing;
+    }
 
     @Nullable
     public Region[] getAllowedRegions() {
         return allowedRegions;
+    }
+
+    public void tracing(boolean tracing) {
+        this.tracing = tracing;
     }
 }
