@@ -23,7 +23,6 @@ repositories {
         name = "ProtocolLib Repo"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
-    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/")}
     flatDir {dir(File("src/main/resources"))}
 }
 
@@ -58,7 +57,7 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    "implementation"("org.inventivetalent:mapmanager:1.7.3-SNAPSHOT") { isTransitive = false }
+    "implementation"("com.github.InventivetalentDev:MapManager:1.7.8-SNAPSHOT") { isTransitive = false }
 
     "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
