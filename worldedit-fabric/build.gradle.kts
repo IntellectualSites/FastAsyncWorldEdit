@@ -5,6 +5,7 @@ applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
 apply(plugin = "fabric-loom")
+apply(plugin = "java-library")
 
 val minecraftVersion = "1.15.2"
 val yarnMappings = "1.15.2+build.14:v2"

@@ -14,7 +14,10 @@ repositories {
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
     maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
-    maven { url = uri("https://jitpack.io")}
+    maven {
+        this.name = "JitPack"
+        this.url = uri("https://jitpack.io")
+    }
     maven { url = uri("https://repo.destroystokyo.com/repository/maven-public/") }
     maven {
         name = "ProtocolLib Repo"
@@ -30,24 +33,29 @@ configurations.all {
 }
 
 dependencies {
-    compile("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
+        isTransitive = false
+    }
     "api"(project(":worldedit-core"))
     "api"(project(":worldedit-libs:bukkit"))
     "compile"(":worldedit-adapters:")
     "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
     "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
-    "compile"("it.unimi.dsi:fastutil:8.2.1")
+    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
     "api"("com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
     }
+    "compileOnly"("org.jetbrains:annotations:20.0.0")
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
     "compileOnly"("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
     "compileOnly"("org.spigotmc:spigot:1.16.1-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.2")
-    "compileOnly"("com.sk89q:dummypermscompat:1.10")
+    "implementation"("io.papermc:paperlib:1.0.+")
+    "compileOnly"("com.sk89q:dummypermscompat:1.10") {
+        exclude("com.github.MilkBowl", "VaultAPI")
+    }
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
-    "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
+    "testImplementation"("org.mockito:mockito-core:1.9.0-rc1")
     "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.+") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -95,7 +103,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.2"))
+            include(dependency("io.papermc:paperlib:1.+"))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))

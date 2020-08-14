@@ -29,22 +29,22 @@ configurations.all {
 }
 
 dependencies {
-    "compile"(project(":worldedit-libs:core"))
-    "compile"("de.schlichtherle:truezip:6.8.3")
-    "compile"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
-    "compile"("org.mozilla:rhino-runtime:1.7.12")
-    "compile"("org.yaml:snakeyaml:1.23")
-    "compile"("com.google.guava:guava:21.0")
-    "compile"("com.google.code.findbugs:jsr305:3.0.2")
-    "compile"("com.google.code.gson:gson:2.8.0")
-    "compile"("org.slf4j:slf4j-api:1.7.26")
-    "compile"("it.unimi.dsi:fastutil:8.2.1")
+    "api"(project(":worldedit-libs:core"))
+    "implementation"("de.schlichtherle:truezip:6.8.3")
+    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
+    "implementation"("org.mozilla:rhino-runtime:1.7.12")
+    "implementation"("org.yaml:snakeyaml:1.23")
+    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
+    "implementation"("com.google.code.findbugs:jsr305:3.0.2")
+    "implementation"("com.google.code.gson:gson:${Versions.GSON}")
+    "implementation"("org.slf4j:slf4j-api:1.7.26")
+    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
 
     val antlrVersion = "4.7.2"
     "antlr"("org.antlr:antlr4:$antlrVersion")
     "implementation"("org.antlr:antlr4-runtime:$antlrVersion")
 
-    "compile"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
+    "implementation"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     "compileOnly"(project(":worldedit-libs:core:ap"))
     "annotationProcessor"(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
@@ -53,7 +53,6 @@ dependencies {
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
     "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.4.3-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
@@ -62,7 +61,7 @@ dependencies {
     "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
         isTransitive = false
     }
-    implementation(kotlin("stdlib-jdk8", "1.3.61"))
+    implementation(kotlin("stdlib-jdk8", "1.3.72"))
 }
 
 tasks.named<Test>("test") {

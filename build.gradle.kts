@@ -14,17 +14,18 @@ logger.lifecycle("""
  Output files will be in [subproject]/build/libs
 *******************************************
 """)
+
 //TODO FIX THIS WHEN I FEEL LIKE IT
-var rootVersion = "1.16"
-var revision: String = ""
-var buildNumber = ""
-var date: String = ""
+var rootVersion by extra("1.16")
+var revision: String by extra("")
+var buildNumber by extra("")
+var date: String by extra("")
 ext {
     val git: Grgit = Grgit.open {
         dir = File("$rootDir/.git");
     }
-    ext["date"] = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
-    ext["revision"] = "-${git.head().abbreviatedId}";
+    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+    revision = "-${git.head().abbreviatedId}";
     var parents: MutableList<String>? = git.head().parentIds;
     if (project.hasProperty("buildnumber")) {
         buildNumber = project.properties["buildnumber"] as String;
@@ -47,6 +48,8 @@ allprojects {
 }
 
 version = String.format("%s-%s", rootVersion, buildNumber)
+
+applyCommonConfiguration()
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
