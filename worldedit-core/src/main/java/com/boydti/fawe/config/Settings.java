@@ -80,6 +80,9 @@ public class Settings extends Config {
             "Specific aspects can be turned on and off further below"
         })
         public boolean PLOTSQUARED_HOOK = true;
+        @Comment({"Send anonymous FAWE statistics to https://bstats.org/.",
+            "Please keep this setting enabled. It helps us identifying which parts of FAWE are used the most to organize future updates better."})
+        public boolean BSTATS = true;
     }
 
     @Comment("Paths for various directories")
