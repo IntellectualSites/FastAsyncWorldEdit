@@ -775,6 +775,10 @@ public abstract class BlockVector3 {
     }
 
     public final boolean equals(BlockVector3 other) {
+        if (other == null) {
+            return false;
+        }
+        
         return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 
