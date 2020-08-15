@@ -7,18 +7,16 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class RandomCollection<T> {
-    protected SimpleRandom random;
+    private SimpleRandom random;
 
-    public RandomCollection(Map<T, Double> weights, SimpleRandom random) {
+    protected RandomCollection(SimpleRandom random) {
         this.random = random;
     }
 
     public static <T> RandomCollection<T> of(Map<T, Double> weights, SimpleRandom random) {
-        try {
-            return new FastRandomCollection<>(weights, random);
-        } catch (IllegalArgumentException ignore) {
-            return new SimpleRandomCollection<>(weights, random);
-        }
+        checkNotNull(random);
+        return FastRandomCollection.create(weights, random)
+                .orElse(new SimpleRandomCollection<>(weights, random));
     }
 
     public void setRandom(SimpleRandom random) {

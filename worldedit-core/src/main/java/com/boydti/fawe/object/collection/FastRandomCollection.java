@@ -5,12 +5,25 @@ import com.boydti.fawe.util.MathMan;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 
 public class FastRandomCollection<T> extends RandomCollection<T> {
-    private T[] values;
+    private final T[] values;
 
-    public FastRandomCollection(Map<T, Double> weights, SimpleRandom random) {
-        super(weights, random);
+    private FastRandomCollection(T[] values, SimpleRandom random) {
+        super(random);
+        this.values = values;
+    }
+
+    /**
+     * Create a new FastRandomCollection if the given values and weights match the criteria.
+     * @param weights the weight of the values.
+     * @param random the random generator to use for this collection.
+     * @param <T> the value type.
+     * @return an {@link Optional} containing the new collection if it could
+     * be created, {@link Optional#empty()} otherwise.
+     */
+    public static <T> Optional<RandomCollection<T>> create(Map<T, Double> weights, SimpleRandom random) {
         int max = 0;
         int[] counts = new int[weights.size()];
         Double[] weightDoubles = weights.values().toArray(new Double[0]);
@@ -18,7 +31,7 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
             int weight = (int) (weightDoubles[i] * 100);
             counts[i] = weight;
             if (weight != (weightDoubles[i] * 100)) {
-                throw new IllegalArgumentException("Too small");
+                return Optional.empty();
             }
             if (weight > max) {
                 max = weight;
@@ -26,7 +39,7 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
         }
         int gcd = MathMan.gcd(counts);
         if (max / gcd > 100000) {
-            throw new IllegalArgumentException("Too large");
+            return Optional.empty();
         }
         ArrayList<T> parsed = new ArrayList<>();
         for (Map.Entry<T, Double> entry : weights.entrySet()) {
@@ -35,11 +48,14 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
                 parsed.add(entry.getKey());
             }
         }
-        this.values = (T[]) parsed.toArray();
+        @SuppressWarnings("unchecked")
+        T[] values = (T[]) parsed.toArray();
+        FastRandomCollection<T> fastRandomCollection = new FastRandomCollection<>(values, random);
+        return Optional.of(fastRandomCollection);
     }
 
     @Override
     public T next(int x, int y, int z) {
-        return values[random.nextInt(x, y, z, values.length)];
+        return values[getRandom().nextInt(x, y, z, values.length)];
     }
 }

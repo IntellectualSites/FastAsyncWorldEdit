@@ -12,7 +12,7 @@ public class SimpleRandomCollection<E> extends RandomCollection<E> {
     private double total = 0;
 
     public SimpleRandomCollection(Map<E, Double> weights, SimpleRandom random) {
-        super(weights, random);
+        super(random);
         for (Map.Entry<E, Double> entry : weights.entrySet()) {
             add(entry.getValue(), entry.getKey());
         }
@@ -24,7 +24,8 @@ public class SimpleRandomCollection<E> extends RandomCollection<E> {
         map.put(total, result);
     }
 
+    @Override
     public E next(int x, int y, int z) {
-        return map.ceilingEntry(random.nextDouble(x, y, z)).getValue();
+        return map.ceilingEntry(getRandom().nextDouble(x, y, z)).getValue();
     }
 }
