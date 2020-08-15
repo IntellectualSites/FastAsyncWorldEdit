@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.math.convolution;
@@ -46,14 +46,14 @@ public class HeightMap {
     private final boolean layers;
     private int[] data;
     private boolean[] invalid;
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
-    private Region region;
-    private EditSession session;
+    private final Region region;
+    private final EditSession session;
 
     /**
-     * Constructs the HeightMap
+     * Constructs the HeightMap.
      *
      * @param session an edit session
      * @param region the region
@@ -106,10 +106,11 @@ public class HeightMap {
             int yTmp = 255;
             for (int z = 0; z < height; ++z) {
                 for (int x = 0; x < width; ++x, index++) {
-                    if (mask != null)
+                    if (mask != null) {
                         yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
-                    else
+                    } else {
                         yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    }
                     switch (yTmp) {
                         case Integer.MIN_VALUE:
                             yTmp = minY;
@@ -145,8 +146,8 @@ public class HeightMap {
      * @param filter the filter
      * @param iterations the number of iterations
      * @return number of blocks affected
+     * @throws MaxChangedBlocksException if the maximum block change limit is exceeded
      */
-
     public int applyFilter(HeightMapFilter filter, int iterations) throws MaxChangedBlocksException {
         checkNotNull(filter);
 
@@ -182,7 +183,9 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x) {
-                if (this.invalid != null && this.invalid[index]) continue;
+                if (this.invalid != null && this.invalid[index]) {
+                    continue;
+                }
                 int curHeight = this.data[index];
 
                 //Clamp newHeight within the selection area
@@ -204,7 +207,9 @@ public class HeightMap {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int setY = newBlock - 1, getY = curBlock; setY >= curBlock; --setY, getY--) {
                             BlockStateHolder<BlockState> get = session.getBlock(xr, getY, zr);
-                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
+                            if (get != BlockTypes.AIR.getDefaultState()) {
+                                tmpBlock = get;
+                            }
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }
@@ -244,17 +249,18 @@ public class HeightMap {
     }
 
     /**
-     * Apply a raw heightmap to the region
+     * Apply a raw heightmap to the region.
      *
      * @param data the data
      * @return number of blocks affected
+     * @throws MaxChangedBlocksException if the maximum block change limit is exceeded
      */
-
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
         BlockVector3 minY = region.getMinimumPoint();
         int originX = minY.getBlockX();
+        int originY = minY.getBlockY();
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
@@ -268,7 +274,9 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
-                if (this.invalid != null && this.invalid[index]) continue;
+                if (this.invalid != null && this.invalid[index]) {
+                    continue;
+                }
 
                 int curHeight = this.data[index];
 
@@ -293,7 +301,9 @@ public class HeightMap {
                             } else {
                                 get = BlockTypes.AIR.getDefaultState();
                             }
-                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
+                            if (get != BlockTypes.AIR.getDefaultState()) {
+                                tmpBlock = get;
+                            }
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }

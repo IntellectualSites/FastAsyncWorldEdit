@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 // $Id$
@@ -37,17 +37,19 @@ public class LinearInterpolation implements Interpolation {
     @Override
     public void setNodes(List<Node> nodes) {
         checkNotNull(nodes);
-        
+
         this.nodes = nodes;
     }
 
     @Override
     public Vector3 getPosition(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= nodes.size() - 1;
 
@@ -77,11 +79,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= nodes.size() - 1;
 
@@ -95,11 +99,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public double arcLength(double positionA, double positionB) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (positionA > positionB)
+        if (positionA > positionB) {
             return arcLength(positionB, positionA);
+        }
 
         positionA *= nodes.size() - 1;
         positionB *= nodes.size() - 1;
@@ -118,19 +124,17 @@ public class LinearInterpolation implements Interpolation {
      */
     private double arcLengthRecursive(int indexA, double remainderA, int indexB, double remainderB) {
         switch (indexB - indexA) {
-        case 0:
-            return arcLengthRecursive(indexA, remainderA, remainderB);
+            case 0:
+                return arcLengthRecursive(indexA, remainderA, remainderB);
 
-        case 1:
-            // This case is merely a speed-up for a very common case
-            return
-                    arcLengthRecursive(indexA, remainderA, 1.0) +
-                    arcLengthRecursive(indexB, 0.0, remainderB);
+            case 1:
+                // This case is merely a speed-up for a very common case
+                return arcLengthRecursive(indexA, remainderA, 1.0)
+                    + arcLengthRecursive(indexB, 0.0, remainderB);
 
-        default:
-            return
-                    arcLengthRecursive(indexA, remainderA, indexB - 1, 1.0) +
-                    arcLengthRecursive(indexB, 0.0, remainderB);
+            default:
+                return arcLengthRecursive(indexA, remainderA, indexB - 1, 1.0)
+                    + arcLengthRecursive(indexB, 0.0, remainderB);
         }
     }
 
@@ -143,11 +147,13 @@ public class LinearInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (nodes == null)
+        if (nodes == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         position *= nodes.size() - 1;
 

@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.math;
@@ -67,6 +67,8 @@ public abstract class BlockVector3 {
                     return ONE;
                 }
                 break;
+            default:
+                break;
         }
         */
         return new BlockVector3Imp(x, y, z);
@@ -80,9 +82,9 @@ public abstract class BlockVector3 {
     }
 
     public static boolean isLongPackable(BlockVector3 location) {
-        return isHorizontallyInBounds(location.getX()) &&
-            isHorizontallyInBounds(location.getZ()) &&
-            0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+        return isHorizontallyInBounds(location.getX())
+            && isHorizontallyInBounds(location.getZ())
+            && 0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
     }
 
     public static void checkLongPackable(BlockVector3 location) {
@@ -110,6 +112,7 @@ public abstract class BlockVector3 {
      *
      * <p>
      * Useful for sorting by chunk block storage order.
+     * </p>
      */
     public static Comparator<BlockVector3> sortByCoordsYzx() {
         return YzxOrderComparator.YZX_ORDER;
@@ -125,7 +128,7 @@ public abstract class BlockVector3 {
 
     public long toLongPackedForm() {
         checkLongPackable(this);
-        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
+        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & BITS_12) << (26 + 26)));
     }
 
     public MutableBlockVector3 mutX(double x) {
@@ -264,7 +267,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 add(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX += other.getX();
@@ -307,7 +312,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 subtract(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX -= other.getX();
@@ -347,7 +354,9 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 multiply(BlockVector3... others) {
-        int newX = getX(), newY = getY(), newZ = getZ();
+        int newX = getX();
+        int newY = getY();
+        int newZ = getZ();
 
         for (BlockVector3 other : others) {
             newX *= other.getX();
@@ -766,8 +775,7 @@ public abstract class BlockVector3 {
     }
 
     public final boolean equals(BlockVector3 other) {
-        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this
-            .getZ();
+        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 
     @Override
