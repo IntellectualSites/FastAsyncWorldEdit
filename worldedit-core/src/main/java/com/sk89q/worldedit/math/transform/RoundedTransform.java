@@ -17,8 +17,7 @@ public class RoundedTransform implements Transform {
     @Override
     public Vector3 apply(Vector3 input) {
         Vector3 val = transform.apply(input);
-        return Vector3.at(Math.floor(val.getX() + 0.5), Math.floor(val.getY() + 0.5), Math
-            .floor(val.getY() + 0.5));
+        return val.round();
     }
 
     @Override

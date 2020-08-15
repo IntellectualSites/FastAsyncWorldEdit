@@ -13,11 +13,13 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
@@ -37,6 +39,22 @@ public class SweepBrush implements Brush, ResettableTool {
     public SweepBrush(int copies) {
         this.positions = new ArrayList<>();
         this.copies = copies > 0 ? copies : -1;
+    }
+
+    private Vector3 getSidePos(Interpolation interpol, double position, Clipboard clipboard, boolean rightHand) {
+        Vector3 pos = interpol.getPosition(position);
+        Vector3 deriv = interpol.get1stDerivative(position);
+        double length = (rightHand ? 1 : -1) * Math.abs(
+            clipboard.getOrigin().getBlockZ() - clipboard.getRegion().getMinimumPoint().getBlockZ()
+        );
+
+        Vector3 cross = deriv.cross(Vector3.UNIT_Y);
+        if (cross.equals(Vector3.ZERO)) {
+            return null;
+        }
+
+        Vector3 perpendicular = cross.normalize().multiply(length);
+        return pos.add(perpendicular);
     }
 
     @Override
@@ -99,18 +117,24 @@ public class SweepBrush implements Brush, ResettableTool {
                 double splineLength = interpol.arcLength(0D, 1D);
                 double blockDistance = 1d / splineLength;
                 double step = blockDistance / quality;
-                double accumulation = 0;
-                MutableVector3 last = new MutableVector3(0, 0, 0);
+                MutableVector3 lastLHS = new MutableVector3(getSidePos(interpol, 0, clipboard, false).round());
+                MutableVector3 lastRHS = new MutableVector3(getSidePos(interpol, 0, clipboard, true).round());
+
                 for (double pos = 0D; pos <= 1D; pos += step) {
-                    Vector3 gradient = interpol.get1stDerivative(pos);
-                    double dist = MathMan.sqrtApprox(last.distanceSq(gradient));
-                    last.mutX(gradient.getX());
-                    last.mutY(gradient.getY());
-                    last.mutZ(gradient.getZ());
-                    double change = dist * step;
-                    // Accumulation is arbitrary, but much faster than calculation overlapping regions
-                    if ((accumulation += change + step * 2) > blockDistance) {
-                        accumulation -= blockDistance;
+                    Vector3 lhs = getSidePos(interpol, pos, clipboard, false);
+                    boolean doLeft = lhs == null || !lhs.round().equals(lastLHS);
+                    if (doLeft && lhs != null) {
+                        lastLHS.setComponents(lhs.round());
+                    }
+                    
+                    Vector3 rhs = getSidePos(interpol, pos, clipboard, true);
+                    boolean doRight = rhs == null || !rhs.round().equals(lastRHS);
+                    if (doRight && rhs != null) {
+                        lastRHS.setComponents(rhs.round());
+                    }
+                    
+                    // Only paste if the edges have passed the previous edges
+                    if (doLeft || doRight) {
                         spline.pastePosition(pos);
                     }
                 }

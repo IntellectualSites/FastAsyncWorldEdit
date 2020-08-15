@@ -129,7 +129,7 @@ public abstract class Spline {
         // Calculate position from spline
         BlockVector3 target = interpolation.getPosition(position).toBlockPoint();
         BlockVector3 offset = target.subtract(target.round());
-        target = target.subtract(offset);
+        target = target.subtract(offset).round();
 
         // Calculate rotation from spline
 
