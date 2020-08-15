@@ -46,7 +46,7 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
 
-        boolean newPos = !position.equals(this.position);
+        boolean newPos = this.position == null || !position.equals(this.position);
         this.position = position;
         Player player = editSession.getPlayer();
         if (player == null) {

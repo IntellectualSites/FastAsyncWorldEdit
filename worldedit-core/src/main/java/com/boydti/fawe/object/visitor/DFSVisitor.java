@@ -104,7 +104,7 @@ public abstract class DFSVisitor implements Operation {
                         from.getZ() + direction.getZ());
                 if (isVisitable(bv, bv2)) {
                     Node adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
-                    if (!adjacent.equals(current.from)) {
+                    if (current.from == null || !adjacent.equals(current.from)) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {
                             if (countAdd++ < maxBranch) {
