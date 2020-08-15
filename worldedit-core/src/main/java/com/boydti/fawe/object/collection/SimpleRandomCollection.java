@@ -11,6 +11,14 @@ public class SimpleRandomCollection<E> extends RandomCollection<E> {
     private final NavigableMap<Double, E> map = new TreeMap<>();
     private double total = 0;
 
+    /**
+     * Create a {@link RandomCollection} from a weighted map and a RNG.
+     * It is recommended to use {@link RandomCollection#of(Map, SimpleRandom)}
+     * instead of this constructor.
+     *
+     * @param weights the weighted map.
+     * @param random  the random number generator.
+     */
     public SimpleRandomCollection(Map<E, Double> weights, SimpleRandom random) {
         super(random);
         for (Map.Entry<E, Double> entry : weights.entrySet()) {
