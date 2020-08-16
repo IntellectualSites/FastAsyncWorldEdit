@@ -116,6 +116,13 @@ public abstract class Spline {
     }
 
     /**
+     * 2 dimensional "cross" product. cross2D(v1, v2) = |v1|*|v2|*sin(theta) or v1 X v2 taking Y to be 0
+     */
+    private double cross2D(Vector2 v1, Vector2 v2) {
+        return v1.getX() * v2.getZ() - v2.getX() * v1.getZ();
+    }
+
+    /**
      * Paste structure at the provided position on the curve. The position will not be position-corrected
      * but will be passed directly to the interpolation algorithm.
      * @param position The position on the curve. Must be between 0.0 and 1.0 (both inclusive)
@@ -136,9 +143,9 @@ public abstract class Spline {
         Vector3 deriv = interpolation.get1stDerivative(position);
         Vector2 deriv2D = Vector2.at(deriv.getX(), deriv.getZ()).normalize();
         double angle = Math.toDegrees(
-                -Math.acos(direction.dot(deriv2D))
+            -Math.atan2(cross2D(direction, deriv2D), direction.dot(deriv2D))
         );
-
+            
         angle = ((angle % 360) + 360) % 360; // Wrap to 360 degrees
 
         return pasteBlocks(blockTarget, offset, angle);
