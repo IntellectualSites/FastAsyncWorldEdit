@@ -18,6 +18,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
+import com.sk89q.worldedit.math.interpolation.ReparametrisingInterpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -39,22 +40,6 @@ public class SweepBrush implements Brush, ResettableTool {
     public SweepBrush(int copies) {
         this.positions = new ArrayList<>();
         this.copies = copies > 0 ? copies : -1;
-    }
-
-    private Vector3 getSidePos(Interpolation interpol, double position, Clipboard clipboard, boolean rightHand) {
-        Vector3 pos = interpol.getPosition(position);
-        Vector3 deriv = interpol.get1stDerivative(position);
-        double length = (rightHand ? 1 : -1) * Math.abs(
-            clipboard.getOrigin().getBlockZ() - clipboard.getRegion().getMinimumPoint().getBlockZ()
-        );
-
-        Vector3 cross = deriv.cross(Vector3.UNIT_Y);
-        if (cross.equals(Vector3.ZERO)) {
-            return null;
-        }
-
-        Vector3 perpendicular = cross.normalize().multiply(length);
-        return pos.add(perpendicular);
     }
 
     @Override
@@ -82,7 +67,7 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
 
-        Interpolation interpol = new KochanekBartelsInterpolation();
+        Interpolation interpol = new ReparametrisingInterpolation(new KochanekBartelsInterpolation());
         List<Node> nodes = positions.stream().map(v -> {
             Node n = new Node(v.toVector3());
             n.setTension(tension);
@@ -114,29 +99,10 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
             case -1: {
-                double splineLength = interpol.arcLength(0D, 1D);
-                double blockDistance = 1d / splineLength;
-                double step = blockDistance / quality;
-                MutableVector3 lastLHS = new MutableVector3(getSidePos(interpol, 0, clipboard, false).round());
-                MutableVector3 lastRHS = new MutableVector3(getSidePos(interpol, 0, clipboard, true).round());
-
-                for (double pos = 0D; pos <= 1D; pos += step) {
-                    Vector3 lhs = getSidePos(interpol, pos, clipboard, false);
-                    boolean doLeft = lhs == null || !lhs.round().equals(lastLHS);
-                    if (doLeft && lhs != null) {
-                        lastLHS.setComponents(lhs.round());
-                    }
-                    
-                    Vector3 rhs = getSidePos(interpol, pos, clipboard, true);
-                    boolean doRight = rhs == null || !rhs.round().equals(lastRHS);
-                    if (doRight && rhs != null) {
-                        lastRHS.setComponents(rhs.round());
-                    }
-                    
-                    // Only paste if the edges have passed the previous edges
-                    if (doLeft || doRight) {
-                        spline.pastePosition(pos);
-                    }
+                double length = interpol.arcLength(0, 1);
+                double step = 1 / (length * quality);
+                for (double pos = 0; pos <= 1; pos += step) {
+                    spline.pastePosition(pos);
                 }
                 break;
             }
