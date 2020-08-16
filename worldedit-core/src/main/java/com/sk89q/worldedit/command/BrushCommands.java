@@ -93,6 +93,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.factory.Apply;
 import com.sk89q.worldedit.function.factory.ApplyLayer;
+import com.sk89q.worldedit.function.factory.ApplyRegion;
+import com.sk89q.worldedit.function.factory.BiomeFactory;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.factory.Snow;
@@ -111,7 +113,9 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -1552,6 +1556,26 @@ public class BrushCommands {
         set(context, new ButcherBrush(flags), "worldedit.brush.butcher").setSize(radius);
     }
 
+    @Command(name = "biome",
+            desc = "Biome brush, sets biomes in the area"
+    )
+    @CommandPermissions("worldedit.brush.biome")
+    public void biome(
+            Player player, LocalSession localSession,
+            @Arg(desc = "The shape of the region")
+                    RegionFactory shape,
+            @Arg(desc = "The size of the brush", def = "5")
+                    double radius,
+            @Arg(desc = "The biome type")
+                    BiomeType biomeType
+    ) throws WorldEditException {
+        setOperationBasedBrush(
+                player, localSession, radius,
+                new ApplyRegion(new BiomeFactory(biomeType)), shape, "worldedit.brush.biome"
+        );
+        player.printInfo(TranslatableComponent.of("worldedit.setbiome.warning"));
+    }
+
     //FAWE start
     public BrushSettings process(Player player, Arguments arguments, BrushSettings settings)
             throws WorldEditException {
@@ -1596,13 +1620,12 @@ public class BrushCommands {
     }
     //FAWE end
 
-    static void setOperationBasedBrush(
-            Player player, LocalSession session, double radius,
-            Contextual<? extends Operation> factory,
-            RegionFactory shape,
-            String permission
-    ) throws WorldEditException {
-        WorldEdit.getInstance().checkMaxBrushRadius(radius, player);
+
+    static void setOperationBasedBrush(Player player, LocalSession session, double radius,
+                                        Contextual<? extends Operation> factory,
+                                        RegionFactory shape,
+                                        String permission) throws WorldEditException {
+        WorldEdit.getInstance().checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
         tool.setSize(radius);
         tool.setFill(null);
