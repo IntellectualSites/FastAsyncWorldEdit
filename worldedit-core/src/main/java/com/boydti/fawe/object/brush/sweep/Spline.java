@@ -127,9 +127,9 @@ public abstract class Spline {
         Preconditions.checkArgument(position <= 1);
 
         // Calculate position from spline
-        BlockVector3 target = interpolation.getPosition(position).toBlockPoint();
-        BlockVector3 offset = target.subtract(target.round());
-        target = target.subtract(offset).round();
+        Vector3 target = interpolation.getPosition(position);
+        BlockVector3 blockTarget = target.toBlockPoint();
+        Vector3 offset = target.subtract(target.floor());
 
         // Calculate rotation from spline
 
@@ -139,10 +139,10 @@ public abstract class Spline {
                 Math.atan2(direction.getZ(), direction.getX()) - Math.atan2(deriv2D.getZ(), deriv2D.getX())
         );
 
-        return pasteBlocks(target, offset, angle);
+        return pasteBlocks(blockTarget, offset, angle);
     }
 
-    protected abstract int pasteBlocks(BlockVector3 target, BlockVector3 offset, double angle) throws MaxChangedBlocksException;
+    protected abstract int pasteBlocks(BlockVector3 target, Vector3 offset, double angle) throws MaxChangedBlocksException;
 
     private void initSections() {
         int sectionCount = nodeCount - 1;
