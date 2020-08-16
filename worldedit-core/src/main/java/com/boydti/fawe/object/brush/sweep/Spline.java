@@ -178,7 +178,15 @@ public abstract class Spline {
         double flexOffset = flexPosition - previousSection.flexStart;
         double uniOffset = flexOffset / previousSection.flexLength * previousSection.uniLength;
 
-        return previousSection.uniStart + uniOffset;
+        double finalPosition = previousSection.uniStart + uniOffset;
+
+        //Really rough fix, but fixes a bug with no visual artifacts so it's probably ok?
+        //flexPosition very close to 1 causes outputs very slightly higher than 1 on rare occasions
+        if (finalPosition > 1) {
+            return 1;
+        }
+
+        return finalPosition;
     }
 
     private class Section {
