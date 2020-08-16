@@ -21,7 +21,7 @@ import java.util.List;
  */
 public abstract class Spline {
 
-    private BlockVector2 direction = BlockVector2.at(1, 0);
+    private Vector2 direction = Vector2.at(1, 0);
     private final int nodeCount;
 
     protected EditSession editSession;
@@ -77,10 +77,10 @@ public abstract class Spline {
      * is rotated by that angle to follow the curve slope.
      * <p>
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
-     * @param direction A normalized vector representing the horizontal forward direction of the clipboard content
+     * @param direction A vector representing the horizontal forward direction of the clipboard content
      */
-    public void setDirection(BlockVector2 direction) {
-        this.direction = direction;
+    public void setDirection(Vector2 direction) {
+        this.direction = direction.normalize();
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class Spline {
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
      * @return A vector representing the horizontal forward direction of the clipboard content
      */
-    public BlockVector2 getDirection() {
+    public Vector2 getDirection() {
         return direction;
     }
 
@@ -136,8 +136,10 @@ public abstract class Spline {
         Vector3 deriv = interpolation.get1stDerivative(position);
         Vector2 deriv2D = Vector2.at(deriv.getX(), deriv.getZ()).normalize();
         double angle = Math.toDegrees(
-                Math.atan2(direction.getZ(), direction.getX()) - Math.atan2(deriv2D.getZ(), deriv2D.getX())
+                -Math.acos(direction.dot(deriv2D))
         );
+
+        angle = ((angle % 360) + 360) % 360; // Wrap to 360 degrees
 
         return pasteBlocks(blockTarget, offset, angle);
     }
