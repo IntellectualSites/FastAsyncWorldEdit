@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.math.convolution;
@@ -32,7 +32,7 @@ public class HeightMapFilter {
 
     /**
      * Construct the HeightMapFilter object.
-     * 
+     *
      * @param kernel the kernel
      */
     public HeightMapFilter(Kernel kernel) {
@@ -42,7 +42,7 @@ public class HeightMapFilter {
 
     /**
      * Construct the HeightMapFilter object.
-     * 
+     *
      * @param kernelWidth the width
      * @param kernelHeight the height
      * @param kernelData the data
@@ -53,15 +53,15 @@ public class HeightMapFilter {
     }
 
     /**
-     * @return the kernel
+     * Get the kernel.
      */
     public Kernel getKernel() {
         return kernel;
     }
 
     /**
-     * Set Kernel
-     * 
+     * Set the kernel.
+     *
      * @param kernel the kernel
      */
     public void setKernel(Kernel kernel) {
@@ -71,7 +71,7 @@ public class HeightMapFilter {
     }
 
     /**
-     * Filter with a 2D kernel
+     * Filter with a 2D kernel.
      *
      * @param inData the data
      * @param width the width
@@ -107,7 +107,9 @@ public class HeightMapFilter {
                     int matrixOffset = ky * kw;
                     for (int kx = 0; kx < kw; ++kx) {
                         float f = matrix[matrixOffset + kx];
-                        if (f == 0) continue;
+                        if (f == 0) {
+                            continue;
+                        }
 
                         int offsetX = x + kx - kox;
                         // Clamp coordinates inside data

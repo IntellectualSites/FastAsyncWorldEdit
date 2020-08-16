@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 // $Id$
@@ -47,7 +47,7 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     public ReparametrisingInterpolation(Interpolation baseInterpolation) {
         checkNotNull(baseInterpolation);
-        
+
         this.baseInterpolation = baseInterpolation;
     }
 
@@ -67,16 +67,18 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     @Override
     public Vector3 getPosition(double position) {
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         return baseInterpolation.getPosition(arcToParameter(position));
     }
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         return baseInterpolation.get1stDerivative(arcToParameter(position)).normalize().multiply(totalArcLength);
     }
@@ -87,10 +89,13 @@ public class ReparametrisingInterpolation implements Interpolation {
     }
 
     private double arcToParameter(double arc) {
-        if (cache.isEmpty())
+        if (cache.isEmpty()) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (arc > 1) arc = 1;
+        if (arc > 1) {
+            arc = 1;
+        }
         arc *= totalArcLength;
 
         Entry<Double, Double> floorEntry = cache.floorEntry(arc);
@@ -140,8 +145,7 @@ public class ReparametrisingInterpolation implements Interpolation {
                 // search between left and mid
                 rightArc = midArc;
                 rightParameter = midParameter;
-            }
-            else {
+            } else {
                 // search between mid and right
                 leftArc = midArc;
                 leftParameter = midParameter;
@@ -152,8 +156,9 @@ public class ReparametrisingInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         return baseInterpolation.getSegment(arcToParameter(position));
     }

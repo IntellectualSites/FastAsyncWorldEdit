@@ -71,7 +71,7 @@ public class WorldEditCommands {
     @Command(
         name = "version",
         aliases = { "ver" },
-        desc = "Get WorldEdit/FAWE version"
+        desc = "Get the FAWE version"
     )
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
@@ -132,9 +132,8 @@ public class WorldEditCommands {
     }
 
     @Command(
-        name = "report",
-        aliases = { "debugpaste" },
-        desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
+        name = "debugpaste",
+        desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException {

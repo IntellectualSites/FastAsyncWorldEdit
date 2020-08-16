@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 // $Id$
@@ -43,10 +43,10 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3[] coeffC;
     private Vector3[] coeffD;
     private double scaling;
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public KochanekBartelsInterpolation() {
-        setNodes(Collections.<Node>emptyList());
+        setNodes(Collections.emptyList());
     }
 
     @Override
@@ -64,8 +64,9 @@ public class KochanekBartelsInterpolation implements Interpolation {
         coeffC = new Vector3[nNodes];
         coeffD = new Vector3[nNodes];
 
-        if (nNodes == 0)
+        if (nNodes == 0) {
             return;
+        }
 
         Node nodeB = nodes.get(0);
         double tensionB = nodeB.getTension();
@@ -84,14 +85,14 @@ public class KochanekBartelsInterpolation implements Interpolation {
             }
 
             // Kochanek-Bartels tangent coefficients
-            final double ta = (1-tensionA)*(1+biasA)*(1+continuityA)/2; // Factor for lhs of d[i]
-            final double tb = (1-tensionA)*(1-biasA)*(1-continuityA)/2; // Factor for rhs of d[i]
-            final double tc = (1-tensionB)*(1+biasB)*(1-continuityB)/2; // Factor for lhs of d[i+1]
-            final double td = (1-tensionB)*(1-biasB)*(1+continuityB)/2; // Factor for rhs of d[i+1]
+            final double ta = (1 - tensionA) * (1 + biasA) * (1 + continuityA) / 2; // Factor for lhs of d[i]
+            final double tb = (1 - tensionA) * (1 - biasA) * (1 - continuityA) / 2; // Factor for rhs of d[i]
+            final double tc = (1 - tensionB) * (1 + biasB) * (1 - continuityB) / 2; // Factor for lhs of d[i+1]
+            final double td = (1 - tensionB) * (1 - biasB) * (1 + continuityB) / 2; // Factor for rhs of d[i+1]
 
-            coeffA[i] = linearCombination(i,  -ta,    ta-  tb-tc+2,    tb+tc-td-2,  td);
-            coeffB[i] = linearCombination(i, 2*ta, -2*ta+2*tb+tc-3, -2*tb-tc+td+3, -td);
-            coeffC[i] = linearCombination(i,  -ta,    ta-  tb     ,    tb        ,   0);
+            coeffA[i] = linearCombination(i, -ta, ta - tb - tc + 2, tb + tc - td - 2, td);
+            coeffB[i] = linearCombination(i, 2 * ta, -2 * ta + 2 * tb + tc - 3, -2 * tb - tc + td + 3, -td);
+            coeffC[i] = linearCombination(i, -ta, ta - tb, tb, 0);
             //coeffD[i] = linearCombination(i,    0,               1,             0,   0);
             coeffD[i] = retrieve(i); // this is an optimization
         }
@@ -125,11 +126,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
      * @return nodes[clamp(0, nodes.length-1)]
      */
     private Vector3 retrieve(int index) {
-        if (index < 0)
+        if (index < 0) {
             return fastRetrieve(0);
+        }
 
-        if (index >= nodes.size())
-            return fastRetrieve(nodes.size()-1);
+        if (index >= nodes.size()) {
+            return fastRetrieve(nodes.size() - 1);
+        }
 
         return fastRetrieve(index);
     }
@@ -140,11 +143,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public Vector3 getPosition(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= scaling;
 
@@ -166,11 +171,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public Vector3 get1stDerivative(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return null;
+        }
 
         position *= scaling;
 
@@ -181,16 +188,18 @@ public class KochanekBartelsInterpolation implements Interpolation {
         final Vector3 b = coeffB[index];
         final Vector3 c = coeffC[index];
 
-        return a.multiply(1.5*position - 3.0*index).add(b).multiply(2.0*position).add(a.multiply(1.5*index).subtract(b).multiply(2.0*index)).add(c).multiply(scaling);
+        return a.multiply(1.5 * position - 3.0 * index).add(b).multiply(2.0 * position).add(a.multiply(1.5 * index).subtract(b).multiply(2.0 * index)).add(c).multiply(scaling);
     }
 
     @Override
     public double arcLength(double positionA, double positionB) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (positionA > positionB)
+        if (positionA > positionB) {
             return arcLength(positionB, positionA);
+        }
 
         positionA *= scaling;
         positionB *= scaling;
@@ -205,23 +214,21 @@ public class KochanekBartelsInterpolation implements Interpolation {
     }
 
     /**
-     * Assumes a < b
+     * Assumes a < b.
      */
     private double arcLengthRecursive(int indexLeft, double remainderLeft, int indexRight, double remainderRight) {
         switch (indexRight - indexLeft) {
-        case 0:
-            return arcLengthRecursive(indexLeft, remainderLeft, remainderRight);
+            case 0:
+                return arcLengthRecursive(indexLeft, remainderLeft, remainderRight);
 
-        case 1:
-            // This case is merely a speed-up for a very common case
-            return
-                    arcLengthRecursive(indexLeft, remainderLeft, 1.0) +
-                    arcLengthRecursive(indexRight, 0.0, remainderRight);
+            case 1:
+                // This case is merely a speed-up for a very common case
+                return arcLengthRecursive(indexLeft, remainderLeft, 1.0)
+                    + arcLengthRecursive(indexRight, 0.0, remainderRight);
 
-        default:
-            return
-                    arcLengthRecursive(indexLeft, remainderLeft, indexRight - 1, 1.0) +
-                    arcLengthRecursive(indexRight, 0.0, remainderRight);
+            default:
+                return arcLengthRecursive(indexLeft, remainderLeft, indexRight - 1, 1.0)
+                    + arcLengthRecursive(indexRight, 0.0, remainderRight);
         }
     }
 
@@ -233,9 +240,9 @@ public class KochanekBartelsInterpolation implements Interpolation {
         final int nPoints = 8;
 
         double accum = a.multiply(remainderLeft).add(b).multiply(remainderLeft).add(c).length() / 2.0;
-        for (int i = 1; i < nPoints-1; ++i) {
+        for (int i = 1; i < nPoints - 1; ++i) {
             double t = ((double) i) / nPoints;
-            t = (remainderRight-remainderLeft)*t + remainderLeft;
+            t = (remainderRight - remainderLeft) * t + remainderLeft;
             accum += a.multiply(t).add(b).multiply(t).add(c).length();
         }
 
@@ -245,11 +252,13 @@ public class KochanekBartelsInterpolation implements Interpolation {
 
     @Override
     public int getSegment(double position) {
-        if (coeffA == null)
+        if (coeffA == null) {
             throw new IllegalStateException("Must call setNodes first.");
+        }
 
-        if (position > 1)
+        if (position > 1) {
             return Integer.MAX_VALUE;
+        }
 
         position *= scaling;
 

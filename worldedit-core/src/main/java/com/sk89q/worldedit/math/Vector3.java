@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.math;
@@ -54,6 +54,8 @@ public abstract class Vector3 {
                     return ONE;
                 }
                 break;
+            default:
+                break;
         }
         */
         return new Vector3Impl(x, y, z);
@@ -75,6 +77,7 @@ public abstract class Vector3 {
      *
      * <p>
      * Useful for sorting by chunk block storage order.
+     * </p>
      */
     public static Comparator<Vector3> sortByCoordsYzx() {
         return YzxOrderComparator.YZX_ORDER;
@@ -209,7 +212,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 add(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX += other.getX();
@@ -252,7 +257,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 subtract(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX -= other.getX();
@@ -292,7 +299,9 @@ public abstract class Vector3 {
      * @return a new vector
      */
     public Vector3 multiply(Vector3... others) {
-        double newX = getX(), newY = getY(), newZ = getZ();
+        double newX = getX();
+        double newY = getY();
+        double newZ = getZ();
 
         for (Vector3 other : others) {
             newX *= other.getX();

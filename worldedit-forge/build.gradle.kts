@@ -1,19 +1,23 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.minecraftforge.gradle.common.util.RunConfig
-import net.minecraftforge.gradle.userdev.UserDevExtension
 import net.minecraftforge.gradle.mcp.task.GenerateSRG
+import net.minecraftforge.gradle.userdev.UserDevExtension
 import net.minecraftforge.gradle.userdev.tasks.RenameJarInPlace
 
 plugins {
     id("net.minecraftforge.gradle")
+    `java-library`
 }
 
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
-val minecraftVersion = "1.14.4"
-val mappingsMinecraftVersion = "1.14.3"
-val forgeVersion = "28.1.0"
+val minecraftVersion = "1.16.1"
+val nextMajorMinecraftVersion: String = minecraftVersion.split('.').let { (useless, major) ->
+    "$useless.${major.toInt() + 1}"
+}
+val mappingsMinecraftVersion = "1.16"
+val forgeVersion = "32.0.92"
 
 configurations.all {
     resolutionStrategy {
@@ -22,8 +26,8 @@ configurations.all {
 }
 
 dependencies {
-    "compile"(project(":worldedit-core"))
-    "compile"("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
+    "api"(project(":worldedit-core"))
+    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
 
     "minecraft"("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 }
@@ -31,7 +35,7 @@ dependencies {
 configure<UserDevExtension> {
     mappings(mapOf(
             "channel" to "snapshot",
-            "version" to "20190913-$mappingsMinecraftVersion"
+            "version" to "20200514-$mappingsMinecraftVersion"
     ))
 
     accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
@@ -57,40 +61,44 @@ configure<BasePluginConvention> {
 
 tasks.named<Copy>("processResources") {
     // this will ensure that this task is redone when the versions change.
-    inputs.property("version", project.ext["internalVersion"])
-    inputs.property("forgeVersion", forgeVersion)
+    val properties = mapOf(
+            "version" to project.ext["internalVersion"],
+            "forgeVersion" to forgeVersion,
+            "minecraftVersion" to minecraftVersion,
+            "nextMajorMinecraftVersion" to nextMajorMinecraftVersion
+    )
+    properties.forEach { (key, value) ->
+        inputs.property(key, value)
+    }
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets["main"].resources.srcDirs) {
         include("META-INF/mods.toml")
 
         // replace version and mcversion
-        expand(
-                "version" to project.ext["internalVersion"],
-                "forgeVersion" to forgeVersion
-        )
+        expand(properties)
     }
 
     // copy everything else except the mcmod.info
     from(sourceSets["main"].resources.srcDirs) {
         exclude("META-INF/mods.toml")
     }
+
+    // copy from -core resources as well
+    from(project(":worldedit-core").tasks.named("processResources"))
 }
 
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes("Class-Path" to CLASSPATH,
-                "WorldEdit-Version" to project.version)
-    }
-}
+addJarManifest(includeClasspath = false)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
         relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
+        relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
 
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
+        include(dependency("org.antlr:antlr4-runtime"))
         include(dependency("de.schlichtherle:truezip"))
         include(dependency("net.java.truevfs:truevfs-profile-default_2.13"))
         include(dependency("org.mozilla:rhino-runtime"))

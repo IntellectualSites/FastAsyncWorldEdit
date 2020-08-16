@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ModuleDependency
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.MavenRepositoryHandlerConvention
@@ -41,7 +42,7 @@ fun Project.applyLibrariesConfiguration() {
         val deps = configurations["shade"].incoming.dependencies
                 .filterIsInstance<ModuleDependency>()
                 .map { it.copy() }
-                .map { dependency ->
+                .map { dependency: ModuleDependency ->
                     dependency.artifact {
                         name = dependency.name
                         type = artifactType
@@ -94,4 +95,17 @@ fun Project.applyLibrariesConfiguration() {
         }
     }
 
+}
+
+fun Project.constrainDependenciesToLibsCore() {
+    evaluationDependsOn(":worldedit-libs:core")
+    val coreDeps = project(":worldedit-libs:core").configurations["shade"].dependencies
+        .filterIsInstance<ExternalModuleDependency>()
+    dependencies.constraints {
+        for (coreDep in coreDeps) {
+            add("shade", "${coreDep.group}:${coreDep.name}:${coreDep.version}") {
+                because("libs should align with libs:core")
+            }
+        }
+    }
 }

@@ -88,7 +88,7 @@ public class FaweBukkit implements IFawe, Listener {
             Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
 
         //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
-        setupVault();
+        TaskManager.IMP.later(this::setupVault, 0);
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.IMP.later(this::setupPlotSquared, 0);
