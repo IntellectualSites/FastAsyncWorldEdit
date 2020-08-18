@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions.polyhedron;
@@ -28,10 +28,10 @@ public class Triangle {
     private String tag = "Triangle";
     private final Vector3[] vertices;
     private final Vector3 normal;
-    private final double b;
+    private final double maxDotProduct;
 
     /**
-     * Constructs a triangle with the given vertices (counter-clockwise)
+     * Constructs a triangle with the given vertices (counter-clockwise).
      *
      * @param v0 first vertex
      * @param v1 second vertex
@@ -45,7 +45,7 @@ public class Triangle {
         vertices = new Vector3[] { v0, v1, v2 };
 
         this.normal = v1.subtract(v0).cross(v2.subtract(v0)).normalize();
-        this.b = Math.max(Math.max(normal.dot(v0), normal.dot(v1)), normal.dot(v2));
+        this.maxDotProduct = Math.max(Math.max(normal.dot(v0), normal.dot(v1)), normal.dot(v2));
     }
 
     /**
@@ -79,7 +79,7 @@ public class Triangle {
      */
     public boolean below(Vector3 pt) {
         checkNotNull(pt);
-        return normal.dot(pt) < b;
+        return normal.dot(pt) < maxDotProduct;
     }
 
     /**
@@ -90,7 +90,7 @@ public class Triangle {
      */
     public boolean above(Vector3 pt) {
         checkNotNull(pt);
-        return normal.dot(pt) > b;
+        return normal.dot(pt) > maxDotProduct;
     }
 
     /**

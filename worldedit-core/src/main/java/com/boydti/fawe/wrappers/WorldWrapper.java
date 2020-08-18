@@ -292,7 +292,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return parent.setBiome(x, y , z, biome);
+        return parent.setBiome(x, y, z, biome);
     }
 
     @Override

@@ -230,7 +230,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private ImageViewer viewer;
     // Used for visualizing the world by sending chunk packets
     // These three variables should be set together
-//    private IQueueExtent packetQueue;
+    //    private IQueueExtent packetQueue;
     private Player player;
     private BlockVector2 chunkOffset = BlockVector2.ZERO;
     private EditSession editSession;
@@ -893,6 +893,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     @Override
     public Path getStoragePath() {
         return getFolder().toPath();
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
     }
 
     @Override

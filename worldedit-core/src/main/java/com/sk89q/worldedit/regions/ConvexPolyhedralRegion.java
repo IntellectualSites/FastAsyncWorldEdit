@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions;
@@ -68,7 +68,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
     private BlockVector3 centerAccum = BlockVector3.ZERO;
 
     /**
-     * The last triangle that caused a {@link #contains(BlockVector3)} to classify a point as "outside". Used for optimization.
+     * The last triangle that caused a {@link #contains(BlockVector3)}} to classify a point as "outside". Used for optimization.
      */
     private Triangle lastTriangle;
 
@@ -127,12 +127,14 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
             return false;
         }
 
+        Vector3 vertexD = vertex.toVector3();
+
         if (vertices.size() == 3) {
             if (vertexBacklog.contains(vertex)) {
                 return false;
             }
 
-            if (containsRaw(vertex.toVector3())) {
+            if (containsRaw(vertexD)) {
                 return vertexBacklog.add(vertex);
             }
         }
@@ -150,19 +152,22 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
 
 
         switch (vertices.size()) {
-        case 0:
-        case 1:
-        case 2:
-            // Incomplete, can't make a mesh yet
-            return true;
+            case 0:
+            case 1:
+            case 2:
+                // Incomplete, can't make a mesh yet
+                return true;
 
-        case 3:
-            // Generate minimal mesh to start from
-            final BlockVector3[] v = vertices.toArray(new BlockVector3[vertices.size()]);
+            case 3:
+                // Generate minimal mesh to start from
+                final BlockVector3[] v = vertices.toArray(new BlockVector3[0]);
 
-            triangles.add((new Triangle(v[0].toVector3(), v[1].toVector3(), v[2].toVector3())));
-            triangles.add((new Triangle(v[0].toVector3(), v[2].toVector3(), v[1].toVector3())));
-            return true;
+                triangles.add((new Triangle(v[0].toVector3(), v[1].toVector3(), v[2].toVector3())));
+                triangles.add((new Triangle(v[0].toVector3(), v[2].toVector3(), v[1].toVector3())));
+                return true;
+
+            default:
+                break;
         }
 
         // Look for triangles that face the vertex and remove them
@@ -171,7 +176,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
             final Triangle triangle = it.next();
 
             // If the triangle can't be seen, it's not relevant
-            if (!triangle.above(vertex.toVector3())) {
+            if (!triangle.above(vertexD)) {
                 continue;
             }
 
@@ -191,7 +196,7 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
 
         // Add triangles between the remembered edges and the new vertex.
         for (Edge edge : borderEdges) {
-            triangles.add(edge.createTriangle(vertex.toVector3()));
+            triangles.add(edge.createTriangle(vertexD));
         }
 
         if (!vertexBacklog.isEmpty()) {
@@ -275,19 +280,12 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
             return false;
         }
 
-        final int x = position.getBlockX();
-        final int y = position.getBlockY();
-        final int z = position.getBlockZ();
-
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();
 
-        if (x < min.getBlockX()) return false;
-        if (x > max.getBlockX()) return false;
-        if (y < min.getBlockY()) return false;
-        if (y > max.getBlockY()) return false;
-        if (z < min.getBlockZ()) return false;
-        if (z > max.getBlockZ()) return false;
+        if (!position.containedWithin(min, max)) {
+            return false;
+        }
 
         return containsRaw(position.toVector3());
     }

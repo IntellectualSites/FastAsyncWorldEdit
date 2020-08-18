@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.world;
@@ -70,6 +70,13 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      */
     @Nullable
     Path getStoragePath();
+
+    /**
+     * Get the minimum Y.
+     *
+     * @return the minimum Y
+     */
+    int getMinY();
 
     /**
      * Get the maximum Y.
@@ -324,11 +331,9 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     /**
-     * Refresh a specific chunk
+     * Refresh a specific chunk.
      * Note: only 0 is guaranteed to send all tiles / entities
      * Note: Only 65535 is guaranteed to send all blocks
-     * @param chunkX
-     * @param chunkZ
      */
     void refreshChunk(final int chunkX, final int chunkZ);
 
@@ -336,7 +341,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     IChunkGet get(int x, int z);
 
     /**
-     * Send a fake chunk to a player/s
+     * Send a fake chunk to a player.
      * @param player may be null to send to everyone
      * @param packet the chunk packet
      */

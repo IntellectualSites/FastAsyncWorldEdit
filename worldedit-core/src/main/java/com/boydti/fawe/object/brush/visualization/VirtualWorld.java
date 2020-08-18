@@ -38,7 +38,9 @@ public interface VirtualWorld extends SimpleWorld, Closeable {
 
     void close(boolean update) throws IOException;
 
-    default void handleBlockInteract(Player player, BlockVector3 pos, BlockInteractEvent event) {}
+    default void handleBlockInteract(Player player, BlockVector3 pos, BlockInteractEvent event) {
+    }
 
-    default void handlePlayerInput(Player player, PlayerInputEvent event) {}
+    default void handlePlayerInput(Player player, PlayerInputEvent event) {
+    }
 }

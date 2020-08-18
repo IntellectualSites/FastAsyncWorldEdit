@@ -3,23 +3,21 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.bukkit;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
@@ -51,11 +49,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import java.lang.ref.WeakReference;
-import java.nio.file.Path;
-import java.util.*;
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
@@ -69,15 +62,42 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
 
+import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class BukkitWorld extends AbstractWorld {
 
     private static final Logger logger = WorldEdit.logger;
 
+    private static final boolean HAS_3D_BIOMES;
+
     private static final Map<Integer, Effect> effects = new HashMap<>();
+
     static {
         for (Effect effect : Effect.values()) {
-            effects.put(effect.getId(), effect);
+            @SuppressWarnings("deprecation")
+            int id = effect.getId();
+            effects.put(id, effect);
         }
+
+        boolean temp;
+        try {
+            World.class.getMethod("getBiome", int.class, int.class, int.class);
+            temp = true;
+        } catch (NoSuchMethodException e) {
+            temp = false;
+        }
+        HAS_3D_BIOMES = temp;
     }
 
     private WeakReference<World> worldRef;
@@ -157,7 +177,9 @@ public class BukkitWorld extends AbstractWorld {
         World tmp = worldRef.get();
         if (tmp == null) {
             tmp = Bukkit.getWorld(worldNameRef);
-            if (tmp != null) worldRef = new WeakReference<>(tmp);
+            if (tmp != null) {
+                worldRef = new WeakReference<>(tmp);
+            }
         }
         return checkNotNull(tmp, "The world was unloaded and the reference is unavailable");
     }
@@ -187,7 +209,16 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public Path getStoragePath() {
-        return getWorld().getWorldFolder().toPath();
+        Path worldFolder = getWorld().getWorldFolder().toPath();
+        switch (getWorld().getEnvironment()) {
+            case NETHER:
+                return worldFolder.resolve("DIM-1");
+            case THE_END:
+                return worldFolder.resolve("DIM1");
+            case NORMAL:
+            default:
+                return worldFolder;
+        }
     }
 
     @Override
@@ -299,7 +330,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     /**
-     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes
+     * An EnumMap that stores which WorldEdit TreeTypes apply to which Bukkit TreeTypes.
      */
     private static final EnumMap<TreeGenerator.TreeType, TreeType> treeTypeMapping =
             new EnumMap<>(TreeGenerator.TreeType.class);
@@ -385,6 +416,7 @@ public class BukkitWorld extends AbstractWorld {
         return getWorld().getMaxHeight() - 1;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void fixAfterFastMode(Iterable<BlockVector2> chunks) {
         World world = getWorld();
@@ -488,8 +520,8 @@ public class BukkitWorld extends AbstractWorld {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
-                    logger.warn("Tried to set a corrupt tile entity at " + position.toString() +
-                        ": " + ((BaseBlock) block).getNbtData(), e);
+                    logger.warn("Tried to set a corrupt tile entity at " + position.toString()
+                        + ": " + ((BaseBlock) block).getNbtData(), e);
                 } else {
                     logger.warn("Failed to set block via adapter, falling back to generic", e);
                 }
@@ -535,20 +567,29 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockZ()));
+    public BiomeType getBiome(BlockVector3 position) {
+        if (HAS_3D_BIOMES) {
+            return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ()));
+        } else {
+            return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockZ()));
+        }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        getWorld().setBiome(position.getBlockX(), position.getBlockZ(), BukkitAdapter.adapt(biome));
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        if (HAS_3D_BIOMES) {
+            getWorld().setBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ(), BukkitAdapter.adapt(biome));
+        } else {
+            getWorld().setBiome(position.getBlockX(), position.getBlockZ(), BukkitAdapter.adapt(biome));
+        }
         return true;
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
-        return setBlock(BlockVector3.at(x,y,z), block);
+        return setBlock(BlockVector3.at(x, y, z), block);
     }
 
     @Override
@@ -558,12 +599,12 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return setBiome(BlockVector2.at(x,z), biome);
+        return setBiome(BlockVector2.at(x, z), biome);
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
-        getWorld().refreshChunk(X, Z);
+    public void refreshChunk(int chunkX, int chunkZ) {
+        getWorld().refreshChunk(chunkX, chunkZ);
     }
 
     @Override

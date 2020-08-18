@@ -223,7 +223,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         @Nullable BlockBag blockBag, @Nullable EditSessionEvent event) {
         this(new EditSessionBuilder(world).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
-    
+
     /**
      * Construct the object with a maximum number of blocks and a block bag.
      *
@@ -2925,7 +2925,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int[] timedOut = {0};
         final ArbitraryBiomeShape shape = new ArbitraryBiomeShape(region) {
             @Override
-            protected BiomeType getBiome(int x, int z, BiomeType defaultBiomeType) {
+            protected BiomeType getBiome(int x, int y, int z, BiomeType defaultBiomeType) {
                 environment.setCurrentBlock(x, 0, z);
                 double scaledX = (x - zero2D.getX()) / unit2D.getX();
                 double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();

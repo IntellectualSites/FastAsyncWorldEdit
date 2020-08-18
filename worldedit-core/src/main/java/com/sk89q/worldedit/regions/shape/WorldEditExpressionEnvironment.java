@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions.shape;
@@ -31,7 +31,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     private final Vector3 unit;
     private final Vector3 zero2;
     private Vector3 current = new MutableVector3(Vector3.ZERO);
-    private Extent extent;
+    private final Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
         this((Extent) editSession, unit, zero);
@@ -52,31 +52,37 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
         return current.add(x, y, z);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockType(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockData(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockTypeAbs(double x, double y, double z) {
         return extent.getBlock(BlockVector3.at(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockDataAbs(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockTypeRel(double x, double y, double z) {
         return extent.getBlock(toWorldRel(x, y, z).toBlockPoint()).getBlockType().getLegacyCombinedId() >> 4;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getBlockDataRel(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;

@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions;
@@ -29,6 +29,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
@@ -125,8 +126,7 @@ public class EllipsoidRegion extends AbstractRegion {
         BlockVector3 diff = BlockVector3.ZERO.add(changes);
 
         if ((diff.getBlockX() & 1) + (diff.getBlockY() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException(
-                    "Ellipsoid changes must be even for each dimensions.");
+            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.ellipsoid.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();
@@ -214,8 +214,10 @@ public class EllipsoidRegion extends AbstractRegion {
                     continue;
                 }
 
-                chunks.add(
-                    BlockVector2.at(x >> ChunkStore.CHUNK_SHIFTS, z >> ChunkStore.CHUNK_SHIFTS));
+                chunks.add(BlockVector2.at(
+                    x >> ChunkStore.CHUNK_SHIFTS,
+                    z >> ChunkStore.CHUNK_SHIFTS
+                ));
             }
         }
 
@@ -347,10 +349,9 @@ public class EllipsoidRegion extends AbstractRegion {
                 if (remainderZ < 0) {
                     continue;
                 }
-                int diffX, minX, maxX;
-                diffX = (int) Math.floor(Math.sqrt(remainderZ));
-                minX = Math.max(0, cx - diffX - bx);
-                maxX = Math.min(15, cx + diffX - bx);
+                int diffX = (int) Math.floor(Math.sqrt(remainderZ));
+                int minX = Math.max(0, cx - diffX - bx);
+                int maxX = Math.min(15, cx + diffX - bx);
                 block.filter(filter, minX, y, z, maxX, y, z);
             }
         }
@@ -371,17 +372,15 @@ public class EllipsoidRegion extends AbstractRegion {
 
         int cx1 = Math.abs(bx - cx);
         int cx2 = Math.abs(tx - cx);
-        int cxMax, cxMin;
-        cxMin = Math.min(cx1, cx2);
-        cxMax = Math.max(cx1, cx2);
+        int cxMin = Math.min(cx1, cx2);
+        int cxMax = Math.max(cx1, cx2);
         int cxMin2 = cxMin * cxMin;
         int cxMax2 = cxMax * cxMax;
 
         int cz1 = Math.abs(bz - cz);
         int cz2 = Math.abs(tz - cz);
-        int czMax, czMin;
-        czMin = Math.min(cz1, cz2);
-        czMax = Math.max(cz1, cz2);
+        int czMin = Math.min(cz1, cz2);
+        int czMax = Math.max(cz1, cz2);
         int czMin2 = czMin * czMin;
         int czMax2 = czMax * czMax;
 

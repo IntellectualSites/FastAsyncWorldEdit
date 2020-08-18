@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions;
@@ -28,6 +28,8 @@ import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -85,19 +87,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     /**
      * Get the number of blocks in the region.
      *
-     * <p>Note: This method <b>must</b> be overridden.</p>
-     *
      * @return number of blocks
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
      */
+    @NonAbstractForCompatibility(
+        delegateName = "getArea",
+        delegateParams = {}
+    )
     default long getVolume() {
-        // TODO Remove default status when getArea is removed.
-        try {
-            if (getClass().getMethod("getArea").getDeclaringClass().equals(Region.class)) {
-                throw new IllegalStateException("Class " + getClass().getName() + " must override getVolume.");
-            }
-        } catch (NoSuchMethodException e) {
-            throw new AssertionError(e);
-        }
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
         return getArea();
     }
 
@@ -134,7 +134,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Expand the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void expand(BlockVector3... changes) throws RegionOperationException;
 
@@ -142,7 +142,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Contract the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void contract(BlockVector3... changes) throws RegionOperationException;
 
@@ -150,7 +150,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Shift the region.
      *
      * @param change the change
-     * @throws RegionOperationException
+     * @throws RegionOperationException if the operation cannot be performed
      */
     void shift(BlockVector3 change) throws RegionOperationException;
 
@@ -184,7 +184,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     Set<BlockVector2> getChunks();
 
     /**
-     * Return a list of 16*16*16 chunks in a region
+     * Return a list of 16*16*16 chunks in a region.
      *
      * @return the chunk cubes this region overlaps with
      */
@@ -232,7 +232,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int maxSection = Math.min(15, getMaximumY() >> 4);
         block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+                return;
+            }
             block = block.initLayer(get, set, layer);
             block.filter(filter, this);
         }
@@ -264,32 +266,38 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter);
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd, boolean full) {
-        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) return;
+        if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            return;
+        }
         block = block.initLayer(get, set, layer);
         block.filter(filter, yStart, yEnd);
     }
 
     default boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
-        return contains(bx, by, bz) &&
-                contains(bx, by, tz) &&
-                contains(tx, by, bz) &&
-                contains(tx, by, tz) &&
-                contains(bx, ty, bz) &&
-                contains(bx, ty, tz) &&
-                contains(tx, ty, bz) &&
-                contains(tx, ty, tz);
+        return contains(bx, by, bz)
+            && contains(bx, by, tz)
+            && contains(tx, by, bz)
+            && contains(tx, by, tz)
+            && contains(bx, ty, bz)
+            && contains(bx, ty, tz)
+            && contains(tx, ty, bz)
+            && contains(tx, ty, tz);
     }
 
     default boolean containsChunk(int chunkX, int chunkZ) {

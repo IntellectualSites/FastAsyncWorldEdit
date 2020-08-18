@@ -99,6 +99,7 @@ public class NullWorld extends AbstractWorld {
     public BiomeType getBiome(BlockVector2 position) {
         return BiomeTypes.THE_VOID;
     }
+
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return BiomeTypes.THE_VOID;

@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.regions;
@@ -49,7 +49,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
 
-    private int minX, minY, minZ, maxX, maxY, maxZ;
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
     private BlockVector3 pos1;
     private BlockVector3 pos2;
 
@@ -318,16 +323,17 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         final int size = (maxX - minX + 1) * (maxZ - minZ + 1);
 
         return new AbstractSet<BlockVector2>() {
-            @NotNull @Override
+            @NotNull
+            @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {
                     final MutableBlockVector2 mutable = new MutableBlockVector2(0, 0);
 
-                    int bx = minX;
-                    int bz = minZ;
+                    final int bx = minX;
+                    final int bz = minZ;
 
-                    int tx = maxX;
-                    int tz = maxZ;
+                    final int tx = maxX;
+                    final int tz = maxZ;
 
                     private int x = minX;
                     private int z = minZ;
@@ -444,16 +450,16 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         }
         return new Iterator<BlockVector3>() {
             final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
-            private BlockVector3 min = getMinimumPoint();
-            private BlockVector3 max = getMaximumPoint();
+            private final BlockVector3 min = getMinimumPoint();
+            private final BlockVector3 max = getMaximumPoint();
 
-            int bx = min.getBlockX();
-            int by = min.getBlockY();
-            int bz = min.getBlockZ();
+            final int bx = min.getBlockX();
+            final int by = min.getBlockY();
+            final int bz = min.getBlockZ();
 
-            int tx = max.getBlockX();
-            int ty = max.getBlockY();
-            int tz = max.getBlockZ();
+            final int tx = max.getBlockX();
+            final int ty = max.getBlockY();
+            final int tz = max.getBlockZ();
 
             private int x = min.getBlockX();
             private int y = min.getBlockY();
@@ -524,8 +530,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     public Iterator<BlockVector3> iterator_old() {
         final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         return new Iterator<BlockVector3>() {
-            private BlockVector3 min = getMinimumPoint();
-            private BlockVector3 max = getMaximumPoint();
+            private final BlockVector3 min = getMinimumPoint();
+            private final BlockVector3 max = getMaximumPoint();
             private int nextX = min.getBlockX();
             private int nextY = min.getBlockY();
             private int nextZ = min.getBlockZ();
@@ -546,7 +552,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     if (++nextZ > max.getBlockZ()) {
                         nextZ = min.getBlockZ();
                         if (++nextY > max.getBlockY()) {
-                            if (!hasNext()) throw new NoSuchElementException();
+                            if (!hasNext()) {
+                                throw new NoSuchElementException();
+                            }
                             nextX = max.getBlockX();
                             nextZ = max.getBlockZ();
                             nextY = max.getBlockY();
@@ -562,8 +570,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     @Override
     public Iterable<BlockVector2> asFlatRegion() {
         return () -> new Iterator<BlockVector2>() {
-            private BlockVector3 min = getMinimumPoint();
-            private BlockVector3 max = getMaximumPoint();
+            private final BlockVector3 min = getMinimumPoint();
+            private final BlockVector3 max = getMaximumPoint();
             private int nextX = min.getBlockX();
             private int nextZ = min.getBlockZ();
 
@@ -574,7 +582,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector2 next() {
-                if (!hasNext()) throw new NoSuchElementException();
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();
@@ -717,13 +727,13 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            int indexY, index;
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
-                        indexY = 0;
+                        int indexY = 0;
                         for (int y = 0; y < 16; y++, indexY += 256) {
+                            int index;
                             if (trimZ) {
                                 index = indexY;
                                 for (int z = 0; z < lowerZ; z++) {

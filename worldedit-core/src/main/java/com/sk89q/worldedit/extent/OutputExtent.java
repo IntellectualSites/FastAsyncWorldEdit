@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.extent;
@@ -22,6 +22,8 @@ package com.sk89q.worldedit.extent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
@@ -72,18 +74,51 @@ public interface OutputExtent {
      * @param position the (x, z) location to set the biome at
      * @param biome the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
+     * @deprecated Biomes in Minecraft are 3D now, use {@link OutputExtent#setBiome(BlockVector3, BiomeType)}
      */
+    @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
         return setBiome(position.getX(), 0, position.getBlockZ(), biome);
     }
 
+    @NonAbstractForCompatibility(
+        delegateName = "setBiome",
+        delegateParams = { int.class, int.class, int.class, BiomeType.class }
+    )
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
         return setBiome(MutableBlockVector2.get(x, z), biome);
     }
 
     /**
-     * Set the light value
+     * Set the biome.
+     *
+     * <p>
+     *     As implementation varies per Minecraft version, this may set more than
+     *     this position's biome. On versions prior to 1.15, this will set the entire
+     *     column. On later versions it will set the 4x4x4 cube.
+     * </p>
+     *
+     * @param position the (x, y, z) location to set the biome at
+     * @param biome the biome to set to
+     * @return true if the biome was successfully set (return value may not be accurate)
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(
+        delegateName = "setBiome",
+        delegateParams = { BlockVector3.class, BiomeType.class }
+    )
+    default boolean setBiome(BlockVector3 position, BiomeType biome) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
+        return setBiome(position.toBlockVector2(), biome);
+    }
+
+    /**
+     * Set the light value.
      *
      * @param position position of the block
      * @param value light level to set
@@ -92,10 +127,11 @@ public interface OutputExtent {
         setBlockLight(position.getX(), position.getY(), position.getZ(), value);
     }
 
-    default void setBlockLight(int x, int y, int z, int value) {}
+    default void setBlockLight(int x, int y, int z, int value) {
+    }
 
     /**
-     * Set the sky light value
+     * Set the sky light value.
      *
      * @param position position of the block
      * @param value light level to set
@@ -104,7 +140,8 @@ public interface OutputExtent {
         setSkyLight(position.getX(), position.getY(), position.getZ(), value);
     }
 
-    default void setSkyLight(int x, int y, int z, int value) {}
+    default void setSkyLight(int x, int y, int z, int value) {
+    }
 
     /**
      * Return an {@link Operation} that should be called to tie up loose ends
