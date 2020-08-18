@@ -3,36 +3,38 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.scripting;
 
-import com.sk89q.worldedit.DisallowedItemException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.UnknownItemException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.InsufficientArgumentsException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.input.DisallowedUsageException;
+import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.invoke.ReturnException;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
@@ -47,8 +49,8 @@ import java.util.Set;
  */
 public class CraftScriptContext extends CraftScriptEnvironment {
 
-    private List<EditSession> editSessions = new ArrayList<>();
-    private String[] args;
+    private final List<EditSession> editSessions = new ArrayList<>();
+    private final String[] args;
 
     public CraftScriptContext(WorldEdit controller,
             Platform server, LocalConfiguration config,
@@ -142,13 +144,23 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @param min a number of arguments
      * @param max -1 for no maximum
      * @param usage usage string
-     * @throws InsufficientArgumentsException
+     * @throws InsufficientArgumentsException if the arguments are not "sufficiently" good
      */
     public void checkArgs(int min, int max, String usage)
             throws InsufficientArgumentsException {
         if (args.length <= min || (max != -1 && args.length - 1 > max)) {
-            throw new InsufficientArgumentsException("Usage: " + usage);
+            throw new InsufficientArgumentsException(TranslatableComponent.of("worldedit.error.incorrect-usage", TextComponent.of(usage)));
         }
+    }
+
+    /**
+     * Immediately terminate execution of the script, but without a failure message.
+     *
+     * @implNote This exits by throwing an exception, which if caught will prevent
+     *     the script from exiting
+     */
+    public void exit() {
+        throw new ReturnException(null);
     }
 
     /**
@@ -157,8 +169,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @param input input to parse
      * @param allAllowed true to ignore blacklists
      * @return a block
-     * @throws UnknownItemException
-     * @throws DisallowedItemException
+     * @throws NoMatchException if no block was found
+     * @throws DisallowedUsageException if the block is disallowed
      */
     public BaseBlock getBlock(String input, boolean allAllowed) throws WorldEditException {
         ParserContext context = new ParserContext();
@@ -176,8 +188,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * @param id the type Id
      * @return a block
-     * @throws UnknownItemException
-     * @throws DisallowedItemException
+     * @throws NoMatchException if no block was found
+     * @throws DisallowedUsageException if the block is disallowed
      */
     public BaseBlock getBlock(String id) throws WorldEditException {
         return getBlock(id, false);
@@ -188,8 +200,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * @param list the input
      * @return pattern
-     * @throws UnknownItemException
-     * @throws DisallowedItemException
+     * @throws NoMatchException if the pattern was invalid
+     * @throws DisallowedUsageException if the block is disallowed
      */
     public Pattern getBlockPattern(String list) throws WorldEditException {
         ParserContext context = new ParserContext();
@@ -205,8 +217,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @param list a list
      * @param allBlocksAllowed true if all blocks are allowed
      * @return set
-     * @throws UnknownItemException
-     * @throws DisallowedItemException
+     * @throws NoMatchException if the blocks couldn't be found
+     * @throws DisallowedUsageException if the block is disallowed
      */
     public Set<BaseBlock> getBlocks(String list, boolean allBlocksAllowed) throws WorldEditException {
         ParserContext context = new ParserContext();
@@ -231,7 +243,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @param defaultExt default extension to append if there is none
      * @param exts list of extensions for file open dialog, null for no filter
      * @return a file
-     * @throws FilenameException
+     * @throws FilenameException if there is a problem with the name of the file
      */
     public File getSafeOpenFile(String folder, String filename, String defaultExt, String... exts) throws FilenameException {
         File dir = controller.getWorkingDirectoryFile(folder);
@@ -252,7 +264,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @param defaultExt default extension to append if there is none
      * @param exts list of extensions for file save dialog, null for no filter
      * @return a file
-     * @throws FilenameException
+     * @throws FilenameException if there is a problem with the name of the file
      */
     public File getSafeSaveFile(String folder, String filename, String defaultExt, String... exts) throws FilenameException {
         File dir = controller.getWorkingDirectoryFile(folder);
