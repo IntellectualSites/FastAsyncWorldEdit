@@ -3100,7 +3100,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
     
     @Override
-    public Entity createEntity(Location location, BaseEntity entity){
+    public Entity createEntity(Location location, BaseEntity entity) {
         try {
             return this.getExtent().createEntity(location, entity);
         } catch (WorldEditException e) {
@@ -3109,8 +3109,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    public void removeEntity(int x, int y, int z, UUID uuid)
-    {
+    public void removeEntity(int x, int y, int z, UUID uuid) {
         try {
             this.getExtent().removeEntity(x, y, z, uuid);
         } catch (WorldEditException e) {
