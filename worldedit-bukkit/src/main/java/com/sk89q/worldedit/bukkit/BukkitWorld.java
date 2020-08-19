@@ -123,6 +123,8 @@ public class BukkitWorld extends AbstractWorld {
         return list;
     }
 
+    //createEntity was moved to IChunkExtent to prevent issues with Async Entitiy Add.
+    
     /**
      * Get the world handle.
      *
