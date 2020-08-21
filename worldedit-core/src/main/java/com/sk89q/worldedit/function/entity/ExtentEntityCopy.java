@@ -37,6 +37,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.UUID;
 
 /**
  * Copies entities provided to the function to the provided destination
@@ -44,6 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ExtentEntityCopy implements EntityFunction {
 
+    private final Extent source;
     private final Extent destination;
     private final Vector3 from;
     private final Vector3 to;
@@ -58,11 +60,35 @@ public class ExtentEntityCopy implements EntityFunction {
      * @param to the destination position
      * @param transform the transformation to apply to both position and orientation
      */
+    @Deprecated
     public ExtentEntityCopy(Vector3 from, Extent destination, Vector3 to, Transform transform) {
         checkNotNull(from);
         checkNotNull(destination);
         checkNotNull(to);
         checkNotNull(transform);
+        this.source = null;
+        this.destination = destination;
+        this.from = from;
+        this.to = to;
+        this.transform = transform;
+    }
+    
+    /**
+     * Create a new instance.
+     *
+     * @param source the source {@code Extent}
+     * @param from the from position
+     * @param destination the destination {@code Extent}
+     * @param to the destination position
+     * @param transform the transformation to apply to both position and orientation
+     */
+    public ExtentEntityCopy(Extent source, Vector3 from, Extent destination, Vector3 to, Transform transform) {
+        checkNotNull(source);
+        checkNotNull(from);
+        checkNotNull(destination);
+        checkNotNull(to);
+        checkNotNull(transform);
+        this.source = source;
         this.destination = destination;
         this.from = from;
         this.to = to;
@@ -119,7 +145,22 @@ public class ExtentEntityCopy implements EntityFunction {
 
             // Remove
             if (isRemoving() && success) {
-                entity.remove();
+                UUID uuid = null;
+                if (tag.containsKey("UUID")) {
+                    int[] arr = tag.getIntArray("UUID");
+                    uuid = new UUID((long)arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long)arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+                } else if (tag.containsKey("UUIDMost")) {
+                    uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
+                } else if (tag.containsKey("PersistentIDMSB")) {
+                    uuid = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
+                }
+                if (uuid != null) {
+                    if (source != null) {
+                        source.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
+                    } else {
+                        entity.remove();
+                    }
+                }
             }
 
             return success;

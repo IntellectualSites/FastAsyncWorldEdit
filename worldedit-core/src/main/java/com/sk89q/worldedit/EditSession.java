@@ -40,6 +40,8 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -112,6 +114,7 @@ import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
@@ -147,6 +150,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+import java.util.UUID;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -3083,5 +3087,33 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<? extends Entity> getEntities() {
+        return world.getEntities();
+    }
+    
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return world.getEntities(region);
+    }
+    
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity) {
+        try {
+            return this.getExtent().createEntity(location, entity);
+        } catch (WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
+    }
+
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        try {
+            this.getExtent().removeEntity(x, y, z, uuid);
+        } catch (WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
     }
 }

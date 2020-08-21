@@ -40,11 +40,15 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -151,6 +155,11 @@ public class AbstractDelegateExtent implements Extent {
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
         return extent.createEntity(location, entity);
+    }
+
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        extent.removeEntity(x, y, z, uuid);
     }
 
     @Override

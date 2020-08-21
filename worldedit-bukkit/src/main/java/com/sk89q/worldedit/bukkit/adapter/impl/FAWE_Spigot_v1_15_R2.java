@@ -48,7 +48,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -82,6 +81,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.jnbt.StringTag;
 
 public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_15_R2 parent;
@@ -245,7 +245,11 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
             Supplier<CompoundTag> saveTag = () -> {
                 NBTTagCompound tag = new NBTTagCompound();
                 readEntityIntoTag(mcEntity, tag);
-                return (CompoundTag) toNative(tag);
+                
+                //add Id for AbstractChangeSet to work
+                CompoundTag natve = (CompoundTag) toNative(tag);
+                natve.getValue().put("Id", new StringTag(id));
+                return natve;
             };
             return new LazyBaseEntity(type, saveTag);
         } else {

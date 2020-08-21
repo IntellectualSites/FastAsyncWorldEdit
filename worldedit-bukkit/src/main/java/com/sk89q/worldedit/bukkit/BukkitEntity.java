@@ -87,7 +87,7 @@ public class BukkitEntity implements Entity {
 
     @Override
     public com.sk89q.worldedit.world.entity.EntityType getType() {
-        return EntityTypes.get(type.getName().toUpperCase(Locale.ROOT));
+        return EntityTypes.get(type.getName().toLowerCase(Locale.ROOT));
     }
 
     @Override
