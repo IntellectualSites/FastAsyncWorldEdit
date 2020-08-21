@@ -8,6 +8,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.RoundedTransform;
@@ -80,7 +81,7 @@ public class ClipboardSpline extends Spline {
     }
 
     @Override
-    protected int pasteBlocks(BlockVector3 target, BlockVector3 offset, double angle) throws MaxChangedBlocksException {
+    protected int pasteBlocks(BlockVector3 target, Vector3 offset, double angle) throws MaxChangedBlocksException {
         RoundedTransform transform = new RoundedTransform(new AffineTransform()
                 .translate(offset)
                 .rotateY(angle));

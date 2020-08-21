@@ -13,11 +13,14 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
+import com.sk89q.worldedit.math.interpolation.ReparametrisingInterpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
@@ -64,7 +67,7 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
 
-        Interpolation interpol = new KochanekBartelsInterpolation();
+        Interpolation interpol = new ReparametrisingInterpolation(new KochanekBartelsInterpolation());
         List<Node> nodes = positions.stream().map(v -> {
             Node n = new Node(v.toVector3());
             n.setTension(tension);
@@ -82,13 +85,15 @@ public class SweepBrush implements Brush, ResettableTool {
         Clipboard clipboard = holder.getClipboard();
 
         BlockVector3 dimensions = clipboard.getDimensions();
-        AffineTransform transform = new AffineTransform();
-        if (dimensions.getBlockX() > dimensions.getBlockZ()) {
-            transform = transform.rotateY(90);
-        }
         double quality = Math.max(dimensions.getBlockX(), dimensions.getBlockZ());
 
+        AffineTransform transform = new AffineTransform();
+
         ClipboardSpline spline = new ClipboardSpline(editSession, holder, interpol, transform, nodes.size());
+
+        if (dimensions.getBlockX() > dimensions.getBlockZ()) { 
+            spline.setDirection(Vector2.at(0, 1));
+        }
 
         switch (copies) {
             case 1: {
@@ -96,23 +101,10 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
             case -1: {
-                double splineLength = interpol.arcLength(0D, 1D);
-                double blockDistance = 1d / splineLength;
-                double step = blockDistance / quality;
-                double accumulation = 0;
-                MutableVector3 last = new MutableVector3(0, 0, 0);
-                for (double pos = 0D; pos <= 1D; pos += step) {
-                    Vector3 gradient = interpol.get1stDerivative(pos);
-                    double dist = MathMan.sqrtApprox(last.distanceSq(gradient));
-                    last.mutX(gradient.getX());
-                    last.mutY(gradient.getY());
-                    last.mutZ(gradient.getZ());
-                    double change = dist * step;
-                    // Accumulation is arbitrary, but much faster than calculation overlapping regions
-                    if ((accumulation += change + step * 2) > blockDistance) {
-                        accumulation -= blockDistance;
-                        spline.pastePosition(pos);
-                    }
+                double length = interpol.arcLength(0, 1);
+                double step = 1 / (length * quality);
+                for (double pos = 0; pos <= 1; pos += step) {
+                    spline.pastePosition(pos);
                 }
                 break;
             }

@@ -200,6 +200,10 @@ public abstract class DFSVisitor implements Operation {
 
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+
             Node other = (Node) obj;
             return other.x == x && other.z == z && other.y == y;
         }

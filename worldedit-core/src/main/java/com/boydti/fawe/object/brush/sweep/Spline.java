@@ -21,7 +21,7 @@ import java.util.List;
  */
 public abstract class Spline {
 
-    private BlockVector2 direction = BlockVector2.at(1, 0);
+    private Vector2 direction = Vector2.at(1, 0);
     private final int nodeCount;
 
     protected EditSession editSession;
@@ -77,10 +77,10 @@ public abstract class Spline {
      * is rotated by that angle to follow the curve slope.
      * <p>
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
-     * @param direction A normalized vector representing the horizontal forward direction of the clipboard content
+     * @param direction A vector representing the horizontal forward direction of the clipboard content
      */
-    public void setDirection(BlockVector2 direction) {
-        this.direction = direction;
+    public void setDirection(Vector2 direction) {
+        this.direction = direction.normalize();
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class Spline {
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
      * @return A vector representing the horizontal forward direction of the clipboard content
      */
-    public BlockVector2 getDirection() {
+    public Vector2 getDirection() {
         return direction;
     }
 
@@ -116,6 +116,13 @@ public abstract class Spline {
     }
 
     /**
+     * 2 dimensional "cross" product. cross2D(v1, v2) = |v1|*|v2|*sin(theta) or v1 X v2 taking Y to be 0
+     */
+    private double cross2D(Vector2 v1, Vector2 v2) {
+        return v1.getX() * v2.getZ() - v2.getX() * v1.getZ();
+    }
+
+    /**
      * Paste structure at the provided position on the curve. The position will not be position-corrected
      * but will be passed directly to the interpolation algorithm.
      * @param position The position on the curve. Must be between 0.0 and 1.0 (both inclusive)
@@ -127,22 +134,24 @@ public abstract class Spline {
         Preconditions.checkArgument(position <= 1);
 
         // Calculate position from spline
-        BlockVector3 target = interpolation.getPosition(position).toBlockPoint();
-        BlockVector3 offset = target.subtract(target.round());
-        target = target.subtract(offset);
+        Vector3 target = interpolation.getPosition(position);
+        BlockVector3 blockTarget = target.toBlockPoint();
+        Vector3 offset = target.subtract(target.floor());
 
         // Calculate rotation from spline
 
         Vector3 deriv = interpolation.get1stDerivative(position);
         Vector2 deriv2D = Vector2.at(deriv.getX(), deriv.getZ()).normalize();
         double angle = Math.toDegrees(
-                Math.atan2(direction.getZ(), direction.getX()) - Math.atan2(deriv2D.getZ(), deriv2D.getX())
+            -Math.atan2(cross2D(direction, deriv2D), direction.dot(deriv2D))
         );
+            
+        angle = ((angle % 360) + 360) % 360; // Wrap to 360 degrees
 
-        return pasteBlocks(target, offset, angle);
+        return pasteBlocks(blockTarget, offset, angle);
     }
 
-    protected abstract int pasteBlocks(BlockVector3 target, BlockVector3 offset, double angle) throws MaxChangedBlocksException;
+    protected abstract int pasteBlocks(BlockVector3 target, Vector3 offset, double angle) throws MaxChangedBlocksException;
 
     private void initSections() {
         int sectionCount = nodeCount - 1;
@@ -176,7 +185,15 @@ public abstract class Spline {
         double flexOffset = flexPosition - previousSection.flexStart;
         double uniOffset = flexOffset / previousSection.flexLength * previousSection.uniLength;
 
-        return previousSection.uniStart + uniOffset;
+        double finalPosition = previousSection.uniStart + uniOffset;
+
+        //Really rough fix, but fixes a bug with no visual artifacts so it's probably ok?
+        //flexPosition very close to 1 causes outputs very slightly higher than 1 on rare occasions
+        if (finalPosition > 1) {
+            return 1;
+        }
+
+        return finalPosition;
     }
 
     private class Section {

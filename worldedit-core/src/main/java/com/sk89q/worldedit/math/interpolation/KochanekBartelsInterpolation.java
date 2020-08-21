@@ -22,6 +22,7 @@
 package com.sk89q.worldedit.math.interpolation;
 
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3[] coeffC;
     private Vector3[] coeffD;
     private double scaling;
-    private final MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableVector3 mutable = new MutableVector3();
 
     public KochanekBartelsInterpolation() {
         setNodes(Collections.emptyList());
@@ -166,7 +167,7 @@ public class KochanekBartelsInterpolation implements Interpolation {
         mutable.mutX((a.getX() * r3 + b.getX() * r2 + c.getX() * remainder + d.getX()));
         mutable.mutY((a.getY() * r3 + b.getY() * r2 + c.getY() * remainder + d.getY()));
         mutable.mutZ((a.getZ() * r3 + b.getZ() * r2 + c.getZ() * remainder + d.getZ()));
-        return mutable.toVector3();
+        return Vector3.at(mutable.getX(), mutable.getY(), mutable.getZ());
     }
 
     @Override

@@ -59,7 +59,7 @@ public class SplineBrush implements Brush, ResettableTool {
             return;
         }
         int originalSize = numSplines;
-        boolean newPos = this.position == null || !position.equals(this.position);
+        boolean newPos = !position.equals(this.position);
         this.position = position;
         if (newPos) {
             if (positionSets.size() >= MAX_POINTS) {

@@ -87,7 +87,7 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
 
     @Override
     public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
-        if (position1 != null && position2 != null && position.equals(position1) && position.equals(position2)) {
+        if (position.equals(position1) && position.equals(position2)) {
             return false;
         }
 
