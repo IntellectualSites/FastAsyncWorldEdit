@@ -43,6 +43,7 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.SchematicsEventListener;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.invoke.ReturnException;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -130,6 +131,7 @@ public final class WorldEdit {
     }
 
     private WorldEdit() {
+        eventBus.register(new SchematicsEventListener());
     }
 
     /**

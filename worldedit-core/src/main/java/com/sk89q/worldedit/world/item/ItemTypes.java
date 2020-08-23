@@ -629,6 +629,8 @@ public final class ItemTypes {
     @Nullable public static final ItemType PHANTOM_MEMBRANE = init();
     @Nullable public static final ItemType PHANTOM_SPAWN_EGG = init();
     @Nullable public static final ItemType PIG_SPAWN_EGG = init();
+    @Nullable public static final ItemType PIGLIN_BRUTE_SPAWN_EGG = init();
+    @Nullable public static final ItemType PIGLIN_BANNER_PATTERN = init();
     @Nullable public static final ItemType PILLAGER_SPAWN_EGG = init();
     @Nullable public static final ItemType PINK_BANNER = init();
     @Nullable public static final ItemType PINK_BED = init();

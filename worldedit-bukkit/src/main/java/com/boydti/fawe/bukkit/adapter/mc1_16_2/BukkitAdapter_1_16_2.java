@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_1;
+package com.boydti.fawe.bukkit.adapter.mc1_16_2;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
@@ -14,9 +14,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_16_R1.*;
-import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
+import net.minecraft.server.v1_16_R2.*;
+import org.bukkit.craftbukkit.v1_16_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
-public final class BukkitAdapter_1_16_1 extends NMSAdapter {
+public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     /*
     NMS fields
     */
@@ -258,7 +258,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
                 final BlockState state = BlockTypesCache.states[ordinal];
-                final IBlockData ibd = ((BlockMaterial_1_16_1) state.getMaterial()).getState();
+                final IBlockData ibd = ((BlockMaterial_1_16_2) state.getMaterial()).getState();
                 palette.a(ibd);
             }
             try {

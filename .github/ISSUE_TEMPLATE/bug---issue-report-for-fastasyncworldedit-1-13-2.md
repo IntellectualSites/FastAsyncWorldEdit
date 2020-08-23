@@ -1,5 +1,5 @@
 ---
-name: Bug / Issue report for FastAsyncWorldEdit v1.16.1
+name: Bug / Issue report for FastAsyncWorldEdit v1.16.2
 about: Bug / Issue report about this plugin
 title: ''
 labels: Requires Testing
@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-# Bug report for FastAsyncWorldEdit 1.16.1
-<!--- If you are using 1.13 or 1.14 consider updating to 1.16.1 before raising an issue -->
+# Bug report for FastAsyncWorldEdit 1.16.2
+<!--- If you are using 1.13 or 1.14 consider updating to 1.16.2 before raising an issue -->
 <!--- The priority lays on 1.16 right now, so issues reported for 1.13 or 1.14 will be fixed for the 1.16 versions -->
 <!--- In order to create a valid issue report you have to follow this template. -->
 <!--- Remove this template if making a suggestion or asking a question. -->
@@ -41,5 +41,5 @@ assignees: ''
 <!--- Make sure you've completed the following steps (put an "X" between of brackets): -->
 - [] I included all information required in the sections above
 - [] I made sure there are no duplicates of this report [(Use Search)](https://github.com/IntellectualSites/FastAsyncWorldEdit/issues?q=is%3Aissue)
-- [] I made sure I am using an up-to-date version of [FastAsyncWorldEdit for 1.16.1](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
+- [] I made sure I am using an up-to-date version of [FastAsyncWorldEdit for 1.16.2](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
 - [] I made sure the bug/error is not caused by any other plugin
