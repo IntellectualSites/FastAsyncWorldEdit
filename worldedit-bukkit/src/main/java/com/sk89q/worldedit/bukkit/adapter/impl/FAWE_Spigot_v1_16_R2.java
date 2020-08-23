@@ -49,6 +49,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
@@ -449,7 +450,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
     @Override
     public int getInternalBiomeId(BiomeType biome) {
-        BiomeBase base = CraftBlock.biomeToBiomeBase(BukkitAdapter.adapt(biome));
-        return IRegistry.BIOME.a(base);
+        BiomeBase base = CraftBlock.biomeToBiomeBase(MinecraftServer.getServer().aX().b(IRegistry.ay), BukkitAdapter.adapt(biome));
+        return MinecraftServer.getServer().aX().b(IRegistry.ay).a(base);
     }
 }

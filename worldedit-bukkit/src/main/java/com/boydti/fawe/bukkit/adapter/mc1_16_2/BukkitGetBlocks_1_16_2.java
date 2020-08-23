@@ -84,7 +84,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
         } else {
             base = index.getBiome(x >> 2, y >> 2, z >> 2);
         }
-        return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
+        return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(world.r().b(IRegistry.ay), base)) : null;
     }
 
     @Override
@@ -350,7 +350,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                             final BiomeType biome = biomes[i];
                             if (biome != null) {
                                 final Biome craftBiome = BukkitAdapter.adapt(biome);
-                                BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
+                                BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(nmsWorld.r().b(IRegistry.ay), craftBiome);
                                 for (int y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
                                     currentBiomes.setBiome(x >> 2, y >> 2, z >> 2, nmsBiome);
                                 }
