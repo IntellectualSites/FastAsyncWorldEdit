@@ -50,7 +50,7 @@ dependencies {
     "compileOnly"("org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT")
     "compileOnly"("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
     "compileOnly"("org.spigotmc:spigot:1.16.2-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.+")
+    "implementation"("io.papermc:paperlib:1.0.4")
     "compileOnly"("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
@@ -103,7 +103,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.+"))
+            include(dependency("io.papermc:paperlib:1.0.4"))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))

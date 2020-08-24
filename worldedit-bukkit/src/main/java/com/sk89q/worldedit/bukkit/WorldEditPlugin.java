@@ -22,7 +22,6 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -52,6 +51,7 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
+import java.util.Optional;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -90,7 +90,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -105,7 +104,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
-    ///The BSTATS_ID needs to be modified for FAWE to prevent contaminating WorldEdit stats
+    // The BSTATS_ID needs to be modified for FAWE to prevent contaminating WorldEdit stats
     private static final int BSTATS_PLUGIN_ID = 1403;
 
     private BukkitImplAdapter bukkitAdapter;
@@ -235,15 +234,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
 
         // Setup metrics
-        if (Settings.IMP.ENABLED_COMPONENTS.BSTATS) {
-            new Metrics(this, BSTATS_PLUGIN_ID);
-        } else {
-            getLogger().warning("bStats is disabled. Please enable it in /plugins/FastAsyncWorldEdit/config.yml. It helps the developers to identify the features most used");
-            getLogger().warning("and organize future updates better. Cheers.");
-        }
-
-        // Suggest PaperMC
-        PaperLib.suggestPaper(this);
+        new Metrics(this, BSTATS_PLUGIN_ID);
     }
 
     private void setupPreWorldData() {

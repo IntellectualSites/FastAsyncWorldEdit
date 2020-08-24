@@ -4,10 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
