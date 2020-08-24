@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.bukkit;
@@ -26,6 +26,7 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.AbstractPlatform;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
@@ -41,7 +42,6 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -50,27 +50,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
-public class BukkitServerInterface implements MultiUserPlatform {
-    public Server server;
-    public WorldEditPlugin plugin;
-    private CommandRegistration dynamicCommands;
+public class BukkitServerInterface extends AbstractPlatform implements MultiUserPlatform {
+
+    public final Server server;
+    public final WorldEditPlugin plugin;
+    private final CommandRegistration dynamicCommands;
+    private final LazyReference<Watchdog> watchdog;
     private boolean hookingEvents;
-    private final LazyReference<Watchdog> watchdog = LazyReference.from(() -> {
-        if (plugin.getBukkitImplAdapter() != null) {
-            return plugin.getBukkitImplAdapter().supportsWatchdog()
-                ? new BukkitWatchdog(plugin.getBukkitImplAdapter())
-                : null;
-        }
-        return null;
-    });
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
         this.plugin = plugin;
         this.server = server;
-        dynamicCommands = new CommandRegistration(plugin);
+        this.dynamicCommands = new CommandRegistration(plugin);
+        this.watchdog = LazyReference.from(() -> {
+            if (plugin.getBukkitImplAdapter() != null) {
+                return plugin.getBukkitImplAdapter().supportsWatchdog()
+                    ? new BukkitWatchdog(plugin.getBukkitImplAdapter())
+                    : null;
+            }
+            return null;
+        });
     }
 
     CommandRegistration getDynamicCommands() {
@@ -107,6 +110,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
         if (!type.startsWith("minecraft:")) {
             return false;
         }
+        @SuppressWarnings("deprecation")
         final EntityType entityType = EntityType.fromName(type.substring(10));
         return entityType != null && entityType.isAlive();
     }

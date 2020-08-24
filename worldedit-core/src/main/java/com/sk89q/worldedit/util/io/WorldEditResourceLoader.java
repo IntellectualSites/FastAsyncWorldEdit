@@ -17,24 +17,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit;
+package com.sk89q.worldedit.util.io;
 
-import com.sk89q.worldedit.world.registry.BundledItemRegistry;
-import org.bukkit.Material;
+import com.sk89q.worldedit.WorldEdit;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.nio.file.Path;
 
-public class BukkitItemRegistry extends BundledItemRegistry {
+public class WorldEditResourceLoader implements ResourceLoader {
+
+    private final WorldEdit worldEdit;
+
+    public WorldEditResourceLoader(WorldEdit worldEdit) {
+        this.worldEdit = worldEdit;
+    }
+
     @Override
-    public Collection<String> values() {
-        ArrayList<String> values = new ArrayList<>();
-        for (Material m : Material.values()) {
-            if (!m.isLegacy() && (m.isBlock() || m.isItem())) {
-                String id = m.getKey().toString();
-                values.add(id);
-            }
-        }
-        return values;
+    public Path getLocalResource(String pathName) {
+        return this.worldEdit.getWorkingDirectoryPath(pathName);
     }
 }

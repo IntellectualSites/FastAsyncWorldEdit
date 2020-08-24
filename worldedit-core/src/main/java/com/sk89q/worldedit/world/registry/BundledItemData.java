@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.world.registry;
@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.util.io.ResourceLoader;
@@ -54,6 +55,7 @@ public final class BundledItemData {
 
     private static final Logger log = LoggerFactory.getLogger(BundledItemData.class);
     private static BundledItemData INSTANCE;
+    private final ResourceLoader resourceLoader;
 
     private final Map<String, ItemEntry> idMap = new HashMap<>();
 
@@ -61,6 +63,8 @@ public final class BundledItemData {
      * Create a new instance.
      */
     private BundledItemData() {
+        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+
         try {
             loadFromResource();
         } catch (Throwable e) {
@@ -79,15 +83,15 @@ public final class BundledItemData {
         Gson gson = gsonBuilder.create();
         URL url = null;
         final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        if (dataVersion > 2577) { // > MC 1.15
-            url = ResourceLoader.getResource(BundledBlockData.class, "items.116.json");
-        } else if (dataVersion > 2224) { // > MC 1.14
-            url = ResourceLoader.getResource(BundledBlockData.class, "items.115.json");
-        } else if (dataVersion > 1900) { // > MC 1.13
-            url = ResourceLoader.getResource(BundledBlockData.class, "items.114.json");
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
+            url = resourceLoader.getResource(BundledBlockData.class, "items.116.json");
+        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
+            url = resourceLoader.getResource(BundledBlockData.class, "items.115.json");
+        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_14) {
+            url = resourceLoader.getResource(BundledBlockData.class, "items.114.json");
         }
         if (url == null) {
-            url = ResourceLoader.getResource(BundledBlockData.class, "items.json");
+            url = resourceLoader.getResource(BundledBlockData.class, "items.json");
         }
         if (url == null) {
             throw new IOException("Could not find items.json");

@@ -14,7 +14,21 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R2.Block;
+import net.minecraft.server.v1_16_R2.Chunk;
+import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R2.ChunkSection;
+import net.minecraft.server.v1_16_R2.DataBits;
+import net.minecraft.server.v1_16_R2.DataPalette;
+import net.minecraft.server.v1_16_R2.DataPaletteBlock;
+import net.minecraft.server.v1_16_R2.DataPaletteLinear;
+import net.minecraft.server.v1_16_R2.GameProfileSerializer;
+import net.minecraft.server.v1_16_R2.IBlockData;
+import net.minecraft.server.v1_16_R2.PacketPlayOutLightUpdate;
+import net.minecraft.server.v1_16_R2.PlayerChunk;
+import net.minecraft.server.v1_16_R2.PlayerChunkMap;
+import net.minecraft.server.v1_16_R2.World;
+import net.minecraft.server.v1_16_R2.WorldServer;
 import org.bukkit.craftbukkit.v1_16_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import sun.misc.Unsafe;
@@ -34,20 +48,20 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     /*
     NMS fields
     */
-    public final static Field fieldBits;
-    public final static Field fieldPalette;
-    public final static Field fieldSize;
+    public static final Field fieldBits;
+    public static final Field fieldPalette;
+    public static final Field fieldSize;
 
-    public final static Field fieldBitsPerEntry;
+    public static final Field fieldBitsPerEntry;
 
-    public final static Field fieldFluidCount;
-    public final static Field fieldTickingBlockCount;
-    public final static Field fieldNonEmptyBlockCount;
+    public static final Field fieldFluidCount;
+    public static final Field fieldTickingBlockCount;
+    public static final Field fieldNonEmptyBlockCount;
 
-    private final static Field fieldDirtyCount;
-    private final static Field fieldDirtyBits;
+    private static final Field fieldDirtyCount;
+    private static final Field fieldDirtyBits;
 
-    private final static MethodHandle methodGetVisibleChunk;
+    private static final MethodHandle methodGetVisibleChunk;
 
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
@@ -128,17 +142,17 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(X, Z, false);
+    public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
+        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
         if (nmsChunk != null) {
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            return nmsWorld.getChunkAt(X, Z);
+            return nmsWorld.getChunkAt(chunkX, chunkZ);
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
-            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
+            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
                 return chunk.getHandle();
@@ -147,20 +161,20 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
+        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
     }
 
-    public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int cx, final int cz) {
+    public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int chunkX, final int chunkZ) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         try {
-            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
+            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(chunkX, chunkZ));
         } catch (Throwable thr) {
             throw new RuntimeException(thr);
         }
     }
 
-    public static void sendChunk(WorldServer nmsWorld, int X, int Z, int mask, boolean lighting) {
-        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
+    public static void sendChunk(WorldServer nmsWorld, int chunkX, int chunkZ, int mask, boolean lighting) {
+        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (playerChunk == null) {
             return;
         }
@@ -181,7 +195,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                     fieldDirtyCount.set(playerChunk, 64);
 
                     if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
+                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
                         boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
                         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                         playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {

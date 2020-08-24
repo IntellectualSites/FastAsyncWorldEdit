@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit;
@@ -54,6 +54,7 @@ import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -119,7 +120,10 @@ public final class WorldEdit {
     private final SessionManager sessions = new SessionManager(this);
     private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
-    private final TranslationManager translationManager = new TranslationManager(this);
+    private final LazyReference<TranslationManager> translationManager =
+            LazyReference.from(() -> new TranslationManager(
+                    WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader()
+            ));
 
     private final BlockFactory blockFactory = new BlockFactory(this);
     private final ItemFactory itemFactory = new ItemFactory(this);
@@ -242,7 +246,7 @@ public final class WorldEdit {
      * @return the translation manager
      */
     public TranslationManager getTranslationManager() {
-        return translationManager;
+        return translationManager.getValue();
     }
 
     /**
@@ -432,14 +436,27 @@ public final class WorldEdit {
      *
      * @param path the subpath under the working directory
      * @return a working directory
+     * @deprecated Use {@link WorldEdit#getWorkingDirectoryPath(String)} instead
      */
+    @Deprecated
     public File getWorkingDirectoryFile(String path) {
-        File f = new File(path);
-        if (f.isAbsolute()) {
-            return f;
+        return getWorkingDirectoryPath(path).toFile();
+    }
+
+    /**
+     * Get a file relative to the defined working directory. If the specified
+     * path is absolute, then the working directory is not used.
+     *
+     * @param path the subpath under the working directory
+     * @return a working directory
+     */
+    public Path getWorkingDirectoryPath(String path) {
+        Path p = Paths.get(path);
+        if (p.isAbsolute()) {
+            return p;
         }
 
-        return new File(getConfiguration().getWorkingDirectory(), path);
+        return getConfiguration().getWorkingDirectoryPath().resolve(path);
     }
 
     /**
@@ -769,6 +786,7 @@ public final class WorldEdit {
     /**
      * Get a factory for {@link EditSession}s.
      */
+    @Deprecated
     public EditSessionFactory getEditSessionFactory() {
         return editSessionFactory;
     }

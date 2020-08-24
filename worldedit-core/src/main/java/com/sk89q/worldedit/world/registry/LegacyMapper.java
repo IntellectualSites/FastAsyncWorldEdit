@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.world.registry;
@@ -32,6 +32,7 @@ import com.sk89q.worldedit.extension.factory.BlockFactory;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
@@ -57,21 +58,24 @@ public final class LegacyMapper {
 
     private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
     private static LegacyMapper INSTANCE;
+    private final ResourceLoader resourceLoader;
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
     private final int[] blockArr = new int[4096];
     private final BiMap<Integer, ItemType> itemMap = HashBiMap.create();
     private Map<String, String> blockEntries = new HashMap<>();
-    private Map<String, BlockState> stringToBlockMap = new HashMap<>();
-    private Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
-    private Map<String, ItemType> stringToItemMap = new HashMap<>();
-    private Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
+    private final Map<String, BlockState> stringToBlockMap = new HashMap<>();
+    private final Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
+    private final Map<String, ItemType> stringToItemMap = new HashMap<>();
+    private final Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
 
     /**
      * Create a new instance.
      */
     private LegacyMapper() {
+        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+
         try {
             loadFromResource();
         } catch (Throwable e) {
@@ -88,7 +92,7 @@ public final class LegacyMapper {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         Gson gson = gsonBuilder.disableHtmlEscaping().create();
-        URL url = ResourceLoader.getResource(LegacyMapper.class, "legacy.json");
+        URL url = resourceLoader.getResource(LegacyMapper.class, "legacy.json");
         if (url == null) {
             throw new IOException("Could not find legacy.json");
         }
@@ -122,7 +126,7 @@ public final class LegacyMapper {
                     try {
                         String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
                         state = blockFactory.parseFromInput(newEntry, parserContext).toImmutableState();
-                    } catch (InputParseException e) {
+                    } catch (InputParseException ignored) {
                     }
                 }
 
@@ -130,7 +134,7 @@ public final class LegacyMapper {
                 if (state == null) {
                     try {
                         state = blockFactory.parseFromInput(value, parserContext).toImmutableState();
-                    } catch (InputParseException e) {
+                    } catch (InputParseException ignored) {
                     }
                 }
 
@@ -164,7 +168,7 @@ public final class LegacyMapper {
             String value = itemEntry.getValue();
             ItemType type = ItemTypes.get(value);
             if (type == null && fixer != null) {
-                value = fixer.fixUp(DataFixer.FixTypes.ITEM_TYPE, value, 1631);
+                value = fixer.fixUp(DataFixer.FixTypes.ITEM_TYPE, value, Constants.DATA_VERSION_MC_1_13_2);
                 type = ItemTypes.get(value);
             }
             if (type == null) {

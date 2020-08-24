@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.world.item;
@@ -26,7 +26,9 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.RegistryItem;
+import com.sk89q.worldedit.util.GuavaUtil;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.ItemMaterial;
@@ -37,11 +39,24 @@ public class ItemType implements RegistryItem, Keyed {
 
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
 
-    private String id;
-    private String name;
-    private final LazyReference<ItemMaterial> itemMaterial
-            = LazyReference.from(() -> WorldEdit.getInstance().getPlatformManager()
-            .queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().getMaterial(this));
+    private final String id;
+    @SuppressWarnings("deprecation")
+    private final LazyReference<String> name = LazyReference.from(() -> {
+        String name = GuavaUtil.firstNonNull(
+            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                .getRegistries().getItemRegistry().getName(this),
+            ""
+        );
+        return name.isEmpty() ? getId() : name;
+    });
+    private final LazyReference<Component> richName = LazyReference.from(() ->
+        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getItemRegistry().getRichName(this)
+    );
+    private final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
+        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getItemRegistry().getMaterial(this)
+    );
     private BlockType blockType;
     private boolean initBlockType;
     private BaseItem defaultState;
@@ -71,20 +86,19 @@ public class ItemType implements RegistryItem, Keyed {
         return internalId;
     }
 
+    public Component getRichName() {
+        return richName.getValue();
+    }
+
     /**
      * Gets the name of this item, or the ID if the name cannot be found.
      *
      * @return The name, or ID
+     * @deprecated Names are translatable now, use {@link #getRichName()}.
      */
+    @Deprecated
     public String getName() {
-        if (name == null) {
-            name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries()
-                    .getItemRegistry().getName(this);
-            if (name == null) {
-                name = "";
-            }
-        }
-        return name.isEmpty() ? getId() : name;
+        return name.getValue();
     }
 
 
