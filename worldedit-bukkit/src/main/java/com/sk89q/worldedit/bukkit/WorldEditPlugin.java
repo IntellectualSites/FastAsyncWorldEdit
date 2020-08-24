@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.bukkit;
@@ -50,6 +50,7 @@ import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
 import org.bstats.bukkit.Metrics;
@@ -101,6 +102,19 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
  * Plugin for Bukkit.
  */
 public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
+
+    // This must be before the Logger is initialized, which fails in 1.8
+    private static final String FAILED_VERSION_CHECK =
+        "\n**********************************************\n"
+            + "** This Minecraft version (%s) is not supported by this version of WorldEdit.\n"
+            + "** Please download an OLDER version of WorldEdit which does.\n"
+            + "**********************************************\n";
+
+    static {
+        if (PaperLib.getMinecraftVersion() < 13) {
+            throw new IllegalStateException(String.format(FAILED_VERSION_CHECK, Bukkit.getVersion()));
+        }
+    }
 
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
@@ -234,6 +248,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
 
+        //todo consider removing this again because it is better to stay consistent with upstream
         // Setup metrics
         if (Settings.IMP.ENABLED_COMPONENTS.BSTATS) {
             new Metrics(this, BSTATS_PLUGIN_ID);
@@ -258,6 +273,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
     }
 
+    @SuppressWarnings({ "deprecation", "unchecked" })
     private void initializeRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
@@ -269,8 +285,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
         // Block & Item
-        /*for (Material material : Material.values()) {
+        for (Material material : Material.values()) {
             if (material.isBlock() && !material.isLegacy()) {
+/*
                 BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
                     // TODO Use something way less hacky than this.
                     ParserContext context = new ParserContext();
@@ -292,12 +309,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                         return blockState;
                     }
                 }));
+*/
             }
             if (material.isItem() && !material.isLegacy()) {
                 ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
             }
         }
-        */
         // Entity
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
