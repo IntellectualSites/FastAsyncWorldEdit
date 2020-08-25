@@ -147,7 +147,7 @@ public class ToolUtilCommands {
                          int size) throws WorldEditException {
         we.checkMaxBrushRadius(size);
 
-        session.getBrushTool(player, false).setSize(size);
+        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
         player.printInfo(TranslatableComponent.of("worldedit.tool.size.set"));
     }
     

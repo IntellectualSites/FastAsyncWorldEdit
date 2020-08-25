@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.adapter.mc1_14.nbt;
 
-import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
