@@ -45,6 +45,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public class HttpRequest implements Closeable {
 
     private static final int CONNECT_TIMEOUT = 1000 * 5;
@@ -213,6 +215,13 @@ public class HttpRequest implements Closeable {
         }
 
         return conn.getResponseCode();
+    }
+
+    public String getSingleHeaderValue(String header) {
+        checkState(conn != null, "No connection has been made");
+
+        // maybe we should check for multi-header?
+        return conn.getHeaderField(header);
     }
 
     /**
