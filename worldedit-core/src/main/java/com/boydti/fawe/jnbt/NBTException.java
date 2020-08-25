@@ -6,7 +6,7 @@ public class NBTException extends RuntimeException {
     }
 
     /**
-     * Faster exception throwing if you don't fill the stacktrace
+     * Faster exception throwing if you don't fill the stacktrace.
      *
      * @return
      */
