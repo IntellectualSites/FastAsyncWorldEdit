@@ -87,7 +87,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
+            fieldDirtyCount = PlayerChunk.class.getDeclaredField("s");
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
