@@ -49,10 +49,8 @@ import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
-import java.util.Optional;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -91,6 +89,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
@@ -275,10 +274,11 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 biomeType.setLegacyId(bukkitAdapter.getInternalBiomeId(biomeType));
             }
         }
+        /*
+
         // Block & Item
         for (Material material : Material.values()) {
             if (material.isBlock() && !material.isLegacy()) {
-/*
                 BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
                     // TODO Use something way less hacky than this.
                     ParserContext context = new ParserContext();
@@ -300,12 +300,13 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                         return blockState;
                     }
                 }));
-*/
             }
             if (material.isItem() && !material.isLegacy()) {
                 ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
             }
         }
+*/
+
         // Entity
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
