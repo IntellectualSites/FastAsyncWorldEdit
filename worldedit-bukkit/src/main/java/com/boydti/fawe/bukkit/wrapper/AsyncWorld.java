@@ -60,6 +60,7 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import io.papermc.paper.world.MoonPhase;
 
 import java.io.File;
 import java.util.Collection;
@@ -525,6 +526,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public boolean setSpawnLocation(final int x, final int y, final int z) {
         return TaskManager.IMP.sync(() -> parent.setSpawnLocation(x, y, z));
+    }
+
+    @Override
+    public boolean setSpawnLocation(final int x, final int y, final int z, final float angle) {
+        return TaskManager.IMP.sync(() -> parent.setSpawnLocation(x, y, z, angle));
+    }
+
+    @Override
+    public @NotNull MoonPhase getMoonPhase() {
+        return parent.getMoonPhase();
     }
 
     @Override
