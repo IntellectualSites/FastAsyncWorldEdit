@@ -13,6 +13,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.Chunk;
@@ -35,11 +37,14 @@ import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -68,6 +73,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
 
     private static final Field fieldLock;
 
+    private static final Constructor shortArraySetConstructor;
+
     static {
         try {
             fieldSize = DataPaletteBlock.class.getDeclaredField("i");
@@ -87,9 +94,9 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("s");
+            fieldDirtyCount = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
+            fieldDirtyBits = PlayerChunk.class.getDeclaredField("dirtyBlocks");
             fieldDirtyBits.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
@@ -107,6 +114,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             if ((scale & (scale - 1)) != 0)
                 throw new Error("data type scale not a power of two");
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
+
+            shortArraySetConstructor = Class.forName(new String(new char[]{'i','t','.','u','n','i','m','i','.','d','s','i','.','f','a','s','t','u','t','i','l','.','s','h','o','r','t','s','.','S','h','o','r','t','A','r','r','a','y','S','e','t'})).getConstructor();
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -181,18 +190,14 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(() -> {
                 try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
-                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
+                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBits.get(playerChunk);
+                    for (int i = 0; i < 16; i++) {
+                        if (dirtyblocks[i] == null) dirtyblocks[i] = (Set<Short>) shortArraySetConstructor.newInstance();
+                        dirtyblocks[i].add((short) 0);
+                        dirtyblocks[i].add((short) 1);
                     }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
-                    }
-
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
+                    fieldDirtyBits.set(playerChunk, dirtyblocks);
+                    nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
 
                     if (lighting) {
                         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
@@ -204,6 +209,10 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                     }
 
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
                 return null;
