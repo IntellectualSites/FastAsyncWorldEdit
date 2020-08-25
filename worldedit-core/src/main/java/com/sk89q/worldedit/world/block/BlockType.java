@@ -112,6 +112,7 @@ public class BlockType implements Keyed, Pattern {
      *
      * @return The name, or ID
      */
+    @Deprecated
     public String getName() {
         String name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this);
         if (name == null) {
@@ -133,7 +134,9 @@ public class BlockType implements Keyed, Pattern {
     */
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
-        if (settings.stateOrdinals == null) return settings.defaultState;
+        if (settings.stateOrdinals == null) {
+            return settings.defaultState;
+        }
         return BlockTypesCache.states[settings.stateOrdinals[propertyId]];
     }
 
@@ -207,7 +210,9 @@ public class BlockType implements Keyed, Pattern {
      * @return All possible states
      */
     public List<BlockState> getAllStates() {
-        if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
+        if (settings.stateOrdinals == null) {
+            return Collections.singletonList(getDefaultState());
+        }
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
     }
 
@@ -268,8 +273,10 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
+     *
      * <p>
      * DO NOT USE THIS.
+     * </p>
      *
      * @return legacy id or 0, if unknown
      */
@@ -279,10 +286,17 @@ public class BlockType implements Keyed, Pattern {
         return combinedId == null ? 0 : combinedId;
     }
 
+    @Deprecated
+    public int getLegacyId() {
+        return computeLegacy(0);
+    }
+
     /**
      * The internal index of this type.
+     *
      * <p>
      * This number is not necessarily consistent across restarts.
+     * </p>
      *
      * @return internal id
      */
@@ -323,15 +337,12 @@ public class BlockType implements Keyed, Pattern {
         return new SingleBlockTypeMask(extent, this);
     }
 
-    @Deprecated
-    public int getLegacyId() {
-        return computeLegacy(0);
-    }
-
     /**
      * Gets the legacy data. Needed for legacy reasons.
+     *
      * <p>
      * DO NOT USE THIS.
+     * </p>
      *
      * @return legacy data or 0, if unknown
      */

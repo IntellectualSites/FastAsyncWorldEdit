@@ -25,20 +25,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SchematicsEventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SchematicsEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchematicsEventListener.class);
 
-  @Subscribe
-  public void onConfigLoad(ConfigurationLoadEvent event) {
-    Path config = event.getConfiguration().getWorkingDirectory().toPath();
-    try {
-      Files.createDirectories(config.resolve(event.getConfiguration().saveDir));
-    } catch (IOException e) {
-      LOGGER.warn("Failed to create schematics directory", e);
+    @Subscribe
+    public void onConfigLoad(ConfigurationLoadEvent event) {
+        Path config = event.getConfiguration().getWorkingDirectory().toPath();
+        try {
+            Files.createDirectories(config.resolve(event.getConfiguration().saveDir));
+        } catch (FileAlreadyExistsException e) {
+            LOGGER.debug("Schematic directory exists as file. Possible symlink.", e);
+        } catch (IOException e) {
+            LOGGER.warn("Failed to create schematics directory", e);
+        }
     }
-  }
 }

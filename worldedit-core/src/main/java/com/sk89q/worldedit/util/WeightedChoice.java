@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class WeightedChoice<T> {
 
     private final Function<T, ? extends Number> function;
-    private double target;
+    private final double target;
     private double best;
     private T current;
 

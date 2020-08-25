@@ -33,8 +33,11 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 /**
- * Stores a list of common Block String IDs.
+ * Stores a list of common {@link BlockType BlockTypes}.
+ *
+ * @see BlockType
  */
+@SuppressWarnings("unused")
 public final class BlockTypes {
     // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
     @Nullable public static final BlockType __RESERVED__ = init(); // Placeholder for null index (i.e. when block types are represented as primitives)
@@ -820,6 +823,7 @@ public final class BlockTypes {
         CharSequence fullName = joined.init(BlockType.REGISTRY.getDefaultNamespace(), ':', name);
         return BlockType.REGISTRY.getMap().get(fullName);
     }
+
     static {
         fieldsTmp = null;
         joined = null;
@@ -835,14 +839,20 @@ public final class BlockTypes {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
 
-        if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
+        if (!input.split("\\[", 2)[0].contains(":")) {
+            input = "minecraft:" + input;
+        }
         BlockType result = BlockType.REGISTRY.get(input);
-        if (result != null) return result;
+        if (result != null) {
+            return result;
+        }
 
         try {
             BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
-            if (block != null) return block.getBlockType();
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            if (block != null) {
+                return block.getBlockType();
+            }
+        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypesCache.values)
@@ -857,8 +867,11 @@ public final class BlockTypes {
         return BlockTypesCache.$NAMESPACES;
     }
 
+    /**
+     * Gets the {@link BlockType} associated with the given id.
+     */
     @Nullable
-    public static BlockType get(final String id) {
+    public static BlockType get(String id) {
         return BlockType.REGISTRY.get(id);
     }
 

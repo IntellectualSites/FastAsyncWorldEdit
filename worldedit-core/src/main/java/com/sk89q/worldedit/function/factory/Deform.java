@@ -47,7 +47,7 @@ public class Deform implements Contextual<Operation> {
     private Extent destination;
     private Region region;
     private String expression;
-    private Mode mode = Mode.UNIT_CUBE;
+    private Mode mode;
     private Vector3 offset = Vector3.ZERO;
 
     public Deform(String expression) {
@@ -65,8 +65,8 @@ public class Deform implements Contextual<Operation> {
     public Deform(Extent destination, Region region, String expression, Mode mode) {
         checkNotNull(destination, "destination");
         checkNotNull(region, "region");
-        checkNotNull(expression, "expression");
         checkNotNull(mode, "mode");
+        checkNotNull(expression, "expression");
         this.destination = destination;
         this.region = region;
         this.expression = expression;
@@ -138,9 +138,15 @@ public class Deform implements Contextual<Operation> {
                 zero = max.add(min).multiply(0.5);
                 unit = max.subtract(zero);
 
-                if (unit.getX() == 0) unit = unit.withX(1.0);
-                if (unit.getY() == 0) unit = unit.withY(1.0);
-                if (unit.getZ() == 0) unit = unit.withZ(1.0);
+                if (unit.getX() == 0) {
+                    unit = unit.withX(1.0);
+                }
+                if (unit.getY() == 0) {
+                    unit = unit.withY(1.0);
+                }
+                if (unit.getZ() == 0) {
+                    unit = unit.withZ(1.0);
+                }
                 break;
             case RAW_COORD:
                 zero = Vector3.ZERO;

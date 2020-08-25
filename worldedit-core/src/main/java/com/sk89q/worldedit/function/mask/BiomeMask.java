@@ -20,23 +20,21 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Tests true if the biome at applied points is the same as the one given.
- *
- * @deprecated use {@link BiomeMask} as biomes are now 3D.
  */
-@Deprecated
-public class BiomeMask2D extends AbstractMask2D {
+public class BiomeMask extends AbstractMask {
 
     private final Extent extent;
     private final Set<BiomeType> biomes = new HashSet<>();
@@ -47,7 +45,7 @@ public class BiomeMask2D extends AbstractMask2D {
      * @param extent the extent
      * @param biomes a list of biomes to match
      */
-    public BiomeMask2D(Extent extent, Collection<BiomeType> biomes) {
+    public BiomeMask(Extent extent, Collection<BiomeType> biomes) {
         checkNotNull(extent);
         checkNotNull(biomes);
         this.extent = extent;
@@ -60,7 +58,7 @@ public class BiomeMask2D extends AbstractMask2D {
      * @param extent the extent
      * @param biome an array of biomes to match
      */
-    public BiomeMask2D(Extent extent, BiomeType... biome) {
+    public BiomeMask(Extent extent, BiomeType... biome) {
         this(extent, Arrays.asList(checkNotNull(biome)));
     }
 
@@ -93,9 +91,15 @@ public class BiomeMask2D extends AbstractMask2D {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector2 vector) {
+    public boolean test(BlockVector3 vector) {
         BiomeType biome = extent.getBiome(vector);
         return biomes.contains(biome);
+    }
+
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
     }
 
 }

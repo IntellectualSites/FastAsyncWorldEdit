@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -55,12 +56,23 @@ public class PropertiesConfiguration extends LocalConfiguration {
     /**
      * Construct the object. The configuration isn't loaded yet.
      *
-     * @param path the path tot he configuration
+     * @param path the path to the configuration
      */
-    public PropertiesConfiguration(File path) {
-        this.path = path;
+    public PropertiesConfiguration(Path path) {
+        this.path = path.toFile();
 
         properties = new Properties();
+    }
+
+    /**
+     * Construct the object. The configuration isn't loaded yet.
+     *
+     * @param path the path to the configuration
+     * @deprecated Use {@link PropertiesConfiguration#PropertiesConfiguration(Path)}
+     */
+    @Deprecated
+    public PropertiesConfiguration(File path) {
+        this(path.toPath());
     }
 
     @Override
@@ -82,6 +94,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
                 new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
+        defaultVerticalHeight = getInt("default-vertical-height", defaultVerticalHeight);
         defaultMaxPolygonalPoints = getInt("default-max-polygon-points", defaultMaxPolygonalPoints);
         maxPolygonalPoints = getInt("max-polygon-points", maxPolygonalPoints);
         defaultMaxPolyhedronPoints = getInt("default-max-polyhedron-points", defaultMaxPolyhedronPoints);
@@ -97,7 +110,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         wandItem = getString("wand-item", wandItem);
         try {
             wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).getId();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
         superPickaxeManyDrop = getBool("super-pickaxe-many-drop-items", superPickaxeManyDrop);
@@ -107,7 +120,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         navigationWand = getString("nav-wand-item", navigationWand);
         try {
             navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).getId();
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
         navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
         navigationUseGlass = getBool("nav-use-glass", navigationUseGlass);

@@ -33,6 +33,7 @@ public interface BiomeData {
      *
      * @return the biome's name
      */
+    @Deprecated
     String getName();
 
 }

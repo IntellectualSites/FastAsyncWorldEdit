@@ -36,8 +36,9 @@ import com.sk89q.worldedit.util.Direction.Flag;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Copies entities provided to the function to the provided destination
@@ -133,9 +134,9 @@ public class ExtentEntityCopy implements EntityFunction {
             }
             Vector3 newDirection;
 
-            newDirection = transform.isIdentity() ?
-                    entity.getLocation().getDirection()
-                    : transform.apply(location.getDirection()).subtract(transform.apply(Vector3.ZERO)).normalize();
+            newDirection = transform.isIdentity()
+                ? entity.getLocation().getDirection()
+                : transform.apply(location.getDirection()).subtract(transform.apply(Vector3.ZERO)).normalize();
             newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
 
             // Some entities store their position data in NBT
@@ -148,7 +149,7 @@ public class ExtentEntityCopy implements EntityFunction {
                 UUID uuid = null;
                 if (tag.containsKey("UUID")) {
                     int[] arr = tag.getIntArray("UUID");
-                    uuid = new UUID((long)arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long)arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+                    uuid = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
                 } else if (tag.containsKey("UUIDMost")) {
                     uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
                 } else if (tag.containsKey("PersistentIDMSB")) {

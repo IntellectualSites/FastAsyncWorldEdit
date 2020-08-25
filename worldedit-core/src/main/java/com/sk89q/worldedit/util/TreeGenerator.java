@@ -170,7 +170,7 @@ public class TreeGenerator {
 
     private static final Random RANDOM = new Random();
 
-     /**
+    /**
      * Makes a terrible looking pine tree.
      *
      * @param basePosition the base position

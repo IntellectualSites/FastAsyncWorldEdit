@@ -26,7 +26,6 @@ import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -89,7 +88,7 @@ public interface OutputExtent {
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
         DeprecationUtil.checkDelegatingOverride(getClass());
 
-        return setBiome(MutableBlockVector2.get(x, z), biome);
+        return setBiome(MutableBlockVector3.get(x, y, z), biome);
     }
 
     /**

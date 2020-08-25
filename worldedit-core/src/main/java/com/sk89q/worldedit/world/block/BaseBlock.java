@@ -108,7 +108,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     /**
-     * Gets a map of state to statevalue
+     * Gets a map of state to state values.
      *
      * @return The state map
      */
