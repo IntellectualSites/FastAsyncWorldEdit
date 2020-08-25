@@ -10,7 +10,7 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.0"
 }
 
 repositories {
@@ -61,7 +61,7 @@ dependencies {
     "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
         isTransitive = false
     }
-    implementation(kotlin("stdlib-jdk8", "1.3.72"))
+    implementation(kotlin("stdlib-jdk8", "1.4.0"))
 }
 
 tasks.named<Test>("test") {
