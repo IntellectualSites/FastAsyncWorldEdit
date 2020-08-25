@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.bukkit.adapter;
@@ -47,15 +47,14 @@ public class BukkitImplLoader {
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
-            "\n**********************************************\n" +
-            "** This WorldEdit version does not fully support your version of Bukkit.\n" +
-            "**\n" +
-            "** When working with blocks or undoing, chests will be empty, signs\n" +
-            "** will be blank, and so on. There will be no support for entity\n" +
-            "** and block property-related functions.\n" +
-            "**\n" +
-            "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n" +
-            "**********************************************\n";
+        "\n**********************************************\n"
+            + "** This WorldEdit version does not fully support your version of Bukkit.\n"
+            + "**\n" + "** When working with blocks or undoing, chests will be empty, signs\n"
+            + "** will be blank, and so on. There will be no support for entity\n"
+            + "** and block property-related functions.\n"
+            + "**\n"
+            + "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n"
+            + "**********************************************\n";
 
     /**
      * Create a new instance.
@@ -97,7 +96,9 @@ public class BukkitImplLoader {
 
                 String className = jarEntry.getName().replaceAll("[/\\\\]+", ".");
 
-                if (!className.startsWith(SEARCH_PACKAGE_DOT) || jarEntry.isDirectory()) continue;
+                if (!className.startsWith(SEARCH_PACKAGE_DOT) || jarEntry.isDirectory()) {
+                    continue;
+                }
 
                 int beginIndex = 0;
                 int endIndex = className.length() - CLASS_SUFFIX.length();
@@ -155,32 +156,23 @@ public class BukkitImplLoader {
      */
     public BukkitImplAdapter loadAdapter() throws AdapterLoadException {
         for (String className : adapterCandidates) {
-            System.out.println("Candidate: " + className);
             try {
                 Class<?> cls = Class.forName(className);
-                if (cls.isSynthetic()){
-                    System.out.println(className + " is synthetic, continuing");
+                if (cls.isSynthetic()) {
                     continue;
-                }else{
-                    System.out.println(className + " is not synthetic");
                 }
                 if (BukkitImplAdapter.class.isAssignableFrom(cls)) {
-                    System.out.println(className + " is assignable from BukkitImplAdapter, returning");
                     return (BukkitImplAdapter) cls.newInstance();
-                }else{
-                    System.out.println(className + " is NOT assignable from BukkitImplAdapter, returning");
                 }
             } catch (ClassNotFoundException e) {
-                log.warn("Failed to load the Bukkit adapter class '" + className +
-                        "' that is not supposed to be missing", e);
+                log.warn("Failed to load the Bukkit adapter class '" + className
+                    + "' that is not supposed to be missing", e);
             } catch (IllegalAccessException e) {
-                log.warn("Failed to load the Bukkit adapter class '" + className +
-                        "' that is not supposed to be raising this error", e);
+                log.warn("Failed to load the Bukkit adapter class '" + className
+                    + "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
                 if (className.equals(customCandidate)) {
                     log.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
-                }else{
-                    log.warn(className + " is not custom candidate.", e);
                 }
             }
         }
