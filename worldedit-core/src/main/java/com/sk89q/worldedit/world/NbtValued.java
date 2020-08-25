@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit.world;
@@ -29,11 +29,11 @@ import javax.annotation.Nullable;
  * format, but may be used in other cases.
  */
 public interface NbtValued {
-    
+
     /**
      * Returns whether the block contains NBT data. {@link #getNbtData()}
      * must not return null if this method returns true.
-     * 
+     *
      * @return true if there is NBT data
      */
     boolean hasNbtData();
@@ -47,7 +47,7 @@ public interface NbtValued {
      *
      * <p>{@link #hasNbtData()} must return true if and only if method does
      * not return null.</p>
-     * 
+     *
      * @return compound tag, or null
      */
     @Nullable
@@ -55,7 +55,7 @@ public interface NbtValued {
 
     /**
      * Set the object's NBT data (tile entity data).
-     * 
+     *
      * @param nbtData NBT data, or null if no data
      */
     void setNbtData(@Nullable CompoundTag nbtData);
