@@ -63,8 +63,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirtyCount;
-    private static final Field fieldDirtyBits;
+    private static final Field fieldDirty;
+    private static final Field fieldDirtyBlocks;
 
     private static final MethodHandle methodGetVisibleChunk;
 
@@ -94,10 +94,10 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("r");
-            fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("dirtyBlocks");
-            fieldDirtyBits.setAccessible(true);
+            fieldDirty = PlayerChunk.class.getDeclaredField("p");
+            fieldDirty.setAccessible(true);
+            fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
+            fieldDirtyBlocks.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -190,14 +190,20 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(() -> {
                 try {
-                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBits.get(playerChunk);
+                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBlocks.get(playerChunk);
+                    if (Arrays.stream(dirtyblocks).allMatch(e -> e == null || e.isEmpty())) {
+                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
+                    }
                     for (int i = 0; i < 16; i++) {
                         if (dirtyblocks[i] == null) dirtyblocks[i] = (Set<Short>) shortArraySetConstructor.newInstance();
-                        dirtyblocks[i].add((short) 0);
-                        dirtyblocks[i].add((short) 1);
+                        for (int x = 0; x < 16; x++)
+                            for (int y = 0; y < 16; y++)
+                                for (int z = 0; z < 16; z++)
+                                    dirtyblocks[i].add((short) ((x << 8) | (z << 4) | (y)));
                     }
-                    fieldDirtyBits.set(playerChunk, dirtyblocks);
-                    nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
+
+                    fieldDirtyBlocks.set(playerChunk, dirtyblocks);
+                    fieldDirty.setBoolean(playerChunk, true);
 
                     if (lighting) {
                         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
