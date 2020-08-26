@@ -13,6 +13,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.Chunk;
@@ -35,11 +37,14 @@ import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -58,8 +63,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirtyCount;
-    private static final Field fieldDirtyBits;
+    private static final Field fieldDirty;
+    private static final Field fieldDirtyBlocks;
 
     private static final MethodHandle methodGetVisibleChunk;
 
@@ -67,6 +72,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
+
+    private static final Constructor shortArraySetConstructor;
 
     static {
         try {
@@ -87,10 +94,10 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("s");
-            fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
-            fieldDirtyBits.setAccessible(true);
+            fieldDirty = PlayerChunk.class.getDeclaredField("p");
+            fieldDirty.setAccessible(true);
+            fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
+            fieldDirtyBlocks.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -107,6 +114,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             if ((scale & (scale - 1)) != 0)
                 throw new Error("data type scale not a power of two");
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
+
+            shortArraySetConstructor = Class.forName(new String(new char[]{'i','t','.','u','n','i','m','i','.','d','s','i','.','f','a','s','t','u','t','i','l','.','s','h','o','r','t','s','.','S','h','o','r','t','A','r','r','a','y','S','e','t'})).getConstructor();
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -181,18 +190,20 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(() -> {
                 try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
+                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBlocks.get(playerChunk);
+                    if (Arrays.stream(dirtyblocks).allMatch(e -> e == null || e.isEmpty())) {
                         nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                     }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
+                    for (int i = 0; i < 16; i++) {
+                        if (dirtyblocks[i] == null) dirtyblocks[i] = (Set<Short>) shortArraySetConstructor.newInstance();
+                        for (int x = 0; x < 16; x++)
+                            for (int y = 0; y < 16; y++)
+                                for (int z = 0; z < 16; z++)
+                                    dirtyblocks[i].add((short) ((x << 8) | (z << 4) | (y)));
                     }
 
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
+                    fieldDirtyBlocks.set(playerChunk, dirtyblocks);
+                    fieldDirty.setBoolean(playerChunk, true);
 
                     if (lighting) {
                         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
@@ -204,6 +215,10 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                     }
 
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
                 return null;
