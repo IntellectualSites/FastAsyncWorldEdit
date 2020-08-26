@@ -48,6 +48,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     /*
@@ -73,7 +75,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
 
     private static final Field fieldLock;
 
-    private static final Constructor shortArraySetConstructor;
+    private static final short[] FULL_CHUNK_SECTION_CHANGE_SET;
+    private static final Constructor shortArraySetFromShortArrayConstructor;
 
     static {
         try {
@@ -115,7 +118,18 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                 throw new Error("data type scale not a power of two");
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
 
-            shortArraySetConstructor = Class.forName(new String(new char[]{'i','t','.','u','n','i','m','i','.','d','s','i','.','f','a','s','t','u','t','i','l','.','s','h','o','r','t','s','.','S','h','o','r','t','A','r','r','a','y','S','e','t'})).getConstructor();
+            Class clsShortArraySet = Class.forName(new String(new char[]{'i','t','.','u','n','i','m','i','.','d','s','i','.','f','a','s','t','u','t','i','l','.','s','h','o','r','t','s','.','S','h','o','r','t','A','r','r','a','y','S','e','t'}));
+            shortArraySetFromShortArrayConstructor = clsShortArraySet.getConstructor(short[].class);
+        
+            FULL_CHUNK_SECTION_CHANGE_SET = new short[16 * 16 * 16];
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        short i = (short) ((x << 8) | (z << 4) | y);
+                        FULL_CHUNK_SECTION_CHANGE_SET[i] = i;
+                    }
+                }
+            }
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -195,11 +209,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                         nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                     }
                     for (int i = 0; i < 16; i++) {
-                        if (dirtyblocks[i] == null) dirtyblocks[i] = (Set<Short>) shortArraySetConstructor.newInstance();
-                        for (int x = 0; x < 16; x++)
-                            for (int y = 0; y < 16; y++)
-                                for (int z = 0; z < 16; z++)
-                                    dirtyblocks[i].add((short) ((x << 8) | (z << 4) | (y)));
+                        dirtyblocks[i] = getFullChunkSliceChangeSet();
                     }
 
                     fieldDirtyBlocks.set(playerChunk, dirtyblocks);
@@ -213,12 +223,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                             p.playerConnection.sendPacket(packet);
                         });
                     }
-
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
                 return null;
@@ -319,5 +324,15 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+   
+    private static Set<Short> getFullChunkSliceChangeSet() {
+        try {
+            short[] data = new short[16 * 16 * 16];
+            System.arraycopy(FULL_CHUNK_SECTION_CHANGE_SET, 0, data, 0, FULL_CHUNK_SECTION_CHANGE_SET.length);
+            return (Set<Short>) shortArraySetFromShortArrayConstructor.newInstance((Object) data);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 }
