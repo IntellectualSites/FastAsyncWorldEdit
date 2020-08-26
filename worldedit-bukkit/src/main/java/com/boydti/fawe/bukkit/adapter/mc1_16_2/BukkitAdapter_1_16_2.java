@@ -13,8 +13,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import it.unimi.dsi.fastutil.shorts.ShortArraySet;
-import it.unimi.dsi.fastutil.shorts.ShortSet;
 import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.Chunk;
@@ -39,7 +37,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,8 +45,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     /*
@@ -118,7 +113,12 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                 throw new Error("data type scale not a power of two");
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
 
-            Class clsShortArraySet = Class.forName(new String(new char[]{'i','t','.','u','n','i','m','i','.','d','s','i','.','f','a','s','t','u','t','i','l','.','s','h','o','r','t','s','.','S','h','o','r','t','A','r','r','a','y','S','e','t'}));
+            Class clsShortArraySet;
+            try { //paper
+                clsShortArraySet = Class.forName(new String(new char[]{'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
+            } catch (Throwable t) {// still using spigot boooo
+                clsShortArraySet = Class.forName(new String(new char[]{'o', 'r', 'g', '.', 'b', 'u', 'k', 'k', 'i', 't', '.', 'c', 'r', 'a', 'f', 't', 'b', 'u', 'k', 'k', 'i', 't', '.', 'l', 'i', 'b', 's', '.', 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
+            }
             shortArraySetFromShortArrayConstructor = clsShortArraySet.getConstructor(short[].class);
         
             FULL_CHUNK_SECTION_CHANGE_SET = new short[16 * 16 * 16];
