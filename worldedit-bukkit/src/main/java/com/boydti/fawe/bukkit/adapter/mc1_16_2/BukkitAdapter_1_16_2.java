@@ -39,12 +39,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -63,7 +61,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirty;
+    private static final Field hasChangedSectionsField;
     private static final Field fieldDirtyBlocks;
 
     private static final MethodHandle methodGetVisibleChunk;
@@ -94,8 +92,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirty = PlayerChunk.class.getDeclaredField("p");
-            fieldDirty.setAccessible(true);
+            hasChangedSectionsField = PlayerChunk.class.getDeclaredField("p");
+            hasChangedSectionsField.setAccessible(true);
             fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
             fieldDirtyBlocks.setAccessible(true);
 
@@ -190,20 +188,25 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(() -> {
                 try {
-                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBlocks.get(playerChunk);
+                    ShortSet[] dirtyblocks = (ShortSet[]) fieldDirtyBlocks.get(playerChunk);
                     if (Arrays.stream(dirtyblocks).allMatch(e -> e == null || e.isEmpty())) {
                         nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                     }
                     for (int i = 0; i < 16; i++) {
-                        if (dirtyblocks[i] == null) dirtyblocks[i] = (Set<Short>) shortArraySetConstructor.newInstance();
-                        for (int x = 0; x < 16; x++)
-                            for (int y = 0; y < 16; y++)
-                                for (int z = 0; z < 16; z++)
+                        if (dirtyblocks[i] == null) {
+                            dirtyblocks[i] = new ShortArraySet();
+                        }
+                        for (int x = 0; x < 16; x++) {
+                            for (int y = 0; y < 16; y++) {
+                                for (int z = 0; z < 16; z++) {
                                     dirtyblocks[i].add((short) ((x << 8) | (z << 4) | (y)));
+                                }
+                            }
+                        }
                     }
 
                     fieldDirtyBlocks.set(playerChunk, dirtyblocks);
-                    fieldDirty.setBoolean(playerChunk, true);
+                    hasChangedSectionsField.setBoolean(playerChunk, true);
 
                     if (lighting) {
                         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
@@ -215,10 +218,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                     }
 
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
                 return null;
@@ -265,7 +264,9 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
             if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
+                for (int i = 0; i < blockBitArrayEnd; i++) {
+                    blockStates[i] = 0;
+                }
             } else {
                 final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
                 bitArray.fromRaw(blocksCopy);
