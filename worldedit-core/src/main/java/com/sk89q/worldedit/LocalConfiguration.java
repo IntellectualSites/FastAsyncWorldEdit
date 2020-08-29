@@ -208,7 +208,7 @@ public abstract class LocalConfiguration {
      * @return a working directory
      */
     public Path getWorkingDirectoryPath() {
-        return Paths.get(".");
+        return Paths.get(".","plugins", "FastAsyncWorldEdit");
     }
 
     public void initializeSnapshotConfiguration(String directory, boolean experimental) {
