@@ -393,6 +393,15 @@ public class AsyncBlock implements Block {
         return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
     }
 
+    public boolean applyBoneMeal(@NotNull BlockFace face) {
+        throw new UnsupportedOperationException("FAWE does not support this method");
+    }
+
+    public String getTranslationKey() {
+        throw new UnsupportedOperationException("FAWE does not support this yet");
+    }
+
+
     @NotNull
     @Override
     public BoundingBox getBoundingBox() {

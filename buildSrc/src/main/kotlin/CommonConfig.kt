@@ -19,6 +19,7 @@ fun Project.applyCommonConfiguration() {
                 artifact("/[organisation]/[revision]/artifact/[module].[ext]")
             }}
     }
+
     configurations.all {
         resolutionStrategy {
             cacheChangingModulesFor(5, "MINUTES")
