@@ -35,6 +35,13 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
+    - name: Cache BuildTools decompiled code
+      uses: actions/cache@v2
+      with:
+        path: $GITHUB_WORKSPACE/work
+        key: ${{ runner.os }}-buildtools
+        restore-keys: |
+          ${{ runner.os }}-buildtools
     - name: Test enviornment
       run: echo $GITHUB_WORKSPACE
     - name: Download BuildTools
