@@ -33,6 +33,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -204,61 +206,18 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean regenerate(Region region, EditSession editSession) {
+    public boolean regenerate(Region region, Extent extent, RegenOptions options) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         try {
             if (adapter != null) {
-                return adapter.regenerate(getWorld(), region, editSession);
+                return adapter.regenerate(getWorld(), region, extent, options);
             } else {
                 throw new UnsupportedOperationException("Missing BukkitImplAdapater for this version.");
             }
         } catch (Exception e) {
             logger.warn("Regeneration via adapter failed.", e);
+            return false;
         }
-        /*
-        BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
-
-        for (BlockVector2 chunk : region.getChunks()) {
-            BlockVector3 min = BlockVector3.at(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
-
-            // First save all the blocks inside
-            for (int x = 0; x < 16; ++x) {
-                for (int y = 0; y < (getMaxY() + 1); ++y) {
-                    for (int z = 0; z < 16; ++z) {
-                        BlockVector3 pt = min.add(x, y, z);
-                        int index = y * 16 * 16 + z * 16 + x;
-                        history[index] = editSession.getFullBlock(pt);
-                    }
-                }
-            }
-
-            try {
-                getWorld().regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
-            } catch (Throwable t) {
-                logger.warn("Chunk generation via Bukkit raised an error", t);
-            }
-
-            // Then restore
-            for (int x = 0; x < 16; ++x) {
-                for (int y = 0; y < (getMaxY() + 1); ++y) {
-                    for (int z = 0; z < 16; ++z) {
-                        BlockVector3 pt = min.add(x, y, z);
-                        int index = y * 16 * 16 + z * 16 + x;
-
-                        // We have to restore the block if it was outside
-                        if (!region.contains(pt)) {
-                            editSession.smartSetBlock(pt, history[index]);
-                        } else { // Otherwise fool with history
-                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
-         */
-        return editSession.regenerate(region);
     }
 
     /**

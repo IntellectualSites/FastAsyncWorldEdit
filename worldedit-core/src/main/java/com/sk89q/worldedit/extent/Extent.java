@@ -180,7 +180,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
-        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED: " + isWorld());
+        return false;
     }
 
     /*

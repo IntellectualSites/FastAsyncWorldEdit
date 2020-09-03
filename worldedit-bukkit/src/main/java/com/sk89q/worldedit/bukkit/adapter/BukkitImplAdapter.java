@@ -30,6 +30,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -37,6 +38,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.DataFixer;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -234,11 +236,12 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * Regenerate a region in the given world, so it appears "as new".
      * @param world the world to regen in
      * @param region the region to regen
-     * @param session the session to use for setting blocks
+     * @param extent the extent to use for setting blocks
+     * @param options the regeneration options
      * @return true on success, false on failure
      */
-    default boolean regenerate(org.bukkit.World world, Region region, EditSession session) {
-        return session.regenerate(region);
+    default boolean regenerate(World world, Region region, Extent extent, RegenOptions options) {
+        throw new UnsupportedOperationException("This adapter does not support regeneration.");
     }
 
     default IChunkGet get(World world, int chunkX, int chunkZ) {
