@@ -48,6 +48,8 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +73,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         super(worldEdit, new BlocksMaskParser(worldEdit));
 
         register(new ExistingMaskParser(worldEdit));
+        register(new AirMaskParser(worldEdit));
         register(new SolidMaskParser(worldEdit));
         register(new LazyRegionMaskParser(worldEdit));
         register(new RegionMaskParser(worldEdit));
@@ -79,12 +82,12 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new BlockStateMaskParser(worldEdit));
         register(new NegateMaskParser(worldEdit));
         register(new ExpressionMaskParser(worldEdit));
+
         register(new BlockCategoryMaskParser(worldEdit));
         register(new BiomeMaskParser(worldEdit));
         // Mask Parsers from FAWE
         register(new FalseMaskParser(worldEdit));
         register(new TrueMaskParser(worldEdit));
-        register(new AirMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
@@ -113,18 +116,23 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 continue;
             }
 
+            Mask match = null;
             for (InputParser<Mask> parser : getParsers()) {
-                Mask match = parser.parseFromInput(component, context);
+                match = parser.parseFromInput(component, context);
 
                 if (match != null) {
-                    masks.add(match);
+                    break;
                 }
             }
+            if (match == null) {
+                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(component)));
+            }
+            masks.add(match);
         }
 
         switch (masks.size()) {
             case 0:
-                throw new NoMatchException("No match for '" + input + "'");
+                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
             case 1:
                 return masks.get(0).optimize();
             default:
