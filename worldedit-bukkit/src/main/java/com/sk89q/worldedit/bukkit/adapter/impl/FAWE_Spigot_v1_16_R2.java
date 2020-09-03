@@ -19,15 +19,24 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
+import com.bekvon.bukkit.residence.commands.server;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IQueueChunk;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.*;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Lifecycle;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -36,16 +45,20 @@ import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldguard.session.Session;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -61,10 +74,17 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -365,82 +385,111 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         return parent.fromNative(foreign);
     }
 
-    @Override
-    public boolean regenerate(org.bukkit.World world, Region region, EditSession editSession) {
-//        WorldServer originalWorld = ((CraftWorld) world).getHandle();
-//        ChunkProviderServer provider = originalWorld.getChunkProvider();
-//        if (!(provider instanceof ChunkProviderServer)) {
-//            return false;
-//        }
-//
-//        File saveFolder = Files.createTempDir();
-//        // register this just in case something goes wrong
-//        // normally it should be deleted at the end of this method
-//        saveFolder.deleteOnExit();
-//        try {
-//            MinecraftServer server = originalWorld.getServer().getServer();
-//            Convertable.ConversionSession originalDataManager = server.convertable;
-////            Convertable.ConversionSession saveHandler = new Convertable.ConversionSession(world.getName(), world.);
-//            WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound) null),
-//                    server.dataConverterManager, getDataVersion(), null);
-//            newWorldData.setName(UUID.randomUUID().toString());
-//
-//            ChunkGenerator gen = world.getGenerator();
-//            Environment env = world.getEnvironment();
-//            try (WorldServer freshWorld = new WorldServer(server,
-//                    server.executorService, originalDataManager,
-//                    newWorldData,
-//                    originalWorld.worldProvider.getDimensionManager(),
-//                    originalWorld.getMethodProfiler(),
-//                    server.worldLoadListenerFactory.create(11),
-//                    env,
-//                    gen){
-//                @Override
-//                public boolean addEntityChunk(Entity entity) {
-//                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously
-//                    return false;
-//                }
-//            }) {
-//
-//                // Pre-gen all the chunks
-//                // We need to also pull one more chunk in every direction
-//                Fawe.get().getQueueHandler().startSet(true);
-//                try {
-//                    IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
-//                    extent.init(null, (x, z) -> new BukkitGetBlocks_1_16_2(freshWorld, x, z) {
-//                        @Override
-//                        public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-//                            Chunk cached = nmsWorld.getChunkIfLoaded(X, Z);
-//                            if (cached != null) return cached;
-//                            Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
-//                            while (!future.isDone()) {
-//                                // this feels so dirty
-//                                freshWorld.getChunkProvider().runTasks();
-//                            }
-//                            try {
-//                                return future.get();
-//                            } catch (InterruptedException | ExecutionException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        }
-//                    }, null);
-//                    for (BlockVector3 vec : region) {
-//                        editSession.setBlock(vec, extent.getFullBlock(vec));
-//                    }
-//                } finally {
-//                    Fawe.get().getQueueHandler().endSet(true);
-//                }
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        } catch (MaxChangedBlocksException e) {
-//            throw new RuntimeException(e);
-//        } finally {
-//            saveFolder.delete();
-//        }
-//        return true;
+    private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
+        switch(env) {
+            case NETHER:
+                return WorldDimension.THE_NETHER;
+            case THE_END:
+                return WorldDimension.THE_END;
+            case NORMAL:
+            default:
+                return WorldDimension.OVERWORLD;
+        }
+    }
 
-        return false; //TODO: rework or remove for 1.16
+    private Dynamic<NBTBase> recursivelySetSeed(Dynamic<NBTBase> dynamic, long seed, Set<Dynamic<NBTBase>> seen) {
+        return !seen.add(dynamic) ? dynamic : dynamic.updateMapValues((pair) -> {
+            if (((Dynamic)pair.getFirst()).asString("").equals("seed")) {
+                return pair.mapSecond((v) -> {
+                    return v.createLong(seed);
+                });
+            } else {
+                return ((Dynamic)pair.getSecond()).getValue() instanceof NBTTagCompound ? pair.mapSecond((v) -> {
+                    return this.recursivelySetSeed((Dynamic)v, seed, seen);
+                }) : pair;
+            }
+        });
+    }
+
+    private static class NoOpWorldLoadListener implements WorldLoadListener {
+        private NoOpWorldLoadListener() {
+        }
+
+        public void a(ChunkCoordIntPair chunkCoordIntPair) {
+        }
+
+        public void a(ChunkCoordIntPair chunkCoordIntPair, @Nullable ChunkStatus chunkStatus) {
+        }
+
+        public void b() {
+        }
+    }
+
+    @Override
+    public boolean regenerate(org.bukkit.World world, Region region, Extent realExtent, RegenOptions options) {
+        WorldServer originalWorld = ((CraftWorld) world).getHandle();
+        ChunkProviderServer provider = originalWorld.getChunkProvider();
+        if (!(provider instanceof ChunkProviderServer)) {
+            return false;
+        }
+
+        File saveFolder = Files.createTempDir();
+        // register this just in case something goes wrong
+        // normally it should be deleted at the end of this method
+        saveFolder.deleteOnExit();
+        try {
+            org.bukkit.World.Environment env = world.getEnvironment();
+            org.bukkit.generator.ChunkGenerator gen = world.getGenerator();
+            Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
+            Convertable convertable = Convertable.a(tempDir);
+            ResourceKey worldDimKey = getWorldDimKey(env);
+            Convertable.ConversionSession session = convertable.c("worldeditregentempworld", worldDimKey);
+            WorldDataServer originalWorldData = originalWorld.worldDataServer;
+            long seed = options.getSeed().orElse(originalWorld.getSeed());
+            WorldDataServer levelProperties = (WorldDataServer)originalWorld.getServer().getServer().getSaveData();
+            RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, originalWorld.getServer().getServer().dataPackResources.h(), IRegistryCustom.b());
+            GeneratorSettings newOpts = (GeneratorSettings)GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap((tag) -> {
+                return GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic(nbtRegOps, tag), seed, new HashSet()));
+            }).result().orElseThrow(() -> {
+                return new IllegalStateException("Unable to map GeneratorOptions");
+            });
+            WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
+            WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
+            WorldServer freshWorld = new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new NoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen);
+            // Pre-gen all the chunks
+            // We need to also pull one more chunk in every direction
+            Fawe.get().getQueueHandler().startSet(true);
+            try {
+                IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
+                extent.init(null, (x, z) -> new BukkitGetBlocks_1_16_2(freshWorld, x, z) {
+                    @Override
+                    public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
+                        Chunk cached = nmsWorld.getMinecraftWorld().getChunkIfLoaded(X, Z);
+                        if (cached != null) return cached;
+                        Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
+                        while (!future.isDone()) {
+                            // this feels so dirty
+                            MinecraftServer.getServer().execute(() -> freshWorld.getChunkProvider().runTasks());
+                        }
+                        try {
+                            return future.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }, null);
+                for (BlockVector3 vec : region) {
+                    realExtent.setBlock(vec, extent.getFullBlock(vec));
+                }
+                } finally {
+                    Fawe.get().getQueueHandler().endSet(true);
+                }
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        } finally {
+            saveFolder.delete();
+        }
+        return true;
     }
 
     @Override
