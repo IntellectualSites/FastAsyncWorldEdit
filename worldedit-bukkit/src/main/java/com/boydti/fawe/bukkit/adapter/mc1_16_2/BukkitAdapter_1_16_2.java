@@ -9,6 +9,7 @@ import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -25,6 +26,7 @@ import net.minecraft.server.v1_16_R2.DataPaletteLinear;
 import net.minecraft.server.v1_16_R2.GameProfileSerializer;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.PacketPlayOutLightUpdate;
+import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunkMap;
 import net.minecraft.server.v1_16_R2.World;
@@ -35,13 +37,12 @@ import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -69,9 +70,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
-
-    private static final short[] FULL_CHUNK_SECTION_CHANGE_SET;
-    private static final Constructor shortArraySetFromShortArrayConstructor;
 
     static {
         try {
@@ -118,17 +116,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                 clsShortArraySet = Class.forName(new String(new char[]{'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
             } catch (Throwable t) {// still using spigot boooo
                 clsShortArraySet = Class.forName(new String(new char[]{'o', 'r', 'g', '.', 'b', 'u', 'k', 'k', 'i', 't', '.', 'c', 'r', 'a', 'f', 't', 'b', 'u', 'k', 'k', 'i', 't', '.', 'l', 'i', 'b', 's', '.', 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
-            }
-            shortArraySetFromShortArrayConstructor = clsShortArraySet.getConstructor(short[].class);
-        
-            FULL_CHUNK_SECTION_CHANGE_SET = new short[16 * 16 * 16];
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
-                        short i = (short) ((x << 8) | (z << 4) | y);
-                        FULL_CHUNK_SECTION_CHANGE_SET[i] = i;
-                    }
-                }
             }
         } catch (RuntimeException e) {
             throw e;
@@ -203,28 +190,22 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         }
         if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(() -> {
-                try {
-                    Set<Short>[] dirtyblocks = (Set<Short>[]) fieldDirtyBlocks.get(playerChunk);
-                    if (Arrays.stream(dirtyblocks).allMatch(e -> e == null || e.isEmpty())) {
-                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                    }
-                    for (int i = 0; i < 16; i++) {
-                        dirtyblocks[i] = getFullChunkSliceChangeSet();
-                    }
+                ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+                Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+                if (optional.isPresent()) {
+                    PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(optional.get(), 65535);
+                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                        p.playerConnection.sendPacket(chunkpacket);
+                    });
+                }
 
-                    fieldDirtyBlocks.set(playerChunk, dirtyblocks);
-                    fieldDirty.setBoolean(playerChunk, true);
-
-                    if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                        boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                            p.playerConnection.sendPacket(packet);
-                        });
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                if (lighting) {
+//                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+                    boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
+                    PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
+                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                        p.playerConnection.sendPacket(packet);
+                    });
                 }
                 return null;
             });
@@ -324,15 +305,5 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
-    }
-   
-    private static Set<Short> getFullChunkSliceChangeSet() {
-        try {
-            short[] data = new short[16 * 16 * 16];
-            System.arraycopy(FULL_CHUNK_SECTION_CHANGE_SET, 0, data, 0, FULL_CHUNK_SECTION_CHANGE_SET.length);
-            return (Set<Short>) shortArraySetFromShortArrayConstructor.newInstance((Object) data);
-        } catch (Throwable e) {
-            return null;
-        }
     }
 }
