@@ -166,11 +166,9 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !mask.test(extent, x, y + 1, z)) {
+            if (y < 255 && !adjacentAir(extent, vector)) {
                 return lastValue = false;
             }
-        } else if (!adjacentAir(extent, vector)) {
-            return false;
         }
         return testSlope(extent, x, y, z);
     }

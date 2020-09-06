@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.object.mask.AngleMask;
+import com.boydti.fawe.object.mask.ExtremaMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
-public class AngleMaskParser extends RichParser<Mask> {
+public class ExtremaMaskParser extends RichParser<Mask> {
 
     private final String[] flags = new String[]{"-o"};
 
-    public AngleMaskParser(WorldEdit worldEdit) {
-        super(worldEdit, "/");
+    public ExtremaMaskParser(WorldEdit worldEdit) {
+        super(worldEdit, "#extrema");
     }
 
     @Override
@@ -59,6 +59,6 @@ public class AngleMaskParser extends RichParser<Mask> {
             max = Double.parseDouble(maxArg);
         }
 
-        return new AngleMask(context.getExtent(), min, max, overlay, 1);
+        return new ExtremaMask(context.getExtent(), min, max, overlay, 4);
     }
 }
