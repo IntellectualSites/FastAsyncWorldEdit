@@ -27,7 +27,7 @@ You can safely ignore `gradlew setupDecompWorkspace` if you are not planning to 
 
 ```
 $ gradlew setupDecompWorkspace
-$ gradlew clean build -x test
+$ gradlew build
 ```
 
 The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.jar`
