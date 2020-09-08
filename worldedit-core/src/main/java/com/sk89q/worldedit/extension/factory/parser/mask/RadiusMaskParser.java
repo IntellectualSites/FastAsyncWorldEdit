@@ -18,7 +18,7 @@ public class RadiusMaskParser extends RichParser<Mask> {
 
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
-        if(index == 0 || index == 1){
+        if (index == 0 || index == 1) {
             return suggestPositiveDoubles(argumentInput);
         }
         return Stream.empty();
@@ -26,10 +26,9 @@ public class RadiusMaskParser extends RichParser<Mask> {
 
     @Override
     protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if(arguments.length < 2) return null;
+        if (arguments.length < 2) return null;
         int min = Integer.parseInt(arguments[0]);
         int max = Integer.parseInt(arguments[1]);
-        System.out.println("radius: " + min + " | " + max);
         return new RadiusMask(min, max);
     }
 }
