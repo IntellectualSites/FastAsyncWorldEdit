@@ -94,16 +94,6 @@ public interface Mask {
         return value == null ? this : value;
     }
 
-    default Mask and(Mask other) {
-        Mask value = and(other);
-        return value == null ? MaskIntersection.of(this, other) : value;
-    }
-
-    default Mask or(Mask other) {
-        Mask value = or(other);
-        return value == null ? MaskUnion.of(this, other) : value;
-    }
-
     default Mask inverse() {
         if (this instanceof Masks.AlwaysTrue) {
             return Masks.ALWAYS_FALSE;
