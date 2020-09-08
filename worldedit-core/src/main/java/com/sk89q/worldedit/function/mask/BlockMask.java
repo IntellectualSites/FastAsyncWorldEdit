@@ -321,6 +321,11 @@ public class BlockMask extends ABlockMask {
         for (int i = 0; i < cloned.length; i++) {
             cloned[i] = !cloned[i];
         }
+        if(replacesAir()){
+            cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
+            cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
+            cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;
+        }
         return new BlockMask(getExtent(), cloned);
     }
 }

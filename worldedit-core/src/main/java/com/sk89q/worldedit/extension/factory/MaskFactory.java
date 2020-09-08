@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.parser.mask.AdjacentMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.AngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
@@ -28,16 +29,20 @@ import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlocksMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.ExtremaMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.FalseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.LiquidMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.ROCAngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SimplexMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.SurfaceMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.TrueMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.WallMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.XAxisMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.YAxisMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ZAxisMaskParser;
@@ -86,14 +91,20 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new BlockCategoryMaskParser(worldEdit));
         register(new BiomeMaskParser(worldEdit));
         // Mask Parsers from FAWE
+        register(new AdjacentMaskParser(worldEdit));
+        register(new AngleMaskParser(worldEdit));
+        register(new ExtremaMaskParser(worldEdit));
         register(new FalseMaskParser(worldEdit));
-        register(new TrueMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));
+        //register(new RadiusMaskParser(worldEdit)); TODO: Adapt to work with FAWE's Chunk I/O
+        register(new ROCAngleMaskParser(worldEdit));
+        register(new SimplexMaskParser(worldEdit));
+        register(new SurfaceMaskParser(worldEdit));
+        register(new TrueMaskParser(worldEdit));
+        register(new WallMaskParser(worldEdit));
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
         register(new ZAxisMaskParser(worldEdit));
-        register(new SimplexMaskParser(worldEdit));
-        register(new AngleMaskParser(worldEdit));
 
     }
 

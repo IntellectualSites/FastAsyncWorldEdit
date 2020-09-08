@@ -13,9 +13,9 @@ public class SurfaceMask extends AdjacentAnyMask {
 
     public static AbstractExtentMask getMask(Extent extent) {
         return new BlockMaskBuilder()
-        .addTypes(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR)
-        .addAll(b -> !b.getMaterial().isMovementBlocker())
-        .build(extent);
+                .addTypes(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR)
+                .addAll(b -> !b.getMaterial().isMovementBlocker())
+                .build(extent);
     }
 
     @Override
