@@ -91,7 +91,7 @@ public class ErodeBrush implements Brush {
                 int x2y2 = x2 + z * z;
                 for (int y = -brushSize, rely = 0; y <= brushSize; y++, rely++) {
                     int cube = x2y2 + y * y;
-                    target.setBlock(x, y, z, current.getBlock(relx, rely, relz));
+                    target.setBlock(relx, rely, relz, current.getBlock(relx, rely, relz));
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
@@ -136,7 +136,7 @@ public class ErodeBrush implements Brush {
                 int x2y2 = x2 + z * z;
                 for (int y = -brushSize, rely = 0; y <= brushSize; y++, rely++) {
                     int cube = x2y2 + y * y;
-                    target.setBlock(x, y, z, current.getBlock(relx, rely, relz));
+                    target.setBlock(relx, rely, relz, current.getBlock(relx, rely, relz));
                     if (cube >= brushSizeSquared) {
                         continue;
                     }
