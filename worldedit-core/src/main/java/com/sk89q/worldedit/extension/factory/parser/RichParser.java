@@ -36,7 +36,7 @@ public abstract class RichParser<E> extends InputParser<E> {
     @Override
     public Stream<String> getSuggestions(String input) {
         // we don't even want to start suggesting if it's not meant to be this parser result
-        if (input.length() > this.required.length() && !input.startsWith(this.required)) {
+        if (input.length() >= this.required.length() && !input.startsWith(this.required)) {
             return Stream.empty();
         }
         // suggest until the first [ as long as it isn't fully typed
@@ -45,11 +45,11 @@ public abstract class RichParser<E> extends InputParser<E> {
         }
         // we know that it is at least "<required>"
         String[] strings = extractArguments(input.substring(this.prefix.length()), false);
-        StringJoiner joiner = new StringJoiner(",");
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < strings.length - 1; i++) {
-            joiner.add("[" + strings[i] + "]");
+            builder.append('[').append(strings[i]).append(']');
         }
-        String previous = this.prefix + joiner;
+        String previous = this.prefix + builder;
         return getSuggestions(strings[strings.length - 1], strings.length - 1).map(s -> previous + "[" + s + "]");
     }
 
