@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -16,7 +15,7 @@ public class RandomMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
+    public boolean test(BlockVector3 vector) {
         return random.nextInt() <= threshold;
     }
 

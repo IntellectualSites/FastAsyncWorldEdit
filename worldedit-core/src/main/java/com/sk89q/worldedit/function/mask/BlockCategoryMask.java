@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BlockCategoryMask extends AbstractExtentMask {
 
-    private BlockCategory category;
+    private final BlockCategory category;
 
     public BlockCategoryMask(Extent extent, BlockCategory category) {
         super(extent);
@@ -42,8 +42,8 @@ public class BlockCategoryMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
-        return category.contains(vector.getBlock(extent));
+    public boolean test(BlockVector3 vector) {
+        return category.contains(getExtent().getBlock(vector));
     }
 
     @Nullable

@@ -53,7 +53,6 @@ public class SplineBrush implements Brush, ResettableTool {
         } else {
             mask = new MaskIntersection(mask, new IdMask(editSession));
         }
-        mask = mask.withExtent(editSession);
         boolean visualization = editSession.getExtent() instanceof VisualExtent;
         if (visualization && positionSets.isEmpty()) {
             return;

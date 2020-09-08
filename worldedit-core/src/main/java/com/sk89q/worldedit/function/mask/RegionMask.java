@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
@@ -63,7 +62,7 @@ public class RegionMask extends AbstractMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
+    public boolean test(BlockVector3 vector) {
         return region.contains(vector);
     }
 
