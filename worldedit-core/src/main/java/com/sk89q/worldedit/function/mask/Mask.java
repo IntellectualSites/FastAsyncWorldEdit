@@ -22,10 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.implementation.filter.MaskFilter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.request.Request;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -41,24 +38,10 @@ public interface Mask {
      * @param vector the vector to test
      * @return true if the criteria is met
      */
-    default boolean test(BlockVector3 vector) {
-        Extent extent = Request.request().getExtent();
-        if (extent == null) {
-            extent = NullExtent.INSTANCE;
-        }
-        return test(extent, vector);
-    }
-
-    default boolean test(Extent extent, BlockVector3 vector) {
-        return test(vector);
-    }
+    boolean test(BlockVector3 vector);
 
     default <T extends Filter> MaskFilter<T> toFilter(T filter) {
         return new MaskFilter<>(filter, this);
-    }
-
-    default Mask withExtent(Extent extent) {
-        return new DelegateExtentMask(extent, this);
     }
 
     /**
@@ -107,7 +90,7 @@ public interface Mask {
         return new Filter() {
             @Override
             public void applyBlock(FilterBlock block) {
-                if (test(block, block)) {
+                if (test(block)) {
                     run.accept(block);
                 }
             }

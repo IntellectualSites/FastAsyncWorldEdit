@@ -54,7 +54,7 @@ public class RegionMaskingFilter implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        return mask.test(extent, position) && function.apply(position);
+        return mask.test(position) && function.apply(position);
     }
 
 }
