@@ -5,6 +5,6 @@ public class RaiseBrush extends ErodeBrush {
         this(6, 0, 1, 1);
     }
     public RaiseBrush(int erodeFaces, int erodeRec, int fillFaces, int fillRec) {
-        super(2, 1, 5, 1);
+        super(erodeFaces, erodeRec, fillFaces, fillRec);
     }
 }
