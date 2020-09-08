@@ -25,7 +25,6 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -44,10 +43,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -56,6 +51,11 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -240,7 +240,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param options the regeneration options
      * @return true on success, false on failure
      */
-    default boolean regenerate(World world, Region region, Extent extent, RegenOptions options) {
+    default boolean regenerate(World world, Region region, Extent extent, RegenOptions options) throws Exception{
         throw new UnsupportedOperationException("This adapter does not support regeneration.");
     }
 

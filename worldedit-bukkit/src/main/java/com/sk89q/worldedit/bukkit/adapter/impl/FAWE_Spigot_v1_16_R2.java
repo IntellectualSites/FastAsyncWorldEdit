@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.server;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
@@ -27,16 +26,19 @@ import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.mc1_16_2.*;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BlockMaterial_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BukkitAdapter_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BukkitGetBlocks_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.FAWEWorldNativeAccess_1_16;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.MapChunkUtil_1_16_2;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Files;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -54,15 +56,50 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldguard.session.Session;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R2.BiomeBase;
+import net.minecraft.server.v1_16_R2.Block;
+import net.minecraft.server.v1_16_R2.BlockPosition;
+import net.minecraft.server.v1_16_R2.Chunk;
+import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R2.ChunkProviderServer;
+import net.minecraft.server.v1_16_R2.ChunkSection;
+import net.minecraft.server.v1_16_R2.ChunkStatus;
+import net.minecraft.server.v1_16_R2.Convertable;
+import net.minecraft.server.v1_16_R2.DynamicOpsNBT;
+import net.minecraft.server.v1_16_R2.Entity;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.EntityTypes;
+import net.minecraft.server.v1_16_R2.GeneratorSettings;
+import net.minecraft.server.v1_16_R2.IBlockData;
+import net.minecraft.server.v1_16_R2.IRegistry;
+import net.minecraft.server.v1_16_R2.IRegistryCustom;
+import net.minecraft.server.v1_16_R2.ItemStack;
+import net.minecraft.server.v1_16_R2.MinecraftKey;
+import net.minecraft.server.v1_16_R2.MinecraftServer;
+import net.minecraft.server.v1_16_R2.NBTBase;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import net.minecraft.server.v1_16_R2.NBTTagInt;
+import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_16_R2.PlayerChunk;
+import net.minecraft.server.v1_16_R2.RegistryReadOps;
+import net.minecraft.server.v1_16_R2.ResourceKey;
+import net.minecraft.server.v1_16_R2.TileEntity;
+import net.minecraft.server.v1_16_R2.World;
+import net.minecraft.server.v1_16_R2.WorldDataServer;
+import net.minecraft.server.v1_16_R2.WorldDimension;
+import net.minecraft.server.v1_16_R2.WorldLoadListener;
+import net.minecraft.server.v1_16_R2.WorldServer;
+import net.minecraft.server.v1_16_R2.WorldSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
@@ -73,23 +110,20 @@ import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.jnbt.StringTag;
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R2 parent;
@@ -253,7 +287,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             Supplier<CompoundTag> saveTag = () -> {
                 NBTTagCompound tag = new NBTTagCompound();
                 readEntityIntoTag(mcEntity, tag);
-                
+
                 //add Id for AbstractChangeSet to work
                 CompoundTag natve = (CompoundTag) toNative(tag);
                 natve.getValue().put("Id", new StringTag(id));
@@ -426,8 +460,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World world, Region region, Extent realExtent, RegenOptions options) {
-        WorldServer originalWorld = ((CraftWorld) world).getHandle();
+    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
+        WorldServer originalWorld = ((CraftWorld) bukkitWorld).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {
             return false;
@@ -437,22 +471,19 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         // register this just in case something goes wrong
         // normally it should be deleted at the end of this method
         saveFolder.deleteOnExit();
-        try {
-            org.bukkit.World.Environment env = world.getEnvironment();
-            org.bukkit.generator.ChunkGenerator gen = world.getGenerator();
-            Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
-            Convertable convertable = Convertable.a(tempDir);
-            ResourceKey worldDimKey = getWorldDimKey(env);
-            Convertable.ConversionSession session = convertable.c("worldeditregentempworld", worldDimKey);
+        org.bukkit.World.Environment env = bukkitWorld.getEnvironment();
+        org.bukkit.generator.ChunkGenerator gen = bukkitWorld.getGenerator();
+        Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
+        Convertable convertable = Convertable.a(tempDir);
+        ResourceKey<WorldDimension> worldDimKey = getWorldDimKey(env);
+        try (Convertable.ConversionSession session = convertable.c("worldeditregentempworld", worldDimKey)) {
             WorldDataServer originalWorldData = originalWorld.worldDataServer;
+
             long seed = options.getSeed().orElse(originalWorld.getSeed());
+
             WorldDataServer levelProperties = (WorldDataServer)originalWorld.getServer().getServer().getSaveData();
             RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, originalWorld.getServer().getServer().dataPackResources.h(), IRegistryCustom.b());
-            GeneratorSettings newOpts = (GeneratorSettings)GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap((tag) -> {
-                return GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic(nbtRegOps, tag), seed, new HashSet()));
-            }).result().orElseThrow(() -> {
-                return new IllegalStateException("Unable to map GeneratorOptions");
-            });
+            GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
             WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
             WorldServer freshWorld = new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new NoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen);
@@ -463,10 +494,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
                 extent.init(null, (x, z) -> new BukkitGetBlocks_1_16_2(freshWorld, x, z) {
                     @Override
-                    public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-                        Chunk cached = nmsWorld.getMinecraftWorld().getChunkIfLoaded(X, Z);
-                        if (cached != null) return cached;
-                        Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(X, Z));
+                    public Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
+                        Chunk cached = nmsWorld.getMinecraftWorld().getChunkIfLoaded(chunkX, chunkZ);
+                        if (cached != null) {
+                            return cached;
+                        }
+                        Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(chunkX, chunkZ));
                         while (!future.isDone()) {
                             // this feels so dirty
                             MinecraftServer.getServer().execute(() -> freshWorld.getChunkProvider().runTasks());
@@ -481,9 +514,9 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 for (BlockVector3 vec : region) {
                     realExtent.setBlock(vec, extent.getFullBlock(vec));
                 }
-                } finally {
-                    Fawe.get().getQueueHandler().endSet(true);
-                }
+            } finally {
+                Fawe.get().getQueueHandler().endSet(true);
+            }
         } catch (Throwable e) {
             throw new RuntimeException(e);
         } finally {
