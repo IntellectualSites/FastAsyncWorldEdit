@@ -47,7 +47,7 @@ jobs:
     - name: Download BuildTools
       run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
     - name: Run BuildTools
-      run: java -jar BuildTools.jar --rev latest
+      run: java -jar BuildTools.jar --rev 1.16.2
     - name: Test with Gradle
-      run: ./gradlew clean build -x test
+      run: ./gradlew clean build sourcesJar javadocJar
       
