@@ -2,7 +2,6 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -69,7 +68,7 @@ public class TemporalExtent extends PassthroughExtent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         if (position.getX() == bx && position.getZ() == bz) {
             return biome;
         }

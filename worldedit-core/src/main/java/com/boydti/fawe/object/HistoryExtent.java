@@ -7,7 +7,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -96,7 +95,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType newBiome) {
+    public boolean setBiome(BlockVector3 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockZ(), oldBiome, newBiome);
@@ -108,7 +107,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
-        BiomeType oldBiome = this.getBiome(BlockVector2.at(x, z));
+        BiomeType oldBiome = this.getBiome(BlockVector3.at(x, y, z));
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(x, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);

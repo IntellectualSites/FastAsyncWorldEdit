@@ -82,6 +82,10 @@ object NullChunk : IQueueChunk<Nothing> {
 
     }
 
+    override fun fullySupports3DBiomes(): Boolean {
+        return false
+    }
+
     override fun setBlockLight(x: Int, y: Int, z: Int, value: Int) {
 
     }

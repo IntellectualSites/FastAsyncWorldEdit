@@ -96,7 +96,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
@@ -144,13 +143,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-import java.util.UUID;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -763,7 +762,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean fullySupports3DBiomes() {
+        return this.getExtent().fullySupports3DBiomes();
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return this.getExtent().getBiome(position);
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         this.changes++;
         return this.getExtent().setBiome(position, biome);
     }
@@ -2916,8 +2925,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,
                               final String expressionString, final boolean hollow, final int timeout)
             throws ExpressionException, MaxChangedBlocksException {
-        final Vector2 zero2D = zero.toVector2();
-        final Vector2 unit2D = unit.toVector2();
 
         final Expression expression = Expression.compile(expressionString, "x", "z");
         expression.optimize();
@@ -2930,12 +2937,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final ArbitraryBiomeShape shape = new ArbitraryBiomeShape(region) {
             @Override
             protected BiomeType getBiome(int x, int y, int z, BiomeType defaultBiomeType) {
-                environment.setCurrentBlock(x, 0, z);
-                double scaledX = (x - zero2D.getX()) / unit2D.getX();
-                double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();
+                environment.setCurrentBlock(x, y, z);
+                double scaledX = (x - zero.getX()) / unit.getX();
+                double scaledY = (x - zero.getY()) / unit.getX();
+                double scaledZ = (z - zero.getZ()) / unit.getZ();
 
                 try {
-                    if (expression.evaluate(timeout, scaledX, scaledZ) <= 0) {
+                    if (expression.evaluate(timeout, scaledX, scaledY, scaledZ) <= 0) {
                         return null;
                     }
 

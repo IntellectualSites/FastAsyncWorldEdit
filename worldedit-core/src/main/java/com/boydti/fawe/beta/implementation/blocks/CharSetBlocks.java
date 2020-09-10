@@ -7,7 +7,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -198,8 +197,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(),0, position.getZ(), biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(),position.getY(), position.getZ(), biome);
     }
 
     @Override

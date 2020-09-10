@@ -31,7 +31,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -71,7 +70,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -144,7 +142,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     //createEntity was moved to IChunkExtent to prevent issues with Async Entitiy Add.
-    
+
     /**
      * Get the world handle.
      *
@@ -544,6 +542,13 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public boolean fullySupports3DBiomes() {
+        // Supports if API does and we're not in the overworld
+        return HAS_3D_BIOMES && getWorld().getEnvironment() != World.Environment.NORMAL;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
     public BiomeType getBiome(BlockVector3 position) {
         if (HAS_3D_BIOMES) {
             return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ()));
@@ -576,7 +581,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return setBiome(BlockVector2.at(x, z), biome);
+        return setBiome(BlockVector3.at(x, y, z), biome);
     }
 
     @Override

@@ -26,7 +26,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -87,7 +86,7 @@ public class RequestExtent implements Extent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         return getExtent().getBiome(position);
     }
 
@@ -103,18 +102,23 @@ public class RequestExtent implements Extent {
     }
 
     @Override
+    public boolean fullySupports3DBiomes() {
+        return getExtent().fullySupports3DBiomes();
+    }
+
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return getExtent().setTile(x, y, z, tile);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(BlockVector2.at(x,z), biome);
+        return getExtent().setBiome(BlockVector3.at(x, y, z), biome);
     }
 
     @Override

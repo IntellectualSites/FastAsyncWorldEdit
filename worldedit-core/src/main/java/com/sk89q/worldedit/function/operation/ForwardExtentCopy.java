@@ -39,7 +39,6 @@ import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -85,6 +84,10 @@ public class ForwardExtentCopy implements Operation {
     private Transform currentTransform = null;
     private int affectedBlocks;
     private RegionFunction filterFunction;
+    private RegionVisitor lastBiomeVisitor;
+    private EntityVisitor lastEntityVisitor;
+    private int affectedBiomeCols;
+    private int affectedEntities;
 
     /**
      * Create a new copy using the region's lowest minimum point as the
@@ -99,10 +102,6 @@ public class ForwardExtentCopy implements Operation {
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
         this(source, region, region.getMinimumPoint(), destination, to);
     }
-    private FlatRegionVisitor lastBiomeVisitor;
-    private EntityVisitor lastEntityVisitor;
-    private int affectedBiomeCols;
-    private int affectedEntities;
 
     /**
      * Create a new copy.
