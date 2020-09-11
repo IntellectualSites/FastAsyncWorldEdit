@@ -33,7 +33,7 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
 
     @Override
     public void applyBlock(FilterBlock block) {
-        if (mask.test(block, block)) {
+        if (mask.test(block)) {
             getParent().applyBlock(block);
             this.changes++;
         }

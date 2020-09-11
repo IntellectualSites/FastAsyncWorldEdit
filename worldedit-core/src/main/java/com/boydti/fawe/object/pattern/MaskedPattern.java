@@ -30,7 +30,7 @@ public class MaskedPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        if (mask.test(extent, get)) {
+        if (mask.test(get)) {
             return primary.apply(extent, get, set);
         }
         return secondary.apply(extent, get, set);

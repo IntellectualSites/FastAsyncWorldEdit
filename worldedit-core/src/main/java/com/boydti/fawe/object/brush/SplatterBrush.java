@@ -4,7 +4,6 @@ import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -38,10 +37,10 @@ public class SplatterBrush extends ScatterBrush {
 
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             @Override
-            public boolean test(Extent extent, BlockVector3 vector) {
+            public boolean test(BlockVector3 vector) {
                 double dist = vector.distanceSq(position);
                 if (dist < size2 && !placed.contains(vector) && ThreadLocalRandom.current().nextInt(5) < 2
-                        && surface.test(extent, vector)) {
+                        && surface.test(vector)) {
                     placed.add(vector);
                     return true;
                 }

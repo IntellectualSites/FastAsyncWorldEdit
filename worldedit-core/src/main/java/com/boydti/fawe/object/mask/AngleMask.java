@@ -124,53 +124,53 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         }
     }
 
-    public boolean adjacentAir(Extent extent, BlockVector3 v) {
+    public boolean adjacentAir(BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
-        if (!mask.test(extent, x + 1, y, z)) {
+        if (!mask.test(x + 1, y, z)) {
             return true;
         }
-        if (!mask.test(extent, x - 1, y, z)) {
+        if (!mask.test(x - 1, y, z)) {
             return true;
         }
-        if (!mask.test(extent, x, y, z + 1)) {
+        if (!mask.test(x, y, z + 1)) {
             return true;
         }
-        if (!mask.test(extent, x, y, z - 1)) {
+        if (!mask.test(x, y, z - 1)) {
             return true;
         }
-        if (y < 255 && !mask.test(extent, x, y + 1, z)) {
+        if (y < 255 && !mask.test(x, y + 1, z)) {
             return true;
         }
-        if (y > 0 && !mask.test(extent, x, y - 1, z)) {
+        if (y > 0 && !mask.test(x, y - 1, z)) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
+    public boolean test(BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
-            int height = getHeight(extent, x, y, z);
+            int height = getHeight(getExtent(), x, y, z);
             if (y <= height) {
                 return overlay ? (lastValue && y == height) : lastValue;
             }
         }
 
-        if (!mask.test(extent, x, y, z)) {
+        if (!mask.test(x, y, z)) {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !adjacentAir(extent, vector)) {
+            if (y < 255 && !adjacentAir(vector)) {
                 return lastValue = false;
             }
         }
-        return testSlope(extent, x, y, z);
+        return testSlope(getExtent(), x, y, z);
     }
 
 }

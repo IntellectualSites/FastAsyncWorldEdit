@@ -75,7 +75,7 @@ public class ExtentBuffer extends AbstractBufferingExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        if (mask.test(getExtent(), location)) {
+        if (mask.test(location)) {
             buffer.put(location, block.toBaseBlock());
             return true;
         }

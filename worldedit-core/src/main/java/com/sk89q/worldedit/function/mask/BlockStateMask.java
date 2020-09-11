@@ -36,7 +36,7 @@ public class BlockStateMask extends AbstractExtentMask {
 
     private final Map<String, String> states;
     private final boolean strict;
-    private Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
+    private final Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
 
     /**
      * Creates a mask that checks if a given block has the desired properties set to the desired value.
@@ -53,8 +53,8 @@ public class BlockStateMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
-        return test(vector.getBlock(extent));
+    public boolean test(BlockVector3 vector) {
+        return test(getExtent().getBlock(vector));
     }
 
     public boolean test(BlockState block) {

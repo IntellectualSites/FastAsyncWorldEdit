@@ -813,7 +813,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(getExtent(), mutablebv.setComponents(x, y, z))) {
+            if (filter.test(mutablebv.setComponents(x, y, z))) {
                 return y;
             }
         }
@@ -1144,7 +1144,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (direction.equals(BlockVector3.at(0, -1, 0))) {
             return fillXZ(origin, pattern, radius, depth, false);
         }
-        Mask mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this))).withExtent(getExtent());
+        Mask mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this)));
         // Want to replace blocks
         final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
 
@@ -1196,7 +1196,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 new BoundedHeightMask(
                         Math.max(origin.getBlockY() - depth + 1, getMinimumPoint().getBlockY()),
                         Math.min(getMaxY(), origin.getBlockY())),
-                Masks.negate(new ExistingBlockMask(this))).withExtent(getExtent());
+                Masks.negate(new ExistingBlockMask(this)));
         // Want to replace blocks
         BlockReplace replace = new BlockReplace(this, pattern);
 
@@ -1408,7 +1408,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             replaceBlocks(region, new Mask() {
                 @Override
-                public boolean test(Extent extent, BlockVector3 position) {
+                public boolean test(BlockVector3 position) {
                     int x = position.getBlockX();
                     int z = position.getBlockZ();
                     return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region
@@ -1669,7 +1669,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, getWorld().getMaxY()),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
-                liquidMask).withExtent(getExtent());
+                liquidMask);
         BlockReplace replace;
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
@@ -1680,7 +1680,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
-            if (mask.test(getExtent(), position)) {
+            if (mask.test(position)) {
                 visitor.visit(position);
             }
         }
@@ -1714,13 +1714,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
-        ).withExtent(getExtent());
+        );
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
-            if (liquidMask.test(getExtent(), position)) {
+            if (liquidMask.test(position)) {
                 visitor.visit(position);
             }
         }
@@ -2899,7 +2899,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             while (iter.hasNext()) {
                 final BlockVector3 current = iter.next();
                 iter.remove();
-                if (mask.test(getExtent(), current)) {
+                if (mask.test(current)) {
                     continue;
                 }
                 if (!outside.add(current)) {

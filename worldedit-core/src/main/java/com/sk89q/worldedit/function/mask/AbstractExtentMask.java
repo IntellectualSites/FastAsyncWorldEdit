@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,10 +39,6 @@ public abstract class AbstractExtentMask extends AbstractMask {
         setExtent(extent);
     }
 
-    @Override
-    public boolean test(BlockVector3 vector) {
-        return test(getExtent(), vector);
-    }
 
     /**
      * Get the extent.
@@ -64,9 +59,4 @@ public abstract class AbstractExtentMask extends AbstractMask {
         this.extent = extent;
     }
 
-    @Override
-    public Mask withExtent(Extent extent) {
-        setExtent(extent);
-        return this;
-    }
 }

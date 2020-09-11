@@ -42,7 +42,7 @@ public class FuzzyRegion extends AbstractRegion {
     }
 
     public void select(int x, int y, int z) {
-        RecursiveVisitor search = new RecursiveVisitor(mask.withExtent(extent), p -> {
+        RecursiveVisitor search = new RecursiveVisitor(mask, p -> {
             setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
             return true;
         }, 256);

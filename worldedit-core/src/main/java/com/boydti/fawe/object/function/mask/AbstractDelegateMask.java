@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.function.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
@@ -25,20 +24,10 @@ public class AbstractDelegateMask extends AbstractMask {
         return mask.test(vector);
     }
 
-    @Override
-    public boolean test(Extent extent, BlockVector3 pos) {
-        return mask.test(extent, pos);
-    }
-
     @Nullable
     @Override
     public Mask2D toMask2D() {
         return mask.toMask2D();
     }
 
-    @Override
-    public Mask withExtent(Extent extent) {
-        mask.withExtent(extent);
-        return this;
-    }
 }

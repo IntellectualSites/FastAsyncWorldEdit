@@ -579,7 +579,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                             int y = heights[index] & 0xFF;
                             mutable.mutX(x);
                             mutable.mutY(y);
-                            if (mask.test(this, mutable)) {
+                            if (mask.test(mutable)) {
                                 int newHeight = table.average(x, z, index);
                                 setLayerHeightRaw(index, newHeight);
                             }
@@ -641,7 +641,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (!mask.test(this, mutable)) {
+                if (!mask.test(mutable)) {
                     continue;
                 }
                 if (placed.containsRadius(x, z, distance)) {
@@ -691,7 +691,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (!mask.test(this, mutable)) {
+                if (!mask.test(mutable)) {
                     continue;
                 }
                 if (placed.containsRadius(x, z, distance)) {
@@ -1151,7 +1151,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     if (mask != null) {
                         mutable.mutX(z);
                         mutable.mutY(heights.getByte(index) & 0xFF);
-                        if (!mask.test(this, mutable)) {
+                        if (!mask.test(mutable)) {
                             continue;
                         }
                     }
@@ -1281,7 +1281,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     mutable.mutX(x);
                     mutable.mutY(heights.getByte(index) & 0xFF);
-                    if (mask.test(this, mutable)) {
+                    if (mask.test(mutable)) {
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
@@ -1358,7 +1358,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(this, mutable)) {
+                if (mask.test(mutable)) {
                     biomes.setByte(index, biomeByte);
                 }
             }
@@ -1501,7 +1501,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++, index++) {
                         filter.init(x, z, index);
-                        if (mask.test(this, filter)) {
+                        if (mask.test(filter)) {
                             pattern.apply(this, filter, filter);
                         }
                     }
@@ -1522,7 +1522,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++, index++) {
                         filter.init(x, z, index);
-                        if (mask.test(this, filter)) {
+                        if (mask.test(filter)) {
                             pattern.apply(this, filter, filter);
                         }
                     }
@@ -1542,7 +1542,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int index = 0;
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++, index++) {
-                        if (mask.test(this, filter)) {
+                        if (mask.test(filter)) {
                             pattern.apply(this, filter, filter);
                         }
                     }
@@ -1566,10 +1566,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         floorFilter.init(x, z, index);
                         mainFilter.init(x, z, index);
-                        if (mask.test(this, mainFilter)) {
+                        if (mask.test(mainFilter)) {
                             pattern.apply(this, mainFilter, mainFilter);
                         }
-                        if (mask.test(this, floorFilter)) {
+                        if (mask.test(floorFilter)) {
                             pattern.apply(this, floorFilter, floorFilter);
                         }
                     }
@@ -1887,7 +1887,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(this, mutable)) {
+                if (mask.test(mutable)) {
                     overlay.setInt(index, combined);
                 }
             }
@@ -1902,7 +1902,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(this, mutable)) {
+                if (mask.test(mutable)) {
                     floor.setInt(index, combined);
                 }
             }
@@ -1918,7 +1918,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(this, mutable)) {
+                if (mask.test(mutable)) {
                     main.setInt(index, combined);
                 }
             }
@@ -1934,7 +1934,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 int y = heights.getByte(index) & 0xFF;
                 mutable.mutX(x);
                 mutable.mutY(y);
-                if (mask.test(this, mutable)) {
+                if (mask.test(mutable)) {
                     floor.setInt(index, combined);
                     main.setInt(index, combined);
                 }

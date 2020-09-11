@@ -102,7 +102,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             max = max.getMaximum(location);
         }
 
-        if (mask.test(getExtent(), location)) {
+        if (mask.test(location)) {
             buffer.put(location, block.toBaseBlock());
             return true;
         } else {
@@ -126,7 +126,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             max = max.getMaximum(position);
         }
 
-        if (mask.test(getExtent(), position)) {
+        if (biomeMask.test(position)) {
             biomeBuffer.put(position, biome);
             return true;
         } else {
@@ -150,8 +150,8 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             max = max.getMaximum(BlockVector3.at(x, y, z));
         }
 
-        if (mask.test(getExtent(), BlockVector3.at(x, y, z))) {
-            biomeBuffer.put(BlockVector3.at(x, y, z), biome);
+        if (biomeMask.test(BlockVector2.at(x,z))) {
+            biomeBuffer.put(BlockVector2.at(x,z), biome);
             return true;
         } else {
             return getExtent().setBiome(x, y, z, biome);

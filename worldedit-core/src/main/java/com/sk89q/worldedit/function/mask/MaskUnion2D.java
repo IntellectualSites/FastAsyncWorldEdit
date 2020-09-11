@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 
 import java.util.Collection;
@@ -48,11 +47,11 @@ public class MaskUnion2D extends MaskIntersection2D {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector2 vector) {
+    public boolean test(BlockVector2 vector) {
         Collection<Mask2D> masks = getMasks();
 
         for (Mask2D mask : masks) {
-            if (mask.test(extent, vector)) {
+            if (mask.test(vector)) {
                 return true;
             }
         }
