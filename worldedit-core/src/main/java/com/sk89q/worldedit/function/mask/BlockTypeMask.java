@@ -110,8 +110,8 @@ public class BlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
-        return test(vector.getBlock(extent).getBlockType());
+    public boolean test(BlockVector3 vector) {
+        return test(getExtent().getBlock(vector).getBlockType());
     }
 
     @Override

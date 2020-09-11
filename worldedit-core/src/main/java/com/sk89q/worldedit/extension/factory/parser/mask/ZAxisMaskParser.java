@@ -43,6 +43,6 @@ public class ZAxisMaskParser extends SimpleInputParser<Mask> {
 
     @Override
     public Mask parseFromSimpleInput(String input, ParserContext context) {
-        return new ZAxisMask(context.getExtent());
+        return new ZAxisMask();
     }
 }

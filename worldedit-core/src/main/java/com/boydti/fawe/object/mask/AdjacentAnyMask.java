@@ -29,25 +29,25 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 v) {
-        return direction(extent, v) != null;
+    public boolean test(BlockVector3 v) {
+        return direction(v) != null;
     }
 
-    public BlockVector3 direction(Extent extent, BlockVector3 v) {
+    public BlockVector3 direction(BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
-        if (mask.test(extent, x + 1, y, z)) {
+        if (mask.test(x + 1, y, z)) {
             return mutable.setComponents(1, 0, 0);
-        } else if (mask.test(extent, x - 1, y, z)) {
+        } else if (mask.test(x - 1, y, z)) {
             return mutable.setComponents(-1, 0, 0);
-        } else if (mask.test(extent, x, y, z + 1)) {
+        } else if (mask.test(x, y, z + 1)) {
             return mutable.setComponents(0, 0, 1);
-        } else if (mask.test(extent, x, y, z - 1)) {
+        } else if (mask.test(x, y, z - 1)) {
             return mutable.setComponents(0, 0, -1);
-        } else if (y < 256 && mask.test(extent, x, y + 1, z)) {
+        } else if (y < 256 && mask.test(x, y + 1, z)) {
             return mutable.setComponents(0, 1, 0);
-        } else if (y > 0 && mask.test(extent, x, y - 1, z)) {
+        } else if (y > 0 && mask.test(x, y - 1, z)) {
             return mutable.setComponents(0, -1, 0);
         } else {
             return null;

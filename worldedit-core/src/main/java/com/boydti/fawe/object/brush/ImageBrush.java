@@ -88,8 +88,8 @@ public class ImageBrush implements Brush {
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
             private final MutableVector3 mutable = new MutableVector3();
             @Override
-            public boolean test(Extent extent, BlockVector3 vector) {
-                if (solid.test(extent, vector)) {
+            public boolean test(BlockVector3 vector) {
+                if (solid.test(vector)) {
                     int dx = vector.getBlockX() - cx;
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
