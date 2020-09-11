@@ -201,7 +201,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
 
                 if (lighting) {
 //                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                    boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
+                    boolean trustEdges = true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
                     PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                     playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
                         p.playerConnection.sendPacket(packet);
