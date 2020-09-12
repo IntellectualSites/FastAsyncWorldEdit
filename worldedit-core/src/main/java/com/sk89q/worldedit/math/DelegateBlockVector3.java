@@ -326,11 +326,6 @@ public class DelegateBlockVector3 extends BlockVector3 {
     }
 
     @Override
-    public boolean setBiome(Extent orDefault, BiomeType biome) {
-        return parent.setBiome(orDefault, biome);
-    }
-
-    @Override
     public int getOrdinal(Extent orDefault) {
         return parent.getOrdinal(orDefault);
     }

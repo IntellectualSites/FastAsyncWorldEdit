@@ -2,7 +2,6 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
@@ -62,11 +61,11 @@ public class PositionTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
-        mutable.mutY(0);
-        return super.getBiome(getPos(mutable).toBlockVector2());
+        mutable.mutY(position.getBlockY());
+        return super.getBiome(getPos(mutable));
     }
 
     @Override
@@ -81,11 +80,11 @@ public class PositionTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
-        mutable.mutY(0);
-        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
+        mutable.mutY(position.getBlockY());
+        return super.setBiome(getPos(mutable), biome);
     }
 
     public void setTransform(Transform transform) {

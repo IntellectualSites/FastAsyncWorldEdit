@@ -151,12 +151,6 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     }
 
     @Override
-    public boolean setBiome(Extent orDefault, BiomeType biome) {
-        setBiome(biome);
-        return true;
-    }
-
-    @Override
     public int getOrdinal(Extent orDefault) {
         return getOrdinal();
     }

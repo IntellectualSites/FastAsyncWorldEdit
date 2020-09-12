@@ -33,7 +33,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This biome change does not have an {@link Extent} assigned to it because
  * one will be taken from the passed {@link UndoContext}. If the context
  * does not have an extent (it is null), cryptic errors may occur.</p>
+ * @deprecated use {@link BiomeChange3D}
  */
+@Deprecated
 public class BiomeChange implements Change {
 
     private final BlockVector2 position;
@@ -85,12 +87,12 @@ public class BiomeChange implements Change {
 
     @Override
     public void undo(UndoContext context) throws WorldEditException {
-        checkNotNull(context.getExtent()).setBiome(position, previous);
+        checkNotNull(context.getExtent()).setBiome(position.toBlockVector3(), previous);
     }
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {
-        checkNotNull(context.getExtent()).setBiome(position, current);
+        checkNotNull(context.getExtent()).setBiome(position.toBlockVector3(), current);
     }
 
 }

@@ -41,7 +41,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
@@ -311,16 +311,17 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
         pasteBiomes &= Clipboard.this.hasBiomes();
 
-        MutableBlockVector2 mpos2d = new MutableBlockVector2();
-        mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        MutableBlockVector3 blockVector3 = new MutableBlockVector3();
+        blockVector3.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         for (BlockVector3 pos : this) {
             BaseBlock block = pos.getFullBlock(this);
             int xx = pos.getX() + relx;
-            int zz = pos.getZ() + relz;
+            int yy = pos.getZ() + relz;
+            int zz = pos.getY() + rely;
             if (hasBiomes() && pos.getBlockY() == 0) {
-                if (pasteBiomes && (xx != mpos2d.getBlockX() || zz != mpos2d.getBlockZ())) {
-                    mpos2d.setComponents(xx, zz);
-                    extent.setBiome(mpos2d, Clipboard.this.getBiome(BlockVector2.at(pos.getX(), pos.getZ())));
+                if (pasteBiomes && (xx != blockVector3.getBlockX() || zz != blockVector3.getBlockZ())) {
+                    blockVector3.setComponents(xx, yy, zz);
+                    extent.setBiome(blockVector3, Clipboard.this.getBiome(BlockVector3.at(pos.getX(), pos.getY(), pos.getZ())));
                 }
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {

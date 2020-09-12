@@ -45,7 +45,7 @@ object EmptyClipboard : Clipboard {
         return BlockTypes.AIR!!.defaultState
     }
 
-    override fun getBiome(position: BlockVector2): BiomeType? {
+    override fun getBiome(position: BlockVector3): BiomeType? {
         return null
     }
 
@@ -64,7 +64,11 @@ object EmptyClipboard : Clipboard {
         return false
     }
 
-    override fun setBiome(position: BlockVector2, biome: BiomeType): Boolean {
+    override fun setBiome(position: BlockVector3, biome: BiomeType): Boolean {
+        return false
+    }
+
+    override fun fullySupports3DBiomes(): Boolean {
         return false
     }
 

@@ -35,7 +35,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
@@ -155,11 +154,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                         values.remove("z");
 
                         values.put("Id", new StringTag(block.getNbtId()));
-                        values.put("Pos", new IntArrayTag(new int[]{
-                                x,
-                                y,
-                                z
-                        }));
+                        values.put("Pos", new IntArrayTag(new int[] { x, y, z }));
 
                         tileEntities.add(new CompoundTag(values));
                     }
@@ -218,7 +213,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             int z0 = min.getBlockZ() + z;
             for (int x = 0; x < width; x++) {
                 int x0 = min.getBlockX() + x;
-                BlockVector2 pt = BlockVector2.at(x0, z0);
+                BlockVector3 pt = BlockVector3.at(x0, min.getBlockY(), z0);
                 BiomeType biome = clipboard.getBiome(pt);
 
                 String biomeKey = biome.getId();

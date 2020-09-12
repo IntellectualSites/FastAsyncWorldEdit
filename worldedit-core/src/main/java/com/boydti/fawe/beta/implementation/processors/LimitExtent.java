@@ -16,7 +16,6 @@ import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -545,7 +544,7 @@ public class LimitExtent extends PassthroughExtent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         limit.THROW_MAX_CHECKS();
         try {
             return getExtent().getBiome(position);
@@ -614,7 +613,7 @@ public class LimitExtent extends PassthroughExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         limit.THROW_MAX_CHANGES();
         try {
             return getExtent().setBiome(position, biome);

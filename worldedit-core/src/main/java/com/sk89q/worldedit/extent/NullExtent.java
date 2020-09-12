@@ -98,6 +98,11 @@ public class NullExtent implements Extent {
     }
 
     @Override
+    public boolean fullySupports3DBiomes() {
+        return false;
+    }
+
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return false;
     }
