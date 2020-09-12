@@ -480,7 +480,7 @@ public class Settings extends Config {
         })
         public int MODE = 1;
         @Comment({"If existing lighting should be removed before relighting"})
-        public boolean REMOVE_FIRST = false;
+        public boolean REMOVE_FIRST = true;
     }
 
     public void reload(File file) {
