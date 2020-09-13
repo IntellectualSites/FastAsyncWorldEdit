@@ -381,8 +381,12 @@ public class FaweAPI {
             }
         }
         if (mode != RelightMode.NONE) {
-            relighter.fixSkyLighting();
-            relighter.fixBlockLighting();
+            if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                relighter.removeAndRelight(true);
+            } else {
+                relighter.fixSkyLighting();
+                relighter.fixBlockLighting();
+            }
         } else {
             relighter.removeLighting();
         }
