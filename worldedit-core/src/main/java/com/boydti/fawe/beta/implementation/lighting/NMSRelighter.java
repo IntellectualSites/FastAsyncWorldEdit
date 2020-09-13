@@ -39,7 +39,7 @@ public class NMSRelighter implements Relighter {
     private static final EnumProperty slabHalf;
 
     static {
-        stairDirection = (DirectionalProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("direction");
+        stairDirection = (DirectionalProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("facing");
         stairHalf = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
         stairShape = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("shape");
         slabHalf = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
@@ -182,11 +182,6 @@ public class NMSRelighter implements Relighter {
 
         // Make sure BlockTypes is initialised so we can check block characteristics later if needed
         BlockTypes.STONE.getMaterial();
-        for (Property<?> property : BlockTypes.SANDSTONE_STAIRS.getDefaultState().getStates().keySet()) {
-            System.out.println(property.getClass().getCanonicalName());
-            System.out.println(property.getName());
-            System.out.println(property.getValues());
-        }
 
         Iterator<Map.Entry<Long, long[][][]>> iter = map.entrySet().iterator();
         while (iter.hasNext() && size-- > 0) {
@@ -279,14 +274,14 @@ public class NMSRelighter implements Relighter {
             }
             if (id.contains("slab")) {
                 boolean top = state.getState(slabHalf).equalsIgnoreCase("top");
-                computeSlab(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, iChunk, top);
+                computeSlab(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, top);
             } else if (id.contains("stair")) {
                 boolean top = state.getState(stairHalf).equalsIgnoreCase("top");
                 Direction direction = getStairDir(state);
                 String shape = getStairShape(state);
-                computeStair(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, iChunk, top, direction, shape);
+                computeStair(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, top, direction, shape);
             } else {
-                computeNormal(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, iChunk);
+                computeNormal(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited);
             }
         }
     }
@@ -297,20 +292,22 @@ public class NMSRelighter implements Relighter {
                               int currentLight,
                               Queue<MutableBlockVector3> queue,
                               Map<MutableBlockVector3, Object> visited,
-                              ChunkHolder<?> iChunk,
                               boolean top,
                               Direction direction,
                               String shape) {
         east:
         {
             // Block East
-            if (direction != Direction.WEST && !shape.contains("outer") && !((direction == Direction.NORTH && !shape.equals("inner_left")) || (
-                direction == Direction.SOUTH && !shape.equals("inner_right")) || direction == Direction.EAST)) {
+            if (direction != Direction.WEST && !((direction == Direction.NORTH && !shape.equals("inner_left")) || (direction == Direction.SOUTH
+                && !shape.equals("inner_right")) || (direction == Direction.EAST && shape.contains("outer")))) {
                 break east;
             }
-            ChunkHolder<?> quickChunk = checkQuickChunkEast(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x + 1, y, z);
+            BlockState state = this.queue.getBlock(x + 1, y, z);
             if (!(checkStairEast(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
+                break east;
+            }
+            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+                this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
                 break east;
             }
             Direction otherDir = getStairDir(state);
@@ -337,12 +334,12 @@ public class NMSRelighter implements Relighter {
                     }
                     break;
                 case SOUTH:
-                    if (!(shape.contains("outer") || b1)) {
+                    if (shape.equals("inner_left") || b1 || (otherDir == Direction.SOUTH && otherShape.equals("inner_right"))) {
                         break east;
                     }
                     break;
                 case NORTH:
-                    if (!(shape.contains("outer") || b2)) {
+                    if (shape.equals("inner_right") || b2 || (otherDir == Direction.NORTH && otherShape.equals("inner_left"))) {
                         break east;
                     }
                     break;
@@ -352,13 +349,16 @@ public class NMSRelighter implements Relighter {
         west:
         {
             // Block West
-            if (direction != Direction.EAST && !shape.contains("outer") && !((direction == Direction.SOUTH && !shape.equals("inner_left")) || (
-                direction == Direction.NORTH && !shape.equals("inner_right")) || direction == Direction.WEST)) {
+            if (direction != Direction.EAST && !((direction == Direction.SOUTH && !shape.equals("inner_left")) || (direction == Direction.NORTH
+                && !shape.equals("inner_right")) || (direction == Direction.WEST && shape.contains("outer")))) {
                 break west;
             }
-            ChunkHolder<?> quickChunk = checkQuickChunkWest(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x - 1, y, z);
+            BlockState state = this.queue.getBlock(x - 1, y, z);
             if (!(checkStairWest(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
+                break west;
+            }
+            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+                this.computeSpreadBlockLight(x - 1, y, z, currentLight, queue, visited);
                 break west;
             }
             Direction otherDir = getStairDir(state);
@@ -385,12 +385,12 @@ public class NMSRelighter implements Relighter {
                     }
                     break;
                 case NORTH:
-                    if (!(shape.contains("outer") || b1)) {
+                    if (shape.equals("inner_left") || b1 || (otherDir == Direction.NORTH && otherShape.equals("inner_right"))) {
                         break west;
                     }
                     break;
                 case SOUTH:
-                    if (!(shape.contains("outer") || b2)) {
+                    if (shape.equals("inner_right") || b2 || (otherDir == Direction.SOUTH && otherShape.equals("inner_left"))) {
                         break west;
                     }
                     break;
@@ -400,13 +400,16 @@ public class NMSRelighter implements Relighter {
         south:
         {
             // Block South
-            if (direction != Direction.NORTH && !shape.contains("outer") && !((direction == Direction.WEST && !shape.equals("inner_left")) || (
-                direction == Direction.EAST && !shape.equals("inner_right")) || direction == Direction.SOUTH)) {
+            if (direction != Direction.NORTH && !((direction == Direction.WEST && !shape.equals("inner_left")) || (direction == Direction.EAST
+                && !shape.equals("inner_right")) || (direction == Direction.SOUTH && shape.contains("outer")))) {
                 break south;
             }
-            ChunkHolder<?> quickChunk = checkQuickChunkSouth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z + 1);
+            BlockState state = this.queue.getBlock(x, y, z + 1);
             if (!(checkStairSouth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
+                break south;
+            }
+            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+                this.computeSpreadBlockLight(x, y, z + 1, currentLight, queue, visited);
                 break south;
             }
             Direction otherDir = getStairDir(state);
@@ -433,12 +436,12 @@ public class NMSRelighter implements Relighter {
                     }
                     break;
                 case WEST:
-                    if (!(shape.contains("outer") || b1)) {
+                    if (shape.equals("inner_left") || b1 || (otherDir == Direction.WEST && otherShape.equals("inner_right"))) {
                         break south;
                     }
                     break;
                 case EAST:
-                    if (!(shape.contains("outer") || b2)) {
+                    if (shape.equals("inner_right") || b2 || (otherDir == Direction.EAST && otherShape.equals("inner_left"))) {
                         break south;
                     }
                     break;
@@ -448,13 +451,16 @@ public class NMSRelighter implements Relighter {
         north:
         {
             // Block North
-            if (direction != Direction.SOUTH && !shape.contains("outer") && !((direction == Direction.EAST && !shape.equals("inner_left")) || (
-                direction == Direction.WEST && !shape.equals("inner_right")) || direction == Direction.NORTH)) {
+            if (direction != Direction.SOUTH && !((direction == Direction.EAST && !shape.equals("inner_left")) || (direction == Direction.WEST
+                && !shape.equals("inner_right")) || (direction == Direction.NORTH && shape.contains("outer")))) {
                 break north;
             }
-            ChunkHolder<?> quickChunk = checkQuickChunkNorth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z - 1);
+            BlockState state = this.queue.getBlock(x, y, z - 1);
             if (!(checkStairNorth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
+                break north;
+            }
+            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+                this.computeSpreadBlockLight(x, y, z - 1, currentLight, queue, visited);
                 break north;
             }
             Direction otherDir = getStairDir(state);
@@ -481,24 +487,19 @@ public class NMSRelighter implements Relighter {
                     }
                     break;
                 case EAST:
-                    if (!(shape.contains("outer") || b1)) {
+                    if (shape.equals("inner_left") || b1 || (otherDir == Direction.EAST && otherShape.equals("inner_right"))) {
                         break north;
                     }
                     break;
                 case WEST:
-                    if (!(shape.contains("outer") || b2)) {
+                    if (shape.equals("inner_right") || b2 || (otherDir == Direction.WEST && otherShape.equals("inner_left"))) {
                         break north;
                     }
                     break;
             }
             this.computeSpreadBlockLight(x, y, z - 1, currentLight, queue, visited);
         }
-        if (y > 0 && top) {
-            this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
-        }
-        if (y < 255 && !top) {
-            this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
-        }
+        computeUpDown(x, y, z, currentLight, queue, visited, top);
 
     }
 
@@ -508,145 +509,92 @@ public class NMSRelighter implements Relighter {
                              int currentLight,
                              Queue<MutableBlockVector3> queue,
                              Map<MutableBlockVector3, Object> visited,
-                             ChunkHolder<?> iChunk,
                              boolean top) {
         {
             // Block East
-            ChunkHolder<?> quickChunk = checkQuickChunkEast(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x + 1, y, z);
+            BlockState state = this.queue.getBlock(x + 1, y, z);
             if (checkStairEast(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom")) {
                 this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
             }
         }
         {
             // Block West
-            ChunkHolder<?> quickChunk = checkQuickChunkWest(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x - 1, y, z);
+            BlockState state = this.queue.getBlock(x - 1, y, z);
             if (checkStairWest(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom")) {
-                this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
+                this.computeSpreadBlockLight(x - 1, y, z, currentLight, queue, visited);
             }
         }
         {
             // Block South
-            ChunkHolder<?> quickChunk = checkQuickChunkSouth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z + 1);
+            BlockState state = this.queue.getBlock(x, y, z + 1);
             if (checkStairSouth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom")) {
                 this.computeSpreadBlockLight(x, y, z + 1, currentLight, queue, visited);
             }
         }
         {
             // Block North
-            ChunkHolder<?> quickChunk = checkQuickChunkNorth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z - 1);
+            BlockState state = this.queue.getBlock(x, y, z - 1);
             if (checkStairNorth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom")) {
                 this.computeSpreadBlockLight(x, y, z - 1, currentLight, queue, visited);
             }
         }
-        if (y > 0 && top) {
-            this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
-        }
-        if (y < 255 && !top) {
-            this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
-        }
+        computeUpDown(x, y, z, currentLight, queue, visited, top);
     }
 
-    private void computeNormal(int x,
+    private void computeUpDown(int x,
                                int y,
                                int z,
                                int currentLight,
                                Queue<MutableBlockVector3> queue,
                                Map<MutableBlockVector3, Object> visited,
-                               ChunkHolder<?> iChunk) {
+                               boolean top) {
+        BlockState state = this.queue.getBlock(x, y - 1, z);
+        if (y > 0 && top && isSlabOrTrueValue(state, "bottom") && isStairOrTrueTop(state, false)) {
+            this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
+        }
+        state = this.queue.getBlock(x, y + 1, z);
+        if (y < 255 && !top && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, true)) {
+            this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
+        }
+    }
+
+    private void computeNormal(int x, int y, int z, int currentLight, Queue<MutableBlockVector3> queue, Map<MutableBlockVector3, Object> visited) {
         {
             // Block East
-            ChunkHolder<?> quickChunk = checkQuickChunkEast(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x + 1, y, z);
-            if (checkStairEast(state)) {
+            BlockState state = this.queue.getBlock(x + 1, y, z);
+            if (checkStairEast(state) && (isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "bottom"))) {
                 this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
             }
         }
         {
             // Block West
-            ChunkHolder<?> quickChunk = checkQuickChunkWest(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x - 1, y, z);
-            if (checkStairWest(state)) {
-                this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
+            BlockState state = this.queue.getBlock(x - 1, y, z);
+            if (checkStairWest(state) && (isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "bottom"))) {
+                this.computeSpreadBlockLight(x - 1, y, z, currentLight, queue, visited);
             }
         }
         {
             // Block South
-            ChunkHolder<?> quickChunk = checkQuickChunkSouth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z + 1);
-            if (checkStairSouth(state)) {
+            BlockState state = this.queue.getBlock(x, y, z + 1);
+            if (checkStairSouth(state) && (isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "bottom"))) {
                 this.computeSpreadBlockLight(x, y, z + 1, currentLight, queue, visited);
             }
         }
         {
             // Block North
-            ChunkHolder<?> quickChunk = checkQuickChunkNorth(x, y, z, iChunk);
-            BlockState state = quickChunk.getBlock(x, y, z - 1);
-            if (checkStairNorth(state)) {
+            BlockState state = this.queue.getBlock(x, y, z - 1);
+            if (checkStairNorth(state) && (isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "bottom"))) {
                 this.computeSpreadBlockLight(x, y, z - 1, currentLight, queue, visited);
             }
         }
-        if (y > 0) {
+        BlockState state = this.queue.getBlock(x, y - 1, z);
+        if (y > 0 && isSlabOrTrueValue(state, "bottom") && isStairOrTrueTop(state, false)) {
             this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
         }
-        if (y < 255) {
+        state = this.queue.getBlock(x, y + 1, z);
+        if (y < 255 && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, false)) {
             this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
         }
-    }
-
-    private ChunkHolder<?> checkQuickChunkEast(int x, int y, int z, ChunkHolder<?> iChunk) {
-        ChunkHolder<?> quickChunk;
-        if ((z & 15) == 15) {
-            quickChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk((x >> 4) + 1, z >> 4);
-            if (!quickChunk.isInit()) {
-                quickChunk.init(this.queue, (x >> 4) + 1, z >> 4);
-            }
-        } else {
-            quickChunk = iChunk;
-        }
-        return quickChunk;
-    }
-
-    private ChunkHolder<?> checkQuickChunkWest(int x, int y, int z, ChunkHolder<?> iChunk) {
-        ChunkHolder<?> quickChunk;
-        if ((z & 15) == 0) {
-            quickChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk((x >> 4) - 1, z >> 4);
-            if (!quickChunk.isInit()) {
-                quickChunk.init(this.queue, (x >> 4) - 1, z >> 4);
-            }
-        } else {
-            quickChunk = iChunk;
-        }
-        return quickChunk;
-    }
-
-    private ChunkHolder<?> checkQuickChunkSouth(int x, int y, int z, ChunkHolder<?> iChunk) {
-        ChunkHolder<?> quickChunk;
-        if ((z & 15) == 15) {
-            quickChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk(x >> 4, (z >> 4) + 1);
-            if (!quickChunk.isInit()) {
-                quickChunk.init(this.queue, x >> 4, (z >> 4) + 1);
-            }
-        } else {
-            quickChunk = iChunk;
-        }
-        return quickChunk;
-    }
-
-    private ChunkHolder<?> checkQuickChunkNorth(int x, int y, int z, ChunkHolder<?> iChunk) {
-        ChunkHolder<?> quickChunk;
-        if ((z & 15) == 0) {
-            quickChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk(x >> 4, (z >> 4) - 1);
-            if (!quickChunk.isInit()) {
-                quickChunk.init(this.queue, x >> 4, (z >> 4) - 1);
-            }
-        } else {
-            quickChunk = iChunk;
-        }
-        return quickChunk;
     }
 
     private boolean checkStairNorth(BlockState state) {
@@ -777,16 +725,15 @@ public class NMSRelighter implements Relighter {
                                          Map<MutableBlockVector3, Object> visited) {
         BlockMaterial material = this.queue.getBlock(x, y, z).getMaterial();
         boolean solidNeedsLight = (!material.isSolid() || !material.isFullCube()) && material.getLightOpacity() > 0 && material.getLightValue() == 0;
-        int noOpacity = currentLight - 1;
-        currentLight = currentLight - Math.max(1, material.getLightOpacity());
-        if (currentLight > 0 || (solidNeedsLight && noOpacity > 0)) {
+        currentLight = !solidNeedsLight ? currentLight - Math.max(1, material.getLightOpacity()) : currentLight - 1;
+        if (currentLight > 0) {
             ChunkHolder<?> iChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk(x >> 4, z >> 4);
             if (!iChunk.isInit()) {
                 iChunk.init(this.queue, x >> 4, z >> 4);
             }
             int current = iChunk.getEmmittedLight(x & 15, y, z & 15);
-            if ((!solidNeedsLight && currentLight > current) || (solidNeedsLight && noOpacity > current)) {
-                iChunk.setBlockLight(x, y, z, solidNeedsLight ? noOpacity : currentLight);
+            if (currentLight > current) {
+                iChunk.setBlockLight(x & 15, y, z & 15, currentLight);
                 mutableBlockPos.setComponents(x, y, z);
                 if (!visited.containsKey(mutableBlockPos)) {
                     visited.put(new MutableBlockVector3(x, y, z), present);
