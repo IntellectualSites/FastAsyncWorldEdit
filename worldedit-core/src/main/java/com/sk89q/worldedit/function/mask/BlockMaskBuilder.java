@@ -39,7 +39,7 @@ public class BlockMaskBuilder {
     private static final Operator LESS_EQUAL = (a, b) -> a <= b;
     private static final Operator NOT = (a, b) -> a != b;
 
-    private final static long[] ALL = new long[0];
+    private static final long[] ALL = new long[0];
 
     private interface Operator {
         boolean test(int left, int right);
@@ -147,8 +147,7 @@ public class BlockMaskBuilder {
                         boolean filtered = false;
                         if (type != null) {
                             filtered = filterRegexOrOperator(type, key, operator, charSequence);
-                        }
-                        else {
+                        } else {
                             for (BlockType myType : blockTypeList) {
                                 filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
                             }
@@ -328,10 +327,11 @@ public class BlockMaskBuilder {
                 set = FastBitSet.get(states, stateId);
                 Arrays.fill(states, 0);
             }
-            if (set)
+            if (set) {
                 FastBitSet.set(states, stateId);
-            else
+            } else {
                 bitSets[i] = null;
+            }
             reset(true);
         }
         return this;

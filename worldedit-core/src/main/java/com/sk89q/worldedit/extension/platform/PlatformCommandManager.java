@@ -837,6 +837,7 @@ public final class PlatformCommandManager {
                 }
                 throw t;
             }
+
             event.setSuggestions(suggestions.stream()
                 .map(suggestion -> {
                     int noSlashLength = arguments.length() - 1;

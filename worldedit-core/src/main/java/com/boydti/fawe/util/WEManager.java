@@ -26,7 +26,7 @@ public class WEManager {
 
     private static final Logger log = LoggerFactory.getLogger(WEManager.class);
 
-    public final static WEManager IMP = new WEManager();
+    public static final WEManager IMP = new WEManager();
 
     public final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
@@ -53,10 +53,7 @@ public class WEManager {
     }
 
     /**
-     * Get a player's mask
-     *
-     * @param player
-     * @return
+     * Get a player's mask.
      */
     public Region[] getMask(Player player, FaweMaskManager.MaskType type) {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
@@ -98,7 +95,9 @@ public class WEManager {
                         }
                     }
                 }
-                if (!removed) return regions.toArray(new Region[0]);
+                if (!removed) {
+                    return regions.toArray(new Region[0]);
+                }
                 masks.clear();
             }
         }
@@ -106,12 +105,16 @@ public class WEManager {
         for (FaweMaskManager manager : managers) {
             if (player.hasPermission("fawe." + manager.getKey())) {
                 try {
-                    if (manager.isExclusive() && !masks.isEmpty()) continue;
+                    if (manager.isExclusive() && !masks.isEmpty()) {
+                        continue;
+                    }
                     final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
                     if (mask != null) {
                         regions.add(mask.getRegion());
                         masks.add(mask);
-                        if (manager.isExclusive()) break;
+                        if (manager.isExclusive()) {
+                            break;
+                        }
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -139,9 +142,8 @@ public class WEManager {
         BlockVector3 rg2P1 = region2.getMinimumPoint();
         BlockVector3 rg2P2 = region2.getMaximumPoint();
 
-        return rg1P1.getBlockX() <= rg2P2.getBlockX() && rg1P2.getBlockX() >= rg2P1.getBlockX() &&
-            rg1P1.getBlockZ() <= rg2P2.getBlockZ() &&
-            rg1P2.getBlockZ() >= rg2P1.getBlockZ();
+        return rg1P1.getBlockX() <= rg2P2.getBlockX() && rg1P2.getBlockX() >= rg2P1.getBlockX()
+            && rg1P1.getBlockZ() <= rg2P2.getBlockZ() && rg1P2.getBlockZ() >= rg2P1.getBlockZ();
     }
 
     public boolean regionContains(Region selection, HashSet<Region> mask) {

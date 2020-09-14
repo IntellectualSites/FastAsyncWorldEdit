@@ -131,7 +131,8 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
-    public void test(Player player, EditSession editSession, @Arg(desc = "test") double testValue) throws WorldEditException {
+    public void test(Player player, EditSession editSession,
+                     @Arg(desc = "test") double testValue) throws WorldEditException {
         player.print(TextComponent.of(testValue));
     }
 
@@ -316,9 +317,9 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/lay",
-            desc = "Set the top block in the region"
-)
+        name = "/lay",
+        desc = "Set the top block in the region"
+    )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
@@ -412,7 +413,8 @@ public class RegionCommands {
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
                           Mask mask,
-        @Switch(name = 's', desc = "TODO") boolean snow) throws WorldEditException {
+                      @Switch(name = 's', desc = "TODO")
+                          boolean snow) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
@@ -527,14 +529,16 @@ public class RegionCommands {
             desc = "Have the blocks in the selection fall",
             descFooter = "Make the blocks in the selection fall\n" +
                    "The -m flag will only fall within the vertical selection."
-)
+    )
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
     @Confirm(Confirm.Processor.REGION)
     public void fall(Player player, EditSession editSession, LocalSession session,
                      @Selection Region region,
-                     @Arg(desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
-                     @Switch(name = 'm', desc = "TODO") boolean notFullHeight) throws WorldEditException {
+                     @Arg(desc = "BlockStateHolder", def = "air")
+                             BlockStateHolder replace,
+                     @Switch(name = 'm', desc = "TODO")
+                             boolean notFullHeight) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
         player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
     }
@@ -604,8 +608,8 @@ public class RegionCommands {
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void regenerateChunk(Actor actor, World world, LocalSession session,
-            EditSession editSession, @Selection Region region) throws WorldEditException {
+    public void regenerateChunk(Actor actor, World world, LocalSession session, EditSession editSession,
+                                @Selection Region region) throws WorldEditException {
         Mask mask = session.getMask();
         boolean success;
         try {
@@ -626,9 +630,9 @@ public class RegionCommands {
     @Command(
         name = "/deform",
         desc = "Deforms a selected region with an expression",
-        descFooter = "The expression is executed for each block and is expected\n" +
-            "to modify the variables x, y and z to point to a new block\n" +
-            "to fetch. See also https://tinyurl.com/weexpr"
+        descFooter = "The expression is executed for each block and is expected\n"
+            + "to modify the variables x, y and z to point to a new block\n"
+            + "to fetch. See also https://tinyurl.com/weexpr"
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
@@ -665,9 +669,15 @@ public class RegionCommands {
             zero = max.add(min).divide(2);
             unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit = unit.withX(1.0);
-            if (unit.getY() == 0) unit = unit.withY(1.0);
-            if (unit.getZ() == 0) unit = unit.withZ(1.0);
+            if (unit.getX() == 0) {
+                unit = unit.withX(1.0);
+            }
+            if (unit.getY() == 0) {
+                unit = unit.withY(1.0);
+            }
+            if (unit.getZ() == 0) {
+                unit = unit.withZ(1.0);
+            }
         }
 
         final Vector3 unit1 = unit;
@@ -701,7 +711,8 @@ public class RegionCommands {
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
-                      @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask) throws WorldEditException {
+                      @ArgFlag(name = 'm', desc = "Mask to hollow with")
+                              Mask mask) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
 

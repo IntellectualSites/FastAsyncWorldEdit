@@ -94,8 +94,8 @@ public class BlobBrush implements Brush {
                         double distSqr = x * x * modX + z * z * modZ + y * y * modY;
 
                         double distance =
-                        Math.sqrt(distSqr) * sphericity +
-                        MathMan.max(manDist, xScaled * manScaleX, yScaled * manScaleY, zScaled * manScaleZ) * roughness;
+                            Math.sqrt(distSqr) * sphericity +
+                                MathMan.max(manDist, xScaled * manScaleX, yScaled * manScaleY, zScaled * manScaleZ) * roughness;
 
                         double noise = this.amplitude * SimplexNoise.noise(seedX + x * distort, seedZ + z * distort, seedZ + z * distort);
                         if (distance + distance * noise < radius) {

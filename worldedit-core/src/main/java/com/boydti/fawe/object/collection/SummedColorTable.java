@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 /**
- * Efficient blur / average color over an image
+ * Efficient blur / average color over an image.
  */
 public class SummedColorTable {
     private final long[] reds, greens, blues, alpha;

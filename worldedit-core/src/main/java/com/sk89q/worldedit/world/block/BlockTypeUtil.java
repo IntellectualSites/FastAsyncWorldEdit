@@ -59,7 +59,9 @@ public class BlockTypeUtil {
             case BlockID.STONE_BRICK_SLAB:
             case BlockID.STONE_SLAB: {
                 String state = (String) block.getState(PropertyKey.TYPE);
-                if (state == null) return 0;
+                if (state == null) {
+                    return 0;
+                }
                 switch (state) {
                     case "double":
                     case "bottom":

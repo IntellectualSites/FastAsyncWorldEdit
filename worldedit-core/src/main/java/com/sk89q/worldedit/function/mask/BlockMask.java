@@ -182,6 +182,7 @@ public class BlockMask extends ABlockMask {
     public Collection<BaseBlock> getBlocks() {
         return Collections.emptyList(); //TODO Not supported in FAWE yet
     }
+
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() <= 3;
@@ -321,7 +322,7 @@ public class BlockMask extends ABlockMask {
         for (int i = 0; i < cloned.length; i++) {
             cloned[i] = !cloned[i];
         }
-        if(replacesAir()){
+        if (replacesAir()) {
             cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;

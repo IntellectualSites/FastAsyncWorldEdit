@@ -66,6 +66,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+
     /**
      * Construct a block with a state.
      *

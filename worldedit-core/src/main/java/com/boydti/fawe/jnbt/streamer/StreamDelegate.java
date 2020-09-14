@@ -100,7 +100,9 @@ public class StreamDelegate {
             default: {
                 for (; index < keys.length; index++) {
                     byte[] key = keys[index];
-                    if (key.length < nameLength) continue;
+                    if (key.length < nameLength) {
+                        continue;
+                    }
                     if (key.length == nameLength) {
                         break;
                     } else {

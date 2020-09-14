@@ -90,7 +90,7 @@ public class FaweAPI {
 
     /**
      * You can either use a IQueueExtent or an EditSession to change blocks<br>
-     * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
+     * - The IQueueExtent skips a bit of overhead, so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
      * Remember to commit when you're done!<br>
      *

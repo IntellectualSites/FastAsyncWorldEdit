@@ -54,13 +54,13 @@ public final class BitArrayUnstretched {
         int longIndexStart = bitIndexStart >> 6;
 
         int localBitIndexStart = bitIndexStart & 63;
-        return (int)(this.data[longIndexStart] >>> localBitIndexStart & mask);
+        return (int) (this.data[longIndexStart] >>> localBitIndexStart & mask);
     }
 
     public int getLength() {
         return longLen;
     }
-    
+
     public final void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;

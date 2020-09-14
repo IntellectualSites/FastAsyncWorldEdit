@@ -33,9 +33,8 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
      *
      * @return a block bag, which may be null if none is used
      */
-    public
     @Nullable
-    BlockBag getBlockBag() {
+    public BlockBag getBlockBag() {
         return blockBag;
     }
 

@@ -58,8 +58,8 @@ public class TemporalExtent extends PassthroughExtent {
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
-            if(block instanceof BaseBlock) {
-                return (BaseBlock)block;
+            if (block instanceof BaseBlock) {
+                return (BaseBlock) block;
             } else {
                 return block.toBaseBlock();
             }

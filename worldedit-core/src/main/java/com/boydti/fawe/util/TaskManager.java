@@ -297,7 +297,7 @@ public abstract class TaskManager {
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Run a task on the main thread when the TPS is high enough, and wait for execution to finish.
      * - Useful if you need to access something from the Bukkit API from another thread<br>

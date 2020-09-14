@@ -49,8 +49,8 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      *
      * @param zipFile the ZIP file
      * @param folder the folder to look into
-     * @throws IOException
-     * @throws ZipException
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public TrueZipMcRegionChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -64,8 +64,8 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      * be detected.
      *
      * @param zipFile the ZIP file
-     * @throws IOException
-     * @throws ZipException
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public TrueZipMcRegionChunkStore(File zipFile) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -79,8 +79,8 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      * @param name the name
      * @param worldName the world name
      * @return an input stream
-     * @throws IOException
-     * @throws DataException
+     * @throws IOException if there is an error getting the chunk data
+     * @throws DataException if there is an error getting the chunk data
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -97,11 +97,18 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
             for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements(); ) {
                 ZipEntry testEntry = e.nextElement();
                 // Check for world
-                if (worldPattern.matcher(testEntry.getName()).matches()) {
+                String entryName = testEntry.getName();
+                if (worldPattern.matcher(entryName).matches()) {
                     // Check for file
-                    if (pattern.matcher(testEntry.getName()).matches()) {
-                        folder = testEntry.getName().substring(0, testEntry.getName().lastIndexOf('/'));
-                        if (folder.endsWith("poi")) continue;
+                    if (pattern.matcher(entryName).matches()) {
+                        int endIndex = entryName.lastIndexOf('/');
+                        if (endIndex < 0) {
+                            endIndex = entryName.lastIndexOf('\\');
+                        }
+                        folder = entryName.substring(0, endIndex);
+                        if (folder.endsWith("poi")) {
+                            continue;
+                        }
                         name = folder + "/" + name;
                         break;
                     }
