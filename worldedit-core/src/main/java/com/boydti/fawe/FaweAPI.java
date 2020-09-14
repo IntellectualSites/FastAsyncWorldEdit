@@ -373,7 +373,7 @@ public class FaweAPI {
             }
         }
 
-        NMSRelighter relighter = new NMSRelighter(queue);
+        NMSRelighter relighter = new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS);
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 relighter.addChunk(x, z, null, 65535);

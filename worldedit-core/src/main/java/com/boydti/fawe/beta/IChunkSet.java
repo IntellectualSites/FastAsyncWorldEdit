@@ -1,11 +1,14 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -33,6 +36,9 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     @Override
     void setSkyLight(int x, int y, int z, int value);
+
+    @Override
+    void setHeightMap(HeightMapType type, int[] heightMap);
 
     void setLightLayer(int layer, char[] toSet);
 
@@ -74,6 +80,10 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     default int getBitMask(){
         return -1;
+    }
+
+    default Map<HeightMapType, int[]> getHeightMaps() {
+        return new HashMap<>();
     }
 
     @Override

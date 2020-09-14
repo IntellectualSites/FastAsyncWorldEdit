@@ -5,11 +5,13 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
@@ -141,6 +143,12 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
         }
         long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+    }
+
+    @Override public int[] getHeightMap(HeightMapType type) {
+        long[] longArray = getChunk().heightMap.get(HeightMap.Type.valueOf(type.name())).a();
+        BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256, longArray);
+        return bitArray.toRaw(new int[256]);
     }
 
     @Override
@@ -359,6 +367,13 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                     }
                 }
 
+                Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
+                for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
+                    BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
+                    bitArray.fromRaw(entry.getValue());
+                    nmsChunk.heightMap.get(HeightMap.Type.valueOf(entry.getKey().name())).a(bitArray.getData());
+                }
+
                 boolean lightUpdate = false;
 
                 // Lighting
@@ -567,7 +582,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                 final int bitsPerEntry = (int) BukkitAdapter_1_16_2.fieldBitsPerEntry.get(bits);
                 final long[] blockStates = bits.a();
 
-                new BitArrayUnstretched(bitsPerEntry, blockStates).toRaw(data);
+                new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
 
                 int num_palette;
                 if (palette instanceof DataPaletteLinear) {

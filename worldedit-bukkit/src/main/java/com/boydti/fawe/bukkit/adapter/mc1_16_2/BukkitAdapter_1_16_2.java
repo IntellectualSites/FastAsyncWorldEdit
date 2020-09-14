@@ -253,7 +253,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             if (num_palette == 1) {
                 for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 

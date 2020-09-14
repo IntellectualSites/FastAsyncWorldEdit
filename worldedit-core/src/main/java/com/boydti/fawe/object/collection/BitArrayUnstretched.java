@@ -11,18 +11,28 @@ public final class BitArrayUnstretched {
     private final long mask;
     private final int longLen;
 
-    public BitArrayUnstretched(int bitsPerEntry, long[] buffer) {
+    public BitArrayUnstretched(int bitsPerEntry, int arraySize, long[] buffer) {
         this.bitsPerEntry = bitsPerEntry;
         this.mask = (1L << bitsPerEntry) - 1L;
         this.emptyBitCount = 64 % bitsPerEntry;
         this.maxSeqLocIndex = 64 - (bitsPerEntry + emptyBitCount);
         final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
-        this.longLen = MathMan.ceilZero((float) 4096 / blocksPerLong);
+        this.longLen = MathMan.ceilZero((float) arraySize / blocksPerLong);
         if (buffer.length < longLen) {
             this.data = new long[longLen];
         } else {
             this.data = buffer;
         }
+    }
+
+    public BitArrayUnstretched(int bitsPerEntry, int arraySize) {
+        this.bitsPerEntry = bitsPerEntry;
+        this.mask = (1L << bitsPerEntry) - 1L;
+        this.emptyBitCount = 64 % bitsPerEntry;
+        this.maxSeqLocIndex = 64 - bitsPerEntry;
+        final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
+        this.longLen = MathMan.ceilZero((float) arraySize / blocksPerLong);
+        this.data = new long[longLen];
     }
 
     public long[] getData() {
@@ -61,7 +71,7 @@ public final class BitArrayUnstretched {
         long l = 0;
         for (int i = 0; i < longLen; i++) {
             int lastVal;
-            for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
+            for (; localStart <= maxSeqLocIndex && arrI < arr.length; localStart += bitsPerEntry) {
                 lastVal = arr[arrI++];
                 l |= ((long) lastVal << localStart);
             }
@@ -85,7 +95,7 @@ public final class BitArrayUnstretched {
         for (int i = 0; i < longLen; i++) {
             long l = data[i];
             char lastVal;
-            for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
+            for (; localStart <= maxSeqLocIndex && arrI < buffer.length; localStart += bitsPerEntry) {
                 lastVal = (char) (l >>> localStart & this.mask);
                 buffer[arrI++] = lastVal;
             }
@@ -104,7 +114,7 @@ public final class BitArrayUnstretched {
         for (int i = 0; i < longLen; i++) {
             long l = data[i];
             char lastVal;
-            for (; localStart <= maxSeqLocIndex && arrI < 4096; localStart += bitsPerEntry) {
+            for (; localStart <= maxSeqLocIndex && arrI < buffer.length; localStart += bitsPerEntry) {
                 lastVal = (char) (l >>> localStart & this.mask);
                 buffer[arrI++] = lastVal;
             }

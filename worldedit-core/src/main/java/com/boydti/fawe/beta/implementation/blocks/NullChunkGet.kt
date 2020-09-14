@@ -4,6 +4,7 @@ import com.boydti.fawe.FaweCache
 import com.boydti.fawe.beta.IBlocks
 import com.boydti.fawe.beta.IChunkGet
 import com.boydti.fawe.beta.IChunkSet
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType
 import com.sk89q.jnbt.CompoundTag
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.world.biome.BiomeType
@@ -70,6 +71,10 @@ object NullChunkGet : IChunkGet {
 
     override fun getSkyLight(x: Int, y: Int, z: Int): Int {
         return 15
+    }
+
+    override fun getHeightMap(type: HeightMapType?): IntArray {
+        return IntArray(256)
     }
 
     override fun reset(): IBlocks? {

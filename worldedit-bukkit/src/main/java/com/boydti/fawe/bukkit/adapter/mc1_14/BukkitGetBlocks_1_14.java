@@ -5,6 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_14.nbt.LazyCompoundTag_1_14;
@@ -38,6 +39,7 @@ import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.EnumSkyBlock;
+import net.minecraft.server.v1_14_R1.HeightMap;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.LightEngine;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
@@ -185,6 +187,12 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         return blockLight[layer]
             .a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)),
                 SectionPosition.b(BlockPosition.d(l)));
+    }
+
+    @Override public int[] getHeightMap(HeightMapType type) {
+        long[] longArray = getChunk().heightMap.get(HeightMap.Type.valueOf(type.name())).a();
+        BitArray bitArray = new BitArray(9, 256, longArray);
+        return bitArray.toRaw(new int[256]);
     }
 
     @Override
@@ -400,6 +408,13 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
                             currentBiomes[i] = CraftBlock.biomeToBiomeBase(craftBiome);
                         }
                     }
+                }
+
+                Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
+                for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
+                    BitArray bitArray = new BitArray(9, 256);
+                    bitArray.fromRaw(entry.getValue());
+                    nmsChunk.heightMap.get(HeightMap.Type.valueOf(entry.getKey().name())).a(bitArray.getData());
                 }
 
                 boolean lightUpdate = false;

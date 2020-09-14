@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
@@ -14,6 +15,7 @@ import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -50,20 +52,24 @@ public class NMSRelighter implements Relighter {
     private final Map<Long, RelightSkyEntry> skyToRelight;
     private final Object present = new Object();
     private final Map<Long, Integer> chunksToSend;
+    private final Map<Long, Map<HeightMapType, int[]>> heightMaps;
     private final ConcurrentLinkedQueue<RelightSkyEntry> extentdSkyToRelight = new ConcurrentLinkedQueue<>();
     private final Map<Long, long[][][] /* z y x */> lightQueue;
     private final AtomicBoolean lightLock = new AtomicBoolean(false);
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
     private final int maxY;
+    private final boolean calculateHeightMaps;
     private boolean removeFirst;
 
-    public NMSRelighter(IQueueExtent<IQueueChunk> queue) {
+    public NMSRelighter(IQueueExtent<IQueueChunk> queue, boolean calculateHeightMaps) {
         this.queue = queue;
         this.skyToRelight = new Long2ObjectOpenHashMap<>(12);
         this.lightQueue = new Long2ObjectOpenHashMap<>(12);
         this.chunksToSend = new Long2ObjectOpenHashMap<>(12);
         this.concurrentLightQueue = new ConcurrentHashMap<>(12);
+        this.heightMaps = new Long2ObjectOpenHashMap<>(12);
         this.maxY = queue.getMaxY();
+        this.calculateHeightMaps = calculateHeightMaps;
     }
 
     @Override public boolean isEmpty() {
@@ -93,7 +99,7 @@ public class NMSRelighter implements Relighter {
         if (m2 == null) {
             m2 = m1[x] = new long[4];
         }
-        long value = m2[y >> 6] |= 1l << y;
+        m2[y >> 6] |= 1L << y;
     }
 
     public void addLightUpdate(int x, int y, int z) {
@@ -125,11 +131,12 @@ public class NMSRelighter implements Relighter {
         extentdSkyToRelight.clear();
         skyToRelight.clear();
         chunksToSend.clear();
+        heightMaps.clear();
         lightQueue.clear();
     }
 
     public boolean addChunk(int cx, int cz, byte[] fix, int bitmask) {
-        RelightSkyEntry toPut = new RelightSkyEntry(cx, cz, fix, bitmask);
+        RelightSkyEntry toPut = new RelightSkyEntry(cx, cz, fix, bitmask, calculateHeightMaps);
         extentdSkyToRelight.add(toPut);
         return true;
     }
@@ -791,6 +798,14 @@ public class NMSRelighter implements Relighter {
             int z = MathMan.unpairIntY(pair);
             ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
             chunk.setBitMask(bitMask);
+            if (calculateHeightMaps && heightMaps != null) {
+                Map<HeightMapType, int[]> heightMapList = heightMaps.get(pair);
+                if (heightMapList != null) {
+                    for (Map.Entry<HeightMapType, int[]> heightMapEntry : heightMapList.entrySet()){
+                        chunk.setHeightMap(heightMapEntry.getKey(), heightMapEntry.getValue());
+                    }
+                }
+            }
             iter.remove();
         }
         if (Settings.IMP.LIGHTING.ASYNC) {
@@ -856,18 +871,33 @@ public class NMSRelighter implements Relighter {
     private void fixSkyLighting(List<RelightSkyEntry> sorted) {
         RelightSkyEntry[] chunks = sorted.toArray(new RelightSkyEntry[sorted.size()]);
         boolean remove = this.removeFirst;
+        boolean heightMaps = this.calculateHeightMaps;
         BlockVectorSet chunkSet = null;
-        if (remove) {
-            chunkSet = new BlockVectorSet();
+        if (remove || heightMaps) {
             BlockVectorSet tmpSet = new BlockVectorSet();
-            for (RelightSkyEntry chunk : chunks) {
-                tmpSet.add(chunk.x, 0, chunk.z);
+            if (remove) {
+                chunkSet = new BlockVectorSet();
+                for (RelightSkyEntry chunk : chunks) {
+                    tmpSet.add(chunk.x, 0, chunk.z);
+                }
             }
             for (RelightSkyEntry chunk : chunks) {
-                int x = chunk.x;
-                int z = chunk.z;
-                if (tmpSet.contains(x + 1, 0, z) && tmpSet.contains(x - 1, 0, z) && tmpSet.contains(x, 0, z + 1) && tmpSet.contains(x, 0, z - 1)) {
-                    chunkSet.add(x, 0, z);
+                if (remove) {
+                    int x = chunk.x;
+                    int z = chunk.z;
+                    if (tmpSet.contains(x + 1, 0, z) && tmpSet.contains(x - 1, 0, z) && tmpSet.contains(x, 0, z + 1) && tmpSet
+                        .contains(x, 0, z - 1)) {
+                        chunkSet.add(x, 0, z);
+                    }
+                }
+                if (heightMaps) {
+                    long pair = MathMan.pairInt(chunk.x, chunk.z);
+                    this.heightMaps.putIfAbsent(pair, new HashMap<>());
+                    Map<HeightMapType, int[]> heightMapList = this.heightMaps.get(pair);
+                    heightMapList.putIfAbsent(HeightMapType.WORLD_SURFACE, new int[256]);
+                    heightMapList.putIfAbsent(HeightMapType.OCEAN_FLOOR, new int[256]);
+                    heightMapList.putIfAbsent(HeightMapType.MOTION_BLOCKING, new int[256]);
+                    heightMapList.putIfAbsent(HeightMapType.MOTION_BLOCKING_NO_LEAVES, new int[256]);
                 }
             }
         }
@@ -893,17 +923,42 @@ public class NMSRelighter implements Relighter {
                     iChunk.removeSectionLighting(y >> 4, true);
                 }
 
+                Map<HeightMapType, int[]> heightMapList = null;
+                if (heightMaps) {
+                    long pair = MathMan.pairInt(chunk.x, chunk.z);
+                    heightMapList = this.heightMaps.get(pair);
+                }
+
                 for (int j = 0; j < 256; j++) {
                     int x = j & 15;
                     int z = j >> 4;
                     byte value = mask[j];
-                    BlockMaterial material = iChunk.getBlock(x, y, z).getBlockType().getMaterial();
+                    BlockType type = iChunk.getBlock(x, y, z).getBlockType();
+                    BlockMaterial material = type.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = iChunk.getBrightness(x, y, z);
                     boolean solidNeedsLight = (!material.isSolid() || !material.isFullCube()) && material.getLightOpacity() > 0;
                     if (brightness > 1) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
+
+                    if (heightMaps) {
+                        if (heightMapList.get(HeightMapType.WORLD_SURFACE)[j] == 0 && !material.isAir()) {
+                            // MC Requires y+1
+                            heightMapList.get(HeightMapType.WORLD_SURFACE)[j] = y + 1;
+                        }
+                        if (heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] == 0 && material.isSolid()) {
+                            heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] = y + 1;
+                        }
+                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid())) {
+                            heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
+                        }
+                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid()) && !type
+                            .getId().toLowerCase().contains("leaves")) {
+                            heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
+                        }
+                    }
+
                     switch (value) {
                         case 0:
                             if (opacity > 1) {
@@ -1081,7 +1136,7 @@ public class NMSRelighter implements Relighter {
         public int bitmask;
         public boolean smooth;
 
-        public RelightSkyEntry(int x, int z, byte[] fix, int bitmask) {
+        public RelightSkyEntry(int x, int z, byte[] fix, int bitmask, boolean heightmaps) {
             this.x = x;
             this.z = z;
             byte[] array = new byte[256];
