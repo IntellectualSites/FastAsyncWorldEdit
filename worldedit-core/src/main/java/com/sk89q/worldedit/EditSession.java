@@ -2939,7 +2939,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             protected BiomeType getBiome(int x, int y, int z, BiomeType defaultBiomeType) {
                 environment.setCurrentBlock(x, y, z);
                 double scaledX = (x - zero.getX()) / unit.getX();
-                double scaledY = (x - zero.getY()) / unit.getX();
+                double scaledY = (y - zero.getY()) / unit.getY();
                 double scaledZ = (z - zero.getZ()) / unit.getZ();
 
                 try {
