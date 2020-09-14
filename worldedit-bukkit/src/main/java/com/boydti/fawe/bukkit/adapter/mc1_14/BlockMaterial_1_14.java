@@ -3,6 +3,8 @@ package com.boydti.fawe.bukkit.adapter.mc1_14;
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.BlockAccessAir;
+import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.EnumPistonReaction;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.ITileEntity;
@@ -16,6 +18,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
     private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
+    private final int opacity;
 
     public BlockMaterial_1_14(Block block) {
         this(block, block.getBlockData());
@@ -28,6 +31,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
         this.craftBlockData = CraftBlockData.fromData(defaultState);
         this.craftMaterial = craftBlockData.getMaterial();
         this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "v");
+        opacity = defaultState.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
     }
 
     public Block getBlock() {
@@ -98,7 +102,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public int getLightOpacity() {
-        return !isTranslucent() ? 15 : 0;
+        return opacity;
     }
 
     @Override

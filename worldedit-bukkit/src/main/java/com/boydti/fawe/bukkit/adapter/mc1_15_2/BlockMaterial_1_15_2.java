@@ -12,6 +12,7 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
     private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
+    private final int opacity;
 
     public BlockMaterial_1_15_2(Block block) {
         this(block, block.getBlockData());
@@ -24,6 +25,7 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
         this.craftBlockData = CraftBlockData.fromData(defaultState);
         this.craftMaterial = craftBlockData.getMaterial();
         this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "v");
+        opacity = defaultState.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
     }
 
     public Block getBlock() {
@@ -94,7 +96,7 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
 
     @Override
     public int getLightOpacity() {
-        return !isTranslucent() ? 15 : 0;
+        return opacity;
     }
 
     @Override
