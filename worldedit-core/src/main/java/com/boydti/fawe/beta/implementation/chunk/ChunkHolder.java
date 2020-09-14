@@ -179,7 +179,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.chunkSet.setFullBright(layer);
         }
 

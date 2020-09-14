@@ -39,7 +39,6 @@ public abstract class AbstractExtentMask extends AbstractMask {
         setExtent(extent);
     }
 
-
     /**
      * Get the extent.
      *

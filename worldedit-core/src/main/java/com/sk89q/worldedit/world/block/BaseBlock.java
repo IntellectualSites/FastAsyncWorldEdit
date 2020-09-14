@@ -66,6 +66,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+
     /**
      * Construct a block with a state.
      *
@@ -230,7 +231,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     @Override
     public void applyTileEntity(OutputExtent output, int x, int y, int z) {
         CompoundTag nbt = getNbtData();
-        if (nbt != null) output.setTile(x, y, z, nbt);
+        if (nbt != null) {
+            output.setTile(x, y, z, nbt);
+        }
     }
 
     @Override
@@ -276,11 +279,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public String toString() {
-//        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
-//            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
-//        } else {
-            return blockState.getAsString();
-//        }
+        // TODO use a json serializer for the NBT data
+        return blockState.getAsString() + (hasNbtData() ? "{hasNbt}" : "");
     }
 
     public BlockState toBlockState() {

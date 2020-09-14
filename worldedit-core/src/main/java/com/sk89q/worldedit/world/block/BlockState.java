@@ -222,6 +222,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BlockType getBlockType() {
         return this.blockType;
     }
+
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setBlock(extent, this);

@@ -10,7 +10,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class OffsetExtent extends ResettableExtent {
 
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public OffsetExtent(Extent parent, int dx, int dy, int dz) {

@@ -281,8 +281,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public @Nullable
-    Operation commit() {
+    @Nullable
+    public Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
         if (extent != this) {

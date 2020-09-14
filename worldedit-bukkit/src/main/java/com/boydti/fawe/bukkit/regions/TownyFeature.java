@@ -38,7 +38,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                 if (block.getResident().equals(resident)) {
                     return true;
                 }
-            } catch (NotRegisteredException ignore) {}
+            } catch (NotRegisteredException ignored) {
+            }
             Town town = block.getTown();
             if (town.isMayor(resident)) {
                 return true;
@@ -54,7 +55,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     return true;
                 }
             }
-        } catch (NotRegisteredException ignore) {}
+        } catch (NotRegisteredException ignore) {
+        }
         return false;
     }
 
@@ -87,7 +89,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     }
                 };
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 }

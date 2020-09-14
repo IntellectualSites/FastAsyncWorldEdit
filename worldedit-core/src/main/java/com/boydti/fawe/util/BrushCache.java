@@ -29,14 +29,22 @@ public final class BrushCache {
     private static final ThreadLocal<Boolean> RECURSION = new ThreadLocal<>();
 
     public static final BrushTool getTool(Player player, LocalSession session, BaseItem item) {
-        if (!item.hasNbtData()) return null;
+        if (!item.hasNbtData()) {
+            return null;
+        }
         Object key = getKey(item);
-        if (key == null) return null;
+        if (key == null) {
+            return null;
+        }
         BrushTool cached = brushCache.get(key);
-        if (cached != null) return cached;
+        if (cached != null) {
+            return cached;
+        }
 
         CompoundTag nbt = item.getNbtData();
-        if (nbt == null) return null;
+        if (nbt == null) {
+            return null;
+        }
         StringTag json = (StringTag) nbt.getValue().get("weBrushJson");
         // TODO: Ping @MattBDev to reimplement 2020-02-04
 //        if (json != null) {
@@ -61,12 +69,16 @@ public final class BrushCache {
 
     public static BrushTool getCachedTool(BaseItem item) {
         Object key = getKey(item);
-        if (key != null) return brushCache.get(key);
+        if (key != null) {
+            return brushCache.get(key);
+        }
         return null;
     }
 
     public static final BrushTool setTool(BaseItem item, BrushTool tool) {
-        if (item.getNativeItem() == null) return null;
+        if (item.getNativeItem() == null) {
+            return null;
+        }
 
         CompoundTag nbt = item.getNbtData();
         Map<String, Tag> map;

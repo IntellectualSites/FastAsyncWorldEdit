@@ -720,7 +720,8 @@ public class LocalSession implements TextureHolder {
         return selector.getRegion();
     }
 
-    public @Nullable VirtualWorld getVirtualWorld() {
+    @Nullable
+    public VirtualWorld getVirtualWorld() {
         synchronized (dirty) {
             return virtual;
         }

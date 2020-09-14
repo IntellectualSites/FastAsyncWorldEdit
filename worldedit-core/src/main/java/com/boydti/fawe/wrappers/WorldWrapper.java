@@ -58,8 +58,7 @@ public class WorldWrapper extends AbstractWorld {
     public static World unwrap(World world) {
         if (world instanceof WorldWrapper) {
             return unwrap(((WorldWrapper) world).getParent());
-        }
-        else if (world instanceof EditSession) {
+        } else if (world instanceof EditSession) {
             return unwrap(((EditSession) world).getWorld());
         }
         return world;
@@ -92,7 +91,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
-            throws WorldEditException{
+            throws WorldEditException {
         return parent.applySideEffects(position, previousType, sideEffectSet);
     }
 
@@ -250,8 +249,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
-        parent.refreshChunk(X, Z);
+    public void refreshChunk(int chunkX, int chunkZ) {
+        parent.refreshChunk(chunkX, chunkZ);
     }
 
     @Override

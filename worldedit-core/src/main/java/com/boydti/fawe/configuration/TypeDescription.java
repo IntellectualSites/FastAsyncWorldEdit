@@ -1,18 +1,3 @@
-/**
- * Copyright (c) 2008, http://www.snakeyaml.org
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.yaml.snakeyaml;
 
 import org.yaml.snakeyaml.nodes.Tag;
@@ -60,8 +45,7 @@ public final class TypeDescription {
     /**
      * Set tag to be used to load or dump the type (class).
      *
-     * @param tag
-     *            local or global tag
+     * @param tag local or global tag
      */
     public void setTag(Tag tag) {
         this.tag = tag;
@@ -72,7 +56,7 @@ public final class TypeDescription {
     }
 
     /**
-     * Get represented type (class)
+     * Get the represented type (class).
      *
      * @return type (class) to be described.
      */
@@ -81,12 +65,10 @@ public final class TypeDescription {
     }
 
     /**
-     * Specify that the property is a type-safe <code>List</code>.
+     * Specify that the property is a type-safe {@code List}.
      *
-     * @param property
-     *            name of the JavaBean property
-     * @param type
-     *            class of List values
+     * @param property name of the JavaBean property
+     * @param type class of List values
      */
     public void putListPropertyType(String property, Class<? extends Object> type) {
         listProperties.put(property, type);
@@ -95,8 +77,7 @@ public final class TypeDescription {
     /**
      * Get class of List values for provided JavaBean property.
      *
-     * @param property
-     *            property name
+     * @param property property name
      * @return class of List values
      */
     public Class<? extends Object> getListPropertyType(String property) {
@@ -104,14 +85,11 @@ public final class TypeDescription {
     }
 
     /**
-     * Specify that the property is a type-safe <code>Map</code>.
+     * Specify that the property is a type-safe {@code Map}.
      *
-     * @param property
-     *            property name of this JavaBean
-     * @param key
-     *            class of keys in Map
-     * @param value
-     *            class of values in Map
+     * @param property property name of this JavaBean
+     * @param key class of keys in Map
+     * @param value class of values in Map
      */
     public void putMapPropertyType(String property, Class<? extends Object> key,
                                    Class<? extends Object> value) {
@@ -120,10 +98,9 @@ public final class TypeDescription {
     }
 
     /**
-     * Get keys type info for this JavaBean
+     * Get keys type info for this JavaBean.
      *
-     * @param property
-     *            property name of this JavaBean
+     * @param property property name of this JavaBean
      * @return class of keys in the Map
      */
     public Class<? extends Object> getMapKeyType(String property) {
@@ -131,10 +108,9 @@ public final class TypeDescription {
     }
 
     /**
-     * Get values type info for this JavaBean
+     * Get values type info for this JavaBean.
      *
-     * @param property
-     *            property name of this JavaBean
+     * @param property property name of this JavaBean
      * @return class of values in the Map
      */
     public Class<? extends Object> getMapValueType(String property) {
