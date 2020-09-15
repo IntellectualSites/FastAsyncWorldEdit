@@ -135,11 +135,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         if (this.getDataFolder().getParentFile().listFiles(file -> {
             if (file.getName().equals("DummyFawe.jar")) {
+                file.delete();
                 return true;
             }
             return false;
         }).length > 0) {
-            getLogger().warning("DummyFawe detected! This is no longer necessary. Please remove immediately and restart your server!");
+            getLogger().warning("DummyFawe detected and automatically deleted! This file is no longer necessary.");
         }
     }
 
