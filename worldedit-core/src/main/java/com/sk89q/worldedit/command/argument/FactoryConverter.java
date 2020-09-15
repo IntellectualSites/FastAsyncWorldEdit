@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.argument;
 
+import com.boydti.fawe.object.extent.SupplyingExtent;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -109,10 +110,10 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
             if (extent instanceof World) {
                 parserContext.setWorld((World) extent);
             }
-            parserContext.setExtent(new RequestExtent());
+            parserContext.setExtent(new SupplyingExtent(((Locatable) actor)::getExtent));
         } else if (session.hasWorldOverride()) {
             parserContext.setWorld(session.getWorldOverride());
-            parserContext.setExtent(new RequestExtent());
+            parserContext.setExtent(new SupplyingExtent(session::getWorldOverride));
         }
         parserContext.setSession(session);
         parserContext.setRestricted(true);

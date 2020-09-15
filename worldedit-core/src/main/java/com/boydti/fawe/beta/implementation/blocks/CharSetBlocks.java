@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +34,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
+    public Map<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
 
@@ -71,6 +74,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public Set<UUID> getEntityRemoves() {
         return entityRemoves == null ? Collections.emptySet() : entityRemoves;
+    }
+
+    @Override
+    public Map<HeightMapType, int[]> getHeightMaps() {
+        return heightMaps == null ? new HashMap<>() : heightMaps;
     }
 
     @Override
@@ -136,6 +144,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         }
         final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
         skyLight[y >> 4][index] = (char) value;
+    }
+
+    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+        if (heightMaps == null) {
+            heightMaps = new HashMap<>();
+        }
+        heightMaps.put(type, heightMap);
     }
 
     @Override public void setLightLayer(int layer, char[] toSet) {

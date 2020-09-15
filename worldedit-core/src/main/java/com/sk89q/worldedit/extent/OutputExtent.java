@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -156,6 +157,9 @@ public interface OutputExtent {
     }
 
     default void setSkyLight(int x, int y, int z, int value) {
+    }
+
+    default void setHeightMap(HeightMapType type, int[] heightMap) {
     }
 
     /**

@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.Filter
 import com.boydti.fawe.beta.IChunkSet
 import com.boydti.fawe.beta.IQueueChunk
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType
 import com.sk89q.jnbt.CompoundTag
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.Region
@@ -74,11 +75,19 @@ object NullChunk : IQueueChunk<Nothing> {
         return emptyArray()
     }
 
+    override fun getHeightMap(type: HeightMapType?): IntArray {
+        return IntArray(256)
+    }
+
     override fun getEmmittedLight(x: Int, y: Int, z: Int): Int {
         return 15
     }
 
     override fun setSkyLight(x: Int, y: Int, z: Int, value: Int) {
+
+    }
+
+    override fun setHeightMap(type: HeightMapType?, heightMap: IntArray?) {
 
     }
 

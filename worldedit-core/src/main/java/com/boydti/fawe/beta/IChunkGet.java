@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.InputExtent;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -28,6 +29,9 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     @Override
     int getEmmittedLight(int x, int y, int z);
+
+    @Override
+    int[] getHeightMap(HeightMapType type);
 
     default void optimize() {
 

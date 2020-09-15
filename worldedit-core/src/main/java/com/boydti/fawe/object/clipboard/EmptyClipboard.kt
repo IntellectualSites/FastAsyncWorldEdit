@@ -1,5 +1,6 @@
 package com.boydti.fawe.`object`.clipboard
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType
 import com.sk89q.jnbt.CompoundTag
 import com.sk89q.worldedit.WorldEditException
 import com.sk89q.worldedit.entity.Entity
@@ -47,6 +48,10 @@ object EmptyClipboard : Clipboard {
 
     override fun getBiome(position: BlockVector3): BiomeType? {
         return null
+    }
+
+    override fun getHeightMap(type: HeightMapType?): IntArray {
+        return IntArray(256)
     }
 
     @Throws(WorldEditException::class)

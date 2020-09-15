@@ -110,8 +110,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     public BlockMaterial getMaterial(BlockState state) {
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
         return new BlockMaterial_1_16_2(bs.getBlock(), bs);
-
-
     }
 
     public Block getBlock(BlockType blockType) {

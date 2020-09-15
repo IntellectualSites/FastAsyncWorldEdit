@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.object.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -70,6 +71,8 @@ public class BitSetBlocks implements IChunkSet {
     @Override public void setBlockLight(int x, int y, int z, int value) {}
 
     @Override public void setSkyLight(int x, int y, int z, int value) {}
+
+    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {}
 
     @Override public void setLightLayer(int layer, char[] toSet) {}
 
