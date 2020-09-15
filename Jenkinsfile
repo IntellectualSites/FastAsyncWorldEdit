@@ -34,16 +34,16 @@ pipeline {
             }
         }
         // Deploy the artifacts to maven
-        stage ('Nexus Publish') {
-            when {
-                expression {
-                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                }
-            }
-            steps {
-                echo "Publishing to nexus..."
-                sh 'gradle :worldedit-bukkit:publish'
-            }
-        }
+//        stage ('Nexus Publish') {
+ //           when {
+  //              expression {
+   //                 currentBuild.result == null || currentBuild.result == 'SUCCESS'
+    //            }
+     //       }
+      //      steps {
+       //         echo "Publishing to nexus..."
+        //        sh 'gradle :worldedit-bukkit:publish'
+         //   }
+        //}
     }
 }
