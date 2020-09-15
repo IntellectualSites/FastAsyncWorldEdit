@@ -2,6 +2,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
+    `maven-publish`
+}
+
+apply {
+    from("https://dev.savage.games/commons.gradle")
 }
 
 applyPlatformAndCoreConfiguration()
@@ -23,7 +28,32 @@ repositories {
         name = "ProtocolLib Repo"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
-    flatDir {dir(File("src/main/resources"))}
+    flatDir { dir(File("src/main/resources")) }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = rootProject.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            artifact(tasks.getByName("shadowJar"))
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username = System.getProperty("NEXUS_USR")
+                password = System.getProperty("NEXUS_PSW")
+            }
+            if(!project.version.toString().endsWith("-SNAPSHOT")) {
+                setUrl("https://dev.savage.games/nexus/repository/maven-releases")
+            } else {
+                setUrl("https://dev.savage.games/nexus/repository/maven-snapshots")
+            }
+        }
+    }
 }
 
 configurations.all {
@@ -86,6 +116,7 @@ tasks.named<Jar>("jar") {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    // TODO: Change out with our adapters
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
     })
