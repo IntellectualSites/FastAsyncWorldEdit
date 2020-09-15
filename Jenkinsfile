@@ -42,7 +42,7 @@ pipeline {
             }
             steps {
                 echo "Publishing to nexus..."
-                sh 'mvn deploy:deploy-file -DgroupId=com.sk89q.worldedit -DartifactId=FastAsyncWorldEdit -Dversion=1.16 -Dpackaging=jar -DgeneratePom=true -Dfile=worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-855.jar -DrepositoryId=savage -Durl=https://dev.savage.games/nexus/repository/maven-releases/'
+                sh 'gradle :worldedit-bukkit:publish'
             }
         }
     }
