@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
@@ -241,15 +239,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *  Permissions are used to managing WorldEdit region restrictions
          *   - The `/wea` command will give/remove the required bypass permission
          */
-        if(VaultResolver.perms != null){
-            if(value){
-                if(!VaultResolver.perms.playerAdd(player, permission)){
+        if (VaultResolver.perms != null) {
+            if (value) {
+                if (!VaultResolver.perms.playerAdd(player, permission)) {
                     player.addAttachment(plugin).setPermission(permission, value);
                 }
-            }else if(!VaultResolver.perms.playerRemove(player, permission)){
+            } else if (!VaultResolver.perms.playerRemove(player, permission)) {
                 player.addAttachment(plugin).setPermission(permission, value);
             }
-        }else{
+        } else {
             player.addAttachment(plugin).setPermission(permission, value);
         }
     }
