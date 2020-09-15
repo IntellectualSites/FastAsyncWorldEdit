@@ -125,70 +125,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private BukkitServerInterface server;
     private BukkitConfiguration config;
 
-    private static Map<String, Plugin> lookupNames;
-
-    static {
-        // Disable AWE as otherwise both fail to load
-        PluginManager manager = Bukkit.getPluginManager();
-        try {
-            Field pluginsField = manager.getClass().getDeclaredField("plugins");
-            Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
-            pluginsField.setAccessible(true);
-            lookupNamesField.setAccessible(true);
-            List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
-            lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
-            pluginsField.set(manager, new ArrayList<Plugin>(plugins) {
-                @Override
-                public boolean add(Plugin plugin) {
-                    if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                        log.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-                    } else {
-                        return super.add(plugin);
-                    }
-                    return false;
-                }
-            });
-            lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
-                @Override
-                public Plugin put(@NotNull String key, @NotNull Plugin plugin) {
-                    if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                        return null;
-                    }
-                    return super.put(key, plugin);
-                }
-            });
-        } catch (Throwable ignored) {
-        }
-    }
-
-    public WorldEditPlugin() {
-        init();
-    }
-
-    public WorldEditPlugin(JavaPluginLoader loader, PluginDescriptionFile desc, File dataFolder, File jarFile) {
-        super(loader, desc, dataFolder, jarFile);
-        init();
-    }
-
-    private void init() {
-        if (lookupNames != null) {
-            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ROOT), this);
-            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ROOT), this);
-            lookupNames.putIfAbsent("FastAsyncWorldEdit", this);
-            lookupNames.putIfAbsent("WorldEdit", this);
-            rename();
-        }
-        setEnabled(true);
-    }
-
     @Override
     public void onLoad() {
-        if (INSTANCE != null) {
-            return;
-        }
-        rename();
         INSTANCE = this;
-        FaweBukkit imp = new FaweBukkit(this);
 
         //noinspection ResultOfMethodCallIgnored
         getDataFolder().mkdirs();
@@ -203,8 +142,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
-
-        fail(() -> PermissionsResolverManager.initialize(INSTANCE), "Failed to initialize permissions resolver");
     }
 
     /**
@@ -212,10 +149,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      */
     @Override
     public void onEnable() {
-        if (INSTANCE != null) {
-            return;
-        }
-        onLoad();
+
+        FaweBukkit imp = new FaweBukkit(this);
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
@@ -332,44 +267,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         } catch (NoSuchMethodError ignored) {
             getLogger().warning("The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
-        }
-    }
-
-    private void rename() {
-        File dir = new File(getDataFolder().getParentFile(), "FastAsyncWorldEdit");
-        try {
-            Field descriptionField = JavaPlugin.class.getDeclaredField("dataFolder");
-            descriptionField.setAccessible(true);
-            descriptionField.set(this, dir);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        try {
-            File pluginsFolder = MainUtil.getJarFile().getParentFile();
-
-            for (File file : pluginsFolder.listFiles()) {
-                if (file.length() == 2052) {
-                    return;
-                }
-            }
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
-            File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
-            if (dummy != null && dummy.exists() && plugin == this) {
-                try {
-                    Bukkit.getPluginManager().loadPlugin(dummy);
-                } catch (Throwable e) {
-                    if (Bukkit.getUpdateFolderFile().mkdirs()) {
-                        MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, Bukkit.getUpdateFolder() + File.separator + "DummyFawe.jar");
-                    } else {
-                        getLogger().info("Please delete DummyFawe.jar and restart");
-                    }
-                }
-                getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
-            } else if (dummy == null) {
-                MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "update" + File.separator + "DummyFawe.jar");
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
         }
     }
 
