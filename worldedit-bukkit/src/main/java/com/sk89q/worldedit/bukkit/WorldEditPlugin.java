@@ -22,7 +22,6 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
@@ -67,12 +66,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,16 +76,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -142,6 +132,15 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
+
+        if(this.getDataFolder().getParentFile().listFiles(file -> {
+            if(file.getName().equals("DummyFawe.jar")){
+                return true;
+            }
+            return false;
+        }).length > 0){
+            getLogger().warning("DummyFawe detected! This is no longer necessary. Please remove immediately and restart your server!");
+        }
     }
 
     /**
@@ -150,7 +149,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     @Override
     public void onEnable() {
 
-        FaweBukkit imp = new FaweBukkit(this);
+        new FaweBukkit(this);
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
