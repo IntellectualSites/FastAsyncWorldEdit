@@ -19,13 +19,12 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
+import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -240,13 +239,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *  Permissions are used to managing WorldEdit region restrictions
          *   - The `/wea` command will give/remove the required bypass permission
          */
-        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
-            player.addAttachment(plugin).setPermission(permission, value);
-        } else if (value) {
-            if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
+        if (VaultResolver.perms != null) {
+            if (value) {
+                if (!VaultResolver.perms.playerAdd(player, permission)) {
+                    player.addAttachment(plugin).setPermission(permission, value);
+                }
+            } else if (!VaultResolver.perms.playerRemove(player, permission)) {
                 player.addAttachment(plugin).setPermission(permission, value);
             }
-        } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
+        } else {
             player.addAttachment(plugin).setPermission(permission, value);
         }
     }
