@@ -107,7 +107,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
-    // The BSTATS_ID needs to be modified for FAWE to prevent contaminating WorldEdit stats
     private static final int BSTATS_PLUGIN_ID = 1403;
 
     private BukkitImplAdapter bukkitAdapter;
@@ -181,7 +180,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
 
-        //todo consider removing this again because it is better to stay consistent with upstream
         // Setup metrics
         new Metrics(this, BSTATS_PLUGIN_ID);
     }

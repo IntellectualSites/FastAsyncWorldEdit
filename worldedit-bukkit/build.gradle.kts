@@ -12,7 +12,7 @@ repositories {
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
-    maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
+    maven { url = uri("https://ci.emc.gs/nexus/content/groups/aikar/") }
     maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
     maven {
         this.name = "JitPack"
@@ -60,6 +60,8 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
+    "compile"("org.bstats:bstats-bukkit:1.7")
+    // Third party
     "implementation"("com.github.InventivetalentDev:MapManager:1.7.+") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
@@ -105,6 +107,9 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
+        }
+        relocate("org.bstats", "com.boydti.metrics") {
+            include(dependency("org.bstats:bstats-bukkit:1.7"))
         }
     }
 }
