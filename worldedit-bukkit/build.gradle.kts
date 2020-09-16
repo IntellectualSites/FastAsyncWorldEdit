@@ -5,9 +5,6 @@ plugins {
     `maven-publish`
 }
 
-apply {
-    from("https://dev.savage.games/commons.gradle")
-}
 
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()

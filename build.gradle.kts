@@ -45,6 +45,16 @@ allprojects {
             options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
         }
     }
+    apply {
+        from("https://dev.savage.games/commons.gradle.kts")
+    }
+
+    ext {
+        val loadFunction = extra["loadFunction"] as (key: String) -> Unit
+        val nexusUser = System.getenv("NEXUS_USR") ?: loadFunction("savage.nexus.user")
+        val nexusPass = System.getenv("NEXUS_PSW") ?: loadFunction("savage.nexus.pass")
+    }
+
 }
 
 version = String.format("%s-%s", rootVersion, buildNumber)
