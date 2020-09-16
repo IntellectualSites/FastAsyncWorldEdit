@@ -39,7 +39,6 @@ dependencies {
     "api"(project(":worldedit-core"))
     "api"(project(":worldedit-libs:bukkit"))
     "compile"(":worldedit-adapters:")
-    "compile"("org.spigotmcv1_14_r1:spigotmcv1_14_r1:1_14_r1")
     "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
     "compile"("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
