@@ -22,7 +22,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
     }
 
     public MultiClipboardHolder(URI uri) {
-        super(uri, EmptyClipboard.INSTANCE);
+        super(uri, EmptyClipboard.getInstance());
         holders = new ArrayList<>();
     }
 
@@ -32,7 +32,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
     }
 
     public MultiClipboardHolder(Clipboard clipboard) {
-        super(URI.create(""), EmptyClipboard.INSTANCE);
+        super(URI.create(""), EmptyClipboard.getInstance());
         holders = new ArrayList<>();
         URI uri = URI.create("");
         if (clipboard.getURI() != null) {
@@ -140,7 +140,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             cached = available = getClipboards().toArray(new Clipboard[0]);
         }
         switch (available.length) {
-            case 0: return EmptyClipboard.INSTANCE;
+            case 0: return EmptyClipboard.getInstance();
             case 1: return available[0];
         }
 

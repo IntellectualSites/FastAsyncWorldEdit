@@ -2,7 +2,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.mendhak.gradlecrowdin.DownloadTranslationsTask
 import com.mendhak.gradlecrowdin.UploadSourceFileTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java-library")
@@ -10,7 +9,6 @@ plugins {
     id("net.ltgt.apt-idea")
     id("antlr")
     id("com.mendhak.gradlecrowdin")
-    kotlin("jvm") version "1.4.0"
 }
 
 repositories {
@@ -61,7 +59,6 @@ dependencies {
     "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
         isTransitive = false
     }
-    implementation(kotlin("stdlib-jdk8", "1.4.0"))
 }
 
 tasks.named<Test>("test") {
@@ -147,12 +144,4 @@ if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
     tasks.named("classes") {
         dependsOn("crowdinDownload")
     }
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
 }

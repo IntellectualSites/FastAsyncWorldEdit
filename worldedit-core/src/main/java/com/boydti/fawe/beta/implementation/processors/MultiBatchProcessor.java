@@ -29,7 +29,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         }
         switch (list.size()) {
             case 0:
-                return EmptyBatchProcessor.INSTANCE;
+                return EmptyBatchProcessor.getInstance();
             case 1:
                 return list.get(0);
             default:
