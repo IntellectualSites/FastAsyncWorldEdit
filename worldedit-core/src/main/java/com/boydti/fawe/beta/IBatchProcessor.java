@@ -125,7 +125,7 @@ public interface IBatchProcessor {
      */
     default <T extends IBatchProcessor> IBatchProcessor remove(Class<T> clazz) {
         if (clazz.isInstance(this)) {
-            return EmptyBatchProcessor.INSTANCE;
+            return EmptyBatchProcessor.getInstance();
         }
         return this;
     }

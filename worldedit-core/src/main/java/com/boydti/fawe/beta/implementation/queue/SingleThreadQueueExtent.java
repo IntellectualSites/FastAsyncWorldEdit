@@ -109,7 +109,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.lastPair = Long.MAX_VALUE;
         this.currentThread = null;
         this.initialized = false;
-        this.setProcessor(EmptyBatchProcessor.INSTANCE);
+        this.setProcessor(EmptyBatchProcessor.getInstance());
     }
 
     /**
@@ -128,7 +128,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
         this.cacheGet = get;
         this.cacheSet = set;
-        this.setProcessor(EmptyBatchProcessor.INSTANCE);
+        this.setProcessor(EmptyBatchProcessor.getInstance());
         initialized = true;
     }
 
@@ -223,8 +223,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
         if (!processGet(x, z)) {
             lastPair = pair;
-            lastChunk = NullChunk.INSTANCE;
-            return NullChunk.INSTANCE;
+            lastChunk = NullChunk.getInstance();
+            return NullChunk.getInstance();
         }
         IQueueChunk chunk = chunks.get(pair);
         if (chunk != null) {

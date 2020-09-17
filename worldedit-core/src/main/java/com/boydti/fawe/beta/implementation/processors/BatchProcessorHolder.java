@@ -6,7 +6,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 
 public class BatchProcessorHolder implements IBatchProcessorHolder {
-    private IBatchProcessor processor = EmptyBatchProcessor.INSTANCE;
+    private IBatchProcessor processor = EmptyBatchProcessor.getInstance();
 
     @Override
     public IBatchProcessor getProcessor() {
