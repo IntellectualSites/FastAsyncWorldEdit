@@ -22,7 +22,7 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
 
     public ReadOnlyClipboard(Region region) {
         super(region);
-        this.region = region;
+        this.region = region.clone();
     }
 
     public static ReadOnlyClipboard of(final Region region) {
