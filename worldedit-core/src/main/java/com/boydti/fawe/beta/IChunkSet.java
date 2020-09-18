@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -20,6 +21,11 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     @Override
     boolean setBiome(int x, int y, int z, BiomeType biome);
+
+    @Override
+    default boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    }
 
     @Override
     <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder);

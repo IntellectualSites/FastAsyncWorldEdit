@@ -6,6 +6,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
@@ -75,6 +76,11 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        throw new UnsupportedOperationException("Clipboard is immutable");
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 

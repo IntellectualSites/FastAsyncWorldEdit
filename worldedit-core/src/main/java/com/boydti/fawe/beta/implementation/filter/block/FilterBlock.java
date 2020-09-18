@@ -184,4 +184,14 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     public BlockState getStateRelativeY(Extent orDefault, int y) {
         return getBlockRelativeY(y);
     }
+
+    @Override @Nullable
+    public BiomeType getBiome(BlockVector3 position) {
+        return null;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    }
 }
