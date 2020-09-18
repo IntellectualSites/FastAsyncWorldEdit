@@ -157,6 +157,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
 
+        StreamDelegate compatTilesDelegate = schematic.add("TileEntities");
+        compatTilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
+        compatTilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
+
         StreamDelegate entitiesDelegate = schematic.add("Entities");
         entitiesDelegate.withInfo((length, type) -> entities = new ArrayList<>(length));
         entitiesDelegate.withElem((ValueReader<Map<String, Object>>) (index, entity) -> entities.add(entity));
