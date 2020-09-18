@@ -153,7 +153,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         });
         blockData.withInt((index, value) -> blocks.write(value));
 
-        StreamDelegate tilesDelegate = schematic.add("TileEntities");
+        StreamDelegate tilesDelegate = schematic.add("BlockEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
 
