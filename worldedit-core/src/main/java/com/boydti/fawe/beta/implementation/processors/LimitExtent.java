@@ -10,8 +10,8 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.generator.GenBase;
 import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-public class LimitExtent extends PassthroughExtent {
+public class LimitExtent extends AbstractDelegateExtent {
     private final FaweLimit limit;
 
     /**
@@ -53,7 +53,7 @@ public class LimitExtent extends PassthroughExtent {
     public List<? extends Entity> getEntities(Region region) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         try {
-            return getExtent().getEntities(region);
+            return super.getEntities(region);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -66,7 +66,7 @@ public class LimitExtent extends PassthroughExtent {
     public List<? extends Entity> getEntities() {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getEntities();
+            return super.getEntities();
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -81,7 +81,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHANGES();
         limit.THROW_MAX_ENTITIES();
         try {
-            return getExtent().createEntity(location, entity);
+            return super.createEntity(location, entity);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -95,7 +95,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHANGES();
         limit.THROW_MAX_ENTITIES();
         try {
-            getExtent().removeEntity(x, y, z, uuid);
+            super.removeEntity(x, y, z, uuid);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -107,7 +107,7 @@ public class LimitExtent extends PassthroughExtent {
     public boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
         limit.THROW_MAX_CHANGES(Character.MAX_VALUE);
         try {
-            return getExtent().regenerateChunk(x, z, type, seed);
+            return super.regenerateChunk(x, z, type, seed);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -120,7 +120,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getHighestTerrainBlock(x, z, minY, maxY);
+            return super.getHighestTerrainBlock(x, z, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -133,7 +133,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getHighestTerrainBlock(x, z, minY, maxY, filter);
+            return super.getHighestTerrainBlock(x, z, minY, maxY, filter);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -146,7 +146,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceLayer(x, z, y, minY, maxY);
+            return super.getNearestSurfaceLayer(x, z, y, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -159,7 +159,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
+            return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -172,7 +172,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
+            return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -185,7 +185,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
+            return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -198,7 +198,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
+            return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -211,7 +211,7 @@ public class LimitExtent extends PassthroughExtent {
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
-            return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
+            return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -225,7 +225,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().addCaves(region);
+            super.addCaves(region);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -238,7 +238,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().generate(region, gen);
+            super.generate(region, gen);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -251,7 +251,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().addSchems(region, mask, clipboards, rarity, rotate);
+            super.addSchems(region, mask, clipboards, rarity, rotate);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -264,7 +264,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().spawnResource(region, gen, rarity, frequency);
+            super.spawnResource(region, gen, rarity, frequency);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -277,7 +277,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().addOre(region, mask, material, size, frequency, rarity, minY, maxY);
+            super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -290,7 +290,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            getExtent().addOres(region, mask);
+            super.addOres(region, mask);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -302,7 +302,7 @@ public class LimitExtent extends PassthroughExtent {
     public List<Countable<BlockType>> getBlockDistribution(Region region) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         try {
-            return getExtent().getBlockDistribution(region);
+            return super.getBlockDistribution(region);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -315,7 +315,7 @@ public class LimitExtent extends PassthroughExtent {
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         try {
-            return getExtent().getBlockDistributionWithData(region);
+            return super.getBlockDistributionWithData(region);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -328,7 +328,7 @@ public class LimitExtent extends PassthroughExtent {
     public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         try {
-            return getExtent().countBlocks(region, searchBlocks);
+            return super.countBlocks(region, searchBlocks);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -341,7 +341,7 @@ public class LimitExtent extends PassthroughExtent {
     public int countBlocks(Region region, Mask searchMask) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         try {
-            return getExtent().countBlocks(region, searchMask);
+            return super.countBlocks(region, searchMask);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -354,7 +354,7 @@ public class LimitExtent extends PassthroughExtent {
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().setBlocks(region, block);
+            return super.setBlocks(region, block);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -367,7 +367,7 @@ public class LimitExtent extends PassthroughExtent {
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().setBlocks(region, pattern);
+            return super.setBlocks(region, pattern);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -381,7 +381,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().replaceBlocks(region, filter, replacement);
+            return super.replaceBlocks(region, filter, replacement);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -395,7 +395,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().replaceBlocks(region, filter, pattern);
+            return super.replaceBlocks(region, filter, pattern);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -409,7 +409,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().replaceBlocks(region, mask, pattern);
+            return super.replaceBlocks(region, mask, pattern);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -423,7 +423,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().center(region, pattern);
+            return super.center(region, pattern);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -436,7 +436,7 @@ public class LimitExtent extends PassthroughExtent {
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
         limit.THROW_MAX_CHANGES(vset.size());
         try {
-            return getExtent().setBlocks(vset, pattern);
+            return super.setBlocks(vset, pattern);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -450,7 +450,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         try {
-            return getExtent().apply(region, filter, full);
+            return super.apply(region, filter, full);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -483,7 +483,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHECKS(size);
         limit.THROW_MAX_CHANGES(size);
         try {
-            return getExtent().apply(positions, filter);
+            return super.apply(positions, filter);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -495,7 +495,7 @@ public class LimitExtent extends PassthroughExtent {
     public BlockState getBlock(BlockVector3 position) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getBlock(position);
+            return super.getBlock(position);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -508,7 +508,7 @@ public class LimitExtent extends PassthroughExtent {
     public BlockState getBlock(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getBlock(x, y, z);
+            return super.getBlock(x, y, z);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -521,7 +521,7 @@ public class LimitExtent extends PassthroughExtent {
     public BaseBlock getFullBlock(BlockVector3 position) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getFullBlock(position);
+            return super.getFullBlock(position);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -534,7 +534,7 @@ public class LimitExtent extends PassthroughExtent {
     public BaseBlock getFullBlock(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getFullBlock(x, y, z);
+            return super.getFullBlock(x, y, z);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -547,7 +547,7 @@ public class LimitExtent extends PassthroughExtent {
     public BiomeType getBiome(BlockVector3 position) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getBiome(position);
+            return super.getBiome(position);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -560,7 +560,7 @@ public class LimitExtent extends PassthroughExtent {
     public BiomeType getBiomeType(int x, int y, int z) {
         limit.THROW_MAX_CHECKS();
         try {
-            return getExtent().getBiomeType(x, y, z);
+            return super.getBiomeType(x, y, z);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -575,7 +575,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHANGES();
         if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
         try {
-            return getExtent().setBlock(position, block);
+            return super.setBlock(position, block);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -589,7 +589,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHANGES();
         if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
         try {
-            return getExtent().setBlock(x, y, z, block);
+            return super.setBlock(x, y, z, block);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -603,7 +603,7 @@ public class LimitExtent extends PassthroughExtent {
         limit.THROW_MAX_CHANGES();
         limit.MAX_BLOCKSTATES();
         try {
-            return getExtent().setTile(x, y, z, tile);
+            return super.setTile(x, y, z, tile);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -616,7 +616,7 @@ public class LimitExtent extends PassthroughExtent {
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         limit.THROW_MAX_CHANGES();
         try {
-            return getExtent().setBiome(position, biome);
+            return super.setBiome(position, biome);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
@@ -629,7 +629,7 @@ public class LimitExtent extends PassthroughExtent {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         limit.THROW_MAX_CHANGES();
         try {
-            return getExtent().setBiome(x, y, z, biome);
+            return super.setBiome(x, y, z, biome);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
