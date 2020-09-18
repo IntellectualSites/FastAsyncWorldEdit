@@ -1,5 +1,7 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.plotsquared.core.configuration.Settings;
@@ -75,6 +77,10 @@ public class FaweRegionManager extends RegionManager {
                 }
                 try {
                     session.flushQueue();
+                    for (CuboidRegion region : regions) {
+                        FaweAPI.fixLighting(world, region, null,
+                            RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
+                    }
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
@@ -100,7 +106,8 @@ public class FaweRegionManager extends RegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
-                EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()))).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+                World world = BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()));
+                EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
                 if (!hybridPlotWorld.PLOT_SCHEMATIC || !Settings.Schematics.PASTE_ON_TOP) {
                     final BlockType bedrock;
@@ -153,7 +160,8 @@ public class FaweRegionManager extends RegionManager {
                 }
 
                 editSession.flushQueue();
-
+                FaweAPI.fixLighting(world, new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()), null,
+                    RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
                 TaskManager.IMP.task(whenDone);
             }
         });
@@ -185,6 +193,10 @@ public class FaweRegionManager extends RegionManager {
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
+                FaweAPI.fixLighting(pos1World, new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()), null,
+                    RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
+                FaweAPI.fixLighting(pos1World, new CuboidRegion(pos3.getBlockVector3(), pos4.getBlockVector3()), null,
+                    RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
                 TaskManager.IMP.task(whenDone);
             }
         });
@@ -229,6 +241,9 @@ public class FaweRegionManager extends RegionManager {
                 try {
                     Operations.completeLegacy(copy);
                     to.flushQueue();
+                    FaweAPI.fixLighting(pos1World,
+                        new CuboidRegion(pos3.getBlockVector3(), pos3.getBlockVector3().add(pos2.getBlockVector3().subtract(pos1.getBlockVector3()))),
+                        null, RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
