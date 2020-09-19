@@ -18,6 +18,12 @@ public class InverseSingleBlockStateMask extends ABlockMask {
         this.ordinal = state.getOrdinalChar();
     }
 
+    private InverseSingleBlockStateMask(Extent extent, char ordinal, boolean isAir) {
+        super(extent);
+        this.ordinal = ordinal;
+        this.isAir = isAir;
+    }
+
     @Override
     public boolean test(BlockVector3 vector) {
         int test = getExtent().getBlock(vector).getOrdinal();
@@ -39,5 +45,10 @@ public class InverseSingleBlockStateMask extends ABlockMask {
     @Override
     public Mask inverse() {
         return new SingleBlockStateMask(getExtent(), BlockState.getFromOrdinal(ordinal));
+    }
+
+    @Override
+    public Mask clone() {
+        return new InverseSingleBlockStateMask(getExtent(), ordinal, isAir);
     }
 }

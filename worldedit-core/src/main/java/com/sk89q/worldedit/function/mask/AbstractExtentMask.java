@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import org.jetbrains.annotations.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

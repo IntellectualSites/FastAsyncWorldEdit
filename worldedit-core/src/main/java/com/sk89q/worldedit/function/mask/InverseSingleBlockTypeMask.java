@@ -27,4 +27,9 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
     public BlockType getBlockType() {
         return BlockTypes.get(internalId);
     }
+
+    public Mask clone() {
+        // The mask is not mutable. There is no need to clone it.
+        return this;
+    }
 }

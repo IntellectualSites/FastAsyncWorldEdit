@@ -24,7 +24,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 /**
  * Tests whether a given vector meets a criteria.
  */
-public interface Mask2D {
+public interface Mask2D extends Cloneable {
 
     /**
      * Returns true if the criteria is met.
@@ -33,5 +33,7 @@ public interface Mask2D {
      * @return true if the criteria is met
      */
     boolean test(BlockVector2 vector);
+
+    Mask2D copy();
 
 }

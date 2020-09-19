@@ -72,4 +72,9 @@ public class ExpressionMask2D extends AbstractMask2D {
         }
     }
 
+    @Override
+    public Mask2D copy() {
+        return new ExpressionMask2D(expression.clone(), timeout);
+    }
+
 }

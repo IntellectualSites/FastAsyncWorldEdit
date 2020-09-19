@@ -18,6 +18,12 @@ public class SingleBlockStateMask extends ABlockMask {
         this.ordinal = state.getOrdinalChar();
     }
 
+    private SingleBlockStateMask(Extent extent, char ordinal, boolean isAir) {
+        super(extent);
+        this.ordinal = ordinal;
+        this.isAir = isAir;
+    }
+
     @Override
     public boolean test(BlockVector3 vector) {
         int test = getExtent().getBlock(vector).getOrdinal();
@@ -49,5 +55,10 @@ public class SingleBlockStateMask extends ABlockMask {
             return Masks.alwaysFalse();
         }
         return null;
+    }
+
+    @Override
+    public Mask clone() {
+        return new SingleBlockStateMask(getExtent(), ordinal, isAir);
     }
 }

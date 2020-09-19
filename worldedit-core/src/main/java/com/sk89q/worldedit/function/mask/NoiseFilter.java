@@ -96,4 +96,9 @@ public class NoiseFilter extends AbstractMask {
         return new NoiseFilter2D(getNoiseGenerator(), getDensity());
     }
 
+    @Override
+    public Mask clone() {
+        return new NoiseFilter(noiseGenerator, density);
+    }
+
 }

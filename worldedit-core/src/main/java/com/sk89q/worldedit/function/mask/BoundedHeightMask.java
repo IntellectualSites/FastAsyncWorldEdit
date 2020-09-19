@@ -57,4 +57,10 @@ public class BoundedHeightMask extends AbstractMask {
         return null;
     }
 
+    @Override
+    public Mask clone() {
+        // The mask is not mutable. There is no need to clone it.
+        return this;
+    }
+
 }

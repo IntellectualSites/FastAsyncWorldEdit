@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * Tests whether a given vector meets a criteria.
  */
-public interface Mask {
+public interface Mask extends Cloneable {
 
     /**
      * Returns true if the criteria is met.
@@ -100,4 +100,10 @@ public interface Mask {
     default boolean replacesAir() {
         return false;
     }
+
+    /**
+     * Returns a copy of the mask. Usually for multi-threaded operation
+     * @return a clone of the mask
+     */
+    Mask clone();
 }

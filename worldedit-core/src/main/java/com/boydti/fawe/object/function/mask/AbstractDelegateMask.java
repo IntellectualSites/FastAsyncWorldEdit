@@ -30,4 +30,9 @@ public class AbstractDelegateMask extends AbstractMask {
         return mask.toMask2D();
     }
 
+    @Override
+    public Mask clone() {
+        return new AbstractDelegateMask(mask.clone());
+    }
+
 }

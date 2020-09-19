@@ -92,6 +92,10 @@ public final class Masks {
             public boolean test(BlockVector2 vector) {
                 return !mask.test(vector);
             }
+
+            @Override public Mask2D copy() {
+                return Masks.negate(mask.copy());
+            }
         };
     }
 
@@ -112,6 +116,10 @@ public final class Masks {
             @Override
             public Mask2D toMask2D() {
                 return mask;
+            }
+
+            @Override public Mask clone() {
+                return Masks.asMask(mask.copy());
             }
         };
     }
@@ -143,6 +151,16 @@ public final class Masks {
             return this;
         }
 
+        // No need to properly clone an always true mask
+        @Override public Mask clone() {
+            return new AlwaysTrue();
+        }
+
+        // No need to properly clone an always true mask
+        @Override public Mask2D copy() {
+            return new AlwaysTrue();
+        }
+
     }
 
     protected static class AlwaysFalse implements Mask, Mask2D {
@@ -170,6 +188,16 @@ public final class Masks {
         @Override
         public Mask tryOr(Mask other) {
             return other;
+        }
+
+        // No need to properly clone an always false mask
+        @Override public Mask clone() {
+            return new AlwaysFalse();
+        }
+
+        // No need to properly clone an always true mask
+        @Override public Mask2D copy() {
+            return new AlwaysFalse();
         }
 
     }

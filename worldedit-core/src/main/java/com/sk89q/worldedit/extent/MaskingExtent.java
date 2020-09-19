@@ -45,6 +45,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     private Mask mask;
     private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+    private LoadingCache<Long, Mask> threadIdToMask = FaweCache.IMP.createCache(() -> mask.clone());
 
     /**
      * Create a new instance.
@@ -79,17 +80,17 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return mask.test(location) && super.setBlock(location, block);
+        return threadIdToMask.getUnchecked(Thread.currentThread().getId()).test(location) && super.setBlock(location, block);
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
+        return threadIdToMask.getUnchecked(Thread.currentThread().getId()).test(position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
+        return threadIdToMask.getUnchecked(Thread.currentThread().getId()).test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 
     @Override
@@ -100,11 +101,8 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public void applyBlock(FilterBlock block) {
-        //TODO: Find a way to make masking thread safe without having to synchonise the whole extent
-        synchronized (this) {
-            if (!mask.test(block)) {
-                block.setOrdinal(0);
-            }
+        if (!threadIdToMask.getUnchecked(Thread.currentThread().getId()).test(block)) {
+            block.setOrdinal(0);
         }
     }
 
@@ -112,5 +110,10 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     public Extent construct(Extent child) {
         if (child == getExtent()) return this;
         return new MaskingExtent(child, mask);
+    }
+
+    @Override
+    public Filter fork() {
+        return new MaskingExtent(getExtent(), mask.clone());
     }
 }

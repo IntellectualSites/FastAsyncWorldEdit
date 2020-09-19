@@ -52,4 +52,9 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     public MaskFilter newInstance(Filter other) {
         return new MaskFilter<>(other, supplier);
     }
+
+    @Override
+    public Filter fork() {
+        return new MaskFilter<>(getParent().fork(), mask::clone, mask.clone());
+    }
 }

@@ -98,4 +98,9 @@ public class BiomeMask2D extends AbstractMask2D {
         return biomes.contains(biome);
     }
 
+    @Override
+    public Mask2D copy() {
+        return new BiomeMask2D(extent, new HashSet<>(biomes));
+    }
+
 }

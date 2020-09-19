@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
@@ -44,7 +45,6 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         }
     }
 
-    protected transient int cacheCenX;
     protected transient int cacheCenZ;
     protected transient int cacheBotX = Integer.MIN_VALUE;
     protected transient int cacheBotZ = Integer.MIN_VALUE;
@@ -171,6 +171,11 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             }
         }
         return testSlope(getExtent(), x, y, z);
+    }
+
+    @Override
+    public Mask clone() {
+        return new AngleMask(getExtent(), min, max, overlay, distance);
     }
 
 }

@@ -48,4 +48,9 @@ public class WallMask extends AbstractMask {
         v.mutZ(z);
         return count >= min && count <= max;
     }
+
+    @Override
+    public Mask clone() {
+        return new WallMask(mask.clone(), min, max);
+    }
 }

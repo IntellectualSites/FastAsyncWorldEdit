@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,9 +46,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class MaskIntersection extends AbstractMask {
 
-    private final Set<Mask> masks;
-    private Mask[] masksArray;
-    private boolean defaultReturn;
+    protected final Set<Mask> masks;
+    protected Mask[] masksArray;
+    protected boolean defaultReturn;
 
     /**
      * Create a new intersection.
@@ -58,6 +59,12 @@ public class MaskIntersection extends AbstractMask {
         checkNotNull(masks);
         this.masks = new LinkedHashSet<>(masks);
         formArray();
+    }
+
+    protected MaskIntersection(Set<Mask> masks, Mask[] masksArray, boolean defaultReturn) {
+        this.masks = masks;
+        this.masksArray = masksArray;
+        this.defaultReturn = defaultReturn;
     }
 
     public static Mask of(Mask... masks) {
@@ -248,6 +255,13 @@ public class MaskIntersection extends AbstractMask {
             }
         }
         return new MaskIntersection2D(mask2dList);
+    }
+
+    @Override
+    public Mask clone(){
+        Set<Mask> masks = this.masks.stream().map(Mask::clone).collect(Collectors.toSet());
+        Mask[] maskArray = (Mask[]) Arrays.stream(this.masksArray).map(Mask::clone).toArray();
+        return new MaskIntersection(masks, maskArray, this.defaultReturn);
     }
 
 }
