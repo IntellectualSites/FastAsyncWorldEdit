@@ -950,11 +950,13 @@ public class NMSRelighter implements Relighter {
                         if (heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] == 0 && material.isSolid()) {
                             heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] = y + 1;
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || state.getState(waterLogged))) {
+                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                            state.getStates().containsKey(waterLogged) && state.getState(waterLogged)))) {
                             heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || state
-                            .getState(waterLogged)) && !state.getBlockType().getId().toLowerCase().contains("leaves")) {
+                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                            state.getStates().containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId().toLowerCase()
+                            .contains("leaves")) {
                             heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
                         }
                     }
