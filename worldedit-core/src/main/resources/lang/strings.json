@@ -372,6 +372,7 @@
     "worldedit.schematic.directory-does-not-exist": "Directory '{0}' does not exist!",
     "worldedit.schematic.file-perm-fail": "Creation of '{0}' failed! Check file permission.",
     "worldedit.schematic.sorting-old-new": "Cannot sort by oldest and newest.",
+    "worldedit.schematic.unsupported-minecraft-version": "This version of WorldEdit does not support your Minecraft version. Schematics will not work until this is resolved.",
 
     "worldedit.pos.already-set": "Position already set.",
     "worldedit.pos.console-require-coords": "You must provide coordinates as console.",

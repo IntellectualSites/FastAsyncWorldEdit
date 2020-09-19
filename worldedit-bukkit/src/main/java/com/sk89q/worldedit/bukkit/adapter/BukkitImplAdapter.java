@@ -54,22 +54,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
  */
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
-
-    /**
-     * Get the Minecraft data version for the current world data.
-     *
-     * @return the data version
-     */
-    int getDataVersion();
 
     /**
      * Get a data fixer, or null if not supported.

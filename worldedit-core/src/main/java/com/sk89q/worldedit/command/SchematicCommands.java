@@ -38,6 +38,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -328,6 +329,11 @@ public class SchematicCommands {
                          boolean allowOverwrite,
                      @Switch(name = 'g', desc = "Bypasses per-player-schematic folders")
                          boolean global) throws WorldEditException {
+        if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
+            actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
+            return;
+        }
+
         LocalConfiguration config = worldEdit.getConfiguration();
 
         File dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
