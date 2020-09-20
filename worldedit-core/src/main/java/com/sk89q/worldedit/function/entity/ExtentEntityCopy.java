@@ -39,6 +39,9 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.ListTag;
+import java.util.Arrays;
 
 /**
  * Copies entities provided to the function to the provided destination
@@ -201,6 +204,7 @@ public class ExtentEntityCopy implements EntityFunction {
             // Handle hanging entities (paintings, item frames, etc.)
             boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
             boolean hasFacing = tag.containsKey("Facing");
+            boolean hasRotation = tag.containsKey("Rotation");
 
             if (hasTilePosition) {
                 Vector3 tilePosition = Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
@@ -224,6 +228,22 @@ public class ExtentEntityCopy implements EntityFunction {
                         }
                     }
                 }
+
+                if (hasRotation) {
+                    ListTag orgrot = state.getNbtData().getListTag("Rotation");
+                    Vector3 orgDirection = new Location(source, 0, 0, 0, orgrot.getFloat(0), orgrot.getFloat(1)).getDirection();
+                    Vector3 newDirection = transform.apply(orgDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
+                    builder.put("Rotation", new ListTag(FloatTag.class, Arrays.asList(new FloatTag((float) newDirection.toYaw()), new FloatTag((float) newDirection.toPitch()))));
+                }
+
+                return new BaseEntity(state.getType(), builder.build());
+            } else if (hasRotation) { //armor stands do not have a tile pos
+                CompoundTagBuilder builder = tag.createBuilder();
+
+                ListTag orgrot = state.getNbtData().getListTag("Rotation");
+                Vector3 orgDirection = new Location(source, 0, 0, 0, orgrot.getFloat(0), orgrot.getFloat(1)).getDirection();
+                Vector3 newDirection = transform.apply(orgDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
+                builder.put("Rotation", new ListTag(FloatTag.class, Arrays.asList(new FloatTag((float) newDirection.toYaw()), new FloatTag((float) newDirection.toPitch()))));
 
                 return new BaseEntity(state.getType(), builder.build());
             }
