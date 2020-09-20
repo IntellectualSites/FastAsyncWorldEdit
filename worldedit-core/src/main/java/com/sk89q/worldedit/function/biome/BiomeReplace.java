@@ -22,8 +22,10 @@ package com.sk89q.worldedit.function.biome;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
+import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,10 +33,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Replaces the biome at the locations that this function is applied to.
  */
-public class BiomeReplace implements FlatRegionFunction {
+public class BiomeReplace implements FlatRegionFunction, RegionFunction {
 
     private final Extent extent;
-    private BiomePattern biome;
+    private final BiomePattern biome;
 
     /**
      * Create a new instance.
@@ -60,8 +62,17 @@ public class BiomeReplace implements FlatRegionFunction {
     }
 
     @Override
-    public boolean apply(BlockVector2 position) throws WorldEditException {
-        return extent.setBiome(position, biome.apply(position));
+    public boolean apply(BlockVector3 position) throws WorldEditException {
+        return extent.setBiome(position, biome.applyBiome(position));
     }
 
+    @Override
+    @Deprecated
+    public boolean apply(BlockVector2 position) throws WorldEditException {
+        boolean success = false;
+        for (int y = extent.getMinimumPoint().getY(); y <= extent.getMaximumPoint().getY(); y++) {
+            success |= apply(position.toBlockVector3(y));
+        }
+        return success;
+    }
 }

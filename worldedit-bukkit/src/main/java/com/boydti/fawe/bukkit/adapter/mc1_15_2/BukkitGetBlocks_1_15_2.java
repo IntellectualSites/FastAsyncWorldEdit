@@ -5,6 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
@@ -15,7 +16,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -39,6 +39,7 @@ import net.minecraft.server.v1_15_R1.DataPaletteLinear;
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
+import net.minecraft.server.v1_15_R1.HeightMap;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.LightEngine;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
@@ -175,6 +176,12 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         }
         long l = BlockPosition.a(x, y, z);
         return blockLight[layer].a(SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)), SectionPosition.b(BlockPosition.d(l)));
+    }
+
+    @Override public int[] getHeightMap(HeightMapType type) {
+        long[] longArray = getChunk().heightMap.get(HeightMap.Type.valueOf(type.name())).a();
+        BitArray bitArray = new BitArray(9, 256, longArray);
+        return bitArray.toRaw(new int[256]);
     }
 
     @Override
@@ -389,6 +396,13 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                             }
                         }
                     }
+                }
+
+                Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
+                for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
+                    BitArray bitArray = new BitArray(9, 256);
+                    bitArray.fromRaw(entry.getValue());
+                    nmsChunk.heightMap.get(HeightMap.Type.valueOf(entry.getKey().name())).a(bitArray.getData());
                 }
 
                 boolean lightUpdate = false;

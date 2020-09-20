@@ -179,6 +179,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    }
+
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setBiome(getIndex(x, y, z), biome);
         return true;
@@ -221,6 +226,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(getIndex(x, 0, z));
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return getBiome(getIndex(position.getX(), 0, position.getZ()));
     }
 
     public BlockArrayClipboard toClipboard() {

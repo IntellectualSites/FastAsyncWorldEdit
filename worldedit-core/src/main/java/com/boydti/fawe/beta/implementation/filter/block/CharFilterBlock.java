@@ -11,7 +11,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -397,7 +397,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public char getOrdinalChar(Extent orDefault) {
         return getOrdinalChar();
     }
-    
+
     //Set delegate
     private SetDelegate initSet() {
         setArr = set.load(layer);
@@ -419,8 +419,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(), 0, position.getBlockZ(), biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getBlockZ(), biome);
     }
 
     @Override

@@ -42,10 +42,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.util.stream.Collectors;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
@@ -63,7 +63,7 @@ public class BlockArrayClipboard implements Clipboard {
 
     public BlockArrayClipboard(Clipboard clipboard, BlockVector3 offset) {
         this.parent = clipboard;
-        Region shifted = clipboard.getRegion();
+        Region shifted = clipboard.getRegion().clone();
         shifted.shift(offset);
         this.region = shifted;
         this.origin = shifted.getMinimumPoint();
@@ -84,7 +84,7 @@ public class BlockArrayClipboard implements Clipboard {
         checkNotNull(parent);
         checkNotNull(region);
         this.parent = parent;
-        this.region = region;
+        this.region = region.clone();
         this.origin = region.getMinimumPoint();
     }
 
@@ -174,16 +174,17 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
-        return getParent().getBiomeType(v.getX(), 0, v.getZ());
+    public BiomeType getBiome(BlockVector3 position) {
+        BlockVector3 v = position.subtract(region.getMinimumPoint());
+        return getParent().getBiomeType(v.getX(), v.getY(), v.getZ());
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         int x = position.getBlockX() - origin.getX();
+        int y = position.getBlockY() - origin.getY();
         int z = position.getBlockZ() - origin.getZ();
-        return getParent().setBiome(x, 0, z, biome);
+        return getParent().setBiome(x, y, z, biome);
     }
 
     @Override

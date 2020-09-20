@@ -96,7 +96,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
@@ -144,13 +143,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-import java.util.UUID;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -763,7 +762,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean fullySupports3DBiomes() {
+        return this.getExtent().fullySupports3DBiomes();
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return this.getExtent().getBiome(position);
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         this.changes++;
         return this.getExtent().setBiome(position, biome);
     }
@@ -804,7 +813,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(getExtent(), mutablebv.setComponents(x, y, z))) {
+            if (filter.test(mutablebv.setComponents(x, y, z))) {
                 return y;
             }
         }
@@ -1135,7 +1144,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (direction.equals(BlockVector3.at(0, -1, 0))) {
             return fillXZ(origin, pattern, radius, depth, false);
         }
-        Mask mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this))).withExtent(getExtent());
+        Mask mask = new MaskIntersection(new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))), Masks.negate(new ExistingBlockMask(EditSession.this)));
         // Want to replace blocks
         final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
 
@@ -1187,7 +1196,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 new BoundedHeightMask(
                         Math.max(origin.getBlockY() - depth + 1, getMinimumPoint().getBlockY()),
                         Math.min(getMaxY(), origin.getBlockY())),
-                Masks.negate(new ExistingBlockMask(this))).withExtent(getExtent());
+                Masks.negate(new ExistingBlockMask(this)));
         // Want to replace blocks
         BlockReplace replace = new BlockReplace(this, pattern);
 
@@ -1399,7 +1408,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             replaceBlocks(region, new Mask() {
                 @Override
-                public boolean test(Extent extent, BlockVector3 position) {
+                public boolean test(BlockVector3 position) {
                     int x = position.getBlockX();
                     int z = position.getBlockZ();
                     return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region
@@ -1660,7 +1669,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         Mask mask = new MaskIntersection(
                 new BoundedHeightMask(0, getWorld().getMaxY()),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
-                liquidMask).withExtent(getExtent());
+                liquidMask);
         BlockReplace replace;
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
@@ -1671,7 +1680,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
-            if (mask.test(getExtent(), position)) {
+            if (mask.test(position)) {
                 visitor.visit(position);
             }
         }
@@ -1705,13 +1714,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
-        ).withExtent(getExtent());
+        );
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
-            if (liquidMask.test(getExtent(), position)) {
+            if (liquidMask.test(position)) {
                 visitor.visit(position);
             }
         }
@@ -2890,7 +2899,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             while (iter.hasNext()) {
                 final BlockVector3 current = iter.next();
                 iter.remove();
-                if (mask.test(getExtent(), current)) {
+                if (mask.test(current)) {
                     continue;
                 }
                 if (!outside.add(current)) {
@@ -2916,8 +2925,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,
                               final String expressionString, final boolean hollow, final int timeout)
             throws ExpressionException, MaxChangedBlocksException {
-        final Vector2 zero2D = zero.toVector2();
-        final Vector2 unit2D = unit.toVector2();
 
         final Expression expression = Expression.compile(expressionString, "x", "z");
         expression.optimize();
@@ -2930,12 +2937,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final ArbitraryBiomeShape shape = new ArbitraryBiomeShape(region) {
             @Override
             protected BiomeType getBiome(int x, int y, int z, BiomeType defaultBiomeType) {
-                environment.setCurrentBlock(x, 0, z);
-                double scaledX = (x - zero2D.getX()) / unit2D.getX();
-                double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();
+                environment.setCurrentBlock(x, y, z);
+                double scaledX = (x - zero.getX()) / unit.getX();
+                double scaledY = (y - zero.getY()) / unit.getY();
+                double scaledZ = (z - zero.getZ()) / unit.getZ();
 
                 try {
-                    if (expression.evaluate(timeout, scaledX, scaledZ) <= 0) {
+                    if (expression.evaluate(timeout, scaledX, scaledY, scaledZ) <= 0) {
                         return null;
                     }
 

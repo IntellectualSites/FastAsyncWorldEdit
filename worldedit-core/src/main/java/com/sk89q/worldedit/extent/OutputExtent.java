@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -68,6 +69,22 @@ public interface OutputExtent {
     boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException;
 
     /**
+     * Check if this extent fully supports 3D biomes.
+     *
+     * <p>
+     * If {@code false}, the extent only visually reads biomes from {@code y = 0}.
+     * The biomes will still be set in 3D, but the client will only see the one at
+     * {@code y = 0}. It is up to the caller to determine if they want to set that
+     * biome instead, or simply warn the actor.
+     * </p>
+     *
+     * @return if the extent fully supports 3D biomes
+     */
+    default boolean fullySupports3DBiomes() {
+        return true;
+    }
+
+    /**
      * Set the biome.
      *
      * @param position the (x, z) location to set the biome at
@@ -77,7 +94,7 @@ public interface OutputExtent {
      */
     @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(), 0, position.getBlockZ(), biome);
+        return setBiome(position.toBlockVector3(), biome);
     }
 
     @NonAbstractForCompatibility(
@@ -142,6 +159,9 @@ public interface OutputExtent {
     default void setSkyLight(int x, int y, int z, int value) {
     }
 
+    default void setHeightMap(HeightMapType type, int[] heightMap) {
+    }
+
     /**
      * Return an {@link Operation} that should be called to tie up loose ends
      * (such as to commit changes in a buffer).
@@ -149,5 +169,4 @@ public interface OutputExtent {
      * @return an operation or null if there is none to execute
      */
     @Nullable Operation commit();
-
 }

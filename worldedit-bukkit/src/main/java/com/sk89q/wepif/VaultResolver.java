@@ -28,7 +28,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class VaultResolver implements PermissionsResolver {
 
-    private static Permission perms = null;
+    public static Permission perms = null;
 
     public static PermissionsResolver factory(Server server, YAMLProcessor config) {
         if (server.getPluginManager().getPlugin("Vault") == null) {

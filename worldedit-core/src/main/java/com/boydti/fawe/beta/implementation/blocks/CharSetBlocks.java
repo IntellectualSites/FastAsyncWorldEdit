@@ -2,12 +2,12 @@ package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVector3ChunkMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
+    public Map<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
 
@@ -72,6 +74,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public Set<UUID> getEntityRemoves() {
         return entityRemoves == null ? Collections.emptySet() : entityRemoves;
+    }
+
+    @Override
+    public Map<HeightMapType, int[]> getHeightMaps() {
+        return heightMaps == null ? new HashMap<>() : heightMaps;
     }
 
     @Override
@@ -139,6 +146,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         skyLight[y >> 4][index] = (char) value;
     }
 
+    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+        if (heightMaps == null) {
+            heightMaps = new HashMap<>();
+        }
+        heightMaps.put(type, heightMap);
+    }
+
     @Override public void setLightLayer(int layer, char[] toSet) {
         if (light == null) {
             light = new char[16][];
@@ -198,8 +212,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.getX(),0, position.getZ(), biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(),position.getY(), position.getZ(), biome);
     }
 
     @Override

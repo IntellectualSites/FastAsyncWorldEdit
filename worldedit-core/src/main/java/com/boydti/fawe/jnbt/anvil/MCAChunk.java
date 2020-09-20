@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.jnbt.streamer.StreamDelegate;
 import com.boydti.fawe.jnbt.streamer.ValueReader;
 import com.boydti.fawe.object.collection.BitArray;
@@ -16,7 +17,6 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
@@ -444,6 +444,10 @@ public class MCAChunk implements IChunk {
 
     }
 
+    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+
+    }
+
     @Override public void removeSectionLighting(int layer, boolean sky) {}
 
     @Override public void setFullBright(int layer) {}
@@ -481,14 +485,14 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 pos, BiomeType biome) {
-        return this.setBiome(pos.getX(), 0, pos.getZ(), biome);
+    public boolean setBiome(BlockVector3 pos, BiomeType biome) {
+        return this.setBiome(pos.getX(), pos.getY(), pos.getZ(), biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[x + (z << 4)] = biome;
+        biomes[x + (z << 4)] = biome; //TODO Support 3D Biomes
         return true;
     }
 
@@ -532,6 +536,10 @@ public class MCAChunk implements IChunk {
 
     @Override public int getEmmittedLight(int x, int y, int z) {
         return 0;
+    }
+
+    @Override public int[] getHeightMap(HeightMapType type) {
+        return new int[256];
     }
 
     @Override

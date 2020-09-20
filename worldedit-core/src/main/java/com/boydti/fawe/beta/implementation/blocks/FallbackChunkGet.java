@@ -4,6 +4,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -48,6 +49,10 @@ public class FallbackChunkGet implements IChunkGet {
 
     @Override public int getSkyLight(int x, int y, int z) {
         return extent.getSkyLight(bx + x, y, bz + z);
+    }
+
+    @Override public int[] getHeightMap(HeightMapType type) {
+        return extent.getHeightMap(type);
     }
 
     @Override public int getEmmittedLight(int x, int y, int z) {

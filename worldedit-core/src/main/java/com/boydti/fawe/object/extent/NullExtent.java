@@ -19,7 +19,6 @@ import com.sk89q.worldedit.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -110,7 +109,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         return BiomeTypes.THE_VOID;
     }
 
@@ -141,7 +140,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return false;
     }
 
@@ -149,7 +148,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
-        
+
     @Override
     public boolean isQueueEnabled() {
         throw reason;

@@ -37,7 +37,6 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.visitor.Order;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -211,14 +210,14 @@ public class FastSchematicWriter implements ClipboardWriter {
             }
 
             if (numTiles != 0) {
-                out.writeNamedTagName("TileEntities", NBTConstants.TYPE_LIST);
+                out.writeNamedTagName("BlockEntities", NBTConstants.TYPE_LIST);
                 rawStream.write(NBTConstants.TYPE_COMPOUND);
                 rawStream.writeInt(numTiles);
                 try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(tilesCompressed.toByteArray()))) {
                     IOUtil.copy(in, rawStream);
                 }
             } else {
-                out.writeNamedEmptyList("TileEntities");
+                out.writeNamedEmptyList("BlockEntities");
             }
 
             if (finalClipboard.hasBiomes()) {
@@ -287,7 +286,7 @@ public class FastSchematicWriter implements ClipboardWriter {
             int z0 = min.getBlockZ() + z;
             for (int x = 0; x < width; x++, i++) {
                 int x0 = min.getBlockX() + x;
-                BlockVector2 pt = BlockVector2.at(x0, z0);
+                BlockVector3 pt = BlockVector3.at(x0, min.getBlockY(), z0);
                 BiomeType biome = clipboard.getBiome(pt);
                 task.applyInt(i, biome.getInternalId());
             }

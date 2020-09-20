@@ -16,7 +16,7 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 * [JavaDocs](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/javadoc/)
 
 ## Downloads
-### 1.14+
+### 1.15+
 * [Download](https://intellectualsites.github.io/download/fawe.html)
 * [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
 
@@ -27,7 +27,7 @@ You can safely ignore `gradlew setupDecompWorkspace` if you are not planning to 
 
 ```
 $ gradlew setupDecompWorkspace
-$ gradlew clean build -x test
+$ gradlew build
 ```
 
 The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.jar`

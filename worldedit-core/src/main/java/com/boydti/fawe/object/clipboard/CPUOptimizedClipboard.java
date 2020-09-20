@@ -8,6 +8,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -15,13 +16,13 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public class CPUOptimizedClipboard extends LinearClipboard {
 
@@ -42,6 +43,11 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     @Override
     public boolean hasBiomes() {
         return biomes != null;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }
 
     @Override
@@ -85,6 +91,11 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(getIndex(x, 0, z));
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return getBiome(getIndex(position.getX(), 0, position.getZ()));
     }
 
     public void convertTilesToIndex() {

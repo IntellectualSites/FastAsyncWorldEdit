@@ -87,8 +87,6 @@ public final class BundledItemData {
             url = resourceLoader.getResource(BundledBlockData.class, "items.116.json");
         } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
             url = resourceLoader.getResource(BundledBlockData.class, "items.115.json");
-        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_14) {
-            url = resourceLoader.getResource(BundledBlockData.class, "items.114.json");
         }
         if (url == null) {
             url = resourceLoader.getResource(BundledBlockData.class, "items.json");

@@ -15,8 +15,8 @@ public abstract class ABlockMask extends AbstractExtentMask {
         super(extent);
     }
 
-    @Override public boolean test(Extent extent, BlockVector3 vector) {
-        return test(vector.getBlock(extent));
+    @Override public boolean test(BlockVector3 vector) {
+        return test(getExtent().getBlock(vector));
     }
 
     public abstract boolean test(BlockState state);

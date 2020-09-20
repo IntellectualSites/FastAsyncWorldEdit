@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -192,6 +193,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.chunkSet.setSkyLightLayer(layer, toSet);
         }
 
+        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+            chunk.chunkSet.setHeightMap(type, heightMap);
+        }
+
         @Override
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getBiomeType(x, y, z);
@@ -245,8 +250,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public int getOpacity(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getOpacity(x, y, z);
         }
+
+        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+            return chunk.chunkExisting.getHeightMap(type);
+        }
     };
-    
+
     private static final IBlockDelegate GET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
@@ -318,6 +327,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.setSkyLightLayer(layer, toSet);
         }
 
+        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+            chunk.getOrCreateSet();
+            chunk.delegate = BOTH;
+            chunk.setHeightMap(type, heightMap);
+        }
+
         @Override
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getBiomeType(x, y, z);
@@ -353,8 +368,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public int getOpacity(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getOpacity(x, y, z);
         }
+
+        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+            return chunk.chunkExisting.getHeightMap(type);
+        }
     };
-    
+
     private static final IBlockDelegate SET = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
@@ -407,6 +426,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet) {
             chunk.chunkSet.setSkyLightLayer(layer, toSet);
+        }
+
+        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+            chunk.chunkSet.setHeightMap(type, heightMap);
         }
 
         @Override
@@ -476,8 +499,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.delegate = BOTH;
             return chunk.getOpacity(x, y, z);
         }
+
+        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            return chunk.getHeightMap(type);
+        }
     };
-    
+
     private static final IBlockDelegate NULL = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
@@ -575,6 +604,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.setSkyLightLayer(layer, toSet);
         }
 
+        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+            chunk.getOrCreateSet();
+            chunk.delegate = SET;
+            chunk.setHeightMap(type, heightMap);
+        }
+
         @Override
         public int getSkyLight(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
@@ -605,6 +640,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.delegate = GET;
             chunk.chunkExisting.trim(false);
             return chunk.getOpacity(x, y, z);
+        }
+
+        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
+            return chunk.getHeightMap(type);
         }
     };
 
@@ -791,6 +833,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         delegate.setSkyLight(this, x, y, z, value);
     }
 
+    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+        delegate.setHeightMap(this, type, heightMap);
+    }
+
     @Override public void removeSectionLighting(int layer, boolean sky) {
         delegate.removeSectionLighting(this, layer, sky);
     }
@@ -834,6 +880,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.getOpacity(this, x, y, z);
     }
 
+    @Override public int[] getHeightMap(HeightMapType type) {
+        return delegate.getHeightMap(this, type);
+    }
+
     public interface IBlockDelegate {
         <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
         IChunkSet set(ChunkHolder chunk);
@@ -860,6 +910,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         void setSkyLightLayer(ChunkHolder chunk, int layer, char[] toSet);
 
+        void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap);
+
         int getSkyLight(ChunkHolder chunk, int x, int y, int z);
 
         int getEmmittedLight(ChunkHolder chunk, int x, int y, int z);
@@ -867,5 +919,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         int getBrightness(ChunkHolder chunk, int x, int y, int z);
 
         int getOpacity(ChunkHolder chunk, int x, int y, int z);
+
+        int[] getHeightMap(ChunkHolder chunk, HeightMapType type);
     }
 }

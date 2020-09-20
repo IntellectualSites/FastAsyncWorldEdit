@@ -1,7 +1,9 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.InputExtent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -21,6 +23,11 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     BiomeType getBiomeType(int x, int y, int z);
 
     @Override
+    default BiomeType getBiome(BlockVector3 position) {
+        return getBiomeType(position.getX(), position.getY(), position.getZ());
+    }
+
+    @Override
     BlockState getBlock(int x, int y, int z);
 
     @Override
@@ -28,6 +35,9 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     @Override
     int getEmmittedLight(int x, int y, int z);
+
+    @Override
+    int[] getHeightMap(HeightMapType type);
 
     default void optimize() {
 

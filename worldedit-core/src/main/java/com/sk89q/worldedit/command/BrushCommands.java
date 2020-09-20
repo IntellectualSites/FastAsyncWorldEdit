@@ -182,9 +182,9 @@ public class BrushCommands {
     public void erodeBrush(InjectedValueAccess context, @Arg(desc = "The radius for eroding",
                                                              def = "5") Expression radius,
         @Arg(desc = "erodeFaces",
-             def = "6") int erodefaces, @Arg(desc = "erodeRec",
-                                             def = "0") int erodeRec, @Arg(desc = "fillFaces",
-                                                                           def = "1") int fillFaces,
+             def = "2") int erodefaces, @Arg(desc = "erodeRec",
+                                             def = "1") int erodeRec, @Arg(desc = "fillFaces",
+                                                                           def = "5") int fillFaces,
         @Arg(desc = "fillRec",
              def = "1") int fillRec) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -197,10 +197,10 @@ public class BrushCommands {
     public void pullBrush(InjectedValueAccess context,
         @Arg(desc = "The radius to sample for blending",
              def = "5") Expression radius, @Arg(desc = "erodeFaces",
-                                                def = "2") int erodefaces, @Arg(desc = "erodeRec",
-                                                                                def = "1")
+                                                def = "6") int erodefaces, @Arg(desc = "erodeRec",
+                                                                                def = "0")
         int erodeRec, @Arg(desc = "fillFaces",
-                           def = "5") int fillFaces, @Arg(desc = "fillRec",
+                           def = "1") int fillFaces, @Arg(desc = "fillRec",
                                                           def = "1") int fillRec)
         throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);

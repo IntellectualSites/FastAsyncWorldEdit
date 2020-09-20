@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -20,7 +19,7 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 to) {
+    public boolean test(BlockVector3 to) {
         if (pos == null) {
             pos = to.toImmutable();
         }

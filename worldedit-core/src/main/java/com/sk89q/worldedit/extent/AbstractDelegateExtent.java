@@ -32,7 +32,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -40,15 +39,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
 import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -88,10 +84,21 @@ public class AbstractDelegateExtent implements Extent {
         return extent.getBlock(position.getX(), position.getY(), position.getZ());
     }
 
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return extent.getFullBlock(x, y, z);
+    }
+
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return extent.getFullBlock(position.getX(), position.getY(), position.getZ());
+    }
+
     /*
         Queue based methods
         TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
          */
+
     @Override
     public boolean isQueueEnabled() {
         return extent.isQueueEnabled();
@@ -122,10 +129,10 @@ public class AbstractDelegateExtent implements Extent {
             new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(extent));
         }
     }
-
     /*
      History
      */
+
     public void setChangeSet(AbstractChangeSet changeSet) {
         if (extent instanceof HistoryExtent) {
             HistoryExtent history = ((HistoryExtent) extent);
@@ -173,13 +180,13 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return extent.getBiome(position);
+    public boolean fullySupports3DBiomes() {
+        return extent.fullySupports3DBiomes();
     }
 
     @Override
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        return extent.getFullBlock(x, y, z);
+    public BiomeType getBiome(BlockVector3 position) {
+        return extent.getBiome(position);
     }
 
     @Override
@@ -210,8 +217,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return extent.setBiome(position.getX(), 0, position.getZ(), biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return extent.setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }
 
     @Override

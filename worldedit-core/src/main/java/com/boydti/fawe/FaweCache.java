@@ -375,7 +375,7 @@ public enum FaweCache implements Trimable {
                 blockStates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, blockStates);
+                BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 

@@ -22,7 +22,6 @@ package com.sk89q.worldedit.math;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -715,10 +714,6 @@ public abstract class BlockVector3 {
         return orDefault.setBlock(this, block);
     }
 
-    public boolean setBiome(Extent orDefault, BiomeType biome) {
-        return orDefault.setBiome(getX(), getY(), getZ(), biome);
-    }
-
     public int getOrdinal(Extent orDefault) {
         return getBlock(orDefault).getOrdinal();
     }
@@ -778,7 +773,7 @@ public abstract class BlockVector3 {
         if (other == null) {
             return false;
         }
-        
+
         return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 

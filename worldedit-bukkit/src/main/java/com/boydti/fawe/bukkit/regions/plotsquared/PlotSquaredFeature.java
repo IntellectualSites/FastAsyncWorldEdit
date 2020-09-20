@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
@@ -24,11 +23,10 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
-import java.util.HashSet;
-import java.util.List;
+
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,15 +125,6 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return null;
         }
         PlotArea area = pp.getApplicablePlotArea();
-        int min = area != null ? area.getMinBuildHeight() : 0;
-        int max = area != null ? Math.min(255, area.getMaxBuildHeight()) : 255;
-        final HashSet<RegionWrapper> faweRegions = new HashSet<>();
-        for (CuboidRegion current : regions) {
-            faweRegions.add(new RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
-        }
-        final CuboidRegion region = regions.iterator().next();
-        final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());
-        final BlockVector3 pos2 = BlockVector3.at(region.getMaximumX(), max, region.getMaximumZ());
         final Plot finalPlot = plot;
         if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(finalPlot) || regions.isEmpty()) {
             return null;
@@ -143,13 +132,16 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
         Region maskedRegion;
         if (regions.size() == 1) {
+            int min = area != null ? area.getMinBuildHeight() : 0;
+            int max = area != null ? Math.min(255, area.getMaxBuildHeight()) : 255;
+
+            final CuboidRegion region = regions.iterator().next();
+            final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());
+            final BlockVector3 pos2 = BlockVector3.at(region.getMaximumX(), max, region.getMaximumZ());
             maskedRegion = new CuboidRegion(pos1, pos2);
         } else {
             World world = FaweAPI.getWorld(area.getWorldName());
-            List<Region> weRegions = regions.stream()
-                    .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
-                    .collect(Collectors.toList());
-            maskedRegion = new RegionIntersection(world, weRegions);
+            maskedRegion = new RegionIntersection(world, new ArrayList<>(regions));
         }
 
         return new FaweMask(maskedRegion) {

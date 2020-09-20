@@ -27,8 +27,6 @@ public class RecurseBrush implements Brush {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = Masks.alwaysTrue();
-        } else {
-            mask = mask.withExtent(editSession);
         }
         final int radius = (int) size;
         BlockState block = editSession.getBlock(position);
@@ -44,7 +42,7 @@ public class RecurseBrush implements Brush {
                 @Override
                 public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
-                    return y < maxY && radMask.test(editSession, to) && super.isVisitable(from, to);
+                    return y < maxY && radMask.test(to) && super.isVisitable(from, to);
                 }
             };
             visitor.visit(position);

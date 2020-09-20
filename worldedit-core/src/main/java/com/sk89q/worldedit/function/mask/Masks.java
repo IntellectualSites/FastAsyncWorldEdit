@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -43,7 +42,7 @@ public final class Masks {
     }
 
     /**
-     * Return a 3D mask that always returns true;
+     * Return a 3D mask that always returns true.
      *
      * @return a mask
      */
@@ -56,7 +55,7 @@ public final class Masks {
     }
 
     /**
-     * Return a 2D mask that always returns true;
+     * Return a 2D mask that always returns true.
      *
      * @return a mask
      */
@@ -90,8 +89,8 @@ public final class Masks {
         checkNotNull(mask);
         return new AbstractMask2D() {
             @Override
-            public boolean test(Extent extent, BlockVector2 vector) {
-                return !mask.test(extent, vector);
+            public boolean test(BlockVector2 vector) {
+                return !mask.test(vector);
             }
         };
     }
@@ -105,8 +104,8 @@ public final class Masks {
     public static Mask asMask(final Mask2D mask) {
         return new AbstractMask() {
             @Override
-            public boolean test(Extent extent, BlockVector3 vector) {
-                return mask.test(extent, vector.toBlockVector2());
+            public boolean test(BlockVector3 vector) {
+                return mask.test(vector.toBlockVector2());
             }
 
             @Nullable
@@ -119,12 +118,12 @@ public final class Masks {
 
     protected static class AlwaysTrue implements Mask, Mask2D {
         @Override
-        public boolean test(Extent extent, BlockVector3 vector) {
+        public boolean test(BlockVector3 vector) {
             return true;
         }
 
         @Override
-        public boolean test(Extent extent, BlockVector2 vector) {
+        public boolean test(BlockVector2 vector) {
             return true;
         }
 
@@ -144,20 +143,16 @@ public final class Masks {
             return this;
         }
 
-        @Override
-        public Mask withExtent(Extent extent) {
-            return this;
-        }
     }
 
     protected static class AlwaysFalse implements Mask, Mask2D {
         @Override
-        public boolean test(Extent extent,  BlockVector3 vector) {
+        public boolean test(BlockVector3 vector) {
             return false;
         }
 
         @Override
-        public boolean test(Extent extent, BlockVector2 vector) {
+        public boolean test(BlockVector2 vector) {
             return false;
         }
 
@@ -177,10 +172,6 @@ public final class Masks {
             return other;
         }
 
-        @Override
-        public Mask withExtent(Extent extent) {
-            return this;
-        }
     }
 
 }

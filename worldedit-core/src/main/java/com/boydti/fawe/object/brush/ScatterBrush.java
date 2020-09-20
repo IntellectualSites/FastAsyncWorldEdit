@@ -8,7 +8,6 @@ import com.boydti.fawe.object.mask.SurfaceMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -52,7 +51,7 @@ public class ScatterBrush implements Brush {
 
         final int distance = Math.min((int) size, this.distance);
 
-        RecursiveVisitor visitor = new RecursiveVisitor(new MaskIntersection(radius, surface).withExtent(editSession), function -> true);
+        RecursiveVisitor visitor = new RecursiveVisitor(new MaskIntersection(radius, surface), function -> true);
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);
@@ -67,7 +66,7 @@ public class ScatterBrush implements Brush {
         for (int i = 0; i < count; i++) {
             int index = ThreadLocalRandom.current().nextInt(length);
             BlockVector3 pos = visited.get(index);
-            if (pos != null && canApply(editSession, pos)) {
+            if (pos != null && canApply(pos)) {
                 int x = pos.getBlockX();
                 int y = pos.getBlockY();
                 int z = pos.getBlockZ();
@@ -88,12 +87,12 @@ public class ScatterBrush implements Brush {
     public void finish(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pos, Pattern pattern, double size) {
     }
 
-    public boolean canApply(EditSession editSession, BlockVector3 pos) {
-        return mask.test(editSession, pos);
+    public boolean canApply(BlockVector3 pos) {
+        return mask.test(pos);
     }
 
-    public BlockVector3 getDirection(Extent extent, BlockVector3 pt) {
-        return surface.direction(extent, pt);
+    public BlockVector3 getDirection(BlockVector3 pt) {
+        return surface.direction(pt);
     }
 
     public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws MaxChangedBlocksException {

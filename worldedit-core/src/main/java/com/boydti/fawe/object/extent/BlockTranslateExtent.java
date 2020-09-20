@@ -3,7 +3,6 @@ package com.boydti.fawe.object.extent;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -36,8 +35,8 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return super.setBiome(position.add(dx, dz), biome);
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return super.setBiome(position.add(dx, dy, dz), biome);
     }
 
     @Override
@@ -46,8 +45,8 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return super.getBiome(position.add(dx, dz));
+    public BiomeType getBiome(BlockVector3 position) {
+        return super.getBiome(position.add(dx, dy, dz));
     }
 
     @Override

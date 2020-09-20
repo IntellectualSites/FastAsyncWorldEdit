@@ -21,7 +21,7 @@ public class LazyClipboardHolder extends URIClipboardHolder {
      *
      */
     public LazyClipboardHolder(URI uri, ByteSource source, ClipboardFormat format, UUID uuid) {
-        super(uri, EmptyClipboard.INSTANCE);
+        super(uri, EmptyClipboard.getInstance());
         this.source = source;
         this.format = format;
         this.uuid = uuid != null ? uuid : UUID.randomUUID();

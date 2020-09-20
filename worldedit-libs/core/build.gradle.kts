@@ -14,5 +14,4 @@ dependencies {
     "shade"("org.enginehub.piston:core:${Versions.PISTON}")
     "shade"("org.enginehub.piston.core-ap:runtime:${Versions.PISTON}")
     "shade"("org.enginehub.piston:default-impl:${Versions.PISTON}")
-    "shade"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0")
 }

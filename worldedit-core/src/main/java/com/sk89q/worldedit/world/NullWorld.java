@@ -32,7 +32,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
@@ -95,9 +94,13 @@ public class NullWorld extends AbstractWorld {
     public boolean clearContainerBlockContents(BlockVector3 position) {
         return false;
     }
+    @Override
+    public boolean fullySupports3DBiomes() {
+        return false;
+    }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         return BiomeTypes.THE_VOID;
     }
 
@@ -107,7 +110,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return false;
     }
 
@@ -164,7 +167,12 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public IChunkGet get(int x, int z) {
-        return NullChunkGet.INSTANCE;
+        return NullChunkGet.getInstance();
+    }
+
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
+        return this.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
     @Override

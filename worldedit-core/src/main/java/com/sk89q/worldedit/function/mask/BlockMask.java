@@ -188,8 +188,8 @@ public class BlockMask extends ABlockMask {
     }
 
     @Override
-    public boolean test(Extent extent, BlockVector3 vector) {
-        int test = vector.getOrdinal(extent);
+    public boolean test(BlockVector3 vector) {
+        int test = getExtent().getBlock(vector).getOrdinal();
         return ordinals[test] || replacesAir() && test == 0;
     }
 
@@ -320,6 +320,11 @@ public class BlockMask extends ABlockMask {
         boolean[] cloned = ordinals.clone();
         for (int i = 0; i < cloned.length; i++) {
             cloned[i] = !cloned[i];
+        }
+        if(replacesAir()){
+            cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
+            cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
+            cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;
         }
         return new BlockMask(getExtent(), cloned);
     }
