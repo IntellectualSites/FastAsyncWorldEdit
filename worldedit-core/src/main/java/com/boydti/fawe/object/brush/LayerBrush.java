@@ -6,6 +6,7 @@ import com.boydti.fawe.object.mask.RadiusMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -47,6 +48,11 @@ public class LayerBrush implements Brush {
         Operations.completeBlindly(visitor);
         BlockVectorSet visited = visitor.getVisited();
         visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
+            @Override
+            public boolean test(Extent extent, BlockVector3 vector) {
+                return test(vector);
+            }
+
             @Override
             public boolean test(BlockVector3 pos) {
                 int depth = visitor.getDepth() + 1;
