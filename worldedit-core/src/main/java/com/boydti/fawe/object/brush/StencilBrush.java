@@ -4,6 +4,7 @@ import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
@@ -55,6 +56,11 @@ public class StencilBrush extends HeightBrush {
 
         double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor = new RecursiveVisitor(new AbstractExtentMask(editSession) {
+            @Override
+            public boolean test(Extent extent, BlockVector3 vector) {
+                return test(vector);
+            }
+
             private final MutableVector3 mutable = new MutableVector3();
             @Override
             public boolean test(BlockVector3 vector) {
