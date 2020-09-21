@@ -3,6 +3,7 @@ package com.boydti.fawe.beta.implementation.filter;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.implementation.filter.block.DelegateFilter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
 import java.util.function.Supplier;
@@ -33,7 +34,12 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
 
     @Override
     public void applyBlock(FilterBlock block) {
-        if (mask.test(block)) {
+        if (mask instanceof AbstractExtentMask) {
+            if (((AbstractExtentMask) mask).test(block, block)) {
+                getParent().applyBlock(block);
+                this.changes++;
+            }
+        } else if (mask.test(block)) {
             getParent().applyBlock(block);
             this.changes++;
         }

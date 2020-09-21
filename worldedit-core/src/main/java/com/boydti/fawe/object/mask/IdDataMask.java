@@ -12,13 +12,18 @@ public class IdDataMask extends AbstractExtentMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(BlockVector3 vector) {
+    public boolean test(Extent extent, BlockVector3 vector) {
         if (combined != -1) {
             return getExtent().getBlock(vector).getInternalId() == combined;
         } else {
             combined = getExtent().getBlock(vector).getInternalId();
             return true;
         }
+    }
+
+    @Override
+    public boolean test(BlockVector3 vector) {
+        return test(getExtent(), vector);
     }
 
     @Override

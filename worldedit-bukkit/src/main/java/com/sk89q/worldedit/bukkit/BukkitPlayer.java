@@ -60,6 +60,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.permissions.PermissionAttachment;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
@@ -73,16 +74,19 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     private Player player;
     private WorldEditPlugin plugin;
+    private PermissionAttachment permAttachment;
 
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
+        this.permAttachment = player.addAttachment(plugin);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        this.permAttachment = player.addAttachment(plugin);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -239,16 +243,20 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *  Permissions are used to managing WorldEdit region restrictions
          *   - The `/wea` command will give/remove the required bypass permission
          */
+        boolean usesuperperms = VaultResolver.perms == null;
         if (VaultResolver.perms != null) {
             if (value) {
                 if (!VaultResolver.perms.playerAdd(player, permission)) {
-                    player.addAttachment(plugin).setPermission(permission, value);
+                    usesuperperms = true;
                 }
-            } else if (!VaultResolver.perms.playerRemove(player, permission)) {
-                player.addAttachment(plugin).setPermission(permission, value);
+            } else {
+                if (!VaultResolver.perms.playerRemove(player, permission)) {
+                    usesuperperms = true;
+                }
             }
-        } else {
-            player.addAttachment(plugin).setPermission(permission, value);
+        }
+        if (usesuperperms) {
+            permAttachment.setPermission(permission, value);
         }
     }
 
