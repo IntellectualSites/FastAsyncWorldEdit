@@ -544,7 +544,14 @@ public class ClipboardCommands {
     }
     
     private void saveDiskClipboard(Clipboard clipboard) {
+        DiskOptimizedClipboard c;
         if (clipboard instanceof DiskOptimizedClipboard)
-            ((DiskOptimizedClipboard) clipboard).flush();
+            c = (DiskOptimizedClipboard) clipboard;
+        else if (clipboard instanceof BlockArrayClipboard
+                 && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard)
+            c = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+        else
+            return;
+        c.flush();
     }
 }
