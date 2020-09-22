@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -161,8 +162,7 @@ public class StringMan {
     }
 
     public static String toProperCase(String s) {
-        return s.substring(0, 1).toUpperCase() +
-                s.substring(1);
+        return s.substring(0, 1).toUpperCase(Locale.ROOT) + s.substring(1);
     }
 
     public static List<String> split(String input, char delim) {

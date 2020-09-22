@@ -129,7 +129,7 @@
 //                            URI uri = file.toURI();
 //                            ClipboardFormat format = ClipboardFormats.findByFile(file);
 //                            format.hold(player, uri, new FileInputStream(file));
-//                            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , filename));
+//                            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded", filename));
 //                            session.setVirtualWorld(null);
 //                            return;
 //                        }
@@ -165,7 +165,7 @@
 //                                MultiClipboardHolder multi = new MultiClipboardHolder(URI.create(""), new LazyClipboardHolder(uri, source, format, null));
 //                                session.addClipboard(multi);
 //                                select.put(clicked, true);
-//                                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded" , file.getName()));
+//                                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded", file.getName()));
 //                            }
 //                        }
 //                        // Resend relevant chunks
@@ -590,28 +590,4 @@
 //            }
 //        }
 //    }
-//
-//	@Override
-//	public boolean playEffect(Vector3 position, int type, int data) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean setBiome(BlockVector2 position, BiomeType biome) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-//
-//	@Override
-//	public BlockVector3 getSpawnPosition() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 //}

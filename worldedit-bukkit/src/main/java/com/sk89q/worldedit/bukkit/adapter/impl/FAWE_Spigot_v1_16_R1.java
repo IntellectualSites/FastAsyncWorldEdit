@@ -88,7 +88,9 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
     }
 
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
+            return false;
+        }
         ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
@@ -189,9 +191,13 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
                 }
             }
         } else {
-            if (existing == blockData) return true;
+            if (existing == blockData) {
+                return true;
+            }
             if (section == null) {
-                if (blockData.isAir()) return true;
+                if (blockData.isAir()) {
+                    return true;
+                }
                 sections[y4] = section = new ChunkSection(y4 << 4);
             }
             nmsChunk.setType(blockPos, blockData, false);
@@ -287,7 +293,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
             } catch (NullPointerException e) {
                 init();
                 return adaptToChar(ibd);
-            } catch(ArrayIndexOutOfBoundsException e1){
+            } catch (ArrayIndexOutOfBoundsException e1) {
                 Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
                 return 0;
             }
@@ -393,7 +399,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
 //                    originalWorld.getMethodProfiler(),
 //                    server.worldLoadListenerFactory.create(11),
 //                    env,
-//                    gen){
+//                    gen) {
 //                @Override
 //                public boolean addEntityChunk(Entity entity) {
 //                    //Fixes #320; Prevent adding entities so we aren't attempting to spawn them asynchronously

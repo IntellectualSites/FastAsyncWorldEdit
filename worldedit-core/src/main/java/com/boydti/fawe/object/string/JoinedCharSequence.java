@@ -61,7 +61,9 @@ public class JoinedCharSequence implements CharSequence {
         CharSequence anotherString = (CharSequence) obj;
         if (length == anotherString.length()) {
             for (int i = length - 1; i >= 0; i--) {
-                if (charAt(i) != anotherString.charAt(i)) return false;
+                if (charAt(i) != anotherString.charAt(i)) {
+                    return false;
+                }
             }
             return true;
         }

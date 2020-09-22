@@ -18,7 +18,12 @@ public class FuzzyRegion extends AbstractRegion {
 
     private final Mask mask;
     private BlockVectorSet set = new BlockVectorSet();
-    private int minX, minY, minZ, maxX, maxY, maxZ;
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
     private Extent extent;
 
     {

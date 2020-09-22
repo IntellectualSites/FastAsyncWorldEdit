@@ -20,12 +20,16 @@ public class SuggestInputParseException extends InputParseException {
     }
 
     public static SuggestInputParseException of(Throwable other, String prefix, Supplier<List<String>> getSuggestions) {
-        if (other instanceof InputParseException) return of((InputParseException) other, prefix, getSuggestions);
+        if (other instanceof InputParseException) {
+            return of((InputParseException) other, prefix, getSuggestions);
+        }
         return of(new InputParseException(other.getMessage()), prefix, getSuggestions);
     }
 
     public static SuggestInputParseException of(InputParseException other, String prefix, Supplier<List<String>> getSuggestions) {
-        if (other instanceof SuggestInputParseException) return (SuggestInputParseException) other;
+        if (other instanceof SuggestInputParseException) {
+            return (SuggestInputParseException) other;
+        }
         return new SuggestInputParseException(other, prefix, getSuggestions);
     }
 
@@ -42,7 +46,9 @@ public class SuggestInputParseException extends InputParseException {
         Throwable t = e;
         while (t.getCause() != null) {
             t = t.getCause();
-            if (t instanceof SuggestInputParseException) return (SuggestInputParseException) t;
+            if (t instanceof SuggestInputParseException) {
+                return (SuggestInputParseException) t;
+            }
         }
         return null;
     }

@@ -115,9 +115,9 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/air",
-            aliases = {"/0"},
-            desc = "Sets all the blocks in the region to air"
+        name = "/air",
+        aliases = {"/0"},
+        desc = "Sets all the blocks in the region to air"
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
@@ -126,8 +126,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/test",
-            desc = "test region"
+        name = "/test",
+        desc = "test region"
     )
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
@@ -137,8 +137,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/fixlighting",
-            desc = "Get the light at a position"
+        name = "/fixlighting",
+        desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixLighting(Player player) throws WorldEditException {
@@ -149,25 +149,25 @@ public class RegionCommands {
             final int cz = loc.getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, RelightMode.ALL);
-        player.print(Caption.of("fawe.info.lighting.propagate.selection" , count));
+        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, RelightMode.ALL);
+        player.print(Caption.of("fawe.info.lighting.propagate.selection", count));
     }
 
-//    @Command(
-//            name = "/getlighting",
-//            desc = "Get the light at a position"
-//    )
-//    @CommandPermissions("worldedit.light.fix")
-//    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
-//        final Location loc = player.getLocation();
-//        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-//        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-//        player.print(TextComponent.of("Light: " + block + " | " + sky));
-//    }
+    //    @Command(
+    //        name = "/getlighting",
+    //        desc = "Get the light at a position"
+    //    )
+    //    @CommandPermissions("worldedit.light.fix")
+    //    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
+    //        final Location loc = player.getLocation();
+    //        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+    //        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+    //        player.print(TextComponent.of("Light: " + block + " | " + sky));
+    //    }
 
     @Command(
-            name = "/removelighting",
-            desc = "Removing lighting in a selection"
+        name = "/removelighting",
+        desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
     public void removeLighting(Player player) {
@@ -178,13 +178,13 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection, null, RelightMode.NONE);
-        player.print(Caption.of("fawe.info.updated.lighting.selection" , count));
+        player.print(Caption.of("fawe.info.updated.lighting.selection", count));
     }
 
     @Command(
-            name = "/nbtinfo",
-            aliases = "/nbt",
-            desc = "View nbt info for a block"
+        name = "/nbtinfo",
+        aliases = "/nbt",
+        desc = "View nbt info for a block"
     )
     @CommandPermissions("worldedit.nbtinfo")
     public void nbtinfo(Player player, EditSession editSession) {
@@ -202,8 +202,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/setblocklight",
-            desc = "Set block lighting in a selection"
+        name = "/setblocklight",
+        desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, EditSession editSession, @Selection Region region) {
@@ -211,8 +211,8 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/setskylight",
-            desc = "Set sky lighting in a selection"
+        name = "/setskylight",
+        desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region) {
@@ -338,7 +338,7 @@ public class RegionCommands {
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
-        player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
+        player.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
     }
 
     @Command(
@@ -435,10 +435,10 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/wea",
-            aliases = {"wea", "worldeditanywhere", "/worldeditanywhere", "/weanywhere"},
-            desc = "Bypass region restrictions",
-            descFooter = "Bypass region restrictions"
+        name = "/wea",
+        aliases = {"wea", "worldeditanywhere", "/worldeditanywhere", "/weanywhere"},
+        desc = "Bypass region restrictions",
+        descFooter = "Bypass region restrictions"
     )
     @CommandPermissions("fawe.admin")
     public void wea(Actor actor) throws WorldEditException {
@@ -450,10 +450,10 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/wer",
-            aliases = {"wer", "worldeditregion", "/worldeditregion", "select", "/select"},
-            desc = "Select your current allowed region",
-            descFooter = "Select your current allowed region"
+        name = "/wer",
+        aliases = {"wer", "worldeditregion", "/worldeditregion", "select", "/select"},
+        desc = "Select your current allowed region",
+        descFooter = "Select your current allowed region"
     )
     @CommandPermissions("fawe.worldeditregion")
     public void wer(Player player) throws WorldEditException {
@@ -525,10 +525,9 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/fall",
-            desc = "Have the blocks in the selection fall",
-            descFooter = "Make the blocks in the selection fall\n" +
-                   "The -m flag will only fall within the vertical selection."
+        name = "/fall",
+        desc = "Have the blocks in the selection fall",
+        descFooter = "Make the blocks in the selection fall\n"
     )
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
@@ -537,10 +536,10 @@ public class RegionCommands {
                      @Selection Region region,
                      @Arg(desc = "BlockStateHolder", def = "air")
                              BlockStateHolder replace,
-                     @Switch(name = 'm', desc = "TODO")
+                     @Switch(name = 'm', desc = "Only fall within the vertical selection")
                              boolean notFullHeight) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
-        player.print(Caption.of("fawe.worldedit.visitor.visitor.block" , affected));
+        player.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
     }
 
     @Command(
@@ -602,8 +601,8 @@ public class RegionCommands {
     @Command(
         name = "/regen",
         desc = "Regenerates the contents of the selection",
-        descFooter = "This command might affect things outside the selection,\n" +
-                "if they are within the same chunk."
+        descFooter = "This command might affect things outside the selection,\n"
+            + "if they are within the same chunk."
     )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
@@ -697,10 +696,9 @@ public class RegionCommands {
     @Command(
         name = "/hollow",
         desc = "Hollows out the object contained in this selection",
-        descFooter = "Hollows out the object contained in this selection.\n" +
-            "Optionally fills the hollowed out part with the given block.\n" +
-            "Thickness is measured in manhattan distance."
-
+        descFooter = "Hollows out the object contained in this selection.\n"
+            + "Optionally fills the hollowed out part with the given block.\n"
+            + "Thickness is measured in manhattan distance."
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
@@ -712,7 +710,7 @@ public class RegionCommands {
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
                       @ArgFlag(name = 'm', desc = "Mask to hollow with")
-                              Mask mask) throws WorldEditException {
+                          Mask mask) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
 

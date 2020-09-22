@@ -620,7 +620,9 @@ public final class PlatformCommandManager {
     }
 
     public int parseCommand(String args, InjectedValueAccess access) {
-        if (args.isEmpty()) return 0;
+        if (args.isEmpty()) {
+            return 0;
+        }
         String[] split = parseArgs(args)
                 .map(Substring::getSubstring)
                 .toArray(String[]::new);

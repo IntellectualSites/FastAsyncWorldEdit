@@ -77,7 +77,8 @@ public class PlatformManager {
     private final PlatformCommandManager platformCommandManager;
     private final List<Platform> platforms = new ArrayList<>();
     private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
-    private @Nullable String firstSeenVersion;
+    @Nullable
+    private String firstSeenVersion;
     private final AtomicBoolean initialized = new AtomicBoolean();
     private final AtomicBoolean configured = new AtomicBoolean();
 
@@ -208,7 +209,8 @@ public class PlatformManager {
      * @param capability the capability
      * @return the most preferred platform, or null if no platform was found
      */
-    private synchronized @Nullable Platform findMostPreferred(Capability capability) {
+    @Nullable
+    private synchronized Platform findMostPreferred(Capability capability) {
         Platform preferred = null;
         Preference highest = null;
 
@@ -404,7 +406,7 @@ public class PlatformManager {
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason" , faweException.getComponent()));
+            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
         } else {
             actor.printError("Please report this error: [See console]");
             actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
@@ -459,7 +461,7 @@ public class PlatformManager {
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason" , faweException.getComponent()));
+                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
             } else {
                 player.printError("Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());

@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -42,9 +40,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -54,6 +49,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
@@ -83,7 +84,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Checks equality between a WorldEdit BlockType and a Bukkit Material
+     * Checks equality between a WorldEdit BlockType and a Bukkit Material.
      *
      * @param blockType The WorldEdit BlockType
      * @param type The Bukkit Material
@@ -117,7 +118,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit Actor from a Bukkit CommandSender
+     * Create a WorldEdit Actor from a Bukkit CommandSender.
      *
      * @param sender The Bukkit CommandSender
      * @return The WorldEdit Actor
@@ -284,7 +285,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a Bukkit Material form a WorldEdit ItemType
+     * Create a Bukkit Material form a WorldEdit ItemType.
      *
      * @param itemType The WorldEdit ItemType
      * @return The Bukkit Material
@@ -294,7 +295,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a Bukkit Material form a WorldEdit BlockType
+     * Create a Bukkit Material form a WorldEdit BlockType.
      *
      * @param blockType The WorldEdit BlockType
      * @return The Bukkit Material
@@ -345,7 +346,7 @@ public enum BukkitAdapter {
     private static EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
 
     /**
-     * Converts a Material to a BlockType
+     * Converts a Material to a BlockType.
      *
      * @param material The material
      * @return The blocktype
@@ -356,7 +357,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Converts a Material to a ItemType
+     * Converts a Material to a ItemType.
      *
      * @param material The material
      * @return The itemtype
@@ -370,7 +371,7 @@ public enum BukkitAdapter {
     private static Map<String, BlockState> blockStateStringCache = new HashMap<>();
 
     /**
-     * Create a WorldEdit BlockState from a Bukkit BlockData
+     * Create a WorldEdit BlockState from a Bukkit BlockData.
      *
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
@@ -382,7 +383,7 @@ public enum BukkitAdapter {
     private static Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
 
     /**
-     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
+     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder.
      *
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
@@ -392,7 +393,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BlockState from a Bukkit ItemStack
+     * Create a WorldEdit BlockState from a Bukkit ItemStack.
      *
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BlockState
@@ -402,7 +403,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a WorldEdit BaseItemStack from a Bukkit ItemStack
+     * Create a WorldEdit BaseItemStack from a Bukkit ItemStack.
      *
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BaseItemStack
@@ -412,7 +413,7 @@ public enum BukkitAdapter {
     }
 
     /**
-     * Create a Bukkit ItemStack from a WorldEdit BaseItemStack
+     * Create a Bukkit ItemStack from a WorldEdit BaseItemStack.
      *
      * @param item The WorldEdit BaseItemStack
      * @return The Bukkit ItemStack

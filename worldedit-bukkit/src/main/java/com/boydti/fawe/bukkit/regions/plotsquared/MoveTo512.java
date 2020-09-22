@@ -62,7 +62,7 @@ public class MoveTo512 /*extends Command*/ {
 //                if (yMax != 15) {
 //                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
 //                }
-//            } else if (layer == 0){
+//            } else if (layer == 0) {
 //                Arrays.fill(ids, 256, 4096, (byte) 3);
 //                Arrays.fill(ids, 0, 256, (byte) 7);
 //            } else {
@@ -113,7 +113,7 @@ public class MoveTo512 /*extends Command*/ {
 //                    int yMax158 = yMax15 << 8;
 //                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
 //                }
-//            } else if (layer == 0){
+//            } else if (layer == 0) {
 //                Arrays.fill(ids, 256, 4096, (byte) hpw.ROAD_BLOCK.id);
 //                Arrays.fill(ids, 0, 256, (byte) 7);
 //            } else {

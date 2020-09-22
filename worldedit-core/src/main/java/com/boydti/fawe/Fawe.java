@@ -152,7 +152,7 @@ public class Fawe {
         }
         debugPlain(s);
     }
-    
+
     /**
      * Write something to the console
      *
@@ -220,7 +220,7 @@ public class Fawe {
         }
         return queueHandler;
     }
-    
+
     // TODO: Ping @MattBDev to reimplement 2020-02-04
 //    public DefaultTransformParser getTransformParser() {
 //        return transformParser;
@@ -280,8 +280,8 @@ public class Fawe {
      *
      * @return FaweVersion
      */
-    public
     @Nullable
+    public
     FaweVersion getVersion() {
         return version;
     }
@@ -305,7 +305,7 @@ public class Fawe {
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.16/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignored) {}
         try {
             Settings.IMP.reload(file);
         } catch (Throwable e) {

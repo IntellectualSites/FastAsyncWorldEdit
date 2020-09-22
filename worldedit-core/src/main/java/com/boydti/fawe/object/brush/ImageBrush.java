@@ -112,7 +112,9 @@ public class ImageBrush implements Brush {
                         z2 = tmp;
                     }
 
-                    if (x1 >= width || x2 < 0 || z1 >= height || z2 < 0) return false;
+                    if (x1 >= width || x2 < 0 || z1 >= height || z2 < 0) {
+                        return false;
+                    }
 
 
                     int color = colorFunction.call(x1, z1, x2, z2, editSession, vector);

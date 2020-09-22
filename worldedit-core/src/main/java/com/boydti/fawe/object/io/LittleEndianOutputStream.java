@@ -66,8 +66,11 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
     @Override
     public void writeBoolean(boolean b) throws IOException {
 
-        if (b) this.write(1);
-        else this.write(0);
+        if (b) {
+            this.write(1);
+        } else {
+            this.write(0);
+        }
 
     }
 
@@ -249,12 +252,18 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
 
         for (int i = 0 ; i < numchars ; i++) {
             int c = s.charAt(i);
-            if ((c >= 0x0001) && (c <= 0x007F)) numbytes++;
-            else if (c > 0x07FF) numbytes += 3;
-            else numbytes += 2;
+            if ((c >= 0x0001) && (c <= 0x007F)) {
+                numbytes++;
+            } else if (c > 0x07FF) {
+                numbytes += 3;
+            } else {
+                numbytes += 2;
+            }
         }
 
-        if (numbytes > 65535) throw new UTFDataFormatException();
+        if (numbytes > 65535) {
+            throw new UTFDataFormatException();
+        }
 
         out.write((numbytes >>> 8) & 0xFF);
         out.write(numbytes & 0xFF);

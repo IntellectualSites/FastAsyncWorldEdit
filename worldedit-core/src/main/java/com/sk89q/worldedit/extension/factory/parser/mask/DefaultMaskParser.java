@@ -118,7 +118,7 @@
 ////                                    () -> {
 ////                                        if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
 ////                                        return dispatcher.getAliases().stream().filter(
-////                                                s -> s.startsWith(command.toLowerCase())
+////                                                s -> s.startsWith(command.toLowerCase(Locale.ROOT))
 ////                                        ).collect(Collectors.toList());
 ////                                    }
 ////                            );
@@ -147,7 +147,7 @@
 //                                    input = input.substring(input.indexOf(char0) + 1);
 //                                    mask = parseFromInput(char0 + "[" + input + "]", context);
 //                                    if (actor != null) {
-//                                        actor.print(Caption.of("fawe.worldedit.help.command.clarifying.bracket" , char0 + "[" + input + "]"));
+//                                        actor.print(Caption.of("fawe.worldedit.help.command.clarifying.bracket", char0 + "[" + input + "]"));
 //                                    }
 //                                    return mask;
 //                            }
@@ -164,7 +164,7 @@
 //                            {
 //                                try {
 //                                    builder.addRegex(full);
-//                                } catch (InputParseException ignore) {}
+//                                } catch (InputParseException ignored) {}
 //                            }
 //                            if (mask == null) {
 //                                context.setPreferringWildcard(false);

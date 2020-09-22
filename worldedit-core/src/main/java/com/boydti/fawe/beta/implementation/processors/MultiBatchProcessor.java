@@ -23,7 +23,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             if (processor instanceof MultiBatchProcessor) {
                 list.addAll(Arrays.asList(((MultiBatchProcessor) processor).processors));
-            } else if (!(processor instanceof EmptyBatchProcessor)){
+            } else if (!(processor instanceof EmptyBatchProcessor)) {
                 list.add(processor);
             }
         }
@@ -109,7 +109,9 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public void flush() {
-        for (IBatchProcessor processor : this.processors) processor.flush();
+        for (IBatchProcessor processor : this.processors) {
+            processor.flush();
+        }
     }
 
     @Override

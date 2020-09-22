@@ -312,8 +312,6 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw int array to unstretched palette (1.16)
-     * @param layerOffset
-     * @param blocks
      * @return palette
      */
     public Palette toPaletteUnstretched(int layerOffset, int[] blocks) {
@@ -518,7 +516,9 @@ public enum FaweCache implements Trimable {
             }
             list.add(tag);
         }
-        if (clazz == null) clazz = EndTag.class;
+        if (clazz == null) {
+            clazz = EndTag.class;
+        }
         return new ListTag(clazz, list);
     }
 
@@ -532,7 +532,9 @@ public enum FaweCache implements Trimable {
             }
             list.add(tag);
         }
-        if (clazz == null) clazz = EndTag.class;
+        if (clazz == null) {
+            clazz = EndTag.class;
+        }
         return new ListTag(clazz, list);
     }
 
@@ -543,9 +545,9 @@ public enum FaweCache implements Trimable {
         int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
         return new ThreadPoolExecutor(nThreads, nThreads,
-                0L, TimeUnit.MILLISECONDS, queue
-                , Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy()) {
+                                      0L, TimeUnit.MILLISECONDS, queue,
+                                      Executors.defaultThreadFactory(),
+                                      new ThreadPoolExecutor.CallerRunsPolicy()) {
             protected void afterExecute(Runnable r, Throwable t) {
                 try {
                     super.afterExecute(r, t);

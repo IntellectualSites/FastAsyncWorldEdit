@@ -97,7 +97,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * Resets the queue.
      */
     protected synchronized void reset() {
-        if (!this.initialized) return;
+        if (!this.initialized) {
+            return;
+        }
         if (!this.chunks.isEmpty()) {
             for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
@@ -170,9 +172,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
         if (Fawe.isMainThread()) {
             V result = (V)chunk.call();
-            if (result == null){
+            if (result == null) {
                 return (V) (Future) Futures.immediateFuture(null);
-            }else{
+            } else {
                 return result;
             }
         }
@@ -275,7 +277,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 while (!submissions.isEmpty()) {
                     Future future = submissions.poll();
                     try {
-                        while (future != null) future = (Future) future.get();
+                        while (future != null) {
+                            future = (Future) future.get();
+                        }
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
@@ -284,7 +288,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             for (int i = 0; i < overflow; i++) {
                 Future first = submissions.poll();
                 try {
-                    while (first != null) first = (Future) first.get();
+                    while (first != null) {
+                        first = (Future) first.get();
+                    }
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }

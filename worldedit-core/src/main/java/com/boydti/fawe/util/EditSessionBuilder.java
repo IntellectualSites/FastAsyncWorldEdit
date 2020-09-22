@@ -39,6 +39,7 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -125,12 +126,6 @@ public class EditSessionBuilder {
         return this;
     }
 
-    /**
-     * @param disk If it should be stored on disk
-     * @param uuid The uuid to store it under (if on disk)
-     * @param compression Compression level (0-9)
-     * @return
-     */
     public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid, int compression) {
         if (disk) {
             if (Settings.IMP.HISTORY.USE_DATABASE) {
@@ -217,13 +212,13 @@ public class EditSessionBuilder {
             return new NullExtent(extent, FaweCache.MANUAL);
         }
         final Extent toReturn = event.getExtent();
-        if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
+        if (toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
             return new NullExtent(toReturn, FaweCache.MANUAL);
         }
         if (toReturn != extent) {
-            String className = toReturn.getClass().getName().toLowerCase();
+            String className = toReturn.getClass().getName().toLowerCase(Locale.ROOT);
             for (String allowed : Settings.IMP.EXTENT.ALLOWED_PLUGINS) {
-                if (className.contains(allowed.toLowerCase())) {
+                if (className.contains(allowed.toLowerCase(Locale.ROOT))) {
                     this.wrapped = true;
                     return toReturn;
                 }
@@ -252,7 +247,9 @@ public class EditSessionBuilder {
     private boolean wrapped;
 
     public EditSessionBuilder compile() {
-        if (compiled) return this;
+        if (compiled) {
+            return this;
+        }
 
         compiled = true;
         wrapped = false;

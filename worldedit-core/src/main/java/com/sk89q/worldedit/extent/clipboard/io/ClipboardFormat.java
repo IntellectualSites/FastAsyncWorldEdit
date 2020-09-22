@@ -101,7 +101,7 @@ public interface ClipboardFormat {
 
     /**
      * Sets the actor's clipboard.
-     * @param actor
+     * @param actor the actor
      * @param uri the URI of the schematic to hold
      * @param inputStream the input stream
      * @throws IOException thrown on I/O error

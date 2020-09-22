@@ -21,7 +21,9 @@ public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
 
     @Override
     public void clear() {
-        if (!isEmpty()) super.clear();
+        if (!isEmpty()) {
+            super.clear();
+        }
     }
 }
 

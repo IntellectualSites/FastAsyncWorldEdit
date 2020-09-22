@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LevenshteinDistance implements Function<String, Integer> {
 
-    public final static Pattern STANDARD_CHARS = Pattern.compile("[ _\\-]");
+    public static final Pattern STANDARD_CHARS = Pattern.compile("[ _\\-]");
 
     private final String baseString;
     private final boolean caseSensitive;

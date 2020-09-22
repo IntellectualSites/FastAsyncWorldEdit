@@ -62,12 +62,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
@@ -170,23 +169,24 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7d" + part);
+            player.sendMessage("§d" + part);
         }
     }
 
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A77" + part);
+            player.sendMessage("§7" + part);
         }
     }
 
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
+            player.sendMessage("§c" + part);
         }
     }
+
     @Override
     public void print(Component component) {
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
@@ -240,10 +240,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *  Permissions are used to managing WorldEdit region restrictions
          *   - The `/wea` command will give/remove the required bypass permission
          */
-        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit> imp().getVault().permission == null) {
+        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit>imp().getVault().permission == null) {
             player.addAttachment(plugin).setPermission(permission, value);
         } else if (value) {
-            if (!Fawe.<FaweBukkit> imp().getVault().permission.playerAdd(player, permission)) {
+            if (!Fawe.<FaweBukkit>imp().getVault().permission.playerAdd(player, permission)) {
                 player.addAttachment(plugin).setPermission(permission, value);
             }
         } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {

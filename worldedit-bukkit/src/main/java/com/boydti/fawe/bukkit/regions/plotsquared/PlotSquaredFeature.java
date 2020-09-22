@@ -24,13 +24,15 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PlotSquaredFeature extends FaweMaskManager {
 
@@ -48,15 +50,15 @@ public class PlotSquaredFeature extends FaweMaskManager {
             } catch (Throwable ignored) {
                 log.debug("Please update PlotSquared: https://www.spigotmc.org/resources/plotsquared-v5.77506/");
             }
-            if (Settings.PLATFORM.toLowerCase().startsWith("bukkit")) {
+            if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
             }
             if (MainCommand.getInstance().getCommand("generatebiome") == null) {
                 new PlotSetBiome();
-          }
+            }
         }
-// TODO: revisit this later on
-/*
+        // TODO: revisit this later on
+        /*
         try {
             if (Settings.Enabled_Components.WORLDS) {
                 new ReplaceAll();
@@ -64,7 +66,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         } catch (Throwable e) {
             log.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
         }
-*/
+        */
     }
 
     public static String getName(UUID uuid) {
@@ -97,7 +99,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         UUID uid = player.getUniqueId();
         return !plot.getFlag(NoWorldeditFlag.class) && (plot.isOwner(uid)
             || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
-            .contains(DBFunc.EVERYONE)
+                                                                                  .contains(DBFunc.EVERYONE)
             || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
             && player.hasPermission("fawe.plotsquared.member")) || player
             .hasPermission("fawe.plotsquared.admin"));
@@ -113,7 +115,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         Plot plot = pp.getCurrentPlot();
         if (isAllowed(player, plot, type)) {
             regions = plot.getRegions();
-        } else {    
+        } else {
             plot = null;
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
@@ -147,8 +149,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         } else {
             World world = FaweAPI.getWorld(area.getWorldName());
             List<Region> weRegions = regions.stream()
-                    .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
-                    .collect(Collectors.toList());
+                                            .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
+                                            .collect(Collectors.toList());
             maskedRegion = new RegionIntersection(world, weRegions);
         }
 
@@ -166,7 +168,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
     @Override
     public RegionFilter getFilter(String world) {
         PlotArea area = PlotSquared.get().getPlotArea(world, null);
-        if (area != null) return new PlotRegionFilter(area);
+        if (area != null) {
+            return new PlotRegionFilter(area);
+        }
         return null;
     }
 }

@@ -61,7 +61,9 @@ public class LongHashSet {
     public void add(long key) {
         int mainIdx = (int) (key & 255);
         long outer[][] = this.values[mainIdx];
-        if (outer == null) this.values[mainIdx] = outer = new long[256][];
+        if (outer == null) {
+            this.values[mainIdx] = outer = new long[256][];
+        }
 
         int outerIdx = (int) ((key >> 32) & 255);
         long inner[] = outer[outerIdx];
@@ -88,23 +90,33 @@ public class LongHashSet {
 
     public boolean containsKey(long key) {
         long[][] outer = this.values[(int) (key & 255)];
-        if (outer == null) return false;
+        if (outer == null) {
+            return false;
+        }
 
         long[] inner = outer[(int) ((key >> 32) & 255)];
-        if (inner == null) return false;
+        if (inner == null) {
+            return false;
+        }
 
         for (long entry : inner) {
-            if (entry == key) return true;
+            if (entry == key) {
+                return true;
+            }
         }
         return false;
     }
 
     public void remove(long key) {
         long[][] outer = this.values[(int) (key & 255)];
-        if (outer == null) return;
+        if (outer == null) {
+            return;
+        }
 
         long[] inner = outer[(int) ((key >> 32) & 255)];
-        if (inner == null) return;
+        if (inner == null) {
+            return;
+        }
 
         int max = inner.length - 1;
         for (int i = 0; i <= max; i++) {
@@ -122,11 +134,15 @@ public class LongHashSet {
 
     public long popFirst() {
         for (long[][] outer: this.values) {
-            if (outer == null) continue;
+            if (outer == null) {
+                continue;
+            }
 
             for (int i = 0; i < outer.length; i++) {
                 long[] inner = outer[i];
-                if (inner == null || inner.length == 0) continue;
+                if (inner == null || inner.length == 0) {
+                    continue;
+                }
 
                 this.count--;
                 long ret = inner[inner.length - 1];
@@ -142,11 +158,15 @@ public class LongHashSet {
         int index = 0;
         long[] ret = new long[this.count];
         for (long[][] outer : this.values) {
-            if (outer == null) continue;
+            if (outer == null) {
+                continue;
+            }
 
             for (int oIdx = outer.length - 1; oIdx >= 0; oIdx--) {
                 long[] inner = outer[oIdx];
-                if (inner == null) continue;
+                if (inner == null) {
+                    continue;
+                }
 
                 for (long entry: inner) {
                     ret[index++] = entry;
@@ -162,10 +182,14 @@ public class LongHashSet {
         int index = 0;
         long[] ret = new long[this.count];
         for (long[][] outer : this.values) {
-            if (outer == null) continue;
+            if (outer == null) {
+                continue;
+            }
 
             for (long[] inner : outer) {
-                if (inner == null) continue;
+                if (inner == null) {
+                    continue;
+                }
 
                 for (long entry : inner) {
                     ret[index++] = entry;

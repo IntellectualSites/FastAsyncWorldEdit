@@ -27,7 +27,9 @@ public class SimplexMaskParser extends RichParser<Mask> {
 
     @Override
     protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length != 3) return null;
+        if (arguments.length != 3) {
+            return null;
+        }
         double scale = Double.parseDouble(arguments[0]);
         double min = Double.parseDouble(arguments[1]);
         double max = Double.parseDouble(arguments[2]);

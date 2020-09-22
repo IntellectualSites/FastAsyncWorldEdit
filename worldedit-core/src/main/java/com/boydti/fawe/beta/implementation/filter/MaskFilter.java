@@ -44,7 +44,7 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
      *
      * @return number of blocks which passed the Mask test and were applied to
      */
-    public int getBlocksApplied(){
+    public int getBlocksApplied() {
         return this.changes;
     }
 

@@ -15,7 +15,8 @@ import java.util.Set;
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
 public class LocalBlockVectorSet implements Set<BlockVector3> {
-    private int offsetX, offsetZ;
+    private int offsetX;
+    private int offsetZ;
     private final SparseBitSet set;
 
     public LocalBlockVectorSet() {

@@ -75,51 +75,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public void flush() {
-        try {
-            if (!Fawe.isMainThread()) {
-                while (waitingAsync.get() > 0) {
-                    synchronized (waitingAsync) {
-                        waitingAsync.wait(1000);
-                    }
-                }
-            }
-            while (waitingCombined.get() > 0) {
-                synchronized (waitingCombined) {
-                    waitingCombined.wait(1000);
-                }
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (!closed) {
-            closed = true;
-            flush();
-        }
-    }
-
-    public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);
-
-    @Override
-    public Iterator<Change> backwardIterator() {
-        return getIterator(false);
-    }
-
-    @Override
-    public Iterator<Change> forwardIterator() {
-        return getIterator(true);
-    }
-
-    @Override
-    public Extent construct(Extent child) {
-        return new HistoryExtent(child, this);
-    }
-
-    @Override
     public synchronized IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
@@ -204,6 +159,31 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return set;
     }
 
+    @Override
+    public Extent construct(Extent child) {
+        return new HistoryExtent(child, this);
+    }
+
+    @Override
+    public void flush() {
+        try {
+            if (!Fawe.isMainThread()) {
+                while (waitingAsync.get() > 0) {
+                    synchronized (waitingAsync) {
+                        waitingAsync.wait(1000);
+                    }
+                }
+            }
+            while (waitingCombined.get() > 0) {
+                synchronized (waitingCombined) {
+                    waitingCombined.wait(1000);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public abstract void addTileCreate(CompoundTag tag);
 
     public abstract void addTileRemove(CompoundTag tag);
@@ -237,6 +217,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         editSession.setSize(1);
         return editSession;
     }
+
+    public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);
 
     public void add(EntityCreate change) {
         CompoundTag tag = change.state.getNbtData();
@@ -274,6 +256,28 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
     }
 
+    @Override
+    public Iterator<Change> backwardIterator() {
+        return getIterator(false);
+    }
+
+    @Override
+    public Iterator<Change> forwardIterator() {
+        return getIterator(true);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (!closed) {
+            closed = true;
+            flush();
+        }
+    }
+
+    public boolean isEmpty() {
+        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
+    }
+
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
@@ -302,10 +306,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean isEmpty() {
-        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
     }
 
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {

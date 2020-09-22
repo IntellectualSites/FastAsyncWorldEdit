@@ -9,7 +9,9 @@ import java.util.Optional;
 public class MethodCommands {
 
     public static String getArguments(InjectedValueAccess context) {
-        if (context == null) return null;
+        if (context == null) {
+            return null;
+        }
         Optional<Arguments> arguments = context.injectedValue(Key.of(Arguments.class));
         return arguments.map(Arguments::get).orElse(null);
     }

@@ -11,10 +11,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.SplittableRandom;
 
 public class RandomOffsetPattern extends AbstractPattern {
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private final Pattern pattern;
 
-    private transient int dx2, dy2, dz2;
+    private transient int dx2;
+    private transient int dy2;
+    private transient int dz2;
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient SplittableRandom r;
 

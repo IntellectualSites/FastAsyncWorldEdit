@@ -55,13 +55,15 @@ public class MemUtil {
     private static Queue<Runnable> memoryPlentifulTasks = new ConcurrentLinkedQueue<>();
 
     public static void addMemoryLimitedTask(Runnable run) {
-        if (run != null)
+        if (run != null) {
             memoryLimitedTasks.add(run);
+        }
     }
 
     public static void addMemoryPlentifulTask(Runnable run) {
-        if (run != null)
+        if (run != null) {
             memoryPlentifulTasks.add(run);
+        }
     }
 
     public static void memoryLimitedTask() {

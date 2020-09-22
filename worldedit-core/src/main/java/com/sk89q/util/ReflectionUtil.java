@@ -28,10 +28,11 @@ public final class ReflectionUtil {
 
     @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
-        if (from instanceof Class)
+        if (from instanceof Class) {
             return getField((Class) from, null, name);
-        else
+        } else {
             return getField(from.getClass(), from, name);
+        }
     }
 
     @SuppressWarnings("unchecked")

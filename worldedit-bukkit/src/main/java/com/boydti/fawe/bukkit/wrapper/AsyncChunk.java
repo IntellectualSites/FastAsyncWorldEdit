@@ -106,7 +106,8 @@ public class AsyncChunk implements Chunk {
     }
 
     @Override
-    public @NotNull BlockState[] getTileEntities(boolean useSnapshot) {
+    @NotNull
+    public BlockState[] getTileEntities(boolean useSnapshot) {
         if (!isLoaded()) {
             return new BlockState[0];
         }

@@ -139,7 +139,7 @@ public abstract class CharBlocks implements IBlocks {
         sections[layer].set(this, layer, index, value);
     }
 
-    public static abstract class Section {
+    public abstract static class Section {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
 

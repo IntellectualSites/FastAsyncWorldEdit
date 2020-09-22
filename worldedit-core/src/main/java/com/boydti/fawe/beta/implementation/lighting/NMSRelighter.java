@@ -5,7 +5,6 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
@@ -27,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -275,7 +275,7 @@ public class NMSRelighter implements Relighter {
             }
             int lightLevel = iChunk.getEmmittedLight(node.getX() & 15, node.getY(), node.getZ() & 15);
             BlockState state = this.queue.getBlock(node.getX(), node.getY(), node.getZ());
-            String id = state.getBlockType().getId().toLowerCase();
+            String id = state.getBlockType().getId().toLowerCase(Locale.ROOT);
             if (lightLevel <= 1) {
                 continue;
             }
@@ -313,7 +313,7 @@ public class NMSRelighter implements Relighter {
             if (!(checkStairEast(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
                 break east;
             }
-            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+            if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
                 this.computeSpreadBlockLight(x + 1, y, z, currentLight, queue, visited);
                 break east;
             }
@@ -364,7 +364,7 @@ public class NMSRelighter implements Relighter {
             if (!(checkStairWest(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
                 break west;
             }
-            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+            if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
                 this.computeSpreadBlockLight(x - 1, y, z, currentLight, queue, visited);
                 break west;
             }
@@ -415,7 +415,7 @@ public class NMSRelighter implements Relighter {
             if (!(checkStairSouth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
                 break south;
             }
-            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+            if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
                 this.computeSpreadBlockLight(x, y, z + 1, currentLight, queue, visited);
                 break south;
             }
@@ -466,7 +466,7 @@ public class NMSRelighter implements Relighter {
             if (!(checkStairNorth(state) && isStairOrTrueTop(state, top) && isSlabOrTrueValue(state, top ? "top" : "bottom"))) {
                 break north;
             }
-            if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+            if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
                 this.computeSpreadBlockLight(x, y, z - 1, currentLight, queue, visited);
                 break north;
             }
@@ -605,7 +605,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private boolean checkStairNorth(BlockState state) {
-        if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+        if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
             return true;
         }
         Direction direction = getStairDir(state);
@@ -623,7 +623,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private boolean checkStairSouth(BlockState state) {
-        if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+        if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
             return true;
         }
         Direction direction = getStairDir(state);
@@ -641,7 +641,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private boolean checkStairEast(BlockState state) {
-        if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+        if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
             return true;
         }
         Direction direction = getStairDir(state);
@@ -659,7 +659,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private boolean checkStairWest(BlockState state) {
-        if (!state.getBlockType().getId().toLowerCase().contains("stair")) {
+        if (!state.getBlockType().getId().toLowerCase(Locale.ROOT).contains("stair")) {
             return true;
         }
         Direction direction = getStairDir(state);
@@ -681,7 +681,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private String getStairShape(BlockState state) {
-        return state.getState(stairShape).toLowerCase();
+        return state.getState(stairShape).toLowerCase(Locale.ROOT);
     }
 
     private boolean isStairOrTrueTop(BlockState state, boolean top) {
@@ -778,8 +778,9 @@ public class NMSRelighter implements Relighter {
 
     public void fixBlockLighting() {
         synchronized (lightQueue) {
-            while (!lightLock.compareAndSet(false, true))
+            while (!lightLock.compareAndSet(false, true)) {
                 ;
+            }
             try {
                 updateBlockLight(this.lightQueue);
             } finally {
@@ -801,7 +802,7 @@ public class NMSRelighter implements Relighter {
             if (calculateHeightMaps && heightMaps != null) {
                 Map<HeightMapType, int[]> heightMapList = heightMaps.get(pair);
                 if (heightMapList != null) {
-                    for (Map.Entry<HeightMapType, int[]> heightMapEntry : heightMapList.entrySet()){
+                    for (Map.Entry<HeightMapType, int[]> heightMapEntry : heightMapList.entrySet()) {
                         chunk.setHeightMap(heightMapEntry.getKey(), heightMapEntry.getValue());
                     }
                 }
@@ -954,7 +955,7 @@ public class NMSRelighter implements Relighter {
                             heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
                         }
                         if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid()) && !type
-                            .getId().toLowerCase().contains("leaves")) {
+                            .getId().toLowerCase(Locale.ROOT).contains("leaves")) {
                             heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
                         }
                     }

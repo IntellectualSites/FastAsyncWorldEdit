@@ -31,7 +31,7 @@ var blocktype = context.getBlock(argv[1]);
 
 var cycles = region.getLength();
 
-if (region.getWidth() > cycles){
+if (region.getWidth() > cycles) {
     cycles = region.getWidth();
 }
 

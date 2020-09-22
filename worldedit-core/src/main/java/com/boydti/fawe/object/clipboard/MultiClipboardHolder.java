@@ -28,7 +28,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
 
     public MultiClipboardHolder(URI uri, URIClipboardHolder... addHolders) {
         this(uri);
-        for (URIClipboardHolder h : addHolders) add(h);
+        for (URIClipboardHolder h : addHolders) {
+            add(h);
+        }
     }
 
     public MultiClipboardHolder(Clipboard clipboard) {
@@ -44,7 +46,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
     public void remove(URI uri) {
         cached = null;
         if (getUri().equals(uri)) {
-            for (ClipboardHolder holder : holders) holder.close();
+            for (ClipboardHolder holder : holders) {
+                holder.close();
+            }
             holders.clear();
             return;
         }
@@ -66,7 +70,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             if (holder instanceof URIClipboardHolder) {
                 URIClipboardHolder uriHolder = (URIClipboardHolder) holder;
                 URI uri = uriHolder.getURI(clipboard);
-                if (uri != null) return uri;
+                if (uri != null) {
+                    return uri;
+                }
             }
         }
         return null;
@@ -79,7 +85,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
     @Override
     public boolean contains(Clipboard clipboard) {
         for (ClipboardHolder holder : holders) {
-            if (holder.contains(clipboard)) return true;
+            if (holder.contains(clipboard)) {
+                return true;
+            }
         }
         return false;
     }
@@ -128,7 +136,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             return true;
         }
         for (URIClipboardHolder uch : holders) {
-            if (uch.contains(uri)) return true;
+            if (uch.contains(uri)) {
+                return true;
+            }
         }
         return false;
     }
@@ -154,7 +164,9 @@ public class MultiClipboardHolder extends URIClipboardHolder {
         for (ClipboardHolder holder : getHolders()) {
             if (holder instanceof URIClipboardHolder) {
                 URI uri = ((URIClipboardHolder) holder).getUri();
-                if (!uri.toString().isEmpty()) set.add(uri);
+                if (!uri.toString().isEmpty()) {
+                    set.add(uri);
+                }
             }
         }
         return set;

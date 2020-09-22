@@ -274,7 +274,6 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * Contract the region.
      *
      * @param changes array/arguments with multiple related changes
-     * @throws RegionOperationException
      */
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {

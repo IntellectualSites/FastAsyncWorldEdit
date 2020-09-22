@@ -55,7 +55,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                     return true;
                 }
             }
-        } catch (NotRegisteredException ignore) {
+        } catch (NotRegisteredException ignored) {
         }
         return false;
     }

@@ -11,6 +11,7 @@ public class ExtentHeightCacher extends PassthroughExtent {
     private transient int cacheBotZ = Integer.MIN_VALUE;
     private transient byte[] cacheHeights;
     private transient int lastY;
+
     public ExtentHeightCacher(Extent extent) {
         super(extent);
     }

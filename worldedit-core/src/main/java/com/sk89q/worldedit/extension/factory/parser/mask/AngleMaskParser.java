@@ -30,14 +30,15 @@ public class AngleMaskParser extends RichParser<Mask> {
 
     @Override
     protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length < 2 || arguments.length > 2 + flags.length) return null;
+        if (arguments.length < 2 || arguments.length > 2 + flags.length) {
+            return null;
+        }
         String minArg = arguments[0];
         String maxArg = arguments[1];
         boolean degree = minArg.endsWith("d");
         if (degree ^ maxArg.endsWith("d")) {
             throw new InputParseException("Cannot combine degree with block-step");
         }
-        double min, max;
         boolean overlay = false;
         if (arguments.length > 2) {
             for (int index = 2; index < 2 + flags.length; index++) {
@@ -49,6 +50,8 @@ public class AngleMaskParser extends RichParser<Mask> {
                 }
             }
         }
+        double min;
+        double max;
         if (degree) {
             double minDeg = Double.parseDouble(minArg.substring(0, minArg.length() - 1));
             double maxDeg = Double.parseDouble(maxArg.substring(0, maxArg.length() - 1));

@@ -2,7 +2,11 @@ package com.boydti.fawe.bukkit.adapter.mc1_16_1;
 
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.minecraft.server.v1_16_R1.*;
+import net.minecraft.server.v1_16_R1.Block;
+import net.minecraft.server.v1_16_R1.EnumPistonReaction;
+import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.ITileEntity;
+import net.minecraft.server.v1_16_R1.Material;
 import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
 
 public class BlockMaterial_1_16_1 implements BlockMaterial {

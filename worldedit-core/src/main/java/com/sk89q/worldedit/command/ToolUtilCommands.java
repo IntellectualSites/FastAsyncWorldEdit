@@ -74,8 +74,7 @@ public class ToolUtilCommands {
                      @Switch(name = 'h', desc = "TODO")
                          boolean offHand,
                      @Arg(desc = "The destination mask", def = "")
-                             Mask maskOpt,
-                     Arguments arguments) throws WorldEditException {
+                         Mask maskOpt, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
@@ -105,7 +104,7 @@ public class ToolUtilCommands {
                          @Arg(desc = "The pattern of blocks to use")
                              Pattern pattern,
                          @Switch(name = 'h', desc = "TODO")
-                                 boolean offHand, Arguments arguments) throws WorldEditException {
+                             boolean offHand, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.printInfo(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
@@ -219,8 +218,8 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.secondary")
     public void secondary(Player player, LocalSession session,
-                          @Arg(desc = "The brush command", variable = true) List<String> commandStr)
-            throws WorldEditException {
+                          @Arg(desc = "The brush command", variable = true)
+                              List<String> commandStr) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
@@ -292,7 +291,7 @@ public class ToolUtilCommands {
             return;
         }
         tool.setTargetOffset(offset);
-        player.print(Caption.of("fawe.worldedit.brush.brush.target.offset.set" , offset));
+        player.print(Caption.of("fawe.worldedit.brush.brush.target.offset.set", offset));
     }
 
     @Command(
@@ -304,9 +303,9 @@ public class ToolUtilCommands {
                        @Switch(name = 'h', desc = "TODO")
                            boolean offHand,
                        @Arg(desc = "Target Modes", def = "none")
-                               Scroll.Action mode,
+                           Scroll.Action mode,
                        @Arg(desc = "The scroll action", variable = true)
-                               List<String> commandStr) throws WorldEditException {
+                           List<String> commandStr) throws WorldEditException {
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
             player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
@@ -339,7 +338,7 @@ public class ToolUtilCommands {
                       @Arg(desc = "The destination mask", def = "")
                           Mask maskArg,
                       @Switch(name = 'h', desc = "TODO")
-                              boolean offHand,
+                          boolean offHand,
                       Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {

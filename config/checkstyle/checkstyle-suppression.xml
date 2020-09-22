@@ -5,9 +5,15 @@
 <suppressions>
     <suppress files=".*DataFixer\.java" checks="MethodName|FallThrough"/>
     <suppress files=".*[\\/]MathUtils.java" checks="MethodName"/>
+    <suppress files=".*[\\/]MathMan.java" checks="MethodName"/>
     <suppress files=".*[\\/]bPermissionsResolver.java" checks="TypeName"/>
     <!-- This thing only works via the use of a finalizer. -->
     <suppress files=".*[\\/]TracedEditSession.java" checks="NoFinalizer"/>
     <!-- None of the old command stuff really matters -->
     <suppress files=".*[\\/]minecraft[\\/]util[\\/]commands[\\/].*\.java" checks=".*"/>
+    <suppress files=".*[\\/]net[\\/]jpountz[\\/]lz4[\\/].*\.java" checks=".*"/>
+    <suppress files=".*[\\/]BufferedRandomAccessFile.java" checks=".*"/>
+    <suppress files=".*[\\/]ByteBufferUtils.java" checks="NoWhitespaceBefore"/>
+    <suppress files=".*[\\/]Settings.java" checks="MemberName"/>
+    <suppress files=".*[\\/]FaweLimit.java" checks="MemberName"/>
 </suppressions>

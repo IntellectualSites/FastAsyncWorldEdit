@@ -31,7 +31,7 @@ public class BlockTypesCache {
                     Settings
      -----------------------------------------------------
      */
-    protected final static class Settings {
+    protected static final class Settings {
         protected final int internalId;
         protected final BlockState defaultState;
         protected final AbstractProperty<?>[] propertiesMapArr;
@@ -124,7 +124,9 @@ public class BlockTypesCache {
 
 
     private static int[] generateStateOrdinals(int internalId, int ordinal, int maxStateId, List<AbstractProperty<?>> props) {
-        if (props.isEmpty()) return null;
+        if (props.isEmpty()) {
+            return null;
+        }
         int[] result = new int[maxStateId];
         Arrays.fill(result, -1);
         int[] state = new int[props.size()];
@@ -146,7 +148,9 @@ public class BlockTypesCache {
             while (++state[index] == sizes[index]) {
                 state[index] = 0;
                 index++;
-                if (index == state.length) break outer;
+                if (index == state.length) {
+                    break outer;
+                }
             }
             index = 0;
         }
@@ -162,8 +166,8 @@ public class BlockTypesCache {
     public static final int BIT_OFFSET; // Used internally
     protected static final int BIT_MASK; // Used internally
 
-//    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
-//    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", $REGISTRY);
+    //private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
+    //public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", $REGISTRY);
 
     public static final BlockType[] values;
     public static final BlockState[] states;
@@ -184,7 +188,9 @@ public class BlockTypesCache {
 
             int size = blockMap.size() + 1;
             Field[] idFields = BlockID.class.getDeclaredFields();
-            for (Field field : idFields) size = Math.max(field.getInt(null) + 1, size);
+            for (Field field : idFields) {
+                size = Math.max(field.getInt(null) + 1, size);
+            }
             BIT_OFFSET = MathMan.log2nlz(size);
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
             values = new BlockType[size];
@@ -216,13 +222,17 @@ public class BlockTypesCache {
                 for (Map.Entry<String, String> entry : blockMap.entrySet()) {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
-                    for (; values[internalId] != null; internalId++);
+                    for (; values[internalId] != null; internalId++) {
+                        ;
+                    }
                     BlockType type = register(defaultState, internalId, stateList, tickList);
                     values[internalId] = type;
                 }
             }
             for (int i = 0; i < values.length; i++) {
-                if (values[i] == null) values[i] = values[0];
+                if (values[i] == null) {
+                    values[i] = values[0];
+                }
             }
 
             states = stateList.toArray(new BlockState[stateList.size()]);

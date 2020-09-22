@@ -45,7 +45,9 @@ public class AsyncPreloader implements Preloader, Runnable {
     @Override
     public void update(Player player) {
         LocalSession session = WorldEdit.getInstance().getSessionManager().getIfPresent(player);
-        if (session == null) return;
+        if (session == null) {
+            return;
+        }
         World world = player.getWorld();
         MutablePair<World, Set<BlockVector2>> existing = cancelAndGet(player);
         try {
@@ -67,7 +69,8 @@ public class AsyncPreloader implements Preloader, Runnable {
                     update.notify();
                 }
             }
-        } catch (IncompleteRegionException ignore){}
+        } catch (IncompleteRegionException ignored) {
+        }
     }
 
     @Override
