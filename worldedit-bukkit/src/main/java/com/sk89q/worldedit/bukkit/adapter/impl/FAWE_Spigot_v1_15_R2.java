@@ -28,6 +28,7 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.*;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
+import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
@@ -59,6 +60,7 @@ import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
@@ -68,6 +70,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -79,10 +83,23 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.util.concurrent.Futures;
+import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.math.BlockVector2;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_15_R2 parent;
     private char[] ibdToStateOrdinal;
+    
+    private final Field serverWorldsField;
+    private final Method getChunkFutureMethod;
+    private final Field chunkProviderExecutorField;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -90,6 +107,15 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
 
     public FAWE_Spigot_v1_15_R2() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new Spigot_v1_15_R2();
+        
+        serverWorldsField = CraftServer.class.getDeclaredField("worlds");
+        serverWorldsField.setAccessible(true);
+
+        getChunkFutureMethod = net.minecraft.server.v1_16_R2.ChunkProviderServer.class.getDeclaredMethod("getChunkFutureMainThread", int.class, int.class, net.minecraft.server.v1_16_R2.ChunkStatus.class, boolean.class);
+        getChunkFutureMethod.setAccessible(true);
+
+        chunkProviderExecutorField = net.minecraft.server.v1_16_R2.ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
+        chunkProviderExecutorField.setAccessible(true);
     }
 
     @Override
@@ -372,8 +398,8 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         return parent.fromNative(foreign);
     }
     
-    private static class NoOpWorldLoadListener implements WorldLoadListener {
-        private NoOpWorldLoadListener() {
+    private static class RegenNoOpWorldLoadListener implements WorldLoadListener {
+        private RegenNoOpWorldLoadListener() {
         }
 
         public void a(ChunkCoordIntPair chunkCoordIntPair) {
@@ -384,6 +410,51 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
 
         public void b() {
         }
+    }
+    
+    private Map<ChunkCoordIntPair, IChunkAccess> regenPreGenChunks(Region region, WorldServer serverWorld) {
+        List<CompletableFuture<IChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
+        IAsyncTaskHandler executor;
+        try {
+            executor = (IAsyncTaskHandler) chunkProviderExecutorField.get(serverWorld.getChunkProvider());
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Couldn't get executor for chunk loading.", e);
+        }
+        executor.awaitTasks(() -> {
+            // bail out early if a future fails
+            if (chunkLoadings.stream().anyMatch(ftr -> ftr.isDone() && Futures.getUnchecked(ftr) == null)) {
+                return false;
+            }
+            return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
+        });
+        Map<ChunkCoordIntPair, IChunkAccess> chunks = new HashMap<>();
+        for (CompletableFuture<IChunkAccess> future : chunkLoadings) {
+            @Nullable
+            IChunkAccess chunk = future.getNow(null);
+            Preconditions.checkState(chunk != null, "Failed to generate a chunk, regen failed.");
+            chunks.put(chunk.getPos(), chunk);
+        }
+        return chunks;
+    }
+    
+    private List<CompletableFuture<IChunkAccess>> submitChunkLoadTasks(Region region, WorldServer serverWorld) {
+        ChunkProviderServer chunkManager = serverWorld.getChunkProvider();
+        List<CompletableFuture<IChunkAccess>> chunkLoadings = new ArrayList<>();
+        
+        // Pre-gen all the chunks
+        try {
+            for (BlockVector2 chunk : region.getChunks()) {
+                //noinspection unchecked
+                chunkLoadings.add(
+                    ((CompletableFuture<Either<IChunkAccess, PlayerChunk.Failure>>)
+                        getChunkFutureMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FULL, true))
+                            .thenApply(either -> either.left().orElse(null))
+                );
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("Couldn't load chunk for regen.", e);
+        }
+        return chunkLoadings;
     }
 
     @Override
@@ -402,48 +473,53 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         org.bukkit.generator.ChunkGenerator gen = bukkitWorld.getGenerator();
         Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
         try {
-
-            long seed = options.getSeed().orElse(originalWorld.getSeed());
-
             MinecraftServer server = originalWorld.getServer().getServer();
             WorldData newWorldData = new WorldData(originalWorld.worldData.a((NBTTagCompound)null), server.dataConverterManager, this.getDataVersion(), (NBTTagCompound)null);
             newWorldData.setName("worldeditregentempworld");
             WorldNBTStorage saveHandler = new WorldNBTStorage(saveFolder, originalWorld.getDataManager().getDirectory().getName(), server, server.dataConverterManager);
-            WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalWorld.worldProvider.getDimensionManager(), originalWorld.getMethodProfiler(), new NoOpWorldLoadListener(), env, gen)).get();
-            // Pre-gen all the chunks
-            // We need to also pull one more chunk in every direction
-            Fawe.get().getQueueHandler().startSet(true);
+            WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalWorld.worldProvider.getDimensionManager(), originalWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen)).get();
+            freshWorld.savingDisabled = true;
+            
             try {
+                // Pre-gen all the chunks
+                // We need to also pull one more chunk in every direction
+                Map<ChunkCoordIntPair, IChunkAccess> regenPreGenedChunks = Fawe.get().getQueueHandler().sync((Supplier<Map<ChunkCoordIntPair, IChunkAccess>>) () -> regenPreGenChunks(region, freshWorld)).get();
                 IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
                 extent.init(null, (x, z) -> new BukkitGetBlocks_1_15_2(freshWorld, x, z) {
                     @Override
                     public Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
-                        Chunk cached = freshWorld.getChunkIfLoaded(chunkX, chunkZ);
-                        if (cached != null) {
-                            return cached;
-                        }
-                        Future<Chunk> future = Fawe.get().getQueueHandler().sync((Supplier<Chunk>) () -> freshWorld.getChunkAt(chunkX, chunkZ));
-                        while (!future.isDone()) {
-                            // this feels so dirty
-                            MinecraftServer.getServer().execute(() -> freshWorld.getChunkProvider().runTasks());
-                        }
-                        try {
-                            return future.get();
-                        } catch (InterruptedException | ExecutionException e) {
-                            throw new RuntimeException(e);
-                        }
+                        return (Chunk) regenPreGenedChunks.get(new ChunkCoordIntPair(chunkX, chunkZ));
                     }
                 }, null);
                 for (BlockVector3 vec : region) {
                     realExtent.setBlock(vec, extent.getFullBlock(vec));
                 }
             } finally {
-                Fawe.get().getQueueHandler().endSet(true);
+                Fawe.get().getQueueHandler().sync(() -> {
+                    try {
+                        freshWorld.getChunkProvider().close(false);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             }
         } catch (Throwable e) {
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
             throw new RuntimeException(e);
         } finally {
-            saveFolder.delete();
+            try {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    try {
+                        Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+                        map.remove("worldeditregentempworld");
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } finally {
+                saveFolder.delete();
+            }
         }
         return true;
     }
