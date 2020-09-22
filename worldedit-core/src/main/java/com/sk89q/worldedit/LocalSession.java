@@ -769,20 +769,20 @@ public class LocalSession implements TextureHolder {
      * @throws EmptyClipboardException thrown if no clipboard is set
      */
     public ClipboardHolder getClipboard() throws EmptyClipboardException {
-        if (clipboard == null) {
-            throw new EmptyClipboardException();
-        }
         synchronized (clipboardLock) {
+            if (clipboard == null) {
+                throw new EmptyClipboardException();
+            }
             return clipboard;
         }
     }
 
     @Nullable
     public ClipboardHolder getExistingClipboard() {
-        if (clipboard == null) {
-            return null;
-        }
         synchronized (clipboardLock) {
+            if (clipboard == null) {
+                return null;
+            }
             return clipboard;
         }
     }
