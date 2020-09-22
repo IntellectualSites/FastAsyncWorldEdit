@@ -134,6 +134,7 @@ public class LocalSession implements TextureHolder {
     });
     private transient volatile Integer historyNegativeIndex;
     private transient ClipboardHolder clipboard;
+    private transient final Object clipboardLock = new Object();
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
     private transient final Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
@@ -767,19 +768,26 @@ public class LocalSession implements TextureHolder {
      * @return clipboard
      * @throws EmptyClipboardException thrown if no clipboard is set
      */
-    public synchronized ClipboardHolder getClipboard() throws EmptyClipboardException {
+    public ClipboardHolder getClipboard() throws EmptyClipboardException {
         if (clipboard == null) {
             throw new EmptyClipboardException();
         }
-        return clipboard;
+        synchronized (clipboardLock) {
+            return clipboard;
+        }
     }
 
     @Nullable
-    public synchronized ClipboardHolder getExistingClipboard() {
-        return clipboard;
+    public ClipboardHolder getExistingClipboard() {
+        if (clipboard == null) {
+            return null;
+        }
+        synchronized (clipboardLock) {
+            return clipboard;
+        }
     }
 
-    public synchronized void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
+    public void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
         checkNotNull(toAppend);
         ClipboardHolder existing = getExistingClipboard();
         MultiClipboardHolder multi;
@@ -804,15 +812,18 @@ public class LocalSession implements TextureHolder {
      *
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
      */
-    public synchronized void setClipboard(@Nullable ClipboardHolder clipboard) {
-        if (this.clipboard == clipboard) return;
+    public void setClipboard(@Nullable ClipboardHolder clipboard) {
+        synchronized (clipboardLock) {
+            if (this.clipboard == clipboard)
+                return;
 
-        if (this.clipboard != null) {
-            if (clipboard == null || !clipboard.contains(this.clipboard.getClipboard())) {
-                this.clipboard.close();
+            if (this.clipboard != null) {
+                if (clipboard == null || !clipboard.contains(this.clipboard.getClipboard())) {
+                    this.clipboard.close();
+                }
             }
+            this.clipboard = clipboard;
         }
-        this.clipboard = clipboard;
     }
 
     /**
