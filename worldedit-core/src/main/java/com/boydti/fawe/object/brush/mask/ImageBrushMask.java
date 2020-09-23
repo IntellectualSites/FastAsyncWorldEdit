@@ -3,6 +3,7 @@ package com.boydti.fawe.object.brush.mask;
 import com.boydti.fawe.object.brush.ImageBrush;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -49,6 +50,11 @@ public class ImageBrushMask extends AbstractExtentMask {
         this.colorFunction = colorFunction;
         this.session = session;
         this.texture = texture;
+    }
+
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(vector);
     }
 
     @Override

@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-import org.jetbrains.annotations.Nullable;
+import com.sk89q.worldedit.math.BlockVector3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -59,5 +59,7 @@ public abstract class AbstractExtentMask extends AbstractMask {
         checkNotNull(extent);
         this.extent = extent;
     }
+
+    abstract public boolean test(Extent extent, BlockVector3 position);
 
 }

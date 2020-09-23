@@ -121,6 +121,11 @@ public class BlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(extent.getBlock(vector).getBlockType());
+    }
+
+    @Override
     public boolean replacesAir() {
         return hasAir;
     }

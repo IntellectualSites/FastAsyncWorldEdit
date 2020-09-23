@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush.mask;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
@@ -23,6 +24,11 @@ public class LayerBrushMask extends AbstractExtentMask {
         this.visitor = visitor;
         this.layers = layers;
         this.adjacent = adjacent;
+    }
+
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(vector);
     }
 
     @Override

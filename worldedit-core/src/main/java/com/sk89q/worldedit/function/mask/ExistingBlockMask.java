@@ -44,6 +44,11 @@ public class ExistingBlockMask extends AbstractExtentMask {
         return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
     }
 
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return !extent.getBlock(vector).getBlockType().getMaterial().isAir();
+    }
+
     @Nullable
     @Override
     public Mask2D toMask2D() {

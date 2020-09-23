@@ -3,6 +3,7 @@ package com.boydti.fawe.object.brush.mask;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -51,6 +52,11 @@ public class StencilBrushMask extends AbstractExtentMask {
         this.cutoff = cutoff;
         this.maxY = maxY;
         this.pattern = pattern;
+    }
+
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(vector);
     }
 
     @Override

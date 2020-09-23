@@ -58,6 +58,11 @@ public class BlockStateMask extends AbstractExtentMask {
         return test(getExtent().getBlock(vector));
     }
 
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(extent.getBlock(vector));
+    }
+
     public boolean test(BlockState block) {
         final Map<Property<Object>, Object> checkProps = cache
                 .computeIfAbsent(block.getBlockType(), (b -> Blocks.resolveProperties(states, b)));
