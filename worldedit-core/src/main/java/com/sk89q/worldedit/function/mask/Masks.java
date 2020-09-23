@@ -93,8 +93,9 @@ public final class Masks {
                 return !mask.test(vector);
             }
 
-            @Override public Mask2D copy() {
-                return Masks.negate(mask.copy());
+            @Override
+            public Mask2D copy2D() {
+                return Masks.negate(mask.copy2D());
             }
         };
     }
@@ -118,8 +119,9 @@ public final class Masks {
                 return mask;
             }
 
-            @Override public Mask clone() {
-                return Masks.asMask(mask.copy());
+            @Override
+            public Mask copy() {
+                return Masks.asMask(mask.copy2D());
             }
         };
     }
@@ -152,12 +154,14 @@ public final class Masks {
         }
 
         // No need to properly clone an always true mask
-        @Override public Mask clone() {
+        @Override
+        public Mask copy() {
             return new AlwaysTrue();
         }
 
         // No need to properly clone an always true mask
-        @Override public Mask2D copy() {
+        @Override
+        public Mask2D copy2D() {
             return new AlwaysTrue();
         }
 
@@ -191,12 +195,14 @@ public final class Masks {
         }
 
         // No need to properly clone an always false mask
-        @Override public Mask clone() {
+        @Override
+        public Mask copy() {
             return new AlwaysFalse();
         }
 
         // No need to properly clone an always true mask
-        @Override public Mask2D copy() {
+        @Override
+        public Mask2D copy2D() {
             return new AlwaysFalse();
         }
 

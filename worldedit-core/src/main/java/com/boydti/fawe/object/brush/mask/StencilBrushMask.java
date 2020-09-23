@@ -59,7 +59,8 @@ public class StencilBrushMask extends AbstractExtentMask {
         this.pattern = pattern;
     }
 
-    @Override public boolean test(BlockVector3 vector) {
+    @Override
+    public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
             int dx = vector.getBlockX() - cx;
             int dy = vector.getBlockY() - cy;
@@ -87,7 +88,8 @@ public class StencilBrushMask extends AbstractExtentMask {
         return false;
     }
 
-    @Override public Mask clone() {
-        return new StencilBrushMask(editSession, solid.clone(), cx, cy, cz, transform, size2, map, scale, add, cutoff, maxY, pattern);
+    @Override
+    public Mask copy() {
+        return new StencilBrushMask(editSession, solid.copy(), cx, cy, cz, transform, size2, map, scale, add, cutoff, maxY, pattern);
     }
 }

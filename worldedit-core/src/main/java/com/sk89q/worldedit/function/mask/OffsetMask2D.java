@@ -93,8 +93,8 @@ public class OffsetMask2D extends AbstractMask2D {
     }
 
     @Override
-    public Mask2D copy() {
-        return new OffsetMask2D(mask.copy(), BlockVector2.at(offset.getX(), offset.getZ()));
+    public Mask2D copy2D() {
+        return new OffsetMask2D(mask.copy2D(), BlockVector2.at(offset.getX(), offset.getZ()));
     }
 
 }

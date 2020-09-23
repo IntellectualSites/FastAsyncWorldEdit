@@ -258,9 +258,9 @@ public class MaskIntersection extends AbstractMask {
     }
 
     @Override
-    public Mask clone(){
-        Set<Mask> masks = this.masks.stream().map(Mask::clone).collect(Collectors.toSet());
-        Mask[] maskArray = (Mask[]) Arrays.stream(this.masksArray).map(Mask::clone).toArray();
+    public Mask copy(){
+        Set<Mask> masks = this.masks.stream().map(Mask::copy).collect(Collectors.toSet());
+        Mask[] maskArray = (Mask[]) Arrays.stream(this.masksArray).map(Mask::copy).toArray();
         return new MaskIntersection(masks, maskArray, this.defaultReturn);
     }
 

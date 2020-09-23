@@ -65,7 +65,7 @@ public class ExtremaMask extends AngleMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new ExtremaMask(getExtent(), min, max, overlay, distance);
     }
 }

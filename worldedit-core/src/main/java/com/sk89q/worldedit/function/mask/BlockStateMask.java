@@ -80,7 +80,7 @@ public class BlockStateMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         Map<String, String> statesClone = new HashMap<>();
         states.forEach(statesClone::put);
         return new BlockStateMask(getExtent(), statesClone, strict);

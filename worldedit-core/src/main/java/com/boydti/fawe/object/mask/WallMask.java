@@ -50,7 +50,7 @@ public class WallMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
-        return new WallMask(mask.clone(), min, max);
+    public Mask copy() {
+        return new WallMask(mask.copy(), min, max);
     }
 }

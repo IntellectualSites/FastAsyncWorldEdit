@@ -11,7 +11,8 @@ public class LiquidMask extends BlockMask {
         add(state -> state.getMaterial().isLiquid());
     }
 
-    public Mask clone() {
+    @Override
+    public Mask copy() {
         return new LiquidMask(getExtent());
     }
 

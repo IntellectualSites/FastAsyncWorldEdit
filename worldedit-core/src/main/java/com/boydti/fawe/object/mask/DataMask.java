@@ -29,7 +29,7 @@ public class DataMask extends AbstractExtentMask implements ResettableMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new DataMask(getExtent());
     }
 

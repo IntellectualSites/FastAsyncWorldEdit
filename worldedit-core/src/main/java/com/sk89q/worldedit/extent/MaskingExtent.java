@@ -45,7 +45,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     private Mask mask;
     private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
-    private LoadingCache<Long, Mask> threadIdToMask = FaweCache.IMP.createCache(() -> mask.clone());
+    private LoadingCache<Long, Mask> threadIdToMask = FaweCache.IMP.createCache(() -> mask.copy());
 
     /**
      * Create a new instance.
@@ -114,6 +114,6 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public Filter fork() {
-        return new MaskingExtent(getExtent(), mask.clone());
+        return new MaskingExtent(getExtent(), mask.copy());
     }
 }

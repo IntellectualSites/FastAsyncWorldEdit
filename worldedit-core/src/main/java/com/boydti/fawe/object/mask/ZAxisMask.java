@@ -25,7 +25,7 @@ public class ZAxisMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new ZAxisMask();
     }
 

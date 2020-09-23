@@ -62,8 +62,8 @@ public class MaskUnion2D extends MaskIntersection2D {
     }
 
     @Override
-    public Mask2D copy() {
-        Set<Mask2D> masksCopy = masks.stream().map(Mask2D::copy).collect(Collectors.toSet());
+    public Mask2D copy2D() {
+        Set<Mask2D> masksCopy = masks.stream().map(Mask2D::copy2D).collect(Collectors.toSet());
         return new MaskUnion2D(masksCopy);
     }
 

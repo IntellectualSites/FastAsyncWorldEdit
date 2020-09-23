@@ -174,7 +174,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new AngleMask(getExtent(), min, max, overlay, distance);
     }
 

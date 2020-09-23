@@ -11,7 +11,8 @@ public class AirMask extends BlockMask {
         add(state -> state.getMaterial().isAir());
     }
 
-    public Mask clone() {
+    @Override
+    public Mask copy() {
         return new AirMask(getExtent());
     }
 

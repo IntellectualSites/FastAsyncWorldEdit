@@ -11,13 +11,15 @@ public class WallMakeMask implements Mask {
         this.region = region.clone();
     }
 
-    @Override public boolean test(BlockVector3 position) {
+    @Override
+    public boolean test(BlockVector3 position) {
         int x = position.getBlockX();
         int z = position.getBlockZ();
         return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z);
     }
 
-    @Override public Mask clone() {
+    @Override
+    public Mask copy() {
         return new WallMakeMask(region);
     }
 

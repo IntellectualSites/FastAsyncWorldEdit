@@ -54,7 +54,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public Mask clone() {
-        return new AdjacentAnyMask(mask.clone());
+    public Mask copy() {
+        return new AdjacentAnyMask(mask.copy());
     }
 }

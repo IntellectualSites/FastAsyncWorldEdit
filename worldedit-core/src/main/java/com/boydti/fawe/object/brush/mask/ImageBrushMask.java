@@ -57,7 +57,8 @@ public class ImageBrushMask extends AbstractExtentMask {
         this.texture = texture;
     }
 
-    @Override public boolean test(BlockVector3 vector) {
+    @Override
+    public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
             int dx = vector.getBlockX() - cx;
             int dy = vector.getBlockY() - cy;
@@ -98,7 +99,8 @@ public class ImageBrushMask extends AbstractExtentMask {
         return false;
     }
 
-    @Override public Mask clone() {
-        return new ImageBrushMask(solid.clone(), cx, cy, cz, transform, scale, centerX, centerZ, width, height, colorFunction, session, texture);
+    @Override
+    public Mask copy() {
+        return new ImageBrushMask(solid.copy(), cx, cy, cz, transform, scale, centerX, centerZ, width, height, colorFunction, session, texture);
     }
 }

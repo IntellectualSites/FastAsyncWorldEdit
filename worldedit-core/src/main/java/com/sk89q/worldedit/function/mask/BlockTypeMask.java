@@ -136,7 +136,7 @@ public class BlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new BlockTypeMask(getExtent(), types.clone(), hasAir);
     }
 

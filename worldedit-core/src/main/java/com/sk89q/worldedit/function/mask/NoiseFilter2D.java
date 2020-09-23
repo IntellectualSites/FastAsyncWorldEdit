@@ -88,7 +88,7 @@ public class NoiseFilter2D extends AbstractMask2D {
     }
 
     @Override
-    public Mask2D copy() {
+    public Mask2D copy2D() {
         return new NoiseFilter2D(noiseGenerator, density);
     }
 

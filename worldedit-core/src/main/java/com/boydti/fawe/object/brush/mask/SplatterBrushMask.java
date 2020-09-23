@@ -36,7 +36,7 @@ public class SplatterBrushMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         // There should not be multiple instances to be thread safe
         return this;
     }

@@ -90,7 +90,7 @@ public class ExpressionMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new ExpressionMask(expression.clone(), timeout);
     }
 

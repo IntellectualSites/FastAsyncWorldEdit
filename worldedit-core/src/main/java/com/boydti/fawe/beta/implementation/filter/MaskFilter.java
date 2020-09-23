@@ -55,6 +55,6 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
 
     @Override
     public Filter fork() {
-        return new MaskFilter<>(getParent().fork(), mask::clone, mask.clone());
+        return new MaskFilter<>(getParent().fork(), mask::copy, mask.copy());
     }
 }

@@ -58,7 +58,7 @@ public class SingleBlockStateMask extends ABlockMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new SingleBlockStateMask(getExtent(), ordinal, isAir);
     }
 }

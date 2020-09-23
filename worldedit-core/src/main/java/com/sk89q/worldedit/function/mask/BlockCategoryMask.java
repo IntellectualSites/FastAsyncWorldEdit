@@ -53,7 +53,7 @@ public class BlockCategoryMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new BlockCategoryMask(getExtent(), category);
     }
 }

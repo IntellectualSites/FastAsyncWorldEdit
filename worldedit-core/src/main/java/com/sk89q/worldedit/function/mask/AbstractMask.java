@@ -28,7 +28,7 @@ public abstract class AbstractMask implements Mask {
 
     @Override
     @Nullable
-    public Mask clone() {
+    public Mask copy() {
         try {
             return (Mask) super.clone();
         } catch (CloneNotSupportedException e) {

@@ -103,7 +103,7 @@ public class BiomeMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new BiomeMask(extent, new HashSet<>(biomes));
     }
 

@@ -42,7 +42,7 @@ public class SingleBlockTypeMask extends ABlockMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new SingleBlockTypeMask(getExtent(), internalId, isAir);
     }
 }

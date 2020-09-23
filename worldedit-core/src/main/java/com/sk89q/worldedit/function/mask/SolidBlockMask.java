@@ -36,7 +36,7 @@ public class SolidBlockMask extends BlockMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new SolidBlockMask(getExtent());
     }
 

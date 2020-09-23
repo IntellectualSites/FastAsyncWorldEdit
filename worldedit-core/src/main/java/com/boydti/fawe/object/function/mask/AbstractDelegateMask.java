@@ -31,8 +31,8 @@ public class AbstractDelegateMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
-        return new AbstractDelegateMask(mask.clone());
+    public Mask copy() {
+        return new AbstractDelegateMask(mask.copy());
     }
 
 }

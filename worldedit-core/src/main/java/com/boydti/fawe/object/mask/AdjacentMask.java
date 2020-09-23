@@ -62,7 +62,7 @@ public class AdjacentMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
-        return new AdjacentMask(mask.clone(), min, max);
+    public Mask copy() {
+        return new AdjacentMask(mask.copy(), min, max);
     }
 }

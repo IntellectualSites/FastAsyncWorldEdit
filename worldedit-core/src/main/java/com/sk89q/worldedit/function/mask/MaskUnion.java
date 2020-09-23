@@ -119,9 +119,9 @@ public class MaskUnion extends MaskIntersection {
     }
 
     @Override
-    public Mask clone() {
-        Set<Mask> masksCopy = masks.stream().map(Mask::clone).collect(Collectors.toSet());
-        Mask[] maskArray = (Mask[]) Arrays.stream(masksArray).map(Mask::clone).toArray();
+    public Mask copy() {
+        Set<Mask> masksCopy = masks.stream().map(Mask::copy).collect(Collectors.toSet());
+        Mask[] maskArray = (Mask[]) Arrays.stream(masksArray).map(Mask::copy).toArray();
         return new MaskUnion(masksCopy, maskArray, defaultReturn);
     }
 }

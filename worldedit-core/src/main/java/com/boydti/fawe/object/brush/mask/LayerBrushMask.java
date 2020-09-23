@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.mask;
 
-import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -26,7 +25,8 @@ public class LayerBrushMask extends AbstractExtentMask {
         this.adjacent = adjacent;
     }
 
-    @Override public boolean test(BlockVector3 pos) {
+    @Override
+    public boolean test(BlockVector3 pos) {
         int depth = visitor.getDepth() + 1;
         if (depth > 1) {
             boolean found = false;
@@ -54,7 +54,7 @@ public class LayerBrushMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask clone() {
-        return new LayerBrushMask(editSession, visitor, layers.clone(), adjacent.clone());
+    public Mask copy() {
+        return new LayerBrushMask(editSession, visitor, layers.clone(), adjacent.copy());
     }
 }

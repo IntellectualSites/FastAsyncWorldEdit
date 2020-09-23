@@ -99,7 +99,7 @@ public class BiomeMask2D extends AbstractMask2D {
     }
 
     @Override
-    public Mask2D copy() {
+    public Mask2D copy2D() {
         return new BiomeMask2D(extent, new HashSet<>(biomes));
     }
 

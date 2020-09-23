@@ -73,7 +73,7 @@ public class RegionMask extends AbstractMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new RegionMask(region.clone());
     }
 

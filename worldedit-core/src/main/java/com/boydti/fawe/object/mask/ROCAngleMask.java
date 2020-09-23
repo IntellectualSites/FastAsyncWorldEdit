@@ -34,7 +34,7 @@ public class ROCAngleMask extends AngleMask {
     }
 
     @Override
-    public Mask clone() {
+    public Mask copy() {
         return new ROCAngleMask(getExtent(), min, max, overlay, distance);
     }
 }
