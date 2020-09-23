@@ -320,7 +320,9 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                     if (!set.hasSection(layer)){
                         continue;
                     }
-                    copy.storeSection(layer);
+                    if (createCopy) {
+                        copy.storeSection(layer);
+                    }
 
                     bitMask |= 1 << layer;
 
