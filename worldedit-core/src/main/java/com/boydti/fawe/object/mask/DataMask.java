@@ -23,6 +23,16 @@ public class DataMask extends AbstractExtentMask implements ResettableMask {
     }
 
     @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        if (data != -1) {
+            return extent.getBlock(vector).getInternalPropertiesId() == data;
+        } else {
+            data = extent.getBlock(vector).getInternalPropertiesId();
+            return true;
+        }
+    }
+
+    @Override
     public void reset() {
         this.data = -1;
     }

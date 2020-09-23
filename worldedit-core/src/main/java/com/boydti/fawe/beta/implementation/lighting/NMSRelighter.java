@@ -18,6 +18,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -31,8 +33,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class NMSRelighter implements Relighter {
+
+    private static final Logger log = LoggerFactory.getLogger(NMSRelighter.class);
     private static final int DISPATCH_SIZE = 64;
     private static final DirectionalProperty stairDirection;
     private static final EnumProperty stairHalf;
@@ -950,14 +955,26 @@ public class NMSRelighter implements Relighter {
                         if (heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] == 0 && material.isSolid()) {
                             heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] = y + 1;
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || (
-                            state.getStates().containsKey(waterLogged) && state.getState(waterLogged)))) {
-                            heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
+                        try {
+                            if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged)))) {
+                                heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
+                            }
+                        } catch (Exception ignored) {
+                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                                .collect(Collectors.joining(", ", "{", "}")));
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || (
-                            state.getStates().containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId().toLowerCase()
-                            .contains("leaves")) {
-                            heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
+                        try {
+                            if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId()
+                                .toLowerCase().contains("leaves")) {
+                                heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
+                            }
+                        } catch (Exception ignored) {
+                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                                .collect(Collectors.joining(", ", "{", "}")));
                         }
                     }
 
