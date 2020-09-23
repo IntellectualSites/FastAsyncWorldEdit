@@ -170,6 +170,12 @@ public class RegionIntersection extends AbstractRegion {
         return null;
     }
 
+    @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Doesn't need to do anything
+        return set;
+    }
+
     public List<Region> getRegions() {
         return regions;
     }

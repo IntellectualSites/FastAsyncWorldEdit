@@ -99,6 +99,12 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     }
 
     @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // This should not do anything otherwise dangerous...
+        return set;
+    }
+
+    @Override
     public void applyBlock(FilterBlock block) {
         //TODO: Find a way to make masking thread safe without having to synchonise the whole extent
         synchronized (this) {

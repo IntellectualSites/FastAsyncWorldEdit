@@ -13,11 +13,15 @@ import com.sk89q.worldedit.extent.Extent;
 public interface IBatchProcessorHolder extends IBatchProcessor {
     IBatchProcessor getProcessor();
 
+    IBatchProcessor getPostProcessor();
+
     /**
      * set the held processor
      * @param set
      */
     void setProcessor(IBatchProcessor set);
+
+    void setPostProcessor(IBatchProcessor set);
 
     @Override
     default IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
@@ -37,6 +41,12 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     @Override
     default IBatchProcessor join(IBatchProcessor other) {
         setProcessor(getProcessor().join(other));
+        return this;
+    }
+
+    @Override
+    default IBatchProcessor joinPost(IBatchProcessor other) {
+        setPostProcessor(getPostProcessor().join(other));
         return this;
     }
 

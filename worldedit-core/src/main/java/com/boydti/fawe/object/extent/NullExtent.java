@@ -341,6 +341,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        throw reason;
+    }
+
+    @Override
     public boolean processGet(int chunkX, int chunkZ) {
         throw reason;
     }

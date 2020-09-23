@@ -1,6 +1,9 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;

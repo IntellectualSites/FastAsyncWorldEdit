@@ -27,6 +27,11 @@ public final class EmptyBatchProcessor implements IBatchProcessor {
     }
 
     @NotNull
+    public IChunkSet postProcessSet(@Nullable IChunk chunk, @Nullable IChunkGet get, @Nullable IChunkSet set) {
+        return set;
+    }
+
+    @NotNull
     public IBatchProcessor join(@Nullable IBatchProcessor other) {
         return other;
     }

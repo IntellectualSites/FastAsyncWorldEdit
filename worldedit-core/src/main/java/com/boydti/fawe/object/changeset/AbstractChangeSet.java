@@ -204,6 +204,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return set;
     }
 
+    @Override
+    public synchronized IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return processSet(chunk, get, set);
+    }
+
     public abstract void addTileCreate(CompoundTag tag);
 
     public abstract void addTileRemove(CompoundTag tag);

@@ -51,4 +51,9 @@ public class HeightBoundExtent extends FaweRegionExtent {
         }
         return null;
     }
+
+    @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return set;
+    }
 }

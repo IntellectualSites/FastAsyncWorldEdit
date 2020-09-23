@@ -23,6 +23,8 @@ public interface IBatchProcessor {
      */
     IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
 
+    IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set);
+
     default boolean processGet(int chunkX, int chunkZ) {
         return true;
     }
@@ -112,6 +114,10 @@ public interface IBatchProcessor {
      * @return
      */
     default IBatchProcessor join(IBatchProcessor other) {
+        return MultiBatchProcessor.of(this, other);
+    }
+
+    default IBatchProcessor joinPost(IBatchProcessor other) {
         return MultiBatchProcessor.of(this, other);
     }
 

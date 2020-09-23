@@ -318,6 +318,24 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public Extent addPostProcessor(IBatchProcessor processor) {
+        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            logger.info("addPostProcessor Info: \t " + processor.getClass().getName());
+            logger.info("The following is not an error or a crash:");
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement stackTraceElement : stackTrace) {
+                logger.info(stackTraceElement.toString());
+            }
+
+        }
+        Extent result = this.extent.addPostProcessor(processor);
+        if (result != this.extent) {
+            new ExtentTraverser<Extent>(this).setNext(result);
+        }
+        return this;
+    }
+
+    @Override
     public Extent disableHistory() {
         Extent result = this.extent.disableHistory();
         if (result != this.extent) {

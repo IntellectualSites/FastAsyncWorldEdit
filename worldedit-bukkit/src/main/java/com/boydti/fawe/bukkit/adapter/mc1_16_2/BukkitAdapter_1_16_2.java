@@ -15,6 +15,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
+import net.minecraft.server.v1_16_R2.BiomeBase;
+import net.minecraft.server.v1_16_R2.BiomeStorage;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.Chunk;
 import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
@@ -64,6 +66,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     private static final Field fieldDirty;
     private static final Field fieldDirtyBlocks;
 
+    private static final Field fieldBiomeArray;
+
     private static final MethodHandle methodGetVisibleChunk;
 
     private static final int CHUNKSECTION_BASE;
@@ -94,6 +98,9 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldDirty.setAccessible(true);
             fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
             fieldDirtyBlocks.setAccessible(true);
+
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("h");
+            fieldBiomeArray.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -286,7 +293,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                         .setType(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
                             Block.getByCombinedId(ordinal)));
                 }
-            } catch (final IllegalAccessException | NoSuchFieldException e) {
+            } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
 
@@ -301,9 +308,18 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         return new ChunkSection(layer << 4);
     }
 
-    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
+    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws IllegalAccessException {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+
+    public static BiomeBase[] getBiomeArray(BiomeStorage storage) {
+        try {
+            return (BiomeBase[]) fieldBiomeArray.get(storage);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

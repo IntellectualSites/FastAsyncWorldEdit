@@ -45,6 +45,11 @@ public class SingleRegionExtent extends FaweRegionExtent {
     }
 
     @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return region.postProcessSet(chunk, get, set);
+    }
+
+    @Override
     public boolean processGet(int chunkX, int chunkZ) {
         return region.containsChunk(chunkX, chunkZ);
     }

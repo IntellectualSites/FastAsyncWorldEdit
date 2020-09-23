@@ -65,6 +65,12 @@ public class ChunkSendProcessor implements IBatchProcessor {
         return set;
     }
 
+    @Override
+    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Post processing does not send chunks
+        return set;
+    }
+
     public IBlocks combine(IChunk chunk, IChunkGet get, IChunkSet set) {
         return new CombinedBlocks(get, set, 0);
     }

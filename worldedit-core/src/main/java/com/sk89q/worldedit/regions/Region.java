@@ -351,6 +351,12 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     @Override
+    default IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Doesn't need to do anything
+        return set;
+    }
+
+    @Override
     default Extent construct(Extent child) {
         if (isGlobal()) {
             return child;
