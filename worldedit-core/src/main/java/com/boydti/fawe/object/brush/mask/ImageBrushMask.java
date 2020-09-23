@@ -15,13 +15,11 @@ public class ImageBrushMask extends AbstractExtentMask {
 
     private final MutableVector3 mutable = new MutableVector3();
     private final Mask solid;
-    private final int cx;
-    private final int cy;
-    private final int cz;
+    private final BlockVector3 center;
     private final Transform transform;
     private final double scale;
-    private final double centerX;
-    private final double centerZ;
+    private final double centerImageX;
+    private final double centerImageZ;
     private final int width;
     private final int height;
     private final ImageBrush.ColorFunction colorFunction;
@@ -29,13 +27,11 @@ public class ImageBrushMask extends AbstractExtentMask {
     private final TextureUtil texture;
 
     public ImageBrushMask(Mask solid,
-                          int cx,
-                          int cy,
-                          int cz,
+                          BlockVector3 center,
                           Transform transform,
                           double scale,
-                          double centerX,
-                          double centerZ,
+                          double centerImageX,
+                          double centerImageZ,
                           int width,
                           int height,
                           ImageBrush.ColorFunction colorFunction,
@@ -43,13 +39,11 @@ public class ImageBrushMask extends AbstractExtentMask {
                           TextureUtil texture) {
         super(session);
         this.solid = solid;
-        this.cx = cx;
-        this.cy = cy;
-        this.cz = cz;
+        this.center = center;
         this.transform = transform;
         this.scale = scale;
-        this.centerX = centerX;
-        this.centerZ = centerZ;
+        this.centerImageX = centerImageX;
+        this.centerImageZ = centerImageZ;
         this.width = width;
         this.height = height;
         this.colorFunction = colorFunction;
@@ -60,17 +54,17 @@ public class ImageBrushMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
-            int dx = vector.getBlockX() - cx;
-            int dy = vector.getBlockY() - cy;
-            int dz = vector.getBlockZ() - cz;
+            int dx = vector.getBlockX() - center.getBlockX();
+            int dy = vector.getBlockY() - center.getBlockY();
+            int dz = vector.getBlockZ() - center.getBlockZ();
 
             Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
-            int x1 = (int) (pos1.getX() * scale + centerX);
-            int z1 = (int) (pos1.getZ() * scale + centerZ);
+            int x1 = (int) (pos1.getX() * scale + centerImageX);
+            int z1 = (int) (pos1.getZ() * scale + centerImageZ);
 
             Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
-            int x2 = (int) (pos2.getX() * scale + centerX);
-            int z2 = (int) (pos2.getZ() * scale + centerZ);
+            int x2 = (int) (pos2.getX() * scale + centerImageX);
+            int z2 = (int) (pos2.getZ() * scale + centerImageZ);
             if (x2 < x1) {
                 int tmp = x1;
                 x1 = x2;
@@ -101,6 +95,7 @@ public class ImageBrushMask extends AbstractExtentMask {
 
     @Override
     public Mask copy() {
-        return new ImageBrushMask(solid.copy(), cx, cy, cz, transform, scale, centerX, centerZ, width, height, colorFunction, session, texture);
+        return new ImageBrushMask(solid.copy(), center.toImmutable(), transform, scale, centerImageX, centerImageZ, width, height, colorFunction,
+            session, texture);
     }
 }

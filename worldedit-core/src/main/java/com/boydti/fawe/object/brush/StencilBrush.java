@@ -26,10 +26,7 @@ public class StencilBrush extends HeightBrush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
-        final int cx = position.getBlockX();
-        final int cy = position.getBlockY();
-        final int cz = position.getBlockZ();
+    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         int size = (int) sizeDouble;
         int size2 = (int) (sizeDouble * sizeDouble);
         int maxY = editSession.getMaxY();
@@ -51,10 +48,10 @@ public class StencilBrush extends HeightBrush {
 
         double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor =
-            new RecursiveVisitor(new StencilBrushMask(editSession, solid, cx, cy, cz, transform, size2, map, scale, add, cutoff, maxY, pattern),
+            new RecursiveVisitor(new StencilBrushMask(editSession, solid, center, transform, size2, map, scale, add, cutoff, maxY, pattern),
                 vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
-        visitor.visit(position);
+        visitor.visit(center);
         Operations.completeBlindly(visitor);
     }
 }

@@ -18,9 +18,7 @@ public class StencilBrushMask extends AbstractExtentMask {
     private final MutableVector3 mutable = new MutableVector3();
     private final EditSession editSession;
     private final Mask solid;
-    private final int cx;
-    private final int cy;
-    private final int cz;
+    private final BlockVector3 center;
     private final Transform transform;
     private final int size2;
     private final HeightMap map;
@@ -32,9 +30,7 @@ public class StencilBrushMask extends AbstractExtentMask {
 
     public StencilBrushMask(EditSession editSession,
                             Mask solid,
-                            int cx,
-                            int cy,
-                            int cz,
+                            BlockVector3 center,
                             Transform transform,
                             int size2,
                             HeightMap map,
@@ -46,9 +42,7 @@ public class StencilBrushMask extends AbstractExtentMask {
         super(editSession);
         this.editSession = editSession;
         this.solid = solid;
-        this.cx = cx;
-        this.cy = cy;
-        this.cz = cz;
+        this.center = center;
         this.transform = transform;
         this.size2 = size2;
         this.map = map;
@@ -62,9 +56,9 @@ public class StencilBrushMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         if (solid.test(vector)) {
-            int dx = vector.getBlockX() - cx;
-            int dy = vector.getBlockY() - cy;
-            int dz = vector.getBlockZ() - cz;
+            int dx = vector.getBlockX() - center.getBlockX();
+            int dy = vector.getBlockY() - center.getBlockY();
+            int dz = vector.getBlockZ() - center.getBlockZ();
 
             Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz));
             dx = MathMan.roundInt(srcPos.getX());
@@ -90,6 +84,6 @@ public class StencilBrushMask extends AbstractExtentMask {
 
     @Override
     public Mask copy() {
-        return new StencilBrushMask(editSession, solid.copy(), cx, cy, cz, transform, size2, map, scale, add, cutoff, maxY, pattern);
+        return new StencilBrushMask(editSession, solid.copy(), center.toImmutable(), transform, size2, map, scale, add, cutoff, maxY, pattern);
     }
 }

@@ -27,8 +27,8 @@ public class ImageBrush implements Brush {
     private final SummedColorTable table;
     private final int width;
     private final int height;
-    private final double centerX;
-    private final double centerZ;
+    private final double centerImageX;
+    private final double centerImageZ;
 
     private final ColorFunction colorFunction;
 
@@ -37,8 +37,8 @@ public class ImageBrush implements Brush {
         this.table = new SummedColorTable(image, alpha);
         this.width = image.getWidth();
         this.height = image.getHeight();
-        this.centerX = width / 2d;
-        this.centerZ = height / 2d;
+        this.centerImageX = width / 2d;
+        this.centerImageZ = height / 2d;
 
         if (alpha) {
             colorFunction = (x1, z1, x2, z2, extent, pos) -> {
@@ -67,11 +67,7 @@ public class ImageBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
-
-        final int cx = position.getBlockX();
-        final int cy = position.getBlockY();
-        final int cz = position.getBlockZ();
+    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         final Mask solid = new SurfaceMask(editSession);
 
         double scale = Math.max(width, height) / sizeDouble;
@@ -82,10 +78,10 @@ public class ImageBrush implements Brush {
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
 
         RecursiveVisitor visitor = new RecursiveVisitor(
-            new ImageBrushMask(solid, cx, cy, cz, transform, scale, centerX, centerZ, width, height, colorFunction, editSession,
+            new ImageBrushMask(solid, center, transform, scale, centerImageX, centerImageZ, width, height, colorFunction, editSession,
                 session.getTextureUtil()), vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
-        visitor.visit(position);
+        visitor.visit(center);
         Operations.completeBlindly(visitor);
     }
 
