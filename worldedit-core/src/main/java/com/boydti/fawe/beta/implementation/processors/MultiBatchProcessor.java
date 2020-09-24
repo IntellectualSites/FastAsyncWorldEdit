@@ -125,6 +125,18 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
+    public IBatchProcessor joinPost(IBatchProcessor other) {
+        if (other instanceof MultiBatchProcessor) {
+            for (IBatchProcessor processor : ((MultiBatchProcessor) other).processors) {
+                addBatchProcessor(processor);
+            }
+        } else {
+            addBatchProcessor(other);
+        }
+        return this;
+    }
+
+    @Override
     public void flush() {
         for (IBatchProcessor processor : this.processors) processor.flush();
     }

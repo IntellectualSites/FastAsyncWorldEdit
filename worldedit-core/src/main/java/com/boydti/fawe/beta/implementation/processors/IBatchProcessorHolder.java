@@ -29,6 +29,11 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     }
 
     @Override
+    default IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return getPostProcessor().postProcessSet(chunk, get, set);
+    }
+
+    @Override
     default boolean processGet(int chunkX, int chunkZ) {
         return getProcessor().processGet(chunkX, chunkZ);
     }
@@ -46,7 +51,7 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
 
     @Override
     default IBatchProcessor joinPost(IBatchProcessor other) {
-        setPostProcessor(getPostProcessor().join(other));
+        setPostProcessor(getPostProcessor().joinPost(other));
         return this;
     }
 

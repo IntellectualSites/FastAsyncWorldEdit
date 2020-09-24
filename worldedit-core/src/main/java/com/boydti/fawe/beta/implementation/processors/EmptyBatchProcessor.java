@@ -36,6 +36,11 @@ public final class EmptyBatchProcessor implements IBatchProcessor {
         return other;
     }
 
+    @NotNull
+    public IBatchProcessor joinPost(@Nullable IBatchProcessor other) {
+        return other;
+    }
+
     private EmptyBatchProcessor() {
     }
 

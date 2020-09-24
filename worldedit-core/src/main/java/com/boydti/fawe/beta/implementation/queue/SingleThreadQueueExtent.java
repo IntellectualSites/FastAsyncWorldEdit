@@ -110,6 +110,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.currentThread = null;
         this.initialized = false;
         this.setProcessor(EmptyBatchProcessor.getInstance());
+        this.setPostProcessor(EmptyBatchProcessor.getInstance());
     }
 
     /**
@@ -129,6 +130,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.cacheGet = get;
         this.cacheSet = set;
         this.setProcessor(EmptyBatchProcessor.getInstance());
+        this.setPostProcessor(EmptyBatchProcessor.getInstance());
         initialized = true;
     }
 
