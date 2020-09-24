@@ -9,6 +9,9 @@ import com.sk89q.worldedit.extent.Extent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
 public final class EmptyBatchProcessor implements IBatchProcessor {
     private static final EmptyBatchProcessor instance = new EmptyBatchProcessor();
 
@@ -26,9 +29,11 @@ public final class EmptyBatchProcessor implements IBatchProcessor {
         return set;
     }
 
+    @Override
     @NotNull
-    public IChunkSet postProcessSet(@Nullable IChunk chunk, @Nullable IChunkGet get, @Nullable IChunkSet set) {
-        return set;
+    public Future<IChunkSet> postProcessSet(@Nullable IChunk chunk, @Nullable IChunkGet get, @Nullable IChunkSet set) {
+        // Doesn't need to do anything
+        return CompletableFuture.completedFuture(set);
     }
 
     @NotNull

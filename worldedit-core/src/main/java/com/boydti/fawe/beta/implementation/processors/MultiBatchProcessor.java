@@ -10,6 +10,8 @@ import com.sk89q.worldedit.extent.Extent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class MultiBatchProcessor implements IBatchProcessor {
     private IBatchProcessor[] processors;
@@ -71,19 +73,19 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
-    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         try {
             for (int i = processors.length - 1 ; i >= 0; i--) {
                 IBatchProcessor processor = processors[i];
-                set = processor.postProcessSet(chunk, get, set);
+                set = processor.postProcessSet(chunk, get, set).get();
                 if (set == null) {
                     return null;
                 }
             }
-            return set;
+            return CompletableFuture.completedFuture(set);
         } catch (Throwable e) {
             e.printStackTrace();
-            throw e;
+            return null;
         }
     }
 

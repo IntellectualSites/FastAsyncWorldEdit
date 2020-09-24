@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -171,9 +173,9 @@ public class RegionIntersection extends AbstractRegion {
     }
 
     @Override
-    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         // Doesn't need to do anything
-        return set;
+        return CompletableFuture.completedFuture(set);
     }
 
     public List<Region> getRegions() {

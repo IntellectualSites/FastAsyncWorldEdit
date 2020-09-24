@@ -5,6 +5,8 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 
+import java.util.concurrent.Future;
+
 public class BatchProcessorHolder implements IBatchProcessorHolder {
     private IBatchProcessor processor = EmptyBatchProcessor.getInstance();
     private IBatchProcessor postProcessor = EmptyBatchProcessor.getInstance();
@@ -25,7 +27,7 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
     }
 
     @Override
-    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return getPostProcessor().postProcessSet(chunk, get, set);
     }
 

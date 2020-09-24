@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -206,13 +205,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public IChunkSet postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
-        try {
-            return (IChunkSet) addWriteTask(() -> processSet(chunk, get, set)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
+        return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
     }
 
     public abstract void addTileCreate(CompoundTag tag);

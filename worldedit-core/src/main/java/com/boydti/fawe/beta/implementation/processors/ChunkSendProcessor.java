@@ -12,6 +12,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 public class ChunkSendProcessor implements IBatchProcessor {
@@ -66,9 +68,9 @@ public class ChunkSendProcessor implements IBatchProcessor {
     }
 
     @Override
-    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        // Post processing does not send chunks
-        return set;
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Doesn't need to do anything
+        return CompletableFuture.completedFuture(set);
     }
 
     public IBlocks combine(IChunk chunk, IChunkGet get, IChunkSet set) {

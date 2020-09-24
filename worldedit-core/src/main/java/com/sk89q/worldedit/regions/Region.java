@@ -37,6 +37,8 @@ import com.sk89q.worldedit.world.World;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 /**
@@ -351,9 +353,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     }
 
     @Override
-    default IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    default Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         // Doesn't need to do anything
-        return set;
+        return CompletableFuture.completedFuture(set);
     }
 
     @Override

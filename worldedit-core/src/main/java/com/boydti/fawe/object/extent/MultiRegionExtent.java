@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.RegionIntersection;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.Future;
 
 public class MultiRegionExtent extends FaweRegionExtent {
 
@@ -88,7 +89,7 @@ public class MultiRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return intersection.postProcessSet(chunk, get, set);
     }
 }

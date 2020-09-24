@@ -6,6 +6,8 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 
+import java.util.concurrent.Future;
+
 /**
  * Holds a batch processor
  * (Join and remove operations affect the held processor)
@@ -29,7 +31,7 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     }
 
     @Override
-    default IChunkSet postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    default Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return getPostProcessor().postProcessSet(chunk, get, set);
     }
 
