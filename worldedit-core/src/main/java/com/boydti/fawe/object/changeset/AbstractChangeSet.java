@@ -59,7 +59,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         if (closed) {
             return;
         }
-        closed = true;
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
             waitingAsync.decrementAndGet();
@@ -97,8 +96,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     @Override
     public void close() throws IOException {
         if (!closed) {
-            closed = true;
             flush();
+            closed = true;
         }
     }
 
