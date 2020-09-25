@@ -468,8 +468,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
         BlockVector3 oldMax = region.getMaximumPoint();
         BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 -1);
-        int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
-        newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
+//        int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
+//        newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
