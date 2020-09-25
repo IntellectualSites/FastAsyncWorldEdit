@@ -39,11 +39,6 @@ public class FabricBlockRegistry extends BundledBlockRegistry {
     private final Map<net.minecraft.block.BlockState, FabricBlockMaterial> materialMap = new HashMap<>();
 
     @Override
-    public Component getRichName(BlockType blockType) {
-        return TranslatableComponent.of(FabricAdapter.adapt(blockType).getTranslationKey());
-    }
-
-    @Override
     public BlockMaterial getMaterial(BlockType blockType) {
         Block block = FabricAdapter.adapt(blockType);
         return materialMap.computeIfAbsent(

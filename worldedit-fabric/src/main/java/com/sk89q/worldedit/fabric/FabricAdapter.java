@@ -65,7 +65,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class FabricAdapter {
 
-    private static @Nullable MinecraftServer server;
+    @Nullable
+    private static MinecraftServer server;
 
     private static MinecraftServer requireServer() {
         return Objects.requireNonNull(server, "No server injected");

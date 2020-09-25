@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.fabric;
 
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -35,6 +37,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.fabric.internal.ExtendedMinecraftServer;
 import com.sk89q.worldedit.fabric.internal.FabricWorldNativeAccess;
@@ -177,6 +180,21 @@ public class FabricWorld extends AbstractWorld {
     }
 
     @Override
+    public void refreshChunk(int chunkX, int chunkZ) {
+
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return null;
+    }
+
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+
+    }
+
+    @Override
     public Path getStoragePath() {
         final World world = getWorld();
         MinecraftServer server = world.getServer();
@@ -210,6 +228,11 @@ public class FabricWorld extends AbstractWorld {
             ((Clearable) tile).clear();
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return false;
     }
 
@@ -295,20 +318,8 @@ public class FabricWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean regenerate(Region region, Extent extent, RegenOptions options) {
-        // Don't even try to regen if it's going to fail.
-        ChunkManager provider = getWorld().getChunkManager();
-        if (!(provider instanceof ServerChunkManager)) {
-            return false;
-        }
-
-        try {
-            doRegen(region, extent, options);
-        } catch (Exception e) {
-            throw new IllegalStateException("Regen failed", e);
-        }
-
-        return true;
+    public boolean regenerate(Region region, EditSession editSession) {
+        return false;
     }
 
     private void doRegen(Region region, Extent extent, RegenOptions options) throws Exception {

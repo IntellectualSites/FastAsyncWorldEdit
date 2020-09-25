@@ -198,6 +198,11 @@ public class FabricPlayer extends AbstractPlayerActor {
         return FabricWorldEdit.inst.getPermissionsProvider().hasPermission(player, perm);
     }
 
+    @Override
+    public void setPermission(String permission, boolean value) {
+
+    }
+
     @Nullable
     @Override
     public <T> T getFacet(Class<? extends T> cls) {
@@ -250,6 +255,11 @@ public class FabricPlayer extends AbstractPlayerActor {
                 }
             }
         }
+    }
+
+    @Override
+    public void sendTitle(Component title, Component sub) {
+
     }
 
     @Override

@@ -7,3 +7,5 @@ listOf("bukkit", "core", "fabric").forEach {
     include("worldedit-$it")
 }
 include("worldedit-libs:core:ap")
+
+include("worldedit-core:doctools")

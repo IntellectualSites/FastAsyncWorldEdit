@@ -32,11 +32,6 @@ import net.minecraft.util.Util;
  */
 class FabricBiomeRegistry implements BiomeRegistry {
 
-    @Override
-    public Component getRichName(BiomeType biomeType) {
-        return TranslatableComponent.of(Util.createTranslationKey("biome", new Identifier(biomeType.getId())));
-    }
-
     @Deprecated
     @Override
     public BiomeData getData(BiomeType biome) {
