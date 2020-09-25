@@ -1,20 +1,28 @@
 package com.boydti.fawe.beta.implementation.processors;
 
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.util.StringMan;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
     private IBatchProcessor[] processors;
+    private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
+        FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) HashMap::new);
 
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
@@ -58,14 +66,20 @@ public class MultiBatchProcessor implements IBatchProcessor {
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         try {
-            for (int i = processors.length - 1 ; i >= 0; i--) {
+            IChunkSet chunkSet = set;
+            for (int i = processors.length - 1; i >= 0; i--) {
                 IBatchProcessor processor = processors[i];
-                set = processor.processSet(chunk, get, set);
-                if (set == null) {
+                if (processor instanceof Filter) {
+                    chunkSet = ((IBatchProcessor) classToThreadIdToFilter.getUnchecked(processor.getClass())
+                        .computeIfAbsent(Thread.currentThread().getId(), k -> ((Filter) processor).fork())).processSet(chunk, get, chunkSet);
+                } else {
+                    chunkSet = processor.processSet(chunk, get, chunkSet);
+                }
+                if (chunkSet == null) {
                     return null;
                 }
             }
-            return set;
+            return chunkSet;
         } catch (Throwable e) {
             e.printStackTrace();
             throw e;

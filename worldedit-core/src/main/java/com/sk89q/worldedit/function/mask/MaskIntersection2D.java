@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class MaskIntersection2D implements Mask2D {
 
-    private final Set<Mask2D> masks = new HashSet<>();
+    protected final Set<Mask2D> masks = new HashSet<>();
 
     /**
      * Create a new intersection.
@@ -95,6 +96,12 @@ public class MaskIntersection2D implements Mask2D {
         }
 
         return true;
+    }
+
+    @Override
+    public Mask2D copy2D() {
+        Set<Mask2D> masksCopy = this.masks.stream().map(Mask2D::copy2D).collect(Collectors.toSet());
+        return new MaskIntersection2D(masksCopy);
     }
 
 }

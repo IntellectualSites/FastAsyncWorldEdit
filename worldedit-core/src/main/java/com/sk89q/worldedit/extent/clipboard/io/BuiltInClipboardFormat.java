@@ -24,8 +24,11 @@ import com.boydti.fawe.object.io.ResettableFileInputStream;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.object.schematic.PNGWriter;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.Tag;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -73,7 +77,25 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(File file) {
             String name = file.getName().toLowerCase();
-            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
+            if (name.endsWith(".schematic")) {
+                try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                    NamedTag rootTag = str.readNamedTag();
+                    if (!rootTag.getName().equals("Schematic")) {
+                        return false;
+                    }
+                    CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+
+                    // Check
+                    Map<String, Tag> schematic = schematicTag.getValue();
+                    if (!schematic.containsKey("Materials")) {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+                return true;
+            }
+            return name.endsWith(".mcedit") || name.endsWith(".mce");
         }
     },
     SPONGE_SCHEMATIC("sponge", "schem") {
@@ -109,7 +131,24 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public boolean isFormat(File file) {
             String name = file.getName().toLowerCase();
-            return name.endsWith(".schem") || name.endsWith(".sponge");
+            if (name.endsWith(".schem") || name.endsWith(".sponge")) {
+                try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                    NamedTag rootTag = str.readNamedTag();
+                    if (!rootTag.getName().equals("Schematic")) {
+                        return false;
+                    }
+                    CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+
+                    // Check
+                    Map<String, Tag> schematic = schematicTag.getValue();
+                    if (!schematic.containsKey("Version")) {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            return false;
         }
 
     },

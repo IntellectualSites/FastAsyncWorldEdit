@@ -31,4 +31,9 @@ public class InverseMask extends AbstractMask {
     public Mask inverse() {
         return mask;
     }
+
+    @Override
+    public Mask copy() {
+        return new InverseMask(mask.copy());
+    }
 }

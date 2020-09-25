@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
@@ -51,6 +52,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean enabledQueue = true;
 
     private boolean fastmode = false;
+
+    private final ReentrantLock getChunkLock = new ReentrantLock();
 
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
@@ -219,50 +222,55 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public final IQueueChunk getOrCreateChunk(int x, int z) {
-        final long pair = (long) x << 32 | z & 0xffffffffL;
-        if (pair == lastPair) {
-            return lastChunk;
-        }
-        if (!processGet(x, z)) {
-            lastPair = pair;
-            lastChunk = NullChunk.getInstance();
-            return NullChunk.getInstance();
-        }
-        IQueueChunk chunk = chunks.get(pair);
-        if (chunk != null) {
+        getChunkLock.lock();
+        try {
+            final long pair = (long) x << 32 | z & 0xffffffffL;
+            if (pair == lastPair) {
+                return lastChunk;
+            }
+            if (!processGet(x, z)) {
+                lastPair = pair;
+                lastChunk = NullChunk.getInstance();
+                return NullChunk.getInstance();
+            }
+            IQueueChunk chunk = chunks.get(pair);
+            if (chunk != null) {
+                lastPair = pair;
+                lastChunk = chunk;
+            }
+            if (chunk != null) {
+                return chunk;
+            }
+            final int size = chunks.size();
+            final boolean lowMem = MemUtil.isMemoryLimited();
+            // If queueing is enabled AND either of the following
+            //  - memory is low & queue size > num threads + 8
+            //  - queue size > target size and primary queue has less than num threads submissions
+            if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized()))) {
+                chunk = chunks.removeFirst();
+                final Future future = submitUnchecked(chunk);
+                if (future != null && !future.isDone()) {
+                    final int targetSize;
+                    if (lowMem) {
+                        targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS + 8;
+                    } else {
+                        targetSize = Settings.IMP.QUEUE.TARGET_SIZE;
+                    }
+                    pollSubmissions(targetSize, lowMem);
+                    submissions.add(future);
+                }
+            }
+            chunk = poolOrCreate(x, z);
+            chunk = wrap(chunk);
+
+            chunks.put(pair, chunk);
             lastPair = pair;
             lastChunk = chunk;
-        }
-        if (chunk != null) {
+
             return chunk;
+        } finally {
+            getChunkLock.unlock();
         }
-        final int size = chunks.size();
-        final boolean lowMem = MemUtil.isMemoryLimited();
-        // If queueing is enabled AND either of the following
-        //  - memory is low & queue size > num threads + 8
-        //  - queue size > target size and primary queue has less than num threads submissions
-        if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized()))) {
-            chunk = chunks.removeFirst();
-            final Future future = submitUnchecked(chunk);
-            if (future != null && !future.isDone()) {
-                final int targetSize;
-                if (lowMem) {
-                    targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS + 8;
-                } else {
-                    targetSize = Settings.IMP.QUEUE.TARGET_SIZE;
-                }
-                pollSubmissions(targetSize, lowMem);
-                submissions.add(future);
-            }
-        }
-        chunk = poolOrCreate(x, z);
-        chunk = wrap(chunk);
-
-        chunks.put(pair, chunk);
-        lastPair = pair;
-        lastChunk = chunk;
-
-        return chunk;
     }
 
     @Override

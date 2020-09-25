@@ -17,6 +17,12 @@ public class SingleBlockTypeMask extends ABlockMask {
         this.internalId = type.getInternalId();
     }
 
+    private SingleBlockTypeMask(Extent extent, int internalId, boolean isAir) {
+        super(extent);
+        this.internalId = internalId;
+        this.isAir = isAir;
+    }
+
     @Override
     public final boolean test(BlockState state) {
         return state.getBlockType().getInternalId() == internalId;
@@ -34,5 +40,10 @@ public class SingleBlockTypeMask extends ABlockMask {
     @Override
     public boolean replacesAir() {
         return isAir;
+    }
+
+    @Override
+    public Mask copy() {
+        return new SingleBlockTypeMask(getExtent(), internalId, isAir);
     }
 }

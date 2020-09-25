@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.function.mask.AbstractMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class PlaneMask extends AbstractMask implements ResettableMask {
@@ -53,6 +54,11 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
     @Override
     public void reset() {
         mode = -1;
+    }
+
+    @Override
+    public Mask copy() {
+        return new PlaneMask();
     }
 
 }
