@@ -65,6 +65,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
@@ -92,6 +93,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,6 +109,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.bukkit.generator.BlockPopulator;
 
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
@@ -472,69 +475,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         }
     }
     
-    private Map<ChunkCoordIntPair, IChunkAccess> regenPreGenChunks(Region region, WorldServer serverWorld) {
-        List<CompletableFuture<IChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
-        IAsyncTaskHandler executor;
-        try {
-            executor = (IAsyncTaskHandler) chunkProviderExecutorField.get(serverWorld.getChunkProvider());
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Couldn't get executor for chunk loading.", e);
-        }
-        executor.awaitTasks(() -> {
-            // bail out early if a future fails
-            if (chunkLoadings.stream().anyMatch(ftr -> ftr.isDone() && Futures.getUnchecked(ftr) == null)) {
-                return false;
-            }
-            return chunkLoadings.stream().allMatch(CompletableFuture::isDone);
-        });
-        Map<ChunkCoordIntPair, IChunkAccess> chunks = new HashMap<>();
-        for (CompletableFuture<IChunkAccess> future : chunkLoadings) {
-            @Nullable
-            IChunkAccess chunk = future.getNow(null);
-            Preconditions.checkState(chunk != null, "Failed to generate a chunk, regen failed.");
-            chunks.put(chunk.getPos(), chunk);
-        }
-        return chunks;
-    }
-    
-    private List<CompletableFuture<IChunkAccess>> submitChunkLoadTasks(Region region, WorldServer serverWorld) {
-        ChunkProviderServer chunkManager = serverWorld.getChunkProvider();
-        List<CompletableFuture<IChunkAccess>> chunkLoadings = new ArrayList<>();
-        
-        // Pre-gen all the chunks
-        try {
-            for (BlockVector2 chunk : region.getChunks()) {
-                //noinspection unchecked
-                chunkLoadings.add(
-                    ((CompletableFuture<Either<IChunkAccess, PlayerChunk.Failure>>)
-                        getChunkFutureMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FULL, true))
-                            .thenApply(either -> either.left().orElse(null))
-                );
-            }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException("Couldn't load chunk for regen.", e);
-        }
-        return chunkLoadings;
-    }
-
-//    private ProtoChunk createProtoChunk(ChunkCoordIntPair coords, boolean generateFlatBedrock) {
-//        return new ProtoChunk(coords, ChunkConverter.a) {
-//            // paper throws NPEs otherwise
-//            public boolean generateFlatBedrock() {
-//                return generateFlatBedrock;
-//            }
-//        };
-//    }
-    
-//    private List<ChunkCoordIntPair> getChunkCoordsRegen(Region region, int border) {
-//        BlockVector3 oldMin = region.getMinimumPoint();
-//        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
-//        BlockVector3 oldMax = region.getMaximumPoint();
-//        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 -1);
-//        Region adjustedRegion = new CuboidRegion(newMin, newMax);
-//        return adjustedRegion.getChunks().stream().map(c -> new ChunkCoordIntPair(c.getX(), c.getZ())).collect(Collectors.toList());
-//    }
-    
     private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
         BlockVector3 oldMin = region.getMinimumPoint();
         BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
@@ -543,7 +483,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
         newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
-//        adjustedRegion.getChunks().forEach(System.out::println);
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
                 .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getX()).thenComparingInt(c -> c.getZ()))
@@ -630,8 +569,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             ChunkGenerator generator = tempgenerator;
             
             try {
-                // Create and store ProtoChunks - note that not each one is used later
-                // but nms requires us to create more than needed
                 long start = System.currentTimeMillis();
 
                 //create chunks
@@ -644,16 +581,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                     protoChunks.put(xz, chunk);
                 }
 
-                Long2ObjectOpenHashMap<List<IChunkAccess>> foo = new Long2ObjectOpenHashMap();
-                for (Long xz : getChunkCoordsRegen(region, 0)) {
-                    int x = MathMan.unpairIntX(xz);
-                    int z = MathMan.unpairIntY(xz);
-                    foo.put(xz, protoChunks.values().stream()
-                            .filter(e -> Math.abs(e.getPos().x - x) <= 8 && Math.abs(e.getPos().z - z) <= 8)
-                            .collect(Collectors.toList()));
-                }
-
-                Arrays.asList(
+                //list of chunk stati in correct order
+                List<ChunkStatus> chunkStati = Arrays.asList(
                         ChunkStatus.EMPTY,
                         ChunkStatus.STRUCTURE_STARTS,
                         ChunkStatus.STRUCTURE_REFERENCES,
@@ -666,133 +595,175 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                         ChunkStatus.LIGHT,
                         ChunkStatus.SPAWN,
                         ChunkStatus.HEIGHTMAPS
-                ).forEach(chunkstatus -> {
+                );
+                
+                //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
+                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
+                chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                    if (radius == -1) //ignore ChunkStatus.EMPTY
+                        return;
+                    System.out.println("precomputing RegionLimitedWorldAccess chunk with radius " + radius);
+                    Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap();
+                    for (Long xz : getChunkCoordsRegen(region, 8 - radius)) {
+                        int x = MathMan.unpairIntX(xz);
+                        int z = MathMan.unpairIntY(xz);
+                        map.put(xz, protoChunks.values().stream()
+                                .filter(e -> Math.abs(e.getPos().x - x) <= radius && Math.abs(e.getPos().z - z) <= radius)
+                                .collect(Collectors.toList()));
+                    }
+                    worldlimits.put(radius, map);
+                });
+                
+                //run generation tasks exluding FULL chunk status
+                chunkStati.forEach(chunkstatus -> {
                     System.out.println(chunkstatus.d());
-                    for (Long xz : getChunkCoordsRegen(region, 0)) {
-                        ProtoChunk chunk = protoChunks.get(xz);
+                    int radius = Math.max(0, chunkstatus.f()); //f() is required border chunks, EMPTY: f() == -1
+                    List<Long> l = getChunkCoordsRegen(region, 8 - radius);
+                    for (Long xz : l) {
+//                        ProtoChunk chunk = protoChunks.get(xz);
 //                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
                         chunkstatus.a(freshWorld,
                                       generator,
                                       structManager,
                                       lightEngine,
                                       c -> CompletableFuture.completedFuture(Either.left(c)),
-                                      foo.get(xz));
+                                      worldlimits.get(radius).get(xz));
                     }
                 });
 
-//                System.out.println("full");
-//                for (Long xz : getChunkCoordsRegen(region, 0)) {
-//                    ProtoChunk chunk = protoChunks.get(xz);
-//                    System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
-//                    ChunkStatus.FULL.a(freshWorld, generator, structManager, lightEngine,
-//                                          c -> CompletableFuture.completedFuture(Either.left(new Chunk(freshWorld, chunk))),
-//                                          foo.get(xz));
-//                }
-
-//                    
-//                    
-//                    
-//                    //populate
-//                    java.util.Random random = new java.util.Random();
-//                    random.setSeed(seed);
-//                    long xRand = random.nextLong() / 2L * 2L + 1L;
-//                    long zRand = random.nextLong() / 2L * 2L + 1L;
-//                    random.setSeed((long) chunkCoords.getX() * xRand + (long) chunkCoords.getZ() * zRand ^ seed);
-//                    Chunk c = new Chunk(freshWorld, protoChunk);
-//                    genedChunks.put(MathMan.pairInt(chunkCoords.getX(), chunkCoords.getZ()), c);
-//                    originalWorld.getChunkProvider().chunkGenerator.getDefaultPopulators(originalWorld.getWorld()).forEach(pop -> {
-//                        pop.populate(freshWorld.getWorld(), random, c.bukkitChunk);
-//                    });
-//                }
+                //convert to proper chunks
+                Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap();
+                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                    ProtoChunk chunk = protoChunks.get(xz);
+                    chunks.put(xz, new Chunk(freshWorld, chunk));
+                }
+                
+                //final chunkstatus
+                System.out.println("full");
+                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                    Chunk chunk = chunks.get(xz);
+                    ChunkStatus.FULL.a(freshWorld, generator, structManager, lightEngine,
+                                          c -> CompletableFuture.completedFuture(Either.left(c)),
+                                          Arrays.asList(chunk)); //chunkstatus.f() == 0!
+                }
+                
+                //populate
+//                List<BlockPopulator> defaultPopulators = originalWorld.generator.getDefaultPopulators(originalWorld.getWorld());
+                List<BlockPopulator> defaultPopulators = originalWorld.getWorld().getPopulators();
+                System.out.println("populate with " + defaultPopulators.size() + " populators");
+                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                    int x = MathMan.unpairIntX(xz);
+                    int z = MathMan.unpairIntY(xz);
+                    
+                    //prepare chunk seed
+                    java.util.Random random = new java.util.Random();
+                    random.setSeed(seed);
+                    long xRand = random.nextLong() / 2L * 2L + 1L;
+                    long zRand = random.nextLong() / 2L * 2L + 1L;
+                    random.setSeed((long) x * xRand + (long) z * zRand ^ seed);
+                    
+                    //actually populate
+                    Chunk c = chunks.get(xz);
+                    defaultPopulators.forEach(pop -> {
+                        pop.populate(freshWorld.getWorld(), random, c.bukkitChunk);
+                    });
+                }
 
                 System.out.println("Finished chunk generation in " + (System.currentTimeMillis() - start) + " ms");
                 IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
-                extent.init(null, (chunkX, chunkZ) -> new IChunkGet() {
+                extent.init(null, (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_2(freshWorld, chunkX, chunkZ) {
                     @Override
-                    public BaseBlock getFullBlock(int x, int y, int z) {
-                        return getBlock(x, y, z).toBaseBlock();
+                    public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
+                        return chunks.get(MathMan.pairInt(X, Z));
                     }
-
-                    @Override
-                    public BiomeType getBiomeType(int x, int y, int z) {
-                        long coords = MathMan.pairInt(chunkX, chunkZ);
-                        IChunkAccess iChunkAccess = protoChunks.get(coords);
-                        // return FAWE_Spigot_v1_16_R2.this.adapt(iChunkAccess.getBiomeIndex().getBiome(x, y, z));
-                        return BiomeTypes.FOREST; // TODO?
-                    }
-
-                    @Override
-                    public BlockState getBlock(int x, int y, int z) {
-                        long coords = MathMan.pairInt(chunkX, chunkZ);
-                        IChunkAccess iChunkAccess = protoChunks.get(coords);
-                        return adapt(iChunkAccess.getType(new BlockPosition(x, y, z)));
-                    }
-
-                    @Override
-                    public int getSkyLight(int x, int y, int z) {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getEmmittedLight(int x, int y, int z) {
-                        return 0;
-                    }
-
-                    @Override
-                    public int[] getHeightMap(HeightMapType type) {
-                        return new int[0];
-                    }
-
-                    @Override
-                    public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
-                        return null;
-                    }
-
-                    @Override
-                    public CompoundTag getEntity(UUID uuid) {
-                        return null;
-                    }
-
-                    @Override
-                    public boolean hasSection(@Range(from = 0, to = 15) int layer) {
-                        return false; // TODO
-                    }
-
-                    @Override
-                    public char[] load(int layer) {
-                        return new char[0];
-                    }
-
-                    @Override
-                    public Map<BlockVector3, CompoundTag> getTiles() {
-                        return null;
-                    }
-
-                    @Override
-                    public CompoundTag getTile(int x, int y, int z) {
-                        return null;
-                    }
-
-                    @Override
-                    public Set<CompoundTag> getEntities() {
-                        return null;
-                    }
-
-                    @Override
-                    public boolean trim(boolean aggressive, int layer) {
-                        return false;
-                    }
-
-                    @Override
-                    public IBlocks reset() {
-                        return null;
-                    }
-
-                    @Override
-                    public boolean trim(boolean aggressive) {
-                        return false;
-                    }
-                }, null);
+                }
+//new IChunkGet() {
+//                    @Override
+//                    public BaseBlock getFullBlock(int x, int y, int z) {
+//                        return getBlock(x, y, z).toBaseBlock();
+//                    }
+//
+//                    @Override
+//                    public BiomeType getBiomeType(int x, int y, int z) {
+//                        long coords = MathMan.pairInt(chunkX, chunkZ);
+//                        IChunkAccess iChunkAccess = protoChunks.get(coords);
+//                        // return FAWE_Spigot_v1_16_R2.this.adapt(iChunkAccess.getBiomeIndex().getBiome(x, y, z));
+//                        return BiomeTypes.FOREST; // TODO?
+//                    }
+//
+//                    @Override
+//                    public BlockState getBlock(int x, int y, int z) {
+//                        long coords = MathMan.pairInt(chunkX, chunkZ);
+//                        IChunkAccess iChunkAccess = protoChunks.get(coords);
+//                        return adapt(iChunkAccess.getType(new BlockPosition(x, y, z)));
+//                    }
+//
+//                    @Override
+//                    public int getSkyLight(int x, int y, int z) {
+//                        return 0;
+//                    }
+//
+//                    @Override
+//                    public int getEmmittedLight(int x, int y, int z) {
+//                        return 0;
+//                    }
+//
+//                    @Override
+//                    public int[] getHeightMap(HeightMapType type) {
+//                        return new int[0];
+//                    }
+//
+//                    @Override
+//                    public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public CompoundTag getEntity(UUID uuid) {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public boolean hasSection(@Range(from = 0, to = 15) int layer) {
+//                        return false; // TODO
+//                    }
+//
+//                    @Override
+//                    public char[] load(int layer) {
+//                        return new char[0];
+//                    }
+//
+//                    @Override
+//                    public Map<BlockVector3, CompoundTag> getTiles() {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public CompoundTag getTile(int x, int y, int z) {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public Set<CompoundTag> getEntities() {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public boolean trim(boolean aggressive, int layer) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public IBlocks reset() {
+//                        return null;
+//                    }
+//
+//                    @Override
+//                    public boolean trim(boolean aggressive) {
+//                        return false;
+//                    }
+//                }
+                    , null);
                 System.out.println("Set blocks");
                 for (BlockVector3 vec : region) {
                     realExtent.setBlock(vec, extent.getBlock(vec));
