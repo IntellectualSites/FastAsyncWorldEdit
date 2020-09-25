@@ -26,7 +26,6 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
@@ -52,7 +51,6 @@ import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -87,23 +85,26 @@ import org.jetbrains.annotations.Range;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
@@ -115,6 +116,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     private final Field serverWorldsField;
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
+    private final Constructor<ProtoChunk> protoChunkCtor;
+    private final Field worldPaperConfigField;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -131,6 +134,22 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
         chunkProviderExecutorField = ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
         chunkProviderExecutorField.setAccessible(true);
+        
+        Constructor tmpProtoChunkCtor = null;
+        try { //only present on paper
+            tmpProtoChunkCtor = ProtoChunk.class.getDeclaredConstructor(ChunkCoordIntPair.class, ChunkConverter.class, World.class);
+            tmpProtoChunkCtor.setAccessible(true);
+        } catch (Exception e) {
+        }
+        protoChunkCtor = tmpProtoChunkCtor;
+        
+        Field tmpPaperConfigField = null;
+        try { //only present on paper
+            tmpPaperConfigField = World.class.getDeclaredField("paperConfig");
+            tmpPaperConfigField.setAccessible(true);
+        } catch (Exception e) {
+        }
+        worldPaperConfigField = tmpPaperConfigField;
     }
 
     @Override
@@ -498,34 +517,48 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         return chunkLoadings;
     }
 
-    private ProtoChunk createProtoChunk(ChunkCoordIntPair coords, boolean generateFlatBedrock) {
-        return new ProtoChunk(coords, ChunkConverter.a) {
-            // paper throws NPEs otherwise
-            public boolean generateFlatBedrock() {
-                return generateFlatBedrock;
-            }
-        };
+//    private ProtoChunk createProtoChunk(ChunkCoordIntPair coords, boolean generateFlatBedrock) {
+//        return new ProtoChunk(coords, ChunkConverter.a) {
+//            // paper throws NPEs otherwise
+//            public boolean generateFlatBedrock() {
+//                return generateFlatBedrock;
+//            }
+//        };
+//    }
+    
+//    private List<ChunkCoordIntPair> getChunkCoordsRegen(Region region, int border) {
+//        BlockVector3 oldMin = region.getMinimumPoint();
+//        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
+//        BlockVector3 oldMax = region.getMaximumPoint();
+//        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 -1);
+//        Region adjustedRegion = new CuboidRegion(newMin, newMax);
+//        return adjustedRegion.getChunks().stream().map(c -> new ChunkCoordIntPair(c.getX(), c.getZ())).collect(Collectors.toList());
+//    }
+    
+    private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
+        BlockVector3 oldMin = region.getMinimumPoint();
+        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
+        BlockVector3 oldMax = region.getMaximumPoint();
+        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 -1);
+        int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
+        newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
+        Region adjustedRegion = new CuboidRegion(newMin, newMax);
+//        adjustedRegion.getChunks().forEach(System.out::println);
+        return adjustedRegion.getChunks().stream()
+                .map(c -> BlockVector2.at(c.getX(), c.getZ()))
+                .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getX()).thenComparingInt(c -> c.getZ()))
+                .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
-        // Adjust region for RegionLimitedWorldAccess (requires a perfect square number as chunks
-        // internal behaviour might even expect a squared region
-        BlockVector3 oldMin = region.getMinimumPoint();
-        // -16 is the offset to increase by 1 chunk
-        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - 16);
-        BlockVector3 oldMax = region.getMaximumPoint();
-        // 31 is the offset to increase by 1 chunk
-        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + 31, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + 31);
-        int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
-        newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
-        Region adjustedRegion = new CuboidRegion(newMin, newMax);
-
         WorldServer originalWorld = ((CraftWorld) bukkitWorld).getHandle();
         ChunkProviderServer provider = originalWorld.getChunkProvider();
         if (!(provider instanceof ChunkProviderServer)) {
             return false;
         }
+        
         // TODO make it work for CustomChunkGenerator
         Field generatorSettingBaseSupplierField = provider.getChunkGenerator().getClass().getDeclaredField("h");
         generatorSettingBaseSupplierField.setAccessible(true);
@@ -535,21 +568,22 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
         Field chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
         chunkProviderField.setAccessible(true);
-
-        // TODO fix, don't know why I did that, would need to access PaperWorldConfig.generateFlatBedrock
-        boolean generateFlatBedrock;
+        
+        //flat bedrock?
+        boolean tmpgenerateFlatBedrock = false;
         try {
-            Field paperConfigField = World.class.getDeclaredField("paperConfig");
-            paperConfigField.setAccessible(true);
-            generateFlatBedrock = (boolean) paperConfigField.get(originalWorld);
+            tmpgenerateFlatBedrock = (boolean) worldPaperConfigField.get(originalWorld);
         } catch (Exception ignored) {
-            generateFlatBedrock = false;
         }
+        boolean generateFlatBedrock = tmpgenerateFlatBedrock;
 
+        //world folder
         File saveFolder = Files.createTempDir();
         // register this just in case something goes wrong
         // normally it should be deleted at the end of this method
         saveFolder.deleteOnExit();
+        
+        //make a world
         org.bukkit.World.Environment env = bukkitWorld.getEnvironment();
         org.bukkit.generator.ChunkGenerator gen = bukkitWorld.getGenerator();
         Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
@@ -565,49 +599,112 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
             WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
-            WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen)).get();
+            
+            //init world
+            Map<Long, ProtoChunk> protoChunks = new LinkedHashMap<>();
+            WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
+                @Override
+                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
+                    return protoChunks.get(MathMan.pairInt(i, j));
+                }
+            }).get();
 
             // needed as it otherwise waits endlessly somehow
-            chunkProviderField.set(freshWorld, new ChunkProviderServer(freshWorld, session, freshWorld.getMinecraftServer().getDataFixer(), freshWorld.getMinecraftServer().getDefinedStructureManager(), freshWorld.getMinecraftServer().executorService, provider.chunkGenerator, freshWorld.spigotConfig.viewDistance, freshWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshWorld.getMinecraftServer().E().getWorldPersistentData()));
+            ChunkProviderServer chunkProvider = new ChunkProviderServer(freshWorld, session, freshWorld.getMinecraftServer().getDataFixer(), freshWorld.getMinecraftServer().getDefinedStructureManager(), freshWorld.getMinecraftServer().executorService, provider.chunkGenerator, freshWorld.spigotConfig.viewDistance, freshWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshWorld.getMinecraftServer().E().getWorldPersistentData()) {
+                @Override
+                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
+                    return protoChunks.get(MathMan.pairInt(i, j));
+                }
+            };
+            chunkProviderField.set(freshWorld, chunkProvider);
 
             Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(freshWorld.getChunkProvider().getChunkGenerator());
-            ChunkGenerator generator = new ChunkGeneratorAbstract(provider.getChunkGenerator().getWorldChunkManager(),
-                    seed, generatorSettingBaseSupplier);
+            ChunkGenerator tempgenerator = new ChunkGeneratorAbstract(provider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
             if (originalWorld.generator != null) {
                 // wrap custom world generator
-                generator = new CustomChunkGenerator(freshWorld, generator, originalWorld.generator);
+                tempgenerator = new CustomChunkGenerator(freshWorld, tempgenerator, originalWorld.generator);
             }
-            final ChunkGenerator chunkGenerator = generator;
 
+            DefinedStructureManager structManager = freshWorld.getMinecraftServer().getDefinedStructureManager();
+            LightEngineThreaded lightEngine = chunkProvider.getLightEngine();
+            ChunkGenerator generator = tempgenerator;
+            
             try {
                 // Create and store ProtoChunks - note that not each one is used later
                 // but nms requires us to create more than needed
-                Long2ObjectOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectOpenHashMap<>();
-                for (BlockVector2 chunkCoords : adjustedRegion.getChunks()) {
-                    long coords = MathMan.pairInt(chunkCoords.getX(), chunkCoords.getZ());
-                    protoChunks.put(coords, createProtoChunk(new ChunkCoordIntPair(chunkCoords.getX(), chunkCoords.getZ()), generateFlatBedrock));
-                }
-                RegionLimitedWorldAccess genRegion = new RegionLimitedWorldAccess(freshWorld, new ArrayList<>(protoChunks.values()));
-                System.out.println("Generate chunks on " + Thread.currentThread());
                 long start = System.currentTimeMillis();
-                for (BlockVector2 chunkCoords : adjustedRegion.getChunks()) {
-                    // similar to CraftServer#createVanillaChunkData (paper)
-                    ProtoChunk protoChunk = protoChunks.get(MathMan.pairInt(chunkCoords.getX(), chunkCoords.getZ()));
-                    // biomes
-                    chunkGenerator.createBiomes(freshWorld.r().b(IRegistry.ay), protoChunk);
-                    // landscape
-                    chunkGenerator.buildNoise(genRegion, new StructureManager(freshWorld, newOpts) {
-                        public Stream<? extends StructureStart<?>> a(SectionPosition sectionposition, StructureGenerator<?> structuregenerator) {
-                            return Stream.empty();
-                        }
 
-                        public java.util.List<StructureStart<?>> getFeatureStarts(SectionPosition sectionPosition, StructureGenerator<?> structureGenerator) {
-                            return new ArrayList<>();
+                //create chunks
+                for (Long xz : getChunkCoordsRegen(region, 8)) { //8 = max number of neighbor chunk radius
+                    ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz)), ChunkConverter.a) {
+                        public boolean generateFlatBedrock() {
+                            return generateFlatBedrock;
                         }
-                    }, protoChunk);
-                    // bedrock
-                    chunkGenerator.buildBase(genRegion, protoChunk);
+                    };
+                    protoChunks.put(xz, chunk);
                 }
+
+                Long2ObjectOpenHashMap<List<IChunkAccess>> foo = new Long2ObjectOpenHashMap();
+                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                    int x = MathMan.unpairIntX(xz);
+                    int z = MathMan.unpairIntY(xz);
+                    foo.put(xz, protoChunks.values().stream()
+                            .filter(e -> Math.abs(e.getPos().x - x) <= 8 && Math.abs(e.getPos().z - z) <= 8)
+                            .collect(Collectors.toList()));
+                }
+
+                Arrays.asList(
+                        ChunkStatus.EMPTY,
+                        ChunkStatus.STRUCTURE_STARTS,
+                        ChunkStatus.STRUCTURE_REFERENCES,
+                        ChunkStatus.BIOMES,
+                        ChunkStatus.NOISE,
+                        ChunkStatus.SURFACE,
+                        ChunkStatus.CARVERS,
+                        ChunkStatus.LIQUID_CARVERS,
+                        ChunkStatus.FEATURES,
+                        ChunkStatus.LIGHT,
+                        ChunkStatus.SPAWN,
+                        ChunkStatus.HEIGHTMAPS
+                ).forEach(chunkstatus -> {
+                    System.out.println(chunkstatus.d());
+                    for (Long xz : getChunkCoordsRegen(region, 0)) {
+                        ProtoChunk chunk = protoChunks.get(xz);
+//                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
+                        chunkstatus.a(freshWorld,
+                                      generator,
+                                      structManager,
+                                      lightEngine,
+                                      c -> CompletableFuture.completedFuture(Either.left(c)),
+                                      foo.get(xz));
+                    }
+                });
+
+//                System.out.println("full");
+//                for (Long xz : getChunkCoordsRegen(region, 0)) {
+//                    ProtoChunk chunk = protoChunks.get(xz);
+//                    System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
+//                    ChunkStatus.FULL.a(freshWorld, generator, structManager, lightEngine,
+//                                          c -> CompletableFuture.completedFuture(Either.left(new Chunk(freshWorld, chunk))),
+//                                          foo.get(xz));
+//                }
+
+//                    
+//                    
+//                    
+//                    //populate
+//                    java.util.Random random = new java.util.Random();
+//                    random.setSeed(seed);
+//                    long xRand = random.nextLong() / 2L * 2L + 1L;
+//                    long zRand = random.nextLong() / 2L * 2L + 1L;
+//                    random.setSeed((long) chunkCoords.getX() * xRand + (long) chunkCoords.getZ() * zRand ^ seed);
+//                    Chunk c = new Chunk(freshWorld, protoChunk);
+//                    genedChunks.put(MathMan.pairInt(chunkCoords.getX(), chunkCoords.getZ()), c);
+//                    originalWorld.getChunkProvider().chunkGenerator.getDefaultPopulators(originalWorld.getWorld()).forEach(pop -> {
+//                        pop.populate(freshWorld.getWorld(), random, c.bukkitChunk);
+//                    });
+//                }
+
                 System.out.println("Finished chunk generation in " + (System.currentTimeMillis() - start) + " ms");
                 IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
                 extent.init(null, (chunkX, chunkZ) -> new IChunkGet() {
