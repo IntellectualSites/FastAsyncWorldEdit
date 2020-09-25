@@ -395,7 +395,7 @@ public class Settings extends Config {
         public boolean ALLOW_TICK_EXISTING = true;
         @Comment({
             "Do not wait for a chunk's history to save before sending it",
-            " - Any following history commands (undo/redo) will still need to wait for history to be saved",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
             " - Requires combine_stages = true"
         })
         public boolean SEND_BEFORE_HISTORY = true;
