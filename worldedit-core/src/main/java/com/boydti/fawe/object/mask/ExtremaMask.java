@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
 
 public class ExtremaMask extends AngleMask {
     public ExtremaMask(Extent extent, double min, double max, boolean overlay, int distance) {
@@ -61,5 +62,10 @@ public class ExtremaMask extends AngleMask {
             lastHeight2 = height2;
         }
         return (lastHeight1 - base) + (lastHeight2 - base);
+    }
+
+    @Override
+    public Mask copy() {
+        return new ExtremaMask(getExtent(), min, max, overlay, distance);
     }
 }

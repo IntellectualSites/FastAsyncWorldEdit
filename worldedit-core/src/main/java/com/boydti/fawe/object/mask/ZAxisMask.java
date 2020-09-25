@@ -1,7 +1,7 @@
-package com.boydti.fawe.function.mask;
+package com.boydti.fawe.object.mask;
 
-import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.function.mask.AbstractMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class ZAxisMask extends AbstractMask implements ResettableMask {
@@ -22,6 +22,11 @@ public class ZAxisMask extends AbstractMask implements ResettableMask {
     @Override
     public void reset() {
         this.layer = -1;
+    }
+
+    @Override
+    public Mask copy() {
+        return new ZAxisMask();
     }
 
 }

@@ -56,4 +56,9 @@ public class BlockCategoryMask extends AbstractExtentMask {
     public Mask2D toMask2D() {
         return null;
     }
+
+    @Override
+    public Mask copy() {
+        return new BlockCategoryMask(getExtent(), category);
+    }
 }

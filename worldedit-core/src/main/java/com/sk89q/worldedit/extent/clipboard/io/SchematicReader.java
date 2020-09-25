@@ -27,6 +27,7 @@ import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.clipboard.LinearClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.io.FastByteArraysInputStream;
+import com.boydti.fawe.object.io.ResettableFileInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -56,7 +57,12 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -64,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.zip.GZIPInputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -72,6 +79,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Reads schematic files based that are compatible with MCEdit and other editors.
  */
 public class SchematicReader implements ClipboardReader {
+
+    private static final Logger log = LoggerFactory.getLogger(SchematicReader.class);
 
     private static final NBTCompatibilityHandler[] COMPATIBILITY_HANDLERS = {
         new SignCompatibilityHandler(),
@@ -218,6 +227,25 @@ public class SchematicReader implements ClipboardReader {
 
     @Override
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
+        try {
+            return readInternal(uuid, createOutput);
+        } catch (EOFException e) {
+            log.error("EOFException read in schematic. Did you give the schematic the wrong extension?");
+            log.error("We will attempt to rectify your mistake for you and load the schematic assuming it is named .schem not .schematic");
+            e.printStackTrace();
+            final InputStream stream;
+            if (rootStream instanceof FileInputStream) {
+                stream = new ResettableFileInputStream((FileInputStream) rootStream);
+            } else {
+                stream = rootStream;
+            }
+            BufferedInputStream buffered = new BufferedInputStream(stream);
+            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
+            return (new FastSchematicReader(nbtStream)).read(uuid, createOutput);
+        }
+    }
+
+    private Clipboard readInternal(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
         inputStream.readNamedTagLazy(root);
 
