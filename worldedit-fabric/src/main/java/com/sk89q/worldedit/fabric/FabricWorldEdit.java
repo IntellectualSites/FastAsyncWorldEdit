@@ -150,12 +150,11 @@ public class FabricWorldEdit implements ModInitializer {
 
     private void setupRegistries(MinecraftServer server) {
         // Blocks
-        for (Identifier name : Registry.BLOCK.getIds()) {
+        /*for (Identifier name : Registry.BLOCK.getIds()) {
             if (BlockType.REGISTRY.get(name.toString()) == null) {
-                BlockType.REGISTRY.register(name.toString(), new BlockType(name.toString(),
-                    input -> FabricAdapter.adapt(FabricAdapter.adapt(input.getBlockType()).getDefaultState())));
+                BlockType.REGISTRY.register(name.toString(), new BlockType(name.toString(), FabricAdapter.adapt(name));
             }
-        }
+        }*/
         // Items
         for (Identifier name : Registry.ITEM.getIds()) {
             if (ItemType.REGISTRY.get(name.toString()) == null) {
