@@ -127,7 +127,7 @@ tasks.named<Copy>("processResources") {
 addJarManifest(includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
-    archiveClassifier.set("dist-dev")
+    archiveFileName.set(archiveFileName.get().substringBeforeLast('.') + "-dev.jar")
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
         relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
