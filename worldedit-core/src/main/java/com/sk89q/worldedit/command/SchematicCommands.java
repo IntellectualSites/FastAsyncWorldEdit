@@ -204,6 +204,11 @@ public class SchematicCommands {
         InputStream in = null;
         try {
             URI uri;
+            if (formatName.startsWith("url:")) {
+                String t = filename;
+                filename = formatName;
+                formatName = t;
+            }
             if (filename.startsWith("url:")) {
                 if (!actor.hasPermission("worldedit.schematic.load.web")) {
                     actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.web"));
