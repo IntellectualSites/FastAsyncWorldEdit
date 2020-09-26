@@ -55,6 +55,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.*;
@@ -63,6 +64,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import java.io.File;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -78,7 +80,6 @@ import org.bukkit.craftbukkit.v1_16_R2.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -464,6 +465,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     }
     
     private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
+        border += 1; //need for chunk features to generate at the border of the region
         BlockVector3 oldMin = region.getMinimumPoint();
         BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
         BlockVector3 oldMax = region.getMaximumPoint();
@@ -473,7 +475,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
-                .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getX()).thenComparingInt(c -> c.getZ()))
+                .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getZ()).thenComparingInt(c -> c.getX())) //needed for RegionLimitedWorldAccess
                 .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
                 .collect(Collectors.toList());
     }
@@ -496,7 +498,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         Field chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
         chunkProviderField.setAccessible(true);
         
-        //flat bedrock?
+        //flat bedrock? (only on paper)
         boolean tmpgenerateFlatBedrock = false;
         try {
             tmpgenerateFlatBedrock = (boolean) worldPaperConfigField.get(originalWorld);
@@ -510,7 +512,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         // normally it should be deleted at the end of this method
         saveFolder.deleteOnExit();
         
-        //make a world
+        //prepare for world init (see upstream implementation for reference)
         org.bukkit.World.Environment env = bukkitWorld.getEnvironment();
         org.bukkit.generator.ChunkGenerator gen = bukkitWorld.getGenerator();
         Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
@@ -528,7 +530,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
             
             //init world
-            Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>();
+            Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //need to be an ordered list for RegionLimitedWorldAccess
             WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
                 @Override
                 public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
@@ -536,8 +538,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 }
             }).get();
 
-            // needed as it otherwise waits endlessly somehow
             ChunkProviderServer chunkProvider = new ChunkProviderServer(freshWorld, session, freshWorld.getMinecraftServer().getDataFixer(), freshWorld.getMinecraftServer().getDefinedStructureManager(), freshWorld.getMinecraftServer().executorService, provider.chunkGenerator, freshWorld.spigotConfig.viewDistance, freshWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshWorld.getMinecraftServer().E().getWorldPersistentData()) {
+                // needed as it otherwise waits endlessly somehow
                 @Override
                 public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
                     return protoChunks.get(MathMan.pairInt(i, j));
@@ -545,6 +547,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             };
             chunkProviderField.set(freshWorld, chunkProvider);
 
+            //generator
             Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(freshWorld.getChunkProvider().getChunkGenerator());
             ChunkGenerator tempgenerator = new ChunkGeneratorAbstract(provider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
             if (originalWorld.generator != null) {
@@ -552,6 +555,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 tempgenerator = new CustomChunkGenerator(freshWorld, tempgenerator, originalWorld.generator);
             }
 
+            //lets start then
             DefinedStructureManager structManager = freshWorld.getMinecraftServer().getDefinedStructureManager();
             LightEngineThreaded lightEngine = chunkProvider.getLightEngine();
             ChunkGenerator generator = tempgenerator;
@@ -606,8 +610,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 chunkStati.forEach(chunkstatus -> {
                     System.out.println(chunkstatus.d());
                     int radius = Math.max(0, chunkstatus.f()); //f() is required border chunks, EMPTY: f() == -1
-                    List<Long> l = getChunkCoordsRegen(region, 8 - radius);
-                    for (Long xz : l) {
+                    for (Long xz : getChunkCoordsRegen(region, 8 - radius)) {
 //                        ProtoChunk chunk = protoChunks.get(xz);
 //                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
                         chunkstatus.a(freshWorld,
@@ -636,7 +639,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 }
                 
                 //populate
-//                List<BlockPopulator> defaultPopulators = originalWorld.generator.getDefaultPopulators(originalWorld.getWorld());
                 List<BlockPopulator> defaultPopulators = originalWorld.getWorld().getPopulators();
                 System.out.println("populate with " + defaultPopulators.size() + " populators");
                 for (Long xz : getChunkCoordsRegen(region, 0)) {
@@ -664,97 +666,13 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                     public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
                         return chunks.get(MathMan.pairInt(X, Z));
                     }
-                }
-//new IChunkGet() {
-//                    @Override
-//                    public BaseBlock getFullBlock(int x, int y, int z) {
-//                        return getBlock(x, y, z).toBaseBlock();
-//                    }
-//
-//                    @Override
-//                    public BiomeType getBiomeType(int x, int y, int z) {
-//                        long coords = MathMan.pairInt(chunkX, chunkZ);
-//                        IChunkAccess iChunkAccess = protoChunks.get(coords);
-//                        // return FAWE_Spigot_v1_16_R2.this.adapt(iChunkAccess.getBiomeIndex().getBiome(x, y, z));
-//                        return BiomeTypes.FOREST; // TODO?
-//                    }
-//
-//                    @Override
-//                    public BlockState getBlock(int x, int y, int z) {
-//                        long coords = MathMan.pairInt(chunkX, chunkZ);
-//                        IChunkAccess iChunkAccess = protoChunks.get(coords);
-//                        return adapt(iChunkAccess.getType(new BlockPosition(x, y, z)));
-//                    }
-//
-//                    @Override
-//                    public int getSkyLight(int x, int y, int z) {
-//                        return 0;
-//                    }
-//
-//                    @Override
-//                    public int getEmmittedLight(int x, int y, int z) {
-//                        return 0;
-//                    }
-//
-//                    @Override
-//                    public int[] getHeightMap(HeightMapType type) {
-//                        return new int[0];
-//                    }
-//
-//                    @Override
-//                    public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public CompoundTag getEntity(UUID uuid) {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public boolean hasSection(@Range(from = 0, to = 15) int layer) {
-//                        return false; // TODO
-//                    }
-//
-//                    @Override
-//                    public char[] load(int layer) {
-//                        return new char[0];
-//                    }
-//
-//                    @Override
-//                    public Map<BlockVector3, CompoundTag> getTiles() {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public CompoundTag getTile(int x, int y, int z) {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public Set<CompoundTag> getEntities() {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public boolean trim(boolean aggressive, int layer) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public IBlocks reset() {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public boolean trim(boolean aggressive) {
-//                        return false;
-//                    }
-//                }
-                    , null);
+                }, null);
                 System.out.println("Set blocks");
                 for (BlockVector3 vec : region) {
-                    realExtent.setBlock(vec, extent.getBlock(vec));
+                    realExtent.setBlock(vec, extent.getFullBlock(vec));
+//                    realExtent.setBiome(vec, extent.getBiome(vec));
+//                    realExtent.setSkyLight(vec, extent.getSkyLight(vec));
+//                    realExtent.setBlockLight(vec, extent.getBrightness(vec));
                 }
                 System.out.println("Finished setting blocks");
             } finally {
@@ -782,6 +700,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                     }
                 });
             } finally {
+                SafeFiles.tryHardToDeleteDir(tempDir);
                 saveFolder.delete();
             }
         }
