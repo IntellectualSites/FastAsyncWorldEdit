@@ -108,7 +108,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     private final Field serverWorldsField;
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
-    private final Constructor<ProtoChunk> protoChunkCtor;
     private final Field worldPaperConfigField;
 
     // ------------------------------------------------------------------------
@@ -126,14 +125,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
         chunkProviderExecutorField = ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
         chunkProviderExecutorField.setAccessible(true);
-        
-        Constructor tmpProtoChunkCtor = null;
-        try { //only present on paper
-            tmpProtoChunkCtor = ProtoChunk.class.getDeclaredConstructor(ChunkCoordIntPair.class, ChunkConverter.class, World.class);
-            tmpProtoChunkCtor.setAccessible(true);
-        } catch (Exception e) {
-        }
-        protoChunkCtor = tmpProtoChunkCtor;
         
         Field tmpPaperConfigField = null;
         try { //only present on paper
