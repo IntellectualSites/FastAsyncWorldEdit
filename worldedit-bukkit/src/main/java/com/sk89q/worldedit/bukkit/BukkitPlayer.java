@@ -67,26 +67,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
-    private Player player;
-    private WorldEditPlugin plugin;
-    private PermissionAttachment permAttachment;
+    private static final PermAttachmentManager permAttachmentManager = new PermAttachmentManager(WorldEditPlugin.getInstance());
+    private final Player player;
+    private final WorldEditPlugin plugin;
+    private final PermissionAttachment permAttachment;
 
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = permAttachmentManager.addAttachment(player);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = permAttachmentManager.addAttachment(player);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -402,7 +404,57 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        permAttachmentManager.removeAttachment(player);
         super.unregister();
     }
 
+    private static class PermAttachmentManager {
+        private final WorldEditPlugin plugin;
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        private final Map<Player, PermissionAttachment> attachments = new HashMap();
+
+        public PermAttachmentManager(WorldEditPlugin plugin) {
+            this.plugin = plugin;
+        }
+
+        public synchronized PermissionAttachment addAttachment(Player p) {
+            PermissionAttachment attach;
+            
+            //try find attachment
+            lock.readLock().lock();
+            try {
+                attach = attachments.get(p);
+            } finally {
+                lock.readLock().unlock();
+            }
+            
+            if (attach == null) {
+                lock.writeLock().lock();
+                try {
+                    //check again - do not remove this
+                    attach = attachments.get(p);
+                    if (attach == null) {
+                        attach = p.addAttachment(plugin);
+                        attachments.put(p, attach);
+                    }
+                } finally {
+                    lock.writeLock().unlock();
+                }
+            }
+            return attach;
+        }
+        
+        public void removeAttachment(Player p) {
+            PermissionAttachment attach;
+            lock.writeLock().lock();
+            try {
+                attach = attachments.remove(p);
+            } finally {
+                lock.writeLock().unlock();
+            }
+            if (attach != null) {
+                p.removeAttachment(attach);
+            }
+        }
+    }
 }
