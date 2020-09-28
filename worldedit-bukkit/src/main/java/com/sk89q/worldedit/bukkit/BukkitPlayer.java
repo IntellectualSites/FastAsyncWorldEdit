@@ -67,26 +67,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
-    private Player player;
-    private WorldEditPlugin plugin;
-    private PermissionAttachment permAttachment;
+    private final Player player;
+    private final WorldEditPlugin plugin;
+    private final PermissionAttachment permAttachment;
 
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -402,7 +403,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }
-
 }

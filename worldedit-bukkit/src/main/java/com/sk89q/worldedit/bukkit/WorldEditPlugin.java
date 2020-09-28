@@ -112,6 +112,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private BukkitImplAdapter bukkitAdapter;
     private BukkitServerInterface server;
     private BukkitConfiguration config;
+    private BukkitPermissionAttachmentManager permissionAttachmentManager;
 
     @Override
     public void onLoad() {
@@ -125,6 +126,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Setup platform
         server = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(server);
+        
+        permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
 
         Path delChunks = Paths.get(getDataFolder().getPath(), DELCHUNKS_FILE_NAME);
         if (Files.exists(delChunks)) {
@@ -479,6 +482,15 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      */
     public PermissionsResolverManager getPermissionsResolver() {
         return PermissionsResolverManager.getInstance();
+    }
+    
+    /**
+     * Get the permissions resolver in use.
+     *
+     * @return the permissions resolver
+     */
+    public BukkitPermissionAttachmentManager getPermissionAttachmentManager() {
+        return permissionAttachmentManager;
     }
 
     /**
