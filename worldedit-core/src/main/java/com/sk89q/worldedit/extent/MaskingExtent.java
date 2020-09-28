@@ -36,6 +36,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -104,6 +107,12 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
         final ChunkFilterBlock filter = threadIdToFilter.getUnchecked(Thread.currentThread().getId());
         return filter.filter(chunk, get, set, MaskingExtent.this);
+    }
+
+    @Override
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // This should not do anything otherwise dangerous...
+        return CompletableFuture.completedFuture(set);
     }
 
     @Override

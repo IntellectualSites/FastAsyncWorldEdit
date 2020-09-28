@@ -393,6 +393,12 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
+        @Comment({
+            "Do not wait for a chunk's history to save before sending it",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
+            " - Requires combine_stages = true"
+        })
+        public boolean SEND_BEFORE_HISTORY = true;
     }
 
     public static class PLOTSQUARED_INTEGRATION {

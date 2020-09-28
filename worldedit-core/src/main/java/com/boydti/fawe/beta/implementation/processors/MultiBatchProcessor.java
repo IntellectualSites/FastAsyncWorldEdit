@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -85,6 +87,23 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        try {
+            for (int i = processors.length - 1 ; i >= 0; i--) {
+                IBatchProcessor processor = processors[i];
+                set = processor.postProcessSet(chunk, get, set).get();
+                if (set == null) {
+                    return null;
+                }
+            }
+            return CompletableFuture.completedFuture(set);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public boolean processGet(int chunkX, int chunkZ) {
         for (IBatchProcessor processor : this.processors) {
             if (!processor.processGet(chunkX, chunkZ)) {
@@ -111,6 +130,18 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public IBatchProcessor join(IBatchProcessor other) {
+        if (other instanceof MultiBatchProcessor) {
+            for (IBatchProcessor processor : ((MultiBatchProcessor) other).processors) {
+                addBatchProcessor(processor);
+            }
+        } else {
+            addBatchProcessor(other);
+        }
+        return this;
+    }
+
+    @Override
+    public IBatchProcessor joinPost(IBatchProcessor other) {
         if (other instanceof MultiBatchProcessor) {
             for (IBatchProcessor processor : ((MultiBatchProcessor) other).processors) {
                 addBatchProcessor(processor);
