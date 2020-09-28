@@ -398,7 +398,7 @@ public class Settings extends Config {
             " - Undo/redo commands will wait until the history has been written to disk before executing",
             " - Requires combine_stages = true"
         })
-        public boolean SEND_BEFORE_HISTORY = true;
+        public boolean SEND_BEFORE_HISTORY = false;
     }
 
     public static class PLOTSQUARED_INTEGRATION {
