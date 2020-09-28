@@ -82,18 +82,23 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -456,13 +461,10 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     }
     
     private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
-        border += 1; //need for chunk features to generate at the border of the region
         BlockVector3 oldMin = region.getMinimumPoint();
         BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
         BlockVector3 oldMax = region.getMaximumPoint();
-        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 -1);
-//        int length = Math.max(newMax.getX() - newMin.getX(), newMax.getZ() - newMin.getZ());
-//        newMax = newMax.withX(newMin.getX() + length).withZ(newMin.getZ() + length);
+        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 - 1);
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
@@ -550,19 +552,10 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             DefinedStructureManager structManager = freshWorld.getMinecraftServer().getDefinedStructureManager();
             LightEngineThreaded lightEngine = chunkProvider.getLightEngine();
             ChunkGenerator generator = tempgenerator;
+            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             
             try {
                 long start = System.currentTimeMillis();
-
-                //create chunks
-                for (Long xz : getChunkCoordsRegen(region, 8)) { //8 = max number of neighbor chunk radius
-                    ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz)), ChunkConverter.a) {
-                        public boolean generateFlatBedrock() {
-                            return generateFlatBedrock;
-                        }
-                    };
-                    protoChunks.put(xz, chunk);
-                }
 
                 //list of chunk stati in correct order
                 List<ChunkStatus> chunkStati = Arrays.asList(
@@ -580,49 +573,134 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                         ChunkStatus.HEIGHTMAPS
                 );
                 
-                //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
-                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
+                //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
+                //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
+                //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
+                
+                //generate chunk coords lists with a certain radius
+                Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap();
+                System.out.println("precomputing chunkCoordsForRadius lists");
                 chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
                     if (radius == -1) //ignore ChunkStatus.EMPTY
                         return;
-                    System.out.println("precomputing RegionLimitedWorldAccess chunk with radius " + radius);
+                    int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
+                    chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
+                });
+                
+                //create chunks
+                System.out.println("ctor");
+                for (Long xz : chunkCoordsForRadius.get(0)) {
+                    ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz)), ChunkConverter.a) {
+                        public boolean generateFlatBedrock() {
+                            return generateFlatBedrock;
+                        }
+                    };
+                    protoChunks.put(xz, chunk);
+                }
+                
+                //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
+                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
+                System.out.println("precomputing RegionLimitedWorldAccess chunks lists");
+                chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                    if (radius == -1) //ignore ChunkStatus.EMPTY
+                        return;
                     Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap();
-                    for (Long xz : getChunkCoordsRegen(region, 8 - radius)) {
+                    for (Long xz : chunkCoordsForRadius.get(radius)) {
                         int x = MathMan.unpairIntX(xz);
                         int z = MathMan.unpairIntY(xz);
-                        map.put(xz, protoChunks.values().stream()
-                                .filter(e -> Math.abs(e.getPos().x - x) <= radius && Math.abs(e.getPos().z - z) <= radius)
-                                .collect(Collectors.toList()));
+                        List<IChunkAccess> l = new ArrayList((radius + 1 + radius) * (radius + 1 + radius));
+                        for (int xx = x - radius; xx <= x + radius; xx++) {
+                            for (int zz = z - radius; zz <= z + radius; zz++) {
+                                l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
+                            }
+                        }
+                        map.put(xz, l);
                     }
                     worldlimits.put(radius, map);
                 });
                 
-                //run generation tasks exluding FULL chunk status
-                chunkStati.forEach(chunkstatus -> {
+                //new
+                for (ChunkStatus chunkstatus : chunkStati) {
                     System.out.println(chunkstatus.d());
-                    int radius = Math.max(0, chunkstatus.f()); //f() is required border chunks, EMPTY: f() == -1
-                    for (Long xz : getChunkCoordsRegen(region, 8 - radius)) {
-//                        ProtoChunk chunk = protoChunks.get(xz);
-//                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
-                        chunkstatus.a(freshWorld,
-                                      generator,
-                                      structManager,
-                                      lightEngine,
-                                      c -> CompletableFuture.completedFuture(Either.left(c)),
-                                      worldlimits.get(radius).get(xz));
+                    int radius = Math.max(0, chunkstatus.f()); //f() = required border chunks, EMPTY.f() == -1
+                    
+                    List<Long> coords = chunkCoordsForRadius.get(radius);
+                    List<List<Long>> rows = getChunkStatusTaskRows(coords, chunkstatus);
+                    List tasks = new ArrayList(rows.size());
+                    for (List<Long> row : rows) {
+                        tasks.add((Callable) () -> {
+                            for (Long xz : row) {
+                                try {
+                                    chunkstatus.a(freshWorld,
+                                                  generator,
+                                                  structManager,
+                                                  lightEngine,
+                                                  c -> CompletableFuture.completedFuture(Either.left(c)),
+                                                  worldlimits.get(radius).get(xz));
+                                } catch (Exception e) {
+                                    System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
+                                    e.printStackTrace();
+                                }
+                            }
+                            return null;
+                        });
                     }
-                });
+                    
+                    List<Future> fut = executor.invokeAll(tasks);
+                    for (Future f : fut) {
+                        try {
+                            f.get();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                
+                //run generation tasks exluding FULL chunk status
+//                chunkStati.forEach(chunkstatus -> {
+//                    System.out.println(chunkstatus.d());
+//                    int radius = Math.max(0, chunkstatus.f()); //f() is required border chunks, EMPTY: f() == -1
+//                    List<Future> fut = new LinkedList<>();
+//                    for (Long xz : chunkCoordsForRadius.get(radius)) {
+////                        ProtoChunk chunk = protoChunks.get(xz);
+////                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
+//                        if (chunkstatus.f() == 0) {
+//                            Future f = executor.submit(() -> chunkstatus.a(freshWorld,
+//                                                                           generator,
+//                                                                           structManager,
+//                                                                           lightEngine,
+//                                                                           c -> CompletableFuture.completedFuture(Either.left(c)),
+//                                                                           worldlimits.get(radius).get(xz)));
+//                            fut.add(f);
+//                        } else {
+//                            
+//                            chunkstatus.a(freshWorld,
+//                                          generator,
+//                                          structManager,
+//                                          lightEngine,
+//                                          c -> CompletableFuture.completedFuture(Either.left(c)),
+//                                          worldlimits.get(radius).get(xz));
+//                        }
+//                        for (Future f : fut) {
+//                            try {
+//                                f.get();
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                });
 
                 //convert to proper chunks
                 Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap();
-                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                for (Long xz : chunkCoordsForRadius.get(0)) {
                     ProtoChunk chunk = protoChunks.get(xz);
                     chunks.put(xz, new Chunk(freshWorld, chunk));
                 }
                 
                 //final chunkstatus
                 System.out.println("full");
-                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                for (Long xz : chunkCoordsForRadius.get(0)) {
                     Chunk chunk = chunks.get(xz);
                     ChunkStatus.FULL.a(freshWorld, generator, structManager, lightEngine,
                                           c -> CompletableFuture.completedFuture(Either.left(c)),
@@ -632,12 +710,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 //populate
                 List<BlockPopulator> defaultPopulators = originalWorld.getWorld().getPopulators();
                 System.out.println("populate with " + defaultPopulators.size() + " populators");
-                for (Long xz : getChunkCoordsRegen(region, 0)) {
+                for (Long xz : chunkCoordsForRadius.get(0)) {
                     int x = MathMan.unpairIntX(xz);
                     int z = MathMan.unpairIntY(xz);
                     
                     //prepare chunk seed
-                    java.util.Random random = new java.util.Random();
+                    Random random = new Random();
                     random.setSeed(seed);
                     long xRand = random.nextLong() / 2L * 2L + 1L;
                     long zRand = random.nextLong() / 2L * 2L + 1L;
@@ -658,15 +736,20 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                         return chunks.get(MathMan.pairInt(X, Z));
                     }
                 }, null);
+                
                 System.out.println("Set blocks");
+                boolean genbiomes = options.shouldRegenBiomes();
                 for (BlockVector3 vec : region) {
-                    realExtent.setBlock(vec, extent.getFullBlock(vec));
-//                    realExtent.setBiome(vec, extent.getBiome(vec));
+                    realExtent.setBlock(vec, extent.getBlock(vec));
+                    if (genbiomes) {
+                        realExtent.setBiome(vec, extent.getBiome(vec));
+                    }
 //                    realExtent.setSkyLight(vec, extent.getSkyLight(vec));
 //                    realExtent.setBlockLight(vec, extent.getBrightness(vec));
                 }
                 System.out.println("Finished setting blocks");
             } finally {
+                executor.shutdownNow();
                 Fawe.get().getQueueHandler().sync(() -> {
                     try {
                         freshWorld.getChunkProvider().close(false);
@@ -696,6 +779,46 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             }
         }
         return true;
+    }
+    
+    /**
+     * Creates a list of chunkcoord rows that may be executed concurrently
+     * @param allcoords the coords that should be sorted into rows
+     * @param chunkstatus the chunkstatus bein executed on the returned rows
+     * @return a list of chunkcoords rows that may be executed concurrently
+     */
+    private List<List<Long>> getChunkStatusTaskRows(List<Long> allcoords, ChunkStatus chunkstatus) {
+        int requiredneighbors = Math.max(0, chunkstatus.f());
+        
+        int minx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(0));
+        int maxx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(allcoords.size() - 1));
+        int numlists = Math.min(requiredneighbors * 2 + 1, maxx - minx + 1);
+        List<List<Long>> ret = new ArrayList(numlists);
+        
+        for (int i = 0; i < numlists; i++) {
+            List<Long> current = new ArrayList((allcoords.size() + 1) / numlists);
+            for (Long xz : allcoords) {
+                if ((MathMan.unpairIntX(xz) - minx) % numlists == i)
+                    current.add(xz);
+            }
+            ret.add(current);
+        }
+        
+//        if (ret.stream().mapToInt(e -> e.size()).sum() != allcoords.size())
+//            System.out.println("size mismatch: ex=" + allcoords.size() + "; ac: " + ret.stream().mapToInt(e -> e.size()).sum());
+//        else if (!ret.stream().flatMap(List::stream).collect(Collectors.toSet()).equals(new HashSet(allcoords))) {
+//            System.out.println("cord mismatch:");
+//            List<Long> ac = ret.stream().flatMap(List::stream).collect(Collectors.toSet()).stream().sorted().collect(Collectors.toList());
+//            System.out.println("ex: " + allcoords);
+//            System.out.println("ac: " + ac);
+//        } else {
+//            List<List<Integer>> xs = ret.stream().map(e -> e.stream().map(x -> MathMan.unpairIntX(x)).distinct().sorted().collect(Collectors.toList())).collect(Collectors.toList());
+//            System.out.println("xs: " + xs);
+//            List<Integer> oxs = allcoords.stream().map(x -> MathMan.unpairIntX(x)).distinct().sorted().collect(Collectors.toList());
+//            System.out.println("oxs: " + oxs);
+//        }
+        
+        return ret;
     }
     
     @Override
