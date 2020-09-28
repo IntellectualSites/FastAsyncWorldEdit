@@ -609,8 +609,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                         int x = MathMan.unpairIntX(xz);
                         int z = MathMan.unpairIntY(xz);
                         List<IChunkAccess> l = new ArrayList((radius + 1 + radius) * (radius + 1 + radius));
-                        for (int xx = x - radius; xx <= x + radius; xx++) {
-                            for (int zz = z - radius; zz <= z + radius; zz++) {
+                        for (int zz = z - radius; zz <= z + radius; zz++) { //order is important , first z then x
+                            for (int xx = x - radius; xx <= x + radius; xx++) {
                                 l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
                             }
                         }
