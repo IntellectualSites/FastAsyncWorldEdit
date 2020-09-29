@@ -80,7 +80,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
 
-            fieldBiomeArray = BiomeStorage.class.getDeclaredField("h");
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
             fieldBiomeArray.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
