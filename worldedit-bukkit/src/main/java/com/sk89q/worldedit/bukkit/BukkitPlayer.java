@@ -77,6 +77,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     private final WorldEditPlugin plugin;
     private final PermissionAttachment permAttachment;
 
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     * 
+     * @param player The corresponding {@link Player} or null if they are offline
+     */
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
@@ -84,6 +89,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
         this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
     }
 
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     * 
+     * @param plugin The running instance of {@link WorldEditPlugin}
+     * @param player The corresponding {@link Player} or null if they are offline
+     */
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
@@ -93,7 +104,20 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    /**
+     * This method gets the existing data {@link Map} for a {@link Player}.
+     * 
+     * @param plugin Our instance of {@link WorldEditPlugin}
+     * @param player The {@link Player} to get the data for, can be null
+     * 
+     * @return A data {@link Map} for that {@link Player}
+     */
     private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, Player player) {
+        if (player == null) {
+            // Null cannot have any data, so we just return an empty Map
+            return new ConcurrentHashMap<>();
+        }
+
         BukkitPlayer cached = plugin.getCachedPlayer(player);
         if (cached != null) {
             return cached.getRawMeta();

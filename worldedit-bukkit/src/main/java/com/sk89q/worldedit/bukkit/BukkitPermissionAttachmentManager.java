@@ -10,7 +10,7 @@ public class BukkitPermissionAttachmentManager {
 
     private final WorldEditPlugin plugin;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Map<Player, PermissionAttachment> attachments = new HashMap();
+    private final Map<Player, PermissionAttachment> attachments = new HashMap<>();
 
     public BukkitPermissionAttachmentManager(WorldEditPlugin plugin) {
         this.plugin = plugin;
