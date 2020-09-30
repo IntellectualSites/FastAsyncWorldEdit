@@ -22,8 +22,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IQueueChunk;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.*;
@@ -44,13 +42,11 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.Regenerator;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
@@ -87,7 +83,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +95,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.generator.BlockPopulator;
@@ -110,34 +104,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     private final Spigot_v1_16_R2 parent;
     private char[] ibdToStateOrdinal;
     
-    private final Field serverWorldsField;
-    private final Method getChunkFutureMethod;
-    private final Field chunkProviderExecutorField;
-    private final Field worldPaperConfigField;
-
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
     public FAWE_Spigot_v1_16_R2() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new Spigot_v1_16_R2();
-
-        serverWorldsField = CraftServer.class.getDeclaredField("worlds");
-        serverWorldsField.setAccessible(true);
-
-        getChunkFutureMethod = ChunkProviderServer.class.getDeclaredMethod("getChunkFutureMainThread", int.class, int.class, ChunkStatus.class, boolean.class);
-        getChunkFutureMethod.setAccessible(true);
-
-        chunkProviderExecutorField = ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
-        chunkProviderExecutorField.setAccessible(true);
-        
-        Field tmpPaperConfigField = null;
-        try { //only present on paper
-            tmpPaperConfigField = World.class.getDeclaredField("paperConfig");
-            tmpPaperConfigField.setAccessible(true);
-        } catch (Exception e) {
-        }
-        worldPaperConfigField = tmpPaperConfigField;
     }
 
     @Override
@@ -420,405 +392,9 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         return parent.fromNative(foreign);
     }
 
-    private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
-        switch(env) {
-            case NETHER:
-                return WorldDimension.THE_NETHER;
-            case THE_END:
-                return WorldDimension.THE_END;
-            case NORMAL:
-            default:
-                return WorldDimension.OVERWORLD;
-        }
-    }
-
-    private Dynamic<NBTBase> recursivelySetSeed(Dynamic<NBTBase> dynamic, long seed, Set<Dynamic<NBTBase>> seen) {
-        return !seen.add(dynamic) ? dynamic : dynamic.updateMapValues((pair) -> {
-            if (((Dynamic)pair.getFirst()).asString("").equals("seed")) {
-                return pair.mapSecond((v) -> {
-                    return v.createLong(seed);
-                });
-            } else {
-                return ((Dynamic)pair.getSecond()).getValue() instanceof NBTTagCompound ? pair.mapSecond((v) -> {
-                    return this.recursivelySetSeed((Dynamic)v, seed, seen);
-                }) : pair;
-            }
-        });
-    }
-
-    private static class RegenNoOpWorldLoadListener implements WorldLoadListener {
-        private RegenNoOpWorldLoadListener() {
-        }
-
-        public void a(ChunkCoordIntPair chunkCoordIntPair) {
-        }
-
-        public void a(ChunkCoordIntPair chunkCoordIntPair, @Nullable ChunkStatus chunkStatus) {
-        }
-
-        public void b() {
-        }
-    }
-    
-    private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
-        BlockVector3 oldMin = region.getMinimumPoint();
-        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
-        BlockVector3 oldMax = region.getMaximumPoint();
-        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 - 1);
-        Region adjustedRegion = new CuboidRegion(newMin, newMax);
-        return adjustedRegion.getChunks().stream()
-                .map(c -> BlockVector2.at(c.getX(), c.getZ()))
-                .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getZ()).thenComparingInt(c -> c.getX())) //needed for RegionLimitedWorldAccess
-                .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
+     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
-        WorldServer originalWorld = ((CraftWorld) bukkitWorld).getHandle();
-        ChunkProviderServer provider = originalWorld.getChunkProvider();
-        if (!(provider instanceof ChunkProviderServer)) {
-            return false;
-        }
-        
-        // TODO make it work for CustomChunkGenerator
-        Field generatorSettingBaseSupplierField = provider.getChunkGenerator().getClass().getDeclaredField("h");
-        generatorSettingBaseSupplierField.setAccessible(true);
-
-        Field structureManagerField = WorldServer.class.getDeclaredField("structureManager");
-        structureManagerField.setAccessible(true);
-
-        Field chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
-        chunkProviderField.setAccessible(true);
-        
-        //flat bedrock? (only on paper)
-        boolean tmpgenerateFlatBedrock = false;
-        try {
-            tmpgenerateFlatBedrock = (boolean) worldPaperConfigField.get(originalWorld);
-        } catch (Exception ignored) {
-        }
-        boolean generateFlatBedrock = tmpgenerateFlatBedrock;
-
-        //world folder
-        File saveFolder = Files.createTempDir();
-        // register this just in case something goes wrong
-        // normally it should be deleted at the end of this method
-        saveFolder.deleteOnExit();
-        
-        //prepare for world init (see upstream implementation for reference)
-        org.bukkit.World.Environment env = bukkitWorld.getEnvironment();
-        org.bukkit.generator.ChunkGenerator gen = bukkitWorld.getGenerator();
-        Path tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
-        Convertable convertable = Convertable.a(tempDir);
-        ResourceKey<WorldDimension> worldDimKey = getWorldDimKey(env);
-        try (Convertable.ConversionSession session = convertable.c("worldeditregentempworld", worldDimKey)) {
-            WorldDataServer originalWorldData = originalWorld.worldDataServer;
-
-            long seed = options.getSeed().orElse(originalWorld.getSeed());
-
-            WorldDataServer levelProperties = (WorldDataServer)originalWorld.getServer().getServer().getSaveData();
-            RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, originalWorld.getServer().getServer().dataPackResources.h(), IRegistryCustom.b());
-            GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
-            WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
-            WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
-            
-            //init world
-            Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //need to be an ordered list for RegionLimitedWorldAccess
-            WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension)newOpts.d().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
-                @Override
-                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
-                    return protoChunks.get(MathMan.pairInt(i, j));
-                }
-            }).get();
-
-            ChunkProviderServer chunkProvider = new ChunkProviderServer(freshWorld, session, freshWorld.getMinecraftServer().getDataFixer(), freshWorld.getMinecraftServer().getDefinedStructureManager(), freshWorld.getMinecraftServer().executorService, provider.chunkGenerator, freshWorld.spigotConfig.viewDistance, freshWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshWorld.getMinecraftServer().E().getWorldPersistentData()) {
-                // needed as it otherwise waits endlessly somehow
-                @Override
-                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
-                    return protoChunks.get(MathMan.pairInt(i, j));
-                }
-            };
-            chunkProviderField.set(freshWorld, chunkProvider);
-
-            //generator
-            Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(freshWorld.getChunkProvider().getChunkGenerator());
-            ChunkGenerator tempgenerator = new ChunkGeneratorAbstract(provider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
-            if (originalWorld.generator != null) {
-                // wrap custom world generator
-                tempgenerator = new CustomChunkGenerator(freshWorld, tempgenerator, originalWorld.generator);
-            }
-
-            //lets start then
-            DefinedStructureManager structManager = freshWorld.getMinecraftServer().getDefinedStructureManager();
-            LightEngineThreaded lightEngine = chunkProvider.getLightEngine();
-            ChunkGenerator generator = tempgenerator;
-            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            
-            try {
-                long start = System.currentTimeMillis();
-
-                //list of chunk stati in correct order
-                List<ChunkStatus> chunkStati = Arrays.asList(
-                        ChunkStatus.EMPTY,
-                        ChunkStatus.STRUCTURE_STARTS,
-                        ChunkStatus.STRUCTURE_REFERENCES,
-                        ChunkStatus.BIOMES,
-                        ChunkStatus.NOISE,
-                        ChunkStatus.SURFACE,
-                        ChunkStatus.CARVERS,
-                        ChunkStatus.LIQUID_CARVERS,
-                        ChunkStatus.FEATURES,
-                        ChunkStatus.LIGHT,
-                        ChunkStatus.SPAWN,
-                        ChunkStatus.HEIGHTMAPS
-                );
-                
-                //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
-                //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
-                //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
-                
-                //generate chunk coords lists with a certain radius
-                Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap();
-                System.out.println("precomputing chunkCoordsForRadius lists");
-                chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
-                    if (radius == -1) //ignore ChunkStatus.EMPTY
-                        return;
-                    int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
-                    chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
-                });
-                
-                //create chunks
-                System.out.println("ctor");
-                for (Long xz : chunkCoordsForRadius.get(0)) {
-                    ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz)), ChunkConverter.a) {
-                        public boolean generateFlatBedrock() {
-                            return generateFlatBedrock;
-                        }
-                    };
-                    protoChunks.put(xz, chunk);
-                }
-                
-                //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
-                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
-                System.out.println("precomputing RegionLimitedWorldAccess chunks lists");
-                chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
-                    if (radius == -1) //ignore ChunkStatus.EMPTY
-                        return;
-                    Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap();
-                    for (Long xz : chunkCoordsForRadius.get(radius)) {
-                        int x = MathMan.unpairIntX(xz);
-                        int z = MathMan.unpairIntY(xz);
-                        List<IChunkAccess> l = new ArrayList((radius + 1 + radius) * (radius + 1 + radius));
-                        for (int zz = z - radius; zz <= z + radius; zz++) { //order is important , first z then x
-                            for (int xx = x - radius; xx <= x + radius; xx++) {
-                                l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
-                            }
-                        }
-                        map.put(xz, l);
-                    }
-                    worldlimits.put(radius, map);
-                });
-                
-                //new
-                for (ChunkStatus chunkstatus : chunkStati) {
-                    System.out.println(chunkstatus.d());
-                    int radius = Math.max(0, chunkstatus.f()); //f() = required border chunks, EMPTY.f() == -1
-                    
-                    List<Long> coords = chunkCoordsForRadius.get(radius);
-                    List<List<Long>> rows = getChunkStatusTaskRows(coords, chunkstatus);
-                    List tasks = new ArrayList(rows.size());
-                    for (List<Long> row : rows) {
-                        tasks.add((Callable) () -> {
-                            for (Long xz : row) {
-                                try {
-                                    chunkstatus.a(freshWorld,
-                                                  generator,
-                                                  structManager,
-                                                  lightEngine,
-                                                  c -> CompletableFuture.completedFuture(Either.left(c)),
-                                                  worldlimits.get(radius).get(xz));
-                                } catch (Exception e) {
-                                    System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
-                                    e.printStackTrace();
-                                }
-                            }
-                            return null;
-                        });
-                    }
-                    
-                    List<Future> fut = executor.invokeAll(tasks);
-                    for (Future f : fut) {
-                        try {
-                            f.get();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                
-                //run generation tasks exluding FULL chunk status
-//                chunkStati.forEach(chunkstatus -> {
-//                    System.out.println(chunkstatus.d());
-//                    int radius = Math.max(0, chunkstatus.f()); //f() is required border chunks, EMPTY: f() == -1
-//                    List<Future> fut = new LinkedList<>();
-//                    for (Long xz : chunkCoordsForRadius.get(radius)) {
-////                        ProtoChunk chunk = protoChunks.get(xz);
-////                        System.out.println(MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz) + ": " + chunk.getPos().x + "/" + chunk.getPos().z);
-//                        if (chunkstatus.f() == 0) {
-//                            Future f = executor.submit(() -> chunkstatus.a(freshWorld,
-//                                                                           generator,
-//                                                                           structManager,
-//                                                                           lightEngine,
-//                                                                           c -> CompletableFuture.completedFuture(Either.left(c)),
-//                                                                           worldlimits.get(radius).get(xz)));
-//                            fut.add(f);
-//                        } else {
-//                            
-//                            chunkstatus.a(freshWorld,
-//                                          generator,
-//                                          structManager,
-//                                          lightEngine,
-//                                          c -> CompletableFuture.completedFuture(Either.left(c)),
-//                                          worldlimits.get(radius).get(xz));
-//                        }
-//                        for (Future f : fut) {
-//                            try {
-//                                f.get();
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    }
-//                });
-
-                //convert to proper chunks
-                Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap();
-                for (Long xz : chunkCoordsForRadius.get(0)) {
-                    ProtoChunk chunk = protoChunks.get(xz);
-                    chunks.put(xz, new Chunk(freshWorld, chunk));
-                }
-                
-                //final chunkstatus
-                System.out.println("full");
-                for (Long xz : chunkCoordsForRadius.get(0)) {
-                    Chunk chunk = chunks.get(xz);
-                    ChunkStatus.FULL.a(freshWorld, generator, structManager, lightEngine,
-                                          c -> CompletableFuture.completedFuture(Either.left(c)),
-                                          Arrays.asList(chunk)); //chunkstatus.f() == 0!
-                }
-                
-                //populate
-                List<BlockPopulator> defaultPopulators = originalWorld.getWorld().getPopulators();
-                System.out.println("populate with " + defaultPopulators.size() + " populators");
-                for (Long xz : chunkCoordsForRadius.get(0)) {
-                    int x = MathMan.unpairIntX(xz);
-                    int z = MathMan.unpairIntY(xz);
-                    
-                    //prepare chunk seed
-                    Random random = new Random();
-                    random.setSeed(seed);
-                    long xRand = random.nextLong() / 2L * 2L + 1L;
-                    long zRand = random.nextLong() / 2L * 2L + 1L;
-                    random.setSeed((long) x * xRand + (long) z * zRand ^ seed);
-                    
-                    //actually populate
-                    Chunk c = chunks.get(xz);
-                    defaultPopulators.forEach(pop -> {
-                        pop.populate(freshWorld.getWorld(), random, c.bukkitChunk);
-                    });
-                }
-
-                System.out.println("Finished chunk generation in " + (System.currentTimeMillis() - start) + " ms");
-                IQueueExtent<IQueueChunk> extent = new SingleThreadQueueExtent();
-                extent.init(null, (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_2(freshWorld, chunkX, chunkZ) {
-                    @Override
-                    public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-                        return chunks.get(MathMan.pairInt(X, Z));
-                    }
-                }, null);
-                
-                System.out.println("Set blocks");
-                boolean genbiomes = options.shouldRegenBiomes();
-                for (BlockVector3 vec : region) {
-                    realExtent.setBlock(vec, extent.getBlock(vec));
-                    if (genbiomes) {
-                        realExtent.setBiome(vec, extent.getBiome(vec));
-                    }
-//                    realExtent.setSkyLight(vec, extent.getSkyLight(vec));
-//                    realExtent.setBlockLight(vec, extent.getBrightness(vec));
-                }
-                System.out.println("Finished setting blocks");
-            } finally {
-                executor.shutdownNow();
-                Fawe.get().getQueueHandler().sync(() -> {
-                    try {
-                        freshWorld.getChunkProvider().close(false);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                Fawe.get().getQueueHandler().sync(() -> {
-                    try {
-                        Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                        map.remove("worldeditregentempworld");
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            } finally {
-                SafeFiles.tryHardToDeleteDir(tempDir);
-                saveFolder.delete();
-            }
-        }
-        return true;
-    }
-    
-    /**
-     * Creates a list of chunkcoord rows that may be executed concurrently
-     * @param allcoords the coords that should be sorted into rows
-     * @param chunkstatus the chunkstatus bein executed on the returned rows
-     * @return a list of chunkcoords rows that may be executed concurrently
-     */
-    private List<List<Long>> getChunkStatusTaskRows(List<Long> allcoords, ChunkStatus chunkstatus) {
-        int requiredneighbors = Math.max(0, chunkstatus.f());
-        
-        int minx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(0));
-        int maxx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(allcoords.size() - 1));
-        int numlists = Math.min(requiredneighbors * 2 + 1, maxx - minx + 1);
-        List<List<Long>> ret = new ArrayList(numlists);
-        
-        for (int i = 0; i < numlists; i++) {
-            List<Long> current = new ArrayList((allcoords.size() + 1) / numlists);
-            for (Long xz : allcoords) {
-                if ((MathMan.unpairIntX(xz) - minx) % numlists == i)
-                    current.add(xz);
-            }
-            ret.add(current);
-        }
-        
-//        if (ret.stream().mapToInt(e -> e.size()).sum() != allcoords.size())
-//            System.out.println("size mismatch: ex=" + allcoords.size() + "; ac: " + ret.stream().mapToInt(e -> e.size()).sum());
-//        else if (!ret.stream().flatMap(List::stream).collect(Collectors.toSet()).equals(new HashSet(allcoords))) {
-//            System.out.println("cord mismatch:");
-//            List<Long> ac = ret.stream().flatMap(List::stream).collect(Collectors.toSet()).stream().sorted().collect(Collectors.toList());
-//            System.out.println("ex: " + allcoords);
-//            System.out.println("ac: " + ac);
-//        } else {
-//            List<List<Integer>> xs = ret.stream().map(e -> e.stream().map(x -> MathMan.unpairIntX(x)).distinct().sorted().collect(Collectors.toList())).collect(Collectors.toList());
-//            System.out.println("xs: " + xs);
-//            List<Integer> oxs = allcoords.stream().map(x -> MathMan.unpairIntX(x)).distinct().sorted().collect(Collectors.toList());
-//            System.out.println("oxs: " + oxs);
-//        }
-        
-        return ret;
+        return new ReneratorImpl(bukkitWorld, region, realExtent, options).regenerate();
     }
     
     @Override
@@ -830,5 +406,397 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     public int getInternalBiomeId(BiomeType biome) {
         BiomeBase base = CraftBlock.biomeToBiomeBase(MinecraftServer.getServer().aX().b(IRegistry.ay), BukkitAdapter.adapt(biome));
         return MinecraftServer.getServer().aX().b(IRegistry.ay).a(base);
+    }
+   
+    private static class ReneratorImpl extends Regenerator {
+
+        private static final Field serverWorldsField;
+        private static final Method getChunkFutureMethod;
+        private static final Field chunkProviderExecutorField;
+        private static final Field worldPaperConfigField;
+        private static final Field generatorSettingBaseSupplierField;
+        private static final Field structureManagerField;
+        private static final Field chunkProviderField;
+
+        //list of chunk stati in correct order without FULL
+        private static final List<ChunkStatus> chunkStati = Arrays.asList(
+                ChunkStatus.EMPTY,
+                ChunkStatus.STRUCTURE_STARTS,
+                ChunkStatus.STRUCTURE_REFERENCES,
+                ChunkStatus.BIOMES,
+                ChunkStatus.NOISE,
+                ChunkStatus.SURFACE,
+                ChunkStatus.CARVERS,
+                ChunkStatus.LIQUID_CARVERS,
+                ChunkStatus.FEATURES,
+                ChunkStatus.LIGHT,
+                ChunkStatus.SPAWN,
+                ChunkStatus.HEIGHTMAPS
+        );
+
+        static {
+            try {
+                serverWorldsField = CraftServer.class.getDeclaredField("worlds");
+                serverWorldsField.setAccessible(true);
+
+                getChunkFutureMethod = ChunkProviderServer.class.getDeclaredMethod("getChunkFutureMainThread", int.class, int.class, ChunkStatus.class, boolean.class);
+                getChunkFutureMethod.setAccessible(true);
+
+                chunkProviderExecutorField = ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
+                chunkProviderExecutorField.setAccessible(true);
+
+                Field tmpPaperConfigField = null;
+                try { //only present on paper
+                    tmpPaperConfigField = World.class.getDeclaredField("paperConfig");
+                    tmpPaperConfigField.setAccessible(true);
+                } catch (Exception e) {
+                }
+                worldPaperConfigField = tmpPaperConfigField;
+
+                generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
+                generatorSettingBaseSupplierField.setAccessible(true);
+
+                structureManagerField = WorldServer.class.getDeclaredField("structureManager");
+                structureManagerField.setAccessible(true);
+
+                chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
+                chunkProviderField.setAccessible(true);
+            } catch (Exception e) {
+                throw new RuntimeException();
+            }
+        }
+
+        //runtime
+        private WorldServer originalNMSWorld;
+        private ChunkProviderServer originalChunkProvider;
+        private WorldServer freshNMSWorld;
+        private ChunkProviderServer freshChunkProvider;
+        private Convertable.ConversionSession session;
+        private DefinedStructureManager structureManager;
+        private LightEngineThreaded lightEngine;
+        private ChunkGenerator generator;
+        private ExecutorService executor;
+
+        private long seed;
+        private Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks;
+        private Path tempDir;
+
+        private boolean generateFlatBedrock = false;
+
+        public ReneratorImpl(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
+            super(originalBukkitWorld, region, target, options);
+        }
+
+        @Override
+        protected boolean prepare() {
+            this.originalNMSWorld = ((CraftWorld) originalBukkitWorld).getHandle();
+            originalChunkProvider = originalNMSWorld.getChunkProvider();
+            if (!(originalChunkProvider instanceof ChunkProviderServer)) {
+                return false;
+            }
+
+            //flat bedrock? (only on paper)
+            try {
+                generateFlatBedrock = (boolean) worldPaperConfigField.get(originalNMSWorld);
+            } catch (Exception ignored) {
+            }
+
+            return true;
+        }
+
+        @Override
+        protected boolean initNewWorld() throws Exception {
+            //world folder
+            tempDir = java.nio.file.Files.createTempDirectory("WorldEditWorldGen");
+
+            //prepare for world init (see upstream implementation for reference)
+            org.bukkit.World.Environment env = originalBukkitWorld.getEnvironment();
+            org.bukkit.generator.ChunkGenerator gen = originalBukkitWorld.getGenerator();
+            Convertable convertable = Convertable.a(tempDir);
+            ResourceKey<WorldDimension> worldDimKey = getWorldDimKey(env);
+            session = convertable.c("worldeditregentempworld", worldDimKey);
+            WorldDataServer originalWorldData = originalNMSWorld.worldDataServer;
+
+            seed = options.getSeed().orElse(originalNMSWorld.getSeed());
+
+            WorldDataServer levelProperties = (WorldDataServer) originalNMSWorld.getServer().getServer().getSaveData();
+            RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, originalNMSWorld.getServer().getServer().dataPackResources.h(), IRegistryCustom.b());
+            GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
+            WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
+            WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
+
+            //init world
+            protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //need to be an ordered list for RegionLimitedWorldAccess
+            freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalNMSWorld.getMinecraftServer(), originalNMSWorld.getMinecraftServer().executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
+                @Override
+                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
+                    return protoChunks.get(MathMan.pairInt(i, j));
+                }
+            }).get();
+
+            freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, freshNMSWorld.getMinecraftServer().getDataFixer(), freshNMSWorld.getMinecraftServer().getDefinedStructureManager(), freshNMSWorld.getMinecraftServer().executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, freshNMSWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshNMSWorld.getMinecraftServer().E().getWorldPersistentData()) {
+                // needed as it otherwise waits endlessly somehow
+                @Override
+                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
+                    return protoChunks.get(MathMan.pairInt(i, j));
+                }
+            };
+            chunkProviderField.set(freshNMSWorld, freshChunkProvider);
+
+            //generator
+            Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(freshNMSWorld.getChunkProvider().getChunkGenerator());
+            generator = new ChunkGeneratorAbstract(originalChunkProvider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
+            if (originalNMSWorld.generator != null) {
+                // wrap custom world generator
+                generator = new CustomChunkGenerator(freshNMSWorld, generator, originalNMSWorld.generator);
+            }
+
+            //lets start then
+            structureManager = freshNMSWorld.getMinecraftServer().getDefinedStructureManager();
+            lightEngine = freshChunkProvider.getLightEngine();
+
+            return true;
+        }
+
+        @Override
+        protected void cleanup() {
+            if (executor != null)
+                executor.shutdownNow();
+
+            try {
+                session.close();
+            } catch (Exception e) {
+            }
+
+            //shutdown chunk provider
+            try {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    try {
+                        freshChunkProvider.close(false);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (Exception e) {
+            }
+
+            //remove world from server
+            try {
+                Fawe.get().getQueueHandler().sync(() -> {
+                    try {
+                        Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+                        map.remove("worldeditregentempworld");
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (Exception e) {
+            }
+
+            //delete directory
+            try {
+                SafeFiles.tryHardToDeleteDir(tempDir);
+            } catch (Exception e) {
+            }
+        }
+
+        @Override
+        protected boolean generate() throws Exception {
+            executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+            try {
+                long start = System.currentTimeMillis();
+
+                //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
+                //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
+                //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
+                //generate chunk coords lists with a certain radius
+                Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap();
+                time(() -> {
+                    chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                        if (radius == -1) //ignore ChunkStatus.EMPTY
+                            return;
+                        int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
+                        chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
+                    });
+                }, "precomputing chunkCoordsForRadius lists");
+
+                //create chunks
+                time(() -> {
+                    for (Long xz : chunkCoordsForRadius.get(0)) {
+                        ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz)), ChunkConverter.a) {
+                            public boolean generateFlatBedrock() {
+                                return generateFlatBedrock;
+                            }
+                        };
+                        protoChunks.put(xz, chunk);
+                    }
+                }, "ctor");
+
+                //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
+                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
+                time(() -> {
+                    chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                        if (radius == -1) //ignore ChunkStatus.EMPTY
+                            return;
+                        Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap();
+                        for (Long xz : chunkCoordsForRadius.get(radius)) {
+                            int x = MathMan.unpairIntX(xz);
+                            int z = MathMan.unpairIntY(xz);
+                            List<IChunkAccess> l = new ArrayList((radius + 1 + radius) * (radius + 1 + radius));
+                            for (int zz = z - radius; zz <= z + radius; zz++) { //order is important, first z then x
+                                for (int xx = x - radius; xx <= x + radius; xx++) {
+                                    l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
+                                }
+                            }
+                            map.put(xz, l);
+                        }
+                        worldlimits.put(radius, map);
+                    });
+                }, "precomputing RegionLimitedWorldAccess chunks lists");
+
+                //run generation tasks exluding FULL chunk status
+                for (ChunkStatus chunkstatus : chunkStati) {
+                    time(() -> {
+                        int radius = Math.max(0, chunkstatus.f()); //f() = required border chunks, EMPTY.f() == -1
+
+                        List<Long> coords = chunkCoordsForRadius.get(radius);
+                        SequentialTasks<ParallelTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, chunkstatus.f());
+                        for (ParallelTasks<SequentialTasks<Long>> para : tasks) {
+                            List scheduled = new ArrayList(tasks.size());
+                            for (SequentialTasks<Long> row : para) {
+                                scheduled.add((Callable) () -> {
+                                    for (Long xz : row) {
+                                        try {
+                                            chunkstatus.a(freshNMSWorld,
+                                                          generator,
+                                                          structureManager,
+                                                          lightEngine,
+                                                          c -> CompletableFuture.completedFuture(Either.left(c)),
+                                                          worldlimits.get(radius).get(xz));
+                                        } catch (Exception e) {
+                                            System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    return null;
+                                });
+                            }
+
+                            try {
+                                List<Future> futures = executor.invokeAll(scheduled);
+                                for (Future f : futures) {
+                                    f.get();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, chunkstatus.d());
+                }
+
+                //convert to proper chunks
+                Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap();
+                time(() -> {
+                    for (Long xz : chunkCoordsForRadius.get(0)) {
+                        ProtoChunk chunk = protoChunks.get(xz);
+                        chunks.put(xz, new Chunk(freshNMSWorld, chunk));
+                    }
+                }, "converting to chunks");
+
+                //final chunkstatus
+                time(() -> {
+                    for (Long xz : chunkCoordsForRadius.get(0)) {
+                        Chunk chunk = chunks.get(xz);
+                        ChunkStatus.FULL.a(freshNMSWorld, generator, structureManager, lightEngine,
+                                           c -> CompletableFuture.completedFuture(Either.left(c)),
+                                           Arrays.asList(chunk)); //chunkstatus.f() == 0!
+                    }
+                }, "full");
+
+                //populate
+                List<BlockPopulator> defaultPopulators = originalNMSWorld.getWorld().getPopulators();
+                time(() -> {
+                    for (Long xz : chunkCoordsForRadius.get(0)) {
+                        int x = MathMan.unpairIntX(xz);
+                        int z = MathMan.unpairIntY(xz);
+
+                        //prepare chunk seed
+                        Random random = getChunkRandom(seed, x, z);
+
+                        //actually populate
+                        Chunk c = chunks.get(xz);
+                        defaultPopulators.forEach(pop -> {
+                            pop.populate(freshNMSWorld.getWorld(), random, c.bukkitChunk);
+                        });
+                    }
+                }, "populate with " + defaultPopulators.size() + " populators");
+
+                System.out.println("Finished chunk generation in " + (System.currentTimeMillis() - start) + " ms");
+                source = new SingleThreadQueueExtent();
+                source.init(null, (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_2(freshNMSWorld, chunkX, chunkZ) {
+                    @Override
+                    public Chunk ensureLoaded(World nmsWorld, int X, int Z) {
+                        return chunks.get(MathMan.pairInt(X, Z));
+                    }
+                }, null);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                if (e instanceof RuntimeException)
+                    throw (RuntimeException) e;
+                throw new RuntimeException(e);
+            }
+            return true;
+        }
+
+        private void time(Runnable r, String text) {
+            long starttask = System.currentTimeMillis();
+            System.out.println(text);
+            r.run();
+            System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
+        }
+
+        //util
+        private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
+            switch (env) {
+                case NETHER:
+                    return WorldDimension.THE_NETHER;
+                case THE_END:
+                    return WorldDimension.THE_END;
+                case NORMAL:
+                default:
+                    return WorldDimension.OVERWORLD;
+            }
+        }
+
+        private Dynamic<NBTBase> recursivelySetSeed(Dynamic<NBTBase> dynamic, long seed, Set<Dynamic<NBTBase>> seen) {
+            return !seen.add(dynamic) ? dynamic : dynamic.updateMapValues((pair) -> {
+                if (((Dynamic) pair.getFirst()).asString("").equals("seed")) {
+                    return pair.mapSecond((v) -> {
+                        return v.createLong(seed);
+                    });
+                } else {
+                    return ((Dynamic) pair.getSecond()).getValue() instanceof NBTTagCompound ? pair.mapSecond((v) -> {
+                        return this.recursivelySetSeed((Dynamic) v, seed, seen);
+                    }) : pair;
+
+                }
+            });
+        }
+
+        private static class RegenNoOpWorldLoadListener implements WorldLoadListener {
+
+            private RegenNoOpWorldLoadListener() {
+            }
+
+            public void a(ChunkCoordIntPair chunkCoordIntPair) {
+            }
+
+            public void a(ChunkCoordIntPair chunkCoordIntPair, @Nullable ChunkStatus chunkStatus) {
+            }
+
+            public void b() {
+            }
+        }
     }
 }
