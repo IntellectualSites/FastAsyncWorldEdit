@@ -82,7 +82,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
      * 
      * @param player The corresponding {@link Player} or null if they are offline
      */
-    public BukkitPlayer(Player player) {
+    public BukkitPlayer(@Nullable Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
@@ -112,7 +112,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
      * 
      * @return A data {@link Map} for that {@link Player}
      */
-    private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, Player player) {
+    private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, @Nullable Player player) {
         if (player == null) {
             // Null cannot have any data, so we just return an empty Map
             return new ConcurrentHashMap<>();
