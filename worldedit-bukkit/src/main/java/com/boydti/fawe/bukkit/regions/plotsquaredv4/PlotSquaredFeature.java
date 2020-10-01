@@ -47,7 +47,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 setupSchematicHandler();
                 setupChunkManager();
             } catch (Throwable ignored) {
-                log.debug("Please update PlotSquared: http://ci.athion.net/job/PlotSquared/");
+                log.debug("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
             }
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
