@@ -349,7 +349,7 @@ public abstract class ChunkListener implements Listener {
     }
 
     /**
-     * Prevent FireWorks from loading chunks.
+     * Prevent firework from loading chunks.
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkLoad(ChunkLoadEvent event) {
