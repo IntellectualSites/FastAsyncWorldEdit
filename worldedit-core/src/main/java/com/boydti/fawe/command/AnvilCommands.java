@@ -178,7 +178,7 @@ public class AnvilCommands {
         name = "deleteallunclaimed",
         aliases = {"delallunclaimed" },
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "Supports: WG, P2, GP:\n"
+        descFooter = "Supports: WorldGuard, PlotSquared, GriefPrevention:\n"
             + "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n"
             + "Have not been accessed since `file-duration` (ms) after creation and\n"
             + "Have not been used in the past `chunk-inactivity` (ms)"
