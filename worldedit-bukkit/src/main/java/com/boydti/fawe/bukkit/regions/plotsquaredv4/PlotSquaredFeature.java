@@ -98,7 +98,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         UUID uid = player.getUniqueId();
         return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid)
             || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
-                                                                                  .contains(DBFunc.EVERYONE)
+            .contains(DBFunc.EVERYONE)
             || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
             && player.hasPermission("fawe.plotsquared.member")) || player
             .hasPermission("fawe.plotsquared.admin"));
@@ -148,8 +148,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         } else {
             World world = FaweAPI.getWorld(area.worldname);
             List<Region> weRegions = regions.stream()
-                                            .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
-                                            .collect(Collectors.toList());
+                .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
+                .collect(Collectors.toList());
             maskedRegion = new RegionIntersection(world, weRegions);
         }
 

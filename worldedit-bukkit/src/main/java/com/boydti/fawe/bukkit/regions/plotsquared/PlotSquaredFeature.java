@@ -100,7 +100,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             .hasPermission("fawe.plotsquared.member")) || player.hasPermission("fawe.plotsquared.admin"));
     }
 
-    @Override public FaweMask getMask(Player player, MaskType type) {
+    @Override
+    public FaweMask getMask(Player player, MaskType type) {
         final PlotPlayer pp = PlotPlayer.wrap(player.getUniqueId());
         if (pp == null) {
             return null;
@@ -146,7 +147,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
 
         return new FaweMask(maskedRegion) {
-            @Override public boolean isValid(Player player, MaskType type) {
+            @Override
+            public boolean isValid(Player player, MaskType type) {
                 if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(finalPlot)) {
                     return false;
                 }
@@ -155,7 +157,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         };
     }
 
-    @Override public RegionFilter getFilter(String world) {
+    @Override
+    public RegionFilter getFilter(String world) {
         PlotArea area = PlotSquared.get().getPlotArea(world, null);
         if (area != null) {
             return new PlotRegionFilter(area);
