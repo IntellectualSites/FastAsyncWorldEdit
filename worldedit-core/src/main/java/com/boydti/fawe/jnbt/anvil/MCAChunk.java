@@ -63,6 +63,8 @@ public class MCAChunk implements IChunk {
     public int chunkX;
     public int chunkZ;
 
+    private boolean createCopy = false;
+
     public MCAChunk() {}
 
     private boolean readLayer(Section section) {
@@ -609,6 +611,14 @@ public class MCAChunk implements IChunk {
     @Override
     public CompoundTag getEntity(UUID uuid) {
         return this.entities.get(uuid);
+    }
+
+    @Override public void setCreateCopy(boolean createCopy) {
+        this.createCopy = createCopy;
+    }
+
+    @Override public boolean isCreateCopy() {
+        return createCopy;
     }
 
     @Override

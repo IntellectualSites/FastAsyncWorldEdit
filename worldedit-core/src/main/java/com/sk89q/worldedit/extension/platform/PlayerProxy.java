@@ -174,11 +174,13 @@ public class PlayerProxy extends AbstractPlayerActor {
         return permActor.hasPermission(perm);
     }
 
-    @Override public boolean togglePermission(String permission) {
-        return permActor.hasPermission(permission);
+    @Override 
+    public boolean togglePermission(String permission) {
+        return permActor.togglePermission(permission);
     }
 
-    @Override public void setPermission(String permission, boolean value) {
+    @Override 
+    public void setPermission(String permission, boolean value) {
         permActor.setPermission(permission, value);
     }
 

@@ -329,4 +329,9 @@ public class BlockMask extends ABlockMask {
         }
         return new BlockMask(getExtent(), cloned);
     }
+
+    @Override
+    public Mask copy() {
+        return new BlockMask(getExtent(), ordinals.clone());
+    }
 }

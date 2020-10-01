@@ -9,6 +9,7 @@ import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
+import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,11 +21,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
@@ -47,6 +48,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean fastmode;
     private int bitMask = -1; // Allow forceful setting of bitmask (for lighting)
     private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
+    private boolean createCopy = false;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -138,6 +140,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public CompoundTag getEntity(UUID uuid) {
         return delegate.get(this).getEntity(uuid);
+    }
+
+    @Override public void setCreateCopy(boolean createCopy) {
+        this.createCopy = createCopy;
+    }
+
+    @Override public boolean isCreateCopy() {
+        return createCopy;
     }
 
     private static final IBlockDelegate BOTH = new IBlockDelegate() {
@@ -778,9 +788,15 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
             get.trim(false);
+            boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
+            get.setCreateCopy(postProcess);
             set = getExtent().processSet(this, get, set);
-            if (set != null) {
+            try {
                 return get.call(set, finalize);
+            } finally {
+                if (postProcess) {
+                    getExtent().postProcessSet(this, get.getCopy(), set);
+                }
             }
         }
         return null;

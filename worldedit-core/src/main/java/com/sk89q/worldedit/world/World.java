@@ -40,6 +40,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -346,4 +347,19 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param packet the chunk packet
      */
     void sendFakeChunk(@Nullable Player player, ChunkPacket packet);
+
+    @Override @Nullable
+    default BiomeType getBiome(BlockVector3 position) {
+        return null;
+    }
+
+    @Override
+    default boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return false;
+    }
+
+    @Override
+    default boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return false;
+    }
 }

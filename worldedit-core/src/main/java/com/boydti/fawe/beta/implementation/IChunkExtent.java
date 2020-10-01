@@ -12,6 +12,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -53,6 +54,12 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     }
 
     @Override
+    default boolean setBiome(BlockVector3 position, BiomeType biome) {
+        final IChunk chunk = getOrCreateChunk(position.getX() >> 4, position.getZ() >> 4);
+        return chunk.setBiome(position.getX() & 15, position.getY(), position.getZ() & 15, biome);
+    }
+
+    @Override
     default BlockState getBlock(int x, int y, int z) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getBlock(x & 15, y, z & 15);
@@ -68,6 +75,12 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     default BiomeType getBiomeType(int x, int y, int z) {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         return chunk.getBiomeType(x & 15, y, z & 15);
+    }
+
+    @Override
+    default BiomeType getBiome(BlockVector3 position) {
+        final IChunk chunk = getOrCreateChunk(position.getX() >> 4, position.getZ() >> 4);
+        return chunk.getBiomeType(position.getX() & 15, position.getY(), position.getZ() & 15);
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
@@ -148,6 +149,7 @@ public class ClipboardCommands {
             copy.setSourceMask(mask);
         }
         Operations.completeLegacy(copy);
+        saveDiskClipboard(clipboard);
         session.setClipboard(new ClipboardHolder(clipboard));
 
         copy.getStatusMessages().forEach(actor::print);
@@ -259,6 +261,7 @@ public class ClipboardCommands {
             copy.setSourceMask(mask);
         }
         Operations.completeLegacy(copy);
+        saveDiskClipboard(clipboard);
         session.setClipboard(new ClipboardHolder(clipboard));
 
         if (!actor.hasPermission("fawe.tips")) {
@@ -541,5 +544,17 @@ public class ClipboardCommands {
     public void clearClipboard(Actor actor, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
         actor.printInfo(TranslatableComponent.of("worldedit.clearclipboard.cleared"));
+    }
+    
+    private void saveDiskClipboard(Clipboard clipboard) {
+        DiskOptimizedClipboard c;
+        if (clipboard instanceof DiskOptimizedClipboard)
+            c = (DiskOptimizedClipboard) clipboard;
+        else if (clipboard instanceof BlockArrayClipboard
+                 && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard)
+            c = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+        else
+            return;
+        c.flush();
     }
 }

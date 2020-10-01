@@ -2,10 +2,9 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.processors.LimitProcessor;
+import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
@@ -39,9 +38,9 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -380,16 +379,14 @@ public class EditSessionBuilder {
             } else {
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
-            IBatchProcessor limitProcessor = regionExtent;
-            if (limit != null && !limit.isUnlimited()) {
-                limitProcessor = new LimitProcessor(limit, limitProcessor);
-            }
-            if (regionExtent != null && queue != null && combineStages) {
-                queue.addProcessor(limitProcessor);
+            if (limit != null && !limit.isUnlimited() && regionExtent != null) {
+                this.extent = new LimitExtent(regionExtent, limit);
+            } else if (limit != null && !limit.isUnlimited()) {
+                this.extent = new LimitExtent(this.extent, limit);
             } else if (regionExtent != null) {
-                this.extent = limitProcessor.construct(regionExtent.getExtent());
+                this.extent = regionExtent;
             }
-            if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
+            if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
                 System.out.println("TODO add batch processor for strip nbt");
                 this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
             }

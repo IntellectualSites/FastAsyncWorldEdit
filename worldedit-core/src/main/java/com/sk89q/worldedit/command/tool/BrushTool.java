@@ -614,7 +614,7 @@ public class BrushTool
         newVisualExtent.init(chunkExtent);
 
         editSession.addProcessor(newVisualExtent);
-        editSession.addProcessor(NullProcessor.INSTANCE);
+        editSession.addProcessor(NullProcessor.getInstance());
 
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {

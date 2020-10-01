@@ -53,17 +53,12 @@ public class FaweBukkit implements IFawe, Listener {
     private static final Logger log = LoggerFactory.getLogger(FaweBukkit.class);
 
     private final Plugin plugin;
-    private VaultUtil vault;
     private ItemUtil itemUtil;
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
     private CFIPacketListener packetListener;
     private final boolean chunksStretched;
-
-    public VaultUtil getVault() {
-        return this.vault;
-    }
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -86,9 +81,6 @@ public class FaweBukkit implements IFawe, Listener {
 
         chunksStretched =
             Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
-
-        //Vault is Spigot/Paper only so this needs to be done in the Bukkit module
-        TaskManager.IMP.later(this::setupVault, 0);
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.IMP.later(this::setupPlotSquared, 0);
@@ -175,13 +167,6 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         return tmp;
-    }
-
-    private void setupVault() {
-        try {
-            this.vault = new VaultUtil();
-        } catch (final Throwable ignored) {
-        }
     }
 
     @Override public String getDebugInfo() {

@@ -71,4 +71,9 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
             return result;
         }
     }
+
+    @Override
+    public Mask copy() {
+        return new CachedMask(getMask().copy());
+    }
 }

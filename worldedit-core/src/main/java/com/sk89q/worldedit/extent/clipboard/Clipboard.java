@@ -311,18 +311,13 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
         pasteBiomes &= Clipboard.this.hasBiomes();
 
-        MutableBlockVector3 blockVector3 = new MutableBlockVector3();
-        blockVector3.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         for (BlockVector3 pos : this) {
             BaseBlock block = pos.getFullBlock(this);
             int xx = pos.getX() + relx;
-            int yy = pos.getZ() + relz;
-            int zz = pos.getY() + rely;
-            if (hasBiomes() && pos.getBlockY() == 0) {
-                if (pasteBiomes && (xx != blockVector3.getBlockX() || zz != blockVector3.getBlockZ())) {
-                    blockVector3.setComponents(xx, yy, zz);
-                    extent.setBiome(blockVector3, Clipboard.this.getBiome(BlockVector3.at(pos.getX(), pos.getY(), pos.getZ())));
-                }
+            int yy = pos.getY() + rely;
+            int zz = pos.getZ() + relz;
+            if (pasteBiomes) {
+                extent.setBiome(xx, yy, zz, Clipboard.this.getBiome(BlockVector3.at(pos.getX(), pos.getY(), pos.getZ())));
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
@@ -330,7 +325,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             if (pos.getY() < 0) {
                 throw new RuntimeException("Y-Position cannot be less than 0!");
             }
-            extent.setBlock(xx, pos.getY() + rely, zz, block);
+            extent.setBlock(xx, yy, zz, block);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
         final int entityOffsetX = to.getBlockX() - origin.getBlockX();

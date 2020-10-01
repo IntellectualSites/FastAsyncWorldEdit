@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 
 public interface IBatchProcessor {
@@ -19,6 +20,8 @@ public interface IBatchProcessor {
      * Process a chunk that has been set.
      */
     IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
+
+    Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set);
 
     default boolean processGet(int chunkX, int chunkZ) {
         return true;
@@ -108,6 +111,10 @@ public interface IBatchProcessor {
         return MultiBatchProcessor.of(this, other);
     }
 
+    default IBatchProcessor joinPost(IBatchProcessor other) {
+        return MultiBatchProcessor.of(this, other);
+    }
+
     default void flush() {
     }
 
@@ -116,7 +123,7 @@ public interface IBatchProcessor {
      */
     default <T extends IBatchProcessor> IBatchProcessor remove(Class<T> clazz) {
         if (clazz.isInstance(this)) {
-            return EmptyBatchProcessor.INSTANCE;
+            return EmptyBatchProcessor.getInstance();
         }
         return this;
     }

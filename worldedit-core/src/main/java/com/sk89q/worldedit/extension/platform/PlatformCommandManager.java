@@ -723,7 +723,11 @@ public final class PlatformCommandManager {
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
-            handleUnknownException(actor, e.getCause());
+            if (e.getCause() instanceof FaweException) {
+                actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
+            } else {
+                handleUnknownException(actor, e.getCause());
+            }
         } catch (CommandException e) {
             Component msg = e.getRichMessage();
             if (msg != TextComponent.empty()) {

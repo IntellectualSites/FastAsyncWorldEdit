@@ -19,8 +19,21 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A base class of {@link Mask} that all masks should inherit from.
  */
 public abstract class AbstractMask implements Mask {
+
+    @Override
+    @Nullable
+    public Mask copy() {
+        try {
+            return (Mask) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
 }

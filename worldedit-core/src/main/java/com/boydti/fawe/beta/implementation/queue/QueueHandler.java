@@ -280,16 +280,19 @@ public abstract class QueueHandler implements Trimable, Runnable {
     public abstract void endSet(boolean parallel);
 
     public IQueueExtent<IQueueChunk> getQueue(World world) {
-        return getQueue(world, null);
+        return getQueue(world, null, null);
     }
 
-    public IQueueExtent<IQueueChunk> getQueue(World world, IBatchProcessor processor) {
+    public IQueueExtent<IQueueChunk> getQueue(World world, IBatchProcessor processor, IBatchProcessor postProcessor) {
         final IQueueExtent<IQueueChunk> queue = pool();
         IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
         IChunkCache<IChunkSet> set = null; // TODO cache?
         queue.init(world, cacheGet, set);
         if (processor != null) {
             queue.setProcessor(processor);
+        }
+        if (postProcessor != null) {
+            queue.setPostProcessor(postProcessor);
         }
         return queue;
     }

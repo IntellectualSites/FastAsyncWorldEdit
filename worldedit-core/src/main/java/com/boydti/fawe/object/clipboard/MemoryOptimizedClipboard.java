@@ -11,6 +11,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -70,6 +71,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     }
 
     @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    }
+
+    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
@@ -112,6 +118,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return getBiome(getIndex(x, 0, z));
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return getBiome(getIndex(position.getX(), 0, position.getZ()));
     }
 
     public int getOrdinal(int index) {

@@ -19,13 +19,12 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
+import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -61,6 +60,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.permissions.PermissionAttachment;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -71,18 +71,21 @@ import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
-    private Player player;
-    private WorldEditPlugin plugin;
+    private final Player player;
+    private final WorldEditPlugin plugin;
+    private final PermissionAttachment permAttachment;
 
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
+        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
+        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -240,14 +243,20 @@ public class BukkitPlayer extends AbstractPlayerActor {
          *  Permissions are used to managing WorldEdit region restrictions
          *   - The `/wea` command will give/remove the required bypass permission
          */
-        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit>imp().getVault().permission == null) {
-            player.addAttachment(plugin).setPermission(permission, value);
-        } else if (value) {
-            if (!Fawe.<FaweBukkit>imp().getVault().permission.playerAdd(player, permission)) {
-                player.addAttachment(plugin).setPermission(permission, value);
+        boolean usesuperperms = VaultResolver.perms == null;
+        if (VaultResolver.perms != null) {
+            if (value) {
+                if (!VaultResolver.perms.playerAdd(player, permission)) {
+                    usesuperperms = true;
+                }
+            } else {
+                if (!VaultResolver.perms.playerRemove(player, permission)) {
+                    usesuperperms = true;
+                }
             }
-        } else if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(player, permission)) {
-            player.addAttachment(plugin).setPermission(permission, value);
+        }
+        if (usesuperperms) {
+            permAttachment.setPermission(permission, value);
         }
     }
 
@@ -393,7 +402,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }
-
 }

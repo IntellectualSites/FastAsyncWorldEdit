@@ -210,14 +210,14 @@ public class FastSchematicWriter implements ClipboardWriter {
             }
 
             if (numTiles != 0) {
-                out.writeNamedTagName("TileEntities", NBTConstants.TYPE_LIST);
+                out.writeNamedTagName("BlockEntities", NBTConstants.TYPE_LIST);
                 rawStream.write(NBTConstants.TYPE_COMPOUND);
                 rawStream.writeInt(numTiles);
                 try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(tilesCompressed.toByteArray()))) {
                     IOUtil.copy(in, rawStream);
                 }
             } else {
-                out.writeNamedEmptyList("TileEntities");
+                out.writeNamedEmptyList("BlockEntities");
             }
 
             if (finalClipboard.hasBiomes()) {

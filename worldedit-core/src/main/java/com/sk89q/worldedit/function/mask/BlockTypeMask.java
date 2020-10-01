@@ -70,6 +70,12 @@ public class BlockTypeMask extends AbstractExtentMask {
         }
     }
 
+    private BlockTypeMask(Extent extent, boolean[] types, boolean hasAir) {
+        super(extent);
+        this.types = types;
+        this.hasAir = hasAir;
+    }
+
     /**
      * Add the given blocks to the list of criteria.
      *
@@ -117,6 +123,11 @@ public class BlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return test(extent.getBlock(vector).getBlockType());
+    }
+
+    @Override
     public boolean replacesAir() {
         return hasAir;
     }
@@ -129,6 +140,11 @@ public class BlockTypeMask extends AbstractExtentMask {
     @Override
     public Mask2D toMask2D() {
         return null;
+    }
+
+    @Override
+    public Mask copy() {
+        return new BlockTypeMask(getExtent(), types.clone(), hasAir);
     }
 
 }

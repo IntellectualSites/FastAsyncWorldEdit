@@ -3,6 +3,9 @@ package com.boydti.fawe.bukkit.adapter.mc1_16_2;
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_16_R2.Block;
+import net.minecraft.server.v1_16_R2.BlockAccessAir;
+import net.minecraft.server.v1_16_R2.BlockBase;
+import net.minecraft.server.v1_16_R2.BlockPosition;
 import net.minecraft.server.v1_16_R2.EnumPistonReaction;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.ITileEntity;
@@ -16,6 +19,7 @@ public class BlockMaterial_1_16_2 implements BlockMaterial {
     private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
+    private final int opacity;
 
     public BlockMaterial_1_16_2(Block block) {
         this(block, block.getBlockData());
@@ -27,7 +31,9 @@ public class BlockMaterial_1_16_2 implements BlockMaterial {
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
         this.craftMaterial = craftBlockData.getMaterial();
-        this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "at"); //TODO Update Mapping for 1.16.1
+        BlockBase.Info blockInfo = ReflectionUtil.getField(Block.class, block, "aB");
+        this.isTranslucent = !(boolean)ReflectionUtil.getField(BlockBase.Info.class, blockInfo, "n");
+        opacity = defaultState.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
     }
 
     public Block getBlock() {
@@ -98,7 +104,7 @@ public class BlockMaterial_1_16_2 implements BlockMaterial {
 
     @Override
     public int getLightOpacity() {
-        return !isTranslucent() ? 15 : 0;
+        return opacity;
     }
 
     @Override

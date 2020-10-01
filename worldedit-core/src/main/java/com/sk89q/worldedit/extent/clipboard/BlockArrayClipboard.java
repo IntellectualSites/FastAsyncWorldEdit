@@ -63,7 +63,7 @@ public class BlockArrayClipboard implements Clipboard {
 
     public BlockArrayClipboard(Clipboard clipboard, BlockVector3 offset) {
         this.parent = clipboard;
-        Region shifted = clipboard.getRegion();
+        Region shifted = clipboard.getRegion().clone();
         shifted.shift(offset);
         this.region = shifted;
         this.origin = shifted.getMinimumPoint();
@@ -84,7 +84,7 @@ public class BlockArrayClipboard implements Clipboard {
         checkNotNull(parent);
         checkNotNull(region);
         this.parent = parent;
-        this.region = region;
+        this.region = region.clone();
         this.origin = region.getMinimumPoint();
     }
 

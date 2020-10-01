@@ -14,6 +14,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
+import net.minecraft.server.v1_15_R1.BiomeBase;
+import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
@@ -61,7 +63,9 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     private static final Field fieldDirtyCount;
     private static final Field fieldDirtyBits;
 
-    private static final MethodHandle methodGetVisibleChunk;
+    private static final Field fieldBiomeArray;
+
+    private final static MethodHandle methodGetVisibleChunk;
 
     public static final MethodHandle methodSetLightNibbleArray;
 
@@ -90,6 +94,9 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
+
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
+            fieldBiomeArray.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -308,5 +315,14 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+
+    public static BiomeBase[] getBiomeArray(BiomeStorage storage) {
+        try {
+            return (BiomeBase[]) fieldBiomeArray.get(storage);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -9,15 +9,17 @@ import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.registry.state.BooleanProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,19 +34,24 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class NMSRelighter implements Relighter {
+
+    private static final Logger log = LoggerFactory.getLogger(NMSRelighter.class);
     private static final int DISPATCH_SIZE = 64;
     private static final DirectionalProperty stairDirection;
     private static final EnumProperty stairHalf;
     private static final EnumProperty stairShape;
     private static final EnumProperty slabHalf;
+    private static final BooleanProperty waterLogged;
 
     static {
         stairDirection = (DirectionalProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("facing");
         stairHalf = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
         stairShape = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("shape");
         slabHalf = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
+        waterLogged = (BooleanProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("waterlogged");
     }
 
     public final MutableBlockVector3 mutableBlockPos = new MutableBlockVector3(0, 0, 0);
@@ -934,11 +941,10 @@ public class NMSRelighter implements Relighter {
                     int x = j & 15;
                     int z = j >> 4;
                     byte value = mask[j];
-                    BlockType type = iChunk.getBlock(x, y, z).getBlockType();
-                    BlockMaterial material = type.getMaterial();
+                    BlockState state = iChunk.getBlock(x, y, z);
+                    BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
-                    int brightness = iChunk.getBrightness(x, y, z);
-                    boolean solidNeedsLight = (!material.isSolid() || !material.isFullCube()) && material.getLightOpacity() > 0;
+                    int brightness = material.getLightValue();
                     if (brightness > 1) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
@@ -951,12 +957,26 @@ public class NMSRelighter implements Relighter {
                         if (heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] == 0 && material.isSolid()) {
                             heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] = y + 1;
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid())) {
-                            heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
+                        try {
+                            if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged)))) {
+                                heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
+                            }
+                        } catch (Exception ignored) {
+                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                                .collect(Collectors.joining(", ", "{", "}")));
                         }
-                        if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid()) && !type
-                            .getId().toLowerCase(Locale.ROOT).contains("leaves")) {
-                            heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
+                        try {
+                            if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || (
+                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId()
+                                .toLowerCase().contains("leaves")) {
+                                heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
+                            }
+                        } catch (Exception ignored) {
+                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                                .collect(Collectors.joining(", ", "{", "}")));
                         }
                     }
 
@@ -983,7 +1003,7 @@ public class NMSRelighter implements Relighter {
                         case 14:
                             if (opacity >= value) {
                                 mask[j] = 0;
-                                if (solidNeedsLight) {
+                                if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "double"))) {
                                     iChunk.setSkyLight(x, y, z, value);
                                 } else {
                                     iChunk.setSkyLight(x, y, z, 0);
@@ -997,11 +1017,11 @@ public class NMSRelighter implements Relighter {
                             }
                             break;
                         case 15:
-                            if (opacity > 1) {
+                            if (opacity > 0) {
                                 value -= opacity;
                                 mask[j] = value;
                             }
-                            if (solidNeedsLight) {
+                            if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "double"))) {
                                 iChunk.setSkyLight(x, y, z, value + opacity);
                             } else {
                                 iChunk.setSkyLight(x, y, z, value);

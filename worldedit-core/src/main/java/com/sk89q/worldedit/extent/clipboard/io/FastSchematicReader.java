@@ -166,9 +166,14 @@ public class FastSchematicReader extends NBTSchematicReader {
         });
         blockData.withInt((index, value) -> blocks.write(value));
 
-        StreamDelegate tilesDelegate = schematic.add("TileEntities");
+        StreamDelegate tilesDelegate = schematic.add("BlockEntities");
         tilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
         tilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
+
+        // Keep this here so schematics created with FAWE before TileEntities was fixed to BlockEntities still work
+        StreamDelegate compatTilesDelegate = schematic.add("TileEntities");
+        compatTilesDelegate.withInfo((length, type) -> tiles = new ArrayList<>(length));
+        compatTilesDelegate.withElem((ValueReader<Map<String, Object>>) (index, tile) -> tiles.add(tile));
 
         StreamDelegate entitiesDelegate = schematic.add("Entities");
         entitiesDelegate.withInfo((length, type) -> entities = new ArrayList<>(length));

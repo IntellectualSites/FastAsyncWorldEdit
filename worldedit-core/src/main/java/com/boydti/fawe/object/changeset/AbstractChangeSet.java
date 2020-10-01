@@ -59,7 +59,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         if (closed) {
             return;
         }
-        closed = true;
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
             waitingAsync.decrementAndGet();
@@ -72,6 +71,51 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void flush() {
+        try {
+            if (!Fawe.isMainThread()) {
+                while (waitingAsync.get() > 0) {
+                    synchronized (waitingAsync) {
+                        waitingAsync.wait(1000);
+                    }
+                }
+            }
+            while (waitingCombined.get() > 0) {
+                synchronized (waitingCombined) {
+                    waitingCombined.wait(1000);
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (!closed) {
+            flush();
+            closed = true;
+        }
+    }
+
+    public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);
+
+    @Override
+    public Iterator<Change> backwardIterator() {
+        return getIterator(false);
+    }
+
+    @Override
+    public Iterator<Change> forwardIterator() {
+        return getIterator(true);
+    }
+
+    @Override
+    public Extent construct(Extent child) {
+        return new HistoryExtent(child, this);
     }
 
     @Override
@@ -160,28 +204,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public Extent construct(Extent child) {
-        return new HistoryExtent(child, this);
-    }
-
-    @Override
-    public void flush() {
-        try {
-            if (!Fawe.isMainThread()) {
-                while (waitingAsync.get() > 0) {
-                    synchronized (waitingAsync) {
-                        waitingAsync.wait(1000);
-                    }
-                }
-            }
-            while (waitingCombined.get() > 0) {
-                synchronized (waitingCombined) {
-                    waitingCombined.wait(1000);
-                }
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
+        return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
     }
 
     public abstract void addTileCreate(CompoundTag tag);
@@ -218,8 +242,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return editSession;
     }
 
-    public abstract void add(int x, int y, int z, int combinedFrom, int combinedTo);
-
     public void add(EntityCreate change) {
         CompoundTag tag = change.state.getNbtData();
         MainUtil.setEntityInfo(tag, change.getEntity());
@@ -253,24 +275,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             add(loc, from, to);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public Iterator<Change> backwardIterator() {
-        return getIterator(false);
-    }
-
-    @Override
-    public Iterator<Change> forwardIterator() {
-        return getIterator(true);
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (!closed) {
-            closed = true;
-            flush();
         }
     }
 

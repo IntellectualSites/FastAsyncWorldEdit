@@ -2,6 +2,7 @@ package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -51,6 +52,11 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         return getExtent().getBiomeType(x, y, z);
+    }
+
+    @Override
+    public BiomeType getBiome(BlockVector3 position) {
+        return getExtent().getBiomeType(position.getX(), position.getY(), position.getZ());
     }
 
     @Override

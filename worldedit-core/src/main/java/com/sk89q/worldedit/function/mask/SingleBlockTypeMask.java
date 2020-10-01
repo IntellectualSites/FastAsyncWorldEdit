@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -14,6 +15,12 @@ public class SingleBlockTypeMask extends ABlockMask {
         super(extent);
         isAir = type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR;
         this.internalId = type.getInternalId();
+    }
+
+    private SingleBlockTypeMask(Extent extent, int internalId, boolean isAir) {
+        super(extent);
+        this.internalId = internalId;
+        this.isAir = isAir;
     }
 
     @Override
@@ -33,5 +40,10 @@ public class SingleBlockTypeMask extends ABlockMask {
     @Override
     public boolean replacesAir() {
         return isAir;
+    }
+
+    @Override
+    public Mask copy() {
+        return new SingleBlockTypeMask(getExtent(), internalId, isAir);
     }
 }

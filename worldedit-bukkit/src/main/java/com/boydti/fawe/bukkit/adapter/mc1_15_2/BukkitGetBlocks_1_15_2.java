@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_15_2;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
@@ -87,6 +88,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public int chunkZ;
     public NibbleArray[] blockLight = new NibbleArray[16];
     public NibbleArray[] skyLight = new NibbleArray[16];
+    private boolean createCopy = false;
+    private BukkitGetBlocks_1_15_2_Copy copy = null;
 
     public BukkitGetBlocks_1_15_2(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -100,6 +103,21 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     public int getChunkX() {
         return chunkX;
+    }
+
+    @Override
+    public void setCreateCopy(boolean createCopy) {
+        this.createCopy = createCopy;
+    }
+
+    @Override
+    public boolean isCreateCopy() {
+        return createCopy;
+    }
+
+    @Override
+    public IChunkGet getCopy() {
+        return copy;
     }
 
     public int getChunkZ() {
@@ -298,6 +316,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        copy = createCopy ? new BukkitGetBlocks_1_15_2_Copy(world, getChunkX(), getChunkZ()) : null;
         try {
             WorldServer nmsWorld = world;
             Chunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
@@ -322,6 +341,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
                             nmsChunk.removeTileEntity(tile.getPosition());
+                            if (createCopy) {
+                                copy.storeTile(tile);
+                            }
                         }
                     }
                 }
@@ -334,6 +356,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 for (int layer = 0; layer < 16; layer++) {
                     if (!set.hasSection(layer)) {
                         continue;
+                    }
+                    if (createCopy) {
+                        copy.storeSection(layer);
                     }
 
                     bitMask |= 1 << layer;
@@ -391,6 +416,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 if (biomes != null) {
                     // set biomes
                     BiomeStorage currentBiomes = nmsChunk.getBiomeIndex();
+                    if (createCopy) {
+                        copy.storeBiomes(currentBiomes);
+                    }
                     for (int z = 0, i = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++, i++) {
                             final BiomeType biome = biomes[i];
@@ -455,6 +483,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                 while (iter.hasNext()) {
                                     final Entity entity = iter.next();
                                     if (entityRemoves.contains(entity.getUniqueID())) {
+                                        if (createCopy) {
+                                            copy.storeEntity(entity);
+                                        }
                                         iter.remove();
                                         removeEntity(entity);
                                     }

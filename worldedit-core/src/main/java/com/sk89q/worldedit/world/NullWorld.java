@@ -166,7 +166,7 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public IChunkGet get(int x, int z) {
-        return NullChunkGet.INSTANCE;
+        return NullChunkGet.getInstance();
     }
 
     @Override

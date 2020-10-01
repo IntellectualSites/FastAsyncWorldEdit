@@ -44,10 +44,21 @@ public class ExistingBlockMask extends AbstractExtentMask {
         return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
     }
 
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
+        return !extent.getBlock(vector).getBlockType().getMaterial().isAir();
+    }
+
     @Nullable
     @Override
     public Mask2D toMask2D() {
         return null;
+    }
+
+    @Override
+    public Mask copy() {
+        // The mask is not mutable. There is no need to clone it.
+        return this;
     }
 
 }
