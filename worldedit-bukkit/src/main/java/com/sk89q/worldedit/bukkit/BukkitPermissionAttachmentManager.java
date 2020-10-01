@@ -19,26 +19,16 @@ public class BukkitPermissionAttachmentManager {
         if (p == null) {
             return null;
         }
-        PermissionAttachment attachment = attachments.get(p);
-
-        if (attachment != null) {
-            return attachment;
-        }
-
-        synchronized (this) {
-            return attachments.computeIfAbsent(p, k -> k.addAttachment(plugin));
-        }
+        return attachments.computeIfAbsent(p, k -> k.addAttachment(plugin));
     }
 
     public void removeAttachment(@Nullable final Player p) {
-        if (p == null || attachments.get(p) == null) {
+        if (p == null) {
             return;
         }
-        synchronized (this) {
-            PermissionAttachment attach = attachments.remove(p);
-            if (attach != null) {
-                p.removeAttachment(attach);
-            }
+        PermissionAttachment attach = attachments.remove(p);
+        if (attach != null) {
+            p.removeAttachment(attach);
         }
     }
 }
