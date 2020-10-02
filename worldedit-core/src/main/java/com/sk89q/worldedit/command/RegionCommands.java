@@ -413,7 +413,7 @@ public class RegionCommands {
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
                           Mask mask,
-                      @Switch(name = 's', desc = "TODO")
+                      @Switch(name = 's', desc = "The flag makes it only consider snow")
                           boolean snow) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
