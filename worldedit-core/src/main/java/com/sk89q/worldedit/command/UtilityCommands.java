@@ -121,6 +121,7 @@ public class UtilityCommands {
 
     @Command(
             name = "/heightmapinterface",
+            aliases = { "/hmi", "hmi" },
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     @CommandPermissions("fawe.admin")
