@@ -29,7 +29,6 @@ import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.boydti.fawe.util.MathMan;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
@@ -60,7 +59,6 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import java.io.File;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -392,7 +390,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         return parent.fromNative(foreign);
     }
 
-     @Override
+    @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
         return new ReneratorImpl(bukkitWorld, region, realExtent, options).regenerate();
     }
@@ -526,12 +524,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
 
             //init world
-            protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //need to be an ordered list for RegionLimitedWorldAccess
+            protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //needs to be an ordered list for RegionLimitedWorldAccess
             freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalNMSWorld.getMinecraftServer(), originalNMSWorld.getMinecraftServer().executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
-                @Override
-                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
-                    return protoChunks.get(MathMan.pairInt(i, j));
-                }
+//                @Override
+//                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
+//                    return protoChunks.get(MathMan.pairInt(i, j));
+//                }
             }).get();
 
             freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, freshNMSWorld.getMinecraftServer().getDataFixer(), freshNMSWorld.getMinecraftServer().getDefinedStructureManager(), freshNMSWorld.getMinecraftServer().executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, freshNMSWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshNMSWorld.getMinecraftServer().E().getWorldPersistentData()) {
@@ -755,6 +753,14 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             r.run();
             System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
         }
+        
+//        private void timeHigh(Runnable r, String text) {
+//            long starttask = System.currentTimeMillis();
+//            r.run();
+//            long dur = System.currentTimeMillis() - starttask;
+//            if (dur >= 10)
+//                System.out.println(text + " took " + dur + "ms");
+//        }
 
         //util
         private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
