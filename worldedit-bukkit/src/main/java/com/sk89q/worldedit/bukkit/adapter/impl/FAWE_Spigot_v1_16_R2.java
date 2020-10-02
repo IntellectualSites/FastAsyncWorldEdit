@@ -480,6 +480,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         private Path tempDir;
 
         private boolean generateFlatBedrock = false;
+        private boolean generateConcurrent = true;
 
         public ReneratorImpl(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
             super(originalBukkitWorld, region, target, options);
@@ -547,6 +548,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             if (originalNMSWorld.generator != null) {
                 // wrap custom world generator
                 generator = new CustomChunkGenerator(freshNMSWorld, generator, originalNMSWorld.generator);
+                generateConcurrent = originalNMSWorld.generator.isParallelCapable();
             }
 
             //lets start then
@@ -600,7 +602,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
         @Override
         protected boolean generate() throws Exception {
-            executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            if (generateConcurrent) {
+                executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                System.out.println("using concurrent chunk generation");
+            } else {
+                System.out.println("using squential chunk generation (concurrent not supported)");
+            }
 
             try {
                 long start = System.currentTimeMillis();
@@ -659,8 +666,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                         int radius = Math.max(0, chunkstatus.f()); //f() = required border chunks, EMPTY.f() == -1
 
                         List<Long> coords = chunkCoordsForRadius.get(radius);
-                        SequentialTasks<ParallelTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, chunkstatus.f());
-                        for (ParallelTasks<SequentialTasks<Long>> para : tasks) {
+                        SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, chunkstatus.f());
+                        for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
                             List scheduled = new ArrayList(tasks.size());
                             for (SequentialTasks<Long> row : para) {
                                 scheduled.add((Callable) () -> {
@@ -680,14 +687,24 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                                     return null;
                                 });
                             }
-
-                            try {
-                                List<Future> futures = executor.invokeAll(scheduled);
-                                for (Future f : futures) {
-                                    f.get();
+                            
+                            if (generateConcurrent) {
+                                try {
+                                    List<Future> futures = executor.invokeAll(scheduled);
+                                    for (Future f : futures) {
+                                        f.get();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            } else {
+                                for (Callable c : (List<Callable>) scheduled) {
+                                    try {
+                                        c.call();
+                                    } catch (Exception e) { //should not occur
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
                         }
                     }, chunkstatus.d());

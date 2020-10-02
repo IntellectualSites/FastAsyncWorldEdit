@@ -133,14 +133,14 @@ public abstract class Regenerator {
      * @param requiredNeighborChunkRadius the radius of neighbor chunks that may not be written to conccurently (ChunkStatus.requiredNeighborRadius)
      * @return a list of chunkcoords rows that may be executed concurrently
      */
-    protected SequentialTasks<ParallelTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(List<Long> allcoords, int requiredNeighborChunkRadius) {
+    protected SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(List<Long> allcoords, int requiredNeighborChunkRadius) {
         int requiredneighbors = Math.max(0, requiredNeighborChunkRadius);
 
         int minx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(0));
         int maxx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(allcoords.size() - 1));
         int minz = allcoords.isEmpty() ? 0 : MathMan.unpairIntY(allcoords.get(0));
         int maxz = allcoords.isEmpty() ? 0 : MathMan.unpairIntY(allcoords.get(allcoords.size() - 1));
-        SequentialTasks<ParallelTasks<SequentialTasks<Long>>> tasks;
+        SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks;
         if (maxz - minz > maxx - minx) {
             int numlists = Math.min(requiredneighbors * 2 + 1, maxx - minx + 1);
 
@@ -160,7 +160,7 @@ public abstract class Regenerator {
             //create parallel tasks
             tasks = new SequentialTasks(numlists);
             for (int offset = 0; offset < numlists; offset++) {
-                ParallelTasks<SequentialTasks<Long>> para = new ParallelTasks((maxz - minz + 1) / numlists + 1);
+                ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxz - minz + 1) / numlists + 1);
                 for (int i = 0; minx + i * numlists + offset <= maxx; i++)
                     para.add(byx.get(minx + i * numlists + offset));
                 tasks.add(para);
@@ -184,7 +184,7 @@ public abstract class Regenerator {
             //create parallel tasks
             tasks = new SequentialTasks(numlists);
             for (int offset = 0; offset < numlists; offset++) {
-                ParallelTasks<SequentialTasks<Long>> para = new ParallelTasks((maxx - minx + 1) / numlists + 1);
+                ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxx - minx + 1) / numlists + 1);
                 for (int i = 0; minz + i * numlists + offset <= maxz; i++)
                     para.add(byz.get(minz + i * numlists + offset));
                 tasks.add(para);
@@ -210,9 +210,9 @@ public abstract class Regenerator {
         }
     }
 
-    public static class ParallelTasks<T> extends Tasks<T> {
+    public static class ConcurrentTasks<T> extends Tasks<T> {
 
-        public ParallelTasks(int expectedsize) {
+        public ConcurrentTasks(int expectedsize) {
             super(expectedsize);
         }
     }
