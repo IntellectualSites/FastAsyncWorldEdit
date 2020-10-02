@@ -71,7 +71,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void mask(Player player, LocalSession session,
-                     @Switch(name = 'h', desc = "TODO")
+                     @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
                          boolean offHand,
                      @Arg(desc = "The destination mask", def = "")
                          Mask maskOpt, Arguments arguments) throws WorldEditException {
@@ -103,7 +103,7 @@ public class ToolUtilCommands {
     public void material(Player player, LocalSession session,
                          @Arg(desc = "The pattern of blocks to use")
                              Pattern pattern,
-                         @Switch(name = 'h', desc = "TODO")
+                         @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
                              boolean offHand, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
@@ -300,7 +300,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.scroll")
     public void scroll(Player player, EditSession editSession, LocalSession session,
-                       @Switch(name = 'h', desc = "TODO")
+                       @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
                            boolean offHand,
                        @Arg(desc = "Target Modes", def = "none")
                            Scroll.Action mode,
@@ -337,7 +337,7 @@ public class ToolUtilCommands {
     public void smask(Player player, LocalSession session, EditSession editSession,
                       @Arg(desc = "The destination mask", def = "")
                           Mask maskArg,
-                      @Switch(name = 'h', desc = "TODO")
+                      @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
                           boolean offHand,
                       Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -366,7 +366,7 @@ public class ToolUtilCommands {
 //    @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
 //    public void transform(Player player, LocalSession session, EditSession editSession,
 //                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
-//                          @Switch(name = 'h', desc = "TODO")
+//                          @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
 //                                  boolean offHand,
 //                          Arguments arguments) throws WorldEditException {
 //        BrushTool tool = session.getBrushTool(player, false);

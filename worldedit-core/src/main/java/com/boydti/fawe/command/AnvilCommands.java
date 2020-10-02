@@ -188,7 +188,7 @@ public class AnvilCommands {
     public void deleteAllUnclaimed(Player player, int inhabitedTicks,
                                    @Arg(desc = "int", def = "60000")
                                        int fileDurationMillis,
-                                   @Switch(name = 'd', desc = "TODO")
+                                   @Switch(name = 'd', desc = "The flag will debug the task")
                                        boolean debug) throws WorldEditException {
         //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
         //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
@@ -215,7 +215,7 @@ public class AnvilCommands {
     public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks,
                                 @Arg(desc = "int", def = "60000")
                                     int fileDurationMillis,
-                                @Switch(name = 'd', desc = "TODO")
+                                @Switch(name = 'd', desc = "The flag will debug the task")
                                     boolean debug) throws WorldEditException {
         //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
         //        if (debug) {
@@ -271,7 +271,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.trimallair")
     public void deleteBiome(Player player, String folder, BiomeType biome,
-                            @Switch(name = 'u', desc = "TODO")
+                            @Switch(name = 'u', desc = "The flag will run the task unsafe")
                                 boolean unsafe) {
         //        DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);  TODO NOT IMPLEMENTED
         //        DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
@@ -286,7 +286,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.trimallair")
     public void trimAllAir(Player player, String folder,
-                           @Switch(name = 'u', desc = "TODO")
+                           @Switch(name = 'u', desc = "The flag will run the task unsafe")
                                boolean unsafe) throws WorldEditException {
         //        TrimAirFilter filter = new TrimAirFilter();  TODO NOT IMPLEMENTED
         //        TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
@@ -317,9 +317,9 @@ public class AnvilCommands {
     public void replaceAllPattern(Player player, String folder,
                                   @Arg(desc = "String", def = "")
                                       String from, Pattern toPattern,
-                                  @Switch(name = 'd', desc = "TODO")
+                                  @Switch(name = 'd', desc = "The flag specifies the data to use")
                                       boolean useData,
-                                  @Switch(name = 'm', desc = "TODO")
+                                  @Switch(name = 'm', desc = "The flag specifies the map to use")
                                       boolean useMap) throws WorldEditException {
         //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
         //        if (useMap) {
@@ -350,7 +350,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.countall")
     public void countAll(Player player, EditSession editSession, String folder, String argStr,
-                         @Switch(name = 'd', desc = "TODO")
+                         @Switch(name = 'd', desc = "The flag specifies the data to use")
                              boolean useData) throws WorldEditException {
         //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
         //        MCAFilterCounter filter;
@@ -426,7 +426,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.count")
     public void count(Player player, EditSession editSession, @Selection Region selection, String argStr,
-                      @Switch(name = 'd', desc = "TODO")
+                      @Switch(name = 'd', desc = "The flag specifies the data to use")
                           boolean useData) throws WorldEditException {
         //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);  TODO NOT IMPLEMENTED
         //        MCAFilterCounter filter;
@@ -450,7 +450,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.distr")
     public void distr(Player player, EditSession editSession, @Selection Region selection,
-                      @Switch(name = 'd', desc = "TODO")
+                      @Switch(name = 'd', desc = "The flag specifies the data to use")
                           boolean useData) throws WorldEditException {
         //        long total = 0;  TODO NOT IMPLEMENTED
         //        long[] count;
@@ -533,7 +533,7 @@ public class AnvilCommands {
     public void replace(Player player, EditSession editSession, @Selection Region selection,
                         @Arg(desc = "String", def = "")
                             String from, String toStr,
-                        @Switch(name = 'd', desc = "TODO")
+                        @Switch(name = 'd', desc = "The flag specifies the data to use")
                             boolean useData) throws WorldEditException {
         //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
         //        if (from == null) {
@@ -559,9 +559,9 @@ public class AnvilCommands {
     public void replacePattern(Player player, EditSession editSession, @Selection Region selection,
                                @Arg(desc = "String", def = "")
                                    String from, final Pattern toPattern,
-                               @Switch(name = 'd', desc = "TODO")
+                               @Switch(name = 'd', desc = "The flag specifies the data to use")
                                    boolean useData,
-                               @Switch(name = 'm', desc = "TODO")
+                               @Switch(name = 'm', desc = "The flag specifies the map to use")
                                    boolean useMap) throws WorldEditException {
         //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
         //        if (useMap) {
@@ -592,7 +592,7 @@ public class AnvilCommands {
         desc = "Set all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.set")
-    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern toPattern, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern toPattern, @Switch(name = 'd', desc = "The flag specifies the data to use") boolean useData, @Switch(name = 'm', desc = "The flag specifies the map to use") boolean useMap
     public void set(Player player, EditSession editSession, @Selection Region selection, final Pattern toPattern) throws WorldEditException {
         //        MCAFilterCounter filter = new SetPatternFilter(to);  TODO NOT IMPLEMENTED
         //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
