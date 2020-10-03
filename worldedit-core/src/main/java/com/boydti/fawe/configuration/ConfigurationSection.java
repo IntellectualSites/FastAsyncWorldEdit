@@ -503,7 +503,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * <p>
-     * This method will attempt to cast any values into a Integer if possible, but may miss any
+     * This method will attempt to cast any values into an Integer if possible, but may miss any
      * values out if they are not compatible.
      * </p>
      *
