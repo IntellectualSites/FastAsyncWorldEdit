@@ -413,6 +413,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         private static final Field chunkProviderExecutorField;
         private static final Field worldPaperConfigField;
         private static final Field generatorSettingBaseSupplierField;
+        private static final Field generatorSettingFlatField;
+        private static final Field delegateField;
         private static final Field structureManagerField;
         private static final Field chunkProviderField;
 
@@ -453,6 +455,12 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
                 generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
                 generatorSettingBaseSupplierField.setAccessible(true);
+                
+                generatorSettingFlatField = ChunkProviderFlat.class.getDeclaredField("e");
+                generatorSettingFlatField.setAccessible(true);
+                
+                delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
+                delegateField.setAccessible(true);
 
                 structureManagerField = WorldServer.class.getDeclaredField("structureManager");
                 structureManagerField.setAccessible(true);
@@ -460,7 +468,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
                 chunkProviderField.setAccessible(true);
             } catch (Exception e) {
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             }
         }
 
@@ -543,8 +551,19 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             chunkProviderField.set(freshNMSWorld, freshChunkProvider);
 
             //generator
-            Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(freshNMSWorld.getChunkProvider().getChunkGenerator());
-            generator = new ChunkGeneratorAbstract(originalChunkProvider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
+            if (originalChunkProvider.getChunkGenerator() instanceof ChunkProviderFlat) {
+                GeneratorSettingsFlat generatorSettingFlat = (GeneratorSettingsFlat) generatorSettingFlatField.get(originalChunkProvider.getChunkGenerator());
+                generator = new ChunkProviderFlat(generatorSettingFlat);
+            } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkGeneratorAbstract) {
+                Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(originalChunkProvider.getChunkGenerator());
+                generator = new ChunkGeneratorAbstract(originalChunkProvider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
+            } else if (originalChunkProvider.getChunkGenerator() instanceof CustomChunkGenerator) {
+                ChunkGenerator delegate = (ChunkGenerator) delegateField.get(originalChunkProvider.getChunkGenerator());
+                generator = delegate;
+            } else {
+                System.out.println("Unsupported generator type " + originalChunkProvider.getChunkGenerator().getClass().getName());
+                return false;
+            }
             if (originalNMSWorld.generator != null) {
                 // wrap custom world generator
                 generator = new CustomChunkGenerator(freshNMSWorld, generator, originalNMSWorld.generator);
