@@ -272,6 +272,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir,
         @Nullable Transform transform) {
+        if (extent instanceof World) {
+            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            extent = builder.build();
+        }
+
         Extent source = this;
         if (transform != null && !transform.isIdentity()) {
             source = new BlockTransformExtent(this, transform);
@@ -302,6 +308,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
+        if (extent instanceof World) {
+            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            extent = builder.build();
+        }
+
         final BlockVector3 origin = this.getOrigin();
 
         // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)

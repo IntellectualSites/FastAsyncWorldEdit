@@ -79,13 +79,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
-        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
+        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.permAttachment = plugin.getPermissionAttachmentManager().addAttachment(player);
+        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
