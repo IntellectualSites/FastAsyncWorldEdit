@@ -22,7 +22,6 @@ public abstract class FaweMaskManager {
         }
     }
 
-
     private final String key;
 
     public FaweMaskManager(final String plugin) {
