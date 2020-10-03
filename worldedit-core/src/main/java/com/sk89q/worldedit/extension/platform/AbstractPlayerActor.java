@@ -76,8 +76,8 @@ import javax.annotation.Nullable;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
-
     private final Map<String, Object> meta;
+
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
     private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
@@ -103,6 +103,11 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     public AbstractPlayerActor() {
         this(new ConcurrentHashMap<>());
+    }
+
+    @Override
+    public final Extent getExtent() {
+        return getWorld();
     }
 
     /**
@@ -152,44 +157,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public Direction getCardinalDirection(int yawOffset) {
-        final Location location = getLocation();
-        if (location.getPitch() > 67.5) {
-            return Direction.DOWN;
-        }
-        if (location.getPitch() < -67.5) {
-            return Direction.UP;
-        }
-
-        // From hey0's code
-        double rot = (location.getYaw() + yawOffset) % 360; //let's use real yaw now
-        if (rot < 0) {
-            rot += 360.0;
-        }
-        return getDirection(rot);
-    }
-
-    @Override
-    public Direction getCardinalDirection() {
-        return getCardinalDirection(0);
-    }
-
-    @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
-        final ItemType typeId = getItemInHand(handSide).getType();
-        if (typeId.hasBlockType()) {
-            return typeId.getBlockType().getDefaultState().toBaseBlock();
-        } else {
-            return BlockTypes.AIR.getDefaultState().toBaseBlock(); // FAWE returns air here
-        }
-    }
-
-    @Override
-    public GameMode getGameMode() {
-        return GameModes.SURVIVAL;
-    }
-
-    @Override
     public void findFreePosition(Location searchPos) {
         Extent world = searchPos.getExtent();
 
@@ -230,11 +197,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public void findFreePosition() {
-        findFreePosition(getBlockLocation());
-    }
-
-    @Override
     public void setOnGround(Location searchPos) {
         Extent world = searchPos.getExtent();
 
@@ -256,6 +218,38 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
             --y;
         }
+    }
+
+    @Override
+    public void findFreePosition() {
+        findFreePosition(getBlockLocation());
+    }
+
+    /**
+     * Determines if the block at the given location "harms" the player, either by suffocation
+     * or other means.
+     */
+    private boolean isPlayerHarmingBlock(BlockVector3 location) {
+        BlockType type = getWorld().getBlock(location).getBlockType();
+        return type.getMaterial().isMovementBlocker() || type == BlockTypes.LAVA
+            || BlockCategories.FIRE.contains(type);
+    }
+
+    /**
+     * Check if the location is a good place to leave a standing player.
+     *
+     * @param location where the player would be placed (not Y offset)
+     * @return if the player can stand at the location
+     */
+    private boolean isLocationGoodForStanding(BlockVector3 location) {
+        if (isPlayerHarmingBlock(location.add(0, 1, 0))) {
+            return false;
+        }
+        if (isPlayerHarmingBlock(location)) {
+            return false;
+        }
+        return getWorld().getBlock(location.add(0, -1, 0)).getBlockType().getMaterial()
+                         .isMovementBlocker();
     }
 
     @Override
@@ -460,6 +454,23 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         trySetPosition(Vector3.at(x + 0.5, y, z + 0.5));
     }
 
+    /**
+     * Check whether the player is allowed to fly.
+     *
+     * @return true if allowed flight
+     */
+    protected boolean isAllowedToFly() {
+        return false;
+    }
+
+    /**
+     * Set whether the player is currently flying.
+     *
+     * @param flying true to fly
+     */
+    protected void setFlying(boolean flying) {
+    }
+
     @Override
     public Location getBlockOn() {
         final Location location = getLocation();
@@ -472,22 +483,17 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    public Location getBlockTraceFace(int range, boolean useLastBlock) {
+        return getBlockTraceFace(range, useLastBlock, null);
+    }
+
+    @Override
     public Location getBlockTrace(int range, boolean useLastBlock, @Nullable Mask stopMask) {
         TargetBlock tb = new TargetBlock(this, range, 0.2);
         if (stopMask != null) {
             tb.setStopMask(stopMask);
         }
         return (useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock());
-    }
-
-    @Override
-    public Location getBlockTrace(int range) {
-        return getBlockTrace(range, false);
-    }
-
-    @Override
-    public Location getBlockTraceFace(int range, boolean useLastBlock) {
-        return getBlockTraceFace(range, useLastBlock, null);
     }
 
     @Override
@@ -500,35 +506,19 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    public Location getBlockTrace(int range) {
+        return getBlockTrace(range, false);
+    }
+
+    @Override
     public Location getSolidBlockTrace(int range) {
         TargetBlock tb = new TargetBlock(this, range, 0.2);
         return tb.getSolidTargetBlock();
     }
 
     @Override
-    public boolean passThroughForwardWall(int range) {
-        TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
-
-        if (!advanceToWall(hitBlox)) {
-            return false;
-        }
-
-        if (!advanceToFree(hitBlox)) {
-            return false;
-        }
-
-        Location foundBlock = hitBlox.getCurrentBlock();
-        if (foundBlock != null) {
-            setOnGround(foundBlock);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
-
+    public Direction getCardinalDirection() {
+        return getCardinalDirection(0);
     }
 
     /**
@@ -577,48 +567,32 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         getSession().setRegionSelector(getWorld(), selector);
     }
 
-    /**
-     * Determines if the block at the given location "harms" the player, either by suffocation
-     * or other means.
-     */
-    private boolean isPlayerHarmingBlock(BlockVector3 location) {
-        BlockType type = getWorld().getBlock(location).getBlockType();
-        return type.getMaterial().isMovementBlocker() || type == BlockTypes.LAVA
-            || BlockCategories.FIRE.contains(type);
-    }
-
-    /**
-     * Check if the location is a good place to leave a standing player.
-     *
-     * @param location where the player would be placed (not Y offset)
-     * @return if the player can stand at the location
-     */
-    private boolean isLocationGoodForStanding(BlockVector3 location) {
-        if (isPlayerHarmingBlock(location.add(0, 1, 0))) {
-            return false;
+    @Override
+    public Direction getCardinalDirection(int yawOffset) {
+        final Location location = getLocation();
+        if (location.getPitch() > 67.5) {
+            return Direction.DOWN;
         }
-        if (isPlayerHarmingBlock(location)) {
-            return false;
+        if (location.getPitch() < -67.5) {
+            return Direction.UP;
         }
-        return getWorld().getBlock(location.add(0, -1, 0)).getBlockType().getMaterial()
-            .isMovementBlocker();
+
+        // From hey0's code
+        double rot = (location.getYaw() + yawOffset) % 360; //let's use real yaw now
+        if (rot < 0) {
+            rot += 360.0;
+        }
+        return getDirection(rot);
     }
 
-    /**
-     * Check whether the player is allowed to fly.
-     *
-     * @return true if allowed flight
-     */
-    protected boolean isAllowedToFly() {
-        return false;
-    }
-
-    /**
-     * Set whether the player is currently flying.
-     *
-     * @param flying true to fly
-     */
-    protected void setFlying(boolean flying) {
+    @Override
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+        final ItemType typeId = getItemInHand(handSide).getType();
+        if (typeId.hasBlockType()) {
+            return typeId.getBlockType().getDefaultState().toBaseBlock();
+        } else {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock(); // FAWE returns air here
+        }
     }
 
     private boolean canPassThroughBlock(Location curBlock) {
@@ -664,24 +638,30 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    public boolean passThroughForwardWall(int range) {
+        TargetBlock hitBlox = new TargetBlock(this, range, 0.2);
+
+        if (!advanceToWall(hitBlox)) {
+            return false;
+        }
+
+        if (!advanceToFree(hitBlox)) {
+            return false;
+        }
+
+        Location foundBlock = hitBlox.getCurrentBlock();
+        if (foundBlock != null) {
+            setOnGround(foundBlock);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean trySetPosition(Vector3 pos) {
         final Location location = getLocation();
         return trySetPosition(pos, location.getPitch(), location.getYaw());
-    }
-
-    @Override
-    public final Extent getExtent() {
-        return getWorld();
-    }
-
-    @Override
-    public boolean canDestroyBedrock() {
-        return hasPermission("worldedit.override.bedrock");
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return true;
     }
 
     @Override
@@ -694,10 +674,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public File openFileSaveDialog(String[] extensions) {
         printError(TranslatableComponent.of("worldedit.platform.no-file-dialog"));
         return null;
-    }
-
-    @Override
-    public void dispatchCUIEvent(CUIEvent event) {
     }
 
     /**
@@ -731,8 +707,12 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public int hashCode() {
-        return getName().hashCode();
+    public boolean canDestroyBedrock() {
+        return hasPermission("worldedit.override.bedrock");
+    }
+
+    @Override
+    public void dispatchCUIEvent(CUIEvent event) {
     }
 
     @Override
@@ -745,8 +725,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException("Not supported");
+    public int hashCode() {
+        return getName().hashCode();
     }
 
     @Override
@@ -757,8 +737,32 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    public boolean isPlayer() {
+        return true;
+    }
+
+    @Override
+    public GameMode getGameMode() {
+        return GameModes.SURVIVAL;
+    }
+
+    @Override
+    public void setGameMode(GameMode gameMode) {
+
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("Not supported");
+    }
+
+    @Override
     public boolean remove() {
         return false;
     }
 
+    @Override
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
+
+    }
 }
