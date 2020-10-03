@@ -494,7 +494,7 @@ public interface ConfigurationSection {
     List<String> getStringList(String path);
 
     /**
-     * Gets the requested List of Integer by a path.
+     * Gets the requested List of an Integer by a path.
      *
      * <p>
      * If the List does not exist, but a default value has been specified, this will return the
