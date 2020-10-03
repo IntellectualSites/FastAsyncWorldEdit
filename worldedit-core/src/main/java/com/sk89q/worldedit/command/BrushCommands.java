@@ -359,7 +359,7 @@ public class BrushCommands {
         },
         desc = "Draws a spline (curved line) on the surface",
         descFooter = "Create a spline on the surface\n"
-            + "Video: https://www.youtube.com/watch?v=zSN-2jJxXlM"
+            + "Video: https://www.youtube.com/watch?v=CukvVOi4jv8"
     )
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
     public void surfaceSpline(Player player, InjectedValueAccess context,
