@@ -18,4 +18,5 @@
     <suppress files=".*[\\/]Settings.java" checks="MemberName"/>
     <suppress files=".*[\\/]FaweLimit.java" checks="MemberName"/>
     <suppress files=".*[\\/]SimplexNoise.java" checks="MemberName"/>
+    <suppress files=".*[\\/]SparseBitSet.java" checks=".*"/>
 </suppressions>

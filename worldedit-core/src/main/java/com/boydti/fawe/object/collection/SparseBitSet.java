@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package com.boydti.fawe.object.collection;
 
 /*- This software is the work of Paladin Software International, Incorporated,
