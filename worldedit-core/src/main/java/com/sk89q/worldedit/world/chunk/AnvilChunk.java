@@ -85,14 +85,14 @@ public class AnvilChunk implements Chunk {
             }
 
             blocks[y] = NBTUtils.getChildTag(sectionTag.getValue(),
-                "Blocks", ByteArrayTag.class).getValue();
+                    "Blocks", ByteArrayTag.class).getValue();
             data[y] = NBTUtils.getChildTag(sectionTag.getValue(), "Data",
-                ByteArrayTag.class).getValue();
+                    ByteArrayTag.class).getValue();
 
             // 4096 ID block support
             if (sectionTag.getValue().containsKey("Add")) {
                 blocksAdd[y] = NBTUtils.getChildTag(sectionTag.getValue(),
-                    "Add", ByteArrayTag.class).getValue();
+                        "Add", ByteArrayTag.class).getValue();
             }
         }
 
@@ -100,16 +100,17 @@ public class AnvilChunk implements Chunk {
         for (byte[] block : blocks) {
             if (block.length != sectionsize) {
                 throw new InvalidFormatException(
-                    "Chunk blocks byte array expected " + "to be " + sectionsize + " bytes; found "
-                        + block.length);
+                        "Chunk blocks byte array expected " + "to be "
+                                + sectionsize + " bytes; found "
+                                + block.length);
             }
         }
 
         for (byte[] aData : data) {
             if (aData.length != (sectionsize / 2)) {
-                throw new InvalidFormatException(
-                    "Chunk block data byte array " + "expected to be " + sectionsize
-                        + " bytes; found " + aData.length);
+                throw new InvalidFormatException("Chunk block data byte array "
+                        + "expected to be " + sectionsize + " bytes; found "
+                        + aData.length);
             }
         }
     }
@@ -178,7 +179,8 @@ public class AnvilChunk implements Chunk {
      * Used to load the tile entities.
      */
     private void populateTileEntities() throws DataException {
-        List<Tag> tags = NBTUtils.getChildTag(rootTag.getValue(), "TileEntities", ListTag.class).getValue();
+        List<Tag> tags = NBTUtils.getChildTag(rootTag.getValue(),
+                "TileEntities", ListTag.class).getValue();
 
         tileEntities = new HashMap<>();
 
@@ -254,8 +256,7 @@ public class AnvilChunk implements Chunk {
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
         if (state == null) {
-            WorldEdit.logger.warn("Unknown legacy block " + id + ":" + data
-                + " found when loading legacy anvil chunk.");
+            WorldEdit.logger.warn("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         CompoundTag tileEntity = getBlockTileEntity(position);
