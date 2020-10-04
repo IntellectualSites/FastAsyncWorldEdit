@@ -870,7 +870,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             private final ConcurrentHashMap<Long, Long> map = new ConcurrentHashMap<>(); //needed for multithreaded generation
 
             public FastWorldGenContextArea(long seed, long lconst) {
-                this.magicrandom = b(seed, lconst);
+                this.magicrandom = mix(seed, lconst);
                 this.perlinNoise = new NoiseGeneratorPerlin(new Random(seed));
             }
 
@@ -903,7 +903,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 return this.perlinNoise;
             }
 
-            private static long b(long seed, long lconst) {
+            private static long mix(long seed, long lconst) {
                 long l1 = lconst;
                 l1 = LinearCongruentialGenerator.a(l1, lconst);
                 l1 = LinearCongruentialGenerator.a(l1, lconst);
