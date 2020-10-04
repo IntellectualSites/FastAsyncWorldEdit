@@ -84,18 +84,24 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 import org.bukkit.generator.BlockPopulator;
+import sun.net.www.content.audio.x_aiff;
 
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
@@ -556,7 +562,11 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 generator = new ChunkProviderFlat(generatorSettingFlat);
             } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkGeneratorAbstract) {
                 Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(originalChunkProvider.getChunkGenerator());
-                generator = new ChunkGeneratorAbstract(originalChunkProvider.getChunkGenerator().getWorldChunkManager(), seed, generatorSettingBaseSupplier);
+                WorldChunkManager chunkManager = originalChunkProvider.getChunkGenerator().getWorldChunkManager();
+                if (chunkManager instanceof WorldChunkManagerOverworld) {
+                    chunkManager = fastOverWorldChunkManager(chunkManager);
+                }
+                generator = new ChunkGeneratorAbstract(chunkManager, seed, generatorSettingBaseSupplier);
             } else if (originalChunkProvider.getChunkGenerator() instanceof CustomChunkGenerator) {
                 ChunkGenerator delegate = (ChunkGenerator) delegateField.get(originalChunkProvider.getChunkGenerator());
                 generator = delegate;
@@ -785,7 +795,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
         private void time(Runnable r, String text) {
             long starttask = System.currentTimeMillis();
-            System.out.println(text);
+//            System.out.println(text);
             r.run();
             System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
         }
@@ -826,6 +836,125 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             });
         }
 
+        private WorldChunkManager fastOverWorldChunkManager(WorldChunkManager chunkManager) throws Exception {
+            Field legacyBiomeInitLayerField = WorldChunkManagerOverworld.class.getDeclaredField("i");
+            legacyBiomeInitLayerField.setAccessible(true);
+            Field largeBiomesField = WorldChunkManagerOverworld.class.getDeclaredField("j");
+            largeBiomesField.setAccessible(true);
+            Field biomeRegistryField = WorldChunkManagerOverworld.class.getDeclaredField("k");
+            biomeRegistryField.setAccessible(true);
+            Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("f");
+            genLayerField.setAccessible(true);
+            Field areaLazyField = GenLayer.class.getDeclaredField("b");
+            areaLazyField.setAccessible(true);
+            Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", boolean.class, int.class, int.class, LongFunction.class);
+            initAreaFactoryMethod.setAccessible(true);
+            
+            //init new WorldChunkManagerOverworld
+            boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
+            boolean largebiomes = largeBiomesField.getBoolean(chunkManager);
+            IRegistry<BiomeBase> biomeRegistry = (IRegistry<BiomeBase>) biomeRegistryField.get(chunkManager);
+            chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes, biomeRegistry);
+            
+            //replace genLayer
+            AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largebiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
+            genLayerField.set(chunkManager, new FastGenLayer(factory));
+            
+            return chunkManager;
+        }
+        
+        private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
+
+            private final NoiseGeneratorPerlin perlinNoise;
+            private final long magicrandom;
+            private final ConcurrentHashMap<Long, Long> map = new ConcurrentHashMap<>(); //needed for multithreaded generation
+
+            public FastWorldGenContextArea(long seed, long lconst) {
+                this.magicrandom = b(seed, lconst);
+                this.perlinNoise = new NoiseGeneratorPerlin(new Random(seed));
+            }
+
+            @Override
+            public FastAreaLazy a(AreaTransformer8 var0) {
+                return new FastAreaLazy(var0);
+            }
+
+            @Override
+            public void a(long x, long z) {
+                long l = this.magicrandom;
+                l = LinearCongruentialGenerator.a(l, x);
+                l = LinearCongruentialGenerator.a(l, z);
+                l = LinearCongruentialGenerator.a(l, x);
+                l = LinearCongruentialGenerator.a(l, z);
+                this.map.put(Thread.currentThread().getId(), l);
+            }
+
+            @Override
+            public int a(int y) {
+                long tid = Thread.currentThread().getId();
+                long e = this.map.computeIfAbsent(tid, i -> 0L);
+                int mod = (int) Math.floorMod(e >> 24L, y);
+                this.map.put(tid, LinearCongruentialGenerator.a(e, this.magicrandom));
+                return mod;
+            }
+
+            @Override
+            public NoiseGeneratorPerlin b() {
+                return this.perlinNoise;
+            }
+
+            private static long b(long seed, long lconst) {
+                long l1 = lconst;
+                l1 = LinearCongruentialGenerator.a(l1, lconst);
+                l1 = LinearCongruentialGenerator.a(l1, lconst);
+                l1 = LinearCongruentialGenerator.a(l1, lconst);
+                long l2 = seed;
+                l2 = LinearCongruentialGenerator.a(l2, l1);
+                l2 = LinearCongruentialGenerator.a(l2, l1);
+                l2 = LinearCongruentialGenerator.a(l2, l1);
+                return l2;
+            }
+        }
+     
+        private static class FastGenLayer extends GenLayer {
+
+            private final FastAreaLazy areaLazy;
+
+            public FastGenLayer(AreaFactory<FastAreaLazy> factory) throws Exception {
+                super(() -> null);
+                this.areaLazy = factory.make();
+            }
+
+            @Override
+            public BiomeBase a(IRegistry<BiomeBase> registry, int x, int z) {
+                ResourceKey<BiomeBase> key = BiomeRegistry.a(this.areaLazy.a(x, z));
+                if (key == null)
+                    return registry.a(BiomeRegistry.a(0));
+                BiomeBase biome = registry.a(key);
+                if (biome == null)
+                    return registry.a(BiomeRegistry.a(0));
+                return biome;
+            }
+        }
+
+        private static class FastAreaLazy implements Area {
+            private final AreaTransformer8 transformer;
+            //ConcurrentHashMap is 50% faster that Long2IntLinkedOpenHashMap in a syncronized context
+            //using a map for each thread worsens the performance significantly due to cache misses (factor 5)
+            private final ConcurrentHashMap<Long, Integer> cache; 
+
+            public FastAreaLazy(AreaTransformer8 transformer) {
+                this.transformer = transformer;
+                this.cache = new ConcurrentHashMap<>();
+            }
+
+            @Override
+            public int a(int x, int z) {
+                long zx = ChunkCoordIntPair.pair(x, z);
+                return this.cache.computeIfAbsent(zx, i -> this.transformer.apply(x, z));
+            }
+        }
+        
         private static class RegenNoOpWorldLoadListener implements WorldLoadListener {
 
             private RegenNoOpWorldLoadListener() {
