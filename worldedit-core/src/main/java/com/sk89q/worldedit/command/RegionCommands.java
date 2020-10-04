@@ -611,6 +611,7 @@ public class RegionCommands {
         try {
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
+            actor.printInfo(TranslatableComponent.of("fawe.regen.time"));
             success = world.regenerate(region, editSession);
         } finally {
             session.setMask(mask);

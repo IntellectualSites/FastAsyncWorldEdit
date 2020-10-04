@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 //todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
@@ -337,6 +338,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        throw reason;
+    }
+
+    @Override
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         throw reason;
     }
 

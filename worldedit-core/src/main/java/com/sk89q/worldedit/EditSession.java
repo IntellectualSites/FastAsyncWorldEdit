@@ -71,6 +71,7 @@ import com.sk89q.worldedit.function.mask.NoiseFilter2D;
 import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
+import com.sk89q.worldedit.function.mask.WallMakeMask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -1406,15 +1407,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (region instanceof CuboidRegion) {
             return makeCuboidWalls(region, pattern);
         } else {
-            replaceBlocks(region, new Mask() {
-                @Override
-                public boolean test(BlockVector3 position) {
-                    int x = position.getBlockX();
-                    int z = position.getBlockZ();
-                    return !region.contains(x, z + 1) || !region.contains(x, z - 1) || !region
-                        .contains(x + 1, z) || !region.contains(x - 1, z);
-                }
-            }, pattern);
+            replaceBlocks(region, new WallMakeMask(region), pattern);
         }
         return changes;
     }

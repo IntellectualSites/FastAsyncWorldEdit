@@ -47,6 +47,8 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     private final static Field fieldDirtyCount;
     private final static Field fieldDirtyBits;
 
+    private static final Field fieldBiomeArray;
+
     private final static MethodHandle methodGetVisibleChunk;
 
     private static final int CHUNKSECTION_BASE;
@@ -77,6 +79,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
+
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
+            fieldBiomeArray.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
@@ -290,5 +295,14 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+
+    public static BiomeBase[] getBiomeArray(BiomeStorage storage) {
+        try {
+            return (BiomeBase[]) fieldBiomeArray.get(storage);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

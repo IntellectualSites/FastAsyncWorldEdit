@@ -105,4 +105,9 @@ public class OffsetMask extends AbstractMask {
         }
     }
 
+    @Override
+    public Mask copy() {
+        return new OffsetMask(mask.copy(), offset.toImmutable());
+    }
+
 }

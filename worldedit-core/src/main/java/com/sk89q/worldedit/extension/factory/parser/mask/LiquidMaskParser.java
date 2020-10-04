@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.function.mask.LiquidMask;
+import com.boydti.fawe.object.mask.LiquidMask;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;

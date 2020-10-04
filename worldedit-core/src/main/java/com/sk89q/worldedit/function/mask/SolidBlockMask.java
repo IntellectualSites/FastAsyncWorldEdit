@@ -35,4 +35,9 @@ public class SolidBlockMask extends BlockMask {
         return null;
     }
 
+    @Override
+    public Mask copy() {
+        return new SolidBlockMask(getExtent());
+    }
+
 }

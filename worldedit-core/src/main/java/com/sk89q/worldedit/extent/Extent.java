@@ -23,6 +23,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.boydti.fawe.object.exception.FaweException;
@@ -671,8 +672,16 @@ public interface Extent extends InputExtent, OutputExtent {
         return processor.construct(this);
     }
 
+    default Extent addPostProcessor(IBatchProcessor processor) {
+        return processor.construct(this);
+    }
+
     default Extent enableHistory(AbstractChangeSet changeSet) {
-        return addProcessor(changeSet);
+        if (Settings.IMP.EXPERIMENTAL.SEND_BEFORE_HISTORY) {
+            return addPostProcessor(changeSet);
+        } else {
+            return addProcessor(changeSet);
+        }
     }
 
     default Extent disableHistory() {

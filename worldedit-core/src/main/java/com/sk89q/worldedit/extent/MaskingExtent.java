@@ -36,6 +36,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -44,7 +47,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     private Mask mask;
-    private LoadingCache<Long, ChunkFilterBlock> threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+    private final LoadingCache<Long, ChunkFilterBlock> threadIdToFilter;
 
     /**
      * Create a new instance.
@@ -56,6 +59,14 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
+        this.threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+    }
+
+    private MaskingExtent(Extent extent, Mask mask, LoadingCache<Long, ChunkFilterBlock> threadIdToFilter) {
+        super(extent);
+        checkNotNull(mask);
+        this.mask = mask;
+        this.threadIdToFilter = threadIdToFilter;
     }
 
     /**
@@ -64,7 +75,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
      * @return the mask
      */
     public Mask getMask() {
-        return mask;
+        return this.mask;
     }
 
     /**
@@ -79,38 +90,46 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return mask.test(location) && super.setBlock(location, block);
+        return this.mask.test(location) && super.setBlock(location, block);
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
+        return this.mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
+        return this.mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 
     @Override
-    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        ChunkFilterBlock filter = threadIdToFilter.getUnchecked(Thread.currentThread().getId());
-        return filter.filter(chunk, get, set, this);
+    public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
+        final ChunkFilterBlock filter = threadIdToFilter.getUnchecked(Thread.currentThread().getId());
+        return filter.filter(chunk, get, set, MaskingExtent.this);
     }
 
     @Override
-    public void applyBlock(FilterBlock block) {
-        //TODO: Find a way to make masking thread safe without having to synchonise the whole extent
-        synchronized (this) {
-            if (!mask.test(block)) {
-                block.setOrdinal(0);
-            }
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // This should not do anything otherwise dangerous...
+        return CompletableFuture.completedFuture(set);
+    }
+
+    @Override
+    public void applyBlock(final FilterBlock block) {
+        if (!this.mask.test(block)) {
+            block.setOrdinal(0);
         }
     }
 
     @Override
     public Extent construct(Extent child) {
         if (child == getExtent()) return this;
-        return new MaskingExtent(child, mask);
+        return new MaskingExtent(child, this.mask.copy(), this.threadIdToFilter);
+    }
+
+    @Override
+    public Filter fork() {
+        return new MaskingExtent(getExtent(), this.mask.copy(), this.threadIdToFilter);
     }
 }

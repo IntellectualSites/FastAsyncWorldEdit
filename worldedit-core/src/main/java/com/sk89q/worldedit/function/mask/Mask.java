@@ -100,4 +100,10 @@ public interface Mask {
     default boolean replacesAir() {
         return false;
     }
+
+    /**
+     * Returns a copy of the mask. Usually for multi-threaded operation
+     * @return a clone of the mask
+     */
+    Mask copy();
 }

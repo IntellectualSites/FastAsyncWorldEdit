@@ -102,4 +102,9 @@ public class BiomeMask extends AbstractMask {
         return null;
     }
 
+    @Override
+    public Mask copy() {
+        return new BiomeMask(extent, new HashSet<>(biomes));
+    }
+
 }
