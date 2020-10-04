@@ -230,10 +230,11 @@ public final class IncendoPaster implements Paster {
         b.append("\n# YAY! Now, let's see what we can find in your JVM\n");
         Runtime runtime = Runtime.getRuntime();
         RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
-        b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS) + " minutes").append('\n');
-        b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024 + " MB").append('\n');
-        b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024 + " MB").append('\n');
-        b.append("Total Memory: ").append(runtime.totalMemory() / 1024 / 1024 + " MB").append('\n');
+        b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS))
+            .append(" minutes").append('\n');
+        b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024).append(" MB").append('\n');
+        b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024).append(" MB").append('\n');
+        b.append("Total Memory: ").append(runtime.totalMemory() / 1024 / 1024).append(" MB").append('\n');
         b.append("Available Processors: ").append(runtime.availableProcessors()).append('\n');
         b.append("Java Name: ").append(rb.getVmName()).append('\n');
         b.append("Java Version: '").append(System.getProperty("java.version")).append("'\n");
