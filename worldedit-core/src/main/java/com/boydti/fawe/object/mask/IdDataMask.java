@@ -2,6 +2,7 @@ package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class IdDataMask extends AbstractExtentMask implements ResettableMask {
@@ -29,6 +30,11 @@ public class IdDataMask extends AbstractExtentMask implements ResettableMask {
     @Override
     public void reset() {
         this.combined = -1;
+    }
+
+    @Override
+    public Mask copy() {
+        return new IdDataMask(getExtent());
     }
 
 }

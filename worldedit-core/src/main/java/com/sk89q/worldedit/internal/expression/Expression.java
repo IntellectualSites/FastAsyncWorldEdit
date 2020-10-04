@@ -31,8 +31,10 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Compiles and evaluates expressions.
@@ -60,19 +62,55 @@ import java.util.Objects;
  * pass values for all slots specified while compiling.
  * To query slots after evaluation, you can use the {@linkplain #getSlots() slot table}.
  */
-public class Expression {
+public class Expression implements Cloneable {
 
     private final SlotTable slots = new SlotTable();
     private final List<String> providedSlots;
     private final ExpressionParser.AllStatementsContext root;
     private final Functions functions = Functions.create();
     private final CompiledExpression compiledExpression;
+    private final String initialExpression;
 
     public static Expression compile(String expression, String... variableNames) throws ExpressionException {
         return new Expression(expression, variableNames);
     }
 
     private Expression(String expression, String... variableNames) throws ExpressionException {
+        this.initialExpression = expression;
+
+        slots.putSlot("e", new LocalSlot.Constant(Math.E));
+        slots.putSlot("pi", new LocalSlot.Constant(Math.PI));
+        slots.putSlot("true", new LocalSlot.Constant(1));
+        slots.putSlot("false", new LocalSlot.Constant(0));
+
+        for (String variableName : variableNames) {
+            slots.initVariable(variableName)
+                .orElseThrow(() -> new ExpressionException(-1,
+                    "Tried to overwrite identifier '" + variableName + "'"));
+        }
+        this.providedSlots = ImmutableList.copyOf(variableNames);
+
+        CharStream cs = CharStreams.fromString(expression, "<input>");
+        ExpressionLexer lexer = new ExpressionLexer(cs);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(new LexerErrorListener());
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        ExpressionParser parser = new ExpressionParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ParserErrorListener());
+        try {
+            root = parser.allStatements();
+            Objects.requireNonNull(root, "Unable to parse root, but no exceptions?");
+        } catch (ParseCancellationException e) {
+            throw new ParserException(parser.getState(), e);
+        }
+        ParseTreeWalker.DEFAULT.walk(new ExpressionValidator(slots.keySet(), functions), root);
+        this.compiledExpression = new ExpressionCompiler().compileExpression(root, functions);
+    }
+
+    private Expression(String expression, Set<String> variableNames) throws ExpressionException {
+        this.initialExpression = expression;
+
         slots.putSlot("e", new LocalSlot.Constant(Math.E));
         slots.putSlot("pi", new LocalSlot.Constant(Math.PI));
         slots.putSlot("true", new LocalSlot.Constant(1));
@@ -145,6 +183,10 @@ public class Expression {
 
     public void setEnvironment(ExpressionEnvironment environment) {
         functions.setEnvironment(environment);
+    }
+
+    public Expression clone() {
+        return new Expression(initialExpression, new HashSet<>(providedSlots));
     }
 
 }

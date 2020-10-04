@@ -98,6 +98,12 @@ public class FallbackChunkGet implements IChunkGet {
         return null;
     }
 
+    @Override public void setCreateCopy(boolean createCopy) {}
+
+    @Override public boolean isCreateCopy() {
+        return false;
+    }
+
     @Override
     public boolean trim(boolean aggressive) {
         return true;

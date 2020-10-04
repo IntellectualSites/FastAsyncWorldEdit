@@ -28,6 +28,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -81,5 +82,12 @@ public class BlockStateMask extends AbstractExtentMask {
     @Override
     public Mask2D toMask2D() {
         return null;
+    }
+
+    @Override
+    public Mask copy() {
+        Map<String, String> statesClone = new HashMap<>();
+        states.forEach(statesClone::put);
+        return new BlockStateMask(getExtent(), statesClone, strict);
     }
 }
