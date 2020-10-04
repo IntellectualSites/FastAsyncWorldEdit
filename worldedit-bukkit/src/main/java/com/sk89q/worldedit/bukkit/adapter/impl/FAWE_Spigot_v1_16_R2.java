@@ -101,7 +101,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 import org.bukkit.generator.BlockPopulator;
-import sun.net.www.content.audio.x_aiff;
 
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
