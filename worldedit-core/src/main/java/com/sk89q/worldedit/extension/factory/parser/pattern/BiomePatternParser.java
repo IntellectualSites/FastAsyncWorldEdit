@@ -4,8 +4,11 @@ import com.boydti.fawe.object.pattern.BiomeApplyingPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +34,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
             String biomeId = input.substring(1);
             BiomeType biomeType = BiomeTypes.get(biomeId);
             if (biomeType == null) {
-                throw new InputParseException("Not a valid biome: " + biomeId);
+                throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-biome", TextComponent.of(biomeId)));
             }
             return new BiomeApplyingPattern(context.requireExtent(), biomeType);
         } else {
@@ -64,7 +67,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
         }
         BiomeType biomeType = BiomeTypes.get(arguments[0]);
         if (biomeType == null) {
-            throw new InputParseException("Not a valid biome: " + arguments[0]);
+            throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-biome", TextComponent.of(arguments[0])));
         }
         return new BiomeApplyingPattern(context.requireExtent(), biomeType);
     }
