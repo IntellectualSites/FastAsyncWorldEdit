@@ -84,7 +84,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 import java.util.Set;
@@ -94,14 +93,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 import org.bukkit.generator.BlockPopulator;
-import sun.net.www.content.audio.x_aiff;
 
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
@@ -865,6 +861,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         
         private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
 
+            private final ConcurrentHashMap<Long, Integer> sharedAreaMap = new ConcurrentHashMap<>();
             private final NoiseGeneratorPerlin perlinNoise;
             private final long magicrandom;
             private final ConcurrentHashMap<Long, Long> map = new ConcurrentHashMap<>(); //needed for multithreaded generation
@@ -876,7 +873,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
             @Override
             public FastAreaLazy a(AreaTransformer8 var0) {
-                return new FastAreaLazy(var0);
+                return new FastAreaLazy(sharedAreaMap, var0);
             }
 
             @Override
@@ -941,17 +938,17 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             private final AreaTransformer8 transformer;
             //ConcurrentHashMap is 50% faster that Long2IntLinkedOpenHashMap in a syncronized context
             //using a map for each thread worsens the performance significantly due to cache misses (factor 5)
-            private final ConcurrentHashMap<Long, Integer> cache; 
+            private final ConcurrentHashMap<Long, Integer> sharedMap;
 
-            public FastAreaLazy(AreaTransformer8 transformer) {
+            public FastAreaLazy(ConcurrentHashMap<Long, Integer> sharedMap, AreaTransformer8 transformer) {
+                this.sharedMap = sharedMap;
                 this.transformer = transformer;
-                this.cache = new ConcurrentHashMap<>();
             }
 
             @Override
             public int a(int x, int z) {
                 long zx = ChunkCoordIntPair.pair(x, z);
-                return this.cache.computeIfAbsent(zx, i -> this.transformer.apply(x, z));
+                return this.sharedMap.computeIfAbsent(zx, i -> this.transformer.apply(x, z));
             }
         }
         
