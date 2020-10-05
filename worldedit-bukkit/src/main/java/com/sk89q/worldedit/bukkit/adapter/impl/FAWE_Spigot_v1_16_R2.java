@@ -82,6 +82,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -421,22 +422,22 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         private static final Field chunkProviderField;
 
         //list of chunk stati in correct order without FULL
-        private static final List<ChunkStatus> chunkStati = Arrays.asList(
-                ChunkStatus.EMPTY,
-                ChunkStatus.STRUCTURE_STARTS,
-                ChunkStatus.STRUCTURE_REFERENCES,
-                ChunkStatus.BIOMES,
-                ChunkStatus.NOISE,
-                ChunkStatus.SURFACE,
-                ChunkStatus.CARVERS,
-                ChunkStatus.LIQUID_CARVERS,
-                ChunkStatus.FEATURES,
-                ChunkStatus.LIGHT,
-                ChunkStatus.SPAWN,
-                ChunkStatus.HEIGHTMAPS
-        );
+        private static final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
 
         static {
+            chunkStati.put(ChunkStatus.EMPTY, Concurrency.FULL);                  // radius -1, does nothing
+            chunkStati.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);       // uses unsynchronized maps
+            chunkStati.put(ChunkStatus.STRUCTURE_REFERENCES, Concurrency.FULL);   // radius 8, but no writes to other chunks, only current chunk
+            chunkStati.put(ChunkStatus.BIOMES, Concurrency.FULL);                 // radius 0
+            chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS);                // radius 8
+            chunkStati.put(ChunkStatus.SURFACE, Concurrency.FULL);                // radius 0
+            chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);                // radius 0, but RADIUS and FULL change results
+            chunkStati.put(ChunkStatus.LIQUID_CARVERS, Concurrency.NONE);         // radius 0, but RADIUS and FULL change results
+            chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);               // uses unsynchronized maps
+            chunkStati.put(ChunkStatus.LIGHT, Concurrency.FULL);                  // radius 1, but no writes to other chunks, only current chunk
+            chunkStati.put(ChunkStatus.SPAWN, Concurrency.FULL);                  // radius 0
+            chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);             // radius 0
+            
             try {
                 serverWorldsField = CraftServer.class.getDeclaredField("worlds");
                 serverWorldsField.setAccessible(true);
@@ -641,9 +642,9 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
                 //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
                 //generate chunk coords lists with a certain radius
-                Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap();
+                Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
                 time(() -> {
-                    chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                    chunkStati.keySet().stream().map(ChunkStatus::f).distinct().forEach(radius -> {
                         if (radius == -1) //ignore ChunkStatus.EMPTY
                             return;
                         int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
@@ -664,16 +665,16 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 }, "ctor");
 
                 //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
-                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap();
+                Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
                 time(() -> {
-                    chunkStati.stream().map(ChunkStatus::f).distinct().forEach(radius -> {
+                    chunkStati.keySet().stream().map(ChunkStatus::f).distinct().forEach(radius -> {
                         if (radius == -1) //ignore ChunkStatus.EMPTY
                             return;
-                        Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap();
+                        Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
                         for (Long xz : chunkCoordsForRadius.get(radius)) {
                             int x = MathMan.unpairIntX(xz);
                             int z = MathMan.unpairIntY(xz);
-                            List<IChunkAccess> l = new ArrayList((radius + 1 + radius) * (radius + 1 + radius));
+                            List<IChunkAccess> l = new ArrayList<>((radius + 1 + radius) * (radius + 1 + radius));
                             for (int zz = z - radius; zz <= z + radius; zz++) { //order is important, first z then x
                                 for (int xx = x - radius; xx <= x + radius; xx++) {
                                     l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
@@ -686,57 +687,61 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 }, "precomputing RegionLimitedWorldAccess chunks lists");
 
                 //run generation tasks exluding FULL chunk status
-                for (ChunkStatus chunkstatus : chunkStati) {
+                for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
                     time(() -> {
+                        ChunkStatus chunkstatus = entry.getKey();
                         int radius = Math.max(0, chunkstatus.f()); //f() = required border chunks, EMPTY.f() == -1
 
                         List<Long> coords = chunkCoordsForRadius.get(radius);
-                        SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, chunkstatus.f());
-                        for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
-                            List scheduled = new ArrayList(tasks.size());
-                            for (SequentialTasks<Long> row : para) {
-                                scheduled.add((Callable) () -> {
-                                    for (Long xz : row) {
-                                        try {
-                                            chunkstatus.a(freshNMSWorld,
-                                                          generator,
-                                                          structureManager,
-                                                          lightEngine,
-                                                          c -> CompletableFuture.completedFuture(Either.left(c)),
-                                                          worldlimits.get(radius).get(xz));
-                                        } catch (Exception e) {
-                                            System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
-                                            e.printStackTrace();
+                        if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
+                            SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, chunkstatus.f());
+                            for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
+                                List scheduled = new ArrayList<>(tasks.size());
+                                for (SequentialTasks<Long> row : para) {
+                                    scheduled.add((Callable) () -> {
+                                        for (Long xz : row) {
+                                            processChunk(chunkstatus, xz, worldlimits.get(radius).get(xz));
                                         }
-                                    }
-                                    return null;
-                                });
-                            }
-                            
-                            if (generateConcurrent) {
+                                        return null;
+                                    });
+                                }
                                 try {
                                     List<Future> futures = executor.invokeAll(scheduled);
-                                    for (Future f : futures) {
-                                        f.get();
+                                    for (Future future : futures) {
+                                        future.get();
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                            } else {
-                                for (Callable c : (List<Callable>) scheduled) {
-                                    try {
-                                        c.call();
-                                    } catch (Exception e) { //should not occur
-                                        e.printStackTrace();
-                                    }
+                            }
+                        } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
+                            // every chunk can be processed individually
+                            List scheduled = new ArrayList(coords.size());
+                            for (long xz : coords) {
+                                scheduled.add((Callable) () -> {
+                                    processChunk(chunkstatus, xz, worldlimits.get(radius).get(xz));
+                                    return null;
+                                });
+                            }
+                            try {
+                                List<Future> futures = executor.invokeAll(scheduled);
+                                for (Future future : futures) {
+                                    future.get();
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else { // Concurrency.NONE or generateConcurrent == false
+                            // run sequential
+                            for (long xz : coords) {
+                                processChunk(chunkstatus, xz, worldlimits.get(radius).get(xz));
                             }
                         }
-                    }, chunkstatus.d());
+                    }, entry.getKey().d());
                 }
 
                 //convert to proper chunks
-                Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap();
+                Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
                 time(() -> {
                     for (Long xz : chunkCoordsForRadius.get(0)) {
                         ProtoChunk chunk = protoChunks.get(xz);
@@ -787,6 +792,20 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 throw new RuntimeException(e);
             }
             return true;
+        }
+
+        private void processChunk(ChunkStatus chunkstatus, long xz, List<IChunkAccess> accessableChunks) {
+            try {
+                chunkstatus.a(freshNMSWorld,
+                              generator,
+                              structureManager,
+                              lightEngine,
+                              c -> CompletableFuture.completedFuture(Either.left(c)),
+                              accessableChunks);
+            } catch (Exception e) {
+                System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
+                e.printStackTrace();
+            }
         }
 
         private void time(Runnable r, String text) {

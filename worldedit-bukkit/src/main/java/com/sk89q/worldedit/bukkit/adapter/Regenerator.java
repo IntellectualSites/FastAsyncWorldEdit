@@ -203,6 +203,12 @@ public abstract class Regenerator {
         return random;
     }
 
+    public enum Concurrency {
+        FULL,
+        RADIUS,
+        NONE
+    }
+
     public static class SequentialTasks<T> extends Tasks<T> {
 
         public SequentialTasks(int expectedsize) {
