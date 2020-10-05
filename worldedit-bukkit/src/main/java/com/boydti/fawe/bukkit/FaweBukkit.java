@@ -9,7 +9,7 @@ import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
-import com.boydti.fawe.bukkit.listener.ChunkListener_9;
+import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
@@ -95,7 +95,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
-            new ChunkListener_9();
+            new ChunkListener9();
         });
     }
 
@@ -142,7 +142,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.imageListener = new BukkitImageListener(plugin);
             }
             return viewer;
-        } catch (Throwable ignore) {
+        } catch (Throwable ignored) {
         }
         return null;
     }
@@ -252,7 +252,8 @@ public class FaweBukkit implements IFawe, Listener {
 
     private volatile boolean keepUnloaded;
 
-    @EventHandler(priority = EventPriority.MONITOR) public void onWorldLoad(WorldLoadEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent event) {
         if (keepUnloaded) {
             org.bukkit.World world = event.getWorld();
             world.setKeepSpawnInMemory(false);

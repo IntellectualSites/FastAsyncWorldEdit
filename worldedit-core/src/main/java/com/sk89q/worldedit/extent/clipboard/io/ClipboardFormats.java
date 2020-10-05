@@ -126,7 +126,7 @@ public class ClipboardFormats {
     }
 
     /**
-     * Detect the format using the given extension
+     * Detect the format using the given extension.
      *
      * @param extension the extension
      * @return the format, otherwise null if one cannot be detected
@@ -195,8 +195,8 @@ public class ClipboardFormats {
             return null;
         }
         File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ?
-            new File(working, player.getUniqueId().toString()) : working;
+        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+            ? new File(working, player.getUniqueId().toString()) : working;
         File f;
         if (input.startsWith("#")) {
             String[] extensions;

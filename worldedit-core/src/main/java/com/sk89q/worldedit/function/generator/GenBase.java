@@ -10,7 +10,8 @@ public abstract class GenBase {
 
     private final int checkAreaSize;
     private final long seed;
-    private final long worldSeed1, worldSeed2;
+    private final long worldSeed1;
+    private final long worldSeed2;
 
     public GenBase(int area) {
         this.checkAreaSize = area;

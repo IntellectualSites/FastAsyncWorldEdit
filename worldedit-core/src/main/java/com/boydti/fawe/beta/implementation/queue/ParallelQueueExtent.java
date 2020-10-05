@@ -106,7 +106,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
                         while (true) {
                             // Get the next chunk posWeakChunk
-                            final int chunkX, chunkZ;
+                            final int chunkX;
+                            final int chunkZ;
                             synchronized (chunksIter) {
                                 if (!chunksIter.hasNext()) {
                                     break;

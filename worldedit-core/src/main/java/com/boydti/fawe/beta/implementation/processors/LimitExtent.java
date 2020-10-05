@@ -573,7 +573,9 @@ public class LimitExtent extends AbstractDelegateExtent {
     @Deprecated
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
+        if (block.hasNbtData()) {
+            limit.MAX_BLOCKSTATES();
+        }
         try {
             return super.setBlock(position, block);
         } catch (FaweException e) {
@@ -587,7 +589,9 @@ public class LimitExtent extends AbstractDelegateExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) limit.MAX_BLOCKSTATES();
+        if (block.hasNbtData()) {
+            limit.MAX_BLOCKSTATES();
+        }
         try {
             return super.setBlock(x, y, z, block);
         } catch (FaweException e) {

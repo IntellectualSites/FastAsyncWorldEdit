@@ -44,14 +44,18 @@ public class AsyncNotifyQueue implements Closeable {
                             return task.call();
                         } catch (Throwable e) {
                             handler.uncaughtException(Thread.currentThread(), e);
-                            if (self[0] != null) self[0].cancel(true);
+                            if (self[0] != null) {
+                                self[0].cancel(true);
+                            }
                         }
                     }
                 } finally {
                     lock.unlock();
                 }
             }
-            if (self[0] != null) self[0].cancel(true);
+            if (self[0] != null) {
+                self[0].cancel(true);
+            }
             return null;
         };
         self[0] = Fawe.get().getQueueHandler().async(wrapped);

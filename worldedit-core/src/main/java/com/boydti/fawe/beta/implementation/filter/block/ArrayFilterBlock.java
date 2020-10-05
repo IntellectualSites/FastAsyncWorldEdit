@@ -16,8 +16,11 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     private final char[] blocks;
     private final byte[] heights;
     private final int yOffset;
-    private final int width, length;
-    private int x, z, index;
+    private final int width;
+    private final int length;
+    private int x;
+    private int z;
+    private int index;
 
     public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length,
         int yOffset) {
@@ -49,11 +52,6 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     @Override
     public BlockState getBlock() {
         return BlockTypesCache.states[getOrdinal()];
-    }
-
-    @Override
-    public void setBlock(BlockState state) {
-        blocks[index] = state.getOrdinalChar();
     }
 
     @Override
@@ -91,13 +89,18 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     }
 
     @Override
+    public void setBlock(BlockState state) {
+        blocks[index] = state.getOrdinalChar();
+    }
+
+    @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
-        return getExtent().setBlock(x,y, z, block);
+        return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(x,y, z,biome);
+        return getExtent().setBiome(x, y, z, biome);
     }
 }

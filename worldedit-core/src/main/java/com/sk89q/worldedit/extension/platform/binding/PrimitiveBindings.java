@@ -103,7 +103,9 @@ public class PrimitiveBindings extends Bindings {
     @Binding
     public Vector3 getVector3(String argument) {
         String[] radii = argument.split(",");
-        final double radiusX, radiusY, radiusZ;
+        final double radiusX;
+        final double radiusY;
+        final double radiusZ;
         switch (radii.length) {
             case 1:
                 radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
@@ -133,7 +135,8 @@ public class PrimitiveBindings extends Bindings {
     public Vector2 getVector2(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
-        final double radiusX, radiusZ;
+        final double radiusX;
+        final double radiusZ;
         switch (radii.length) {
             case 1:
                 radiusX = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
@@ -161,7 +164,9 @@ public class PrimitiveBindings extends Bindings {
     public BlockVector3 getBlockVector3(String argument) {
         String radiusString = argument;
         String[] radii = radiusString.split(",");
-        final double radiusX, radiusY, radiusZ;
+        final double radiusX;
+        final double radiusY;
+        final double radiusZ;
         switch (radii.length) {
             case 1:
                 radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
@@ -190,7 +195,8 @@ public class PrimitiveBindings extends Bindings {
     @Binding
     public BlockVector2 getBlockVector2(String argument) {
         String[] radii = argument.split(",");
-        final double radiusX, radiusZ;
+        final double radiusX;
+        final double radiusZ;
         switch (radii.length) {
             case 1:
                 radiusX = radiusZ = parseNumericInput(radii[0]);
@@ -214,7 +220,8 @@ public class PrimitiveBindings extends Bindings {
      * @return a number
      * @throws InputParseException thrown on parse error
      */
-    public static @Nullable Double parseNumericInput(@Nullable String input) {
+    @Nullable
+    public static Double parseNumericInput(@Nullable String input) {
         if (input == null) {
             return null;
         }

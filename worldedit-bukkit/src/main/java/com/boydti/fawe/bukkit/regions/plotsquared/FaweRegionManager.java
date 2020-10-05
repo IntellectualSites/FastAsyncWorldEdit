@@ -136,8 +136,8 @@ public class FaweRegionManager extends RegionManager {
                     clipboard.setBlocks(fillingRegion, filling);
                     clipboard.setBlocks(floorRegion, plotfloor);
                     clipboard.setBlocks(airRegion, air);
-                    for (int x = pos1.getX(); x <= pos2.getX(); x ++) {
-                        for (int z = pos1.getZ(); z <= pos2.getZ(); z ++) {
+                    for (int x = pos1.getX(); x <= pos2.getX(); x++) {
+                        for (int z = pos1.getZ(); z <= pos2.getZ(); z++) {
                             clipboard.setBiome(BlockVector2.at(x, z), biome);
                         }
                     }
@@ -178,7 +178,7 @@ public class FaweRegionManager extends RegionManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(pos1World,-1);
+                WorldEdit.getInstance().getEditSessionFactory().getEditSession(pos1World, -1);
                 EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));

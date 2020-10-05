@@ -13,7 +13,9 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
     private BlockData[][] blockDataCache;
 
     private boolean init() {
-        if (blockDataCache != null) return false;
+        if (blockDataCache != null) {
+            return false;
+        }
         this.blockDataCache = new BlockData[BlockTypes.size()][];
         blockDataCache[0] = new BlockData[] {Material.AIR.createBlockData()};
         return true;
@@ -42,7 +44,9 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
             }
             return blockData;
         } catch (NullPointerException e) {
-            if (init()) return adapt(block);
+            if (init()) {
+                return adapt(block);
+            }
             throw e;
         }
     }

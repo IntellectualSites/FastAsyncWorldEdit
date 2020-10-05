@@ -26,12 +26,13 @@ import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R2.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class FAWEWorldNativeAccess_1_16 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
-    private static final int UPDATE = 1, NOTIFY = 2;
+    private static final int UPDATE = 1;
+    private static final int NOTIFY = 2;
 
     private final FAWE_Spigot_v1_16_R2 adapter;
     private final WeakReference<World> world;

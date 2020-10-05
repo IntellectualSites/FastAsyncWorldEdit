@@ -333,7 +333,8 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(252, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),};
+        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)
+    };
     private BlockType[] layerBuffer = new BlockType[2];
 
     public TextureUtil() throws FileNotFoundException {
@@ -458,10 +459,7 @@ public class TextureUtil implements TextureHolder {
     }
 
     /**
-     * Returns the block combined ids as an array
-     *
-     * @param color
-     * @return
+     * Returns the block combined ids as an array.
      */
     public BlockType[] getNearestLayer(int color) {
         int[] closest = null;

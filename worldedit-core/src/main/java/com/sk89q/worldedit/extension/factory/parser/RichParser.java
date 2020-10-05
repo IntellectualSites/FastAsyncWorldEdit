@@ -55,8 +55,12 @@ public abstract class RichParser<E> extends InputParser<E> {
 
     @Override
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
-        if (!input.startsWith(this.prefix)) return null;
-        if (input.length() < this.prefix.length()) return null;
+        if (!input.startsWith(this.prefix)) {
+            return null;
+        }
+        if (input.length() < this.prefix.length()) {
+            return null;
+        }
         String[] arguments = extractArguments(input.substring(prefix.length()), true);
         return parseFromInput(arguments, context);
     }

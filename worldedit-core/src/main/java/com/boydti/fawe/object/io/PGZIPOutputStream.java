@@ -35,7 +35,7 @@ public class PGZIPOutputStream extends FilterOutputStream {
 
 
     // private static final Logger LOG = LoggerFactory.getLogger(PGZIPOutputStream.class);
-    private final static int GZIP_MAGIC = 0x8b1f;
+    private static final int GZIP_MAGIC = 0x8b1f;
 
     // todo: remove after block guessing is implemented
     // array list that contains the block sizes
@@ -175,10 +175,12 @@ public class PGZIPOutputStream extends FilterOutputStream {
         for (; ; ) {
             Future<byte[]> future = emitQueue.peek();
             // LOG.info("Peeked future " + future);
-            if (future == null)
+            if (future == null) {
                 return;
-            if (!future.isDone())
+            }
+            if (!future.isDone()) {
                 return;
+            }
             // It's an ordered queue. This MUST be the same element as above.
             emitQueue.remove();
             byte[] toWrite = future.get();
@@ -215,8 +217,9 @@ public class PGZIPOutputStream extends FilterOutputStream {
     @Override
     public void flush() throws IOException {
         // LOG.info("Flush: " + block);
-        if (block.in_length > 0)
+        if (block.in_length > 0) {
             submit();
+        }
         emitUntil(0);
         super.flush();
     }

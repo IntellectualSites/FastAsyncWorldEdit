@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * A chunk based search algorithm
  */
 public class ScanChunk {
-    private static final int MAX_QUEUE = 34816;
     public static final BlockVector3[] DEFAULT_DIRECTIONS = new BlockVector3[6];
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
+    private static final int MAX_QUEUE = 34816;
 
     static {
         DEFAULT_DIRECTIONS[0] = BlockVector3.at(0, -1, 0);
@@ -45,6 +45,7 @@ public class ScanChunk {
     private final BlockVector3[] directions;
     private final Long2ObjectOpenHashMap<long[][]> visits;
     private final Long2ObjectOpenHashMap<char[][]> queues;
+    private ConcurrentLinkedQueue<char[]> queuePool = new ConcurrentLinkedQueue<>();
 
     public ScanChunk(RegionFunction function) {
         this.function = function;
@@ -63,10 +64,14 @@ public class ScanChunk {
         int Z = z >> 4;
         long pair = pairInt(X, Z);
         long[][] chunk = visits.get(pair);
-        if (chunk == null) return false;
+        if (chunk == null) {
+            return false;
+        }
         int layer = y >> 4;
         long[] section = chunk[layer];
-        if (section == null) return false;
+        if (section == null) {
+            return false;
+        }
         return get(section, getLocalIndex(x & 15, y & 15, z & 15));
     }
 
@@ -134,23 +139,22 @@ public class ScanChunk {
 
     public void process() {
         LongArraySet set = new LongArraySet();
+        /*
         while (!queues.isEmpty()) {
-//            ObjectIterator<Long2ObjectMap.Entry<char[][]>> iter = queues.long2ObjectEntrySet().fastIterator();
-//            Long2ObjectMap.Entry<char[][]> entry = iter.next();
-//            long index = entry.getLongKey();
-//            int X = MathMan.unpairIntX(index);
-//            int Z = MathMan.unpairIntY(index);
-//            // check that adjacent chunks aren;t being processed
-//
-//            char[] queue = entry.getValue();
-//            long[][] visit = visits.get(index);
-//            if (visit == null) {
-//                visits.put(index, visit = new long[16][]);
-//            }
-        }
-    }
+            ObjectIterator<Long2ObjectMap.Entry<char[][]>> iter = queues.long2ObjectEntrySet().fastIterator();
+            Long2ObjectMap.Entry<char[][]> entry = iter.next();
+            long index = entry.getLongKey();
+            int X = MathMan.unpairIntX(index);
+            int Z = MathMan.unpairIntY(index);
+            // check that adjacent chunks aren;t being processed
 
-    private ConcurrentLinkedQueue<char[]> queuePool = new ConcurrentLinkedQueue<>();
+            char[] queue = entry.getValue();
+            long[][] visit = visits.get(index);
+            if (visit == null) {
+                visits.put(index, visit = new long[16][]);
+            }
+        */
+    }
 
     private char[] newQueue() {
         char[] arr = queuePool.poll();
@@ -178,7 +182,7 @@ public class ScanChunk {
 
             apply(xx + x, yy + y, zz + z);
 
-            int x1 = x, x2 = x;
+            int x1 = x;
 
             // find start of scan-line
             int i1 = index;
@@ -187,7 +191,9 @@ public class ScanChunk {
                     // queue in west chunk
                     break;
                 }
-                if (get(visit, i1)) break;
+                if (get(visit, i1)) {
+                    break;
+                }
                 // visit
                 set(visit, i1);
 
@@ -199,12 +205,15 @@ public class ScanChunk {
 
             // find end of scan-line
             int i2 = index;
+            int x2 = x;
             while (true) {
                 if (x2 > 15) {
                     // queue in east chunk
                     break;
                 }
-                if (get(visit, i2)) break;
+                if (get(visit, i2)) {
+                    break;
+                }
                 set(visit, i2);
                 i2++;
                 x2++;
@@ -220,9 +229,9 @@ public class ScanChunk {
 
     }
 
-    public void process4(int X, int Z, char[][] queues, long[][] visit) {
-        int xx = X << 4;
-        int zz = Z << 4;
+    public void process4(int chunkX, int chunkZ, char[][] queues, long[][] visit) {
+        int xx = chunkX << 4;
+        int zz = chunkZ << 4;
 
         // TODO fetch instead of create
         final BlockVector3[] dirs = directions;
@@ -231,7 +240,9 @@ public class ScanChunk {
             boolean empty = true;
             for (int layer = 0; layer < 16; layer++) {
                 char[] queue = queues[layer];
-                if (queue == null) continue;
+                if (queue == null) {
+                    continue;
+                }
                 char index;
                 while ((index = queue[0]) != queue[1]) {
                     queue[0]++;
@@ -246,73 +257,75 @@ public class ScanChunk {
                 continue;
             }
 
-            if (empty) break;
+            if (empty) {
+                break;
+            }
         }
         // empty queues
 
-//        while (indexStart != indexEnd) {
-//            char index = queue[indexStart++];
-//            byte dirs = 0xF;
-//            int x = index & 15;
-//            int z = (index >> 4) & 15;
-//            int y = index >> 8;
-//
-//            int layer = y >> 4;
-//            long[] visitBits = visit[layer];
-//
-//            int x1 = x;
-//            int x2 = x;
-//
-//            // find start of scan-line
-//            int i1 = index;
-//            while (true) {
-//                if (x1 < 0) {
-//                    // queue in adjacent chunk
-//                    break;
-//                }
-//                if (get(visitBits, i1--)) break;
-//                x1--;
-//            }
-//            i1++;
-//            x1++;
-//
-//            // find end of scan-line
-//            int i2 = index;
-//            while (true) {
-//                if (x2 > 15) {
-//                    // queue in adjacent chunk
-//                    break;
-//                }
-//                if (get(visitBits, i2++)) break;
-//                x2++;
-//            }
-//            i2--;
-//            x2--;
-//
-//            boolean scanUp = false;
-//            boolean scanDown = false;
-//            boolean scanLeft = false;
-//            boolean scanRight = false;
-//
-//            for (int i = i1; i <= i2; i++) {
-//                if (!scanDown && y > 0 && )
-//            }
-//
-//            for (int i=x1; i<=x2; i++) { // find scan-lines above this one
-//                if (!inScanLine && y>0 && ip.getPixel(i,y-1)==color)
-//                {push(i, y-1); inScanLine = true;}
-//                else if (inScanLine && y>0 && ip.getPixel(i,y-1)!=color)
-//                    inScanLine = false;
-//            }
-//
-//            inScanLine = false;
-//            for (int i=x1; i<=x2; i++) { // find scan-lines below this one
-//                if (!inScanLine && y<height-1 && ip.getPixel(i,y+1)==color)
-//                {push(i, y+1); inScanLine = true;}
-//                else if (inScanLine && y<height-1 && ip.getPixel(i,y+1)!=color)
-//                    inScanLine = false;
-//            }
-//        }
+        /*        while (indexStart != indexEnd) {
+            char index = queue[indexStart++];
+            byte dirs = 0xF;
+            int x = index & 15;
+            int z = (index >> 4) & 15;
+            int y = index >> 8;
+
+            int layer = y >> 4;
+            long[] visitBits = visit[layer];
+
+            int x1 = x;
+            int x2 = x;
+
+            // find start of scan-line
+            int i1 = index;
+            while (true) {
+                if (x1 < 0) {
+                    // queue in adjacent chunk
+                    break;
+                }
+                if (get(visitBits, i1--)) break;
+                x1--;
+            }
+            i1++;
+            x1++;
+
+            // find end of scan-line
+            int i2 = index;
+            while (true) {
+                if (x2 > 15) {
+                    // queue in adjacent chunk
+                    break;
+                }
+                if (get(visitBits, i2++)) break;
+                x2++;
+            }
+            i2--;
+            x2--;
+
+            boolean scanUp = false;
+            boolean scanDown = false;
+            boolean scanLeft = false;
+            boolean scanRight = false;
+
+            for (int i = i1; i <= i2; i++) {
+                if (!scanDown && y > 0 && )
+            }
+
+            for (int i=x1; i<=x2; i++) { // find scan-lines above this one
+                if (!inScanLine && y>0 && ip.getPixel(i,y-1)==color)
+                {push(i, y-1); inScanLine = true;}
+                else if (inScanLine && y>0 && ip.getPixel(i,y-1)!=color)
+                    inScanLine = false;
+            }
+
+            inScanLine = false;
+            for (int i=x1; i<=x2; i++) { // find scan-lines below this one
+                if (!inScanLine && y<height-1 && ip.getPixel(i,y+1)==color)
+                {push(i, y+1); inScanLine = true;}
+                else if (inScanLine && y<height-1 && ip.getPixel(i,y+1)!=color)
+                    inScanLine = false;
+            }
+        }*/
     }
 
     public void set(long[] bits, int i) {

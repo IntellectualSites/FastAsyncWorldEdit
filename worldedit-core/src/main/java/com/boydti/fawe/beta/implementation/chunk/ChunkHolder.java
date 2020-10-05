@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 /**
- * An abstract {@link IChunk} class that implements basic get/set blocks
+ * An abstract {@link IChunk} class that implements basic get/set blocks.
  */
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
@@ -189,7 +189,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.chunkSet.setFullBright(layer);
         }
 
@@ -317,7 +317,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             chunk.setFullBright(layer);
@@ -425,7 +425,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.chunkSet.setFullBright(layer);
         }
 
@@ -603,7 +603,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             chunk.setFullBright(layer);
@@ -812,7 +812,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     /**
-     * Get the extent this chunk is in
+     * Get the extent this chunk is in.
      */
     public IQueueExtent<? extends IChunk> getExtent() {
         return extent;
@@ -911,6 +911,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     public interface IBlockDelegate {
         <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
+
         IChunkSet set(ChunkHolder chunk);
 
         boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome);

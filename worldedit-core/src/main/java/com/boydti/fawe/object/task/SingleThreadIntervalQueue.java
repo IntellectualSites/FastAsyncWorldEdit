@@ -30,8 +30,11 @@ public abstract class SingleThreadIntervalQueue<T> {
                     }
                 }
                 synchronized (objMap) {
-                    if (!objMap.isEmpty()) TaskManager.IMP.laterAsync(this, interval);
-                    else queued.set(false);
+                    if (!objMap.isEmpty()) {
+                        TaskManager.IMP.laterAsync(this, interval);
+                    } else {
+                        queued.set(false);
+                    }
                 }
             }
         };

@@ -6,10 +6,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 /**
- * Efficient blur / average color over an image
+ * Efficient blur / average color over an image.
  */
 public class SummedColorTable {
-    private final long[] reds, greens, blues, alpha;
+    private final long[] reds;
+    private final long[] greens;
+    private final long[] blues;
+    private final long[] alpha;
     private final int[] hasAlpha;
     private final int length;
     private final int width;
@@ -38,7 +41,9 @@ public class SummedColorTable {
                 for (int j = 0; j < width; j++, index++) {
                     int color = raw[index];
                     int alpha = (color >> 24) & 0xFF;
-                    int red, green, blue;
+                    int red;
+                    int green;
+                    int blue;
                     switch (alpha) {
                         case 0:
                             red = green = blue = 0;
@@ -68,7 +73,10 @@ public class SummedColorTable {
             for (int i = 0; i < length; i++) {
                 for (int j = 0; j < width; j++, index++) {
                     int color = raw[index];
-                    int red, green, blue, alpha;
+                    int red;
+                    int green;
+                    int blue;
+                    int alpha;
                     if (((color >> 24) != 0)) {
                         alpha = 1;
                         red = (color >> 16) & 0xFF;
@@ -122,7 +130,9 @@ public class SummedColorTable {
             area += hasAlpha[pos];
         }
 
-        if (area == 0) return 0;
+        if (area == 0) {
+            return 0;
+        }
         float factor = this.areaInverses[area - 1];
         return (255 << 24) + (((int) (totRed * factor)) << 16) + (((int) (totGreen * factor)) << 8) + (((int) (totBlue * factor)) << 0);
     }
@@ -166,7 +176,9 @@ public class SummedColorTable {
             area += hasAlpha[pos];
         }
 
-        if (totAlpha == 0) return 0;
+        if (totAlpha == 0) {
+            return 0;
+        }
 
         float factor = this.areaInverses[area - 1];
         float alpha = (totAlpha * factor);

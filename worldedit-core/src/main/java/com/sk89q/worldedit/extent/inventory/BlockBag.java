@@ -35,8 +35,12 @@ public abstract class BlockBag {
      */
     public void storeDroppedBlock(BlockState blockState) throws BlockBagException {
         BlockState dropped = blockState; // TODO BlockType.getBlockBagItem(id, data);
-        if (dropped == null) return;
-        if (dropped.getBlockType().getMaterial().isAir()) return;
+        if (dropped == null) {
+            return;
+        }
+        if (dropped.getBlockType().getMaterial().isAir()) {
+            return;
+        }
 
         storeBlock(dropped);
     }
@@ -55,8 +59,10 @@ public abstract class BlockBag {
             }
             fetchBlock(blockState);
         } catch (OutOfBlocksException e) {
-            BlockState placed = blockState;// TODO BlockType.getBlockBagItem(id, data);
-            if (placed == null || placed.getBlockType().getMaterial().isAir()) throw e; // TODO: check
+            BlockState placed = blockState; // TODO BlockType.getBlockBagItem(id, data);
+            if (placed == null || placed.getBlockType().getMaterial().isAir()) {
+                throw e; // TODO: check
+            }
 
             fetchBlock(placed);
         }

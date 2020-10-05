@@ -30,21 +30,6 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        BaseBlock block = extent.getFullBlock(position);
-        int slope = getSlope(block, position, extent);
-        if (slope == -1) {
-            return block;
-        }
-        int color = holder.getTextureUtil().getColor(block.getBlockType());
-        if (color == 0) {
-            return block;
-        }
-        int newColor = getColor(color, slope);
-        return holder.getTextureUtil().getNearestBlock(newColor).getDefaultState().toBaseBlock();
-    }
-
-    @Override
     public <T extends BlockStateHolder<T>> int getSlope(T block, BlockVector3 vector, Extent extent) {
         int slope = super.getSlope(block, vector, extent);
         if (slope != -1) {
@@ -60,6 +45,21 @@ public class AngleColorPattern extends DataAnglePattern {
             }
         }
         return slope;
+    }
+
+    @Override
+    public BaseBlock apply(BlockVector3 position) {
+        BaseBlock block = extent.getFullBlock(position);
+        int slope = getSlope(block, position, extent);
+        if (slope == -1) {
+            return block;
+        }
+        int color = holder.getTextureUtil().getColor(block.getBlockType());
+        if (color == 0) {
+            return block;
+        }
+        int newColor = getColor(color, slope);
+        return holder.getTextureUtil().getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
 
     @Override

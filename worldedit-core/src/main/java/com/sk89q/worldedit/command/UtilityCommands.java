@@ -101,7 +101,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -111,8 +111,8 @@ public class UtilityCommands {
     }
 
     @Command(
-            name = "/macro",
-            desc = "Generate or run a macro"
+        name = "/macro",
+        desc = "Generate or run a macro"
     )
     @CommandPermissions("worldedit.macro")
     public void macro(Player player, LocalSession session, String name, String argument) throws IOException {
@@ -120,9 +120,9 @@ public class UtilityCommands {
     }
 
     @Command(
-            name = "/heightmapinterface",
+        name = "/heightmapinterface",
             aliases = { "/hmi", "hmi" },
-            desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
+        desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     @CommandPermissions("fawe.admin")
     public void heightmapInterface(Player player, @Arg(name = "min", desc = "int", def = "100") int min, @Arg(name = "max", desc = "int", def = "200") int max) throws IOException {
@@ -135,7 +135,7 @@ public class UtilityCommands {
         final int sub = srcFolder.getAbsolutePath().length();
         List<String> images = new ArrayList<>();
         MainUtil.iterateFiles(srcFolder, file -> {
-            switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase()) {
+            switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase(Locale.ROOT)) {
                 case ".png":
                 case ".jpeg":
                     break;
@@ -144,7 +144,9 @@ public class UtilityCommands {
             }
             try {
                 String name = file.getAbsolutePath().substring(sub);
-                if (name.startsWith(File.separator)) name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
+                if (name.startsWith(File.separator)) {
+                    name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
+                }
                 BufferedImage img = MainUtil.readImage(file);
                 BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
@@ -173,20 +175,20 @@ public class UtilityCommands {
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
         File configFile = new File(webSrc, "config.js");
-        player.print(TextComponent.of(String.format("Writing %s",configFile)));
+        player.print(TextComponent.of(String.format("Writing %s", configFile)));
         Files.write(configFile.toPath(), config.toString().getBytes());
         player.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
     }
 
     @Command(
-            name = "/cancel",
-            aliases= {"fcancel"},
-            desc = "Cancel your current command"
+        name = "/cancel",
+        aliases = {"fcancel"},
+        desc = "Cancel your current command"
     )
     @CommandPermissions(value = "fawe.cancel", queued = false)
     public void cancel(Player player) {
         int cancelled = player.cancel(false);
-        player.print(Caption.of("fawe.cancel.worldedit.cancel.count" , cancelled));
+        player.print(Caption.of("fawe.cancel.worldedit.cancel.count", cancelled));
     }
 
     @Command(
@@ -702,8 +704,8 @@ public class UtilityCommands {
 
 
     @Command(
-            name = "/confirm",
-            desc = "Confirm a command"
+        name = "/confirm",
+        desc = "Confirm a command"
     )
     @CommandPermissions(value = "fawe.confirm", queued = false)
     public void confirm(Player player) throws WorldEditException {
@@ -746,15 +748,16 @@ public class UtilityCommands {
                 if (file.isDirectory()) {
                     type = URIType.DIRECTORY;
                 } else {
-                    if (name.indexOf('.') != -1)
+                    if (name.indexOf('.') != -1) {
                         name = name.substring(0, name.lastIndexOf('.'));
+                    }
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
                         throw new RuntimeException(
                             new StopExecutionException(TextComponent.of("Invalid path")));
                     }
-                } catch (IOException ignore) {
+                } catch (IOException ignored) {
                 }
             } else if (uriStr.startsWith("http://") || uriStr.startsWith("https://")) {
                 type = URIType.URL;
@@ -780,8 +783,9 @@ public class UtilityCommands {
         fileList.sort((f1, f2) -> {
             boolean dir1 = f1.isDirectory();
             boolean dir2 = f2.isDirectory();
-            if (dir1 != dir2)
+            if (dir1 != dir2) {
                 return dir1 ? -1 : 1;
+            }
             int res;
             if (sortType == 0) { // use name by default
                 int p = f1.getParent().compareTo(f2.getParent());
@@ -792,8 +796,9 @@ public class UtilityCommands {
                 }
             } else {
                 res = Long.compare(f1.lastModified(), f2.lastModified()); // use date if there is a flag
-                if (sortType == 1)
+                if (sortType == 1) {
                     res = -res; // flip date for newest first instead of oldest first
+                }
             }
             return res;
         });
@@ -814,7 +819,7 @@ public class UtilityCommands {
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
             for (String arg : args) {
-                switch (arg.toLowerCase()) {
+                switch (arg.toLowerCase(Locale.ROOT)) {
                     case "me":
                     case "mine":
                     case "local":
@@ -874,21 +879,27 @@ public class UtilityCommands {
             forEachFile = new DelegateConsumer<File>(forEachFile) {
                 @Override
                 public void accept(File file) {
-                    if (cf.isFormat(file)) super.accept(file);
+                    if (cf.isFormat(file)) {
+                        super.accept(file);
+                    }
                 }
             };
         } else {
             forEachFile = new DelegateConsumer<File>(forEachFile) {
                 @Override
                 public void accept(File file) {
-                    if (!file.toString().endsWith(".cached")) super.accept(file);
+                    if (!file.toString().endsWith(".cached")) {
+                        super.accept(file);
+                    }
                 }
             };
         }
         if (playerFolder) {
             if (listMine) {
                 File playerDir = MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + dirFilter));
-                if (playerDir.exists()) allFiles(playerDir.listFiles(), false, forEachFile);
+                if (playerDir.exists()) {
+                    allFiles(playerDir.listFiles(), false, forEachFile);
+                }
             }
             if (listGlobal) {
                 File rel = MainUtil.resolveRelative(new File(dir, dirFilter));
@@ -905,37 +916,51 @@ public class UtilityCommands {
                         super.accept(f);
                     }
                 };
-                if (rel.exists()) allFiles(rel.listFiles(), false, forEachFile);
+                if (rel.exists()) {
+                    allFiles(rel.listFiles(), false, forEachFile);
+                }
             }
         } else {
             File rel = MainUtil.resolveRelative(new File(dir, dirFilter));
-            if (rel.exists()) allFiles(rel.listFiles(), false, forEachFile);
+            if (rel.exists()) {
+                allFiles(rel.listFiles(), false, forEachFile);
+            }
         }
         if (!filters.isEmpty() && !toFilter.isEmpty()) {
             List<File> result = filter(toFilter, filters);
-            for (File file : result) rootFunction.accept(file);
+            for (File file : result) {
+                rootFunction.accept(file);
+            }
         }
     }
 
     private static List<File> filter(List<File> fileList, List<String> filters) {
         String[] normalizedNames = new String[fileList.size()];
         for (int i = 0; i < fileList.size(); i++) {
-            String normalized = fileList.get(i).getName().toLowerCase();
-            if (normalized.startsWith("../")) normalized = normalized.substring(3);
+            String normalized = fileList.get(i).getName().toLowerCase(Locale.ROOT);
+            if (normalized.startsWith("../")) {
+                normalized = normalized.substring(3);
+            }
             normalizedNames[i] = normalized.replace("/", File.separator);
         }
 
         for (String filter : filters) {
-            if (fileList.isEmpty()) return fileList;
-            String lowerFilter = filter.toLowerCase().replace("/", File.separator);
+            if (fileList.isEmpty()) {
+                return fileList;
+            }
+            String lowerFilter = filter.toLowerCase(Locale.ROOT).replace("/", File.separator);
             List<File> newList = new ArrayList<>();
 
             for (int i = 0; i < normalizedNames.length; i++) {
-                if (normalizedNames[i].startsWith(lowerFilter)) newList.add(fileList.get(i));
+                if (normalizedNames[i].startsWith(lowerFilter)) {
+                    newList.add(fileList.get(i));
+                }
             }
             if (newList.isEmpty()) {
                 for (int i = 0; i < normalizedNames.length; i++) {
-                    if (normalizedNames[i].contains(lowerFilter)) newList.add(fileList.get(i));
+                    if (normalizedNames[i].contains(lowerFilter)) {
+                        newList.add(fileList.get(i));
+                    }
                 }
 
                 if (newList.isEmpty()) {
@@ -943,9 +968,11 @@ public class UtilityCommands {
                     if (checkName.length() > 3 && checkName.length() <= 16) {
                         UUID fromName = Fawe.imp().getUUID(checkName);
                         if (fromName != null) {
-                            lowerFilter = filter.replaceFirst(checkName, fromName.toString()).toLowerCase();
+                            lowerFilter = filter.replaceFirst(checkName, fromName.toString()).toLowerCase(Locale.ROOT);
                             for (int i = 0; i < normalizedNames.length; i++) {
-                                if (normalizedNames[i].startsWith(lowerFilter)) newList.add(fileList.get(i));
+                                if (normalizedNames[i].startsWith(lowerFilter)) {
+                                    newList.add(fileList.get(i));
+                                }
                             }
                         }
                     }
@@ -957,7 +984,9 @@ public class UtilityCommands {
     }
 
     public static void allFiles(File[] files, boolean recursive, Consumer<File> task) {
-        if (files == null || files.length == 0) return;
+        if (files == null || files.length == 0) {
+            return;
+        }
         for (File f : files) {
             if (f.isDirectory()) {
                 if (recursive) {

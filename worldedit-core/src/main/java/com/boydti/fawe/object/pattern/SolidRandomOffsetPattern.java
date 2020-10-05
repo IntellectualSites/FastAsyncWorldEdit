@@ -14,10 +14,14 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.util.SplittableRandom;
 
 public class SolidRandomOffsetPattern extends AbstractPattern {
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private final Pattern pattern;
 
-    private final int dx2, dy2, dz2;
+    private final int dx2;
+    private final int dy2;
+    private final int dz2;
     private final MutableBlockVector3 mutable;
     private SplittableRandom r;
 

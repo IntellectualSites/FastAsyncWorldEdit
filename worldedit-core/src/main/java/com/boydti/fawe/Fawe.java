@@ -79,70 +79,57 @@ public class Fawe {
 
     private static final Logger log = LoggerFactory.getLogger(Fawe.class);
 
-    /**
-     * The FAWE instance;
-     */
-    private static Fawe INSTANCE;
+    private static Fawe instance;
 
     /**
-     * TPS timer
+     * The ticks-per-second timer.
      */
     private final FaweTimer timer;
     private FaweVersion version;
     private VisualQueue visualQueue;
     private TextureUtil textures;
-    // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    private DefaultTransformParser transformParser;
+
 
     private QueueHandler queueHandler;
 
     /**
-     * Get the implementation specific class
-     *
-     * @return
+     * Get the implementation specific class.
      */
     @SuppressWarnings("unchecked")
     public static <T extends IFawe> T imp() {
-        return INSTANCE != null ? (T) INSTANCE.IMP : null;
+        return instance != null ? (T) instance.implementation : null;
     }
 
     /**
-     * Get the implementation independent class
-     *
-     * @return
+     * Get the implementation independent class.
      */
     public static Fawe get() {
-        return INSTANCE;
+        return instance;
     }
 
     /**
-     * Setup Fawe
-     *
-     * @param implementation
-     * @throws InstanceAlreadyExistsException
+     * This method is not for public use. If you have to ask what it does then you shouldn't be using it.
      */
     public static void set(final IFawe implementation) throws InstanceAlreadyExistsException, IllegalArgumentException {
-        if (INSTANCE != null) {
-            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + INSTANCE.IMP);
+        if (instance != null) {
+            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + instance.implementation);
         }
         if (implementation == null) {
             throw new IllegalArgumentException("Implementation may not be null.");
         }
-        INSTANCE = new Fawe(implementation);
+        instance = new Fawe(implementation);
     }
 
     public static void debugPlain(String s) {
-        if (INSTANCE != null) {
-            INSTANCE.IMP.debug(s);
+        if (instance != null) {
+            instance.implementation.debug(s);
         } else {
-            System.out.println(s);
+            log.debug(s);
         }
     }
 
     /**
-     * Write something to the console
-     *
-     * @param s
+     * Write something to the console.
      */
     public static void debug(String s) {
         Actor actor = Request.request().getActor();
@@ -152,9 +139,9 @@ public class Fawe {
         }
         debugPlain(s);
     }
-    
+
     /**
-     * Write something to the console
+     * Write something to the console.
      *
      * @param c The Component to be printed
      */
@@ -168,24 +155,26 @@ public class Fawe {
     }
 
     /**
-     * The platform specific implementation
+     * The platform specific implementation.
      */
-    private final IFawe IMP;
+    private final IFawe implementation;
     private Thread thread;
 
     private Fawe(final IFawe implementation) {
-        INSTANCE = this;
-        this.IMP = implementation;
+        instance = this;
+        this.implementation = implementation;
         this.thread = Thread.currentThread();
         /*
          * Implementation dependent stuff
          */
         this.setupConfigs();
-        TaskManager.IMP = this.IMP.getTaskManager();
+        TaskManager.IMP = this.implementation.getTaskManager();
 
         TaskManager.IMP.async(() -> {
-            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
-            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(MainUtil.getFile(this.implementation
+                                                      .getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(MainUtil.getFile(this.implementation
+                                                      .getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
         });
 
         /*
@@ -197,11 +186,10 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                // TODO: Ping @MattBDev to reimplement 2020-02-04
-//                transformParser = new DefaultTransformParser(getWorldEdit());
                 visualQueue = new VisualQueue(3);
-                WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
-            } catch (Throwable ignored) {}
+                WEManager.IMP.managers.addAll(Fawe.this.implementation.getMaskManagers());
+            } catch (Throwable ignored) {
+            }
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
@@ -214,17 +202,12 @@ public class Fawe {
         if (queueHandler == null) {
             synchronized (this) {
                 if (queueHandler == null) {
-                    queueHandler = IMP.getQueueHandler();
+                    queueHandler = implementation.getQueueHandler();
                 }
             }
         }
         return queueHandler;
     }
-    
-    // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    public DefaultTransformParser getTransformParser() {
-//        return transformParser;
-//    }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
         // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util
@@ -257,32 +240,27 @@ public class Fawe {
     }
 
     /**
-     * The FaweTimer is a useful class for monitoring TPS
-     *
-     * @return FaweTimer
+     * Gets the TPS monitor.
      */
     public FaweTimer getTimer() {
         return timer;
     }
 
     /**
-     * The visual queue is used to queue visualizations
-     *
-     * @return
+     * Get the visual queue.
      */
     public VisualQueue getVisualQueue() {
         return visualQueue;
     }
 
     /**
-     * The FAWE version
-     * - Unofficial jars may be lacking version information
+     * The FAWE version.
      *
+     * @apiNote Unofficial jars may be lacking version information
      * @return FaweVersion
      */
-    public
     @Nullable
-    FaweVersion getVersion() {
+    public FaweVersion getVersion() {
         return version;
     }
 
@@ -293,8 +271,8 @@ public class Fawe {
     public void setupConfigs() {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
-        File file = new File(this.IMP.getDirectory(), "config.yml");
-        Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
+        File file = new File(this.implementation.getDirectory(), "config.yml");
+        Settings.IMP.PLATFORM = implementation.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -305,14 +283,12 @@ public class Fawe {
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.16/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignored) {
+        }
         try {
             Settings.IMP.reload(file);
         } catch (Throwable e) {
-            debug("====== Failed to load config ======");
-            debug("Please validate your yaml files:");
-            e.printStackTrace();
-            debug("====================================");
+            log.error("Failed to load config.", e);
         }
     }
 
@@ -334,22 +310,15 @@ public class Fawe {
                 if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
-                    debug("====== ZSTD COMPRESSION BINDING NOT FOUND ======");
-                    debug(e.getMessage());
-                    debug("FAWE will work but won't compress data as much");
-                    debug("===============================================");
+                    log.error("ZSTD Compression Binding Not Found.\n"
+                            + "FAWE will still work but compression won't work as well.\n", e);
                 }
             }
             try {
                 net.jpountz.util.Native.load();
             } catch (Throwable e) {
-                e.printStackTrace();
-                debug("====== LZ4 COMPRESSION BINDING NOT FOUND ======");
-                debug(e.getMessage());
-                debug("FAWE will work but compression will be slower");
-                debug(" - Try updating your JVM / OS");
-                debug(" - Report this issue if you cannot resolve it");
-                debug("===============================================");
+                log.error("LZ4 Compression Binding Not Found.\n"
+                              + "FAWE will still work but compression will be slower.\n", e);
             }
         }
 
@@ -402,22 +371,18 @@ public class Fawe {
     }
 
     /**
-     * Get the main thread
-     *
-     * @return
+     * Get the main thread.
      */
     public Thread getMainThread() {
         return this.thread;
     }
 
     public static boolean isMainThread() {
-        return INSTANCE == null || INSTANCE.thread == Thread.currentThread();
+        return instance == null || instance.thread == Thread.currentThread();
     }
 
     /**
-     * Sets the main thread to the current thread
-     *
-     * @return
+     * Sets the main thread to the current thread.
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();

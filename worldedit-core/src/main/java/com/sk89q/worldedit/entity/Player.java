@@ -55,7 +55,7 @@ import java.io.File;
 import javax.annotation.Nullable;
 
 /**
- * Represents a player
+ * Represents a player.
  */
 public interface Player extends Entity, Actor {
 
@@ -356,30 +356,29 @@ public interface Player extends Entity, Actor {
     void setSelection(Region region);
 
     /**
-     * Get the player's current selection (or null)
+     * Get the player's selection region. If the selection is defined in
+     * a different world, the {@code IncompleteRegionException}
+     * exception will be thrown.
      *
-     * @return
+     * @return a region
+     * @throws IncompleteRegionException if no region is selected
      */
-    default Region getSelection() {
-        try {
-            return getSession().getSelection(getWorld());
-        } catch (IncompleteRegionException e) {
-            return null;
-        }
+    default Region getSelection() throws IncompleteRegionException {
+        return getSession().getSelection(getWorld());
     }
 
     /**
-     * Set the player's WorldEdit selection
+     * Set the player's WorldEdit selection.
      *
-     * @param selector
+     * @param selector the selector
      */
     default void setSelection(RegionSelector selector) {
         getSession().setRegionSelector(getWorld(), selector);
     }
 
     /**
-     * Get the World the player is editing in (may not match the world they are in)<br/> - e.g., If
-     * they are editing a CFI world.<br/>
+     * Get the world the player is editing in. The world may or may not match the world they are in.
+     * For example, if they are editing a CFI world.
      *
      * @return Editing world
      */
@@ -396,7 +395,7 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Unregister this player (deletes all metadata etc) - Usually called on logout
+     * Unregister this player, deleting all data stored during the logon session.
      */
     default void unregister() {
         cancel(true);
@@ -410,7 +409,7 @@ public interface Player extends Entity, Actor {
     void sendTitle(Component title, Component sub);
 
     /**
-     * Loads any history items from disk: - Should already be called if history on disk is enabled
+     * Loads any history items from disk: - Should already be called if history on disk is enabled.
      */
     default void loadClipboardFromDisk() {
         File file = MainUtil.getFile(Fawe.imp().getDirectory(),

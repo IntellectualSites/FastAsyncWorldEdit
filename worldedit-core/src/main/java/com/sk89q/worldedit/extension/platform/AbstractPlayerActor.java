@@ -76,21 +76,7 @@ import javax.annotation.Nullable;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
-
     private final Map<String, Object> meta;
-
-    public AbstractPlayerActor(Map<String, Object> meta) {
-        this.meta = meta;
-    }
-
-    public AbstractPlayerActor() {
-        this(new ConcurrentHashMap<>());
-    }
-
-    @Override
-    public Map<String, Object> getRawMeta() {
-        return meta;
-    }
 
     // Queue for async tasks
     private AtomicInteger runningCount = new AtomicInteger();
@@ -110,6 +96,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 }
             }
         });
+
+    public AbstractPlayerActor(Map<String, Object> meta) {
+        this.meta = meta;
+    }
+
+    public AbstractPlayerActor() {
+        this(new ConcurrentHashMap<>());
+    }
 
     @Override
     public final Extent getExtent() {
@@ -144,6 +138,11 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Map<String, Object> getRawMeta() {
+        return meta;
     }
 
     @Override
@@ -250,7 +249,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             return false;
         }
         return getWorld().getBlock(location.add(0, -1, 0)).getBlockType().getMaterial()
-            .isMovementBlocker();
+                         .isMovementBlocker();
     }
 
     @Override
@@ -522,6 +521,52 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return getCardinalDirection(0);
     }
 
+    /**
+     * Get the player's current allowed WorldEdit regions.
+     *
+     * @return an array of allowed regions
+     */
+    public Region[] getCurrentRegions() {
+        return getCurrentRegions(FaweMaskManager.MaskType.MEMBER);
+    }
+
+    public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type);
+    }
+
+    /**
+     * Get the largest region in the player's allowed WorldEdit region.
+     */
+    public Region getLargestRegion() {
+        long area = 0;
+        Region max = null;
+        for (Region region : this.getCurrentRegions()) {
+            final long tmp = region.getVolume();
+            if (tmp > area) {
+                area = tmp;
+                max = region;
+            }
+        }
+        return max;
+    }
+
+    public void setSelection(Region region) {
+        RegionSelector selector;
+        if (region instanceof ConvexPolyhedralRegion) {
+            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
+        } else if (region instanceof CylinderRegion) {
+            selector = new CylinderRegionSelector((CylinderRegion) region);
+        } else if (region instanceof Polygonal2DRegion) {
+            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
+        } else {
+            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
+                region.getMaximumPoint());
+        }
+        selector.setWorld(region.getWorld());
+
+        getSession().setRegionSelector(getWorld(), selector);
+    }
+
     @Override
     public Direction getCardinalDirection(int yawOffset) {
         final Location location = getLocation();
@@ -631,6 +676,36 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return null;
     }
 
+    /**
+     * Run a task either async, or on the current thread.
+     *
+     * @param ifFree the task to run if free
+     * @param checkFree Whether to first check if a task is running
+     * @param async TODO description
+     * @return false if the task was ran or queued
+     */
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
+        if (checkFree) {
+            if (runningCount.get() != 0) {
+                return false;
+            }
+        }
+        Runnable wrapped = () -> {
+            try {
+                runningCount.addAndGet(1);
+                ifFree.run();
+            } finally {
+                runningCount.decrementAndGet();
+            }
+        };
+        if (async) {
+            asyncNotifyQueue.run(wrapped);
+        } else {
+            TaskManager.IMP.taskNow(wrapped, false);
+        }
+        return true;
+    }
+
     @Override
     public boolean canDestroyBedrock() {
         return hasPermission("worldedit.override.bedrock");
@@ -690,84 +765,4 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
     }
-
-    /**
-     * Run a task either async, or on the current thread.
-     *
-     * @param ifFree the task to run if free
-     * @param checkFree Whether to first check if a task is running
-     * @param async TODO description
-     * @return false if the task was ran or queued
-     */
-    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
-        if (checkFree) {
-            if (runningCount.get() != 0) {
-                return false;
-            }
-        }
-        Runnable wrapped = () -> {
-            try {
-                runningCount.addAndGet(1);
-                ifFree.run();
-            } finally {
-                runningCount.decrementAndGet();
-            }
-        };
-        if (async) {
-            asyncNotifyQueue.run(wrapped);
-        } else {
-            TaskManager.IMP.taskNow(wrapped, false);
-        }
-        return true;
-    }
-
-
-    /**
-     * Get the player's current allowed WorldEdit regions.
-     *
-     * @return an array of allowed regions
-     */
-    public Region[] getCurrentRegions() {
-        return getCurrentRegions(FaweMaskManager.MaskType.MEMBER);
-    }
-
-    public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
-        return WEManager.IMP.getMask(this, type);
-    }
-
-    /**
-     * Get the largest region in the player's allowed WorldEdit region.
-     *
-     * @return
-     */
-    public Region getLargestRegion() {
-        long area = 0;
-        Region max = null;
-        for (Region region : this.getCurrentRegions()) {
-            final long tmp = region.getVolume();
-            if (tmp > area) {
-                area = tmp;
-                max = region;
-            }
-        }
-        return max;
-    }
-
-    public void setSelection(Region region) {
-        RegionSelector selector;
-        if (region instanceof ConvexPolyhedralRegion) {
-            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
-        } else if (region instanceof CylinderRegion) {
-            selector = new CylinderRegionSelector((CylinderRegion) region);
-        } else if (region instanceof Polygonal2DRegion) {
-            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
-        } else {
-            selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
-                region.getMaximumPoint());
-        }
-        selector.setWorld(region.getWorld());
-
-        getSession().setRegionSelector(getWorld(), selector);
-    }
-
 }

@@ -79,7 +79,7 @@ public class BlockVector2 {
     protected int x;
     protected int z;
 
-    protected BlockVector2(){
+    protected BlockVector2() {
     }
 
     /**

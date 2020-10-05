@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -276,7 +277,7 @@ public class MCAChunk implements IChunk {
                         int ordinal = blocks[i];
                         int palette = blockToPalette[ordinal];
                         if (palette == Integer.MAX_VALUE) {
-//                            BlockState state = BlockTypesCache.states[ordinal];
+                            //BlockState state = BlockTypesCache.states[ordinal];
                             blockToPalette[ordinal] = palette = num_palette;
                             paletteToBlock[num_palette] = ordinal;
                             num_palette++;
@@ -308,7 +309,7 @@ public class MCAChunk implements IChunk {
                                 String valueStr = value.toString();
                                 if (Character.isUpperCase(valueStr.charAt(0))) {
                                     System.out.println("Invalid uppercase value " + value);
-                                    valueStr = valueStr.toLowerCase();
+                                    valueStr = valueStr.toLowerCase(Locale.ROOT);
                                 }
                                 out.writeNamedTag(key, valueStr);
                             }
@@ -337,13 +338,13 @@ public class MCAChunk implements IChunk {
                     }
 
 
-//                    out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
-//                    out.writeInt(2048);
-//                    out.write(blockLight, layer << 11, 1 << 11);
-//
-//                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
-//                    out.writeInt(2048);
-//                    out.write(skyLight, layer << 11, 1 << 11);
+                    /* out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
+                    out.writeInt(2048);
+                    out.write(blockLight, layer << 11, 1 << 11);
+
+                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
+                    out.writeInt(2048);
+                    out.write(skyLight, layer << 11, 1 << 11); */
 
 
                     out.writeEndTag();
@@ -397,9 +398,13 @@ public class MCAChunk implements IChunk {
 
     @Override
     public boolean isEmpty() {
-        if (deleted) return true;
+        if (deleted) {
+            return true;
+        }
         for (boolean hasSection : hasSections) {
-            if (hasSection) return false;
+            if (hasSection) {
+                return false;
+            }
         }
         return true;
     }
@@ -450,15 +455,19 @@ public class MCAChunk implements IChunk {
 
     }
 
-    @Override public void removeSectionLighting(int layer, boolean sky) {}
+    @Override public void removeSectionLighting(int layer, boolean sky) {
+    }
 
-    @Override public void setFullBright(int layer) {}
+    @Override public void setFullBright(int layer) {
+    }
 
     @Override
-    public void setLightLayer(int layer, char[] toSet) {}
+    public void setLightLayer(int layer, char[] toSet) {
+    }
 
     @Override
-    public void setSkyLightLayer(int layer, char[] toSet) {}
+    public void setSkyLightLayer(int layer, char[] toSet) {
+    }
 
     @Override
     public void setEntity(CompoundTag entityTag) {

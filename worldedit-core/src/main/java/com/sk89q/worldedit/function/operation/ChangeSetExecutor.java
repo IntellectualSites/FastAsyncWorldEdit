@@ -47,10 +47,10 @@ public class ChangeSetExecutor implements Operation {
             public void perform(Change change, UndoContext context) {
                 change.redo(context);
             }
-        }
-        ;
+        };
 
-        public void perform(Change change, UndoContext context) {}
+        public void perform(Change change, UndoContext context) {
+        }
     }
 
     private final Iterator<Change> iterator;

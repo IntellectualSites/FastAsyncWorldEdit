@@ -12,7 +12,7 @@ public class DBHandler {
 
     private final Logger log = LoggerFactory.getLogger(Config.class);
 
-    public final static DBHandler IMP = new DBHandler();
+    public static final DBHandler IMP = new DBHandler();
 
     private Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
 

@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
- * A shared interface for IGetBlocks and ISetBlocks
+ * A shared interface for IGetBlocks and ISetBlocks.
  */
 public interface IBlocks extends Trimable {
 

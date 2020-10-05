@@ -45,7 +45,9 @@ public class ItemUtil {
     public Object getNMSItem(ItemStack item) {
         try {
             Object nmsItem = fieldHandle.get(item);
-            if (nmsItem == null) nmsItem = methodAsNMSCopy.invoke(null, item);
+            if (nmsItem == null) {
+                nmsItem = methodAsNMSCopy.invoke(null, item);
+            }
             return nmsItem;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -57,12 +59,18 @@ public class ItemUtil {
 
     public CompoundTag getNBT(ItemStack item) {
         try {
-            if (!item.hasItemMeta()) return null;
+            if (!item.hasItemMeta()) {
+                return null;
+            }
             Object nmsItem = fieldHandle.get(item);
-            if (nmsItem == null) nmsItem = methodAsNMSCopy.invoke(null, item);
+            if (nmsItem == null) {
+                nmsItem = methodAsNMSCopy.invoke(null, item);
+            }
             if (methodHasTag.invoke(nmsItem).equals(true)) {
                 Object nmsTag = methodGetTag.invoke(nmsItem);
-                if (nmsTag == null) return null;
+                if (nmsTag == null) {
+                    return null;
+                }
 
                 Int2ObjectOpenHashMap<WeakReference<Tag>> map = hashToNMSTag.get();
                 if (map == null) {
@@ -72,7 +80,9 @@ public class ItemUtil {
                 WeakReference<Tag> nativeTagRef = map.get(nmsTag.hashCode());
                 if (nativeTagRef != null) {
                     Tag nativeTag = nativeTagRef.get();
-                    if (nativeTag != null) return (CompoundTag) nativeTag;
+                    if (nativeTag != null) {
+                        return (CompoundTag) nativeTag;
+                    }
                 }
                 Tag nativeTag = adapter.toNative(nmsTag);
                 map.put(nmsTag.hashCode(), new WeakReference<>(nativeTag));
@@ -94,7 +104,9 @@ public class ItemUtil {
             }
             Object nmsTag = adapter.fromNative(tag);
             methodSetTag.invoke(nmsItem, nmsTag);
-            if (copy) return (ItemStack) methodAsBukkitCopy.invoke(null, nmsItem);
+            if (copy) {
+                return (ItemStack) methodAsBukkitCopy.invoke(null, nmsItem);
+            }
             return item;
         } catch (Throwable e) {
             e.printStackTrace();

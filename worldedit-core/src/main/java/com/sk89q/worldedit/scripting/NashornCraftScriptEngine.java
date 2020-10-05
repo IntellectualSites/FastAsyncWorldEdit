@@ -47,7 +47,9 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         ClassLoader cl = Fawe.get().getClass().getClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         synchronized (NashornCraftScriptEngine.class) {
-            if (FACTORY == null) FACTORY = new NashornScriptEngineFactory();
+            if (FACTORY == null) {
+                FACTORY = new NashornScriptEngineFactory();
+            }
         }
         ScriptEngine engine = FACTORY.getScriptEngine("--language=es6");
         SimpleBindings bindings = new SimpleBindings();

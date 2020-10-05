@@ -32,7 +32,9 @@ public class BlockTypeSwitchBuilder<T> {
 
     public BlockTypeSwitch<T> build() {
         for (int i = 0; i < runnables.length; i++) {
-            if (runnables[i] == null) runnables[i] = defaultTask;
+            if (runnables[i] == null) {
+                runnables[i] = defaultTask;
+            }
         }
         return new BlockTypeSwitch(runnables);
     }

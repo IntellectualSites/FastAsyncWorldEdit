@@ -95,7 +95,7 @@ public class SchematicReader implements ClipboardReader {
     private NBTInputStream inputStream;
     private InputStream rootStream;
 
-//    private final DataFixer fixer; TODO
+    //    private final DataFixer fixer; TODO
 
     private FastByteArrayOutputStream idOut = new FastByteArrayOutputStream();
     private FastByteArrayOutputStream dataOut = new FastByteArrayOutputStream();
@@ -110,9 +110,15 @@ public class SchematicReader implements ClipboardReader {
     private List<Map<String, Object>> tiles;
     private List<Map<String, Object>> entities;
 
-    private int width, height, length;
-    private int offsetX, offsetY, offsetZ;
-    private int originX, originY, originZ;
+    private int width;
+    private int height;
+    private int length;
+    private int offsetX;
+    private int offsetY;
+    private int offsetZ;
+    private int originX;
+    private int originY;
+    private int originZ;
 
     /**
      * Create a new instance.
@@ -249,10 +255,18 @@ public class SchematicReader implements ClipboardReader {
         StreamDelegate root = createDelegate();
         inputStream.readNamedTagLazy(root);
 
-        if (ids != null) ids.close();
-        if (datas != null) datas.close();
-        if (adds != null) adds.close();
-        if (biomes != null) biomes.close();
+        if (ids != null) {
+            ids.close();
+        }
+        if (datas != null) {
+            datas.close();
+        }
+        if (adds != null) {
+            adds.close();
+        }
+        if (biomes != null) {
+            biomes.close();
+        }
         ids = null;
         datas = null;
         adds = null;
@@ -265,7 +279,7 @@ public class SchematicReader implements ClipboardReader {
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
-        try (InputStream dataIn = new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays()));InputStream idIn = new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays()))) {
+        try (InputStream dataIn = new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())); InputStream idIn = new LZ4BlockInputStream(new FastByteArraysInputStream(idOut.toByteArrays()))) {
             if (addOut != null) {
                 try (FaweInputStream addIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(addOut.toByteArrays())))) {
                     if (clipboard instanceof LinearClipboard) {
@@ -368,7 +382,9 @@ public class SchematicReader implements ClipboardReader {
     private void fixStates(Clipboard fc) {
         for (BlockVector3 pos : fc) {
             BlockState block = pos.getBlock(fc);
-            if (block.getMaterial().isAir()) continue;
+            if (block.getMaterial().isAir()) {
+                continue;
+            }
 
             int x = pos.getX();
             int y = pos.getY();
@@ -425,13 +441,23 @@ public class SchematicReader implements ClipboardReader {
                 }
             } else {
                 int group = group(type);
-                if (group == -1) return;
+                if (group == -1) {
+                    return;
+                }
                 BlockState set = block;
 
-                if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(fc, group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
-                if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(fc, group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
-                if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(fc, group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
-                if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(fc, group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
+                if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(fc, group, x, y, z - 1)) {
+                    set = set.with(PropertyKey.NORTH, true);
+                }
+                if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(fc, group, x + 1, y, z)) {
+                    set = set.with(PropertyKey.EAST, true);
+                }
+                if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(fc, group, x, y, z + 1)) {
+                    set = set.with(PropertyKey.SOUTH, true);
+                }
+                if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(fc, group, x - 1, y, z)) {
+                    set = set.with(PropertyKey.WEST, true);
+                }
 
                 if (group == 2) {
                     int ns = (set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
@@ -441,7 +467,9 @@ public class SchematicReader implements ClipboardReader {
                     }
                 }
 
-                if (set != block) pos.setBlock(fc, set);
+                if (set != block) {
+                    pos.setBlock(fc, set);
+                }
             }
         }
     }

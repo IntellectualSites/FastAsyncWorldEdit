@@ -280,7 +280,7 @@ public class BrushTool
     /**
      * Set the brush.
      *
-     * @param brush      tbe brush
+     * @param brush the brush
      * @param permission the permission
      */
     public void setBrush(Brush brush, String permission) {

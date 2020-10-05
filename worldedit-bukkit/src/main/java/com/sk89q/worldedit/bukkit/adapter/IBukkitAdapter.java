@@ -93,7 +93,7 @@ public interface IBukkitAdapter {
                 position.getX(), position.getY(), position.getZ());
     }
 
-    default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position){
+    default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
         return adapt(world, position.toVector3());
     }
 
@@ -254,7 +254,9 @@ public interface IBukkitAdapter {
      */
     default ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
-        if (item instanceof BukkitItemStack) return ((BukkitItemStack) item).getBukkitItemStack();
+        if (item instanceof BukkitItemStack) {
+            return ((BukkitItemStack) item).getBukkitItemStack();
+        }
         return new ItemStack(adapt(item.getType()), item.getAmount());
     }
 

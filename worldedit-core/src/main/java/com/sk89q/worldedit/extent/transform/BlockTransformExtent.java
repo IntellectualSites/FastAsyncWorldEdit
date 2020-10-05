@@ -291,7 +291,9 @@ public class BlockTransformExtent extends ResettableExtent {
                     }
                 }
             }
-            if (newIndex != null) return newIndex;
+            if (newIndex != null) {
+                return newIndex;
+            }
         }
         return newIndex;
     }

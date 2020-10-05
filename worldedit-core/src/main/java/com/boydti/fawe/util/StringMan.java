@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,8 +21,9 @@ public class StringMan {
 
     public static boolean containsIgnoreCase(String haystack, String needle) {
         final int length = needle.length();
-        if (length == 0)
+        if (length == 0) {
             return true; // Empty string is contained
+        }
 
         final char firstLo = Character.toLowerCase(needle.charAt(0));
         final char firstUp = Character.toUpperCase(needle.charAt(0));
@@ -29,11 +31,13 @@ public class StringMan {
         for (int i = haystack.length() - length; i >= 0; i--) {
             // Quick check before calling the more expensive regionMatches() method:
             final char ch = haystack.charAt(i);
-            if (ch != firstLo && ch != firstUp)
+            if (ch != firstLo && ch != firstUp) {
                 continue;
+            }
 
-            if (haystack.regionMatches(true, i, needle, 0, length))
+            if (haystack.regionMatches(true, i, needle, 0, length)) {
                 return true;
+            }
         }
 
         return false;
@@ -42,7 +46,9 @@ public class StringMan {
     public static int findMatchingBracket(CharSequence sequence, int index) {
         char startC = sequence.charAt(index);
         char lookC = getMatchingBracket(startC);
-        if (lookC == startC) return -1;
+        if (lookC == startC) {
+            return -1;
+        }
         boolean forward = isBracketForwards(startC);
         int increment = forward ? 1 : -1;
         int end = forward ? sequence.length() : -1;
@@ -70,10 +76,17 @@ public class StringMan {
     }
 
     public static String prettyFormat(double d) {
-        if (d == Double.MIN_VALUE || d == Double.NEGATIVE_INFINITY) return "-∞";
-        if (d == Double.MAX_VALUE || d == Double.POSITIVE_INFINITY) return "∞";
-        if(d == (long) d) return String.format("%d",(long)d);
-        else return String.format("%s",d);
+        if (d == Double.MIN_VALUE || d == Double.NEGATIVE_INFINITY) {
+            return "-∞";
+        }
+        if (d == Double.MAX_VALUE || d == Double.POSITIVE_INFINITY) {
+            return "∞";
+        }
+        if (d == (long) d) {
+            return String.format("%d", (long) d);
+        } else {
+            return String.format("%s", d);
+        }
     }
 
     public static boolean isBracketForwards(char c) {
@@ -140,15 +153,16 @@ public class StringMan {
     public static int indexOf(String input, int start, char... values) {
         for (int i = start; i < input.length(); i++) {
             for (char c : values) {
-                if (c == input.charAt(i)) return i;
+                if (c == input.charAt(i)) {
+                    return i;
+                }
             }
         }
         return -1;
     }
 
     public static String toProperCase(String s) {
-        return s.substring(0, 1).toUpperCase() +
-                s.substring(1);
+        return s.substring(0, 1).toUpperCase(Locale.ROOT) + s.substring(1);
     }
 
     public static List<String> split(String input, char delim) {
@@ -160,11 +174,15 @@ public class StringMan {
             char currentChar = input.charAt(current);
             boolean atLastChar = current == input.length() - 1;
             if (!atLastChar && (bracket > 0 || currentChar == '{' && ++bracket > 0
-                || current == '}' && --bracket <= 0))
+                || current == '}' && --bracket <= 0)) {
                 continue;
-            if (currentChar == '\"') inQuotes = !inQuotes; // toggle state
-            if (atLastChar) result.add(input.substring(start));
-            else if (currentChar == delim && !inQuotes) {
+            }
+            if (currentChar == '\"') {
+                inQuotes = !inQuotes; // toggle state
+            }
+            if (atLastChar) {
+                result.add(input.substring(start));
+            } else if (currentChar == delim && !inQuotes) {
                 String toAdd = input.substring(start, current);
                 if (toAdd.startsWith("\"")) {
                     toAdd = toAdd.substring(1, toAdd.length() - 1);
@@ -339,7 +357,9 @@ public class StringMan {
             char ai = input.charAt(i);
             outer:
             while (true) {
-                if (j >= item.length()) return Integer.MAX_VALUE;
+                if (j >= item.length()) {
+                    return Integer.MAX_VALUE;
+                }
 
                 char bj = item.charAt(j++);
                 if (sequentail) {
@@ -347,7 +367,9 @@ public class StringMan {
                         case ':':
                         case '_':
                             sequentail = false;
-                            if (bj == ai) break outer;
+                            if (bj == ai) {
+                                break outer;
+                            }
                             continue;
                     }
                     continue;
@@ -447,8 +469,9 @@ public class StringMan {
         if (char0 == '-') {
             negative = true;
             start++;
+        } else {
+            negative = false;
         }
-        else negative = false;
         for (int i = start; i < end; i++) {
             char c = string.charAt(i);
             switch (c) {

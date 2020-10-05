@@ -55,11 +55,6 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void setBlock(BlockState state) {
-        setFullBlock(state.toBaseBlock(getBlock().getNbtData()));
-    }
-
-    @Override
     public CompoundTag getNbtData() {
         return getFullBlock().getNbtData();
     }
@@ -77,6 +72,11 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     @Override
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.at(getX(), getY(), getZ());
+    }
+
+    @Override
+    public void setBlock(BlockState state) {
+        setFullBlock(state.toBaseBlock(getBlock().getNbtData()));
     }
 
     @Override

@@ -29,21 +29,6 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
         this.waitingAsync = parent.waitingAsync;
     }
 
-    @Override
-    public void closeAsync() {
-        parent.closeAsync();
-    }
-
-    @Override
-    public void flush() {
-        parent.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        parent.close();
-    }
-
     public final AbstractChangeSet getParent() {
         return parent;
     }
@@ -54,28 +39,13 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void add(int x, int y, int z, int combinedFrom, int combinedTo) {
-        parent.add(x, y, z, combinedFrom, combinedTo);
+    public void closeAsync() {
+        parent.closeAsync();
     }
 
     @Override
-    public Iterator<Change> backwardIterator() {
-        return parent.backwardIterator();
-    }
-
-    @Override
-    public Iterator<Change> forwardIterator() {
-        return parent.forwardIterator();
-    }
-
-    @Override
-    public int size() {
-        return parent.size();
-    }
-
-    @Override
-    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
-        parent.addBiomeChange(x, z, from, to);
+    public void flush() {
+        parent.flush();
     }
 
     @Override
@@ -99,6 +69,11 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
+    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
+        parent.addBiomeChange(x, z, from, to);
+    }
+
+    @Override
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return parent.getIterator(blockBag, mode, redo);
     }
@@ -109,16 +84,6 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void delete() {
-        parent.delete();
-    }
-
-    @Override
-    public ChangeSetSummary summarize(Region region, boolean shallow) {
-        return parent.summarize(region, shallow);
-    }
-
-    @Override
     public EditSession toEditSession(Player player) {
         return parent.toEditSession(player);
     }
@@ -126,6 +91,11 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     @Override
     public EditSession toEditSession(Player player, Region[] regions) {
         return parent.toEditSession(player, regions);
+    }
+
+    @Override
+    public void add(int x, int y, int z, int combinedFrom, int combinedTo) {
+        parent.add(x, y, z, combinedFrom, combinedTo);
     }
 
     @Override
@@ -159,13 +129,28 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public boolean isEmpty() {
-        return parent.isEmpty();
+    public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {
+        parent.add(x, y, z, combinedFrom, to);
     }
 
     @Override
-    public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {
-        parent.add(x, y, z, combinedFrom, to);
+    public Iterator<Change> backwardIterator() {
+        return parent.backwardIterator();
+    }
+
+    @Override
+    public Iterator<Change> forwardIterator() {
+        return parent.forwardIterator();
+    }
+
+    @Override
+    public void close() throws IOException {
+        parent.close();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return parent.isEmpty();
     }
 
     @Override
@@ -186,5 +171,20 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     @Override
     public void setRecordChanges(boolean recordChanges) {
         parent.setRecordChanges(recordChanges);
+    }
+
+    @Override
+    public int size() {
+        return parent.size();
+    }
+
+    @Override
+    public void delete() {
+        parent.delete();
+    }
+
+    @Override
+    public ChangeSetSummary summarize(Region region, boolean shallow) {
+        return parent.summarize(region, shallow);
     }
 }

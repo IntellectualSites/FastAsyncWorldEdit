@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
@@ -149,7 +150,9 @@ public class MainUtil {
     }
 
     public static File resolveRelative(File file) {
-        if (!file.exists()) return new File(relativize(file.getPath()));
+        if (!file.exists()) {
+            return new File(relativize(file.getPath()));
+        }
         return file;
     }
 
@@ -159,11 +162,15 @@ public class MainUtil {
         int skip = 0;
         int len = split.length - 1;
         for (int i = len; i >= 0; i--) {
-            if (skip > 0) skip--;
-            else {
+            if (skip > 0) {
+                skip--;
+            } else {
                 String arg = split[i];
-                if (arg.equals("..")) skip++;
-                else out.insert(0, arg + (i == len ? "" : File.separator));
+                if (arg.equals("..")) {
+                    skip++;
+                } else {
+                    out.insert(0, arg + (i == len ? "" : File.separator));
+                }
             }
         }
         return out.toString();
@@ -171,9 +178,13 @@ public class MainUtil {
 
     public static void forEachFile(Path path, final RunnableVal2<Path, BasicFileAttributes> onEach, Comparator<File> comparator) {
         File dir = path.toFile();
-        if (!dir.exists()) return;
+        if (!dir.exists()) {
+            return;
+        }
         File[] files = path.toFile().listFiles();
-        if (comparator != null) Arrays.sort(files, comparator);
+        if (comparator != null) {
+            Arrays.sort(files, comparator);
+        }
         for (File file : files) {
             Path filePath = file.toPath();
             try {
@@ -194,9 +205,13 @@ public class MainUtil {
                 val = StringMan.toInteger(name, 0, name.length());
             } else {
                 int i = name.lastIndexOf('.');
-                if (i != -1) val = StringMan.toInteger(name, 0, i);
+                if (i != -1) {
+                    val = StringMan.toInteger(name, 0, i);
+                }
             }
-            if (val != null && val > max[0]) max[0] = val;
+            if (val != null && val > max[0]) {
+                max[0] = val;
+            }
             return false;
         });
         return max[0] + 1;
@@ -273,7 +288,9 @@ public class MainUtil {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (!inflater.finished()) {
             int n = inflater.inflate(buffer);
-            if (n != 0) baos.write(buffer, 0, n);
+            if (n != 0) {
+                baos.write(buffer, 0, n);
+            }
         }
         return baos.toByteArray();
     }
@@ -536,7 +553,9 @@ public class MainUtil {
     }
 
     public static BufferedImage toRGB(BufferedImage src) {
-        if (src == null) return src;
+        if (src == null) {
+            return src;
+        }
         BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
         g2d.drawImage(src, 0, 0, null);
@@ -646,18 +665,26 @@ public class MainUtil {
         }
         if (allowDir) {
             File file = MainUtil.resolveRelative(new File(dir, filename));
-            if (file.exists() && file.isDirectory()) return file;
+            if (file.exists() && file.isDirectory()) {
+                return file;
+            }
         }
         for (ClipboardFormat f : ClipboardFormats.getAll()) {
             File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getPrimaryFileExtension()));
-            if (file.exists()) return file;
+            if (file.exists()) {
+                return file;
+            }
         }
         return null;
     }
 
     public static boolean isInSubDirectory(File dir, File file) throws IOException {
-        if (file == null) return false;
-        if (file.equals(dir)) return true;
+        if (file == null) {
+            return false;
+        }
+        if (file.equals(dir)) {
+            return true;
+        }
         file = file.getCanonicalFile();
         dir = dir.getCanonicalFile();
         return isInSubDirectory(dir, file.getParentFile());
@@ -779,7 +806,7 @@ public class MainUtil {
         if (MathMan.isInteger(string)) {
             return Long.parseLong(string);
         }
-        string = string.toLowerCase().trim().toLowerCase();
+        string = string.toLowerCase(Locale.ROOT).trim().toLowerCase(Locale.ROOT);
         if (string.equalsIgnoreCase("false")) {
             return 0;
         }
@@ -830,7 +857,9 @@ public class MainUtil {
             if (age > timeDiff) {
                 pool.submit(file::delete);
                 Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
-                if (printDebug) Fawe.debug(msg);
+                if (printDebug) {
+                    Fawe.debug(msg);
+                }
             }
         });
         pool.shutdown();

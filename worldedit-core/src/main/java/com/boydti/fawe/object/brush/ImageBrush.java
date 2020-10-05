@@ -76,7 +76,6 @@ public class ImageBrush implements Brush {
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
-
         RecursiveVisitor visitor = new RecursiveVisitor(
             new ImageBrushMask(solid, center, transform, scale, centerImageX, centerImageZ, width, height, colorFunction, editSession,
                 session.getTextureUtil()), vector -> true, Integer.MAX_VALUE);

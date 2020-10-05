@@ -45,6 +45,10 @@ public class WorldWrapper extends AbstractWorld {
 
     private final World parent;
 
+    private WorldWrapper(World parent) {
+        this.parent = parent;
+    }
+
     public static WorldWrapper wrap(World world) {
         if (world == null) {
             return null;
@@ -58,8 +62,7 @@ public class WorldWrapper extends AbstractWorld {
     public static World unwrap(World world) {
         if (world instanceof WorldWrapper) {
             return unwrap(((WorldWrapper) world).getParent());
-        }
-        else if (world instanceof EditSession) {
+        } else if (world instanceof EditSession) {
             return unwrap(((EditSession) world).getWorld());
         }
         return world;
@@ -77,10 +80,6 @@ public class WorldWrapper extends AbstractWorld {
         return null;
     }
 
-    private WorldWrapper(World parent) {
-        this.parent = parent;
-    }
-
     public World getParent() {
         return parent instanceof WorldWrapper ? ((WorldWrapper) parent).getParent() : parent;
     }
@@ -88,33 +87,6 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
         return parent.useItem(position, item, face);
-    }
-
-    @Override
-    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
-            throws WorldEditException{
-        return parent.applySideEffects(position, previousType, sideEffectSet);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
-        return parent.setBlock(position, block, notifyAndLight);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return parent.setBlock(x, y, z, block);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
-        return parent.setBlock(position, block, sideEffects);
-    }
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
     }
 
     @Override
@@ -130,27 +102,6 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public void dropItem(Vector3 pt, BaseItemStack item, int times) {
         parent.dropItem(pt, item, times);
-    }
-
-    @Override
-    public void simulateBlockMine(BlockVector3 pt) {
-        TaskManager.IMP.sync(new RunnableVal<Object>() {
-            @Override
-            public void run(Object value) {
-                parent.simulateBlockMine(pt);
-            }
-        });
-    }
-
-    @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
-        return TaskManager.IMP.sync(() -> {
-            try {
-                return parent.generateTree(type, editSession, position);
-            } catch (MaxChangedBlocksException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override
@@ -179,6 +130,22 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public BlockVector3 getMinimumPoint() {
+        return parent.getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return parent.getMaximumPoint();
+    }
+
+    @Override
+    @Nullable
+    public Operation commit() {
+        return parent.commit();
+    }
+
+    @Override
     public WeatherType getWeather() {
         return null;
     }
@@ -199,24 +166,50 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public BlockVector3 getMinimumPoint() {
-        return parent.getMinimumPoint();
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
+        return parent.setBlock(x, y, z, block);
     }
 
     @Override
-    public BlockVector3 getMaximumPoint() {
-        return parent.getMaximumPoint();
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return parent.setTile(x, y, z, tile);
     }
 
     @Override
-    @Nullable
-    public Operation commit() {
-        return parent.commit();
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return parent.setBiome(x, y, z, biome);
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        return parent.setBiome(position, biome);
     }
 
     @Override
     public String getName() {
         return parent.getName();
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+        return parent.setBlock(position, block, notifyAndLight);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+        return parent.setBlock(position, block, sideEffects);
+    }
+
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+        return parent.notifyAndLightBlock(position, previousType);
+    }
+
+    @Override
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet)
+            throws WorldEditException {
+        return parent.applySideEffects(position, previousType, sideEffectSet);
     }
 
     @Override
@@ -235,13 +228,49 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public void simulateBlockMine(BlockVector3 pt) {
+        TaskManager.IMP.sync(new RunnableVal<Object>() {
+            @Override
+            public void run(Object value) {
+                parent.simulateBlockMine(pt);
+            }
+        });
+    }
+
+    @Override
     public boolean regenerate(Region region, EditSession session) {
         return parent.regenerate(region, session);
     }
 
     @Override
-    public boolean equals(Object other) {
-        return parent.equals(other);
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+        return TaskManager.IMP.sync(() -> {
+            try {
+                return parent.generateTree(type, editSession, position);
+            } catch (MaxChangedBlocksException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return parent.getSpawnPosition();
+    }
+
+    @Override
+    public void refreshChunk(int chunkX, int chunkZ) {
+        parent.refreshChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return parent.get(x, z);
+    }
+
+    @Override
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
+        parent.sendFakeChunk(player, packet);
     }
 
     @Override
@@ -250,8 +279,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
-        parent.refreshChunk(X, Z);
+    public boolean equals(Object other) {
+        return parent.equals(other);
     }
 
     @Override
@@ -283,35 +312,5 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public BiomeType getBiome(BlockVector3 position) {
         return parent.getBiome(position);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return parent.setBiome(position, biome);
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return parent.setBiome(x, y, z, biome);
-    }
-
-    @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        return parent.notifyAndLightBlock(position, previousType);
-    }
-
-    @Override
-    public BlockVector3 getSpawnPosition() {
-        return parent.getSpawnPosition();
-    }
-
-    @Override
-    public IChunkGet get(int x, int z) {
-        return parent.get(x, z);
-    }
-
-    @Override
-    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
-        parent.sendFakeChunk(player, packet);
     }
 }

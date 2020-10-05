@@ -6,46 +6,47 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class WallMask extends AbstractMask {
-    private final int min, max;
+    private final int min;
+    private final int max;
     private final Mask mask;
-    private MutableBlockVector3 v;
+    private MutableBlockVector3 vector;
 
     public WallMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
         this.min = requiredMin;
         this.max = requiredMax;
-        this.v = new MutableBlockVector3();
+        this.vector = new MutableBlockVector3();
     }
 
     @Override
     public boolean test(BlockVector3 bv) {
-        v.setComponents(bv);
+        vector.setComponents(bv);
         int count = 0;
-        double x = v.getX();
-        double y = v.getY();
-        double z = v.getZ();
-        v.mutX(x + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        double x = vector.getX();
+        double y = vector.getY();
+        double z = vector.getZ();
+        vector.mutX(x + 1);
+        if (mask.test(vector) && ++count == min && max >= 8) {
+            vector.mutX(x);
             return true;
         }
-        v.mutX(x - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
-            v.mutX(x);
+        vector.mutX(x - 1);
+        if (mask.test(vector) && ++count == min && max >= 8) {
+            vector.mutX(x);
             return true;
         }
-        v.mutX(x);
-        v.mutZ(z + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        vector.mutX(x);
+        vector.mutZ(z + 1);
+        if (mask.test(vector) && ++count == min && max >= 8) {
+            vector.mutZ(z);
             return true;
         }
-        v.mutZ(z - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
-            v.mutZ(z);
+        vector.mutZ(z - 1);
+        if (mask.test(vector) && ++count == min && max >= 8) {
+            vector.mutZ(z);
             return true;
         }
-        v.mutZ(z);
+        vector.mutZ(z);
         return count >= min && count <= max;
     }
 

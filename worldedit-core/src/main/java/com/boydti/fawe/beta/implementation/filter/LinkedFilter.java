@@ -14,12 +14,12 @@ public final class LinkedFilter<T extends Filter, S extends Filter> extends Dele
 
     private final S child;
 
-    public LinkedFilter(T parent, S child){
+    public LinkedFilter(T parent, S child) {
         super(parent);
         this.child = child;
     }
 
-    public S getChild(){
+    public S getChild() {
         return this.child;
     }
 

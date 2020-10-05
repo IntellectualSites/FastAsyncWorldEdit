@@ -278,6 +278,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
     }
 
+    public boolean isEmpty() {
+        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
+    }
+
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
@@ -306,10 +310,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean isEmpty() {
-        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
     }
 
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {

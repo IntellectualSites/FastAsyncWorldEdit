@@ -24,7 +24,7 @@ public class BiomeCopy implements RegionFunction {
         int x = position.getBlockX();
         int y = position.getBlockY();
         int z = position.getBlockZ();
-        if (x != mutableVector.getBlockX() || z != mutableVector.getBlockZ()|| y != mutableVector
+        if (x != mutableVector.getBlockX() || z != mutableVector.getBlockZ() || y != mutableVector
             .getBlockY()) {
             mutableVector.setComponents(x, y, z);
             return destination.setBiome(mutableVector, source.getBiome(mutableVector));

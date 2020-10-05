@@ -43,7 +43,7 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
                 final Location pos2 = area.getHighLoc();
                 final ClaimedResidence finalResidence = residence;
                 return new FaweMask(new CuboidRegion(BukkitAdapter.asBlockVector(pos1), BukkitAdapter.asBlockVector(pos2))) {
-                @Override
+                    @Override
                     public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
                         return isAllowed(BukkitAdapter.adapt(player), finalResidence, type);
                     }

@@ -94,6 +94,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
             print(TextComponent.of(part, TextColor.RED));
         }
     }
+
     @Override
     public void print(Component component) {
         TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));

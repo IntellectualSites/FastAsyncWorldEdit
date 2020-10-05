@@ -187,7 +187,9 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
                     int propIndex = property.getIndex(block.getInternalId());
                     if (propIndex != 0) {
-                        if (properties == null) properties = new HashMap<>();
+                        if (properties == null) {
+                            properties = new HashMap<>();
+                        }
                         Object value = property.getValues().get(propIndex);
                         properties.put(property.getName(), value.toString());
                     }

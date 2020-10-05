@@ -77,7 +77,9 @@ public class PluginPreloader extends PluginBase {
             loaded = region.getChunks();
             Iterator<BlockVector2> iter = loaded.iterator();
 
-            if (!invalidator.get()) return;
+            if (!invalidator.get()) {
+                return;
+            }
             Fawe.get().getQueueHandler().syncWhenFree(() -> {
                 for (; iter.hasNext() && invalidator.get();index++) {
                     BlockVector2 chunk = iter.next();
@@ -95,22 +97,26 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    public @NotNull File getDataFolder() {
+    @NotNull
+    public File getDataFolder() {
         return null;
     }
 
     @Override
-    public @NotNull PluginDescriptionFile getDescription() {
+    @NotNull
+    public PluginDescriptionFile getDescription() {
         return null;
     }
 
     @Override
-    public @NotNull FileConfiguration getConfig() {
+    @NotNull
+    public FileConfiguration getConfig() {
         return null;
     }
 
     @Override
-    public @Nullable InputStream getResource(@NotNull String filename) {
+    @Nullable
+    public InputStream getResource(@NotNull String filename) {
         return null;
     }
 
@@ -135,12 +141,14 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    public @NotNull PluginLoader getPluginLoader() {
+    @NotNull
+    public PluginLoader getPluginLoader() {
         return null;
     }
 
     @Override
-    public @NotNull Server getServer() {
+    @NotNull
+    public Server getServer() {
         return null;
     }
 
@@ -175,12 +183,14 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    public @Nullable ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
+    @Nullable
+    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
         return null;
     }
 
     @Override
-    public @NotNull Logger getLogger() {
+    @NotNull
+    public Logger getLogger() {
         return null;
     }
 
@@ -190,7 +200,8 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    @Nullable
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         return null;
     }
 }

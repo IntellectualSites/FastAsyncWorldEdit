@@ -71,21 +71,27 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
     @NotNull
     @Override
     default Set<K> keySet() {
-        if (isEmpty()) return Collections.emptySet();
+        if (isEmpty()) {
+            return Collections.emptySet();
+        }
         return new AdaptedSetCollection<>(getParent().keySet(), this::adaptKey2);
     }
 
     @NotNull
     @Override
     default Collection<V> values() {
-        if (isEmpty()) return Collections.emptySet();
+        if (isEmpty()) {
+            return Collections.emptySet();
+        }
         return new AdaptedSetCollection<>(getParent().values(), this::adaptValue2);
     }
 
     @NotNull
     @Override
     default Set<Entry<K, V>> entrySet() {
-        if (isEmpty()) return Collections.emptySet();
+        if (isEmpty()) {
+            return Collections.emptySet();
+        }
         return new AdaptedSetCollection<>(getParent().entrySet(), new Function<Entry<K2, V2>, Entry<K, V>>() {
             private MutablePair<K, V> entry = new MutablePair<>();
             @Override

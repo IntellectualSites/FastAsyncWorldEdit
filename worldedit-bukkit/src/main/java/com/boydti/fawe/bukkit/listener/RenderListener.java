@@ -3,10 +3,6 @@ package com.boydti.fawe.bukkit.listener;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.TaskManager;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,6 +14,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RenderListener implements Listener {
 
@@ -32,7 +33,9 @@ public class RenderListener implements Listener {
 
             @Override
             public void run() {
-                if (views.isEmpty()) return;
+                if (views.isEmpty()) {
+                    return;
+                }
 
                 long now = System.currentTimeMillis();
                 int tps32 = (int) (Math.round(Fawe.get().getTimer().getTPS()) * 32);
@@ -64,8 +67,9 @@ public class RenderListener implements Listener {
                             setViewDistance(player, Math.max(4, value[0] + 1));
                             long spent = System.currentTimeMillis() - now;
                             if (spent > 5) {
-                                if (spent > 10)
+                                if (spent > 10) {
                                     value[1] = nowTick + 20;
+                                }
                                 return;
                             }
                         }

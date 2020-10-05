@@ -37,7 +37,7 @@ public class ArchiveNioSupports {
         ImmutableList.Builder<ArchiveNioSupport> builder = ImmutableList.builder();
         try {
             builder.add(TrueVfsArchiveNioSupport.getInstance());
-        } catch (NoClassDefFoundError ignore) {
+        } catch (NoClassDefFoundError ignored) {
             // No TrueVFS available. That's OK.
         }
         SUPPORTS = builder.add(ZipArchiveNioSupport.getInstance())

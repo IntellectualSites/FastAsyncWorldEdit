@@ -799,7 +799,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 try {
                     blocks.set(x, y, z, combined);
                     return true;
-                } catch (IndexOutOfBoundsException ignore) {
+                } catch (IndexOutOfBoundsException ignored) {
                     return false;
                 }
         }

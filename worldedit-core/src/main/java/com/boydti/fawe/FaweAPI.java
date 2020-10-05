@@ -55,19 +55,20 @@ import javax.annotation.Nullable;
  * FaweAPI.[some method]
  */
 public class FaweAPI {
+
     /**
-     * Offers a lot of options for building an EditSession
+     * Offers a lot of options for building an EditSession.
      *
-     * @param world
      * @return A new EditSessionBuilder
      * @see EditSessionBuilder
      */
+    @Deprecated
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
     }
 
     /**
-     * The TaskManager has some useful methods for doing things asynchronously
+     * The TaskManager has some useful methods for doing things asynchronously.
      *
      * @return TaskManager
      */
@@ -75,26 +76,15 @@ public class FaweAPI {
         return TaskManager.IMP;
     }
 
-//    /**
-//     * Add a custom transform for use in
-//     *
-//     * @param methods The class with a bunch of transform methods
-//     * @return true if the transform was registered
-//     * @see com.sk89q.worldedit.command.TransformCommands
-//     */
-//    public static boolean registerTransforms(Object methods) {
-//        DefaultTransformParser parser = Fawe.get().getTransformParser();
-//        if (parser != null) parser.register(methods);
-//        return parser != null;
-//    }
-
     /**
-     * You can either use a IQueueExtent or an EditSession to change blocks<br>
-     * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
-     * - The WorldEdit EditSession can do a lot more<br>
-     * Remember to commit when you're done!<br>
+     * You can either use a {@code IQueueExtent} or an {@code EditSession} to change blocks.
      *
-     * @param world     The name of the world
+     * <p>
+     * The {@link IQueueExtent} skips a bit of overhead, so it is marginally faster. {@link
+     * EditSession} can do a lot more. Remember to commit when you are done!
+     * </p>
+     *
+     * @param world The name of the world
      * @param autoQueue If it should start dispatching before you enqueue it.
      * @return the queue extent
      */
@@ -118,10 +108,10 @@ public class FaweAPI {
     }
 
     /**
-     * Upload the clipboard to the configured web interface
+     * Upload the clipboard to the configured web interface.
      *
      * @param clipboard The clipboard (may not be null)
-     * @param format    The format to use (some formats may not be supported)
+     * @param format The format to use (some formats may not be supported)
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
@@ -129,7 +119,7 @@ public class FaweAPI {
     }
 
     /**
-     * Just forwards to ClipboardFormat.SCHEMATIC.load(file)
+     * Just forwards to ClipboardFormat.SCHEMATIC.load(file).
      *
      * @param file the file to load
      * @return a clipboard containing the schematic
@@ -149,7 +139,7 @@ public class FaweAPI {
     }
 
     /**
-     * Check if the server has more than the configured low memory threshold
+     * Check if the server has more than the configured low memory threshold.
      *
      * @return True if the server has limited memory
      */
@@ -158,28 +148,26 @@ public class FaweAPI {
     }
 
     /**
-     * Get a player's allowed WorldEdit region
-     *
-     * @param player
-     * @return
+     * Get a player's allowed WorldEdit region.
      */
     public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
     }
 
     /**
-     * Cancel the edit with the following extent<br>
-     * - The extent must be the one being used by an EditSession, otherwise an error may be thrown <br>
-     * - Insert an extent into the EditSession using the EditSessionEvent: http://wiki.sk89q.com/wiki/WorldEdit/API/Hooking_EditSession <br>
+     * Cancel the edit with the following extent.
      *
-     * @param extent
-     * @param reason
-     * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
+     * <p>
+     * The extent must be the one being used by an EditSession, otherwise an error will be thrown.
+     * Insert an extent into the EditSession using the EditSessionEvent.
+     * </p>
+     *
+     * @see EditSession#getRegionExtent() How to get the FaweExtent for an EditSession
      */
     public static void cancelEdit(AbstractDelegateExtent extent, Component reason) {
         try {
             WEManager.IMP.cancelEdit(extent, new FaweException(reason));
-        } catch (WorldEditException ignore) {
+        } catch (WorldEditException ignored) {
         }
     }
 
@@ -188,10 +176,7 @@ public class FaweAPI {
     }
 
     /**
-     * Get the DiskStorageHistory object representing a File
-     *
-     * @param file
-     * @return
+     * Get the DiskStorageHistory object representing a File.
      */
     public static DiskStorageHistory getChangeSetFromFile(File file) {
         if (!file.exists() || file.isDirectory()) {
@@ -200,7 +185,7 @@ public class FaweAPI {
         if (Settings.IMP.HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
         }
-        if (!file.getName().toLowerCase().endsWith(".bd")) {
+        if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
             throw new IllegalArgumentException("Not a BD file!");
         }
         String[] path = file.getPath().split(File.separator);
@@ -223,16 +208,18 @@ public class FaweAPI {
     }
 
     /**
-     * Used in the RollBack to generate a list of DiskStorageHistory objects<br>
-     * - Note: An edit outside the radius may be included if it overlaps with an edit inside that depends on it.
+     * Used in the rollback to generate a list of {@link DiskStorageHistory} objects.
      *
-     * @param origin   - The origin location
-     * @param user     - The uuid (may be null)
-     * @param radius   - The radius from the origin of the edit
+     * @param origin - The origin location
+     * @param user - The uuid (may be null)
+     * @param radius - The radius from the origin of the edit
      * @param timediff - The max age of the file in milliseconds
-     * @param shallow  - If shallow is true, FAWE will only read the first Settings.IMP.BUFFER_SIZE bytes to obtain history info<br>
-     *                 Reading only part of the file will result in unreliable bounds info for large edits
+     * @param shallow - If shallow is true, FAWE will only read the first {@link
+     *     Settings.HISTORY#BUFFER_SIZE} bytes to obtain history info
      * @return a list of DiskStorageHistory Objects
+     * @apiNote An edit outside the radius may be included if it overlaps with an edit inside
+     *     that depends on it. Reading only part of the file will result in unreliable bounds info
+     *     for large edits.
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
         Extent extent = origin.getExtent();
@@ -312,35 +299,19 @@ public class FaweAPI {
     /**
      * The DiskStorageHistory class is what FAWE uses to represent the undo on disk.
      *
-     * @param world
-     * @param uuid
-     * @param index
-     * @return
-     * @see DiskStorageHistory#toEditSession(Player)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
     }
 
     /**
-     * Compare two versions
+     * Fix the lighting in a selection. This is a multi-step process as outlined below.
      *
-     * @param version
-     * @param major
-     * @param minor
-     * @param minor2
-     * @return true if version is >= major, minor, minor2
-     */
-    public static boolean checkVersion(final int[] version, final int major, final int minor, final int minor2) {
-        return (version[0] > major) || ((version[0] == major) && (version[1] > minor)) || ((version[0] == major) && (version[1] == minor) && (version[2] >= minor2));
-    }
-
-
-    /**
-     * Fix the lighting in a selection<br>
-     * - First removes all lighting, then relights
-     * - Relights in parallel (if enabled) for best performance<br>
-     * - Also resends chunks<br>
+     * <ol>
+     *     <li>Removes all lighting, then relights.</li>
+     *     <li>Relights in parallel (if enabled) for best performance.</li>
+     *     <li>Resends the chunks to the client.</li>
+     * </ol>
      *
      * @param world World to relight in
      * @param selection Region to relight
@@ -395,26 +366,19 @@ public class FaweAPI {
     }
 
     /**
-     * Have a task run when the server is low on memory (configured threshold)
-     *
-     * @param run
+     * Runs a task when the server is low on memory.
      */
     public static void addMemoryLimitedTask(Runnable run) {
         MemUtil.addMemoryLimitedTask(run);
     }
 
     /**
-     * Have a task run when the server is no longer low on memory (configured threshold)
-     *
-     * @param run
+     * Runs a task when the server is no longer low on memory.
      */
     public static void addMemoryPlentifulTask(Runnable run) {
         MemUtil.addMemoryPlentifulTask(run);
     }
 
-    /**
-     * @return Map of translation ket to value
-     */
     public static Map<String, String> getTranslations(Locale locale) {
         return WorldEdit.getInstance().getTranslationManager().getTranslationMap(locale);
     }

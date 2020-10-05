@@ -63,8 +63,12 @@ public class ServerCUIHandler {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         RegionSelector regionSelector = session.getRegionSelector(player.getWorld());
 
-        int posX, posY, posZ;
-        int width, height, length;
+        int posX;
+        int posY;
+        int posZ;
+        int width;
+        int height;
+        int length;
 
         if (regionSelector instanceof CuboidRegionSelector) {
             if (regionSelector.isDefined()) {
