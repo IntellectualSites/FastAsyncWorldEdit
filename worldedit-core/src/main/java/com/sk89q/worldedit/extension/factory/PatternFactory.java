@@ -22,7 +22,11 @@ package com.sk89q.worldedit.extension.factory;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BiomePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.BufferedPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.ExistingPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.Linear2DPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.Linear3DPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.PerlinPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
@@ -66,6 +70,12 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new PerlinPatternParser(worldEdit));
         register(new RidgedMultiFractalPatternParser(worldEdit));
         register(new BiomePatternParser(worldEdit));
+        register(new Linear2DPatternParser(worldEdit, "#linear2d"));
+        register(new Linear2DPatternParser(worldEdit, "#l2d"));
+        register(new Linear3DPatternParser(worldEdit, "#linear3d"));
+        register(new Linear3DPatternParser(worldEdit, "#l3d"));
+        register(new BufferedPatternParser(worldEdit));
+        register(new ExistingPatternParser(worldEdit));
     }
 
 }

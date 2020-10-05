@@ -10,14 +10,21 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 public class Linear3DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
+    private final int xScale;
+    private final int yScale;
+    private final int zScale;
 
-    public Linear3DBlockPattern(Pattern[] patterns) {
+    public Linear3DBlockPattern(Pattern[] patterns, int xScale, int yScale, int zScale) {
         this.patternsArray = patterns;
+        this.xScale = xScale;
+        this.yScale = yScale;
+        this.zScale = zScale;
     }
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        int index = (position.getBlockX() + position.getBlockY() + position.getBlockZ()) % patternsArray.length;
+        int index = (position.getBlockX() / this.xScale
+                + position.getBlockY() / this.yScale + position.getBlockZ() / this.zScale) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
@@ -26,7 +33,8 @@ public class Linear3DBlockPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        int index = (get.getBlockX() + get.getBlockY() + get.getBlockZ()) % patternsArray.length;
+        int index = (get.getBlockX() / this.xScale
+                + get.getBlockY() / this.yScale + get.getBlockZ() / this.zScale) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
