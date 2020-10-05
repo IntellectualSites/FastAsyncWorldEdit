@@ -25,16 +25,22 @@ public class CFIChangeSet extends AbstractChangeSet {
         int max = MainUtil.getMaxFileId(folder);
         this.file = new File(folder, max + ".cfi");
         File parent = this.file.getParentFile();
-        if (!parent.exists()) this.file.getParentFile().mkdirs();
-        if (!this.file.exists()) this.file.createNewFile();
+        if (!parent.exists()) {
+            this.file.getParentFile().mkdirs();
+        }
+        if (!this.file.exists()) {
+            this.file.createNewFile();
+        }
         hmmg.flushChanges(file);
     }
 
     @Override
-    public void close() {}
+    public void close() {
+    }
 
     @Override
-    public void closeAsync() {}
+    public void closeAsync() {
+    }
 
     @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {

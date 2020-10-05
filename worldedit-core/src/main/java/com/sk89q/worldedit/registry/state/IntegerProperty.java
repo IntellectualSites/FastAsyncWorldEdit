@@ -51,7 +51,7 @@ public class IntegerProperty extends AbstractProperty<Integer> {
     public int getIndex(Integer value) {
         try {
             return this.map[value];
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (IndexOutOfBoundsException ignored) {
             return -1;
         }
     }

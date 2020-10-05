@@ -14,7 +14,9 @@ public class BukkitEntityRegistry implements EntityRegistry {
         for (EntityType type : EntityType.values()) {
             String name = type.getName();
             if (name != null) {
-                if (name.indexOf(':') == -1) name = "minecraft:" + name;
+                if (name.indexOf(':') == -1) {
+                    name = "minecraft:" + name;
+                }
                 types.add(name);
             }
         }

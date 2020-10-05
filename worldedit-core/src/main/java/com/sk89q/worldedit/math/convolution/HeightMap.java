@@ -120,6 +120,8 @@ public class HeightMap {
                             yTmp = maxY;
                             invalid[index] = true;
                             break;
+                        default:
+                            break;
                     }
                     data[index] = yTmp;
                 }

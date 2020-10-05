@@ -258,8 +258,7 @@ public final class StringUtil {
 
             for (i = 1; i <= n; ++i) {
                 cost = s.charAt(i - 1) == tj ? 0 : 1;
-                // minimum of cell to the left+1, to the top+1, diagonally left
-                // and up +cost
+                // minimum of cell to the left+1, to the top+1, diagonally left and up +cost
                 d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1]
                         + cost);
             }

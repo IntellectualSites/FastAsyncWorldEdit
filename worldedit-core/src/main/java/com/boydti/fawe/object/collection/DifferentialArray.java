@@ -139,8 +139,11 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
             }
         }
         if (caught != null) {
-            if (caught instanceof RuntimeException) throw (RuntimeException) caught;
-            else throw new RuntimeException(caught);
+            if (caught instanceof RuntimeException) {
+                throw (RuntimeException) caught;
+            } else {
+                throw new RuntimeException(caught);
+            }
         }
     }
 
@@ -277,7 +280,7 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
         changed = true;
         try {
             changesBytes[index] += (dataBytes[index] - value);
-        } catch (NullPointerException ignore) {
+        } catch (NullPointerException ignored) {
             changes = (T) (changesBytes = new byte[dataBytes.length]);
             changesBytes[index] += (dataBytes[index] - value);
         }
@@ -288,7 +291,7 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
         changed = true;
         try {
             changesInts[index] += dataInts[index] - value;
-        } catch (NullPointerException ignore) {
+        } catch (NullPointerException ignored) {
             changes = (T) (changesInts = new int[dataInts.length]);
             changesInts[index] += dataInts[index] - value;
         }
@@ -299,7 +302,7 @@ public final class DifferentialArray<T> implements DifferentialCollection<T> {
         changed = true;
         try {
             changesChars[index] += dataChars[index] - value;
-        } catch (NullPointerException ignore) {
+        } catch (NullPointerException ignored) {
             changes = (T) (changesChars = new char[dataChars.length]);
             changesChars[index] += dataChars[index] - value;
         }

@@ -91,7 +91,9 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public void streamBiomes(IntValueReader task) {
-        if (!hasBiomes()) return;
+        if (!hasBiomes()) {
+            return;
+        }
         try {
             int index = 0;
             for (int z = 0; z < getLength(); z++) {
@@ -308,7 +310,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     public List<? extends Entity> getEntities(Region region) {
         return new ArrayList<>(entities.stream().filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList()));
     }
-    
+
     @Override
     public void removeEntity(Entity entity) {
         if (entity instanceof ClipboardEntity) {

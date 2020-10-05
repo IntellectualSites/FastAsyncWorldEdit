@@ -5,7 +5,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 
 @Deprecated
 public class RegionWrapper extends CuboidRegion {
-    private final static RegionWrapper GLOBAL = new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    private static final RegionWrapper GLOBAL = new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
     public int minX;
     public int maxX;

@@ -33,13 +33,15 @@ public final class BitArray {
     }
 
     public final void set(int index, int value) {
-        if (longLen == 0) return;
+        if (longLen == 0) {
+            return;
+        }
         int bitIndexStart = index * bitsPerEntry;
         int longIndexStart = bitIndexStart >> 6;
         int localBitIndexStart = bitIndexStart & 63;
         this.data[longIndexStart] = this.data[longIndexStart] & ~(mask << localBitIndexStart) | (long) value << localBitIndexStart;
 
-        if(localBitIndexStart > maxSeqLocIndex) {
+        if (localBitIndexStart > maxSeqLocIndex) {
             int longIndexEnd = longIndexStart + 1;
             int localShiftStart = 64 - localBitIndexStart;
             int localShiftEnd = bitsPerEntry - localShiftStart;
@@ -48,14 +50,16 @@ public final class BitArray {
     }
 
     public final int get(int index) {
-        if (longLen == 0) return 0;
+        if (longLen == 0) {
+            return 0;
+        }
         int bitIndexStart = index * bitsPerEntry;
 
         int longIndexStart = bitIndexStart >> 6;
 
         int localBitIndexStart = bitIndexStart & 63;
-        if(localBitIndexStart <= maxSeqLocIndex) {
-            return (int)(this.data[longIndexStart] >>> localBitIndexStart & mask);
+        if (localBitIndexStart <= maxSeqLocIndex) {
+            return (int) (this.data[longIndexStart] >>> localBitIndexStart & mask);
         } else {
             int localShift = 64 - localBitIndexStart;
             return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & mask);
@@ -65,7 +69,7 @@ public final class BitArray {
     public int getLength() {
         return longLen;
     }
-    
+
     public final void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;

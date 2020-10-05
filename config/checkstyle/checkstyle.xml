@@ -96,6 +96,7 @@ Checks based on Google Checks, modified for EngineHub.
                      value="Member name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="ParameterName">
+            <property name="severity" value="warning"/>
             <property name="format" value="^([a-z][a-z0-9][_a-zA-Z0-9]*|[a-z])$"/>
             <message key="name.invalidPattern"
                      value="Parameter name ''{0}'' must match pattern ''{1}''."/>
@@ -106,6 +107,7 @@ Checks based on Google Checks, modified for EngineHub.
                      value="Class type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="MethodTypeParameterName">
+            <property name="severity" value="warning"/>
             <property name="format" value="(^[A-Z][0-9]?)$|(^[A-Z][a-zA-Z0-9]*$)"/>
             <message key="name.invalidPattern"
                      value="Method type name ''{0}'' must match pattern ''{1}''."/>
@@ -186,6 +188,7 @@ Checks based on Google Checks, modified for EngineHub.
         <module name="CommentsIndentation"/>
         <!-- Validate String.to(Lower|Upper)Case() calls include Locale argument -->
         <module name="Regexp">
+            <property name="severity" value="warning"/>
             <property name="message" value="Case-conversion calls must include an explicit Locale"/>
             <property name="format" value="(?!Character)\.to(Lower|Upper)Case\(\)"/>
             <property name="illegalPattern" value="true"/>

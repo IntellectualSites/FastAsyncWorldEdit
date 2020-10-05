@@ -80,9 +80,9 @@ public class CavesGen extends GenBase {
             y += f4;
             z += MathMan.sinInexact(paramdouble2) * f3;
 
-            if (k != 0)
+            if (k != 0) {
                 paramdouble3 *= 0.92F;
-            else {
+            } else {
                 paramdouble3 *= 0.7F;
             }
             paramdouble3 += f2 * 0.1F;
@@ -117,8 +117,9 @@ public class CavesGen extends GenBase {
 
             //Boundaries check.
             if (x < real_x - 16.0D - d3 * 2.0D || z < real_z - 16.0D - d3 * 2.0D
-                || x > real_x + 16.0D + d3 * 2.0D || z > real_z + 16.0D + d3 * 2.0D)
+                || x > real_x + 16.0D + d3 * 2.0D || z > real_z + 16.0D + d3 * 2.0D) {
                 continue;
+            }
 
 
             int m = (int) (x - d3) - bx - 1;
@@ -130,20 +131,25 @@ public class CavesGen extends GenBase {
             int i3 = (int) (z - d3) - bz - 1;
             int i4 = (int) (z + d3) - bz + 1;
 
-            if (m < 0)
+            if (m < 0) {
                 m = 0;
-            if (n > 16)
+            }
+            if (n > 16) {
                 n = 16;
+            }
 
-            if (i1 < 1)
+            if (i1 < 1) {
                 i1 = 1;
+            }
             if (i2 > 256 - 8) {
                 i2 = 256 - 8;
             }
-            if (i3 < 0)
+            if (i3 < 0) {
                 i3 = 0;
-            if (i4 > 16)
+            }
+            if (i4 > 16) {
                 i4 = 16;
+            }
 
             // Search for water
             boolean waterFound = false;
@@ -156,8 +162,9 @@ public class CavesGen extends GenBase {
                                 waterFound = true;
                             }
                             if (local_y != i1 - 1 && local_x != m && local_x != n - 1 && local_z != i3
-                                && local_z != i4 - 1)
+                                && local_z != i4 - 1) {
                                 local_y = i1;
+                            }
                         }
                     }
                 }
@@ -206,8 +213,9 @@ public class CavesGen extends GenBase {
                     }
                 }
             }
-            if (isLargeCave)
+            if (isLargeCave) {
                 break;
+            }
         }
     }
 
@@ -229,19 +237,21 @@ public class CavesGen extends GenBase {
     public void generateChunk(int chunkX, int chunkZ, BlockVector2 originChunk, Extent chunk) throws WorldEditException {
         int i = ThreadLocalRandom.current().nextInt(ThreadLocalRandom.current()
             .nextInt(ThreadLocalRandom.current().nextInt(this.caveFrequency) + 1) + 1);
-        if (this.evenCaveDistribution)
+        if (this.evenCaveDistribution) {
             i = this.caveFrequency;
-        if (ThreadLocalRandom.current().nextInt(100) >= this.caveRarity)
+        }
+        if (ThreadLocalRandom.current().nextInt(100) >= this.caveRarity) {
             i = 0;
+        }
 
         for (int j = 0; j < i; j++) {
             double x = (chunkX << 4) + ThreadLocalRandom.current().nextInt(16);
 
             double y;
 
-            if (this.evenCaveDistribution)
+            if (this.evenCaveDistribution) {
                 y = ThreadLocalRandom.current().nextInt(this.caveMinAltitude, this.caveMaxAltitude);
-            else {
+            } else {
                 y = ThreadLocalRandom.current()
                     .nextInt(ThreadLocalRandom.current()
                         .nextInt(this.caveMaxAltitude - this.caveMinAltitude + 1) + 1) + this.caveMinAltitude;

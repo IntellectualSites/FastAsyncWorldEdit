@@ -161,7 +161,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public void refreshChunk(int X, int Z) {
+    public void refreshChunk(int chunkX, int chunkZ) {
 
     }
 

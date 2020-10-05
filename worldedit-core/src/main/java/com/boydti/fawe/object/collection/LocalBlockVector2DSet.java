@@ -51,7 +51,9 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
 
     public boolean containsRadius(int x, int y, int radius) {
         int size = size();
-        if (size == 0) return false;
+        if (size == 0) {
+            return false;
+        }
         if (radius <= 0 || size == 1) {
             return contains(x, y);
         }

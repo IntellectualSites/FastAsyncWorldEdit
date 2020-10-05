@@ -21,6 +21,7 @@ public class CachedMathMan {
     }
 
     private static float[] ANGLES = new float[65536];
+
     static {
         for (int i = 0; i < 65536; ++i) {
             ANGLES[i] = (float) Math.sin((double) i * Math.PI * 2.0D / 65536.0D);
@@ -28,6 +29,7 @@ public class CachedMathMan {
     }
 
     private static char[] SQRT = new char[65536];
+
     static {
         for (int i = 0; i < SQRT.length; i++) {
             SQRT[i] = (char) Math.round(Math.sqrt(i));
@@ -35,8 +37,8 @@ public class CachedMathMan {
     }
 
     /**
-     * Optimized for i elem 0,65536 (characters)
-     * @param i
+     * Optimized for i elem 0,65536 (characters).
+     *
      * @return square root
      */
     protected static int usqrt(int i) {
@@ -51,24 +53,25 @@ public class CachedMathMan {
         return ANGLES[(int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF];
     }
 
-    protected static float atan2(float y, float x) {
-        float add, mul;
+    protected static float atan2(float i, float j) {
+        float add;
+        float mul;
 
-        if (x < 0.0f) {
-            if (y < 0.0f) {
-                x = -x;
-                y = -y;
+        if (j < 0.0f) {
+            if (i < 0.0f) {
+                j = -j;
+                i = -i;
 
                 mul = 1.0f;
             } else {
-                x = -x;
+                j = -j;
                 mul = -1.0f;
             }
 
             add = (float) -Math.PI;
         } else {
-            if (y < 0.0f) {
-                y = -y;
+            if (i < 0.0f) {
+                i = -i;
                 mul = -1.0f;
             } else {
                 mul = 1.0f;
@@ -77,10 +80,10 @@ public class CachedMathMan {
             add = 0.0f;
         }
 
-        float invDiv = 1.0f / ((Math.max(x, y)) * INV_ATAN2_DIM_MINUS_1);
+        float invDiv = 1.0f / ((Math.max(j, i)) * INV_ATAN2_DIM_MINUS_1);
 
-        int xi = (int) (x * invDiv);
-        int yi = (int) (y * invDiv);
+        int xi = (int) (j * invDiv);
+        int yi = (int) (i * invDiv);
 
         return (atan2[(yi * ATAN2_DIM) + xi] + add) * mul;
     }

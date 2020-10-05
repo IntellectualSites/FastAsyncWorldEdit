@@ -83,7 +83,7 @@ var clothColorsOpt = [
 ];
 var clothColorsOptHD = [
 	makeColor(168, 168, 168), // White
-	makeColor(143, 59, 0), // Orange 
+	makeColor(143, 59, 0), // Orange
 	makeColor(152, 0, 67), // Magenta
 	makeColor(0, 153, 153), // Light blue
 	makeColor(150, 150, 0), // Yellow
@@ -115,16 +115,16 @@ function colorDistance(c1, c2) {
 function findClosestWoolColor(col, clothColors) {
 	var closestId = 0;
 	var closestDistance = colorDistance(col, clothColors[0]);
-	
-	for(var i = 1; i < clothColors.length; i++) {
+
+	for (var i = 1; i < clothColors.length; i++) {
 		var dist = colorDistance(col, clothColors[i]);
-		
-		if(dist < closestDistance) {
+
+		if (dist < closestDistance) {
 			closestId = i;
 			closestDistance = dist;
 		}
 	}
-	
+
 	return closestId;
 }
 
@@ -135,10 +135,10 @@ var f = context.getSafeOpenFile("drawings", argv[1], "png", ["png", "jpg", "jpeg
 var sess = context.remember();
 var upright = argv[2] == "v";
 var colors = clothColors;
-if(argv[3] == "opt") {
+if (argv[3] == "opt") {
 	colors = clothColorsOpt;
 	player.print("Using optimized palette");
-} else if(argv[3] == "optHD") {
+} else if (argv[3] == "optHD") {
 	colors = clothColorsOptHD;
 	player.print("Using optimized HD palette");
 }

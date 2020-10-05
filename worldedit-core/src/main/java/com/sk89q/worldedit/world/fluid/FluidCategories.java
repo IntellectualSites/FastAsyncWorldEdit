@@ -40,7 +40,8 @@ public final class FluidCategories {
         return FluidCategory.REGISTRY.register(tag.getId(), tag);
     }
 
-    public static @Nullable FluidCategory get(final String id) {
+    @Nullable
+    public static FluidCategory get(final String id) {
         return FluidCategory.REGISTRY.get(id);
     }
 }

@@ -96,7 +96,7 @@ import javax.annotation.Nullable;
 public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R1 parent;
     private char[] ibdToStateOrdinal;
-    
+
     private final Field serverWorldsField;
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
@@ -107,7 +107,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
 
     public FAWE_Spigot_v1_16_R1() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new Spigot_v1_16_R1();
-        
+
         serverWorldsField = CraftServer.class.getDeclaredField("worlds");
         serverWorldsField.setAccessible(true);
 
@@ -124,7 +124,9 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
     }
 
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
+            return false;
+        }
         ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
@@ -223,9 +225,13 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
                 }
             }
         } else {
-            if (existing == blockData) return true;
+            if (existing == blockData) {
+                return true;
+            }
             if (section == null) {
-                if (blockData.isAir()) return true;
+                if (blockData.isAir()) {
+                    return true;
+                }
                 sections[y4] = section = new ChunkSection(y4 << 4);
             }
             nmsChunk.setType(blockPos, blockData, false);
@@ -321,7 +327,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
             } catch (NullPointerException e) {
                 init();
                 return adaptToChar(ibd);
-            } catch(ArrayIndexOutOfBoundsException e1){
+            } catch (ArrayIndexOutOfBoundsException e1) {
                 Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
                 return 0;
             }
@@ -397,7 +403,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         }
         return parent.fromNative(foreign);
     }
-    
+
     private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
         switch(env) {
             case NETHER:
@@ -437,7 +443,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         public void b() {
         }
     }
-    
+
     private Map<ChunkCoordIntPair, IChunkAccess> regenPreGenChunks(Region region, WorldServer serverWorld) {
         List<CompletableFuture<IChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
         IAsyncTaskHandler executor;
@@ -462,11 +468,11 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         }
         return chunks;
     }
-    
+
     private List<CompletableFuture<IChunkAccess>> submitChunkLoadTasks(Region region, WorldServer serverWorld) {
         ChunkProviderServer chunkManager = serverWorld.getChunkProvider();
         List<CompletableFuture<IChunkAccess>> chunkLoadings = new ArrayList<>();
-        
+
         // Pre-gen all the chunks
         try {
             for (BlockVector2 chunk : region.getChunks()) {
@@ -510,7 +516,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
             WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
             WorldServer freshWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalWorld.getMinecraftServer(), originalWorld.getMinecraftServer().executorService, session, newWorldData, originalWorld.getDimensionKey(), originalWorld.getTypeKey(), originalWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension)newOpts.e().a(worldDimKey)).c(), originalWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen)).get();
-            
+
             try {
                 // Pre-gen all the chunks
                 // We need to also pull one more chunk in every direction

@@ -133,7 +133,7 @@ public class ClipboardCommands {
         session.setClipboard(null);
 
         Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
-        
+
         clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint() : session.getPlacementPosition(actor));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
@@ -156,16 +156,15 @@ public class ClipboardCommands {
     }
 
     @Command(
-            name = "/lazycopy",
-            desc = "Lazily copy the selection to the clipboard"
+        name = "/lazycopy",
+        desc = "Lazily copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.lazycopy")
-    public void lazyCopy(Actor actor, LocalSession session, EditSession editSession,
-                         @Selection Region region,
+    public void lazyCopy(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
                          @Switch(name = 'e', desc = "Skip copy entities")
-                                 boolean skipEntities,
+                             boolean skipEntities,
                          @Switch(name = 'b', desc = "Also copy biomes")
-                                 boolean copyBiomes) throws WorldEditException {
+                             boolean copyBiomes) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
@@ -178,39 +177,40 @@ public class ClipboardCommands {
 
         lazyClipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
-        actor.print(Caption.of("fawe.worldedit.copy.command.copy" , region.getVolume()));
+        actor.print(Caption.of("fawe.worldedit.copy.command.copy", region.getVolume()));
     }
 
-//    @Command(
-//            name = "/lazycut",
-//            desc = "Lazily cut the selection to the clipboard"
-//    )
-//    @CommandPermissions("worldedit.clipboard.lazycut")
-//    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
-//                        @Selection final Region region,
-//                        @Switch(name = 'e', desc = "Skip copy entities")
-//                                boolean skipEntities,
-//                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-//                                Mask maskOpt,
-//                        @Switch(name = 'b', desc = "Also copy biomes")
-//                                boolean copyBiomes) throws WorldEditException {
-//        BlockVector3 min = region.getMinimumPoint();
-//        BlockVector3 max = region.getMaximumPoint();
-//        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
-//        FaweLimit limit = actor.getLimit();
-//        if (volume >= limit.MAX_CHECKS) {
-//            throw FaweCache.MAX_CHECKS;
-//        }
-//        if (volume >= limit.MAX_CHANGES) {
-//            throw FaweCache.MAX_CHANGES;
-//        }
-//        session.setClipboard(null);
-//
-//        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
-//        clipboard.setOrigin(session.getPlacementPosition(actor));
-//        session.setClipboard(new ClipboardHolder(lazyClipboard));
-//        actor.print(TranslatableComponent.of("fawe.worldedit.cut.command.cut.lazy" , region.getArea()));
-//    }
+    /*
+    @Command(
+        name = "/lazycut",
+        desc = "Lazily cut the selection to the clipboard"
+    )
+    @CommandPermissions("worldedit.clipboard.lazycut")
+    public void lazyCut(Actor actor, LocalSession session, EditSession editSession,
+                        @Selection final Region region,
+                        @Switch(name = 'e', desc = "Skip copy entities")
+                            boolean skipEntities,
+                        @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
+                            Mask maskOpt,
+                        @Switch(name = 'b', desc = "Also copy biomes")
+                            boolean copyBiomes) throws WorldEditException {
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
+        long volume = ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
+        FaweLimit limit = actor.getLimit();
+        if (volume >= limit.MAX_CHECKS) {
+            throw FaweCache.MAX_CHECKS;
+        }
+        if (volume >= limit.MAX_CHANGES) {
+            throw FaweCache.MAX_CHANGES;
+        }
+        session.setClipboard(null);
+
+        ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
+        clipboard.setOrigin(session.getPlacementPosition(actor));
+        session.setClipboard(new ClipboardHolder(lazyClipboard));
+        actor.print(TranslatableComponent.of("fawe.worldedit.cut.command.cut.lazy", region.getArea()));
+    }*/
 
     @Command(
         name = "/cut",
@@ -267,24 +267,24 @@ public class ClipboardCommands {
         if (!actor.hasPermission("fawe.tips")) {
             actor.print(TranslatableComponent.of("fawe.tips.tip.lazycut"));
         }
-		copy.getStatusMessages().forEach(actor::print);
+        copy.getStatusMessages().forEach(actor::print);
     }
 
     @Command(
-            name = "download",
-            aliases = { "/download" },
-            desc = "Downloads your clipboard through the configured web interface"
+        name = "download",
+        aliases = { "/download" },
+        desc = "Downloads your clipboard through the configured web interface"
     )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "schem") final String formatName) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format" , formatName));
+            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
             return;
         }
 
-        player.print(Caption.of("fawe.web.generating.link" , formatName));
+        player.print(Caption.of("fawe.web.generating.link", formatName));
         ClipboardHolder holder = session.getClipboard();
 
         URL url;
@@ -370,7 +370,7 @@ public class ClipboardCommands {
                     e.printStackTrace();
                 }
             }
-            player.print(Caption.of("fawe.web.download.link" , urlText).clickEvent(ClickEvent.openUrl(urlText)));
+            player.print(Caption.of("fawe.web.download.link", urlText).clickEvent(ClickEvent.openUrl(urlText)));
         }
     }
 
@@ -412,9 +412,13 @@ public class ClipboardCommands {
         checkPaste(actor, editSession, to, holder, clipboard);
 
         if (!onlySelect) {
-            Operation operation =
-                holder.createPaste(editSession).to(to).ignoreAirBlocks(ignoreAirBlocks)
-                    .copyBiomes(pasteBiomes).copyEntities(pasteEntities).maskSource(sourceMask)
+            Operation operation = holder
+                    .createPaste(editSession)
+                    .to(to)
+                    .ignoreAirBlocks(ignoreAirBlocks)
+                    .copyBiomes(pasteBiomes)
+                    .copyEntities(pasteEntities)
+                    .maskSource(sourceMask)
                     .build();
             Operations.completeLegacy(operation);
             messages.addAll(Lists.newArrayList(operation.getStatusMessages()));
@@ -451,23 +455,22 @@ public class ClipboardCommands {
     }
 
     @Command(
-            name = "/place",
-            desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
-)
-
+        name = "/place",
+        desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
+    )
     @CommandPermissions("worldedit.clipboard.place")
     @Logging(PLACEMENT)
     public void place(Actor actor, World world, LocalSession session, final EditSession editSession,
                       @Switch(name = 'a', desc = "Skip air blocks")
-                            boolean ignoreAirBlocks,
+                          boolean ignoreAirBlocks,
                       @Switch(name = 'o', desc = "Paste at the original position")
-                            boolean atOrigin,
+                          boolean atOrigin,
                       @Switch(name = 's', desc = "Select the region after pasting")
-                            boolean selectPasted,
+                          boolean selectPasted,
                       @Switch(name = 'e', desc = "Paste entities if available")
-                            boolean pasteEntities,
+                          boolean pasteEntities,
                       @Switch(name = 'b', desc = "Paste biomes if available")
-                            boolean pasteBiomes) throws WorldEditException {
+                          boolean pasteBiomes) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
         final Clipboard clipboard = holder.getClipboard();
         final BlockVector3 origin = clipboard.getOrigin();
@@ -486,7 +489,7 @@ public class ClipboardCommands {
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
-        actor.print(Caption.of("fawe.worldedit.paste.command.paste" , to));
+        actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
 
         if (!actor.hasPermission("fawe.tips")) {
             actor.print(TranslatableComponent.of("fawe.tips.tip.copypaste"));
@@ -496,23 +499,23 @@ public class ClipboardCommands {
     @Command(
         name = "/rotate",
         desc = "Rotate the contents of the clipboard",
-        descFooter = "Non-destructively rotate the contents of the clipboard.\n" +
-            "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +
-            "Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.\n"
+        descFooter = "Non-destructively rotate the contents of the clipboard.\n"
+            + "Angles are provided in degrees and a positive angle will result in a clockwise rotation. "
+            + "Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.\n"
     )
     @CommandPermissions("worldedit.clipboard.rotate")
     public void rotate(Actor actor, LocalSession session,
                        @Arg(desc = "Amount to rotate on the y-axis")
-                           double yRotate,
+                           double rotateY,
                        @Arg(desc = "Amount to rotate on the x-axis", def = "0")
-                           double xRotate,
+                           double rotateX,
                        @Arg(desc = "Amount to rotate on the z-axis", def = "0")
-                           double zRotate) throws WorldEditException {
+                           double rotateZ) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
-        transform = transform.rotateY(-yRotate);
-        transform = transform.rotateX(-xRotate);
-        transform = transform.rotateZ(-zRotate);
+        transform = transform.rotateY(-rotateY);
+        transform = transform.rotateX(-rotateX);
+        transform = transform.rotateZ(-rotateZ);
         holder.setTransform(holder.getTransform().combine(transform));
         actor.printInfo(TranslatableComponent.of("worldedit.rotate.rotated"));
     }

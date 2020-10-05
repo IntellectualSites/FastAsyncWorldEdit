@@ -141,7 +141,8 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param location the location
      * @return a reference to the created entity, or null if the entity could not be created
      */
-    default @Nullable Entity createEntity(Location location, BaseEntity entity) {
+    @Nullable
+    default Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
 
@@ -164,11 +165,15 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default void enableQueue() {
-        if (!isQueueEnabled()) throw FaweException._enableQueue;
+        if (!isQueueEnabled()) {
+            throw FaweException._enableQueue;
+        }
     }
 
     default void disableQueue() {
-        if (isQueueEnabled()) throw FaweException._disableQueue;
+        if (isQueueEnabled()) {
+            throw FaweException._disableQueue;
+        }
     }
 
     /*
@@ -281,18 +286,26 @@ public interface Extent extends InputExtent, OutputExtent {
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
+            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) {
+                return y1 - offset;
+            }
             int y2 = y - d;
-            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
+            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) {
+                return y2 + offset;
+            }
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
+                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                        return layer + offset;
+                    }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
+                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                        return layer - offset;
+                    }
                 }
             }
         }
@@ -310,26 +323,34 @@ public interface Extent extends InputExtent, OutputExtent {
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getBlock(x, y1, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
+            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                return y1 - offset;
+            }
             int y2 = y - d;
             block = getBlock(x, y2, z);
-            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
+            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                return y2 + offset;
+            }
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
+                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                        return layer + offset;
+                    }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getBlock(x, layer, z);
-                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
+                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) {
+                        return layer - offset;
+                    }
                 }
             }
         }
         int result = state ? failedMin : failedMax;
-        if(result > 0 && !ignoreAir) {
+        if (result > 0 && !ignoreAir) {
             block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
@@ -464,7 +485,9 @@ public interface Extent extends InputExtent, OutputExtent {
         ExtentTraverser<Extent> next = traverser.next();
         if (next != null) {
             Extent child = next.get();
-            if (child instanceof NullExtent) return true;
+            if (child instanceof NullExtent) {
+                return true;
+            }
             traverser.setNext(nullExtent);
             child.cancel();
         }

@@ -295,7 +295,8 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
         char separator = root.options().pathSeparator();
         // i1 is the leading (higher) index
         // i2 is the trailing (lower) index
-        int i1 = -1, i2;
+        int i1 = -1;
+        int i2;
         com.boydti.fawe.configuration.ConfigurationSection section = this;
         while ((i1 = path.indexOf(separator, i2 = i1 + 1)) != -1) {
             String node = path.substring(i2, i1);
@@ -377,7 +378,8 @@ public class MemorySection implements com.boydti.fawe.configuration.Configuratio
         char separator = root.options().pathSeparator();
         // i1 is the leading (higher) index
         // i2 is the trailing (lower) index
-        int i1 = -1, i2;
+        int i1 = -1;
+        int i2;
         com.boydti.fawe.configuration.ConfigurationSection section = this;
         while ((i1 = path.indexOf(separator, i2 = i1 + 1)) != -1) {
             String node = path.substring(i2, i1);

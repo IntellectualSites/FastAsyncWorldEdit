@@ -7,7 +7,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 public class RadiusMask extends AbstractMask implements ResettableMask {
 
     private transient BlockVector3 pos;
-    private final int minSqr, maxSqr;
+    private final int minSqr;
+    private final int maxSqr;
 
     public RadiusMask(int min, int max) {
         this.minSqr = min * min;

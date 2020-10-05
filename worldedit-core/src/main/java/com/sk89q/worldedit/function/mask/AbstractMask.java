@@ -35,4 +35,5 @@ public abstract class AbstractMask implements Mask {
             return null;
         }
     }
+
 }

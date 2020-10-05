@@ -10,7 +10,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class OffsetPattern extends AbstractPattern {
 
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final Pattern pattern;
 

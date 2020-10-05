@@ -33,9 +33,9 @@ public class RockBrush implements Brush {
 
         double distort = this.frequency / size;
 
-        double modX = 1d/radius.getX();
-        double modY = 1d/radius.getY();
-        double modZ = 1d/radius.getZ();
+        double modX = 1D / radius.getX();
+        double modY = 1D / radius.getY();
+        double modZ = 1D / radius.getZ();
 
         int radiusSqr = (int) (size * size);
         int sizeInt = (int) size * 2;

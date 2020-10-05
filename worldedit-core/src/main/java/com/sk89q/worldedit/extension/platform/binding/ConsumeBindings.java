@@ -124,7 +124,7 @@ public class ConsumeBindings extends Bindings {
             uuid = Fawe.imp().getUUID(argument);
         }
         if (uuid == null) {
-            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found" , argument)));
+            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found", argument)));
         }
         return uuid;
     }
@@ -202,7 +202,9 @@ public class ConsumeBindings extends Bindings {
     public BiomeType getBiomeType(String argument) throws WorldEditException {
         if (argument != null) {
 
-            if (MathMan.isInteger(argument)) return BiomeTypes.getLegacy(Integer.parseInt(argument));
+            if (MathMan.isInteger(argument)) {
+                return BiomeTypes.getLegacy(Integer.parseInt(argument));
+            }
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
             Collection<BiomeType> knownBiomes = BiomeType.REGISTRY.values();

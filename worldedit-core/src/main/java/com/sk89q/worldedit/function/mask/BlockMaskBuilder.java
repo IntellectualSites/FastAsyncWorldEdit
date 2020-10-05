@@ -39,7 +39,7 @@ public class BlockMaskBuilder {
     private static final Operator LESS_EQUAL = (a, b) -> a <= b;
     private static final Operator NOT = (a, b) -> a != b;
 
-    private final static long[] ALL = new long[0];
+    private static final long[] ALL = new long[0];
 
     private interface Operator {
         boolean test(int left, int right);
@@ -47,7 +47,9 @@ public class BlockMaskBuilder {
 
     private boolean filterRegex(BlockType blockType, PropertyKey key, String regex) {
         Property<Object> property = blockType.getProperty(key);
-        if (property == null) return false;
+        if (property == null) {
+            return false;
+        }
         List<Object> values = property.getValues();
         boolean result = false;
         for (int i = 0; i < values.size(); i++) {
@@ -62,7 +64,9 @@ public class BlockMaskBuilder {
 
     private boolean filterOperator(BlockType blockType, PropertyKey key, Operator operator, CharSequence value) {
         Property<Object> property = blockType.getProperty(key);
-        if (property == null) return false;
+        if (property == null) {
+            return false;
+        }
         int index = property.getIndexFor(value);
         List<Object> values = property.getValues();
         boolean result = false;
@@ -98,7 +102,9 @@ public class BlockMaskBuilder {
     public BlockMaskBuilder addRegex(String input) throws InputParseException {
         if (input.charAt(input.length() - 1) == ']') {
             int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
-            if (propStart == -1) return this;
+            if (propStart == -1) {
+                return this;
+            }
 
             MutableCharSequence charSequence = MutableCharSequence.getTemporal();
             charSequence.setString(input);
@@ -121,7 +127,9 @@ public class BlockMaskBuilder {
                 if (blockTypeList.isEmpty()) {
                     throw new InputParseException("No block found for " + input);
                 }
-                if (blockTypeList.size() == 1) type = blockTypeList.get(0);
+                if (blockTypeList.size() == 1) {
+                    type = blockTypeList.get(0);
+                }
             }
             // Empty string
             charSequence.setSubstring(0, 0);
@@ -137,18 +145,23 @@ public class BlockMaskBuilder {
                     case '{':
                     case '(':
                         int next = StringMan.findMatchingBracket(input, i);
-                        if (next != -1) i = next;
+                        if (next != -1) {
+                            i = next;
+                        }
                         break;
                     case ']':
                     case ',': {
                         charSequence.setSubstring(last, i);
-                        if (key == null && PropertyKey.get(charSequence) == null) suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
-                        if (operator == null) throw new SuggestInputParseException("No operator for " + input, "", () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">="));
+                        if (key == null && PropertyKey.get(charSequence) == null) {
+                            suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
+                        }
+                        if (operator == null) {
+                            throw new SuggestInputParseException("No operator for " + input, "", () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">="));
+                        }
                         boolean filtered = false;
                         if (type != null) {
                             filtered = filterRegexOrOperator(type, key, operator, charSequence);
-                        }
-                        else {
+                        } else {
                             for (BlockType myType : blockTypeList) {
                                 filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
                             }
@@ -164,8 +177,9 @@ public class BlockMaskBuilder {
                                     for (int j = 0; j < p.getValues().size(); j++) {
                                         if (has(t, p, j)) {
                                             String o = p.getValues().get(j).toString();
-                                            if (o.startsWith(value))
+                                            if (o.startsWith(value)) {
                                                 values.add(o);
+                                            }
                                         }
                                     }
                                 });
@@ -185,7 +199,9 @@ public class BlockMaskBuilder {
                     case '>': {
                         charSequence.setSubstring(last, i);
                         boolean extra = input.charAt(i + 1) == '=';
-                        if (extra) i++;
+                        if (extra) {
+                            i++;
+                        }
                         switch (c) {
                             case '~':
                                 operator = EQUAL_OR_NULL;
@@ -205,8 +221,9 @@ public class BlockMaskBuilder {
                         }
                         if (charSequence.length() > 0 || key == null) {
                             key = PropertyKey.get(charSequence);
-                            if (key == null)
+                            if (key == null) {
                                 suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
+                            }
                         }
                         last = i + 1;
                         break;
@@ -232,7 +249,9 @@ public class BlockMaskBuilder {
     private <T> boolean has(BlockType type, Property<T> property, int index) {
         AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
-        if (states == null) return false;
+        if (states == null) {
+            return false;
+        }
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         return (states == ALL || FastBitSet.get(states, localI));
     }
@@ -328,10 +347,11 @@ public class BlockMaskBuilder {
                 set = FastBitSet.get(states, stateId);
                 Arrays.fill(states, 0);
             }
-            if (set)
+            if (set) {
                 FastBitSet.set(states, stateId);
-            else
+            } else {
                 bitSets[i] = null;
+            }
             reset(true);
         }
         return this;
@@ -350,7 +370,9 @@ public class BlockMaskBuilder {
     public <T> BlockMaskBuilder filter(Predicate<BlockType> typePredicate, BiPredicate<BlockType, Map.Entry<Property<T>, T>> allowed) {
         for (int i = 0; i < bitSets.length; i++) {
             long[] states = bitSets[i];
-            if (states == null) continue;
+            if (states == null) {
+                continue;
+            }
             BlockType type = BlockTypes.get(i);
             if (!typePredicate.test(type)) {
                 bitSets[i] = null;
@@ -398,22 +420,30 @@ public class BlockMaskBuilder {
     }
 
     public <T extends BlockStateHolder<T>> BlockMaskBuilder addBlocks(Collection<T> blocks) {
-        for (BlockStateHolder<T> block : blocks) add(block);
+        for (BlockStateHolder<T> block : blocks) {
+            add(block);
+        }
         return this;
     }
 
     public BlockMaskBuilder addTypes(Collection<BlockType> blocks) {
-        for (BlockType block : blocks) add(block);
+        for (BlockType block : blocks) {
+            add(block);
+        }
         return this;
     }
 
     public <T extends BlockStateHolder<T>> BlockMaskBuilder addBlocks(T... blocks) {
-        for (BlockStateHolder<T> block : blocks) add(block);
+        for (BlockStateHolder<T> block : blocks) {
+            add(block);
+        }
         return this;
     }
 
     public BlockMaskBuilder addTypes(BlockType... blocks) {
-        for (BlockType block : blocks) add(block);
+        for (BlockType block : blocks) {
+            add(block);
+        }
         return this;
     }
 
@@ -430,7 +460,9 @@ public class BlockMaskBuilder {
     public BlockMaskBuilder addAll(Predicate<BlockType> typePredicate, BiPredicate<BlockType, Map.Entry<Property<?>, ?>> propPredicate) {
         for (int i = 0; i < bitSets.length; i++) {
             long[] states = bitSets[i];
-            if (states == ALL) continue;
+            if (states == ALL) {
+                continue;
+            }
             BlockType type = BlockTypes.get(i);
             if (!typePredicate.test(type)) {
                 continue;
@@ -457,7 +489,9 @@ public class BlockMaskBuilder {
     public <T> BlockMaskBuilder add(BlockType type, Property<T> property, int index) {
         AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
-        if (states == ALL) return this;
+        if (states == ALL) {
+            return this;
+        }
 
         List<T> values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
@@ -474,7 +508,9 @@ public class BlockMaskBuilder {
     public <T> BlockMaskBuilder filter(BlockType type, Property<T> property, int index) {
         AbstractProperty<T> prop = (AbstractProperty<T>) property;
         long[] states = bitSets[type.getInternalId()];
-        if (states == null) return this;
+        if (states == null) {
+            return this;
+        }
         List<T> values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
         if (states == ALL || FastBitSet.get(states, localI)) {
@@ -499,8 +535,11 @@ public class BlockMaskBuilder {
         } else {
             for (int i = 0; i < values.size(); i++) {
                 int index = current.modifyIndex(state, i) >> BlockTypesCache.BIT_OFFSET;
-                if (set) FastBitSet.set(states, index);
-                else FastBitSet.clear(states, index);
+                if (set) {
+                    FastBitSet.set(states, index);
+                } else {
+                    FastBitSet.clear(states, index);
+                }
             }
         }
     }
@@ -529,7 +568,9 @@ public class BlockMaskBuilder {
         if (!optimizedStates) {
             for (int i = 0; i < bitSets.length; i++) {
                 long[] bitSet = bitSets[i];
-                if (bitSet == null || bitSet == ALL) continue;
+                if (bitSet == null || bitSet == ALL) {
+                    continue;
+                }
                 BlockType type = BlockTypes.get(i);
                 int maxStateId = type.getMaxStateId();
                 if (maxStateId == 0) {
@@ -547,12 +588,18 @@ public class BlockMaskBuilder {
                     List<?> values = prop.getValues();
                     for (int j = 0; j < values.size(); j++) {
                         int localI = j << prop.getBitOffset() >> BlockTypesCache.BIT_OFFSET;
-                        if (FastBitSet.get(bitSet, localI)) set++;
-                        else clear++;
+                        if (FastBitSet.get(bitSet, localI)) {
+                            set++;
+                        } else {
+                            clear++;
+                        }
                     }
                 }
-                if (set == 0) bitSets[i] = null;
-                else if (clear == 0) bitSets[i] = ALL;
+                if (set == 0) {
+                    bitSets[i] = null;
+                } else if (clear == 0) {
+                    bitSets[i] = ALL;
+                }
             }
             reset(true);
         }
@@ -564,7 +611,9 @@ public class BlockMaskBuilder {
             ordinals = new boolean[BlockTypesCache.states.length];
             for (int i = 0; i < BlockTypesCache.values.length; i++) {
                 long[] bitSet = bitSets[i];
-                if (bitSet == null) continue;
+                if (bitSet == null) {
+                    continue;
+                }
                 BlockType type = BlockTypesCache.values[i];
                 if (bitSet == ALL) {
                     for (BlockState state : type.getAllStates()) {

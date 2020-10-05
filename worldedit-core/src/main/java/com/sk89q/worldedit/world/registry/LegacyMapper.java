@@ -158,7 +158,9 @@ public final class LegacyMapper {
             int base = blockArr[combinedId];
             if (base != 0) {
                 for (int data_ = 0; data_ < 16; data_++, combinedId++) {
-                    if (blockArr[combinedId] == 0) blockArr[combinedId] = base;
+                    if (blockArr[combinedId] == 0) {
+                        blockArr[combinedId] = base;
+                    }
                 }
             }
         }
@@ -193,12 +195,16 @@ public final class LegacyMapper {
     }
 
     public ItemType getItemFromLegacy(String input) {
-        if (input.startsWith("minecraft:")) input = input.substring(10);
+        if (input.startsWith("minecraft:")) {
+            input = input.substring(10);
+        }
         return itemMap.get(getCombinedId(input));
     }
 
     public BlockState getBlockFromLegacy(String input) {
-        if (input.startsWith("minecraft:")) input = input.substring(10);
+        if (input.startsWith("minecraft:")) {
+            input = input.substring(10);
+        }
         try {
             return BlockState.getFromInternalId(blockArr[getCombinedId(input)]);
         } catch (InputParseException e) {
@@ -246,13 +252,15 @@ public final class LegacyMapper {
         if (combinedId < blockArr.length) {
             try {
                 int internalId = blockArr[combinedId];
-                if (internalId == 0) return null;
+                if (internalId == 0) {
+                    return null;
+                }
                 try {
                     return BlockState.getFromInternalId(internalId);
                 } catch (InputParseException e) {
                     e.printStackTrace();
                 }
-            } catch (IndexOutOfBoundsException ignore) {
+            } catch (IndexOutOfBoundsException ignored) {
                 return null;
             }
         }
@@ -279,7 +287,9 @@ public final class LegacyMapper {
     @Nullable
     public Integer getLegacyCombined(BlockState blockState) {
         Integer result = blockStateToLegacyId4Data.get(blockState.getInternalId());
-        if (result == null) result = blockStateToLegacyId4Data.get(blockState.getInternalBlockTypeId());
+        if (result == null) {
+            result = blockStateToLegacyId4Data.get(blockState.getInternalBlockTypeId());
+        }
         return result;
     }
 

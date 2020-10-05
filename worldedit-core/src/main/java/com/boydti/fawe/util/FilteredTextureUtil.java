@@ -23,7 +23,9 @@ public class FilteredTextureUtil extends TextureUtil {
         int num = 0;
         for (int i = 0; i < parent.validBlockIds.length; i++) {
             BlockType block = BlockTypes.get(parent.validBlockIds[i]);
-            if (blocks.contains(block)) num++;
+            if (blocks.contains(block)) {
+                num++;
+            }
         }
         this.validBlockIds = new int[num];
         this.validColors = new int[num];

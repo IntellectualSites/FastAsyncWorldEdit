@@ -15,7 +15,8 @@ import java.util.concurrent.Future;
 
 public class HeightBoundExtent extends FaweRegionExtent {
 
-    private final int min, max;
+    private final int min;
+    private final int max;
     private int lastY = -1;
     private boolean lastResult;
 

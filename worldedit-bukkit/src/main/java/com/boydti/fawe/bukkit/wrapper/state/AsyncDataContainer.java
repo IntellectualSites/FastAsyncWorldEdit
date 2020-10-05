@@ -3,6 +3,12 @@ package com.boydti.fawe.bukkit.wrapper.state;
 import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import org.apache.commons.lang.Validate;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,13 +16,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import org.apache.commons.lang.Validate;
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataAdapterContext;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 
 public final class AsyncDataContainer implements PersistentDataContainer {
     private final CompoundTag root;
@@ -38,7 +37,9 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         CompoundTag tag = root();
         Map<String, Tag> raw;
         if (tag == null) {
-            if (!create) return Collections.emptyMap();
+            if (!create) {
+                return Collections.emptyMap();
+            }
             Map<String, Tag> map = root.getValue();
             map.put("PublicBukkitValues", new CompoundTag(raw = new HashMap<>()));
         } else {
@@ -58,7 +59,9 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(key, "The provided key for the custom value was null");
         Validate.notNull(type, "The provided type for the custom value was null");
         Tag value = get(false).get(key.toString());
-        if (value == null) return type == null;
+        if (value == null) {
+            return type == null;
+        }
         return type.getPrimitiveType() == value.getValue().getClass();
     }
 
@@ -106,7 +109,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
             return false;
         } else {
             Map<String, Tag> myRawMap = this.getRaw();
-            Map<String, Tag> theirRawMap = ((AsyncDataContainer)obj).getRaw();
+            Map<String, Tag> theirRawMap = ((AsyncDataContainer) obj).getRaw();
             return Objects.equals(myRawMap, theirRawMap);
         }
     }

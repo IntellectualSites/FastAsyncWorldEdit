@@ -107,7 +107,7 @@ public class InspectBrush extends BrushTool {
                     player.print(msg);
                 }
             }
-            player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+            player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer", count));
         } catch (IOException e) {
             System.out.println("IOE");
             throw new RuntimeException(e);

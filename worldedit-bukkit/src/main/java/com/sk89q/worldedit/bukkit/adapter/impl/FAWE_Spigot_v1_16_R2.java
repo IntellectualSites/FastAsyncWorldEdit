@@ -24,7 +24,11 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.bukkit.adapter.mc1_16_2.*;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BlockMaterial_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BukkitAdapter_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.BukkitGetBlocks_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.FAWEWorldNativeAccess_1_16;
+import com.boydti.fawe.bukkit.adapter.mc1_16_2.MapChunkUtil_1_16_2;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.boydti.fawe.util.MathMan;
 import com.google.common.base.Preconditions;
@@ -53,9 +57,37 @@ import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import net.minecraft.server.v1_16_R2.BiomeBase;
+import net.minecraft.server.v1_16_R2.Block;
+import net.minecraft.server.v1_16_R2.BlockPosition;
+import net.minecraft.server.v1_16_R2.Chunk;
+import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R2.ChunkSection;
+import net.minecraft.server.v1_16_R2.Entity;
+import net.minecraft.server.v1_16_R2.EntityPlayer;
+import net.minecraft.server.v1_16_R2.EntityTypes;
+import net.minecraft.server.v1_16_R2.IBlockData;
+import net.minecraft.server.v1_16_R2.IRegistry;
+import net.minecraft.server.v1_16_R2.ItemStack;
+import net.minecraft.server.v1_16_R2.MinecraftKey;
+import net.minecraft.server.v1_16_R2.MinecraftServer;
+import net.minecraft.server.v1_16_R2.NBTBase;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import net.minecraft.server.v1_16_R2.NBTTagInt;
+import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_16_R2.PlayerChunk;
+import net.minecraft.server.v1_16_R2.TileEntity;
+import net.minecraft.server.v1_16_R2.World;
+import net.minecraft.server.v1_16_R2.WorldServer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -99,12 +131,15 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.bukkit.generator.BlockPopulator;
+import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.jnbt.StringTag;
 
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R2 parent;
     private char[] ibdToStateOrdinal;
-    
+
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
@@ -119,7 +154,9 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     }
 
     private synchronized boolean init() {
-        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) return false;
+        if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
+            return false;
+        }
         ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
@@ -218,9 +255,13 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 }
             }
         } else {
-            if (existing == blockData) return true;
+            if (existing == blockData) {
+                return true;
+            }
             if (section == null) {
-                if (blockData.isAir()) return true;
+                if (blockData.isAir()) {
+                    return true;
+                }
                 sections[y4] = section = new ChunkSection(y4 << 4);
             }
             nmsChunk.setType(blockPos, blockData, false);
@@ -316,7 +357,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             } catch (NullPointerException e) {
                 init();
                 return adaptToChar(ibd);
-            } catch(ArrayIndexOutOfBoundsException e1){
+            } catch (ArrayIndexOutOfBoundsException e1) {
                 Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
                 return 0;
             }
@@ -397,7 +438,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
         return new ReneratorImpl(bukkitWorld, region, realExtent, options).regenerate();
     }
-    
+
     @Override
     public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
         return new BukkitGetBlocks_1_16_2(world, chunkX, chunkZ);
@@ -408,7 +449,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
         BiomeBase base = CraftBlock.biomeToBiomeBase(MinecraftServer.getServer().aX().b(IRegistry.ay), BukkitAdapter.adapt(biome));
         return MinecraftServer.getServer().aX().b(IRegistry.ay).a(base);
     }
-   
+
     private static class ReneratorImpl extends Regenerator {
 
         private static final Field serverWorldsField;
@@ -437,7 +478,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             chunkStati.put(ChunkStatus.LIGHT, Concurrency.FULL);                  // radius 1, but no writes to other chunks, only current chunk
             chunkStati.put(ChunkStatus.SPAWN, Concurrency.FULL);                  // radius 0
             chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);             // radius 0
-            
+
             try {
                 serverWorldsField = CraftServer.class.getDeclaredField("worlds");
                 serverWorldsField.setAccessible(true);
@@ -458,10 +499,10 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
                 generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
                 generatorSettingBaseSupplierField.setAccessible(true);
-                
+
                 generatorSettingFlatField = ChunkProviderFlat.class.getDeclaredField("e");
                 generatorSettingFlatField.setAccessible(true);
-                
+
                 delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
                 delegateField.setAccessible(true);
 
@@ -814,7 +855,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             r.run();
             System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
         }
-        
+
 //        private void timeHigh(Runnable r, String text) {
 //            long starttask = System.currentTimeMillis();
 //            r.run();
@@ -864,20 +905,20 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             areaLazyField.setAccessible(true);
             Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", boolean.class, int.class, int.class, LongFunction.class);
             initAreaFactoryMethod.setAccessible(true);
-            
+
             //init new WorldChunkManagerOverworld
             boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
             boolean largebiomes = largeBiomesField.getBoolean(chunkManager);
             IRegistry<BiomeBase> biomeRegistry = (IRegistry<BiomeBase>) biomeRegistryField.get(chunkManager);
             chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes, biomeRegistry);
-            
+
             //replace genLayer
             AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largebiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
             genLayerField.set(chunkManager, new FastGenLayer(factory));
-            
+
             return chunkManager;
         }
-        
+
         private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
 
             private final ConcurrentHashMap<Long, Integer> sharedAreaMap = new ConcurrentHashMap<>();
@@ -931,7 +972,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 return l2;
             }
         }
-     
+
         private static class FastGenLayer extends GenLayer {
 
             private final FastAreaLazy areaLazy;
@@ -970,7 +1011,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 return this.sharedMap.computeIfAbsent(zx, i -> this.transformer.apply(x, z));
             }
         }
-        
+
         private static class RegenNoOpWorldLoadListener implements WorldLoadListener {
 
             private RegenNoOpWorldLoadListener() {

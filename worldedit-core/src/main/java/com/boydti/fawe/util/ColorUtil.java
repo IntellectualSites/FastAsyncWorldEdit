@@ -103,9 +103,9 @@ public class ColorUtil {
         } else {
             Color col = null;
             try {
-                Field field = Color.class.getField(color.toLowerCase());
+                Field field = Color.class.getField(color.toLowerCase(Locale.ROOT));
                 col = (Color) field.get(null);
-            } catch (Throwable ignore) {
+            } catch (Throwable ignored) {
             }
             if (col != null) {
                 return col;

@@ -33,10 +33,7 @@ public class Caption {
     }
 
     /**
-     * Colorize a component with legacy color codes
-     * @param component
-     * @param locale
-     * @return Component
+     * Colorize a component with legacy color codes.
      */
     public static Component color(Component component, Locale locale) {
         return color(WorldEditText.format(component, locale));

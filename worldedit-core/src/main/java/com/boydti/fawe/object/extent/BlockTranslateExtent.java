@@ -11,7 +11,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class BlockTranslateExtent extends AbstractDelegateExtent {
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public BlockTranslateExtent(Extent extent, int dx, int dy, int dz) {

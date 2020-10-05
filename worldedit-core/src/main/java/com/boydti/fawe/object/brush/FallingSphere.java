@@ -30,7 +30,9 @@ public class FallingSphere implements Brush {
                 int ax = px + x;
 
                 int remainingY = remaining - xx;
-                if (remainingY < 0) continue;
+                if (remainingY < 0) {
+                    continue;
+                }
 
                 int yRadius = MathMan.usqrt(remainingY);
                 int startY = Math.max(0, py - yRadius);

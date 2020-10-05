@@ -79,7 +79,7 @@ public abstract class PaginationBox extends MessageBox {
         if (pageCommand != null && !pageCommand.contains("%page%")) {
             if (pageCommand.contains("-p ")) {
                 pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
-            } else{
+            } else {
                 pageCommand = pageCommand + " -p %page%";
             }
         }

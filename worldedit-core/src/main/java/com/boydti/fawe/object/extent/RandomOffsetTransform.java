@@ -12,7 +12,9 @@ import java.util.SplittableRandom;
 
 public class RandomOffsetTransform extends ResettableExtent {
 
-    private final int dx, dy, dz;
+    private final int dx;
+    private final int dy;
+    private final int dz;
     private transient SplittableRandom random;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 

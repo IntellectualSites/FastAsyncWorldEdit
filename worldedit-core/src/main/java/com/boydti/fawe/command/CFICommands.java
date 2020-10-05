@@ -245,7 +245,7 @@
 //            desc = "Set the floor and main block"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void column(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void column(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (image != null) {
 //            gen.setColumn(load(image), pattern, !disableWhiteOnly);
@@ -264,7 +264,7 @@
 //            desc = "Set the floor (default: grass)"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void floorCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void floorCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        floor(player, pattern, image, mask, disableWhiteOnly);
 //        player.print("Set floor!");
 //        assertSettings(player).resetComponent();
@@ -287,14 +287,14 @@
 //            desc = "Set the main block (default: stone)"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void mainCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void mainCmd(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        main(player, pattern, image, maskOpt, disableWhiteOnly);
 //        player.print("Set main!");
 //        assertSettings(player).resetComponent();
 //        component(player);
 //    }
 //
-//    public void main(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void main(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask maskOpt, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (image != null) {
 //            gen.setMain(load(image), pattern, !disableWhiteOnly);
@@ -313,7 +313,7 @@
 //                    "e.g., Tallgrass"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void overlay(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void overlay(Player player, @Arg(desc = "Pattern") Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (image != null) {
 //            gen.setOverlay(load(image), pattern, !disableWhiteOnly);
@@ -335,13 +335,13 @@
 //                    " - A good value for radius and iterations would be 1 8."
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void smoothCmd(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void smoothCmd(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        smooth(player, radius, iterations, image, mask, disableWhiteOnly);
 //        assertSettings(player).resetComponent();
 //        component(player);
 //    }
 //
-//    private void smooth(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    private void smooth(Player player, int radius, int iterations, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (image != null) {
 //            gen.smooth(load(image), !disableWhiteOnly, radius, iterations);
@@ -355,7 +355,7 @@
 //            desc = "Create some snow"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void snow(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void snow(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        floor(player, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, mask, disableWhiteOnly);
 //        main(player, BlockTypes.SNOW_BLOCK, image, mask, disableWhiteOnly);
@@ -422,7 +422,7 @@
 //        Request.request().setExtent(generator);
 //
 //        Set<BlockType> blocks;
-//        switch (argOpt.toLowerCase()) {
+//        switch (argOpt.toLowerCase(Locale.ROOT)) {
 //            case "true":
 //            case "*": {
 //                generator.setTextureUtil(Fawe.get().getTextureUtil());
@@ -535,7 +535,7 @@
 //                    " - If a mask is used, the biome will be set anywhere the mask applies"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void biome(Player player, @Arg(desc = "Biome type") BiomeType biome, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+//    public void biome(Player player, @Arg(desc = "Biome type") BiomeType biome, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (image != null) {
 //            gen.setBiome(load(image), biome, !disableWhiteOnly);
@@ -819,7 +819,7 @@
 //            TextComponent.of("/cfi randomization " + !rand)));
 //        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<");
 //        builder.append(newline());
-//        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase() + "]")
+//        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase(Locale.ROOT) + "]")
 //            .clickEvent(ClickEvent.runCommand(
 //                "/cfi randomization " + !rand)).hoverEvent(HoverEvent.showText(
 //                TextComponent.of("/cfi randomization " + !rand))));
@@ -871,7 +871,7 @@
 //            desc = "Select a mask"
 //    )
 //    @CommandPermissions("worldedit.anvil.cfi")
-//    public void mask(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context){
+//    public void mask(Player player, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context) {
 //        CFISettings settings = assertSettings(player);
 //        String[] split = getArguments(context).split(" ");
 //        int index = 2;
@@ -950,7 +950,7 @@
 //        JsonObject data1 = obj.get("data").getAsJsonObject();
 //        String link = data1.get("link").getAsString();
 //        URL url = new URL(link);
-//        player.print(Caption.of("fawe.web.download.link" , url));
+//        player.print(Caption.of("fawe.web.download.link", url));
 //    }
 //
 //    @Command(

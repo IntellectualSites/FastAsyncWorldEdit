@@ -15,12 +15,9 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 
 public interface IBatchProcessor {
+
     /**
-     * Process a chunk that has been set
-     * @param chunk
-     * @param get
-     * @param set
-     * @return
+     * Process a chunk that has been set.
      */
     IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
 
@@ -31,18 +28,13 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Convert this processor into an Extent based processor instead of a queue batch based on
-     * @param child
-     * @return
+     * Convert this processor into an Extent based processor instead of a queue batch based on.
      */
     @Nullable
     Extent construct(Extent child);
 
     /**
-     * Utility method to trim a chunk based on min and max Y
-     * @param set
-     * @param minY
-     * @param maxY
+     * Utility method to trim a chunk based on min and max Y.
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY) {
@@ -52,7 +44,9 @@ public interface IBatchProcessor {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
                     int index = (minY & 15) << 8;
-                    for (int i = 0; i < index; i++) arr[i] = 0;
+                    for (int i = 0; i < index; i++) {
+                        arr[i] = 0;
+                    }
                     set.setBlocks(layer, arr);
                 } else {
                     set.setBlocks(layer, null);
@@ -65,7 +59,9 @@ public interface IBatchProcessor {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
                     int index = ((maxY + 1) & 15) << 8;
-                    for (int i = index; i < arr.length; i++) arr[i] = 0;
+                    for (int i = index; i < arr.length; i++) {
+                        arr[i] = 0;
+                    }
                     set.setBlocks(layer, arr);
                 } else {
                     set.setBlocks(layer, null);
@@ -91,9 +87,8 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Utility method to trim entity and blocks with a provided contains function
-     * @param set
-     * @param contains
+     * Utility method to trim entity and blocks with a provided contains function.
+     *
      * @return false if chunk is empty of NBT
      */
     default boolean trimNBT(IChunkSet set, Function<BlockVector3, Boolean> contains) {
@@ -110,9 +105,7 @@ public interface IBatchProcessor {
     }
 
     /**
-     * Join two processors and return the result
-     * @param other
-     * @return
+     * Join two processors and return the result.
      */
     default IBatchProcessor join(IBatchProcessor other) {
         return MultiBatchProcessor.of(this, other);
@@ -122,13 +115,11 @@ public interface IBatchProcessor {
         return MultiBatchProcessor.of(this, other);
     }
 
-    default void flush() {}
+    default void flush() {
+    }
 
     /**
-     * Return a new processor after removing all are instances of a specified class
-     * @param clazz
-     * @param <T>
-     * @return
+     * Return a new processor after removing all are instances of a specified class.
      */
     default <T extends IBatchProcessor> IBatchProcessor remove(Class<T> clazz) {
         if (clazz.isInstance(this)) {

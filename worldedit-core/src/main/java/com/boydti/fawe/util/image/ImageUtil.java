@@ -31,7 +31,8 @@ public class ImageUtil {
         int type = image.getTransparency() == Transparency.OPAQUE ?
             BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         BufferedImage scaledImage = image;
-        int width, height;
+        int width;
+        int height;
         if (higherQuality) {
             /* Use multi-step technique: start with original size, then
             scale down in multiple passes with drawImage()

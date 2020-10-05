@@ -49,16 +49,16 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 
     /**
-     * Get the cached get object
-     *  - Faster than getting it using NMS and allows for wrapping
-     * @param x
-     * @param z
+     * Get the cached get object. This is faster than getting the object using NMS and allows for
+     * wrapping.
+     * @param chunkX
+     * @param chunkZ
      * @return
      */
-    IChunkGet getCachedGet(@Range(from = 0, to = 15) int x, @Range(from = 0, to = 15) int z);
+    IChunkGet getCachedGet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
 
     /**
-     * Get the cached chunk set object
+     * Get the cached chunk set object.
      * @param chunkX
      * @param chunkZ
      * @return
@@ -88,19 +88,18 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     boolean isFastMode();
 
     /**
-     * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
-     * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
-     * #wrap(T)}
+     * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be
+     * returned in that case.
      *
+     * @apiNote Don't wrap the chunk, that should be done in {@link IQueueExtent#wrap(IChunk)}
      * @param isFull true if a more optimized chunk should be returned
      * @return a more optimized chunk object
      */
     T create(boolean isFull);
 
     /**
-     * Wrap the chunk object (i.e., for region restrictions / limits etc.)
+     * Wrap the chunk object (i.e., for region restrictions / limits etc.).
      *
-     * @param root
      * @return wrapped chunk
      */
     default T wrap(T root) {
@@ -115,15 +114,15 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     }
 
     /**
-     * Flush all changes to the world - Best to call this async so it doesn't hang the server
+     * Flush all changes to the world.
+     * @apiNote Best to call this async, so it doesn't hang the server.
      */
     @Override
     void flush();
 
     /**
-     * A filter block is used to iterate over blocks / positions
-     *  - Essentially combines BlockVector3, Extent and BlockState functions in a way that avoids lookups
-     * @return
+     * A filter block is used to iterate over blocks / positions. Essentially combines BlockVector3,
+     * Extent and BlockState functions in a way that avoids lookups.
      */
     ChunkFilterBlock initFilterBlock();
 

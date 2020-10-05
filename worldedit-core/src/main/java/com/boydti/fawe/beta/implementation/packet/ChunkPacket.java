@@ -116,8 +116,8 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
             fos.writeVarInt(sectionBytes.length);
             fos.write(sectionBytes);
             // TODO entities / NBT
-//            Set<CompoundTag> entities = chunk.getEntities();
-//            Map<BlockVector3, CompoundTag> tiles = chunk.getTiles();
+            //Set<CompoundTag> entities = chunk.getEntities();
+            //Map<BlockVector3, CompoundTag> tiles = chunk.getTiles();
             fos.writeVarInt(0); // (Entities / NBT)
             return baos.toByteArray();
         } catch (Throwable e) {

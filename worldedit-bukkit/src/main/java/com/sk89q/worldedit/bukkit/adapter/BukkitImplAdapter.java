@@ -70,7 +70,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     int getDataVersion();
 
     /**
-     * Get a data fixer, or null if not supported
+     * Get a data fixer, or null if not supported.
      *
      * @return the data fixer
      */
@@ -78,6 +78,8 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     DataFixer getDataFixer();
 
     /**
+     * Check if this adapter supports the watchdog.
+     *
      * @return {@code true} if {@link #tickWatchdog()} is implemented
      */
     default boolean supportsWatchdog() {
@@ -219,14 +221,13 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return null;
     }
 
-    default @Nullable World createWorld(WorldCreator creator) {
+    @Nullable
+    default World createWorld(WorldCreator creator) {
         return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
     }
 
     /**
-     * Send a fake chunk packet to a player
-     * @param player
-     * @param packet
+     * Send a fake chunk packet to a player.
      */
     default void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
         throw new UnsupportedOperationException("Cannot send fake chunks");

@@ -158,13 +158,15 @@ public class AnvilCommands {
         name = "deleteallunvisited",
         aliases = {"delunvisited" },
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
-    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
+    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks,
+                                   @Arg(desc = "int", def = "60000")
+                                       int fileDurationMillis) throws WorldEditException {
         //        DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
         //        DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
         //        if (result != null) {
@@ -176,14 +178,18 @@ public class AnvilCommands {
         name = "deleteallunclaimed",
         aliases = {"delallunclaimed" },
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "Supports: WG, P2, GP:\n" +
-            "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "Supports: WorldGuard, PlotSquared, GriefPrevention:\n"
+            + "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
-    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteAllUnclaimed(Player player, int inhabitedTicks,
+                                   @Arg(desc = "int", def = "60000")
+                                       int fileDurationMillis,
+                                   @Switch(name = 'd', desc = "The flag will debug the task")
+                                       boolean debug) throws WorldEditException {
         //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
         //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
         //        if (debug) {
@@ -198,15 +204,19 @@ public class AnvilCommands {
     @Command(
         name = "deleteunclaimed",
         desc = "Delete all chunks which haven't been occupied",
-        descFooter = "(Supports: WG, P2, GP):\n" +
-            "Is not claimed\n" +
-            "Has not been occupied for `age-ticks` (20t = 1s) and \n" +
-            "Have not been accessed since `file-duration` (ms) after creation and\n" +
-            "Have not been used in the past `chunk-inactivity` (ms)" +
-            "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+        descFooter = "(Supports: WorldGuard, PlotSquared, GriefPrevention):\n"
+            + "Is not claimed\n"
+            + "Has not been occupied for `age-ticks` (20t = 1s) and \n"
+            + "Have not been accessed since `file-duration` (ms) after creation and\n"
+            + "Have not been used in the past `chunk-inactivity` (ms)"
+            + "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
-    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks,
+                                @Arg(desc = "int", def = "60000")
+                                    int fileDurationMillis,
+                                @Switch(name = 'd', desc = "The flag will debug the task")
+                                    boolean debug) throws WorldEditException {
         //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
         //        if (debug) {
         //            filter.enableDebug();
@@ -221,8 +231,8 @@ public class AnvilCommands {
         name = "deletealloldregions",
         aliases = {"deloldreg" },
         desc = "Delete regions which haven't been accessed in a certain amount of time",
-        descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
-            "(months are not a unit of time) e.g., 8h5m12s\n"
+        descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n"
+            + "(months are not a unit of time) e.g., 8h5m12s\n"
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {
@@ -236,12 +246,13 @@ public class AnvilCommands {
 
     @Command(
         name = "trimallplots",
-
         desc = "Trim chunks in a Plot World",
         descFooter = "Unclaimed chunks will be deleted\nUnmodified chunks will be deleted\n"
     )
     @CommandPermissions("worldedit.anvil.trimallplots")
-    public void trimAllPlots(Player player, @Switch(name = 'v', desc = "Delete unvisited chunks") boolean deleteUnvisited) throws WorldEditException {
+    public void trimAllPlots(Player player,
+                             @Switch(name = 'v', desc = "Delete unvisited chunks")
+                                 boolean deleteUnvisited) throws WorldEditException {
         //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
         //        int visitTime = deleteUnvisited ? 1 : -1;
         //        PlotTrimFilter filter = new PlotTrimFilter(player.getWorld(), 0, visitTime, 600000);
@@ -259,7 +270,9 @@ public class AnvilCommands {
         desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void deleteBiome(Player player, String folder, BiomeType biome, @Switch(name = 'u', desc = "TODO") boolean unsafe) {
+    public void deleteBiome(Player player, String folder, BiomeType biome,
+                            @Switch(name = 'u', desc = "The flag will run the task unsafe")
+                                boolean unsafe) {
         //        DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);  TODO NOT IMPLEMENTED
         //        DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
         //        if (result != null) {
@@ -272,7 +285,9 @@ public class AnvilCommands {
         desc = "Trim all air in the world"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void trimAllAir(Player player, String folder, @Switch(name = 'u', desc = "TODO") boolean unsafe) throws WorldEditException {
+    public void trimAllAir(Player player, String folder,
+                           @Switch(name = 'u', desc = "The flag will run the task unsafe")
+                               boolean unsafe) throws WorldEditException {
         //        TrimAirFilter filter = new TrimAirFilter();  TODO NOT IMPLEMENTED
         //        TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
         //        if (result != null) {
@@ -282,7 +297,6 @@ public class AnvilCommands {
 
     @Command(
         name = "debugfixroads",
-
         desc = "debug - do not use"
     )
     @CommandPermissions("worldedit.anvil.debugfixroads")
@@ -300,7 +314,13 @@ public class AnvilCommands {
         desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, Pattern toPattern, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
+    public void replaceAllPattern(Player player, String folder,
+                                  @Arg(desc = "String", def = "")
+                                      String from, Pattern toPattern,
+                                  @Switch(name = 'd', desc = "The flag specifies the data to use")
+                                      boolean useData,
+                                  @Switch(name = 'm', desc = "The flag specifies the map to use")
+                                      boolean useMap) throws WorldEditException {
         //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
         //        if (useMap) {
         //            if (to instanceof RandomPattern) {
@@ -329,7 +349,9 @@ public class AnvilCommands {
         desc = "Count all blocks in a world"
     )
     @CommandPermissions("worldedit.anvil.countall")
-    public void countAll(Player player, EditSession editSession, String folder, String argStr, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
+    public void countAll(Player player, EditSession editSession, String folder, String argStr,
+                         @Switch(name = 'd', desc = "The flag specifies the data to use")
+                             boolean useData) throws WorldEditException {
         //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
         //        MCAFilterCounter filter;
         //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -403,7 +425,9 @@ public class AnvilCommands {
         desc = "Count blocks in a selection"
     )
     @CommandPermissions("worldedit.anvil.count")
-    public void count(Player player, EditSession editSession, @Selection Region selection, String argStr, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
+    public void count(Player player, EditSession editSession, @Selection Region selection, String argStr,
+                      @Switch(name = 'd', desc = "The flag specifies the data to use")
+                          boolean useData) throws WorldEditException {
         //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);  TODO NOT IMPLEMENTED
         //        MCAFilterCounter filter;
         //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -425,7 +449,9 @@ public class AnvilCommands {
         desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.distr")
-    public void distr(Player player, EditSession editSession, @Selection Region selection, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
+    public void distr(Player player, EditSession editSession, @Selection Region selection,
+                      @Switch(name = 'd', desc = "The flag specifies the data to use")
+                          boolean useData) throws WorldEditException {
         //        long total = 0;  TODO NOT IMPLEMENTED
         //        long[] count;
         //        MCAFilter<long[]> counts;
@@ -504,7 +530,11 @@ public class AnvilCommands {
         desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    public void replace(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, String toStr, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
+    public void replace(Player player, EditSession editSession, @Selection Region selection,
+                        @Arg(desc = "String", def = "")
+                            String from, String toStr,
+                        @Switch(name = 'd', desc = "The flag specifies the data to use")
+                            boolean useData) throws WorldEditException {
         //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
         //        if (from == null) {
         //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -526,7 +556,13 @@ public class AnvilCommands {
         desc = "Replace all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, final Pattern toPattern, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
+    public void replacePattern(Player player, EditSession editSession, @Selection Region selection,
+                               @Arg(desc = "String", def = "")
+                                   String from, final Pattern toPattern,
+                               @Switch(name = 'd', desc = "The flag specifies the data to use")
+                                   boolean useData,
+                               @Switch(name = 'm', desc = "The flag specifies the map to use")
+                                   boolean useMap) throws WorldEditException {
         //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
         //        if (useMap) {
         //            if (to instanceof RandomPattern) {
@@ -556,7 +592,7 @@ public class AnvilCommands {
         desc = "Set all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.set")
-    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern toPattern, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern toPattern, @Switch(name = 'd', desc = "The flag specifies the data to use") boolean useData, @Switch(name = 'm', desc = "The flag specifies the map to use") boolean useMap
     public void set(Player player, EditSession editSession, @Selection Region selection, final Pattern toPattern) throws WorldEditException {
         //        MCAFilterCounter filter = new SetPatternFilter(to);  TODO NOT IMPLEMENTED
         //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
@@ -602,17 +638,18 @@ public class AnvilCommands {
         //        MCAClipboard clipboard = new MCAClipboard(queue, cuboid, origin);
         //        FawePlayer fp = FawePlayer.wrap(player);
         //        fp.setMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD, clipboard);
-        //        player.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy" , selection.getArea()));
+        //        player.print(TranslatableComponent.of("fawe.worldedit.copy.command.copy", selection.getArea()));
     }
 
     @Command(
         name = "paste",
         desc = "Paste chunks from your anvil clipboard",
-        descFooter = "Paste the chunks from your anvil clipboard.\n" +
-            "The -c flag will align the paste to the chunks."
+        descFooter = "Paste the chunks from your anvil clipboard."
     )
     @CommandPermissions("worldedit.anvil.pastechunks")
-    public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name = 'c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {
+    public void paste(Player player, LocalSession session, EditSession editSession,
+                      @Switch(name = 'c', desc = "Align to chunks")
+                          boolean alignChunk) throws WorldEditException, IOException {
         //        FawePlayer fp = FawePlayer.wrap(player);  TODO NOT IMPLEMENTED
         //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
         //        if (clipboard == null) {
@@ -639,6 +676,6 @@ public class AnvilCommands {
         //                pasteQueue.pasteRegion(copyQueue, copyRegion, offset, iAnvilHistory);
         //            } catch (IOException e) { throw new RuntimeException(e); }
         //        });
-        //        player.print(TranslatableComponent.of("fawe.worldedit.paste.command.paste" , player.getPosition().toBlockVector()));
+        //        player.print(TranslatableComponent.of("fawe.worldedit.paste.command.paste", player.getPosition().toBlockVector()));
     }
 }

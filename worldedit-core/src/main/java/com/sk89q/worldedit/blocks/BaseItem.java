@@ -62,7 +62,8 @@ public class BaseItem implements NbtValued {
     }
 
     @Deprecated
-    public @Nullable Object getNativeItem() {
+    @Nullable
+    public Object getNativeItem() {
         return null;
     }
 

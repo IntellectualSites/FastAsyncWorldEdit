@@ -22,7 +22,6 @@ package com.sk89q.worldedit.function.mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,10 +54,6 @@ public class MaskUnion extends MaskIntersection {
      */
     public MaskUnion(Mask... mask) {
         super(mask);
-    }
-
-    private MaskUnion(Set<Mask> masks, Mask[] maskArray, boolean defaultReturn) {
-        super(masks, maskArray, defaultReturn);
     }
 
     public static Mask of(Mask... masks) {
@@ -121,7 +116,6 @@ public class MaskUnion extends MaskIntersection {
     @Override
     public Mask copy() {
         Set<Mask> masksCopy = masks.stream().map(Mask::copy).collect(Collectors.toSet());
-        Mask[] maskArray = (Mask[]) Arrays.stream(masksArray).map(Mask::copy).toArray();
-        return new MaskUnion(masksCopy, maskArray, defaultReturn);
+        return new MaskUnion(masksCopy);
     }
 }

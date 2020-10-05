@@ -118,7 +118,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
                     if (methodRemove != null) {
                         try {
                             methodRemove.invoke(tlm, instance);
-                        } catch (Throwable ignore) {
+                        } catch (Throwable ignored) {
                         }
                     }
                 } catch (NoSuchMethodException e) {
@@ -158,7 +158,7 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements Closeable
                     clean(threadLocal);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // We will tolerate an exception here and just log it
             throw new IllegalStateException(e);
         }

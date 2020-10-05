@@ -49,9 +49,11 @@ public class ClipboardHolder {
 
     /**
      * Get the clipboard.
+     *
      * <p>
      * If there is a transformation applied, the returned clipboard will
      * not contain its effect.
+     * </p>
      *
      * @deprecated FAWE supports multiple loaded schematics {@link #getClipboards()}
      * @return the clipboard

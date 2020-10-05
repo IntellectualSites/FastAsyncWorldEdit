@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class SchemSync implements Runnable {
 
-    private final static char PORT = 62522;
+    private static final char PORT = 62522;
 
     private final File tokensFile;
     private final WorldEdit worldEdit;
@@ -37,8 +37,7 @@ public class SchemSync implements Runnable {
         INVALID_HEADER_LENGTH,
         TOKEN_REJECTED,
         FILE_NOT_EXIST,
-        NO_FILE_PERMISSIONS,
-        ;
+        NO_FILE_PERMISSIONS;
 
     }
 
@@ -116,11 +115,13 @@ public class SchemSync implements Runnable {
                                     if (!file.exists()) {
                                         close(Error.FILE_NOT_EXIST);
                                     }
-
+                                    break;
+                                default:
+                                    break;
                                     // todo send file
                             }
                         }
-                    } catch (FaweException ignore) {
+                    } catch (FaweException ignored) {
                     }
                 }
             }

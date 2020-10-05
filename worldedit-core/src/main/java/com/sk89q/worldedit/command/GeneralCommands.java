@@ -409,12 +409,18 @@ public class GeneralCommands {
                 // complexity
                 int min = Integer.parseInt(arguments.get(0));
                 int max = Integer.parseInt(arguments.get(1));
-                if (min < 0 || max > 100) throw new InputParseException("Complexity must be in the range 0-100");
-                if (min != 0 || max != 100) util = new CleanTextureUtil(util, min, max);
+                if (min < 0 || max > 100) {
+                    throw new InputParseException("Complexity must be in the range 0-100");
+                }
+                if (min != 0 || max != 100) {
+                    util = new CleanTextureUtil(util, min, max);
+                }
 
                 randomIndex = 2;
             } else if (arguments.size() == 1 && argLower.equals("true") || argLower.equals("false")) {
-                if (argLower.equals("true")) util = new RandomTextureUtil(util);
+                if (argLower.equals("true")) {
+                    util = new RandomTextureUtil(util);
+                }
                 checkRandomization = false;
             } else {
                 if (argLower.equals("#copy") || argLower.equals("#clipboard")) {
@@ -435,20 +441,24 @@ public class GeneralCommands {
             if (checkRandomization) {
                 if (arguments.size() > randomIndex) {
                     boolean random = Boolean.parseBoolean(arguments.get(randomIndex));
-                    if (random) util = new RandomTextureUtil(util);
+                    if (random) {
+                        util = new RandomTextureUtil(util);
+                    }
                 }
             }
-            if (!(util instanceof CachedTextureUtil)) util = new CachedTextureUtil(util);
+            if (!(util instanceof CachedTextureUtil)) {
+                util = new CachedTextureUtil(util);
+            }
             session.setTextureUtil(util);
-            player.print(Caption.of("fawe.worldedit.general.texture.set" , StringMan.join(arguments, " ")));
+            player.print(Caption.of("fawe.worldedit.general.texture.set", StringMan.join(arguments, " ")));
         }
     }
 
     @Command(
-            name = "/gsmask",
-            aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
-            desc = "Set the global source mask",
-            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
+        name = "/gsmask",
+        aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
+        desc = "Set the global source mask",
+        descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
@@ -462,9 +472,9 @@ public class GeneralCommands {
 
 
     @Command(
-            name = "/gtransform",
-            aliases = {"gtransform"},
-            desc = "Set the global transform"
+        name = "/gtransform",
+        aliases = {"gtransform"},
+        desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
@@ -477,9 +487,9 @@ public class GeneralCommands {
     }
 
     @Command(
-            name = "/tips",
-            aliases = {"tips"},
-            desc = "Toggle FAWE tips"
+        name = "/tips",
+        aliases = {"tips"},
+        desc = "Toggle FAWE tips"
     )
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {

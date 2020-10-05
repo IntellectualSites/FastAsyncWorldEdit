@@ -199,10 +199,10 @@ public interface RegionSelector {
     }
 
     /**
-     * Get the vertices
+     * Get the vertices.
      *
-     * @return
-     * @throws IncompleteRegionException
+     * @return the list of vertices
+     * @throws IncompleteRegionException thrown if a region has not been fully defined
      */
     default List<BlockVector3> getVertices() throws IncompleteRegionException {
         return Collections.singletonList(getPrimaryPosition());

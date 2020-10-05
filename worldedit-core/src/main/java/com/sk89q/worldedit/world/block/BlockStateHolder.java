@@ -37,23 +37,20 @@ import javax.annotation.Nullable;
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 
     /**
-     * Get the block type
+     * Get the block type.
      *
      * @return The type
      */
     BlockType getBlockType();
 
     /**
-     * Magic number (legacy uses)
-     * @param propertyId
-     * @return
+     * Magic number (legacy uses).
      */
     @Deprecated
     B withPropertyId(int propertyId);
 
     /**
-     * Get combined id (legacy uses)
-     * @return
+     * Get combined id (legacy uses).
      */
     @Deprecated
     int getInternalId();
@@ -67,14 +64,13 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     BlockMaterial getMaterial();
 
     /**
-     * Get type id (legacy uses)
-     * @return
+     * Get type id (legacy uses).
      */
     @Deprecated
     int getInternalBlockTypeId();
+
     /**
-     * Get the block data (legacy uses)
-     * @return
+     * Get the block data (legacy uses).
      */
     @Deprecated
     int getInternalPropertiesId();
@@ -98,7 +94,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     <V> B with(final PropertyKey property, final V value);
 
     /**
-     * Gets the value at the given state
+     * Gets the value for the given state.
      *
      * @param property The state
      * @return The value
@@ -106,7 +102,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     <V> V getState(Property<V> property);
 
     /**
-     * Gets the value at the given state
+     * Gets the value for the given state.
      *
      * @param property The state
      * @return The value

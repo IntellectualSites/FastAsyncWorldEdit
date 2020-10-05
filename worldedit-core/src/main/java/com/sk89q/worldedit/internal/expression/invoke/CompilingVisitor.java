@@ -475,11 +475,15 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
 
         long aLong = Double.doubleToRawLongBits(a);
         // Make aLong lexicographically ordered as a twos-complement long
-        if (aLong < 0) aLong = 0x8000000000000000L - aLong;
+        if (aLong < 0) {
+            aLong = 0x8000000000000000L - aLong;
+        }
 
         long bLong = Double.doubleToRawLongBits(b);
         // Make bLong lexicographically ordered as a twos-complement long
-        if (bLong < 0) bLong = 0x8000000000000000L - bLong;
+        if (bLong < 0) {
+            bLong = 0x8000000000000000L - bLong;
+        }
 
         final long longDiff = Math.abs(aLong - bLong);
         return longDiff <= 450359963L;
@@ -555,8 +559,8 @@ class CompilingVisitor extends ExpressionBaseVisitor<MethodHandle> {
                         value -= arg;
                         break;
                     default:
-                        throw ExpressionHelper.evalException(ctx, "Invalid text for assign expr: " +
-                            ctx.assignmentOperator().getText());
+                        throw ExpressionHelper.evalException(ctx, "Invalid text for assign expr: "
+                            + ctx.assignmentOperator().getText());
                 }
             }
             variable.setValue(value);

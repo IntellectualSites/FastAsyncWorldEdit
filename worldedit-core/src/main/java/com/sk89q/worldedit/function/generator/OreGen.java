@@ -102,8 +102,9 @@ public class OreGen implements Resource {
                                 double dz = (zz + 0.5D - d9) * id11o2;
                                 double dxyz2 = dxy2 + dz * dz;
                                 if ((dxyz2 < 1)) {
-                                    if (mask.test(mutable))
+                                    if (mask.test(mutable)) {
                                         pattern.apply(extent, mutable, mutable);
+                                    }
                                 }
                             }
                         }

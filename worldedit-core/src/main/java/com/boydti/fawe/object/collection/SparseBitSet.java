@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package com.boydti.fawe.object.collection;
 
 /*- This software is the work of Paladin Software International, Incorporated,
@@ -805,7 +804,7 @@ public class SparseBitSet implements Cloneable, Serializable
      *  public int hashCode()
      *  {
      *      long hash = 1234L;
-     *      for( int i = bits.length; --i &gt;= 0; )
+     *      for ( int i = bits.length; --i &gt;= 0; )
      *          hash ^= bits[i] * (i + 1);
      *      return (int)((h &gt;&gt; 32) ^ h);
      *  }</pre>
@@ -965,7 +964,7 @@ public class SparseBitSet implements Cloneable, Serializable
      *  sbs</code>, use the following loop:
      *
      *  <pre>
-     *  for( int i = sbbits.nextSetBit(0); i &gt;= 0; i = sbbits.nextSetBit(i+1) )
+     *  for ( int i = sbbits.nextSetBit(0); i &gt;= 0; i = sbbits.nextSetBit(i+1) )
      *  {
      *      // operate on index i here
      *  }</pre>

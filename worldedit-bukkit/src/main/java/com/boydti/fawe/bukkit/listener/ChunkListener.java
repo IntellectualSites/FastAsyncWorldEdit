@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.listener;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.config.Settings;
@@ -25,6 +23,7 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
@@ -45,6 +44,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 import org.slf4j.Logger;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public abstract class ChunkListener implements Listener {
 
     private final Logger logger = getLogger(ChunkListener.class);
@@ -58,10 +59,6 @@ public abstract class ChunkListener implements Listener {
             PluginManager plm = Bukkit.getPluginManager();
             Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
             plm.registerEvents(this, plugin);
-            try {
-                plm.registerEvents(new ChunkListener_8Plus(this), plugin);
-            } catch (Throwable ignore) {
-            }
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
@@ -98,7 +95,8 @@ public abstract class ChunkListener implements Listener {
 
     protected final Long2ObjectOpenHashMap<Boolean> badChunks = new Long2ObjectOpenHashMap<>();
     private Long2ObjectOpenHashMap<int[]> counter = new Long2ObjectOpenHashMap<>();
-    private int lastX = Integer.MIN_VALUE, lastZ = Integer.MIN_VALUE;
+    private int lastX = Integer.MIN_VALUE;
+    private int lastZ = Integer.MIN_VALUE;
     private int[] lastCount;
 
     public int[] getCount(int cx, int cz) {
@@ -136,6 +134,11 @@ public abstract class ChunkListener implements Listener {
         physSkip = 0;
         physStart = System.currentTimeMillis();
         physCancel = false;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void event(BlockExplodeEvent event) {
+        reset();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -250,14 +253,6 @@ public abstract class ChunkListener implements Listener {
                 return;
             }
         }
-//        switch (event.getChangedType()) {
-//            case AIR:
-//            case CAVE_AIR:
-//            case VOID_AIR:
-//                break;
-//            case REDSTONE_WIRE::
-//                return;
-//        }
         Exception e = new Exception();
         int depth = getDepth(e);
         if (depth >= 256) {
@@ -354,9 +349,7 @@ public abstract class ChunkListener implements Listener {
     }
 
     /**
-     * Prevent FireWorks from loading chunks
-     *
-     * @param event
+     * Prevent firework from loading chunks.
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkLoad(ChunkLoadEvent event) {

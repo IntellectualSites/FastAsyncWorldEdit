@@ -35,10 +35,10 @@ import java.util.regex.Pattern;
  */
 public class Yaml {
     protected final Resolver resolver;
-    private String name;
     protected BaseConstructor constructor;
     protected Representer representer;
     protected DumperOptions dumperOptions;
+    private String name;
 
     /**
      * Create Yaml instance. It is safe to create a few instances and use them
@@ -212,19 +212,19 @@ public class Yaml {
     /**
      * <p>
      * Serialize a Java object into a YAML string. Override the default root tag
-     * with <code>rootTag</code>.
+     * with {@code rootTag}.
      * </p>
      *
      * <p>
-     * This method is similar to <code>Yaml.dump(data)</code> except that the
+     * This method is similar to {@code Yaml.dump(data)} except that the
      * root tag for the whole document is replaced with the given tag. This has
      * two main uses.
      * </p>
      *
      * <p>
      * First, if the root tag is replaced with a standard YAML tag, such as
-     * <code>Tag.MAP</code>, then the object will be dumped as a map. The root
-     * tag will appear as <code>!!map</code>, or blank (implicit !!map).
+     * {@code Tag.MAP}, then the object will be dumped as a map. The root
+     * tag will appear as {@code !!map}, or blank (implicit !!map).
      * </p>
      *
      * <p>
@@ -237,11 +237,11 @@ public class Yaml {
      * @param data Java object to be serialized to YAML
      * @param rootTag the tag for the whole YAML document. The tag should be Tag.MAP
      * for a JavaBean to make the tag disappear (to use implicit tag
-     * !!map). If <code>null</code> is provided then the standard tag
+     * !!map). If {@code null} is provided then the standard tag
      * with the full class name is used.
      * @param flowStyle flow style for the whole document. See Chapter 10. Collection
      * Styles http://yaml.org/spec/1.1/#id930798. If
-     * <code>null</code> is provided then the flow style from
+     * {@code null} is provided then the flow style from
      * DumperOptions is used.
      * @return YAML String
      */
@@ -261,11 +261,11 @@ public class Yaml {
     /**
      * <p>
      * Serialize a Java object into a YAML string. Override the default root tag
-     * with <code>Tag.MAP</code>.
+     * with {@code Tag.MAP}.
      * </p>
      * <p>
-     * This method is similar to <code>Yaml.dump(data)</code> except that the
-     * root tag for the whole document is replaced with <code>Tag.MAP</code> tag
+     * This method is similar to {@code Yaml.dump(data)} except that the
+     * root tag for the whole document is replaced with {@code Tag.MAP} tag
      * (implicit !!map).
      * </p>
      * <p>
@@ -298,18 +298,6 @@ public class Yaml {
             throw new YAMLException(e);
         }
         return emitter.getEvents();
-    }
-
-    private static class SilentEmitter implements Emitable {
-        private List<Event> events = new ArrayList<>(100);
-
-        public List<Event> getEvents() {
-            return events;
-        }
-
-        public void emit(Event event) throws IOException {
-            events.add(event);
-        }
     }
 
     /**
@@ -420,18 +408,6 @@ public class Yaml {
         return new YamlIterable(result);
     }
 
-    private static class YamlIterable implements Iterable<Object> {
-        private Iterator<Object> iterator;
-
-        public YamlIterable(Iterator<Object> iterator) {
-            this.iterator = iterator;
-        }
-
-        public Iterator<Object> iterator() {
-            return iterator;
-        }
-    }
-
     /**
      * Parse all YAML documents in a String and produce corresponding Java
      * objects. (Because the encoding in known BOM is not respected.) The
@@ -499,26 +475,13 @@ public class Yaml {
         return new NodeIterable(result);
     }
 
-    private static class NodeIterable implements Iterable<Node> {
-        private Iterator<Node> iterator;
-
-        public NodeIterable(Iterator<Node> iterator) {
-            this.iterator = iterator;
-        }
-
-        public Iterator<Node> iterator() {
-            return iterator;
-        }
-    }
-
     /**
      * Add an implicit scalar detector. If an implicit scalar value matches the
      * given regexp, the corresponding tag is assigned to the scalar.
      *
      * @param tag tag to assign to the node
      * @param regexp regular expression to match against
-     * @param first a sequence of possible initial characters or null (which means
-     * any).
+     * @param first a sequence of possible initial characters or null (which means any).
      */
     public void addImplicitResolver(Tag tag, Pattern regexp, String first) {
         resolver.addImplicitResolver(tag, regexp, first);
@@ -541,7 +504,7 @@ public class Yaml {
     }
 
     /**
-     * Set a meaningful name to be shown in toString()
+     * Set a meaningful name to be shown in {@code toString()}.
      *
      * @param name human readable name
      */
@@ -574,6 +537,51 @@ public class Yaml {
         return new EventIterable(result);
     }
 
+    public void setBeanAccess(BeanAccess beanAccess) {
+        constructor.getPropertyUtils().setBeanAccess(beanAccess);
+        representer.getPropertyUtils().setBeanAccess(beanAccess);
+    }
+
+
+    private static class SilentEmitter implements Emitable {
+        private List<Event> events = new ArrayList<>(100);
+
+        public List<Event> getEvents() {
+            return events;
+        }
+
+        public void emit(Event event) throws IOException {
+            events.add(event);
+        }
+    }
+
+
+    private static class YamlIterable implements Iterable<Object> {
+        private Iterator<Object> iterator;
+
+        public YamlIterable(Iterator<Object> iterator) {
+            this.iterator = iterator;
+        }
+
+        public Iterator<Object> iterator() {
+            return iterator;
+        }
+    }
+
+
+    private static class NodeIterable implements Iterable<Node> {
+        private Iterator<Node> iterator;
+
+        public NodeIterable(Iterator<Node> iterator) {
+            this.iterator = iterator;
+        }
+
+        public Iterator<Node> iterator() {
+            return iterator;
+        }
+    }
+
+
     private static class EventIterable implements Iterable<Event> {
         private Iterator<Event> iterator;
 
@@ -584,11 +592,6 @@ public class Yaml {
         public Iterator<Event> iterator() {
             return iterator;
         }
-    }
-
-    public void setBeanAccess(BeanAccess beanAccess) {
-        constructor.getPropertyUtils().setBeanAccess(beanAccess);
-        representer.getPropertyUtils().setBeanAccess(beanAccess);
     }
 
 }

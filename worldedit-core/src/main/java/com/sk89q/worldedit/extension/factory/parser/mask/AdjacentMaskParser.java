@@ -29,14 +29,18 @@ public class AdjacentMaskParser extends RichParser<Mask> {
 
     @Override
     protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length == 0) return null;
+        if (arguments.length == 0) {
+            return null;
+        }
         Mask subMask = worldEdit.getMaskFactory().parseFromInput(arguments[0], context);
         int min = arguments.length > 1 ? Integer.parseInt(arguments[1]) : -1;
         int max = arguments.length > 2 ? Integer.parseInt(arguments[2]) : -1;
         if (min == -1 && max == -1) {
             min = 1;
             max = 8;
-        } else if (max == -1) max = min;
+        } else if (max == -1) {
+            max = min;
+        }
         if (max >= 8 && min == 1) {
             return new AdjacentAnyMask(subMask);
         }

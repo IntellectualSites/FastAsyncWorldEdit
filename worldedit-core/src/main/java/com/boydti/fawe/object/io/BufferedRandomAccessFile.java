@@ -1,21 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.boydti.fawe.object.io;
 
 import java.io.File;
@@ -26,16 +8,14 @@ import java.util.Arrays;
 
 
 /**
- * A <code>BufferedRandomAccessFile</code> is like a
- * <code>RandomAccessFile</code>, but it uses a private buffer so that most
+ * A {@code BufferedRandomAccessFile} is like a
+ * {@code RandomAccessFile}, but it uses a private buffer so that most
  * operations do not require a disk access.
- * <P>
  *
- * Note: The operations on this class are unmonitored. Also, the correct
- * functioning of the <code>RandomAccessFile</code> methods that are not
- * overridden here relies on the implementation of those methods in the
- * superclass.
- * Author : Avinash Lakshman ( alakshman@facebook.com) & Prashant Malik ( pmalik@facebook.com )
+ * @author Avinash Lakshman ( alakshman@facebook.com) & Prashant Malik ( pmalik@facebook.com )
+ * @apiNote The operations on this class are unmonitored. Also, the correct
+ * functioning of the {@code RandomAccessFile} methods that are not
+ * overridden here relies on the implementation of those methods in the superclass.
  */
 
 public class BufferedRandomAccessFile extends RandomAccessFile {
@@ -50,7 +30,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     private boolean dirty_; // true iff unflushed bytes exist
     private boolean closed_; // true iff the file is closed
     private long curr_; // current position in file
-    private long lo_, hi_; // bounds on characters in "buff"
+    private long lo_; // bounds on characters in "buff"
+    private long hi_; // bounds on characters in "buff"
     private byte[] buff_; // local buffer
     private long maxHi_; // this.lo + this.buff.length
     private boolean hitEOF_; // buffer contains last file block?
@@ -110,8 +91,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
      */
 
     /**
-     * Open a new <code>BufferedRandomAccessFile</code> on <code>file</code>
-     * in mode <code>mode</code>, which should be "r" for reading only, or
+     * Open a new {@code BufferedRandomAccessFile} on {@code file}
+     * in mode {@code mode}, which should be "r" for reading only, or
      * "rw" for reading and writing.
      */
     public BufferedRandomAccessFile(File file, String mode) throws IOException {
@@ -125,8 +106,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
 
     /**
-     * Open a new <code>BufferedRandomAccessFile</code> on the file named
-     * <code>name</code> in mode <code>mode</code>, which should be "r" for
+     * Open a new {@code BufferedRandomAccessFile} on the file named
+     * {@code name} in mode {@code mode}, which should be "r" for
      * reading only, or "rw" for reading and writing.
      */
     public BufferedRandomAccessFile(String name, String mode) throws IOException {
@@ -176,8 +157,9 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     /* Flush any dirty bytes in the buffer to disk. */
     private void flushBuffer() throws IOException {
         if (this.dirty_) {
-            if (this.diskPos_ != this.lo_)
+            if (this.diskPos_ != this.lo_) {
                 super.seek(this.lo_);
+            }
             int len = (int) (this.curr_ - this.lo_);
             super.write(this.buff_, 0, len);
             this.diskPos_ = this.curr_;
@@ -195,8 +177,9 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         int rem = this.buff_.length;
         while (rem > 0) {
             int n = super.read(this.buff_, cnt, rem);
-            if (n < 0)
+            if (n < 0) {
                 break;
+            }
             cnt += n;
             rem -= n;
         }
@@ -277,13 +260,15 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         if (this.curr_ >= this.hi_) {
             // test for EOF
             // if (this.hi < this.maxHi) return -1;
-            if (this.hitEOF_)
+            if (this.hitEOF_) {
                 return -1;
+            }
 
             // slow path -- read another buffer
             this.seek(this.curr_);
-            if (this.curr_ == this.hi_)
+            if (this.curr_ == this.hi_) {
                 return -1;
+            }
         }
         byte res = this.buff_[(int) (this.curr_ - this.lo_)];
         this.curr_++;
@@ -294,13 +279,15 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         if (this.curr_ >= this.hi_) {
             // test for EOF
             // if (this.hi < this.maxHi) return -1;
-            if (this.hitEOF_)
+            if (this.hitEOF_) {
                 return -1;
+            }
 
             // slow path -- read another buffer
             this.seek(this.curr_);
-            if (this.curr_ == this.hi_)
+            if (this.curr_ == this.hi_) {
                 return -1;
+            }
         }
         byte res = this.buff_[(int) (this.curr_ - this.lo_)];
         this.curr_++;
@@ -317,13 +304,15 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         if (this.curr_ >= this.hi_) {
             // test for EOF
             // if (this.hi < this.maxHi) return -1;
-            if (this.hitEOF_)
+            if (this.hitEOF_) {
                 return -1;
+            }
 
             // slow path -- read another buffer
             this.seek(this.curr_);
-            if (this.curr_ == this.hi_)
+            if (this.curr_ == this.hi_) {
                 return -1;
+            }
         }
         len = Math.min(len, (int) (this.hi_ - this.curr_));
         int buffOff = (int) (this.curr_ - this.lo_);
@@ -336,13 +325,15 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
         if (this.curr_ >= this.hi_) {
             // test for EOF
             // if (this.hi < this.maxHi) return -1;
-            if (this.hitEOF_)
+            if (this.hitEOF_) {
                 return -1;
+            }
 
             // slow path -- read another buffer
             this.seek(this.curr_);
-            if (this.curr_ == this.hi_)
+            if (this.curr_ == this.hi_) {
                 return -1;
+            }
         }
         return this.buff_[(int) (this.curr_ - this.lo_)];
     }

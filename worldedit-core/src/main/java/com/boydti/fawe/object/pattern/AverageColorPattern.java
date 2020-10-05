@@ -34,10 +34,14 @@ public class AverageColorPattern extends AbstractExtentPattern {
         BlockType blockType = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(blockType);
-        if (currentColor == 0) return false;
+        if (currentColor == 0) {
+            return false;
+        }
         int newColor = util.averageColor(currentColor, color);
         BlockType newBlock = util.getNearestBlock(newColor);
-        if (newBlock == blockType) return false;
+        if (newBlock == blockType) {
+            return false;
+        }
         return set.setBlock(extent, newBlock.getDefaultState());
     }
 }

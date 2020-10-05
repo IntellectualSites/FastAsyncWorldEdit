@@ -20,7 +20,8 @@ public abstract class MCAWriter implements Extent {
     private final int length;
     private final int width;
     private final int area;
-    private int OX, OZ;
+    private int OX;
+    private int OZ;
 
 
     public MCAWriter(int width, int length, File regionFolder) {
@@ -91,7 +92,7 @@ public abstract class MCAWriter implements Extent {
         final ForkJoinPool pool = new ForkJoinPool();
         int tcx = (width - 1) >> 4;
         int tcz = (length - 1) >> 4;
-        try (CleanableThreadLocal<MCAChunk> chunkStore = createCache()){
+        try (CleanableThreadLocal<MCAChunk> chunkStore = createCache()) {
             final ThreadLocal<byte[]> byteStore1 = ThreadLocal.withInitial(() -> new byte[500000]);
             final ThreadLocal<byte[]> byteStore2 = ThreadLocal.withInitial(() -> new byte[500000]);
             final ThreadLocal<Deflater> deflateStore = ThreadLocal

@@ -2,7 +2,6 @@ package com.boydti.fawe.object.brush.sweep;
 
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
@@ -12,15 +11,12 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector2;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.interpolation.ReparametrisingInterpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
@@ -91,7 +87,7 @@ public class SweepBrush implements Brush, ResettableTool {
 
         ClipboardSpline spline = new ClipboardSpline(editSession, holder, interpol, transform, nodes.size());
 
-        if (dimensions.getBlockX() > dimensions.getBlockZ()) { 
+        if (dimensions.getBlockX() > dimensions.getBlockZ()) {
             spline.setDirection(Vector2.at(0, 1));
         }
 

@@ -8,15 +8,15 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.serializer.gson.GsonComponentSerializer;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
-import java.util.Map;
-
 import com.sk89q.worldedit.world.block.BaseBlock;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
+import java.util.Locale;
+import java.util.Map;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
     public AsyncSign(AsyncBlock block, BaseBlock state) {
@@ -38,12 +38,16 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     }
 
     private String fromJson(String jsonInput) {
-        if (jsonInput == null || jsonInput.isEmpty()) return "";
+        if (jsonInput == null || jsonInput.isEmpty()) {
+            return "";
+        }
         return GsonComponentSerializer.INSTANCE.deserialize(jsonInput).toString();
     }
 
     private String toJson(String oldInput) {
-        if (oldInput == null || oldInput.isEmpty()) return "";
+        if (oldInput == null || oldInput.isEmpty()) {
+            return "";
+        }
         return LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of(oldInput));
     }
 
@@ -73,16 +77,20 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     }
 
     @Override
-    public @NotNull PersistentDataContainer getPersistentDataContainer() {
+    @NotNull
+    public PersistentDataContainer getPersistentDataContainer() {
         return new AsyncDataContainer(getNbtData());
     }
 
     @Override
-    public @Nullable DyeColor getColor() {
+    @Nullable
+    public DyeColor getColor() {
         CompoundTag nbt = getNbtData();
         if (nbt != null) {
-            String color = nbt.getString("Color").toUpperCase();
-            if (!color.isEmpty()) return DyeColor.valueOf(color);
+            String color = nbt.getString("Color").toUpperCase(Locale.ROOT);
+            if (!color.isEmpty()) {
+                return DyeColor.valueOf(color);
+            }
         }
         return DyeColor.BLACK;
     }
@@ -92,7 +100,7 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         CompoundTag nbt = getNbtData();
         if (nbt != null) {
             Map<String, Tag> map = nbt.getValue();
-            map.put("Color", new StringTag(color.name().toLowerCase()));
+            map.put("Color", new StringTag(color.name().toLowerCase(Locale.ROOT)));
         }
     }
 }

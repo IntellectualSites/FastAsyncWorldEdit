@@ -110,7 +110,9 @@ public class BlockTypeMask extends AbstractExtentMask {
     public Collection<BlockType> getBlocks() {
         Set<BlockType> blocks = new HashSet<>();
         for (int i = 0; i < types.length; i++) {
-            if (types[i]) blocks.add(BlockTypes.get(i));
+            if (types[i]) {
+                blocks.add(BlockTypes.get(i));
+            }
         }
         return blocks;
     }

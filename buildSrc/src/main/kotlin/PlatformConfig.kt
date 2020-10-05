@@ -19,6 +19,7 @@ import org.gradle.kotlin.dsl.withType
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java")
+    apply(plugin = "eclipse")
     apply(plugin = "idea")
     apply(plugin = "maven")
 //    apply(plugin = "checkstyle")

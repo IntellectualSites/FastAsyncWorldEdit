@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.regions.plotsquaredv4;
 
-import static org.bukkit.Bukkit.getWorld;
-
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
@@ -18,7 +16,10 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+
 import java.util.concurrent.CompletableFuture;
+
+import static org.bukkit.Bukkit.getWorld;
 
 public class FaweChunkManager extends ChunkManager {
 
