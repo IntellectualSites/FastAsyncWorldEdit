@@ -12,9 +12,9 @@ import com.sk89q.worldedit.extent.Extent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public class MultiBatchProcessor implements IBatchProcessor {
     private IBatchProcessor[] processors;
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
-        FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) HashMap::new);
+        FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
 
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;

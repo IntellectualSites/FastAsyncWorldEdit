@@ -61,12 +61,6 @@ public class MaskIntersection extends AbstractMask {
         formArray();
     }
 
-    protected MaskIntersection(Set<Mask> masks, Mask[] masksArray, boolean defaultReturn) {
-        this.masks = masks;
-        this.masksArray = masksArray;
-        this.defaultReturn = defaultReturn;
-    }
-
     public static Mask of(Mask... masks) {
         Set<Mask> set = new LinkedHashSet<>();
         for (Mask mask : masks) {
@@ -278,8 +272,7 @@ public class MaskIntersection extends AbstractMask {
     @Override
     public Mask copy(){
         Set<Mask> masks = this.masks.stream().map(Mask::copy).collect(Collectors.toSet());
-        Mask[] maskArray = (Mask[]) Arrays.stream(this.masksArray).map(Mask::copy).toArray();
-        return new MaskIntersection(masks, maskArray, this.defaultReturn);
+        return new MaskIntersection(masks);
     }
 
 }

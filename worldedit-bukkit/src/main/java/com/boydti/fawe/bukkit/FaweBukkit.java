@@ -171,11 +171,19 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
+        Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
-        msg.append("Plugins: \n");
-        for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-            msg.append(" - ").append(p.getName()).append(": ")
-                .append(p.getDescription().getVersion()).append("\n");
+        msg.append("Plugins (").append(plugins.length).append("): \n");
+        for (Plugin p : plugins) {
+            msg.append(" - ").append(p.getName()).append(":").append("\n")
+                .append("  • Version: ").append(p.getDescription().getVersion()).append("\n")
+                .append("  • Enabled: ").append(p.isEnabled()).append("\n")
+                .append("  • Main: ").append(p.getDescription().getMain()).append("\n")
+                .append("  • Authors: ").append(p.getDescription().getAuthors()).append("\n")
+                .append("  • Load Before: ").append(p.getDescription().getLoadBefore()).append("\n")
+                .append("  • Dependencies: ").append(p.getDescription().getDepend()).append("\n")
+                .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
+                .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
         }
         return msg.toString();
     }
