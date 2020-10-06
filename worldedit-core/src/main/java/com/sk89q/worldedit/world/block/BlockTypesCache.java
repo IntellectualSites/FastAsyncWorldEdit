@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class BlockTypesCache {
     /*
      -----------------------------------------------------
@@ -203,7 +205,7 @@ public class BlockTypesCache {
                     String defaultState = blockMap.remove(id);
                     if (defaultState == null) {
                         if (internalId != 0) {
-                            System.out.println("Ignoring invalid block " + id);
+                            getLogger(BlockTypesCache.class).info("Ignoring invalid block {}", id);
                             continue;
                         }
                         defaultState = id;

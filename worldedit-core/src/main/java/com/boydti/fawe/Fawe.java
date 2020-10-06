@@ -14,10 +14,6 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.session.request.Request;
-import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,40 +114,6 @@ public class Fawe {
             throw new IllegalArgumentException("Implementation may not be null.");
         }
         instance = new Fawe(implementation);
-    }
-
-    public static void debugPlain(String s) {
-        if (instance != null) {
-            instance.implementation.debug(s);
-        } else {
-            log.debug(s);
-        }
-    }
-
-    /**
-     * Write something to the console.
-     */
-    public static void debug(String s) {
-        Actor actor = Request.request().getActor();
-        if (actor != null && actor.isPlayer()) {
-            actor.printInfo(TextComponent.of(s));
-            return;
-        }
-        debugPlain(s);
-    }
-
-    /**
-     * Write something to the console.
-     *
-     * @param c The Component to be printed
-     */
-    public static void debug(Component c) {
-        Actor actor = Request.request().getActor();
-        if (actor != null && actor.isPlayer()) {
-            actor.printDebug(c);
-            return;
-        }
-        debugPlain(c.toString());
     }
 
     /**
@@ -311,7 +273,7 @@ public class Fawe {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
                     log.error("ZSTD Compression Binding Not Found.\n"
-                            + "FAWE will still work but compression won't work as well.\n", e);
+                                  + "FAWE will still work but compression won't work as well.\n", e);
                 }
             }
             try {
@@ -326,9 +288,7 @@ public class Fawe {
         boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
         boolean x86JVM = System.getProperty("os.arch").contains("32");
         if (x86OS != x86JVM) {
-            debug("====== UPGRADE TO 64-BIT JAVA ======");
-            debug("You are running 32-bit Java on a 64-bit machine");
-            debug("====================================");
+            log.info("You are running 32-bit Java on a 64-bit machine. Please upgrade to 64-bit Java.");
         }
     }
 
@@ -362,11 +322,9 @@ public class Fawe {
                 }
             }
         } catch (Throwable ignored) {
-            debug("====== MEMORY LISTENER ERROR ======");
-            debug("FAWE needs access to the JVM memory system:");
-            debug(" - Change your Java security settings");
-            debug(" - Disable this with `max-memory-percent: -1`");
-            debug("===================================");
+            log.error("FAWE encountered an error trying to listen to JVM memory.\n"
+                          + "Please change your Java security settings or disable this message by"
+                          + "changing 'max-memory-percent' in the config files to '-1'.");
         }
     }
 

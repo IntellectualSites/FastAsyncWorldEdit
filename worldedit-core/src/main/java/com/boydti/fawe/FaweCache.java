@@ -56,6 +56,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public enum FaweCache implements Trimable {
     IMP
@@ -502,7 +503,7 @@ public enum FaweCache implements Trimable {
         } else if (value instanceof Boolean) {
             return asTag((byte) ((boolean) value ? 1 : 0));
         }
-        System.out.println("Invalid nbt: " + value);
+        getLogger(FaweCache.class).error("Invalid nbt: {}", value);
         return null;
     }
 

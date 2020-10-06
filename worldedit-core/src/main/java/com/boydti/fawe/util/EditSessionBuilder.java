@@ -38,9 +38,9 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -333,7 +333,7 @@ public class EditSessionBuilder {
 //                        changeSet = new CPUOptimizedChangeSet(world);
                     } else {
                         if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
-                            System.out.println("TODO add CPUOptimizedChangeSet");
+                            //TODO add CPUOptimizedChangeSet
                         }
                         changeSet = new MemoryOptimizedHistory(world);
                     }
@@ -346,7 +346,7 @@ public class EditSessionBuilder {
                 }
                 if (!(changeSet instanceof NullChangeSet)) {
                     if (this.blockBag != null) {
-                        System.out.println("TODO implement block bag as IBatchProcessor");
+                        //TODO implement block bag as IBatchProcessor
                         changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
                     }
                     if (combineStages) {
@@ -387,7 +387,7 @@ public class EditSessionBuilder {
                 this.extent = regionExtent;
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
-                System.out.println("TODO add batch processor for strip nbt");
+                //TODO add batch processor for strip nbt
                 this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);

@@ -18,7 +18,6 @@ import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
-import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -69,7 +68,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 new BrushListener(plugin);
             } catch (Throwable e) {
-                log.debug("Brush Listener Failed", e);
+                log.error("Brush Listener Failed", e);
             }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
@@ -147,10 +146,6 @@ public class FaweBukkit implements IFawe, Listener {
         return null;
     }
 
-    @Override public void debug(final String message) {
-        Bukkit.getConsoleSender().sendMessage(message);
-    }
-
     @Override public File getDirectory() {
         return plugin.getDataFolder();
     }
@@ -163,7 +158,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
                 Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                log.debug("Persistent Brushes Failed", e);
+                log.error("Persistent Brushes Failed", e);
             }
         }
         return tmp;

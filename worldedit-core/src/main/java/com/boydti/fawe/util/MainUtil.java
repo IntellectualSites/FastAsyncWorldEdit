@@ -858,7 +858,7 @@ public class MainUtil {
                 pool.submit(file::delete);
                 Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
                 if (printDebug) {
-                    Fawe.debug(msg);
+                    getLogger(MainUtil.class).debug(msg.toString());
                 }
             }
         });

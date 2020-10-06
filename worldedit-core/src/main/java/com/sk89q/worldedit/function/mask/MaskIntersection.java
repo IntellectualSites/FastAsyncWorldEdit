@@ -160,9 +160,9 @@ public class MaskIntersection extends AbstractMask {
         while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
-            getLogger(MaskIntersection.class).debug("Failed optimize MaskIntersection");
+            getLogger(MaskIntersection.class).error("Failed optimize MaskIntersection");
             for (Mask mask : masks) {
-                System.out.println(mask.getClass() + " / " + mask);
+                getLogger(MaskIntersection.class).error(mask.getClass() + " / " + mask);
             }
         }
         // Return result

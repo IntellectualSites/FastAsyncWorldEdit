@@ -352,7 +352,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public IChunkSet getChunk(int chunkX, int chunkZ) {
         // TODO don't generate new Writeable MCA chunk
-        System.out.println("TODO don't generate new Writeable MCA chunk");
         MCAChunk tmp = new MCAChunk();
         int bx = chunkX << 4;
         int bz = chunkZ << 4;
