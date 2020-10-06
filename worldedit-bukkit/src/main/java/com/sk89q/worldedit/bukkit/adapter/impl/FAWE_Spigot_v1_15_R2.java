@@ -455,7 +455,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
                Field tmpPaperConfigField = null;
                 Field tmpFlatBedrockField = null;
                 try { //only present on paper
-                    tmpPaperConfigField = net.minecraft.server.v1_16_R2.World.class.getDeclaredField("paperConfig");
+                    tmpPaperConfigField = World.class.getDeclaredField("paperConfig");
                     tmpPaperConfigField.setAccessible(true);
                     
                     tmpFlatBedrockField = tmpPaperConfigField.getType().getDeclaredField("generateFlatBedrock");
