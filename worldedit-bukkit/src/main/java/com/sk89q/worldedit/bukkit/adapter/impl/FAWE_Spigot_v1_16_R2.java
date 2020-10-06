@@ -435,8 +435,8 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     }
 
     @Override
-    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent realExtent, RegenOptions options) throws Exception {
-        return new ReneratorImpl(bukkitWorld, region, realExtent, options).regenerate();
+    public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
+        return new ReneratorImpl(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
@@ -453,13 +453,11 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
     private static class ReneratorImpl extends Regenerator {
 
         private static final Field serverWorldsField;
-        private static final Method getChunkFutureMethod;
-        private static final Field chunkProviderExecutorField;
         private static final Field worldPaperConfigField;
+        private static final Field flatBedrockField;
         private static final Field generatorSettingBaseSupplierField;
         private static final Field generatorSettingFlatField;
         private static final Field delegateField;
-        private static final Field structureManagerField;
         private static final Field chunkProviderField;
 
         //list of chunk stati in correct order without FULL
@@ -483,19 +481,20 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                 serverWorldsField = CraftServer.class.getDeclaredField("worlds");
                 serverWorldsField.setAccessible(true);
 
-                getChunkFutureMethod = ChunkProviderServer.class.getDeclaredMethod("getChunkFutureMainThread", int.class, int.class, ChunkStatus.class, boolean.class);
-                getChunkFutureMethod.setAccessible(true);
-
-                chunkProviderExecutorField = ChunkProviderServer.class.getDeclaredField("serverThreadQueue");
-                chunkProviderExecutorField.setAccessible(true);
-
                 Field tmpPaperConfigField = null;
+                Field tmpFlatBedrockField = null;
                 try { //only present on paper
                     tmpPaperConfigField = World.class.getDeclaredField("paperConfig");
                     tmpPaperConfigField.setAccessible(true);
+                    
+                    tmpFlatBedrockField = tmpPaperConfigField.getType().getDeclaredField("generateFlatBedrock");
+                    tmpFlatBedrockField.setAccessible(true);
                 } catch (Exception e) {
+                    tmpPaperConfigField = null;
+                    tmpFlatBedrockField = null;
                 }
                 worldPaperConfigField = tmpPaperConfigField;
+                flatBedrockField = tmpFlatBedrockField;
 
                 generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
                 generatorSettingBaseSupplierField.setAccessible(true);
@@ -505,9 +504,6 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
                 delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
                 delegateField.setAccessible(true);
-
-                structureManagerField = WorldServer.class.getDeclaredField("structureManager");
-                structureManagerField.setAccessible(true);
 
                 chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
                 chunkProviderField.setAccessible(true);
@@ -548,7 +544,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
             //flat bedrock? (only on paper)
             try {
-                generateFlatBedrock = (boolean) worldPaperConfigField.get(originalNMSWorld);
+                generateFlatBedrock = flatBedrockField.getBoolean(worldPaperConfigField.get(originalNMSWorld));
             } catch (Exception ignored) {
             }
 
@@ -570,23 +566,19 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
             seed = options.getSeed().orElse(originalNMSWorld.getSeed());
 
-            WorldDataServer levelProperties = (WorldDataServer) originalNMSWorld.getServer().getServer().getSaveData();
-            RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, originalNMSWorld.getServer().getServer().dataPackResources.h(), IRegistryCustom.b());
-            GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
+            MinecraftServer server = originalNMSWorld.getServer().getServer();
+            WorldDataServer levelProperties = (WorldDataServer) server.getSaveData();
+            RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, server.dataPackResources.h(), IRegistryCustom.b());
+            GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(this.recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
             WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
             WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
 
             //init world
             protoChunks = new Long2ObjectLinkedOpenHashMap<>(); //needs to be an ordered list for RegionLimitedWorldAccess
-            freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(originalNMSWorld.getMinecraftServer(), originalNMSWorld.getMinecraftServer().executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
-//                @Override
-//                public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
-//                    return protoChunks.get(MathMan.pairInt(i, j));
-//                }
-            }).get();
+            freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen)).get();
 
-            freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, freshNMSWorld.getMinecraftServer().getDataFixer(), freshNMSWorld.getMinecraftServer().getDefinedStructureManager(), freshNMSWorld.getMinecraftServer().executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, freshNMSWorld.getMinecraftServer().isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> freshNMSWorld.getMinecraftServer().E().getWorldPersistentData()) {
-                // needed as it otherwise waits endlessly somehow
+            freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, server.getDataFixer(), server.getDefinedStructureManager(), server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, server.isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> server.E().getWorldPersistentData()) {
+                // redirect to our protoChunks list
                 @Override
                 public IChunkAccess getChunkAt(int i, int j, ChunkStatus chunkstatus, boolean flag) {
                     return protoChunks.get(MathMan.pairInt(i, j));
@@ -619,7 +611,7 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             }
 
             //lets start then
-            structureManager = freshNMSWorld.getMinecraftServer().getDefinedStructureManager();
+            structureManager = server.getDefinedStructureManager();
             lightEngine = freshChunkProvider.getLightEngine();
 
             return true;
@@ -792,11 +784,9 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
 
                 //final chunkstatus
                 time(() -> {
-                    for (Long xz : chunkCoordsForRadius.get(0)) {
+                    for (Long xz : chunkCoordsForRadius.get(0)) { //FULL.f() == 0!
                         Chunk chunk = chunks.get(xz);
-                        ChunkStatus.FULL.a(freshNMSWorld, generator, structureManager, lightEngine,
-                                           c -> CompletableFuture.completedFuture(Either.left(c)),
-                                           Arrays.asList(chunk)); //chunkstatus.f() == 0!
+                        processChunk(ChunkStatus.FULL, xz, Arrays.asList(chunk));
                     }
                 }, "full");
 
@@ -835,14 +825,14 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             return true;
         }
 
-        private void processChunk(ChunkStatus chunkstatus, long xz, List<IChunkAccess> accessableChunks) {
+        private void processChunk(ChunkStatus chunkstatus, long xz, List<IChunkAccess> accessibleChunks) {
             try {
                 chunkstatus.a(freshNMSWorld,
                               generator,
                               structureManager,
                               lightEngine,
                               c -> CompletableFuture.completedFuture(Either.left(c)),
-                              accessableChunks);
+                              accessibleChunks);
             } catch (Exception e) {
                 System.err.println("error while running " + chunkstatus.d() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
                 e.printStackTrace();
@@ -1017,12 +1007,15 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             private RegenNoOpWorldLoadListener() {
             }
 
+            @Override
             public void a(ChunkCoordIntPair chunkCoordIntPair) {
             }
 
+            @Override
             public void a(ChunkCoordIntPair chunkCoordIntPair, @Nullable ChunkStatus chunkStatus) {
             }
 
+            @Override
             public void b() {
             }
         }
