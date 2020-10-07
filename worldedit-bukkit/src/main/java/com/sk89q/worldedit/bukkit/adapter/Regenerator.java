@@ -135,86 +135,60 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             //using sequential chunk generation, concurrent not supported
         }
 
-        long start = System.currentTimeMillis();
-
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
         //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
         //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
+        
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        time(() -> {
-            chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
-                if (radius == -1) //ignore ChunkStatus.EMPTY
-                    return;
-                int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
-                chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
-            });
-        }, "precomputing chunkCoordsForRadius lists");
+        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
+            if (radius == -1) //ignore ChunkStatus.EMPTY
+                return;
+            int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
+            chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
+        });
 
         //create chunks
-        time(() -> {
-            for (Long xz : chunkCoordsForRadius.get(0)) {
-                ProtoChunk chunk = createProtoChunk(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz));
-                protoChunks.put(xz, chunk);
-            }
-        }, "ctor");
+        for (Long xz : chunkCoordsForRadius.get(0)) {
+            ProtoChunk chunk = createProtoChunk(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz));
+            protoChunks.put(xz, chunk);
+        }
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
-        time(() -> {
-            chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
-                if (radius == -1) //ignore ChunkStatus.EMPTY
-                    return;
-                Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
-                for (Long xz : chunkCoordsForRadius.get(radius)) {
-                    int x = MathMan.unpairIntX(xz);
-                    int z = MathMan.unpairIntY(xz);
-                    List<IChunkAccess> l = new ArrayList<>((radius + 1 + radius) * (radius + 1 + radius));
-                    for (int zz = z - radius; zz <= z + radius; zz++) { //order is important, first z then x
-                        for (int xx = x - radius; xx <= x + radius; xx++) {
-                            l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
-                        }
+        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
+            if (radius == -1) //ignore ChunkStatus.EMPTY
+                return;
+            Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
+            for (Long xz : chunkCoordsForRadius.get(radius)) {
+                int x = MathMan.unpairIntX(xz);
+                int z = MathMan.unpairIntY(xz);
+                List<IChunkAccess> l = new ArrayList<>((radius + 1 + radius) * (radius + 1 + radius));
+                for (int zz = z - radius; zz <= z + radius; zz++) { //order is important, first z then x
+                    for (int xx = x - radius; xx <= x + radius; xx++) {
+                        l.add(protoChunks.get(MathMan.pairInt(xx, zz)));
                     }
-                    map.put(xz, l);
                 }
-                worldlimits.put(radius, map);
-            });
-        }, "precomputing RegionLimitedWorldAccess chunks lists");
+                map.put(xz, l);
+            }
+            worldlimits.put(radius, map);
+        });
 
         //run generation tasks exluding FULL chunk status
         for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
-            time(() -> {
-                ChunkStatus chunkStatus = entry.getKey();
-                int radius = Math.max(0, chunkStatus.requiredNeigborChunkRadius()); //EMPTY.requiredNeigborChunkRadius() == -1
+            ChunkStatus chunkStatus = entry.getKey();
+            int radius = Math.max(0, chunkStatus.requiredNeigborChunkRadius()); //EMPTY.requiredNeigborChunkRadius() == -1
 
-                List<Long> coords = chunkCoordsForRadius.get(radius);
-                if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
-                    SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, radius);
-                    for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
-                        List scheduled = new ArrayList<>(tasks.size());
-                        for (SequentialTasks<Long> row : para) {
-                            scheduled.add((Callable) () -> {
-                                for (Long xz : row) {
-                                    chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                                }
-                                return null;
-                            });
-                        }
-                        try {
-                            List<Future> futures = executor.invokeAll(scheduled);
-                            for (Future future : futures) {
-                                future.get();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
-                    // every chunk can be processed individually
-                    List scheduled = new ArrayList(coords.size());
-                    for (long xz : coords) {
+            List<Long> coords = chunkCoordsForRadius.get(radius);
+            if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
+                SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, radius);
+                for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
+                    List scheduled = new ArrayList<>(tasks.size());
+                    for (SequentialTasks<Long> row : para) {
                         scheduled.add((Callable) () -> {
-                            chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                            for (Long xz : row) {
+                                chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                            }
                             return null;
                         });
                     }
@@ -226,49 +200,60 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else { // Concurrency.NONE or generateConcurrent == false
-                    // run sequential
-                    for (long xz : coords) {
-                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                    }
                 }
-            }, entry.getKey().name());
+            } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
+                // every chunk can be processed individually
+                List scheduled = new ArrayList(coords.size());
+                for (long xz : coords) {
+                    scheduled.add((Callable) () -> {
+                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                        return null;
+                    });
+                }
+                try {
+                    List<Future> futures = executor.invokeAll(scheduled);
+                    for (Future future : futures) {
+                        future.get();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else { // Concurrency.NONE or generateConcurrent == false
+                // run sequential
+                for (long xz : coords) {
+                    chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                }
+            }
         }
 
         //convert to proper chunks
-        time(() -> {
-            for (Long xz : chunkCoordsForRadius.get(0)) {
-                ProtoChunk proto = protoChunks.get(xz);
-                chunks.put(xz, createChunk(proto));
-            }
-        }, "converting to chunks");
+        for (Long xz : chunkCoordsForRadius.get(0)) {
+            ProtoChunk proto = protoChunks.get(xz);
+            chunks.put(xz, createChunk(proto));
+        }
 
         //final chunkstatus
-        time(() -> {
-            ChunkStatus chunkStatus = getFullChunkStatus();
-            for (Long xz : chunkCoordsForRadius.get(0)) { //FULL.f() == 0!
-                Chunk chunk = chunks.get(xz);
-                chunkStatus.processChunkSave(xz, Arrays.asList(chunk));
-            }
-        }, "full");
+        ChunkStatus FULL = getFullChunkStatus();
+        for (Long xz : chunkCoordsForRadius.get(0)) { //FULL.requiredNeighbourChunkRadius() == 0!
+            Chunk chunk = chunks.get(xz);
+            FULL.processChunkSave(xz, Arrays.asList(chunk));
+        }
 
         //populate
         List<BlockPopulator> populators = getBlockPopulators();
-        time(() -> {
-            for (Long xz : chunkCoordsForRadius.get(0)) {
-                int x = MathMan.unpairIntX(xz);
-                int z = MathMan.unpairIntY(xz);
+        for (Long xz : chunkCoordsForRadius.get(0)) {
+            int x = MathMan.unpairIntX(xz);
+            int z = MathMan.unpairIntY(xz);
 
-                //prepare chunk seed
-                Random random = getChunkRandom(seed, x, z);
+            //prepare chunk seed
+            Random random = getChunkRandom(seed, x, z);
 
-                //actually populate
-                Chunk c = chunks.get(xz);
-                populators.forEach(pop -> {
-                    populate(c, random, pop);
-                });
-            }
-        }, "populate with " + populators.size() + " populators");
+            //actually populate
+            Chunk c = chunks.get(xz);
+            populators.forEach(pop -> {
+                populate(c, random, pop);
+            });
+        }
 
         source = new SingleThreadQueueExtent();
         source.init(null, initSourceQueueCache(), null);
@@ -450,22 +435,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return tasks;
     }
 
-    protected static Random getChunkRandom(long worldseed, int x, int z) {
+    private static Random getChunkRandom(long worldseed, int x, int z) {
         Random random = new Random();
         random.setSeed(worldseed);
         long xRand = random.nextLong() / 2L * 2L + 1L;
         long zRand = random.nextLong() / 2L * 2L + 1L;
         random.setSeed((long) x * xRand + (long) z * zRand ^ worldseed);
         return random;
-    }
-
-    //util
-    public static void time(Runnable r, String text) {
-        long starttask = System.currentTimeMillis();
-//            System.out.println(text);
-        r.run();
-        //Debug outputs:
-        //System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
     }
 
     //classes
@@ -539,21 +515,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         @Override
         public String toString() {
-            return toString(0);
-        }
-        
-        public String toString(int indent) {
-            String ret = new String(new char[indent]).replace('\0', ' ') + getClass().getSimpleName() +" [\n";
-            ret += new String(new char[indent]).replace('\0', ' ') + tasks.stream().map(e -> {
-                if (e == null)
-                    return "null";
-                else if (e instanceof Tasks) {
-                    return ((Tasks) e).toString(indent + 2);
-                } else {
-                    return e.toString();
-                }
-            }).collect(Collectors.joining(", "));
-            return ret + new String(new char[indent]).replace('\0', ' ') + "]\n";
+            return tasks.toString();
         }
     }
 }
