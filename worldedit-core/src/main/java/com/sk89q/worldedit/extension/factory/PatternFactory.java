@@ -70,10 +70,8 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new PerlinPatternParser(worldEdit));
         register(new RidgedMultiFractalPatternParser(worldEdit));
         register(new BiomePatternParser(worldEdit));
-        register(new Linear2DPatternParser(worldEdit, "#linear2d"));
-        register(new Linear2DPatternParser(worldEdit, "#l2d"));
-        register(new Linear3DPatternParser(worldEdit, "#linear3d"));
-        register(new Linear3DPatternParser(worldEdit, "#l3d"));
+        register(new Linear2DPatternParser(worldEdit));
+        register(new Linear3DPatternParser(worldEdit));
         register(new BufferedPatternParser(worldEdit));
         register(new ExistingPatternParser(worldEdit));
     }

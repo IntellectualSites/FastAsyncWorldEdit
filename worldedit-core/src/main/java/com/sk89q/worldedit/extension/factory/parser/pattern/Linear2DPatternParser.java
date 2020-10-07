@@ -23,10 +23,9 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
      * @param worldEdit the worldedit instance.
-     * @param prefix    the pattern prefix.
      */
-    public Linear2DPatternParser(WorldEdit worldEdit, String prefix) {
-        super(worldEdit, prefix);
+    public Linear2DPatternParser(WorldEdit worldEdit) {
+        super(worldEdit, "#linear2d", "#l2d");
     }
 
     @Override

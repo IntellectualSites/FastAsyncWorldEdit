@@ -23,10 +23,9 @@ public class Linear3DPatternParser extends RichParser<Pattern> {
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
      * @param worldEdit the worldedit instance.
-     * @param prefix    the pattern prefix.
      */
-    public Linear3DPatternParser(WorldEdit worldEdit, String prefix) {
-        super(worldEdit, prefix);
+    public Linear3DPatternParser(WorldEdit worldEdit) {
+        super(worldEdit, "#linear3d", "#l3d");
     }
 
     @Override
