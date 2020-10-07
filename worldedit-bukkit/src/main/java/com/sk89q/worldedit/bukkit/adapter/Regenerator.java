@@ -275,8 +275,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     }
     
     private void cleanup0() {
-        if (executor != null)
+        if (executor != null) {
             executor.shutdownNow();
+        }
         cleanup();
     }
     
