@@ -57,8 +57,9 @@ public class LocationConverter implements ArgumentConverter<Location> {
 
     @Override
     public List<String> getSuggestions(String input, InjectedValueAccess context) {
-        if (input.contains(","))
+        if (input.contains(",")) {
             return Collections.emptyList();
+        }
         return worldConverter.getSuggestions(input, context);
     }
 
@@ -73,11 +74,13 @@ public class LocationConverter implements ArgumentConverter<Location> {
         String[] split2 = s.split(",", 2);
 
         ConversionResult<World> world = worldConverter.convert(split2[0], injectedValueAccess);
-        if (!world.isSuccessful())
+        if (!world.isSuccessful()) {
             return (FailedConversion) world;
+        }
         ConversionResult<BlockVector3> vector = vectorConverter.convert(split2[1], injectedValueAccess);
-        if (!vector.isSuccessful())
+        if (!vector.isSuccessful()) {
             return (FailedConversion) vector;
+        }
 
         Location location = new Location(world.get().iterator().next(), vector.get().iterator().next().toVector3());
         return SuccessfulConversion.fromSingle(location);
