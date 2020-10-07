@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import org.bukkit.generator.BlockPopulator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents an abstract regeneration handler.
@@ -37,6 +39,8 @@ import org.bukkit.generator.BlockPopulator;
  */
 public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess, Chunk extends IChunkAccess, ChunkStatus extends Regenerator.ChunkStatusWrapper<IChunkAccess>> {
 
+    public static final Logger logger = LoggerFactory.getLogger(Regenerator.class);
+    
     protected final org.bukkit.World originalBukkitWorld;
     protected final Region region;
     protected final Extent target;
@@ -463,8 +467,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             try {
                 processChunk(xz, accessibleChunks);
             } catch (Exception e) {
-                System.err.println("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
-                e.printStackTrace();
+                logger.error("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz), e);
             }
         }
     }
