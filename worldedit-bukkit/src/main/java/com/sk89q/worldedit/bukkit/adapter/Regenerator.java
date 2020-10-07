@@ -72,8 +72,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
      * @throws Exception when something goes terribly wrong
      */
     public boolean regenerate() throws Exception {
-        if (!prepare())
+        if (!prepare()) {
             return false;
+        }
 
         try {
             if (!initNewWorld()) {
