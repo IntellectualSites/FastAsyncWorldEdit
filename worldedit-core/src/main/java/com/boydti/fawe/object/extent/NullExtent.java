@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 //todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
@@ -181,18 +182,18 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public boolean contains(int x, int z) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public boolean contains(int x, int y, int z) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public Collection<Region> getRegions() {
@@ -272,13 +273,13 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
@@ -302,8 +303,8 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
-            throw reason;
-        }
+        throw reason;
+    }
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
@@ -337,6 +338,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        throw reason;
+    }
+
+    @Override
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         throw reason;
     }
 

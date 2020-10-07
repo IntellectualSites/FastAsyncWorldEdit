@@ -9,7 +9,7 @@ public class AdjacentMask extends AbstractMask {
     private final int min;
     private final int max;
     private final Mask mask;
-    private MutableBlockVector3 vector;
+    private final MutableBlockVector3 vector;
 
     public AdjacentMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
@@ -59,5 +59,10 @@ public class AdjacentMask extends AbstractMask {
         }
         vector.mutZ(z);
         return count >= min && count <= max;
+    }
+
+    @Override
+    public Mask copy() {
+        return new AdjacentMask(mask.copy(), min, max);
     }
 }

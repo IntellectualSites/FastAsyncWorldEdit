@@ -58,7 +58,7 @@ public interface InputExtent {
     }
 
     /**
-     * Get a immutable snapshot of the block at the given location.
+     * Get an immutable snapshot of the block at the given location.
      *
      * @param position position of the block
      * @return the block

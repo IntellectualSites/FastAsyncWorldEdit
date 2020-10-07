@@ -41,8 +41,12 @@ public class PropertyGroup<G, A> {
         }
 
         public PropertyGroupBuilder add(PropertyKey key, Function<Object, G> getProcessor, Function<A, A> setProcessor) {
-            if (getProcessor == null) getProcessor = VOID_FUNCTION;
-            if (setProcessor == null) setProcessor = VOID_FUNCTION;
+            if (getProcessor == null) {
+                getProcessor = VOID_FUNCTION;
+            }
+            if (setProcessor == null) {
+                setProcessor = VOID_FUNCTION;
+            }
             Object[] pf = new Object[]{key, getProcessor, setProcessor};
             funcs.add(pf);
             return this;
@@ -81,7 +85,9 @@ public class PropertyGroup<G, A> {
     public <B extends BlockStateHolder<B>> G get(BlockStateHolder<B> state) {
         BlockType type = state.getBlockType();
         PropertyFunction func = states[type.getInternalId()];
-        if (func == null) return defaultValue;
+        if (func == null) {
+            return defaultValue;
+        }
         Object value = state.getState(func.key);
         return (G) func.getFunc.apply(value);
     }

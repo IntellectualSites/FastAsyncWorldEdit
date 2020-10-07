@@ -65,7 +65,10 @@ public class PNGWriter implements ClipboardWriter {
 
         boolean fill = length * 4 < imageSize && width * 4 < imageSize;
 
-        MutableBlockVector3 mutable, mutableTop, mutableRight, mutableLeft;
+        MutableBlockVector3 mutable;
+        MutableBlockVector3 mutableTop;
+        MutableBlockVector3 mutableRight;
+        MutableBlockVector3 mutableLeft;
         mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector3(0, 0, 0);
 //        Vector mutableTop = new Vector(0, 0, 0);
 //        Vector mutableRight = new Vector(0, 0, 0);

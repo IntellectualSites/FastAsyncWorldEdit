@@ -9,7 +9,7 @@ import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
-import com.boydti.fawe.bukkit.listener.ChunkListener_9;
+import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
@@ -95,7 +95,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
-            new ChunkListener_9();
+            new ChunkListener9();
         });
     }
 
@@ -142,7 +142,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.imageListener = new BukkitImageListener(plugin);
             }
             return viewer;
-        } catch (Throwable ignore) {
+        } catch (Throwable ignored) {
         }
         return null;
     }
@@ -171,11 +171,19 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
+        Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
-        msg.append("Plugins: \n");
-        for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-            msg.append(" - ").append(p.getName()).append(": ")
-                .append(p.getDescription().getVersion()).append("\n");
+        msg.append("Plugins (").append(plugins.length).append("): \n");
+        for (Plugin p : plugins) {
+            msg.append(" - ").append(p.getName()).append(":").append("\n")
+                .append("  • Version: ").append(p.getDescription().getVersion()).append("\n")
+                .append("  • Enabled: ").append(p.isEnabled()).append("\n")
+                .append("  • Main: ").append(p.getDescription().getMain()).append("\n")
+                .append("  • Authors: ").append(p.getDescription().getAuthors()).append("\n")
+                .append("  • Load Before: ").append(p.getDescription().getLoadBefore()).append("\n")
+                .append("  • Dependencies: ").append(p.getDescription().getDepend()).append("\n")
+                .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
+                .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
         }
         return msg.toString();
     }
@@ -244,7 +252,8 @@ public class FaweBukkit implements IFawe, Listener {
 
     private volatile boolean keepUnloaded;
 
-    @EventHandler(priority = EventPriority.MONITOR) public void onWorldLoad(WorldLoadEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWorldLoad(WorldLoadEvent event) {
         if (keepUnloaded) {
             org.bukkit.World world = event.getWorld();
             world.setKeepSpawnInMemory(false);

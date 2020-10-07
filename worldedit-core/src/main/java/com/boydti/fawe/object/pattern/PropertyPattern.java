@@ -62,7 +62,9 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     private void add(BlockType type, PropertyKey key, Operator operator, MutableCharSequence value, boolean wrap) {
-        if (!type.hasProperty(key)) return;
+        if (!type.hasProperty(key)) {
+            return;
+        }
         AbstractProperty property = (AbstractProperty) type.getProperty(key);
         BlockState defaultState = type.getDefaultState();
         int valueInt;
@@ -78,9 +80,14 @@ public class PropertyPattern extends AbstractExtentPattern {
 
         for (int i = 0; i < values.size(); i++) {
             int result = operator.apply(length, valueInt, i);
-            if (wrap) result = MathMan.wrap(result, 0, length - 1);
-            else result = Math.max(Math.min(result, length - 1), 0);
-            if (result == i) continue;
+            if (wrap) {
+                result = MathMan.wrap(result, 0, length - 1);
+            } else {
+                result = Math.max(Math.min(result, length - 1), 0);
+            }
+            if (result == i) {
+                continue;
+            }
 
             int internalId = valueInt + i;
 
@@ -88,7 +95,9 @@ public class PropertyPattern extends AbstractExtentPattern {
             if (type.getProperties().size() > 1) {
                 ArrayList<Property> properties = new ArrayList<>(type.getProperties().size() - 1);
                 for (Property current : type.getProperties()) {
-                    if (current == property) continue;
+                    if (current == property) {
+                        continue;
+                    }
                     properties.add(current);
                 }
                 applyRecursive(type, property, properties, 0, state, result);
@@ -124,7 +133,9 @@ public class PropertyPattern extends AbstractExtentPattern {
     public PropertyPattern addRegex(String input) {
         if (input.charAt(input.length() - 1) == ']') {
             int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
-            if (propStart == -1) return this;
+            if (propStart == -1) {
+                return this;
+            }
 
             MutableCharSequence charSequence = MutableCharSequence.getTemporal();
             charSequence.setString(input);
@@ -142,7 +153,9 @@ public class PropertyPattern extends AbstractExtentPattern {
                         blockTypeList.add(myType);
                     }
                 }
-                if (blockTypeList.size() == 1) type = blockTypeList.get(0);
+                if (blockTypeList.size() == 1) {
+                    type = blockTypeList.get(0);
+                }
             }
 
             PropertyKey key = null;
@@ -157,14 +170,17 @@ public class PropertyPattern extends AbstractExtentPattern {
                     case '{':
                     case '(':
                         int next = StringMan.findMatchingBracket(input, i);
-                        if (next != -1) i = next;
+                        if (next != -1) {
+                            i = next;
+                        }
                         break;
                     case ']':
                     case ',': {
                         charSequence.setSubstring(last, i);
                         char firstChar = input.charAt(last + 1);
-                        if (type != null) add(type, key, operator, charSequence, wrap);
-                        else {
+                        if (type != null) {
+                            add(type, key, operator, charSequence, wrap);
+                        } else {
                             for (BlockType myType : blockTypeList) {
                                 add(myType, key, operator, charSequence, wrap);
                             }
@@ -180,8 +196,12 @@ public class PropertyPattern extends AbstractExtentPattern {
                             char cp = input.charAt(i + 1);
                             boolean extra = cp == '=';
                             wrap = cp == '~';
-                            if (extra || wrap) i++;
-                            if (charSequence.length() > 0) key = PropertyKey.get(charSequence);
+                            if (extra || wrap) {
+                                i++;
+                            }
+                            if (charSequence.length() > 0) {
+                                key = PropertyKey.get(charSequence);
+                            }
                             last = i + 1;
                         }
                         break;

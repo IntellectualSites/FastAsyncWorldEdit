@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -72,7 +73,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase();
+            String name = file.getName().toLowerCase(Locale.ROOT);
             return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
         }
     },
@@ -108,7 +109,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase();
+            String name = file.getName().toLowerCase(Locale.ROOT);
             return name.endsWith(".schem") || name.endsWith(".sponge");
         }
 
@@ -141,13 +142,13 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase();
+            String name = file.getName().toLowerCase(Locale.ROOT);
             return name.endsWith(".nbt");
         }
     },
 
     /**
-     * Isometric PNG writer
+     * Isometric PNG writer.
      */
     PNG("png", "image") {
 

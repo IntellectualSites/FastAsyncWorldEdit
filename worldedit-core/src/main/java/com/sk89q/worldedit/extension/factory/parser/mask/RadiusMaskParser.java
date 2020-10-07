@@ -26,7 +26,9 @@ public class RadiusMaskParser extends RichParser<Mask> {
 
     @Override
     protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length < 2) return null;
+        if (arguments.length < 2) {
+            return null;
+        }
         int min = Integer.parseInt(arguments[0]);
         int max = Integer.parseInt(arguments[1]);
         return new RadiusMask(min, max);

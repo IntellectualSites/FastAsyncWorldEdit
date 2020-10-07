@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_15_2;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
@@ -57,7 +58,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,6 +71,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -79,30 +80,48 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_15_2.class);
 
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
-    private final static Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_15_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+    private static final Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_15_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     public ChunkSection[] sections;
     public Chunk nmsChunk;
     public WorldServer world;
-    public int X, Z;
+    public int chunkX;
+    public int chunkZ;
     public NibbleArray[] blockLight = new NibbleArray[16];
     public NibbleArray[] skyLight = new NibbleArray[16];
+    private boolean createCopy = false;
+    private BukkitGetBlocks_1_15_2_Copy copy = null;
 
-    public BukkitGetBlocks_1_15_2(World world, int X, int Z) {
-        this(((CraftWorld) world).getHandle(), X, Z);
+    public BukkitGetBlocks_1_15_2(World world, int chunkX, int chunkZ) {
+        this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
     }
 
-    public BukkitGetBlocks_1_15_2(WorldServer world, int X, int Z) {
+    public BukkitGetBlocks_1_15_2(WorldServer world, int chunkX, int chunkZ) {
         this.world = world;
-        this.X = X;
-        this.Z = Z;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
-    public int getX() {
-        return X;
+    public int getChunkX() {
+        return chunkX;
     }
 
-    public int getZ() {
-        return Z;
+    @Override
+    public void setCreateCopy(boolean createCopy) {
+        this.createCopy = createCopy;
+    }
+
+    @Override
+    public boolean isCreateCopy() {
+        return createCopy;
+    }
+
+    @Override
+    public IChunkGet getCopy() {
+        return copy;
+    }
+
+    public int getChunkZ() {
+        return chunkZ;
     }
 
     @Override
@@ -112,7 +131,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         if (y == -1) {
             for (y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
                 base = index.getBiome(x >> 2, y >> 2, z >> 2);
-                if (base != null) break;
+                if (base != null) {
+                    break;
+                }
             }
         } else {
             base = index.getBiome(x >> 2, y >> 2, z >> 2);
@@ -122,7 +143,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        TileEntity tileEntity = getChunk().getTileEntity(new BlockPosition((x & 15) + (X << 4), y, (z & 15) + (Z << 4)));
+        TileEntity tileEntity = getChunk().getTileEntity(new BlockPosition((x & 15) + (
+            chunkX << 4), y, (z & 15) + (chunkZ << 4)));
         if (tileEntity == null) {
             return null;
         }
@@ -146,11 +168,11 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
-               byte[] a = new byte[2048];
-               // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
-               Arrays.fill(a, (byte) 15);
-               nibbleArray = new NibbleArray(a);
-               ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibbleArray);
+                byte[] a = new byte[2048];
+                // Safe enough to assume if it's not created, it's under the sky. Unlikely to be created before lighting is fixed anyway.
+                Arrays.fill(a, (byte) 15);
+                nibbleArray = new NibbleArray(a);
+                ((LightEngine) world.getChunkProvider().getLightEngine()).a(EnumSkyBlock.SKY, sectionPosition, nibbleArray);
             }
             skyLight[layer] = nibbleArray;
         }
@@ -209,7 +231,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         List<Entity>[] slices = getChunk().getEntitySlices();
         int size = 0;
         for (List<Entity> slice : slices) {
-            if (slice != null) size += slice.size();
+            if (slice != null) {
+                size += slice.size();
+            }
         }
         if (slices.length == 0) {
             return Collections.emptySet();
@@ -286,15 +310,16 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         entity.die();
     }
 
-    public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int X, int Z) {
-        return BukkitAdapter_1_15_2.ensureLoaded(nmsWorld, X, Z);
+    public Chunk ensureLoaded(net.minecraft.server.v1_15_R1.World nmsWorld, int chunkX, int chunkZ) {
+        return BukkitAdapter_1_15_2.ensureLoaded(nmsWorld, chunkX, chunkZ);
     }
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        copy = createCopy ? new BukkitGetBlocks_1_15_2_Copy(world, getChunkX(), getChunkZ()) : null;
         try {
             WorldServer nmsWorld = world;
-            Chunk nmsChunk = ensureLoaded(nmsWorld, X, Z);
+            Chunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
             boolean fastmode = set.isFastMode() && Settings.IMP.QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles
@@ -316,6 +341,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         if (ordinal != 0) {
                             TileEntity tile = entry.getValue();
                             nmsChunk.removeTileEntity(tile.getPosition());
+                            if (createCopy) {
+                                copy.storeTile(tile);
+                            }
                         }
                     }
                 }
@@ -326,8 +354,11 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 ChunkSection[] sections = nmsChunk.getSections();
 
                 for (int layer = 0; layer < 16; layer++) {
-                    if (!set.hasSection(layer)){
+                    if (!set.hasSection(layer)) {
                         continue;
+                    }
+                    if (createCopy) {
+                        copy.storeSection(layer);
                     }
 
                     bitMask |= 1 << layer;
@@ -343,7 +374,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         } else {
                             existingSection = sections[layer];
                             if (existingSection == null) {
-                                log.error("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
+                                log.error("Skipping invalid null section. chunk:" + chunkX + ","
+                                              + chunkZ + " layer: " + layer);
                                 continue;
                             }
                         }
@@ -370,7 +402,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                             }
                             newSection = BukkitAdapter_1_15_2.newChunkSection(layer, this::load, setArr, fastmode);
                             if (!BukkitAdapter_1_15_2.setSectionAtomic(sections, existingSection, newSection, layer)) {
-                                log.error("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
+                                log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
                                 continue;
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
@@ -384,6 +416,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 if (biomes != null) {
                     // set biomes
                     BiomeStorage currentBiomes = nmsChunk.getBiomeIndex();
+                    if (createCopy) {
+                        copy.storeBiomes(currentBiomes);
+                    }
                     for (int z = 0, i = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++, i++) {
                             final BiomeType biome = biomes[i];
@@ -430,12 +465,14 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
                 Runnable[] syncTasks = null;
 
-                int bx = X << 4;
-                int bz = Z << 4;
+                int bx = chunkX << 4;
+                int bz = chunkZ << 4;
 
                 Set<UUID> entityRemoves = set.getEntityRemoves();
                 if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                    if (syncTasks == null) syncTasks = new Runnable[3];
+                    if (syncTasks == null) {
+                        syncTasks = new Runnable[3];
+                    }
 
                     syncTasks[2] = () -> {
                         final List<Entity>[] entities = nmsChunk.getEntitySlices();
@@ -446,6 +483,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                 while (iter.hasNext()) {
                                     final Entity entity = iter.next();
                                     if (entityRemoves.contains(entity.getUniqueID())) {
+                                        if (createCopy) {
+                                            copy.storeEntity(entity);
+                                        }
                                         iter.remove();
                                         removeEntity(entity);
                                     }
@@ -457,7 +497,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
                 Set<CompoundTag> entities = set.getEntities();
                 if (entities != null && !entities.isEmpty()) {
-                    if (syncTasks == null) syncTasks = new Runnable[2];
+                    if (syncTasks == null) {
+                        syncTasks = new Runnable[2];
+                    }
 
                     syncTasks[1] = () -> {
                         for (final CompoundTag nativeTag : entities) {
@@ -485,7 +527,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                     for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                         tag.remove(name);
                                     }
-                                    
+
                                     entity.f(tag);
                                     entity.setLocation(x, y, z, yaw, pitch);
                                     nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -499,7 +541,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                 // set tiles
                 Map<BlockVector3, CompoundTag> tiles = set.getTiles();
                 if (tiles != null && !tiles.isEmpty()) {
-                    if (syncTasks == null) syncTasks = new Runnable[1];
+                    if (syncTasks == null) {
+                        syncTasks = new Runnable[1];
+                    }
 
                     syncTasks[0] = () -> {
                         for (final Map.Entry<BlockVector3, CompoundTag> entry : tiles.entrySet()) {
@@ -541,8 +585,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, X, Z, finalMask, finalLightUpdate);
-                        if (finalizer != null) finalizer.run();
+                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, chunkX, chunkZ, finalMask, finalLightUpdate);
+                        if (finalizer != null) {
+                            finalizer.run();
+                        }
                     };
                 }
                 if (syncTasks != null) {
@@ -559,7 +605,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                                 }
                             }
                             if (callback == null) {
-                                if (finalizer != null) finalizer.run();
+                                if (finalizer != null) {
+                                    finalizer.run();
+                                }
                                 return null;
                             } else {
                                 return queueHandler.async(callback, null);
@@ -572,7 +620,9 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     return (T) (Future) queueHandler.sync(chain);
                 } else {
                     if (callback == null) {
-                        if (finalizer != null) finalizer.run();
+                        if (finalizer != null) {
+                            finalizer.run();
+                        }
                     } else {
                         callback.run();
                     }
@@ -722,7 +772,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             synchronized (this) {
                 tmp = nmsChunk;
                 if (tmp == null) {
-                    nmsChunk = tmp = ensureLoaded(this.world, X, Z);
+                    nmsChunk = tmp = ensureLoaded(this.world, chunkX, chunkZ);
                 }
             }
         }

@@ -1,12 +1,15 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.function.mask.AbstractMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class PlaneMask extends AbstractMask implements ResettableMask {
 
     private transient int mode = -1;
-    private transient int originX = Integer.MAX_VALUE, originY = Integer.MAX_VALUE, originZ = Integer.MAX_VALUE;
+    private transient int originX = Integer.MAX_VALUE;
+    private transient int originY = Integer.MAX_VALUE;
+    private transient int originZ = Integer.MAX_VALUE;
 
     @Override
     public boolean test(BlockVector3 vector) {
@@ -53,6 +56,11 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
     @Override
     public void reset() {
         mode = -1;
+    }
+
+    @Override
+    public Mask copy() {
+        return new PlaneMask();
     }
 
 }

@@ -40,7 +40,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public FaweStreamChangeSet(World world) {
         this(world, Settings.IMP.HISTORY.COMPRESSION_LEVEL, Settings.IMP.HISTORY.STORE_REDO, Settings.IMP.HISTORY.SMALL_EDITS);
     }
-    
+
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
         super(world);
         this.compression = compression;
@@ -129,7 +129,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
         if (mode == 1 || mode == 4) { // small
             posDel = new FaweStreamPositionDelegate() {
-                int lx, ly, lz;
+                int lx;
+                int ly;
+                int lz;
 
                 @Override
                 public void write(OutputStream out, int x, int y, int z) throws IOException {
@@ -169,7 +171,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         } else {
             posDel = new FaweStreamPositionDelegate() {
                 final byte[] buffer = new byte[5];
-                int lx, ly, lz;
+                int lx;
+                int ly;
+                int lz;
 
                 @Override
                 public void write(OutputStream stream, int x, int y, int z) throws IOException {
@@ -696,7 +700,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 public Change next() {
                     try {
                         return current.next();
-                    } catch (Throwable ignore) {
+                    } catch (Throwable ignored) {
                         if (i >= iterators.length - 1) {
                             throw new NoSuchElementException("End of iterator");
                         }

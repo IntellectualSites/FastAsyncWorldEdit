@@ -5,7 +5,7 @@
       var a = func.toString().replace(STRIP_COMMENTS, '');
       var r = a.slice(a.indexOf('(')+1, a.indexOf(')')).match(ARGUMENT_NAMES);
       var l = new java.util.ArrayList();
-      if(r !== null) {
+      if (r !== null) {
           for (var i = 0; i < r.length; i++) {
               l.add(r[i]);
           }
@@ -13,10 +13,10 @@
       return l;
     }
 
-    function getAllFunctions(){
+    function getAllFunctions() {
       var a = new java.util.ArrayList();
-      for (var f in this){
-        if (this.hasOwnProperty(f) && this[f] instanceof Function && !/a/i.test(f)){
+      for (var f in this) {
+        if (this.hasOwnProperty(f) && this[f] instanceof Function && !/a/i.test(f)) {
           a.add(this[f]);
         }
       }

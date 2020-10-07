@@ -71,9 +71,8 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given internal id
-     * @param combinedId
-     * @deprecated magic number
+     * Returns a temporary BlockState for a given internal id.
+     * @deprecated Magic Numbers
      * @return BlockState
      */
 
@@ -88,7 +87,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
+     * Returns a temporary BlockState for a given type and string.
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
@@ -97,8 +96,10 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
-     *  - It's faster if a BlockType is provided compared to parsing the string
+     * Returns a temporary BlockState for a given type and string.
+     *
+     * <p>It's faster if a BlockType is provided compared to parsing the string.</p>
+     *
      * @param type BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
@@ -108,8 +109,10 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * Returns a temporary BlockState for a given type and string
-     *  - It's faster if a BlockType is provided compared to parsing the string
+     * Returns a temporary BlockState for a given type and string.
+     *
+     * <p>It's faster if a BlockType is provided compared to parsing the string.</p>
+     *
      * @param type BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
@@ -143,7 +146,9 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
         List<? extends Property> propList = type.getProperties();
 
-        if (state.charAt(state.length() - 1) != ']') state = state + "]";
+        if (state.charAt(state.length() - 1) != ']') {
+            state = state + "]";
+        }
         MutableCharSequence charSequence = MutableCharSequence.getTemporal();
         charSequence.setString(state);
 
@@ -222,6 +227,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BlockType getBlockType() {
         return this.blockType;
     }
+
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setBlock(extent, this);
@@ -242,8 +248,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     /**
-     * The internal id with no type information
-     * @return
+     * The internal id with no type information.
      */
     @Deprecated
     @Override
@@ -405,7 +410,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public boolean isAir() {
         try {
             return material.isAir();
-        } catch (NullPointerException ignore) {
+        } catch (NullPointerException ignored) {
             return getMaterial().isAir();
         }
     }

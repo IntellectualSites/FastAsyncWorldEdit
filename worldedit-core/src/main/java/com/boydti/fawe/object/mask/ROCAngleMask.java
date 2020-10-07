@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
 
 public class ROCAngleMask extends AngleMask {
 
@@ -19,16 +20,27 @@ public class ROCAngleMask extends AngleMask {
 
         double tmp = (getHeight(extent, x, y, z + distance) - base - (base - getHeight(extent, x, y,
                 z - distance))) * ADJACENT_MOD;
-        if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
+        if (Math.abs(tmp) > Math.abs(slope)) {
+            slope = tmp;
+        }
 
         tmp = (getHeight(extent, x + distance, y, z + distance) - base - (base - getHeight(extent, x - distance, y,
                 z - distance))) * DIAGONAL_MOD;
-        if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
+        if (Math.abs(tmp) > Math.abs(slope)) {
+            slope = tmp;
+        }
 
         tmp = (getHeight(extent, x - distance, y, z + distance) - base - (base - getHeight(extent, x + distance, y,
                 z - distance))) * DIAGONAL_MOD;
-        if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
+        if (Math.abs(tmp) > Math.abs(slope)) {
+            slope = tmp;
+        }
 
         return lastValue = slope >= min && slope <= max;
+    }
+
+    @Override
+    public Mask copy() {
+        return new ROCAngleMask(getExtent(), min, max, overlay, distance);
     }
 }

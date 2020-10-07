@@ -10,4 +10,13 @@
     <suppress files=".*[\\/]TracedEditSession.java" checks="NoFinalizer"/>
     <!-- None of the old command stuff really matters -->
     <suppress files=".*[\\/]minecraft[\\/]util[\\/]commands[\\/].*\.java" checks=".*"/>
+    <!-- FAWE ADDITIONS -->
+    <suppress files=".*[\\/]MathMan.java" checks="MethodName"/>
+    <suppress files=".*[\\/]net[\\/]jpountz[\\/]lz4[\\/].*\.java" checks=".*"/>
+    <suppress files=".*[\\/]BufferedRandomAccessFile.java" checks=".*"/>
+    <suppress files=".*[\\/]ByteBufferUtils.java" checks="NoWhitespaceBefore"/>
+    <suppress files=".*[\\/]Settings.java" checks="MemberName"/>
+    <suppress files=".*[\\/]FaweLimit.java" checks="MemberName"/>
+    <suppress files=".*[\\/]SimplexNoise.java" checks="MemberName"/>
+    <suppress files=".*[\\/]SparseBitSet.java" checks=".*"/>
 </suppressions>

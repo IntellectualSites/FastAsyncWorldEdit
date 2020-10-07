@@ -9,12 +9,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
-public class ChunkListener_9 extends ChunkListener {
+public class ChunkListener9 extends ChunkListener {
 
     private Exception exception;
     private StackTraceElement[] elements;
 
-    public ChunkListener_9() {
+    public ChunkListener9() {
         super();
     }
 
@@ -64,7 +64,6 @@ public class ChunkListener_9 extends ChunkListener {
                 cancelNearby(cx, cz);
                 event.setCancelled(true);
                 physCancel = true;
-                return;
             }
         }
     }

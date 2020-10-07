@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -110,5 +111,11 @@ public class MaskUnion extends MaskIntersection {
             }
         }
         return new MaskUnion2D(mask2dList);
+    }
+
+    @Override
+    public Mask copy() {
+        Set<Mask> masksCopy = masks.stream().map(Mask::copy).collect(Collectors.toSet());
+        return new MaskUnion(masksCopy);
     }
 }

@@ -77,7 +77,9 @@ public class RandomPattern extends AbstractPattern {
     public void add(Pattern pattern, double chance) {
         checkNotNull(pattern);
         Double existingWeight = weights.get(pattern);
-        if (existingWeight != null) chance += existingWeight;
+        if (existingWeight != null) {
+            chance += existingWeight;
+        }
         weights.put(pattern, chance);
         collection = RandomCollection.of(weights, random);
         this.patterns.add(pattern);

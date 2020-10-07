@@ -44,7 +44,9 @@ public class PersistentChunkSendProcessor extends ChunkSendProcessor {
             current.put(pair, (Character) bitMask);
             if (previous != null) {
                 Character lastValue = previous.remove(pair);
-                if (lastValue != null) bitMask |= lastValue;
+                if (lastValue != null) {
+                    bitMask |= lastValue;
+                }
             }
         }
         return new CombinedBlocks(get, set, bitMask);
@@ -56,7 +58,9 @@ public class PersistentChunkSendProcessor extends ChunkSendProcessor {
     }
 
     public void clear() {
-        if (queue == null) throw new IllegalStateException("Queue is not provided");
+        if (queue == null) {
+            throw new IllegalStateException("Queue is not provided");
+        }
         clear(current);
         current.clear();
         queue = null;

@@ -43,14 +43,16 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     private final World world;
     private final QueueHandler handler;
     private final BatchProcessorHolder processor;
+    private final BatchProcessorHolder postProcessor;
     private int changes;
     private final boolean fastmode;
 
     public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode) {
-        super(handler.getQueue(world, new BatchProcessorHolder()));
+        super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
         this.world = world;
         this.handler = handler;
         this.processor = (BatchProcessorHolder) getExtent().getProcessor();
+        this.postProcessor = (BatchProcessorHolder) getExtent().getPostProcessor();
         this.fastmode = fastmode;
     }
 
@@ -63,19 +65,21 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     public boolean cancel() {
         if (super.cancel()) {
             processor.setProcessor(new NullExtent(this, FaweCache.MANUAL));
+            postProcessor.setPostProcessor(new NullExtent(this, FaweCache.MANUAL));
             return true;
         }
         return false;
     }
 
     private IQueueExtent<IQueueChunk> getNewQueue() {
-        return wrapQueue(handler.getQueue(this.world, this.processor));
+        return wrapQueue(handler.getQueue(this.world, this.processor, this.postProcessor));
     }
 
     @Override
     public IQueueExtent<IQueueChunk> wrapQueue(IQueueExtent<IQueueChunk> queue) {
         // TODO wrap
         queue.setProcessor(this.processor);
+        queue.setPostProcessor(this.postProcessor);
         return queue;
     }
 
@@ -102,7 +106,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
                         while (true) {
                             // Get the next chunk posWeakChunk
-                            final int chunkX, chunkZ;
+                            final int chunkX;
+                            final int chunkZ;
                             synchronized (chunksIter) {
                                 if (!chunksIter.hasNext()) {
                                     break;

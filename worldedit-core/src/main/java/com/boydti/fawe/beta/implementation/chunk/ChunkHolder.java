@@ -9,6 +9,7 @@ import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
+import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.queue.Pool;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
@@ -20,14 +21,14 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 
 /**
- * An abstract {@link IChunk} class that implements basic get/set blocks
+ * An abstract {@link IChunk} class that implements basic get/set blocks.
  */
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
@@ -47,6 +48,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private boolean fastmode;
     private int bitMask = -1; // Allow forceful setting of bitmask (for lighting)
     private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
+    private boolean createCopy = false;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -140,6 +142,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.get(this).getEntity(uuid);
     }
 
+    @Override public void setCreateCopy(boolean createCopy) {
+        this.createCopy = createCopy;
+    }
+
+    @Override public boolean isCreateCopy() {
+        return createCopy;
+    }
+
     private static final IBlockDelegate BOTH = new IBlockDelegate() {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
@@ -179,7 +189,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.chunkSet.setFullBright(layer);
         }
 
@@ -307,7 +317,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             chunk.setFullBright(layer);
@@ -379,6 +389,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.chunkExisting;
         }
 
@@ -414,7 +425,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.chunkSet.setFullBright(layer);
         }
 
@@ -436,6 +447,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public BiomeType getBiome(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getBiomeType(x, y, z);
         }
 
@@ -443,6 +455,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public BlockState getBlock(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getBlock(x, y, z);
         }
 
@@ -451,6 +464,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getFullBlock(x, y, z);
         }
 
@@ -467,6 +481,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             }
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getSkyLight(x, y, z);
         }
 
@@ -483,6 +498,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             }
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getEmmittedLight(x, y, z);
         }
 
@@ -490,6 +506,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public int getBrightness(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getBrightness(x, y, z);
         }
 
@@ -497,12 +514,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public int getOpacity(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getOpacity(x, y, z);
         }
 
         @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
             return chunk.getHeightMap(type);
         }
     };
@@ -584,7 +603,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public void setFullBright(ChunkHolder chunk, int layer){
+        public void setFullBright(ChunkHolder chunk, int layer) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             chunk.setFullBright(layer);
@@ -778,16 +797,22 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
             get.trim(false);
+            boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
+            get.setCreateCopy(postProcess);
             set = getExtent().processSet(this, get, set);
-            if (set != null) {
+            try {
                 return get.call(set, finalize);
+            } finally {
+                if (postProcess) {
+                    getExtent().postProcessSet(this, get.getCopy(), set);
+                }
             }
         }
         return null;
     }
 
     /**
-     * Get the extent this chunk is in
+     * Get the extent this chunk is in.
      */
     public IQueueExtent<? extends IChunk> getExtent() {
         return extent;
@@ -886,6 +911,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     public interface IBlockDelegate {
         <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
+
         IChunkSet set(ChunkHolder chunk);
 
         boolean setBiome(ChunkHolder chunk, int x, int y, int z, BiomeType biome);

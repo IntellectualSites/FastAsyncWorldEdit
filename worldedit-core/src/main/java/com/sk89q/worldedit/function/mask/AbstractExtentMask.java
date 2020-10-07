@@ -40,7 +40,6 @@ public abstract class AbstractExtentMask extends AbstractMask {
         setExtent(extent);
     }
 
-
     /**
      * Get the extent.
      *
@@ -60,6 +59,6 @@ public abstract class AbstractExtentMask extends AbstractMask {
         this.extent = extent;
     }
 
-    abstract public boolean test(Extent extent, BlockVector3 position);
+    public abstract boolean test(Extent extent, BlockVector3 position);
 
 }

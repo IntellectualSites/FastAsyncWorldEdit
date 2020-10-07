@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
 public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     private final Supplier<Mask> supplier;
     private final Mask mask;
-    private int changes;
+    private final AtomicInteger changes;
 
     public MaskFilter(T other, Mask mask) {
         this(other, () -> mask);
@@ -27,9 +28,14 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     }
 
     public MaskFilter(T other, Supplier<Mask> supplier, Mask root) {
+        this(other, supplier, root, new AtomicInteger());
+    }
+
+    public MaskFilter(T other, Supplier<Mask> supplier, Mask root, AtomicInteger changes) {
         super(other);
         this.supplier = supplier;
         this.mask = root;
+        this.changes = changes;
     }
 
     @Override
@@ -37,11 +43,11 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         if (mask instanceof AbstractExtentMask) {
             if (((AbstractExtentMask) mask).test(block, block)) {
                 getParent().applyBlock(block);
-                this.changes++;
+                this.changes.incrementAndGet();
             }
         } else if (mask.test(block)) {
             getParent().applyBlock(block);
-            this.changes++;
+            this.changes.incrementAndGet();
         }
     }
 
@@ -50,12 +56,17 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
      *
      * @return number of blocks which passed the Mask test and were applied to
      */
-    public int getBlocksApplied(){
-        return this.changes;
+    public int getBlocksApplied() {
+        return this.changes.get();
     }
 
     @Override
-    public MaskFilter newInstance(Filter other) {
+    public MaskFilter<?> newInstance(Filter other) {
         return new MaskFilter<>(other, supplier);
+    }
+
+    @Override
+    public Filter fork() {
+        return new MaskFilter<>(getParent().fork(), mask::copy, mask.copy(), changes);
     }
 }

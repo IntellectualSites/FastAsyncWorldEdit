@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,9 +46,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class MaskIntersection extends AbstractMask {
 
-    private final Set<Mask> masks;
-    private Mask[] masksArray;
-    private boolean defaultReturn;
+    protected final Set<Mask> masks;
+    protected Mask[] masksArray;
+    protected boolean defaultReturn;
 
     /**
      * Create a new intersection.
@@ -111,7 +112,9 @@ public class MaskIntersection extends AbstractMask {
         // Optimize sub masks
         for (int i = 0; i < masksArray.length; i++) {
             Mask mask = masksArray[i];
-            if (ignore.contains(mask)) continue;
+            if (ignore.contains(mask)) {
+                continue;
+            }
             Mask newMask = mask.tryOptimize();
             if (newMask != null) {
                 changed = true;
@@ -134,7 +137,9 @@ public class MaskIntersection extends AbstractMask {
                 changed = true;
             }
         }
-        if (formArray) formArray();
+        if (formArray) {
+            formArray();
+        }
         return changed;
     }
 
@@ -145,9 +150,13 @@ public class MaskIntersection extends AbstractMask {
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
         boolean changed = false;
-        while (combineMasks(pairingFunction(), failedCombines)) changed = true;
+        while (combineMasks(pairingFunction(), failedCombines)) {
+            changed = true;
+        }
         // Optimize / combine
-        do changed |= optimizeMasks(optimized);
+        do {
+            changed |= optimizeMasks(optimized);
+        }
         while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
@@ -158,8 +167,12 @@ public class MaskIntersection extends AbstractMask {
         }
         // Return result
         formArray();
-        if (masks.isEmpty()) return Masks.alwaysTrue();
-        if (masks.size() == 1) return masks.iterator().next();
+        if (masks.isEmpty()) {
+            return Masks.alwaysTrue();
+        }
+        if (masks.size() == 1) {
+            return masks.iterator().next();
+        }
         return changed ? this : null;
     }
 
@@ -170,9 +183,13 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
-                    if (mask == other) continue;
+                    if (mask == other) {
+                        continue;
+                    }
                     AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
-                    if (failedCombines.contains(pair)) continue;
+                    if (failedCombines.contains(pair)) {
+                        continue;
+                    }
                     Mask combined = pairing.apply(pair);
                     if (combined != null) {
                         result = new Mask[]{combined, mask, other};
@@ -182,7 +199,9 @@ public class MaskIntersection extends AbstractMask {
                     }
                 }
             }
-            if (result == null) break;
+            if (result == null) {
+                break;
+            }
             masks.remove(result[1]);
             masks.remove(result[2]);
             masks.add(result[0]);
@@ -248,6 +267,12 @@ public class MaskIntersection extends AbstractMask {
             }
         }
         return new MaskIntersection2D(mask2dList);
+    }
+
+    @Override
+    public Mask copy(){
+        Set<Mask> masks = this.masks.stream().map(Mask::copy).collect(Collectors.toSet());
+        return new MaskIntersection(masks);
     }
 
 }

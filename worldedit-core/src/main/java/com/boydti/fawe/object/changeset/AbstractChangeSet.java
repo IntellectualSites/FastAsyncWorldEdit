@@ -59,7 +59,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         if (closed) {
             return;
         }
-        closed = true;
         waitingAsync.incrementAndGet();
         TaskManager.IMP.async(() -> {
             waitingAsync.decrementAndGet();
@@ -97,8 +96,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     @Override
     public void close() throws IOException {
         if (!closed) {
-            closed = true;
             flush();
+            closed = true;
         }
     }
 
@@ -204,6 +203,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return set;
     }
 
+    @Override
+    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
+        return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
+    }
+
     public abstract void addTileCreate(CompoundTag tag);
 
     public abstract void addTileRemove(CompoundTag tag);
@@ -274,6 +278,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
     }
 
+    public boolean isEmpty() {
+        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
+    }
+
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
@@ -302,10 +310,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean isEmpty() {
-        return waitingCombined.get() == 0 && waitingAsync.get() == 0 && size() == 0;
     }
 
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {

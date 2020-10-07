@@ -56,7 +56,9 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
         Direction dir = Direction.get(string);
-        if (dir == null) return -1;
+        if (dir == null) {
+            return -1;
+        }
         return getIndex(dir);
     }
 

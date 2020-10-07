@@ -85,8 +85,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        return extent.getFullBlock(x, y, z);
+    public BlockState getBlock(int x, int y, int z) {
+        return extent.getBlock(x, y, z);
     }
 
     @Override
@@ -100,38 +100,37 @@ public class AbstractDelegateExtent implements Extent {
          */
 
     @Override
-    public boolean isQueueEnabled() {
-        return extent.isQueueEnabled();
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return extent.getFullBlock(x, y, z);
     }
 
     @Override
-    public void disableQueue() {
-        try {
-            if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
-                extent.disableQueue();
-            }
-        } catch (FaweException ignored) {
-        }
-        if (extent instanceof AbstractDelegateExtent) {
-            Extent next = ((AbstractDelegateExtent) extent).getExtent();
-            new ExtentTraverser(this).setNext(next);
-        } else {
-            getLogger(AbstractDelegateExtent.class).debug("Cannot disable queue");
-        }
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return extent.getBiomeType(x, y, z);
     }
 
     @Override
-    public void enableQueue() {
-        try {
-            extent.enableQueue();
-        } catch (FaweException enableQueue) {
-            // TODO NOT IMPLEMENTED - THIS IS IMPORTANT (ForgetfulExtentBuffer is just a placeholder for now, it won't work)
-            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(extent));
-        }
+    public BiomeType getBiome(BlockVector3 position) {
+        return extent.getBiome(position);
     }
     /*
      History
      */
+
+    @Override
+    public int getEmmittedLight(int x, int y, int z) {
+        return extent.getEmmittedLight(x, y, z);
+    }
+
+    @Override
+    public int getSkyLight(int x, int y, int z) {
+        return extent.getSkyLight(x, y, z);
+    }
+
+    @Override
+    public int getBrightness(int x, int y, int z) {
+        return extent.getBrightness(x, y, z);
+    }
 
     public void setChangeSet(AbstractChangeSet changeSet) {
         if (extent instanceof HistoryExtent) {
@@ -146,57 +145,6 @@ public class AbstractDelegateExtent implements Extent {
         } else if (changeSet != null) {
             new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
         }
-    }
-
-    @Override
-    public int getMaxY() {
-        return extent.getMaxY();
-    }
-
-    @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return extent.getBlock(x, y, z);
-    }
-
-    @Override
-    @Nullable
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return extent.createEntity(location, entity);
-    }
-
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        extent.removeEntity(x, y, z, uuid);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return extent.getEntities();
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return extent.getEntities(region);
-    }
-
-    @Override
-    public boolean fullySupports3DBiomes() {
-        return extent.fullySupports3DBiomes();
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector3 position) {
-        return extent.getBiome(position);
-    }
-
-    @Override
-    public BiomeType getBiomeType(int x, int y, int z) {
-        return extent.getBiomeType(x, y, z);
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return extent.setBiome(x, y, z, biome);
     }
 
     @Override
@@ -217,28 +165,18 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public boolean fullySupports3DBiomes() {
+        return extent.fullySupports3DBiomes();
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return extent.setBiome(x, y, z, biome);
+    }
+
+    @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return extent.setBiome(position.getX(), position.getY(), position.getZ(), biome);
-    }
-
-    @Override
-    public boolean relight(int x, int y, int z) {
-        return extent.relight(x, y, z);
-    }
-
-    @Override
-    public boolean relightBlock(int x, int y, int z) {
-        return extent.relightBlock(x, y, z);
-    }
-
-    @Override
-    public boolean relightSky(int x, int y, int z) {
-        return extent.relightSky(x, y, z);
-    }
-
-    @Override
-    public void setSkyLight(int x, int y, int z, int value) {
-        extent.setSkyLight(x, y, z, value);
     }
 
     @Override
@@ -247,18 +185,8 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public int getSkyLight(int x, int y, int z) {
-        return extent.getSkyLight(x, y, z);
-    }
-
-    @Override
-    public int getEmmittedLight(int x, int y, int z) {
-        return extent.getEmmittedLight(x, y, z);
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        return extent.getBrightness(x, y, z);
+    public void setSkyLight(int x, int y, int z, int value) {
+        extent.setSkyLight(x, y, z, value);
     }
 
     @Override
@@ -276,13 +204,61 @@ public class AbstractDelegateExtent implements Extent {
         return extent.getMaximumPoint();
     }
 
-    protected Operation commitBefore() {
-        return null;
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return extent.getEntities(region);
     }
 
     @Override
-    public @Nullable
-    Operation commit() {
+    public List<? extends Entity> getEntities() {
+        return extent.getEntities();
+    }
+
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity) {
+        return extent.createEntity(location, entity);
+    }
+
+    @Override
+    public void removeEntity(int x, int y, int z, UUID uuid) {
+        extent.removeEntity(x, y, z, uuid);
+    }
+
+    @Override
+    public boolean isQueueEnabled() {
+        return extent.isQueueEnabled();
+    }
+
+    @Override
+    public void enableQueue() {
+        try {
+            extent.enableQueue();
+        } catch (FaweException enableQueue) {
+            // TODO NOT IMPLEMENTED - THIS IS IMPORTANT (ForgetfulExtentBuffer is just a placeholder for now, it won't work)
+            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(extent));
+        }
+    }
+
+    @Override
+    public void disableQueue() {
+        try {
+            if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
+                extent.disableQueue();
+            }
+        } catch (FaweException ignored) {
+        }
+        if (extent instanceof AbstractDelegateExtent) {
+            Extent next = ((AbstractDelegateExtent) extent).getExtent();
+            new ExtentTraverser(this).setNext(next);
+        } else {
+            getLogger(AbstractDelegateExtent.class).debug("Cannot disable queue");
+        }
+    }
+
+    @Override
+    @Nullable
+    public Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
         if (extent != this) {
@@ -297,6 +273,26 @@ public class AbstractDelegateExtent implements Extent {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public int getMaxY() {
+        return extent.getMaxY();
+    }
+
+    @Override
+    public boolean relight(int x, int y, int z) {
+        return extent.relight(x, y, z);
+    }
+
+    @Override
+    public boolean relightBlock(int x, int y, int z) {
+        return extent.relightBlock(x, y, z);
+    }
+
+    @Override
+    public boolean relightSky(int x, int y, int z) {
+        return extent.relightSky(x, y, z);
     }
 
     @Override
@@ -318,11 +314,33 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public Extent addPostProcessor(IBatchProcessor processor) {
+        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            logger.info("addPostProcessor Info: \t " + processor.getClass().getName());
+            logger.info("The following is not an error or a crash:");
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement stackTraceElement : stackTrace) {
+                logger.info(stackTraceElement.toString());
+            }
+
+        }
+        Extent result = this.extent.addPostProcessor(processor);
+        if (result != this.extent) {
+            new ExtentTraverser<Extent>(this).setNext(result);
+        }
+        return this;
+    }
+
+    @Override
     public Extent disableHistory() {
         Extent result = this.extent.disableHistory();
         if (result != this.extent) {
             new ExtentTraverser<Extent>(this).setNext(result);
         }
         return this;
+    }
+
+    protected Operation commitBefore() {
+        return null;
     }
 }

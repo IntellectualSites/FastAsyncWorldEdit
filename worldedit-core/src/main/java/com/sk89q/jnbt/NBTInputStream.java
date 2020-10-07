@@ -187,7 +187,9 @@ public final class NBTInputStream implements Closeable {
                 return;
             case NBTConstants.TYPE_BYTE: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyInt(0, is.readByte());
                 } else {
@@ -197,7 +199,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_SHORT: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyInt(0, is.readShort());
                 } else {
@@ -207,7 +211,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_INT: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyInt(0, is.readInt());
                 } else {
@@ -217,7 +223,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_LONG: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyLong(0, is.readLong());
                 } else {
@@ -227,7 +235,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_FLOAT: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyFloat(0, is.readFloat());
                 } else {
@@ -237,7 +247,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_DOUBLE: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 if (value != null) {
                     value.applyDouble(0, is.readDouble());
                 } else {
@@ -247,7 +259,9 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_STRING: {
                 ValueReader value = scope.getValueReader();
-                if (value == null) value = scope.getElemReader();
+                if (value == null) {
+                    value = scope.getElemReader();
+                }
                 int length = is.readShort() & 0xFFFF;
                 if (value != null) {
                     byte[] bytes = new byte[length];
@@ -325,7 +339,9 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_BYTE_ARRAY: {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_BYTE);
-                if (scope.acceptLazy(length, this)) return;
+                if (scope.acceptLazy(length, this)) {
+                    return;
+                }
                 ValueReader valueReader = scope.getValueReader();
                 if (valueReader != null) {
                     byte[] arr = new byte[length];
@@ -360,7 +376,9 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_INT_ARRAY: {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_INT);
-                if (scope.acceptLazy(length, this)) return;
+                if (scope.acceptLazy(length, this)) {
+                    return;
+                }
                 ValueReader valueReader = scope.getValueReader();
                 if (valueReader != null) {
                     valueReader.apply(0, readIntArrayRaw(length));
@@ -379,7 +397,9 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_LONG_ARRAY: {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_LONG);
-                if (scope.acceptLazy(length, this)) return;
+                if (scope.acceptLazy(length, this)) {
+                    return;
+                }
                 ValueReader valueReader = scope.getValueReader();
                 if (valueReader != null) {
                     valueReader.apply(0, readLongArrayRaw(length));

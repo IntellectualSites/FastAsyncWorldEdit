@@ -50,7 +50,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             mix[3] = average;
             biomeMixes.put(color, mix);
         }
-        if (++index > 2) index = 0;
+        if (++index > 2) {
+            index = 0;
+        }
         int biomeId = mix[index];
         int biomeAvColor = mix[3];
         int blockColor = getColor(block);
@@ -73,7 +75,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             mix[3] = average;
             biomeMixes.put(color, mix);
         }
-        if (++index > 2) index = 0;
+        if (++index > 2) {
+            index = 0;
+        }
         int biomeId = mix[index];
         return getBiome(biomeId);
     }
@@ -87,7 +91,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             offsetColor = color;
         }
         BlockType res = super.getNearestBlock(offsetColor);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         int newColor = getColor(res);
         byte dr = (byte) (((color >> 16) & 0xFF) - ((newColor >> 16) & 0xFF));
         byte dg = (byte) (((color >> 8) & 0xFF) - ((newColor >> 8) & 0xFF));

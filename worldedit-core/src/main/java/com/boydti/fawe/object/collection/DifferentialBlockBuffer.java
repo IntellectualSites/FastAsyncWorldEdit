@@ -12,8 +12,10 @@ import java.lang.reflect.Array;
  */
 public final class DifferentialBlockBuffer implements DifferentialCollection<char[][][][][]> {
 
-    private final int width, length;
-    private final int t1, t2;
+    private final int width;
+    private final int length;
+    private final int t1;
+    private final int t2;
     private char[][][][][] data;
     private char[][][][][] changes;
 
@@ -63,7 +65,9 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<cha
 
     @Override
     public void undoChanges(FaweInputStream in) throws IOException {
-        if (changes != null && changes.length != 0) throw new IllegalStateException("There are uncommitted changes, please flush first");
+        if (changes != null && changes.length != 0) {
+            throw new IllegalStateException("There are uncommitted changes, please flush first");
+        }
         boolean modified = in.readBoolean();
         if (modified) {
             int len = in.readVarInt();
@@ -118,7 +122,9 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<cha
     }
 
     public void set(int x, int y, int z, char combined) {
-        if (combined == 0) combined = 1;
+        if (combined == 0) {
+            combined = 1;
+        }
         int localX = x & 15;
         int localZ = z & 15;
         int chunkX = x >> 4;
@@ -154,7 +160,9 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<cha
             }
 
         } else {
-            if (changes == null || changes.length == 0) changes = new char[t1][][][][];
+            if (changes == null || changes.length == 0) {
+                changes = new char[t1][][][][];
+            }
             appendChange(changes, chunkX, chunkZ, localX, localZ, y, (char) (zMap[localX] - combined));
         }
 
@@ -166,25 +174,33 @@ public final class DifferentialBlockBuffer implements DifferentialCollection<cha
         if (arr == null) {
             src[chunkZ] = new char[0][][][];
             return;
-        } else if (arr.length == 0) return;
+        } else if (arr.length == 0) {
+            return;
+        }
 
         char[][][] arr2 = arr[chunkX];
         if (arr2 == null) {
             arr[chunkX] = new char[0][][];
             return;
-        } else if (arr2.length == 0) return;
+        } else if (arr2.length == 0) {
+            return;
+        }
 
         char[][] yMap = arr2[y];
         if (yMap == null) {
             arr2[y] = new char[0][];
             return;
-        } else if (yMap.length == 0) return;
+        } else if (yMap.length == 0) {
+            return;
+        }
 
         char[] zMap = yMap[localZ];
         if (zMap == null) {
             yMap[localZ] = new char[0];
             return;
-        } else if (zMap.length == 0) return;
+        } else if (zMap.length == 0) {
+            return;
+        }
 
         int current = zMap[localX];
         zMap[localX] = combined;

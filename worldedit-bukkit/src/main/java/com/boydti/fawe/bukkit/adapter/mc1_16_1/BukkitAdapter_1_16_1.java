@@ -14,7 +14,23 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_16_R1.*;
+import net.minecraft.server.v1_16_R1.BiomeBase;
+import net.minecraft.server.v1_16_R1.BiomeStorage;
+import net.minecraft.server.v1_16_R1.Block;
+import net.minecraft.server.v1_16_R1.Chunk;
+import net.minecraft.server.v1_16_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R1.ChunkSection;
+import net.minecraft.server.v1_16_R1.DataBits;
+import net.minecraft.server.v1_16_R1.DataPalette;
+import net.minecraft.server.v1_16_R1.DataPaletteBlock;
+import net.minecraft.server.v1_16_R1.DataPaletteLinear;
+import net.minecraft.server.v1_16_R1.GameProfileSerializer;
+import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.PacketPlayOutLightUpdate;
+import net.minecraft.server.v1_16_R1.PlayerChunk;
+import net.minecraft.server.v1_16_R1.PlayerChunkMap;
+import net.minecraft.server.v1_16_R1.World;
+import net.minecraft.server.v1_16_R1.WorldServer;
 import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import sun.misc.Unsafe;
@@ -34,18 +50,20 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     /*
     NMS fields
     */
-    public final static Field fieldBits;
-    public final static Field fieldPalette;
-    public final static Field fieldSize;
+    public static final Field fieldBits;
+    public static final Field fieldPalette;
+    public static final Field fieldSize;
 
-    public final static Field fieldBitsPerEntry;
+    public static final Field fieldBitsPerEntry;
 
-    public final static Field fieldFluidCount;
-    public final static Field fieldTickingBlockCount;
-    public final static Field fieldNonEmptyBlockCount;
+    public static final Field fieldFluidCount;
+    public static final Field fieldTickingBlockCount;
+    public static final Field fieldNonEmptyBlockCount;
 
-    private final static Field fieldDirtyCount;
-    private final static Field fieldDirtyBits;
+    private static final Field fieldDirtyCount;
+    private static final Field fieldDirtyBits;
+
+    private static final Field fieldBiomeArray;
 
     private final static MethodHandle methodGetVisibleChunk;
 
@@ -78,6 +96,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyBits.setAccessible(true);
 
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
+            fieldBiomeArray.setAccessible(true);
+
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
@@ -90,8 +111,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
-            if ((scale & (scale - 1)) != 0)
+            if ((scale & (scale - 1)) != 0) {
                 throw new Error("data type scale not a power of two");
+            }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
         } catch (RuntimeException e) {
             throw e;
@@ -128,17 +150,17 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
         }
     }
 
-    public static Chunk ensureLoaded(World nmsWorld, int X, int Z) {
-        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(X, Z, false);
+    public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
+        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
         if (nmsChunk != null) {
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            return nmsWorld.getChunkAt(X, Z);
+            return nmsWorld.getChunkAt(chunkX, chunkZ);
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
-            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(X, Z, true);
+            CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
                 return chunk.getHandle();
@@ -147,20 +169,20 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
+        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
     }
 
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         try {
-            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
+            return (PlayerChunk) methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(cx, cz));
         } catch (Throwable thr) {
             throw new RuntimeException(thr);
         }
     }
 
-    public static void sendChunk(WorldServer nmsWorld, int X, int Z, int mask, boolean lighting) {
-        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
+    public static void sendChunk(WorldServer nmsWorld, int chunkX, int chunkZ, int mask, boolean lighting) {
+        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (playerChunk == null) {
             return;
         }
@@ -181,7 +203,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
                     fieldDirtyCount.set(playerChunk, 64);
 
                     if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(X, Z);
+                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
                         boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
                         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                         playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
@@ -236,7 +258,9 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
             if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
+                for (int i = 0; i < blockBitArrayEnd; i++) {
+                    blockStates[i] = 0;
+                }
             } else {
                 final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
@@ -250,7 +274,6 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
             final DataPalette<IBlockData> palette;
-//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
             palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::c);
 
             // set palette
@@ -290,5 +313,14 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+
+    public static BiomeBase[] getBiomeArray(BiomeStorage storage) {
+        try {
+            return (BiomeBase[]) fieldBiomeArray.get(storage);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -78,22 +78,22 @@ public class WorldEditCommands {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
         actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
-		
+
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();
             Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
                 .getTime();
-						
-			TextComponent dateArg = TextComponent.of(date.toLocaleString());
-			TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
-			TextComponent buildArg = TextComponent.of(version.build);
-			TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);	
-			
-			actor.printInfo(TranslatableComponent.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
+
+            TextComponent dateArg = TextComponent.of(date.toLocaleString());
+            TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
+            TextComponent buildArg = TextComponent.of(version.build);
+            TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);
+
+            actor.printInfo(TranslatableComponent.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
         }
-		
-		actor.printInfo(TextComponent.of("Wiki: https://wiki.intellectualsites.com/FastAsyncWorldEdit/index"));
-		
+
+        actor.printInfo(TextComponent.of("Wiki: https://wiki.intellectualsites.com/FastAsyncWorldEdit/index"));
+
         PlatformManager pm = we.getPlatformManager();
 
         TextComponentProducer producer = new TextComponentProducer();
@@ -104,19 +104,19 @@ public class WorldEditCommands {
                     .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
             ).newline();
         }
-		actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
-		
-		producer.reset();
-		for (Capability capability : Capability.values()) {
+        actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
+
+        producer.reset();
+        for (Capability capability : Capability.values()) {
             Platform platform = pm.queryCapability(capability);
             producer.append(
-                    TextComponent.of(capability.name(), TextColor.GRAY)
+                TextComponent.of(capability.name(), TextColor.GRAY)
                     .append(TextComponent.of(": ")
                     .append(TextComponent.of(platform != null ? platform.getPlatformName() : "NONE")))
             ).newline();
         }
         actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
-     
+
     }
 
     @Command(

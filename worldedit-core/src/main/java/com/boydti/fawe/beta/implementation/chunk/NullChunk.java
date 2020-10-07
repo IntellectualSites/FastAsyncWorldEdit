@@ -171,6 +171,12 @@ public final class NullChunk implements IQueueChunk {
         return null;
     }
 
+    @Override public void setCreateCopy(boolean createCopy) {}
+
+    @Override public boolean isCreateCopy() {
+        return false;
+    }
+
     @Nullable
     public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
         return null;

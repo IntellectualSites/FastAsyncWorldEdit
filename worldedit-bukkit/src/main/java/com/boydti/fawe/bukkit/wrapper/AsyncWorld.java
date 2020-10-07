@@ -5,6 +5,7 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.destroystokyo.paper.HeightmapType;
+import com.google.common.annotations.Beta;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import io.papermc.paper.world.MoonPhase;
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -60,7 +62,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import io.papermc.paper.world.MoonPhase;
 
 import java.io.File;
 import java.util.Collection;
@@ -81,6 +82,7 @@ import java.util.function.Predicate;
  * @see #wrap(World)
  * @see #create(WorldCreator)
  */
+@SuppressWarnings("deprecation")
 public class AsyncWorld extends PassthroughExtent implements World {
 
     private World parent;
@@ -93,9 +95,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * @param parent    Parent world
-     * @param autoQueue
-     * @deprecated use {@link #wrap(World)} instead
+     * An internal constructor for using a world asynchronously in FAWE. Do not use!
      */
     @Deprecated
     public AsyncWorld(World parent, boolean autoQueue) {
@@ -107,9 +107,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * @param parent
-     * @param extent
-     * @deprecated use {@link #wrap(World)} instead
+     * An internal constructor for using a world asynchronously in FAWE. Do not use!
      */
     @Deprecated
     public AsyncWorld(World parent, Extent extent) {
@@ -120,9 +118,6 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     /**
      * Wrap a world for async usage.
-     *
-     * @param world
-     * @return
      */
     public static AsyncWorld wrap(World world) {
         if (world instanceof AsyncWorld) {
@@ -141,13 +136,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     /**
-     * Create a world async (untested)
-     * - Only optimized for 1.10
-     *
-     * @param creator
-     * @return
+     * Create a world async. This is not tested and may be removed in the future due to
+     * synchronization problems.
      */
-    public synchronized static AsyncWorld create(final WorldCreator creator) {
+    @Beta
+    public static synchronized AsyncWorld create(final WorldCreator creator) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         @Nullable World world = adapter.createWorld(creator);
         return wrap(world);
@@ -164,7 +157,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull WorldBorder getWorldBorder() {
+    @NotNull
+    public WorldBorder getWorldBorder() {
         return TaskManager.IMP.sync(() -> parent.getWorldBorder());
     }
 
@@ -238,12 +232,14 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull AsyncBlock getBlockAt(final int x, final int y, final int z) {
+    @NotNull
+    public AsyncBlock getBlockAt(final int x, final int y, final int z) {
         return new AsyncBlock(this, x, y, z);
     }
 
     @Override
-    public @NotNull AsyncBlock getBlockAt(Location loc) {
+    @NotNull
+    public AsyncBlock getBlockAt(Location loc) {
         return getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
@@ -264,13 +260,15 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull AsyncBlock getHighestBlockAt(int x, int z) {
+    @NotNull
+    public AsyncBlock getHighestBlockAt(int x, int z) {
         int y = getHighestBlockYAt(x, z);
         return getBlockAt(x, y, z);
     }
 
     @Override
-    public @NotNull AsyncBlock getHighestBlockAt(Location loc) {
+    @NotNull
+    public AsyncBlock getHighestBlockAt(Location loc) {
         return getHighestBlockAt(loc.getBlockX(), loc.getBlockZ());
     }
 
@@ -285,28 +283,33 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Block getHighestBlockAt(int i, int i1, @NotNull HeightMap heightMap) {
+    @NotNull
+    public Block getHighestBlockAt(int i, int i1, @NotNull HeightMap heightMap) {
         return parent.getHighestBlockAt(i, i1, heightMap);
     }
 
     @Override
-    public @NotNull Block getHighestBlockAt(@NotNull Location location,
-        @NotNull HeightMap heightMap) {
+    @NotNull
+    public Block getHighestBlockAt(@NotNull Location location,
+                                   @NotNull HeightMap heightMap) {
         return parent.getHighestBlockAt(location, heightMap);
     }
 
     @Override
-    public @NotNull AsyncChunk getChunkAt(int x, int z) {
+    @NotNull
+    public AsyncChunk getChunkAt(int x, int z) {
         return new AsyncChunk(this, x, z);
     }
 
     @Override
-    public @NotNull AsyncChunk getChunkAt(Location location) {
+    @NotNull
+    public AsyncChunk getChunkAt(Location location) {
         return getChunkAt(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
-    public @NotNull AsyncChunk getChunkAt(Block block) {
+    @NotNull
+    public AsyncChunk getChunkAt(Block block) {
         return getChunkAt(block.getX(), block.getZ());
     }
 
@@ -320,6 +323,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
         return chunk.isLoaded();
     }
 
+    @NotNull
     @Override
     public Chunk[] getLoadedChunks() {
         return parent.getLoadedChunks();
@@ -357,6 +361,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public boolean isChunkInUse(int x, int z) {
         return parent.isChunkInUse(x, z);
     }
@@ -411,6 +416,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public boolean regenerateChunk(final int x, final int z) {
         return TaskManager.IMP.sync(() -> parent.regenerateChunk(x, z));
     }
@@ -422,104 +428,148 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Item dropItem(final @NotNull Location location, final @NotNull ItemStack item) {
+    @NotNull
+    public Item dropItem(
+        @NotNull
+        final Location location, @NotNull
+        final ItemStack item) {
         return TaskManager.IMP.sync(() -> parent.dropItem(location, item));
     }
 
     @Override
-    public @NotNull Item dropItemNaturally(final @NotNull Location location,
-        final @NotNull ItemStack item) {
+    @NotNull
+    public Item dropItemNaturally(
+        @NotNull
+        final Location location,
+        @NotNull
+        final ItemStack item) {
         return TaskManager.IMP.sync(() -> parent.dropItemNaturally(location, item));
     }
 
     @Override
-    public @NotNull Arrow spawnArrow(final @NotNull Location location,
-        final @NotNull Vector direction, final float speed, final float spread) {
+    @NotNull
+    public Arrow spawnArrow(
+        @NotNull
+        final Location location,
+        @NotNull
+        final Vector direction, final float speed, final float spread) {
         return TaskManager.IMP.sync(() -> parent.spawnArrow(location, direction, speed, spread));
     }
 
+    @NotNull
     @Override
-    public <T extends AbstractArrow> @NotNull T spawnArrow(@NotNull Location location,
+    public <T extends AbstractArrow> T spawnArrow(@NotNull Location location,
         @NotNull Vector direction, float speed, float spread, @NotNull Class<T> clazz) {
         return parent.spawnArrow(location, direction, speed, spread, clazz);
     }
 
     @Override
-    public boolean generateTree(final @NotNull Location location, final @NotNull TreeType type) {
+    public boolean generateTree(
+        @NotNull
+        final Location location, @NotNull
+        final TreeType type) {
         return TaskManager.IMP.sync(() -> parent.generateTree(location, type));
     }
 
     @Override
-    public boolean generateTree(final @NotNull Location loc, final @NotNull TreeType type,
-        final @NotNull BlockChangeDelegate delegate) {
+    public boolean generateTree(
+        @NotNull
+        final Location loc, @NotNull
+        final TreeType type,
+        @NotNull
+        final BlockChangeDelegate delegate) {
         return TaskManager.IMP.sync(() -> parent.generateTree(loc, type, delegate));
     }
 
     @Override
-    public @NotNull Entity spawnEntity(@NotNull Location loc, EntityType type) {
+    @NotNull
+    public Entity spawnEntity(@NotNull Location loc, EntityType type) {
         return spawn(loc, type.getEntityClass());
     }
 
     @Override
-    public @NotNull LightningStrike strikeLightning(final @NotNull Location loc) {
+    @NotNull
+    public LightningStrike strikeLightning(
+        @NotNull
+        final Location loc) {
         return TaskManager.IMP.sync(() -> parent.strikeLightning(loc));
     }
 
     @Override
-    public @NotNull LightningStrike strikeLightningEffect(final @NotNull Location loc) {
+    @NotNull
+    public LightningStrike strikeLightningEffect(
+        @NotNull
+        final Location loc) {
         return TaskManager.IMP.sync(() -> parent.strikeLightningEffect(loc));
     }
 
     @Override
-    public @NotNull List getEntities() {
+    @NotNull
+    public List getEntities() {
         return TaskManager.IMP.sync(() -> parent.getEntities());
     }
 
     @Override
-    public @NotNull List<LivingEntity> getLivingEntities() {
+    @NotNull
+    public List<LivingEntity> getLivingEntities() {
         return TaskManager.IMP.sync(() -> parent.getLivingEntities());
     }
 
+    @NotNull
     @Override
     @Deprecated
-    public <T extends Entity> @NotNull Collection<T> getEntitiesByClass(final Class<T>... classes) {
+    public <T extends Entity> Collection<T> getEntitiesByClass(
+        @NotNull
+        final Class<T>... classes) {
         return TaskManager.IMP.sync(() -> parent.getEntitiesByClass(classes));
     }
 
+    @NotNull
     @Override
-    public <T extends Entity> @NotNull Collection<T> getEntitiesByClass(
-        final @NotNull Class<T> cls) {
+    public <T extends Entity> Collection<T> getEntitiesByClass(
+        @NotNull
+        final Class<T> cls) {
         return TaskManager.IMP.sync(() -> parent.getEntitiesByClass(cls));
     }
 
     @Override
-    public @NotNull Collection<Entity> getEntitiesByClasses(final Class<?>... classes) {
+    @NotNull
+    public Collection<Entity> getEntitiesByClasses(
+        @NotNull
+        final Class<?>... classes) {
         return TaskManager.IMP.sync(() -> parent.getEntitiesByClasses(classes));
     }
 
     @Override
-    public @NotNull List<Player> getPlayers() {
+    @NotNull
+    public List<Player> getPlayers() {
         return TaskManager.IMP.sync(() -> parent.getPlayers());
     }
 
     @Override
-    public @NotNull Collection<Entity> getNearbyEntities(final @NotNull Location location,
+    @NotNull
+    public Collection<Entity> getNearbyEntities(
+        @NotNull
+        final Location location,
         final double x, final double y, final double z) {
         return TaskManager.IMP.sync(() -> parent.getNearbyEntities(location, x, y, z));
     }
 
     @Override
-    public @NotNull String getName() {
+    @NotNull
+    public String getName() {
         return parent.getName();
     }
 
     @Override
-    public @NotNull UUID getUID() {
+    @NotNull
+    public UUID getUID() {
         return parent.getUID();
     }
 
     @Override
-    public @NotNull Location getSpawnLocation() {
+    @NotNull
+    public Location getSpawnLocation() {
         return parent.getSpawnLocation();
     }
 
@@ -534,7 +584,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull MoonPhase getMoonPhase() {
+    @NotNull
+    public MoonPhase getMoonPhase() {
         return parent.getMoonPhase();
     }
 
@@ -669,45 +720,52 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull List<BlockPopulator> getPopulators() {
+    @NotNull
+    public List<BlockPopulator> getPopulators() {
         return parent.getPopulators();
     }
 
+    @NotNull
     @Override
-    public <T extends Entity> @NotNull T spawn(final @NotNull Location location,
-        final @NotNull Class<T> clazz) throws IllegalArgumentException {
+    public <T extends Entity> T spawn(@NotNull final Location location, @NotNull final Class<T> clazz) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawn(location, clazz));
     }
 
+    @NotNull
     @Override
-    public <T extends Entity> @NotNull T spawn(@NotNull Location location, @NotNull Class<T> clazz,
+    public <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz,
         Consumer<T> function) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawn(location, clazz, function));
     }
 
+    @NotNull
     @Override
-    public <T extends Entity> @NotNull T spawn(@NotNull Location location, @NotNull Class<T> clazz,
-        @Nullable Consumer<T> function, CreatureSpawnEvent.@NotNull SpawnReason reason)
+    public <T extends Entity> T spawn(@NotNull Location location, @NotNull Class<T> clazz,
+                                      @Nullable Consumer<T> function, @NotNull
+                                              CreatureSpawnEvent.SpawnReason reason)
         throws IllegalArgumentException {
-        return null;
+        return TaskManager.IMP.sync(() -> parent.spawn(location, clazz, function, reason));
     }
 
     @Override
-    public @NotNull FallingBlock spawnFallingBlock(@NotNull Location location,
-        @NotNull MaterialData data) throws IllegalArgumentException {
+    @NotNull
+    public FallingBlock spawnFallingBlock(@NotNull Location location,
+                                          @NotNull MaterialData data) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, data));
     }
 
     @Override
     @Deprecated
-    public @NotNull FallingBlock spawnFallingBlock(@NotNull Location location,
-        @NotNull Material material, byte data) throws IllegalArgumentException {
+    @NotNull
+    public FallingBlock spawnFallingBlock(@NotNull Location location,
+                                          @NotNull Material material, byte data) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, material, data));
     }
 
     @Override
-    public @NotNull FallingBlock spawnFallingBlock(@NotNull Location location,
-        @NotNull BlockData blockData) throws IllegalArgumentException {
+    @NotNull
+    public FallingBlock spawnFallingBlock(@NotNull Location location,
+                                          @NotNull BlockData blockData) throws IllegalArgumentException {
         return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, blockData));
     }
 
@@ -717,7 +775,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public void playEffect(final @NotNull Location location, final @NotNull Effect effect,
+    public void playEffect(
+        @NotNull
+        final Location location, @NotNull
+        final Effect effect,
         final int data, final int radius) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -733,7 +794,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public <T> void playEffect(final @NotNull Location location, final @NotNull Effect effect,
+    public <T> void playEffect(
+        @NotNull
+        final Location location, @NotNull
+        final Effect effect,
         final T data, final int radius) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -744,8 +808,9 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull ChunkSnapshot getEmptyChunkSnapshot(final int x, final int z,
-        final boolean includeBiome, final boolean includeBiomeTempRain) {
+    @NotNull
+    public ChunkSnapshot getEmptyChunkSnapshot(final int x, final int z,
+                                               final boolean includeBiome, final boolean includeBiomeTempRain) {
         return TaskManager.IMP
             .sync(() -> parent.getEmptyChunkSnapshot(x, z, includeBiome, includeBiomeTempRain));
     }
@@ -766,12 +831,14 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Biome getBiome(int x, int z) {
+    @NotNull
+    public Biome getBiome(int x, int z) {
         return adapter.adapt(getExtent().getBiomeType(x, 0, z));
     }
 
     @Override
-    public @NotNull Biome getBiome(int x, int y, int z) {
+    @NotNull
+    public Biome getBiome(int x, int y, int z) {
         return adapter.adapt(getExtent().getBiomeType(x, y, z));
     }
 
@@ -788,6 +855,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public double getTemperature(int x, int z) {
         return parent.getTemperature(x, z);
     }
@@ -798,6 +866,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public double getHumidity(int x, int z) {
         return parent.getHumidity(x, z);
     }
@@ -848,16 +917,19 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Difficulty getDifficulty() {
+    @NotNull
+    public Difficulty getDifficulty() {
         return parent.getDifficulty();
     }
 
     @Override
-    public @NotNull File getWorldFolder() {
+    @NotNull
+    public File getWorldFolder() {
         return parent.getWorldFolder();
     }
 
     @Override
+    @Deprecated
     public WorldType getWorldType() {
         return parent.getWorldType();
     }
@@ -948,7 +1020,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public void playSound(final @NotNull Location location, final @NotNull Sound sound,
+    public void playSound(
+        @NotNull
+        final Location location, @NotNull
+        final Sound sound,
         final float volume, final float pitch) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -959,7 +1034,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public void playSound(final @NotNull Location location, final @NotNull String sound,
+    public void playSound(
+        @NotNull
+        final Location location, @NotNull
+        final String sound,
         final float volume, final float pitch) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -991,17 +1069,20 @@ public class AsyncWorld extends PassthroughExtent implements World {
         });
     }
 
+    @NotNull
     @Override
     public String[] getGameRules() {
         return parent.getGameRules();
     }
 
     @Override
+    @Deprecated
     public String getGameRuleValue(String rule) {
         return parent.getGameRuleValue(rule);
     }
 
     @Override
+    @Deprecated
     public boolean setGameRuleValue(@NotNull String rule, @NotNull String value) {
         return parent.setGameRuleValue(rule, value);
     }
@@ -1012,6 +1093,7 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public <T> T getGameRuleValue(@NotNull GameRule<T> gameRule) {
         return parent.getGameRuleValue(gameRule);
     }
@@ -1027,22 +1109,28 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Spigot spigot() {
+    @NotNull
+    public Spigot spigot() {
         return parent.spigot();
     }
 
     @Override
-    public @Nullable Raid locateNearestRaid(@NotNull Location location, int i) {
+    @Nullable
+    public Raid locateNearestRaid(@NotNull Location location, int i) {
         return parent.locateNearestRaid(location, i);
     }
 
     @Override
-    public @NotNull List<Raid> getRaids() {
+    @NotNull
+    public List<Raid> getRaids() {
         return parent.getRaids();
     }
 
     @Override
-    public void setMetadata(final @NotNull String key, final @NotNull MetadataValue meta) {
+    public void setMetadata(
+        @NotNull
+        final String key, @NotNull
+        final MetadataValue meta) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
@@ -1052,7 +1140,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull List<MetadataValue> getMetadata(@NotNull String key) {
+    @NotNull
+    public List<MetadataValue> getMetadata(@NotNull String key) {
         return parent.getMetadata(key);
     }
 
@@ -1062,7 +1151,10 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public void removeMetadata(final @NotNull String key, final @NotNull Plugin plugin) {
+    public void removeMetadata(
+        @NotNull
+        final String key, @NotNull
+        final Plugin plugin) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
@@ -1072,12 +1164,14 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public void sendPluginMessage(@NotNull Plugin source, @NotNull String channel, byte[] message) {
+    public void sendPluginMessage(@NotNull Plugin source, @NotNull String channel, @NotNull
+        byte[] message) {
         parent.sendPluginMessage(source, channel, message);
     }
 
     @Override
-    public @NotNull Set<String> getListeningPluginChannels() {
+    @NotNull
+    public Set<String> getListeningPluginChannels() {
         return parent.getListeningPluginChannels();
     }
 
@@ -1086,19 +1180,22 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Collection<Entity> getNearbyEntities(@NotNull BoundingBox arg0) {
+    @NotNull
+    public Collection<Entity> getNearbyEntities(@NotNull BoundingBox arg0) {
         return parent.getNearbyEntities(arg0);
     }
 
     @Override
-    public @NotNull Collection<Entity> getNearbyEntities(@NotNull BoundingBox arg0,
-        Predicate<Entity> arg1) {
+    @NotNull
+    public Collection<Entity> getNearbyEntities(@NotNull BoundingBox arg0,
+                                                Predicate<Entity> arg1) {
         return parent.getNearbyEntities(arg0, arg1);
     }
 
     @Override
-    public @NotNull Collection<Entity> getNearbyEntities(@NotNull Location arg0, double arg1,
-        double arg2, double arg3, Predicate<Entity> arg4) {
+    @NotNull
+    public Collection<Entity> getNearbyEntities(@NotNull Location arg0, double arg1,
+                                                double arg2, double arg3, Predicate<Entity> arg4) {
         return parent.getNearbyEntities(arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -1196,7 +1293,8 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Collection<Chunk> getForceLoadedChunks() {
+    @NotNull
+    public Collection<Chunk> getForceLoadedChunks() {
         return parent.getForceLoadedChunks();
     }
 
@@ -1216,18 +1314,22 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull Collection<Plugin> getPluginChunkTickets(int x, int z) {
+    @NotNull
+    public Collection<Plugin> getPluginChunkTickets(int x, int z) {
         return getBukkitWorld().getPluginChunkTickets(x, z);
     }
 
     @Override
-    public @NotNull Map<Plugin, Collection<Chunk>> getPluginChunkTickets() {
+    @NotNull
+    public Map<Plugin, Collection<Chunk>> getPluginChunkTickets() {
         return getBukkitWorld().getPluginChunkTickets();
     }
 
     @Override
+    @Deprecated
     public int getHighestBlockYAt(int x, int z,
-        com.destroystokyo.paper.@NotNull HeightmapType heightmap)
+                                  @NotNull
+                                      com.destroystokyo.paper.HeightmapType heightmap)
         throws UnsupportedOperationException {
         return TaskManager.IMP.sync(() -> parent.getHighestBlockYAt(x, z, heightmap));
     }
@@ -1258,14 +1360,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
-    public @NotNull CompletableFuture<Chunk> getChunkAtAsync(int arg0, int arg1, boolean arg2) {
-        return parent.getChunkAtAsync(arg0, arg1, arg2);
+    @NotNull
+    public CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen) {
+        return parent.getChunkAtAsync(x, z, gen);
     }
 
     @Override
-    public @NotNull CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen,
-        boolean urgent) {
-        return null;
+    @NotNull
+    public CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen,
+                                                    boolean urgent) {
+        return parent.getChunkAtAsync(x, z, gen, urgent);
     }
 
     @Override
@@ -1274,16 +1378,19 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public void getChunkAtAsync(int x, int z, @NotNull ChunkLoadCallback cb) {
         parent.getChunkAtAsync(x, z, cb);
     }
 
     @Override
+    @Deprecated
     public void getChunkAtAsync(@NotNull Location location, @NotNull ChunkLoadCallback cb) {
         parent.getChunkAtAsync(location, cb);
     }
 
     @Override
+    @Deprecated
     public void getChunkAtAsync(@NotNull Block block, @NotNull ChunkLoadCallback cb) {
         parent.getChunkAtAsync(block, cb);
     }
@@ -1343,20 +1450,25 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    @Deprecated
     public int getHighestBlockYAt(@NotNull Location location, @NotNull HeightmapType heightmap)
         throws UnsupportedOperationException {
         return parent.getHighestBlockYAt(location, heightmap);
     }
 
     @Override
-    public @NotNull Block getHighestBlockAt(int x, int z, @NotNull HeightmapType heightmap)
+    @NotNull
+    @Deprecated
+    public Block getHighestBlockAt(int x, int z, @NotNull HeightmapType heightmap)
         throws UnsupportedOperationException {
         return parent.getHighestBlockAt(x, z, heightmap);
     }
 
     @Override
-    public @NotNull Block getHighestBlockAt(@NotNull Location location,
-        @NotNull HeightmapType heightmap) throws UnsupportedOperationException {
+    @NotNull
+    @Deprecated
+    public Block getHighestBlockAt(@NotNull Location location,
+                                   @NotNull HeightmapType heightmap) throws UnsupportedOperationException {
         return parent.getHighestBlockAt(location, heightmap);
     }
 

@@ -100,7 +100,6 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public void setOrigin(BlockVector3 origin) {
-//        this.origin = origin;
         getParent().setOrigin(origin.subtract(region.getMinimumPoint()));
     }
 
@@ -117,9 +116,9 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public BlockState getBlock(BlockVector3 position) {
         if (region.contains(position)) {
-            int x = position.getBlockX()- origin.getX();
-            int y = position.getBlockY()- origin.getY();
-            int z = position.getBlockZ()- origin.getZ();
+            int x = position.getBlockX() - origin.getX();
+            int y = position.getBlockY() - origin.getY();
+            int z = position.getBlockZ() - origin.getZ();
             return getParent().getBlock(x, y, z);
         }
 
@@ -128,10 +127,10 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        if(region.contains(position)) {
-            int x = position.getBlockX()- origin.getX();
-            int y = position.getBlockY()- origin.getY();
-            int z = position.getBlockZ()- origin.getZ();
+        if (region.contains(position)) {
+            int x = position.getBlockX() - origin.getX();
+            int y = position.getBlockY() - origin.getY();
+            int z = position.getBlockZ() - origin.getZ();
             return getParent().getFullBlock(x, y, z);
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -320,8 +319,11 @@ public class BlockArrayClipboard implements Clipboard {
     public static class ClipboardEntity implements Entity {
         private final BaseEntity entity;
         private final Clipboard clipboard;
-        private final double x, y, z;
-        private final float yaw, pitch;
+        private final double x;
+        private final double y;
+        private final double z;
+        private final float yaw;
+        private final float pitch;
 
         public ClipboardEntity(Location loc, BaseEntity entity) {
             this((Clipboard) loc.getExtent(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch(), entity);

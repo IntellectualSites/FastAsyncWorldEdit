@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.parser.pattern.BiomePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.PerlinPatternParser;
@@ -64,6 +65,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new VoronoiPatternParser(worldEdit));
         register(new PerlinPatternParser(worldEdit));
         register(new RidgedMultiFractalPatternParser(worldEdit));
+        register(new BiomePatternParser(worldEdit));
     }
 
 }

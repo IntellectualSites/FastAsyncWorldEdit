@@ -12,7 +12,7 @@ package net.jpountz.util;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * This file has been modified for use in the FAWE project.
  */
 
@@ -74,14 +74,14 @@ public enum Native {
 
         File[] tempLibFiles = dir.listFiles((dir1, name) ->
             name.startsWith("liblz4-java-") && !name.endsWith(".lck"));
-        if(tempLibFiles != null) {
-            for(File tempLibFile : tempLibFiles) {
+        if (tempLibFiles != null) {
+            for (File tempLibFile : tempLibFiles) {
                 File lckFile = new File(tempLibFile.getAbsolutePath() + ".lck");
-                if(!lckFile.exists()) {
+                if (!lckFile.exists()) {
                     try {
                         tempLibFile.delete();
                     }
-                    catch(SecurityException e) {
+                    catch (SecurityException e) {
                         System.err.println("Failed to delete old temp lib" + e.getMessage());
                     }
                 }

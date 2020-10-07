@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -9,10 +7,13 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     private int[] itemTypes;
@@ -25,7 +26,9 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             blockTypes = new int[materials.length];
             for (int i = 0; i < materials.length; i++) {
                 Material material = materials[i];
-                if (material.isLegacy()) continue;
+                if (material.isLegacy()) {
+                    continue;
+                }
                 NamespacedKey key = material.getKey();
                 String id = key.getNamespace() + ":" + key.getKey();
                 if (material.isBlock()) {
@@ -41,7 +44,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     }
 
     /**
-     * Converts a Material to a ItemType
+     * Converts a Material to a ItemType.
      *
      * @param material The material
      * @return The itemtype
@@ -51,7 +54,9 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         try {
             return ItemTypes.get(itemTypes[material.ordinal()]);
         } catch (NullPointerException e) {
-            if (init()) return asItemType(material);
+            if (init()) {
+                return asItemType(material);
+            }
             return ItemTypes.get(itemTypes[material.ordinal()]);
         }
     }
@@ -61,13 +66,15 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         try {
             return BlockTypesCache.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
-            if (init()) return asBlockType(material);
+            if (init()) {
+                return asBlockType(material);
+            }
             throw e;
         }
     }
 
     /**
-     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData
+     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData.
      *
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
@@ -79,11 +86,15 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             Material material = blockData.getMaterial();
             BlockType type = BlockTypes.getFromStateId(blockTypes[material.ordinal()]);
             List<? extends Property> propList = type.getProperties();
-            if (propList.size() == 0) return type.getDefaultState();
+            if (propList.size() == 0) {
+                return type.getDefaultState();
+            }
             String properties = blockData.getAsString();
             return BlockState.get(type, properties, type.getDefaultState());
         } catch (NullPointerException e) {
-            if (init()) return adapt(blockData);
+            if (init()) {
+                return adapt(blockData);
+            }
             throw e;
         }
     }

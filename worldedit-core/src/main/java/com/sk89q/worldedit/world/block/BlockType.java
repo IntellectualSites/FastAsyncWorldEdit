@@ -186,7 +186,7 @@ public class BlockType implements Keyed, Pattern {
     public <V> Property<V> getProperty(PropertyKey key) {
         try {
             return (Property<V>) this.settings.propertiesMapArr[key.ordinal()];
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (IndexOutOfBoundsException ignored) {
             return null;
         }
     }

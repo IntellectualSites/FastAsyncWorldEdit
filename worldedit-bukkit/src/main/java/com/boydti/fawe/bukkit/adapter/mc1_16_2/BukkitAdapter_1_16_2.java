@@ -15,6 +15,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import net.jpountz.util.UnsafeUtils;
+import net.minecraft.server.v1_16_R2.BiomeBase;
+import net.minecraft.server.v1_16_R2.BiomeStorage;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.Chunk;
 import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
@@ -64,6 +66,8 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     private static final Field fieldDirty;
     private static final Field fieldDirtyBlocks;
 
+    private static final Field fieldBiomeArray;
+
     private static final MethodHandle methodGetVisibleChunk;
 
     private static final int CHUNKSECTION_BASE;
@@ -95,6 +99,9 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
             fieldDirtyBlocks.setAccessible(true);
 
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("h");
+            fieldBiomeArray.setAccessible(true);
+
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
@@ -107,14 +114,15 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
-            if ((scale & (scale - 1)) != 0)
+            if ((scale & (scale - 1)) != 0) {
                 throw new Error("data type scale not a power of two");
+            }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
 
-            Class clsShortArraySet;
+            Class<?> clsShortArraySet;
             try { //paper
                 clsShortArraySet = Class.forName(new String(new char[]{'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
-            } catch (Throwable t) {// still using spigot boooo
+            } catch (Throwable t) { // still using spigot boo
                 clsShortArraySet = Class.forName(new String(new char[]{'o', 'r', 'g', '.', 'b', 'u', 'k', 'k', 'i', 't', '.', 'c', 'r', 'a', 'f', 't', 'b', 'u', 'k', 'k', 'i', 't', '.', 'l', 'i', 'b', 's', '.', 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
             }
         } catch (RuntimeException e) {
@@ -177,7 +185,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int chunkX, final int chunkZ) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         try {
-            return (PlayerChunk)methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(chunkX, chunkZ));
+            return (PlayerChunk) methodGetVisibleChunk.invoke(chunkMap, ChunkCoordIntPair.pair(chunkX, chunkZ));
         } catch (Throwable thr) {
             throw new RuntimeException(thr);
         }
@@ -200,7 +208,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                 }
 
                 if (lighting) {
-//                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
                     boolean trustEdges = true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
                     PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                     playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
@@ -251,7 +258,9 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
             if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
+                for (int i = 0; i < blockBitArrayEnd; i++) {
+                    blockStates[i] = 0;
+                }
             } else {
                 final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
@@ -265,7 +274,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
             final DataPalette<IBlockData> palette;
-//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
             palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::c);
 
             // set palette
@@ -286,7 +294,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
                         .setType(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
                             Block.getByCombinedId(ordinal)));
                 }
-            } catch (final IllegalAccessException | NoSuchFieldException e) {
+            } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
 
@@ -301,9 +309,18 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         return new ChunkSection(layer << 4);
     }
 
-    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
+    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws IllegalAccessException {
         fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    }
+
+    public static BiomeBase[] getBiomeArray(BiomeStorage storage) {
+        try {
+            return (BiomeBase[]) fieldBiomeArray.get(storage);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

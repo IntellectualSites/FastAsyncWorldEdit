@@ -16,15 +16,15 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
     }
 
     /**
-     * Create a new FastRandomCollection if the given values and weights match the criteria.
-     * The criteria may change at any point, so this method isn't guaranteed to return a
-     * non-empty Optional in any case.
+     * Create a new FastRandomCollection if the given values and weights match the criteria. The
+     * criteria may change at any point, so this method isn't guaranteed to return a non-empty
+     * {@code Optional} in any case.
      *
      * @param weights the weight of the values.
      * @param random the random generator to use for this collection.
      * @param <T> the value type.
-     * @return an {@link Optional} containing the new collection if it could
-     * be created, {@link Optional#empty()} otherwise.
+     * @return an {@link Optional} containing the new collection if it could be created, {@link
+     *     Optional#empty()} otherwise.
      * @see RandomCollection for API usage.
      */
     public static <T> Optional<RandomCollection<T>> create(Map<T, Double> weights, SimpleRandom random) {

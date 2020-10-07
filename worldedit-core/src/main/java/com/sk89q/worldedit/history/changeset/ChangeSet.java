@@ -21,6 +21,7 @@ package com.sk89q.worldedit.history.changeset;
 
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.regions.Region;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -81,24 +82,22 @@ public interface ChangeSet extends Closeable {
     int size();
 
     /**
-     * Close the changeset
+     * Close the changeset.
      */
     @Override
     default void close() throws IOException {
-
     }
 
     /**
      * Delete the changeset (e.g. files on disk, or in a database)
      */
-    default void delete() {}
+    default void delete() {
+    }
 
     /**
-     * Get a summary of this changeset (or null)
-     * @param region
-     * @param shallow
-     * @return
+     * Get a summary of this changeset.
      */
+    @Nullable
     default ChangeSetSummary summarize(Region region, boolean shallow) {
         return null;
     }

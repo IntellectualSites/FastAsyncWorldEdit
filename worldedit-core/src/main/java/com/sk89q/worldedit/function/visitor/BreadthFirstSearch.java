@@ -236,7 +236,9 @@ public abstract class BreadthFirstSearch implements Operation {
         BlockVectorSet tempQueue = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
             for (BlockVector3 from : queue) {
-                if (function.apply(from)) affected++;
+                if (function.apply(from)) {
+                    affected++;
+                }
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
                     BlockVector3 direction = dirs[i];
                     int y = from.getBlockY() + direction.getY();

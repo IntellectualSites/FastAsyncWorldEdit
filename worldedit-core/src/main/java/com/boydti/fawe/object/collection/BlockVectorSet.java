@@ -17,10 +17,12 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The BlockVectorSet is a Memory optimized Set for storing BlockVectors
- * - Internally it uses a map of Index->LocalBlockVectorSet
- * - All BlockVectors must be a valid world coordinate: y=[0,255],x=[-30000000,30000000],z=[-30000000,30000000]
- * - This will use ~8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
+ * The BlockVectorSet is a memory optimized Set for storing {@link BlockVector3}'s.
+ *
+ * <p>
+ * It uses about 8 bytes of memory for every 64 {@code BlockVector3}s (about 800 times less than a
+ * {@code HashSet}.
+ * </p>
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
@@ -92,7 +94,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return new Iterator<BlockVector3>() {
             Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
             Iterator<BlockVector3> entryIter = entry.getValue().iterator();
-            MutableBlockVector3 mutable = new MutableBlockVector3();
+            final MutableBlockVector3 mutable = new MutableBlockVector3();
 
             @Override
             public void remove() {
@@ -185,7 +187,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     public boolean retainAll(@NotNull Collection<?> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
-        Iterator it = iterator();
+        Iterator<BlockVector3> it = iterator();
         while (it.hasNext()) {
             if (!c.contains(it.next())) {
                 it.remove();

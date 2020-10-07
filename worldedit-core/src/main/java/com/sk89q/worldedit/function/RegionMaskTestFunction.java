@@ -32,7 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegionMaskTestFunction implements RegionFunction {
 
-    private final RegionFunction pass,fail;
+    private final RegionFunction pass;
+    private final RegionFunction fail;
     private Mask mask;
 
     /**

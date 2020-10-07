@@ -134,9 +134,10 @@ public class LocalSession implements TextureHolder {
     });
     private transient volatile Integer historyNegativeIndex;
     private transient ClipboardHolder clipboard;
+    private transient final Object clipboardLock = new Object();
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-    private transient final Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
+    private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -244,9 +245,13 @@ public class LocalSession implements TextureHolder {
 
                 } else {
                     int i = name.lastIndexOf('.');
-                    if (i != -1) val = StringMan.toInteger(name, 0, i);
+                    if (i != -1) {
+                        val = StringMan.toInteger(name, 0, i);
+                    }
                 }
-                if (val != null) set.set(val);
+                if (val != null) {
+                    set.set(val);
+                }
                 return false;
             });
         }
@@ -401,7 +406,9 @@ public class LocalSession implements TextureHolder {
         checkNotNull(editSession);
 
         // Don't store anything if no changes were made
-        if (editSession.size() == 0) return;
+        if (editSession.size() == 0) {
+            return;
+        }
 
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
@@ -720,7 +727,8 @@ public class LocalSession implements TextureHolder {
         return selector.getRegion();
     }
 
-    public @Nullable VirtualWorld getVirtualWorld() {
+    @Nullable
+    public VirtualWorld getVirtualWorld() {
         synchronized (dirty) {
             return virtual;
         }
@@ -767,19 +775,26 @@ public class LocalSession implements TextureHolder {
      * @return clipboard
      * @throws EmptyClipboardException thrown if no clipboard is set
      */
-    public synchronized ClipboardHolder getClipboard() throws EmptyClipboardException {
-        if (clipboard == null) {
-            throw new EmptyClipboardException();
+    public ClipboardHolder getClipboard() throws EmptyClipboardException {
+        synchronized (clipboardLock) {
+            if (clipboard == null) {
+                throw new EmptyClipboardException();
+            }
+            return clipboard;
         }
-        return clipboard;
     }
 
     @Nullable
-    public synchronized ClipboardHolder getExistingClipboard() {
-        return clipboard;
+    public ClipboardHolder getExistingClipboard() {
+        synchronized (clipboardLock) {
+            if (clipboard == null) {
+                return null;
+            }
+            return clipboard;
+        }
     }
 
-    public synchronized void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
+    public void addClipboard(@Nonnull MultiClipboardHolder toAppend) {
         checkNotNull(toAppend);
         ClipboardHolder existing = getExistingClipboard();
         MultiClipboardHolder multi;
@@ -804,15 +819,19 @@ public class LocalSession implements TextureHolder {
      *
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
      */
-    public synchronized void setClipboard(@Nullable ClipboardHolder clipboard) {
-        if (this.clipboard == clipboard) return;
-
-        if (this.clipboard != null) {
-            if (clipboard == null || !clipboard.contains(this.clipboard.getClipboard())) {
-                this.clipboard.close();
+    public void setClipboard(@Nullable ClipboardHolder clipboard) {
+        synchronized (clipboardLock) {
+            if (this.clipboard == clipboard) {
+                return;
             }
+
+            if (this.clipboard != null) {
+                if (clipboard == null || !clipboard.contains(this.clipboard.getClipboard())) {
+                    this.clipboard.close();
+                }
+            }
+            this.clipboard = clipboard;
         }
-        this.clipboard = clipboard;
     }
 
     /**
@@ -979,7 +998,8 @@ public class LocalSession implements TextureHolder {
      *
      * @return the snapshot
      */
-    public @Nullable Snapshot getSnapshotExperimental() {
+    @Nullable
+    public Snapshot getSnapshotExperimental() {
         return snapshotExperimental;
     }
 
@@ -1040,7 +1060,9 @@ public class LocalSession implements TextureHolder {
     public Tool getTool(BaseItem item, Player player) {
         if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
-            if (tool != null) return tool;
+            if (tool != null) {
+                return tool;
+            }
         }
         loadDefaults(player, false);
         return getTool(item.getType());
@@ -1233,7 +1255,9 @@ public class LocalSession implements TextureHolder {
      * @param actor the actor
      */
     public void tellVersion(Actor actor) {
-        if (hasBeenToldVersion) return;
+        if (hasBeenToldVersion) {
+            return;
+        }
         hasBeenToldVersion = true;
         actor.sendAnnouncements();
     }

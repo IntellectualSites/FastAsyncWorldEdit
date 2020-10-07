@@ -41,7 +41,9 @@ public class Bindings {
     private boolean register(Method method, InjectedValueStore store, CommandManager manager) {
         // Check that it has the binding
         Binding binding = method.getAnnotation(Binding.class);
-        if (binding == null) return false;
+        if (binding == null) {
+            return false;
+        }
         Annotation[] annotations = method.getAnnotations();
 
         // Get the key
@@ -49,7 +51,7 @@ public class Bindings {
         Key key;
         if ( annotations.length == 1) {
             key = Key.of(ret);
-        }else if (annotations.length == 2) {
+        } else if (annotations.length == 2) {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
             key = Key.of(ret, annotation);
         } else {

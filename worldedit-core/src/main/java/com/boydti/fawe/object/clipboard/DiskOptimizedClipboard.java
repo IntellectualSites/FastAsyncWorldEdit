@@ -57,7 +57,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static int HEADER_SIZE = 14;
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
-    
+
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
 
@@ -114,7 +114,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public URI getURI() {
         return file.toURI();
@@ -207,7 +207,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public void streamBiomes(IntValueReader task) {
-        if (!hasBiomes()) return;
+        if (!hasBiomes()) {
+            return;
+        }
         int index = 0;
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
         try {
@@ -266,7 +268,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     private void closeDirectBuffer(ByteBuffer cb) {
-        if (cb == null || !cb.isDirect()) return;
+        if (cb == null || !cb.isDirect()) {
+            return;
+        }
         // we could use this type cast and call functions without reflection code,
         // but static import from sun.* package is risky for non-SUN virtual machine.
         //try { ((sun.nio.ch.DirectBuffer)cb).cleaner().clean(); } catch (Exception ex) { }
@@ -373,7 +377,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             int diskIndex = HEADER_SIZE + (index << 1);
             char ordinal = byteBuffer.getChar(diskIndex);
             return BlockState.getFromOrdinal(ordinal);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (IndexOutOfBoundsException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -448,7 +452,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     public List<? extends Entity> getEntities() {
         return new ArrayList<>(entities);
     }
-    
+
     @Override
     public List<? extends Entity> getEntities(Region region) {
         return new ArrayList<>(entities.stream().filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList()));

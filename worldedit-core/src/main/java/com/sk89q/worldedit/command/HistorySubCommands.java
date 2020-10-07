@@ -70,50 +70,62 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "restore",
-            aliases = {"rerun"},
-            desc = "Rerun edits" +
-                    " - The time uses s, m, h, d, y.\n" +
-                    " - Import from disk: /history import"
+        name = "restore",
+        aliases = {"rerun"},
+        desc = "Rerun edits"
+            + " - The time uses s, m, h, d, y.\n"
+            + " - Import from disk: /history import"
     )
     @CommandPermissions("worldedit.history.redo")
     @Confirm
     public synchronized void rerun(Player player, World world, RollbackDatabase database,
                                    @AllowedRegion Region[] allowedRegions,
-                                   @ArgFlag(name = 'u', desc = "String user", def="me") UUID other,
+                                   @ArgFlag(name = 'u', desc = "String user", def = "me")
+                                           UUID other,
                                    @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                   @Range(from = 0, to = Integer.MAX_VALUE) int radius,
+                                   @Range(from = 0, to = Integer.MAX_VALUE)
+                                           int radius,
                                    @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
-                                   @Time long timeDiff) throws WorldEditException {
+                                   @Time
+                                           long timeDiff) throws WorldEditException {
         rollback(player, world, database, allowedRegions, other, radius, timeDiff, true);
     }
 
     @Command(
-            name = "rollback",
-            desc = "Undo a specific edit. " +
-                    " - The time uses s, m, h, d, y."
+        name = "rollback",
+        desc = "Undo a specific edit. "
+            + " - The time uses s, m, h, d, y."
     )
     @CommandPermissions("worldedit.history.undo")
     @Confirm
     public synchronized void rollback(Player player, World world, RollbackDatabase database,
                                       @AllowedRegion Region[] allowedRegions,
-                                      @ArgFlag(name = 'u', desc = "String user", def = "") UUID other,
+                                      @ArgFlag(name = 'u', desc = "String user", def = "")
+                                              UUID other,
                                       @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                      @Range(from = 0, to = Integer.MAX_VALUE) int radius,
-                                      @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0") @Time long timeDiff,
-                                      @Switch(name = 'f', desc = "Restore instead of rollback") boolean restore) throws WorldEditException {
+                                      @Range(from = 0, to = Integer.MAX_VALUE)
+                                              int radius,
+                                      @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
+                                      @Time
+                                              long timeDiff,
+                                      @Switch(name = 'f', desc = "Restore instead of rollback")
+                                              boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with /history import )"));
+            player.print(Caption.of("fawe.error.setting.disable", "history.use-database (Import with /history import )"));
             return;
         }
         checkCommandArgument(radius > 0, "Radius must be >= 0");
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
-        if (other == null) other = player.getUniqueId();
+        if (other == null) {
+            other = player.getUniqueId();
+        }
         if (!other.equals(player.getUniqueId())) {
             player.checkPermission("worldedit.history.undo.other");
         }
-        if (other == Identifiable.EVERYONE) other = null;
+        if (other == Identifiable.EVERYONE) {
+            other = null;
+        }
         Location origin = player.getLocation();
         BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
         BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
@@ -121,11 +133,11 @@ public class HistorySubCommands {
         top = top.clampY(0, world.getMaxY());
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
         // TODO: then mask the edit to the bot / top
-//        if (allowedRegions.length != 1 || !allowedRegions[0].isGlobal()) {
-//            finalQueue = new MaskedIQueueExtent(SetQueue.IMP.getNewQueue(fp.getWorld(), true, false), allowedRegions);
-//        } else {
-//            finalQueue = SetQueue.IMP.getNewQueue(fp.getWorld(), true, false);
-//        }
+        //        if (allowedRegions.length != 1 || !allowedRegions[0].isGlobal()) {
+        //            finalQueue = new MaskedIQueueExtent(SetQueue.IMP.getNewQueue(fp.getWorld(), true, false), allowedRegions);
+        //        } else {
+        //            finalQueue = SetQueue.IMP.getNewQueue(fp.getWorld(), true, false);
+        //        }
         int count = 0;
         UUID finalOther = other;
         long minTime = System.currentTimeMillis() - timeDiff;
@@ -136,14 +148,14 @@ public class HistorySubCommands {
             String path = edit.getWorld().getName() + "/" + finalOther + "-" + edit.getIndex();
             player.print(Caption.of("fawe.worldedit.rollback.rollback.element", path));
         }
-        player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer" , count));
+        player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer", count));
     }
 
     @Command(
-            name = "import",
-            desc = "Import history into the database" +
-                    " - The time uses s, m, h, d, y.\n" +
-                    " - Import from disk: /history import"
+        name = "import",
+        desc = "Import history into the database"
+            + " - The time uses s, m, h, d, y.\n"
+            + " - Import from disk: /history import"
     )
     @CommandPermissions("fawe.rollback.import")
     @Confirm
@@ -197,14 +209,16 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "info",
-            aliases = {"summary", "summarize"},
-            desc = "Summarize an edit"
+        name = "info",
+        aliases = {"summary", "summarize"},
+        desc = "Summarize an edit"
     )
     @CommandPermissions("worldedit.history.info")
     public synchronized void summary(Player player, RollbackDatabase database, Arguments arguments,
-                                     @Arg(desc = "Player uuid/name") UUID other,
-                                     @Arg(desc = "edit index") Integer index) throws WorldEditException, ExecutionException, InterruptedException {
+                                     @Arg(desc = "Player uuid/name")
+                                         UUID other,
+                                     @Arg(desc = "edit index")
+                                             Integer index) throws WorldEditException, ExecutionException, InterruptedException {
         RollbackOptimizedHistory edit = database.getEdit(other, index).get();
         if (edit == null) {
             player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"));
@@ -238,11 +252,21 @@ public class HistorySubCommands {
 
         String sizeStr = StringMan.humanReadableByteCountBin(edit.getSizeOnDisk());
         String extra = "";
-        if (biomes) extra += "biomes, ";
-        if (createdEnts) extra += "+entity, ";
-        if (removedEnts) extra += "-entity, ";
-        if (createdTiles) extra += "+tile, ";
-        if (removedTiles) extra += "-tile, ";
+        if (biomes) {
+            extra += "biomes, ";
+        }
+        if (createdEnts) {
+            extra += "+entity, ";
+        }
+        if (removedEnts) {
+            extra += "-entity, ";
+        }
+        if (createdTiles) {
+            extra += "+tile, ";
+        }
+        if (removedTiles) {
+            extra += "-tile, ";
+        }
 
         TranslatableComponent body = Caption.of("fawe.worldedit.history.find.element.more", size, edit.getMinimumPoint(), edit.getMaximumPoint(), extra.trim(), sizeStr);
         Component distr = TextComponent.of("/history distr").clickEvent(ClickEvent.suggestCommand("//history distr " + other + " " + index));
@@ -296,23 +320,29 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "find",
-            aliases = {"inspect", "search", "near"},
-            desc = "Find nearby edits"
+        name = "find",
+        aliases = {"inspect", "search", "near"},
+        desc = "Find nearby edits"
     )
     @CommandPermissions("worldedit.history.find")
     public synchronized void find(Player player, World world, RollbackDatabase database, Arguments arguments,
-                                  @ArgFlag(name = 'u', def="", desc = "String user") UUID other,
+                                  @ArgFlag(name = 'u', def = "", desc = "String user")
+                                      UUID other,
                                   @ArgFlag(name = 'r', def = "0", desc = "radius")
-                                  @Range(from = 0, to = Integer.MAX_VALUE) Integer radius,
+                                  @Range(from = 0, to = Integer.MAX_VALUE)
+                                      Integer radius,
                                   @ArgFlag(name = 't', desc = "Time e.g. 20s", def = "0")
-                                  @Time Long timeDiff,
-                                  @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) throws WorldEditException {
+                                  @Time
+                                      Long timeDiff,
+                                  @ArgFlag(name = 'p', desc = "Page to view.", def = "")
+                                      Integer page) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(Caption.of("fawe.error.setting.disable" , "history.use-database (Import with //history import )"));
+            player.print(Caption.of("fawe.error.setting.disable", "history.use-database (Import with //history import )"));
             return;
         }
-        if (other == null && radius == 0 && timeDiff == 0) throw new InsufficientArgumentsException("User must be provided");
+        if (other == null && radius == 0 && timeDiff == 0) {
+            throw new InsufficientArgumentsException("User must be provided");
+        }
         checkCommandArgument(radius > 0, "Radius must be >= 0");
         checkCommandArgument(timeDiff > 0, "Time must be >= 0");
 
@@ -322,11 +352,15 @@ public class HistorySubCommands {
         List<Supplier<? extends ChangeSet>> history = cached == null ? null : cached.get();
 
         if (page == null || history == null) {
-            if (other == null) other = player.getUniqueId();
+            if (other == null) {
+                other = player.getUniqueId();
+            }
             if (!other.equals(player.getUniqueId())) {
                 player.checkPermission("worldedit.history.undo.other");
             }
-            if (other == Identifiable.EVERYONE) other = null;
+            if (other == Identifiable.EVERYONE) {
+                other = null;
+            }
 
             BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
             BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
@@ -345,15 +379,18 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "distr",
-            aliases = {"distribution"},
-            desc = "View block distribution for an edit"
+        name = "distr",
+        aliases = {"distribution"},
+        desc = "View block distribution for an edit"
     )
     @CommandPermissions("worldedit.history.distr")
     public void distr(Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
-                      @Arg(desc = "Player uuid/name") UUID other,
-                      @Arg(desc = "edit index") Integer index,
-                      @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) throws ExecutionException, InterruptedException {
+                      @Arg(desc = "Player uuid/name")
+                          UUID other,
+                      @Arg(desc = "edit index")
+                          Integer index,
+                      @ArgFlag(name = 'p', desc = "Page to view.", def = "")
+                          Integer page) throws ExecutionException, InterruptedException {
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();
         Reference<PaginationBox> cached = player.getMeta(pageCommand);
         PaginationBox pages = cached == null ? null : cached.get();
@@ -372,13 +409,15 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "list",
-            desc = "List your history"
+        name = "list",
+        desc = "List your history"
     )
     @CommandPermissions("worldedit.history.list")
     public void list(Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
-                     @Arg(desc = "Player uuid/name") UUID other,
-                     @ArgFlag(name = 'p', desc = "Page to view.", def = "") Integer page) {
+                     @Arg(desc = "Player uuid/name")
+                         UUID other,
+                     @ArgFlag(name = 'p', desc = "Page to view.", def = "")
+                         Integer page) {
         int index = session.getHistoryIndex();
         List<Supplier<? extends ChangeSet>> history = Lists.transform(session.getHistory(), (Function<ChangeSet, Supplier<ChangeSet>>) input -> () -> input);
         Location origin = player.getLocation();
@@ -393,8 +432,8 @@ public class HistorySubCommands {
     }
 
     @Command(
-            name = "clear",
-            desc = "Clear your history"
+        name = "clear",
+        desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {

@@ -9,6 +9,8 @@ import com.sk89q.worldedit.extent.NullExtent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Future;
+
 public final class NullProcessor implements IBatchProcessor {
     private static final NullProcessor instance = new NullProcessor();
 
@@ -18,6 +20,11 @@ public final class NullProcessor implements IBatchProcessor {
 
     @Nullable
     public IChunkSet processSet(@NotNull IChunk chunk, @NotNull IChunkGet get, @NotNull IChunkSet set) {
+        return null;
+    }
+
+    @Nullable
+    public Future<IChunkSet> postProcessSet(@NotNull IChunk chunk, @NotNull IChunkGet get, @NotNull IChunkSet set) {
         return null;
     }
 

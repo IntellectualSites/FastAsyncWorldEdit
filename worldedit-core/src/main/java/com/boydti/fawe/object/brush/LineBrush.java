@@ -11,7 +11,9 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class LineBrush implements Brush, ResettableTool {
 
-    private final boolean shell, select, flat;
+    private final boolean shell;
+    private final boolean select;
+    private final boolean flat;
     private BlockVector3 pos1;
 
     public LineBrush(boolean shell, boolean select, boolean flat) {

@@ -1,16 +1,23 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.function.mask.AbstractMask;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class RadiusMask extends AbstractMask implements ResettableMask {
 
     private transient BlockVector3 pos;
-    private final int minSqr, maxSqr;
+    private final int minSqr;
+    private final int maxSqr;
 
     public RadiusMask(int min, int max) {
         this.minSqr = min * min;
         this.maxSqr = max * max;
+    }
+
+    private RadiusMask(Integer minSqr, Integer maxSqr) {
+        this.minSqr = minSqr;
+        this.maxSqr = maxSqr;
     }
 
     @Override
@@ -39,6 +46,11 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Mask copy() {
+        return new RadiusMask(minSqr, maxSqr);
     }
 
 }

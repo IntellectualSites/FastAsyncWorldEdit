@@ -42,7 +42,9 @@ public class DataAnglePattern extends AbstractPattern {
     public BaseBlock apply(BlockVector3 position) {
         BlockState block = extent.getBlock(position);
         int slope = getSlope(block, position, extent);
-        if (slope == -1) return block.toBaseBlock();
+        if (slope == -1) {
+            return block.toBaseBlock();
+        }
         int data = Math.min(slope, 255) >> 4;
         return block.withPropertyId(data).toBaseBlock();
     }
@@ -51,7 +53,9 @@ public class DataAnglePattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
         BlockState block = extent.getBlock(getPosition);
         int slope = getSlope(block, getPosition, extent);
-        if (slope == -1) return false;
+        if (slope == -1) {
+            return false;
+        }
         int data = Math.min(slope, 255) >> 4;
         return extent.setBlock(setPosition, block.withPropertyId(data));
     }

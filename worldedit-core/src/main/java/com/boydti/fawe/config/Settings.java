@@ -29,7 +29,7 @@ public class Settings extends Config {
     public String COMMIT; // These values are set from FAWE before loading
     @Final
     public String PLATFORM; // These values are set from FAWE before loading
-    
+
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
             "To be allowed to WorldEdit in a region, users need the appropriate",
@@ -369,14 +369,14 @@ public class Settings extends Config {
                 "Might cause client-side FPS lagg in some situations"
         })
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
-        
+
         @Comment({
                 "[SAFE] Experimental freebuild region restrictions",
                 " - PERM: fawe.freebuild",
                 " - PERM: fawe.freebuild.<plugin>"
         })
         public boolean FREEBUILD = false;
-        
+
         @Comment({
                 "Other experimental features"
         })
@@ -393,6 +393,12 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
+        @Comment({
+            "Do not wait for a chunk's history to save before sending it",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
+            " - Requires combine_stages = true"
+        })
+        public boolean SEND_BEFORE_HISTORY = false;
     }
 
     public static class PLOTSQUARED_INTEGRATION {
@@ -498,7 +504,9 @@ public class Settings extends Config {
             limit = new FaweLimit();
         }
         ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
-        if (keys.remove("default")) keys.add("default");
+        if (keys.remove("default")) {
+            keys.add("default");
+        }
 
         boolean limitFound = false;
         for (String key : keys) {
@@ -518,13 +526,16 @@ public class Settings extends Config {
                 limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
                 limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
                 limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
-                if (limit.STRIP_NBT == null) limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
-                else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {
+                if (limit.STRIP_NBT == null) {
+                    limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
+                } else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {
                     limit.STRIP_NBT = Collections.emptySet();
                 } else {
                     limit.STRIP_NBT = new HashSet<>(limit.STRIP_NBT);
                     limit.STRIP_NBT.retainAll(newLimit.STRIP_NBT);
-                    if (limit.STRIP_NBT.isEmpty()) limit.STRIP_NBT = Collections.emptySet();
+                    if (limit.STRIP_NBT.isEmpty()) {
+                        limit.STRIP_NBT = Collections.emptySet();
+                    }
                 }
             }
         }

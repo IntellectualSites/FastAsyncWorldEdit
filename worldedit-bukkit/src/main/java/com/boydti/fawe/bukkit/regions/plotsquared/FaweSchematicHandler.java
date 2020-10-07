@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
-import static org.bukkit.Bukkit.getWorld;
-
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
@@ -29,6 +27,8 @@ import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +39,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import net.jpountz.lz4.LZ4BlockInputStream;
+
+import static org.bukkit.Bukkit.getWorld;
 
 public class FaweSchematicHandler extends SchematicHandler {
     @Override

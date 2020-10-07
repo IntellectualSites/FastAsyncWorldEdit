@@ -62,31 +62,30 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.PermissionAttachment;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
-    private Player player;
-    private WorldEditPlugin plugin;
-    private PermissionAttachment permAttachment;
+    private final Player player;
+    private final WorldEditPlugin plugin;
+    private final PermissionAttachment permAttachment;
 
     public BukkitPlayer(Player player) {
         super(getExistingMap(WorldEditPlugin.getInstance(), player));
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.permAttachment = player.addAttachment(plugin);
+        this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
@@ -173,23 +172,24 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7d" + part);
+            player.sendMessage("§d" + part);
         }
     }
 
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A77" + part);
+            player.sendMessage("§7" + part);
         }
     }
 
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
-            player.sendMessage("\u00A7c" + part);
+            player.sendMessage("§c" + part);
         }
     }
+
     @Override
     public void print(Component component) {
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
@@ -402,7 +402,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void unregister() {
         player.removeMetadata("WE", WorldEditPlugin.getInstance());
+        plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }
-
 }

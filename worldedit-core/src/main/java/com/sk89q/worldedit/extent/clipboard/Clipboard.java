@@ -129,7 +129,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     /**
-     * Remove entity from clipboard
+     * Remove entity from clipboard.
      */
     void removeEntity(Entity entity);
 
@@ -184,7 +184,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     /**
-     * Forwards to paste(world, to, true, true, null)
+     * Forwards to {@link #paste(World, BlockVector3, boolean, boolean, Transform)}.
      */
     default EditSession paste(World world, BlockVector3 to) {
         return paste(world, to, true, true, null);
@@ -204,7 +204,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     /**
-     * Save this schematic to a stream
+     * Save this schematic to a stream.
      */
     default void save(OutputStream stream, ClipboardFormat format) throws IOException {
         checkNotNull(stream);
@@ -220,7 +220,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     /**
-     * Paste this schematic in a world
+     * Paste this schematic in a world.
      */
     default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
         boolean copyEntities, @Nullable Transform transform) {
@@ -272,6 +272,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir,
         @Nullable Transform transform) {
+        if (extent instanceof World) {
+            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            extent = builder.build();
+        }
+
         Extent source = this;
         if (transform != null && !transform.isIdentity()) {
             source = new BlockTransformExtent(this, transform);
@@ -302,6 +308,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
+        if (extent instanceof World) {
+            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            extent = builder.build();
+        }
+
         final BlockVector3 origin = this.getOrigin();
 
         // To must be relative to the clipboard origin ( player location - clipboard origin ) (as the locations supplied are relative to the world origin)

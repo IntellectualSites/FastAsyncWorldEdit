@@ -66,7 +66,8 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     private RandomAccessFile raf;
 
     private boolean deleted;
-    private int X, Z;
+    private int X;
+    private int Z;
     private MCAChunk[] chunks;
     private boolean[] chunkInitialized;
     private Object[] locks;
@@ -336,7 +337,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                 if (size != 0) {
                     try {
                         onEach.accept(getChunk(x, z));
-                    } catch (Throwable ignore) {
+                    } catch (Throwable ignored) {
                     }
                 }
             }
@@ -462,7 +463,9 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
     }
 
     public void close() {
-        if (raf == null) return;
+        if (raf == null) {
+            return;
+        }
         synchronized (raf) {
             if (raf != null) {
                 flush(true);

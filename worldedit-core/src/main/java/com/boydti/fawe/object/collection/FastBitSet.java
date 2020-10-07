@@ -24,22 +24,23 @@ public final class FastBitSet {
         return (bits[i >> 6] & (1L << (i & 0x3F))) != 0;
     }
 
-    public static final void set(long[] bits, final int i) {
+    public static void set(long[] bits, final int i) {
         bits[i >> 6] |= (1L << (i & 0x3F));
     }
 
-    public static final void clear(long[] bits, final int i) {
+    public static void clear(long[] bits, final int i) {
         bits[i >> 6] &= ~(1L << (i & 0x3F));
     }
 
-    public static final void set(long[] bits, final int i, final boolean v) {
-        if (v)
+    public static void set(long[] bits, final int i, final boolean v) {
+        if (v) {
             set(bits, i);
-        else
+        } else {
             clear(bits, i);
+        }
     }
 
-    public static final void setRange(long[] bits, final int b, final int e) {
+    public static void setRange(long[] bits, final int b, final int e) {
         final int bt = b >> 6;
         final int et = e >> 6;
         if (bt != et) {
@@ -51,7 +52,7 @@ public final class FastBitSet {
         }
     }
 
-    public static final void clearRange(long[] bits, final int b, final int e) {
+    public static void clearRange(long[] bits, final int b, final int e) {
         final int bt = b >> 6;
         final int et = e >> 6;
         if (bt != et) {
@@ -63,51 +64,68 @@ public final class FastBitSet {
         }
     }
 
-    public static final void setAll(long[] bits) {
+    public static void setAll(long[] bits) {
         Arrays.fill(bits, -1L);
     }
 
-    public static final void clearAll(long[] bits) {
+    public static void clearAll(long[] bits) {
         Arrays.fill(bits, 0L);
     }
 
-    public static final void invertAll(long[] bits) {
-        for (int i = 0; i < bits.length; ++i)
+    public static void invertAll(long[] bits) {
+        for (int i = 0; i < bits.length; ++i) {
             bits[i] = ~bits[i];
+        }
     }
 
-    public static final void and(long[] bits, final long[] other) {
+    public static void and(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] &= other[i];
+        }
     }
 
-    public static final void or(long[] bits, final long[] other) {
+    public static void or(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] |= other[i];
+        }
     }
 
-    public static final void nand(long[] bits, final long[] other) {
+    public static void nand(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] = ~(bits[i] & other[i]);
+        }
     }
 
-    public static final void nor(long[] bits, final long[] other) {
+    public static void nor(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] = ~(bits[i] | other[i]);
+        }
     }
 
-    public static final void xor(long[] bits, final long[] other) {
+    public static void xor(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] ^= other[i];
+        }
     }
 
-    public static final long memoryUsage(long[] bits) {
+    public static long memoryUsage(long[] bits) {
         return 8L * bits.length;
+    }
+
+    private static void fill(final long[] a, final int b, final int e, final long l) {
+        for (int i = b; i < e; ++i) {
+            a[i] = l;
+        }
+    }
+
+    public static long calculateMemoryUsage(int entries) {
+        final int numLongs = (entries + 64) >> 6;
+        return 8L * numLongs;
     }
 
     public final boolean get(final int i) {
@@ -123,10 +141,11 @@ public final class FastBitSet {
     }
 
     public final void set(final int i, final boolean v) {
-        if (v)
+        if (v) {
             set(i);
-        else
+        } else {
             clear(i);
+        }
     }
 
     public final void setRange(final int b, final int e) {
@@ -162,45 +181,54 @@ public final class FastBitSet {
     }
 
     public final void invertAll() {
-        for (int i = 0; i < bits.length; ++i)
+        for (int i = 0; i < bits.length; ++i) {
             bits[i] = ~bits[i];
+        }
     }
 
     public final void and(final FastBitSet other) {
         final int end = Math.min(other.bits.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] &= other.bits[i];
+        }
     }
 
     public final void or(final FastBitSet other) {
         final int end = Math.min(other.bits.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] |= other.bits[i];
+        }
     }
 
     public final void nand(final FastBitSet other) {
         final int end = Math.min(other.bits.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] = ~(bits[i] & other.bits[i]);
+        }
     }
 
     public final void nor(final FastBitSet other) {
         final int end = Math.min(other.bits.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] = ~(bits[i] | other.bits[i]);
+        }
     }
 
     public final void xor(final FastBitSet other) {
         final int end = Math.min(other.bits.length, bits.length);
-        for (int i = 0; i < end; ++i)
+        for (int i = 0; i < end; ++i) {
             bits[i] ^= other.bits[i];
+        }
     }
 
     public final int cardinality() {
-        if (size == 0) return 0;
+        if (size == 0) {
+            return 0;
+        }
         int count = 0;
-        for (int i = 0; i < bits.length - 1; ++i)
+        for (int i = 0; i < bits.length - 1; ++i) {
             count += Long.bitCount(bits[i]);
+        }
         return count + Long.bitCount(bits[bits.length - 1] & ~(-1L << (size & 0x3F)));
     }
 
@@ -210,16 +238,6 @@ public final class FastBitSet {
 
     public final long memoryUsage() {
         return 8L * bits.length;
-    }
-
-    private static void fill(final long[] a, final int b, final int e, final long l) {
-        for (int i = b; i < e; ++i)
-            a[i] = l;
-    }
-
-    public static long calculateMemoryUsage(int entries) {
-        final int numLongs = (entries + 64) >> 6;
-        return 8L * numLongs;
     }
 
     public IntIterator iterator() {
@@ -240,8 +258,8 @@ public final class FastBitSet {
                 index++;
             }
             final long lowBit = Long.lowestOneBit(bitBuffer);
-            final int bitIndex = Long.bitCount(lowBit-1);
-            value = ((index-1)<<6)+bitIndex;
+            final int bitIndex = Long.bitCount(lowBit - 1);
+            value = ((index - 1) << 6) + bitIndex;
             bitBuffer = bitBuffer ^ lowBit;
             return true;
         }

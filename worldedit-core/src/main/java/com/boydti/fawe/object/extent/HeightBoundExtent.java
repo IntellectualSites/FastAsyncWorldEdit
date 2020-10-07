@@ -10,10 +10,13 @@ import com.sk89q.worldedit.regions.Region;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class HeightBoundExtent extends FaweRegionExtent {
 
-    private final int min, max;
+    private final int min;
+    private final int max;
     private int lastY = -1;
     private boolean lastResult;
 
@@ -50,5 +53,10 @@ public class HeightBoundExtent extends FaweRegionExtent {
             return set;
         }
         return null;
+    }
+
+    @Override
+    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return CompletableFuture.completedFuture(set);
     }
 }

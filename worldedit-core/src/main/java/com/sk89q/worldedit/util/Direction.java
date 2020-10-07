@@ -25,6 +25,7 @@ import com.sk89q.worldedit.math.Vector3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
@@ -73,7 +74,7 @@ public enum Direction {
     static {
         for (Direction dir : Direction.values()) {
             map.put(dir.name(), dir);
-            map.put(dir.name().toLowerCase(), dir);
+            map.put(dir.name().toLowerCase(Locale.ROOT), dir);
         }
     }
 
@@ -273,9 +274,9 @@ public enum Direction {
                 return Optional.of(SOUTHEAST);
             case 15:
                 return Optional.of(SOUTH_SOUTHEAST);
+            default:
+                return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     public OptionalInt toRotationIndex() {
@@ -312,8 +313,9 @@ public enum Direction {
                 return OptionalInt.of(14);
             case SOUTH_SOUTHEAST:
                 return OptionalInt.of(15);
+            default:
+                return OptionalInt.empty();
         }
-        return OptionalInt.empty();
     }
 
     /**

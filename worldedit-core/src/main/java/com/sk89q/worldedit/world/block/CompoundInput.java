@@ -9,9 +9,8 @@ public enum CompoundInput {
         public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
             return state.toBaseBlock(input.getTile(x, y, z));
         }
-    }
+    };
 
-    ;
     public BaseBlock get(BlockState state, ITileInput input, int x, int y, int z) {
         return state.toBaseBlock();
     }

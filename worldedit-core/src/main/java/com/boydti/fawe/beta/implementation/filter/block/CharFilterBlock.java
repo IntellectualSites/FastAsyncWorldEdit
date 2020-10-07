@@ -34,10 +34,20 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
-    private @Nullable char[] setArr;
+    @Nullable
+    private char[] setArr;
     private SetDelegate delegate;
     // local
-    private int layer, index, x, y, z, xx, yy, zz, chunkX, chunkZ;
+    private int layer;
+    private int index;
+    private int x;
+    private int y;
+    private int z;
+    private int xx;
+    private int yy;
+    private int zz;
+    private int chunkX;
+    private int chunkZ;
 
     public CharFilterBlock(Extent extent) {
         super(extent);
@@ -107,8 +117,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void filter(Filter filter, int yStart, int yEnd) {
-        for (y = yStart, index = yStart << 8; y <= yEnd; y++) {
+    public void filter(Filter filter, int startY, int endY) {
+        for (y = startY, index = startY << 8; y <= endY; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
                     filter.applyBlock(this);

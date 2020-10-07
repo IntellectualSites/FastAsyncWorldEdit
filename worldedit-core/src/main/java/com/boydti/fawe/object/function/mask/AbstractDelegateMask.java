@@ -30,4 +30,9 @@ public class AbstractDelegateMask extends AbstractMask {
         return mask.toMask2D();
     }
 
+    @Override
+    public Mask copy() {
+        return new AbstractDelegateMask(mask.copy());
+    }
+
 }

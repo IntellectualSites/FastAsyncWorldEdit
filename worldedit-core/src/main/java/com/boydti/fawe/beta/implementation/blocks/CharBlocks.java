@@ -17,7 +17,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public static final Section EMPTY = new Section() {
         @Override
-        public final char[] get(CharBlocks blocks, int layer) {
+        public synchronized final char[] get(CharBlocks blocks, int layer) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null);
@@ -139,7 +139,7 @@ public abstract class CharBlocks implements IBlocks {
         sections[layer].set(this, layer, index, value);
     }
 
-    public static abstract class Section {
+    public abstract static class Section {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
 

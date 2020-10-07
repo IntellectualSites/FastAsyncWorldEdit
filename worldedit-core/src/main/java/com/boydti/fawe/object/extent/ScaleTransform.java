@@ -15,7 +15,9 @@ import javax.annotation.Nullable;
 
 public class ScaleTransform extends ResettableExtent {
 
-    private final double dx, dy, dz;
+    private final double dx;
+    private final double dy;
+    private final double dz;
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient int maxy;
     private transient BlockVector3 min;

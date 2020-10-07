@@ -75,7 +75,7 @@ public interface BlockRegistry {
     OptionalInt getInternalBlockStateId(BlockState state);
 
     /**
-     * Register all blocks
+     * Register all blocks.
      */
     default Collection<String> values() {
         return Collections.emptyList();

@@ -99,11 +99,19 @@ public class HeightBrush implements Brush {
             for (int z = minZ; z <= maxZ; z++, zIndex += width) {
                 int zz = bz + z;
                 int index = zIndex + (bx + minX);
-                if (index < minIndex) continue;
-                if (index >= metaHeight.length) break;
+                if (index < minIndex) {
+                    continue;
+                }
+                if (index >= metaHeight.length) {
+                    break;
+                }
                 for (int x = minX; x <= maxX; x++, index++) {
-                    if (index < 0) continue;
-                    if (index >= metaHeight.length) break;
+                    if (index < 0) {
+                        continue;
+                    }
+                    if (index >= metaHeight.length) {
+                        break;
+                    }
 
                     int xx = bx + x;
                     int currentBlockHeight = hmmg.getHeight(index);

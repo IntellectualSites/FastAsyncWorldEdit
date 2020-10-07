@@ -24,7 +24,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class FallbackChunkGet implements IChunkGet {
-    private final int bx, bz;
+    private final int bx;
+    private final int bz;
     private final Extent extent;
 
     public FallbackChunkGet(Extent extent, int chunkX, int chunkZ) {
@@ -32,6 +33,7 @@ public class FallbackChunkGet implements IChunkGet {
         this.bx = chunkX << 4;
         this.bz = chunkZ << 4;
     }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         return extent.getFullBlock(bx + x, y, bz + z);
@@ -96,6 +98,12 @@ public class FallbackChunkGet implements IChunkGet {
             }
         }
         return null;
+    }
+
+    @Override public void setCreateCopy(boolean createCopy) {}
+
+    @Override public boolean isCreateCopy() {
+        return false;
     }
 
     @Override

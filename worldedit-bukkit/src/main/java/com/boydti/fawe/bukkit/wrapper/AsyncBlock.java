@@ -107,13 +107,13 @@ public class AsyncBlock implements Block {
     }
 
     @Deprecated
-    public boolean setCombinedId(int combinedId) {
-        return world.setBlock(x, y, z, BlockState.getFromInternalId(combinedId));
+    public boolean setTypeIdAndPropertyId(int id, int propertyId) {
+        return setCombinedId(id + (propertyId << BlockTypesCache.BIT_OFFSET));
     }
 
     @Deprecated
-    public boolean setTypeIdAndPropertyId(int id, int propertyId) {
-        return setCombinedId(id + (propertyId << BlockTypesCache.BIT_OFFSET));
+    public boolean setCombinedId(int combinedId) {
+        return world.setBlock(x, y, z, BlockState.getFromInternalId(combinedId));
     }
 
     @Deprecated
@@ -361,6 +361,10 @@ public class AsyncBlock implements Block {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops(tool));
     }
 
+    public Collection<ItemStack> getDrops(ItemStack tool, Entity entity) {
+        return Collections.emptyList(); //todo
+    }
+
     @Override
     public void setMetadata(@NotNull String metadataKey, @NotNull MetadataValue newMetadataValue) {
         this.getUnsafeBlock().setMetadata(metadataKey, newMetadataValue);
@@ -409,12 +413,9 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public @NotNull BlockSoundGroup getSoundGroup() {
+    @NotNull
+    public BlockSoundGroup getSoundGroup() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getSoundGroup());
-    }
-
-    public Collection<ItemStack> getDrops(ItemStack tool, Entity entity) {
-        return Collections.emptyList(); //todo
     }
 
 }

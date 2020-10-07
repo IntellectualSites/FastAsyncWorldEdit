@@ -3,15 +3,16 @@ package com.boydti.fawe.util;
 public class MathMan {
 
     /**
-     * Optimized for i elem 0,65536 (characters)
-     * @param i
-     * @return square root
+     * An optimized version of {@link Math#sqrt(double)} that accepts integers.
+     * @param a a value
+     * @return the positive square root of {@code a}.
+     *         If the argument is NaN or less than zero, the result is NaN.
      */
-    public static int usqrt(int i) {
-        if (i < 65536) {
-            return CachedMathMan.usqrt(i);
+    public static int usqrt(int a) {
+        if (a < 65536) {
+            return CachedMathMan.usqrt(a);
         }
-        return (int) Math.round(Math.sqrt(i));
+        return (int) Math.round(Math.sqrt(a));
     }
 
     public static float sinInexact(double paramFloat) {
@@ -52,23 +53,11 @@ public class MathMan {
     }
 
     public static int min(int... values) {
-        int min = Integer.MAX_VALUE;
-        for (int d : values) {
-            if (d < min) {
-                min = d;
-            }
-        }
-        return min;
+        return Math.min(Math.min(values[0], values[1]), values[2]);
     }
 
     public static double min(double... values) {
-        double min = Double.MAX_VALUE;
-        for (double d : values) {
-            if (d < min) {
-                min = d;
-            }
-        }
-        return min;
+        return Math.min(Math.min(values[0], values[1]), values[2]);
     }
 
     public static int ceilZero(float floatNumber) {
@@ -138,8 +127,8 @@ public class MathMan {
         return (short) (hash & 0xFFFF);
     }
 
-    public static short pairByte(int x, int y) {
-        return (short) ((x << 8) | (y & 0xFF));
+    public static short pairByte(int a, int b) {
+        return (short) ((a << 8) | (b & 0xFF));
     }
 
     public static byte unpairShortX(short pair) {
@@ -150,8 +139,14 @@ public class MathMan {
         return (byte) pair;
     }
 
-    public static long pairInt(int x, int y) {
-        return ((long) x << 32) | (y & 0xffffffffL);
+    /**
+     * Used to convert a set of coordinates into a packed long.
+     * @param a typically, represents the x coordinate
+     * @param b typically, represents the y coordinate
+     * @return the packed coordinates
+     */
+    public static long pairInt(int a, int b) {
+        return ((long) a << 32) | (b & 0xffffffffL);
     }
 
     public static long tripleWorldCoord(int x, int y, int z) {
@@ -200,8 +195,7 @@ public class MathMan {
         return ((b1 & 0xFF)
                 + ((b2 & 0x7F) << 8)
                 + ((b3 & 0xFF) << 15)
-                + ((b4 & 0xFF) << 23))
-                ;
+                + ((b4 & 0xFF) << 23));
     }
 
     public static int pairSearchCoords(int x, int y) {
@@ -304,11 +298,7 @@ public class MathMan {
     }
 
     /**
-     * Returns [x, y, z]
-     *
-     * @param yaw
-     * @param pitch
-     * @return
+     * Returns [x, y, z].
      */
     public static float[] getDirection(float yaw, float pitch) {
         double pitch_sin = Math.sin(pitch);
@@ -320,20 +310,15 @@ public class MathMan {
     }
 
     /**
-     * Returns [ pitch, yaw ]
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * Returns [ pitch, yaw ].
      */
     public static float[] getPitchAndYaw(float x, float y, float z) {
         float distance = sqrtApprox((z * z) + (x * x));
         return new float[]{atan2(y, distance), atan2(x, z)};
     }
 
-    public static float atan2(float y, float x) {
-        return CachedMathMan.atan2(y, x);
+    public static float atan2(float i, float j) {
+        return CachedMathMan.atan2(i, j);
     }
 
     public static float sqrtApprox(float f) {
@@ -341,7 +326,7 @@ public class MathMan {
     }
 
     public static double sqrtApprox(double d) {
-        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1l << 52)) >> 1) + (1l << 61));
+        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1L << 52)) >> 1) + (1L << 61));
     }
 
     public static float invSqrt(float x) {
@@ -397,21 +382,21 @@ public class MathMan {
         return (value ^ (value >> 8)) - (value >> 8);
     }
 
-    public static int mod(int x, int y) {
-        if (isPowerOfTwo(y)) {
-            return x & (y - 1);
+    public static int mod(int a, int b) {
+        if (isPowerOfTwo(b)) {
+            return a & (b - 1);
         }
-        return x % y;
+        return a % b;
     }
 
-    public static int unsignedmod(int x, int y) {
-        if (isPowerOfTwo(y)) {
-            return x & (y - 1);
+    public static int unsignedMod(int a, int b) {
+        if (isPowerOfTwo(b)) {
+            return a & (b - 1);
         }
-        return x % y;
+        return a % b;
     }
 
-    public static boolean isPowerOfTwo(int x) {
-        return (x & (x - 1)) == 0;
+    public static boolean isPowerOfTwo(int a) {
+        return (a & a - 1) == 0;
     }
 }
