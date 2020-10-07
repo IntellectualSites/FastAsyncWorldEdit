@@ -17,7 +17,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public static final Section EMPTY = new Section() {
         @Override
-        public synchronized final char[] get(CharBlocks blocks, int layer) {
+        public final char[] get(CharBlocks blocks, int layer) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null);
