@@ -402,7 +402,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-        return new ReneratorImpl(bukkitWorld, region, target, options).regenerate();
+        return new RegeneratorImpl(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override
@@ -416,7 +416,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         return IRegistry.BIOME.a(base);
     }
     
-    private static class ReneratorImpl extends Regenerator<IChunkAccess, ProtoChunk, Chunk, ReneratorImpl.ChunkStatusWrap> {
+    private static class RegeneratorImpl extends Regenerator<IChunkAccess, ProtoChunk, Chunk, RegeneratorImpl.ChunkStatusWrap> {
 
         private static final Field serverWorldsField;
         private static final Field worldPaperConfigField;
@@ -483,7 +483,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
 
         private boolean generateFlatBedrock = false;
 
-        public ReneratorImpl(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
+        public RegeneratorImpl(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
             super(originalBukkitWorld, region, target, options);
         }
 
@@ -726,7 +726,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
             public int a(int y) {
                 long tid = Thread.currentThread().getId();
                 long e = this.map.computeIfAbsent(tid, i -> 0L);
-                int mod = (int) Math.floorMod(e >> 24L, y);
+                int mod = (int) Math.floorMod(e >> 24L, (long) y);
                 this.map.put(tid, LinearCongruentialGenerator.a(e, this.magicrandom));
                 return mod;
             }

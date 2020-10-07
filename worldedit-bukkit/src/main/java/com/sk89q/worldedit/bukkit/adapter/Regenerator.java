@@ -129,10 +129,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     private boolean generate() throws Exception {
         if (generateConcurrent) {
+            //Using concurrent chunk generation
             executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            System.out.println("using concurrent chunk generation");
         } else {
-            System.out.println("using squential chunk generation (concurrent not supported)");
+            //using sequential chunk generation, concurrent not supported
         }
 
         long start = System.currentTimeMillis();
@@ -270,14 +270,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             }
         }, "populate with " + populators.size() + " populators");
 
-        System.out.println("Finished chunk generation in " + (System.currentTimeMillis() - start) + " ms");
         source = new SingleThreadQueueExtent();
         source.init(null, initSourceQueueCache(), null);
         return true;
     }
 
     private void copyToWorld() {
-        System.out.println("Set blocks");
+        //Setting Blocks
         long start = System.currentTimeMillis();
         boolean genbiomes = options.shouldRegenBiomes();
         for (BlockVector3 vec : region) {
@@ -288,7 +287,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 //                    realExtent.setSkyLight(vec, extent.getSkyLight(vec));
 //                    realExtent.setBlockLight(vec, extent.getBrightness(vec));
         }
-        System.out.println("Finished setting blocks in " + (System.currentTimeMillis() - start) + "ms");
     }
     
     private void cleanup0() {
@@ -466,7 +464,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         long starttask = System.currentTimeMillis();
 //            System.out.println(text);
         r.run();
-        System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
+        //Debug outputs:
+        //System.out.println(text + " took " + (System.currentTimeMillis() - starttask) + "ms");
     }
 
     //classes
@@ -487,7 +486,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             try {
                 processChunk(xz, accessibleChunks);
             } catch (Exception e) {
-                System.err.println("error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
+                System.err.println("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz));
                 e.printStackTrace();
             }
         }
