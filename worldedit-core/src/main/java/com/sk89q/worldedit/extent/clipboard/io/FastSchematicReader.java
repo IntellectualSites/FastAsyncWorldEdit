@@ -32,10 +32,13 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
@@ -59,9 +62,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.internal.Constants;
 
 /**
  * Reads schematic files using the Sponge Schematic Specification.
