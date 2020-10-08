@@ -106,7 +106,7 @@ public class BukkitGetBlocks_1_15_2_Copy extends BukkitGetBlocks_1_15_2 {
     }
 
     protected void storeSection(int layer) {
-        update(layer, blocks[layer]);
+        blocks[layer] = update(layer, null).clone();
     }
 
     @Override

@@ -84,6 +84,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
+        return basePlayer.runAction(ifFree, checkFree, async);
+    }
+
+    @Override
     public UUID getUniqueId() {
         return basePlayer.getUniqueId();
     }

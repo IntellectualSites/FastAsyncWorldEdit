@@ -71,6 +71,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
@@ -91,6 +92,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
     public NibbleArray[] skyLight = new NibbleArray[16];
     private boolean createCopy = false;
     private BukkitGetBlocks_1_16_2_Copy copy = null;
+    private final ReentrantLock rwLock = new ReentrantLock();
 
     public BukkitGetBlocks_1_16_2(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -319,6 +321,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        rwLock.lock();
         copy = createCopy ? new BukkitGetBlocks_1_16_2_Copy(world, getChunkX(), getChunkZ()) : null;
         try {
             WorldServer nmsWorld = world;
@@ -637,115 +640,122 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
+        } finally {
+            rwLock.unlock();
         }
     }
 
     @Override
     public synchronized char[] update(int layer, char[] data) {
-        ChunkSection section = getSections()[layer];
-        // Section is null, return empty array
-        if (section == null) {
-            data = new char[4096];
-            Arrays.fill(data, (char) 1);
-            return data;
-        }
-        if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
-            data = new char[4096];
-            Arrays.fill(data, (char) 1);
-        }
-        DelegateLock lock = BukkitAdapter_1_16_2.applyLock(section);
-        synchronized (lock) {
-            lock.untilFree();
-            lock.setModified(false);
-            // Efficiently convert ChunkSection to raw data
-            try {
-                FAWE_Spigot_v1_16_R2 adapter = ((FAWE_Spigot_v1_16_R2) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+        rwLock.lock();
+        try {
+            ChunkSection section = getSections()[layer];
+            // Section is null, return empty array
+            if (section == null) {
+                data = new char[4096];
+                Arrays.fill(data, (char) 1);
+                return data;
+            }
+            if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
+                data = new char[4096];
+                Arrays.fill(data, (char) 1);
+            }
+            DelegateLock lock = BukkitAdapter_1_16_2.applyLock(section);
+            synchronized (lock) {
+                lock.untilFree();
+                lock.setModified(false);
+                // Efficiently convert ChunkSection to raw data
+                try {
+                    FAWE_Spigot_v1_16_R2 adapter = ((FAWE_Spigot_v1_16_R2) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
-                final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                final DataBits bits = (DataBits) BukkitAdapter_1_16_2.fieldBits.get(blocks);
-                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_16_2.fieldPalette.get(blocks);
+                    final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
+                    final DataBits bits = (DataBits) BukkitAdapter_1_16_2.fieldBits.get(blocks);
+                    final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_16_2.fieldPalette.get(blocks);
 
-                final int bitsPerEntry = (int) BukkitAdapter_1_16_2.fieldBitsPerEntry.get(bits);
-                final long[] blockStates = bits.a();
+                    final int bitsPerEntry = (int) BukkitAdapter_1_16_2.fieldBitsPerEntry.get(bits);
+                    final long[] blockStates = bits.a();
 
-                new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
+                    new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
 
-                int num_palette;
-                if (palette instanceof DataPaletteLinear) {
-                    num_palette = ((DataPaletteLinear<IBlockData>) palette).b();
-                } else if (palette instanceof DataPaletteHash) {
-                    num_palette = ((DataPaletteHash<IBlockData>) palette).b();
-                } else {
-                    num_palette = 0;
-                    int[] paletteToBlockInts = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-                    char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
-                    try {
-                        for (int i = 0; i < 4096; i++) {
-                            char paletteVal = data[i];
-                            char ordinal = paletteToBlockChars[paletteVal];
-                            if (ordinal == Character.MAX_VALUE) {
-                                paletteToBlockInts[num_palette++] = paletteVal;
-                                IBlockData ibd = palette.a(data[i]);
-                                if (ibd == null) {
-                                    ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
-                                } else {
-                                    ordinal = adapter.adaptToChar(ibd);
+                    int num_palette;
+                    if (palette instanceof DataPaletteLinear) {
+                        num_palette = ((DataPaletteLinear<IBlockData>) palette).b();
+                    } else if (palette instanceof DataPaletteHash) {
+                        num_palette = ((DataPaletteHash<IBlockData>) palette).b();
+                    } else {
+                        num_palette = 0;
+                        int[] paletteToBlockInts = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+                        char[] paletteToBlockChars = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                        try {
+                            for (int i = 0; i < 4096; i++) {
+                                char paletteVal = data[i];
+                                char ordinal = paletteToBlockChars[paletteVal];
+                                if (ordinal == Character.MAX_VALUE) {
+                                    paletteToBlockInts[num_palette++] = paletteVal;
+                                    IBlockData ibd = palette.a(data[i]);
+                                    if (ibd == null) {
+                                        ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
+                                    } else {
+                                        ordinal = adapter.adaptToChar(ibd);
+                                    }
+                                    paletteToBlockChars[paletteVal] = ordinal;
                                 }
-                                paletteToBlockChars[paletteVal] = ordinal;
+                                // Don't read "empty".
+                                if (ordinal == 0) {
+                                    ordinal = 1;
+                                }
+                                data[i] = ordinal;
                             }
+                        } finally {
+                            for (int i = 0; i < num_palette; i++) {
+                                int paletteVal = paletteToBlockInts[i];
+                                paletteToBlockChars[paletteVal] = Character.MAX_VALUE;
+                            }
+                        }
+                        return data;
+                    }
+
+                    char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                    try {
+                        if (num_palette != 1) {
+                            for (int i = 0; i < num_palette; i++) {
+                                char ordinal = ordinal(palette.a(i), adapter);
+                                paletteToOrdinal[i] = ordinal;
+                            }
+                            for (int i = 0; i < 4096; i++) {
+                                char paletteVal = data[i];
+                                char val = paletteToOrdinal[paletteVal];
+                                if (val == Character.MAX_VALUE) {
+                                    val = ordinal(palette.a(i), adapter);
+                                    paletteToOrdinal[i] = val;
+                                }
+                                // Don't read "empty".
+                                if (val == 0) {
+                                    val = 1;
+                                }
+                                data[i] = val;
+                            }
+                        } else {
+                            char ordinal = ordinal(palette.a(0), adapter);
                             // Don't read "empty".
                             if (ordinal == 0) {
                                 ordinal = 1;
                             }
-                            data[i] = ordinal;
+                            Arrays.fill(data, ordinal);
                         }
                     } finally {
                         for (int i = 0; i < num_palette; i++) {
-                            int paletteVal = paletteToBlockInts[i];
-                            paletteToBlockChars[paletteVal] = Character.MAX_VALUE;
+                            paletteToOrdinal[i] = Character.MAX_VALUE;
                         }
                     }
                     return data;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-
-                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
-                try {
-                    if (num_palette != 1) {
-                        for (int i = 0; i < num_palette; i++) {
-                            char ordinal = ordinal(palette.a(i), adapter);
-                            paletteToOrdinal[i] = ordinal;
-                        }
-                        for (int i = 0; i < 4096; i++) {
-                            char paletteVal = data[i];
-                            char val = paletteToOrdinal[paletteVal];
-                            if (val == Character.MAX_VALUE) {
-                                val = ordinal(palette.a(i), adapter);
-                                paletteToOrdinal[i] = val;
-                            }
-                            // Don't read "empty".
-                            if (val == 0) {
-                                val = 1;
-                            }
-                            data[i] = val;
-                        }
-                    } else {
-                        char ordinal = ordinal(palette.a(0), adapter);
-                        // Don't read "empty".
-                        if (ordinal == 0) {
-                            ordinal = 1;
-                        }
-                        Arrays.fill(data, ordinal);
-                    }
-                } finally {
-                    for (int i = 0; i < num_palette; i++) {
-                        paletteToOrdinal[i] = Character.MAX_VALUE;
-                    }
-                }
-                return data;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
             }
+        } finally {
+            rwLock.unlock();
         }
     }
 
