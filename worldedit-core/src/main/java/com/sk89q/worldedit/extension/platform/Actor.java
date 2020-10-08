@@ -189,11 +189,11 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      */
     default boolean confirm() {
         InterruptableCondition confirm = deleteMeta("cmdConfirm");
-        if (confirm != null) {
-            confirm.signal();;
-            return true;
+        if (confirm == null) {
+            return false;
         }
-        return false;
+        queueAction(confirm::signal);
+        return true;
     }
 
     /**
