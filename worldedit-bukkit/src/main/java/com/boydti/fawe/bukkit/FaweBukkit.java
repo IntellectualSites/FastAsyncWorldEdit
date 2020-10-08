@@ -18,7 +18,6 @@ import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
-import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;

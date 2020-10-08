@@ -92,9 +92,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -116,7 +119,7 @@ public class LocalSession implements TextureHolder {
     // Session related
     private transient RegionSelector selector = new CuboidRegionSelector();
     private transient boolean placeAtPos1 = false;
-    private transient List<Object> history = Collections.synchronizedList(new LinkedList<Object>() {
+    private final transient List<Object> history = Collections.synchronizedList(new LinkedList<Object>() {
         @Override
         public Object get(int index) {
             Object value = super.get(index);
@@ -135,6 +138,7 @@ public class LocalSession implements TextureHolder {
     private transient volatile Integer historyNegativeIndex;
     private transient ClipboardHolder clipboard;
     private transient final Object clipboardLock = new Object();
+    private transient final Lock historyWriteLock = new ReentrantLock(true);
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
     private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
@@ -439,109 +443,113 @@ public class LocalSession implements TextureHolder {
         return null;
     }
 
-    public synchronized void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
-        if (Settings.IMP.HISTORY.USE_DISK) {
-            LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
-        }
-        if (changeSet.size() == 0) {
-            return;
-        }
-        loadSessionHistoryFromDisk(player.getUniqueId(), world);
-        if (changeSet instanceof ChangeSet) {
-            ListIterator<Object> iter = history.listIterator();
-            int i = 0;
-            int cutoffIndex = history.size() - getHistoryNegativeIndex();
-            while (iter.hasNext()) {
-                Object item = iter.next();
-                if (++i > cutoffIndex) {
-                    ChangeSet oldChangeSet;
-                    if (item instanceof ChangeSet) {
-                        oldChangeSet = (ChangeSet) item;
-                    } else {
-                        oldChangeSet = getChangeSet(item);
+    public void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
+        historyWriteLock.lock();
+        try {
+            if (Settings.IMP.HISTORY.USE_DISK) {
+                LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
+            }
+            if (changeSet.size() == 0) {
+                return;
+            }
+            loadSessionHistoryFromDisk(player.getUniqueId(), world);
+            if (changeSet instanceof ChangeSet) {
+                ListIterator<Object> iter = history.listIterator();
+                int i = 0;
+                int cutoffIndex = history.size() - getHistoryNegativeIndex();
+                while (iter.hasNext()) {
+                    Object item = iter.next();
+                    if (++i > cutoffIndex) {
+                        ChangeSet oldChangeSet;
+                        if (item instanceof ChangeSet) {
+                            oldChangeSet = (ChangeSet) item;
+                        } else {
+                            oldChangeSet = getChangeSet(item);
+                        }
+                        historySize -= MainUtil.getSize(oldChangeSet);
+                        iter.remove();
                     }
-                    historySize -= MainUtil.getSize(oldChangeSet);
-                    iter.remove();
                 }
             }
+            historySize += MainUtil.getSize(changeSet);
+            history.add(changeSet);
+            if (getHistoryNegativeIndex() != 0) {
+                setDirty();
+                historyNegativeIndex = 0;
+            }
+            if (limit != null) {
+                int limitMb = limit.MAX_HISTORY;
+                while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
+                    ChangeSet item = (ChangeSet) history.remove(0);
+                    item.delete();
+                    long size = MainUtil.getSize(item);
+                    historySize -= size;
+                }
+            }
+        } finally {
+            historyWriteLock.unlock();
         }
-        historySize += MainUtil.getSize(changeSet);
-        history.add(changeSet);
-        if (getHistoryNegativeIndex() != 0) {
-            setDirty();
-            historyNegativeIndex = 0;
-        }
-        if (limit != null) {
-            int limitMb = limit.MAX_HISTORY;
+    }
+
+    public void remember(EditSession editSession, boolean append, int limitMb) {
+        historyWriteLock.lock();
+        try {
+            if (Settings.IMP.HISTORY.USE_DISK) {
+                LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
+            }
+            // It should have already been flushed, but just in case!
+            editSession.flushQueue();
+            if (editSession.getChangeSet() == null || limitMb == 0 || historySize >> 20 > limitMb && !append) {
+                return;
+            }
+
+            ChangeSet changeSet = editSession.getChangeSet();
+            if (changeSet.isEmpty()) {
+                return;
+            }
+
+            Player player = editSession.getPlayer();
+            if (player != null) {
+                loadSessionHistoryFromDisk(player.getUniqueId(), editSession.getWorld());
+            }
+            // Destroy any sessions after this undo point
+            if (append) {
+                ListIterator<Object> iter = history.listIterator();
+                int i = 0;
+                int cutoffIndex = history.size() - getHistoryNegativeIndex();
+                while (iter.hasNext()) {
+                    Object item = iter.next();
+                    if (++i > cutoffIndex) {
+                        ChangeSet oldChangeSet;
+                        if (item instanceof ChangeSet) {
+                            oldChangeSet = (ChangeSet) item;
+                        } else {
+                            oldChangeSet = getChangeSet(item);
+                        }
+                        historySize -= MainUtil.getSize(oldChangeSet);
+                        iter.remove();
+                    }
+                }
+            }
+
+            historySize += MainUtil.getSize(changeSet);
+            if (append) {
+                history.add(changeSet);
+                if (getHistoryNegativeIndex() != 0) {
+                    setDirty();
+                    historyNegativeIndex = 0;
+                }
+            } else {
+                history.add(0, changeSet);
+            }
             while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
                 ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
                 long size = MainUtil.getSize(item);
                 historySize -= size;
             }
-        }
-    }
-
-    public synchronized void remember(EditSession editSession, boolean append, int limitMb) {
-        if (Settings.IMP.HISTORY.USE_DISK) {
-            LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
-        }
-        // It should have already been flushed, but just in case!
-        editSession.flushQueue();
-        if (editSession.getChangeSet() == null || limitMb == 0 || historySize >> 20 > limitMb && !append) {
-            return;
-        }
-        /*
-        // Don't store anything if no changes were made
-        if (editSession.size() == 0) {
-            return;
-        }
-        */
-
-        ChangeSet changeSet = editSession.getChangeSet();
-        if (changeSet.isEmpty()) {
-            return;
-        }
-
-        Player player = editSession.getPlayer();
-        if (player != null) {
-            loadSessionHistoryFromDisk(player.getUniqueId(), editSession.getWorld());
-        }
-        // Destroy any sessions after this undo point
-        if (append) {
-            ListIterator<Object> iter = history.listIterator();
-            int i = 0;
-            int cutoffIndex = history.size() - getHistoryNegativeIndex();
-            while (iter.hasNext()) {
-                Object item = iter.next();
-                if (++i > cutoffIndex) {
-                    ChangeSet oldChangeSet;
-                    if (item instanceof ChangeSet) {
-                        oldChangeSet = (ChangeSet) item;
-                    } else {
-                        oldChangeSet = getChangeSet(item);
-                    }
-                    historySize -= MainUtil.getSize(oldChangeSet);
-                    iter.remove();
-                }
-            }
-        }
-
-        historySize += MainUtil.getSize(changeSet);
-        if (append) {
-            history.add(changeSet);
-            if (getHistoryNegativeIndex() != 0) {
-                setDirty();
-                historyNegativeIndex = 0;
-            }
-        } else {
-            history.add(0, changeSet);
-        }
-        while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
-            ChangeSet item = (ChangeSet) history.remove(0);
-            item.delete();
-            long size = MainUtil.getSize(item);
-            historySize -= size;
+        } finally {
+            historyWriteLock.unlock();
         }
     }
 
