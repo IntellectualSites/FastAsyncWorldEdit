@@ -396,7 +396,6 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         }
         return parent.fromNative(foreign);
     }
-    
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
         return new Regen_v1_15_R2(bukkitWorld, region, target, options).regenerate();
