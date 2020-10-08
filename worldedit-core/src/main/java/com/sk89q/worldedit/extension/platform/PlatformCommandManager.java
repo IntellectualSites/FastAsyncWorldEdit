@@ -649,13 +649,12 @@ public final class PlatformCommandManager {
             } else {
                 actor.decline();
             }
-            LocalSession session = worldEdit.getSessionManager().get(actor);
-            synchronized (session) {
+            actor.runAction(() -> {
                 SessionKey key = actor.getSessionKey();
                 if (key.isActive()) {
                     PlatformCommandManager.this.handleCommandOnCurrentThread(event);
                 }
-            }
+            }, false, true);
         }, Fawe.isMainThread());
     }
 

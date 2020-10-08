@@ -79,8 +79,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     private final Map<String, Object> meta;
 
     // Queue for async tasks
-    private AtomicInteger runningCount = new AtomicInteger();
-    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
+    private final AtomicInteger runningCount = new AtomicInteger();
+    private final AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
         (thread, throwable) -> {
             while (throwable.getCause() != null) {
                 throwable = throwable.getCause();
