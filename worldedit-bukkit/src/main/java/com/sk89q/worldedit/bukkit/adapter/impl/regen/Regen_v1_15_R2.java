@@ -266,7 +266,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         } catch (Exception e) {
         }
     }
-    
+
     @Override
     protected ProtoChunk createProtoChunk(int x, int z) {
         return new ProtoChunk(new ChunkCoordIntPair(x, z), ChunkConverter.a) {
