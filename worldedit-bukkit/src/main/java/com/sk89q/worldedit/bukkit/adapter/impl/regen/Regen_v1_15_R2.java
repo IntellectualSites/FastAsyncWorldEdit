@@ -118,7 +118,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
+            chunkProviderField = World.class.getDeclaredField("chunkProvider");
             chunkProviderField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -150,7 +150,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             return false;
         }
 
-        //flat bedrock? (only on paper) //todo does not exist?
+        //flat bedrock? (only on paper)
         try {
             generateFlatBedrock = flatBedrockField.getBoolean(worldPaperConfigField.get(originalNMSWorld));
         } catch (Exception ignored) {
@@ -179,6 +179,8 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         //init world
         freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalNMSWorld.worldProvider.getDimensionManager(), originalNMSWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen)).get();
         freshNMSWorld.savingDisabled = true;
+        Object paperconf = worldPaperConfigField.get(freshNMSWorld);
+        flatBedrockField.setBoolean(paperconf, generateFlatBedrock);
 
         DefinedStructureManager tmpStructureManager = saveHandler.f();
         freshChunkProvider = new ChunkProviderServer(freshNMSWorld, saveHandler.getDirectory(), server.aC(), tmpStructureManager, server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, new RegenNoOpWorldLoadListener(), () -> freshNMSWorld.getWorldPersistentData()) {
