@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -197,7 +198,14 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
 
         //init world
-        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen)).get();
+        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
+            @Override
+            public void doTick(BooleanSupplier booleansupplier) { //no ticking
+            }
+        }).get();
+        freshNMSWorld.savingDisabled = true;
+        removeWorldFromWorldsMap();
+        newWorldData.checkName(originalNMSWorld.worldDataServer.getName()); //rename to original world name
 
         freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, server.getDataFixer(), server.getDefinedStructureManager(), server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, server.isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> server.E().getWorldPersistentData()) {
             // redirect to our protoChunks list
@@ -261,12 +269,7 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         //remove world from server
         try {
             Fawe.get().getQueueHandler().sync(() -> {
-                try {
-                    Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                    map.remove("worldeditregentempworld");
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                removeWorldFromWorldsMap();
             });
         } catch (Exception e) {
         }
@@ -347,6 +350,17 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
     }
 
     //util
+    private void removeWorldFromWorldsMap() {
+        Fawe.get().getQueueHandler().sync(() -> {
+            try {
+                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+                map.remove("worldeditregentempworld");
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    
     private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
         switch (env) {
             case NETHER:

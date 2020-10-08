@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -177,8 +178,15 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         WorldNBTStorage saveHandler = new WorldNBTStorage(new File(tempDir.toUri()), originalNMSWorld.getDataManager().getDirectory().getName(), server, server.dataConverterManager);
 
         //init world
-        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalNMSWorld.worldProvider.getDimensionManager(), originalNMSWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen)).get();
+        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalNMSWorld.worldProvider.getDimensionManager(), originalNMSWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen) {
+            @Override
+            public void doTick(BooleanSupplier booleansupplier) { //no ticking
+            }
+        }).get();
         freshNMSWorld.savingDisabled = true;
+        removeWorldFromWorldsMap();
+        newWorldData.checkName(originalNMSWorld.getWorldData().getName()); //rename to original world name
+        
         try { //flat bedrock (paper only)
             Object paperconf = worldPaperConfigField.get(freshNMSWorld);
             flatBedrockField.setBoolean(paperconf, generateFlatBedrock);
@@ -248,14 +256,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         //remove world from server
         try {
-            Fawe.get().getQueueHandler().sync(() -> {
-                try {
-                    Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                    map.remove("worldeditregentempworld");
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            removeWorldFromWorldsMap();
         } catch (Exception e) {
         }
 
@@ -265,7 +266,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         } catch (Exception e) {
         }
     }
-
+    
     @Override
     protected ProtoChunk createProtoChunk(int x, int z) {
         return new ProtoChunk(new ChunkCoordIntPair(x, z), ChunkConverter.a) {
@@ -335,6 +336,17 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
     }
 
     //util
+    private void removeWorldFromWorldsMap() {
+        Fawe.get().getQueueHandler().sync(() -> {
+            try {
+                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+                map.remove("worldeditregentempworld");
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+    
     private WorldChunkManager fastOverWorldChunkManager(WorldChunkManager chunkManager) throws Exception {
         Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("d");
         genLayerField.setAccessible(true);
