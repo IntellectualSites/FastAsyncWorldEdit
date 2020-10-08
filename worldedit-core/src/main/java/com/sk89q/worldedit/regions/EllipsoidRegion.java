@@ -409,7 +409,6 @@ public class EllipsoidRegion extends AbstractRegion {
             int yTopFull = Math.min(255, cy + diffYFull);
 
             if (yBotFull == yTopFull || yBotFull > yTopFull) {
-                System.out.println("aa"); //why do we print "aa" here?
             }
             // Set those layers
             filter(chunk, filter, block, get, set, yBotFull, yTopFull, full);
