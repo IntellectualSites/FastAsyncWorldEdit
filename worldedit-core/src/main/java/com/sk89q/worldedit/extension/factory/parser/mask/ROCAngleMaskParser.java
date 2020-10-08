@@ -2,10 +2,13 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.boydti.fawe.object.mask.ROCAngleMask;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
@@ -21,7 +24,7 @@ public class ROCAngleMaskParser extends RichParser<Mask> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         if (index == 0 || index == 1) {
-            return suggestPositiveDoubles(argumentInput).flatMap(s -> Stream.of(s, s + "d"));
+            return SuggestionHelper.suggestPositiveDoubles(argumentInput).flatMap(s -> Stream.of(s, s + "d"));
         } else if (index > 1 && index <= 1 + flags.length) {
             return Stream.of(flags);
         }
@@ -37,7 +40,7 @@ public class ROCAngleMaskParser extends RichParser<Mask> {
         String maxArg = arguments[1];
         boolean degree = minArg.endsWith("d");
         if (degree ^ maxArg.endsWith("d")) {
-            throw new InputParseException("Cannot combine degree with block-step");
+            throw new InputParseException(TranslatableComponent.of("fawe.error.mask.angle"));
         }
         double min;
         double max;
@@ -48,7 +51,8 @@ public class ROCAngleMaskParser extends RichParser<Mask> {
                 if (flag.equals("-o")) {
                     overlay = true;
                 } else {
-                    throw new InputParseException("The flag " + flag + " is not applicable for this mask!");
+                    throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-flag",
+                            TextComponent.of(flag)));
                 }
             }
         }

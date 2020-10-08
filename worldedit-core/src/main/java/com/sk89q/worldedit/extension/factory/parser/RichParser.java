@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
+import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -7,8 +8,10 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -18,51 +21,75 @@ import java.util.stream.Stream;
  * @param <E> the parse result.
  */
 public abstract class RichParser<E> extends InputParser<E> {
-    private final String prefix;
-    private final String required;
+    private final String[] prefixes;
 
     /**
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
      * @param worldEdit the worldedit instance.
-     * @param prefix    the prefix of this parser result.
+     * @param aliases    the prefix of this parser result.
      */
-    protected RichParser(WorldEdit worldEdit, String prefix) {
+    protected RichParser(WorldEdit worldEdit, String... aliases) {
         super(worldEdit);
-        this.prefix = prefix;
-        this.required = prefix + "[";
+        Preconditions.checkArgument(aliases.length >= 1, "Aliases may not be empty");
+        this.prefixes = aliases;
+    }
+
+    @NotNull
+    private static Predicate<String> validPrefix(String other) {
+        return prefix -> {
+            if (prefix.length() > other.length()) {
+                return prefix.startsWith(other);
+            }
+            return other.startsWith(prefix);
+        };
+    }
+
+    @NotNull
+    private Function<String, Stream<? extends String>> extractArguments(String input) {
+        return prefix -> {
+            if (input.length() > prefix.length()) {
+                // input already contains argument(s) -> extract them
+                String[] strings = extractArguments(input.substring(prefix.length()), false);
+                // rebuild the argument string without the last argument
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < strings.length - 1; i++) {
+                    builder.append('[').append(strings[i]).append(']');
+                }
+                String previous = prefix + builder;
+                // read the suggestions for the last argument
+                return getSuggestions(strings[strings.length - 1], strings.length - 1)
+                        .map(suggestion -> previous + "[" + suggestion);
+            } else {
+                return Stream.of(prefix);
+            }
+        };
+    }
+
+    public String getPrefix() {
+        return this.prefixes[0];
     }
 
     @Override
     public Stream<String> getSuggestions(String input) {
-        // we don't even want to start suggesting if it's not meant to be this parser result
-        if (input.length() >= this.required.length() && !input.startsWith(this.required)) {
-            return Stream.empty();
-        }
-        // suggest until the first [ as long as it isn't fully typed
-        if (input.length() < this.required.length()) {
-            return Stream.of(this.required).filter(s -> s.startsWith(input));
-        }
-        // we know that it is at least "<required>"
-        String[] strings = extractArguments(input.substring(this.prefix.length()), false);
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < strings.length - 1; i++) {
-            builder.append('[').append(strings[i]).append(']');
-        }
-        String previous = this.prefix + builder;
-        return getSuggestions(strings[strings.length - 1], strings.length - 1).map(s -> previous + "[" + s + "]");
+        return Arrays.stream(this.prefixes)
+                .filter(validPrefix(input))
+                .flatMap(extractArguments(input));
     }
 
     @Override
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
-        if (!input.startsWith(this.prefix)) {
-            return null;
+        for (String prefix : this.prefixes) {
+            if (!input.startsWith(prefix)) {
+                continue;
+            }
+            if (input.length() < prefix.length()) {
+                continue;
+            }
+            String[] arguments = extractArguments(input.substring(prefix.length()), true);
+            return parseFromInput(arguments, context);
         }
-        if (input.length() < this.prefix.length()) {
-            return null;
-        }
-        String[] arguments = extractArguments(input.substring(prefix.length()), true);
-        return parseFromInput(arguments, context);
+        return null;
     }
 
     /**
@@ -117,41 +144,5 @@ public abstract class RichParser<E> extends InputParser<E> {
             throw new InputParseException("Invalid bracketing, are you missing a '[' or ']'?");
         }
         return arguments.toArray(new String[0]);
-    }
-
-    /**
-     * Returns a stream of suggestions for positive doubles.
-     *
-     * @param argumentInput the given input to filter with.
-     * @return a stream of suggestions.
-     */
-    protected Stream<String> suggestPositiveDoubles(String argumentInput) {
-        if (argumentInput.isEmpty()) {
-            return Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9");
-        }
-        // if already a valid number, suggest more digits
-        if (isDouble(argumentInput)) {
-            Stream<String> numbers = Stream.of("", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-            if (argumentInput.indexOf('.') == -1) {
-                numbers = Stream.concat(numbers, Stream.of("."));
-            }
-            return numbers.map(s -> argumentInput + s);
-        }
-        // no valid input anymore
-        return Stream.empty();
-    }
-
-    private static boolean isDouble(String input) {
-        boolean point = false;
-        for (char c : input.toCharArray()) {
-            if (!Character.isDigit(c)) {
-                if (c == '.' && !point) {
-                    point = true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }

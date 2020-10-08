@@ -2,6 +2,7 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.boydti.fawe.object.mask.RadiusMask;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -19,7 +20,7 @@ public class RadiusMaskParser extends RichParser<Mask> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         if (index == 0 || index == 1) {
-            return suggestPositiveDoubles(argumentInput);
+            return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }
         return Stream.empty();
     }
