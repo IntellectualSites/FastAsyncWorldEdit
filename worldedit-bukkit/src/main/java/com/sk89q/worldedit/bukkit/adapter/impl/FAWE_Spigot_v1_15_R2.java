@@ -103,7 +103,6 @@ import javax.annotation.Nullable;
 public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_15_R2 parent;
     private char[] ibdToStateOrdinal;
-    
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
