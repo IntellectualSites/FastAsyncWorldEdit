@@ -90,6 +90,7 @@ import com.sk89q.worldedit.command.argument.EntityRemoverConverter;
 import com.sk89q.worldedit.command.argument.EnumConverter;
 import com.sk89q.worldedit.command.argument.ExpressionConverter;
 import com.sk89q.worldedit.command.argument.FactoryConverter;
+import com.sk89q.worldedit.command.argument.LocationConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.SideEffectConverter;
@@ -256,6 +257,7 @@ public final class PlatformCommandManager {
         EntityRemoverConverter.register(commandManager);
         RegionFactoryConverter.register(commandManager);
         WorldConverter.register(commandManager);
+        LocationConverter.register(commandManager);
         ExpressionConverter.register(commandManager);
         SideEffectConverter.register(commandManager);
 
@@ -652,13 +654,12 @@ public final class PlatformCommandManager {
             } else {
                 actor.decline();
             }
-            LocalSession session = worldEdit.getSessionManager().get(actor);
-            synchronized (session) {
+            actor.runAction(() -> {
                 SessionKey key = actor.getSessionKey();
                 if (key.isActive()) {
                     PlatformCommandManager.this.handleCommandOnCurrentThread(event);
                 }
-            }
+            }, false, true);
         }, Fawe.isMainThread());
     }
 

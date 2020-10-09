@@ -303,8 +303,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 MainUtil.setPosition(nbt, x, y, z);
                 addTileCreate(nbt);
             }
-            int combinedFrom = from.getInternalId();
-            int combinedTo = to.getInternalId();
+            int combinedFrom = from.getOrdinal();
+            int combinedTo = to.getOrdinal();
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {

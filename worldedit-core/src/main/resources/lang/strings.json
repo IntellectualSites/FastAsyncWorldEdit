@@ -102,6 +102,8 @@
 	"fawe.error.player.not.found": "Player not found: {0}",
 	"fawe.error.worldedit.some.fails": "{0} blocks weren't placed because they were outside your allowed region.",
 	"fawe.error.worldedit.some.fails.blockbag": "Missing blocks: {0}",
+    "fawe.error.mask.angle": "Cannot combine degree with block-step",
+    "fawe.error.invalid-flag": "The flag {0} is not applicable here",
 
 	"fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",

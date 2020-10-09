@@ -33,6 +33,8 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.legacycompat.BannerBlockCompatibilityHandler;
+import com.sk89q.worldedit.extent.clipboard.io.legacycompat.BedBlockCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.EntityNBTCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.FlowerPotCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NBTCompatibilityHandler;
@@ -86,7 +88,9 @@ public class SchematicReader implements ClipboardReader {
         new SignCompatibilityHandler(),
         new FlowerPotCompatibilityHandler(),
         new NoteBlockCompatibilityHandler(),
-        new SkullBlockCompatibilityHandler()
+        new SkullBlockCompatibilityHandler(),
+        new BannerBlockCompatibilityHandler(),
+        new BedBlockCompatibilityHandler()
     };
     private static final EntityNBTCompatibilityHandler[] ENTITY_COMPATIBILITY_HANDLERS = {
         new Pre13HangingCompatibilityHandler()

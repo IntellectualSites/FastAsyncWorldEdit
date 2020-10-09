@@ -3,6 +3,7 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.object.mask.AdjacentMask;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -22,7 +23,7 @@ public class AdjacentMaskParser extends RichParser<Mask> {
         if (index == 0) {
             return worldEdit.getMaskFactory().getSuggestions(argumentInput).stream();
         } else if (index == 1 || index == 2) {
-            return this.suggestPositiveDoubles(argumentInput);
+            return SuggestionHelper.suggestPositiveDoubles(argumentInput);
         }
         return Stream.empty();
     }
