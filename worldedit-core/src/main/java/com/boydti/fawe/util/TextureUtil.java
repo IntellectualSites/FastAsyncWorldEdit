@@ -652,7 +652,7 @@ public class TextureUtil implements TextureHolder {
                         String modelFileName = String.format(modelsDir, nameSpace, name);
                         ZipEntry entry = getEntry(zipFile, modelFileName);
                         if (entry == null) {
-                            System.out.println("Cannot find " + modelFileName + " in " + file);
+                            getLogger(TextureUtil.class).error("Cannot find {} in {}", modelFileName, file);
                             continue;
                         }
 
@@ -690,7 +690,7 @@ public class TextureUtil implements TextureHolder {
 
                         BufferedImage image = readImage(zipFile, textureFileName);
                         if (image == null) {
-                            System.out.println("Cannot find " + textureFileName);
+                            getLogger(TextureUtil.class).error("Cannot find {}", textureFileName);
                             continue;
                         }
                         int color = ImageUtil.getColor(image);

@@ -14,10 +14,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class GriefPreventionFeature extends BukkitMaskManager implements Listener {
 
     public GriefPreventionFeature(final Plugin griefpreventionPlugin) {
         super(griefpreventionPlugin.getName());
+        getLogger(GriefPreventionFeature.class).debug("Plugin 'GriefPrevention' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {

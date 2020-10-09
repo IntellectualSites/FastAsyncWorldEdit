@@ -68,7 +68,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 new BrushListener(plugin);
             } catch (Throwable e) {
-                log.debug("Brush Listener Failed", e);
+                log.error("Brush Listener Failed", e);
             }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
@@ -146,10 +146,6 @@ public class FaweBukkit implements IFawe, Listener {
         return null;
     }
 
-    @Override public void debug(final String message) {
-        Bukkit.getConsoleSender().sendMessage(message);
-    }
-
     @Override public File getDirectory() {
         return plugin.getDataFolder();
     }
@@ -162,7 +158,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
                 Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                log.debug("Persistent Brushes Failed", e);
+                log.error("Persistent Brushes Failed", e);
             }
         }
         return tmp;

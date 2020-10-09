@@ -272,7 +272,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
         try (NBTInputStream nis = getChunkIS(offset)) {
             chunk.read(nis, false);
         }
-        System.out.println("TODO multithreaded"); // TODO
+        //TODO multithreaded
         return chunk;
     }
 

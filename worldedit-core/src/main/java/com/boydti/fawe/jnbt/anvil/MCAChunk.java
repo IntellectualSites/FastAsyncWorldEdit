@@ -44,6 +44,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class MCAChunk implements IChunk {
     public final boolean[] hasSections = new boolean[16];
 
@@ -308,7 +310,7 @@ public class MCAChunk implements IChunk {
                                 Object value = state.getState(property);
                                 String valueStr = value.toString();
                                 if (Character.isUpperCase(valueStr.charAt(0))) {
-                                    System.out.println("Invalid uppercase value " + value);
+                                    getLogger(MCAChunk.class).warn("Invalid uppercase value {}", value);
                                     valueStr = valueStr.toLowerCase(Locale.ROOT);
                                 }
                                 out.writeNamedTag(key, valueStr);

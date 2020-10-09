@@ -18,6 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class TownyFeature extends BukkitMaskManager implements Listener {
 
     private final Plugin towny;
@@ -25,6 +27,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     public TownyFeature(Plugin townyPlugin) {
         super(townyPlugin.getName());
         this.towny = townyPlugin;
+        getLogger(TownyFeature.class).debug("Plugin 'Towny' found. Using it now.");
+
     }
 
     public boolean isAllowed(Player player, TownBlock block) {

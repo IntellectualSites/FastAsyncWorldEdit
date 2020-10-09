@@ -13,8 +13,6 @@ import java.util.UUID;
 
 public interface IFawe {
 
-    void debug(final String s);
-
     File getDirectory();
 
     TaskManager getTaskManager();

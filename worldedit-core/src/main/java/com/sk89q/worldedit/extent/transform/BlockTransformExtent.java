@@ -69,6 +69,7 @@ import static com.sk89q.worldedit.util.Direction.UP;
 import static com.sk89q.worldedit.util.Direction.WEST;
 import static com.sk89q.worldedit.util.Direction.findClosest;
 import static com.sk89q.worldedit.util.Direction.values;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
@@ -149,7 +150,7 @@ public class BlockTransformExtent extends ResettableExtent {
                         case 2:
                             return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
                         default:
-                            System.out.println("Invalid " + property.getName() + " " + property.getValues());
+                            getLogger(BlockTransformExtent.class).error("Invalid {} {}", property.getName(), property.getValues());
                             return null;
                     }
                 case FACING: {
@@ -181,7 +182,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                     continue;
                                 default:
-                                    System.out.println("Unknown direction " + value);
+                                    getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
                                     result.add(0L);
                             }
                         }
@@ -221,7 +222,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     directions.add(combine(NORTHEAST));
                                     break;
                                 default:
-                                    System.out.println("Unknown direction " + value);
+                                    getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
                                     directions.add(0L);
                             }
                         }
