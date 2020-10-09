@@ -3,6 +3,7 @@ package com.sk89q.worldedit.bukkit.adapter;
 import com.boydti.fawe.beta.IChunkCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -32,9 +33,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents an abstract regeneration handler.
- * @param <IChunkAccess> the type of the {@Code IChunkAccess}
- * @param <ProtoChunk> the type of the {@Code ProtoChunk
- * @param <Chunk> the type of the {@Code Chunk}
+ * @param <IChunkAccess> the type of the {@Code IChunkAccess} of the current Minecraft implementation
+ * @param <ProtoChunk> the type of the {@Code ProtoChunk} of the current Minecraft implementation
+ * @param <Chunk> the type of the {@Code Chunk} of the current Minecraft implementation
  * @param <ChunkStatus> the type of the {@Code ChunkStatusWrapper} wrapping the {@Code ChunkStatus} enum
  */
 public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess, Chunk extends IChunkAccess, ChunkStatus extends Regenerator.ChunkStatusWrapper<IChunkAccess>> {
@@ -134,18 +135,15 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     private boolean generate() throws Exception {
         if (generateConcurrent) {
             //Using concurrent chunk generation
-            executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        } else {
-            //using sequential chunk generation, concurrent not supported
-        }
+            executor = Executors.newFixedThreadPool(Settings.IMP.QUEUE.PARALLEL_THREADS);
+        } // else using sequential chunk generation, concurrent not supported
 
-        //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
-        //TODO: maybe do some chunk stages in parallel, e.g. those not requiring neighbour chunks?
-        //      for those ChunkStati that need neighbox chunks a special queue could help (e.g. for FEATURES and NOISE)
+        //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)? 
+        //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
         
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) //ignore ChunkStatus.EMPTY
                 return;
             int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
@@ -160,7 +158,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) //ignore ChunkStatus.EMPTY
                 return;
             Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
@@ -181,7 +179,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //run generation tasks exluding FULL chunk status
         for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
             ChunkStatus chunkStatus = entry.getKey();
-            int radius = Math.max(0, chunkStatus.requiredNeigborChunkRadius()); //EMPTY.requiredNeigborChunkRadius() == -1
+            int radius = chunkStatus.requiredNeigborChunkRadius0();
 
             List<Long> coords = chunkCoordsForRadius.get(radius);
             if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
@@ -287,12 +285,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     
     //functions to be implemented by sub class
     /**
-     * Implement the preparation process in here. DO NOT instanciate any variable here that require the cleanup function. This function is for gathering further information before initializing a new
-     * world.
+     * <p>Implement the preparation process in here. DO NOT instanciate any variable here that require the cleanup function. This function is for gathering further information before initializing a new
+     * world.</p>
      * 
-     * Fields required to be initialized: chunkStati, seed
+     * <p>Fields required to be initialized: chunkStati, seed</p>
+     * <p>For chunkStati also see {code ChunkStatusWrapper}.</p>
      *
-     * @return
+     * @return whether or not the preparation process was successful
      */
     protected abstract boolean prepare();
 
@@ -331,6 +330,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Return the {@code ChunkStatus.FULL} here.
+     * ChunkStatus.FULL is the last step of vanilla chunk generation.
      *
      * @return {@code ChunkStatus.FULL}
      */
@@ -450,17 +450,37 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     }
 
     //classes
+    /**
+     * This class is used to wrap the ChunkStatus of the current Minecraft implementation and as the implementation to execute a chunk generation step.
+     * @param <IChunkAccess> the IChunkAccess class of the current Minecraft implementation
+     */
     public static abstract class ChunkStatusWrapper<IChunkAccess> {
 
         /**
-         * Must not return a negative integer
+         * Return the required neighbor chunk radius the wrapped {@code ChunkStatus} requires.
          *
-         * @return the radius of required neighbor chunk
+         * @return the radius of required neighbor chunks
          */
         public abstract int requiredNeigborChunkRadius();
 
+        int requiredNeigborChunkRadius0() {
+            return Math.max(0, requiredNeigborChunkRadius());
+        }
+
+        /**
+         * Return the name of the wrapped {@code ChunkStatus}.
+         *
+         * @return the radius of required neighbor chunks
+         */
         public abstract String name();
 
+        /**
+         * Return the name of the wrapped {@code ChunkStatus}.
+         *
+         * @param xz represents the chunk coordinates of the chunk to process as denoted by {@code MathMan}
+         * @param accessibleChunks a list of chunks that will be used during the execution of the wrapped {@code ChunkStatus}. 
+         * This list is order in the correct order required by the {@code ChunkStatus}, unless Mojang suddenly decides to do things differently.
+         */
         public abstract void processChunk(Long xz, List<IChunkAccess> accessibleChunks);
 
         void processChunkSave(Long xz, List<IChunkAccess> accessibleChunks) {
