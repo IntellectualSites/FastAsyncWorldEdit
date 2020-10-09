@@ -635,6 +635,9 @@ public final class PlatformCommandManager {
         Actor actor = event.getActor();
         String args = event.getArguments();
         TaskManager.IMP.taskNow(() -> {
+            if (!Fawe.isMainThread()) {
+                Thread.currentThread().setName("FAWE Thread for player: " + actor.getName());
+            }
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
             Optional<Command> optional = commandManager.getCommand(arg0);
