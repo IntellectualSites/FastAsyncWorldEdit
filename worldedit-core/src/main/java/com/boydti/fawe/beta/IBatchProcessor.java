@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
@@ -13,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public interface IBatchProcessor {
 
@@ -79,9 +80,7 @@ public interface IBatchProcessor {
                 layer++;
             }
         } catch (ArrayIndexOutOfBoundsException exception) {
-            Fawe.imp().debug("minY = " + minY);
-            Fawe.imp().debug("layer = " + ((minY - 15) >> 4));
-            exception.printStackTrace();
+            getLogger(IBatchProcessor.class).error("minY = {} , layer = {}", minY, ((minY - 15) >> 4), exception);
         }
         return false;
     }

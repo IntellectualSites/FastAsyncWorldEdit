@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
@@ -90,6 +89,7 @@ import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.OptionalInt;
@@ -98,6 +98,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R1 parent;
@@ -320,7 +322,9 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
                 init();
                 return adaptToChar(ibd);
             } catch (ArrayIndexOutOfBoundsException e1) {
-                Fawe.debug("Attempted to convert " + ibd.getBlock() + " with ID " + Block.REGISTRY_ID.getId(ibd) + " to char. ibdToStateOrdinal length: " + ibdToStateOrdinal.length + ". Defaulting to air!");
+                getLogger(FAWE_Spigot_v1_16_R1.class)
+                    .error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
+                           ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
                 return 0;
             }
         }
@@ -395,7 +399,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         }
         return parent.fromNative(foreign);
     }
-    
+
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
         return new Regen_v1_16_R1(bukkitWorld, region, target, options).regenerate();

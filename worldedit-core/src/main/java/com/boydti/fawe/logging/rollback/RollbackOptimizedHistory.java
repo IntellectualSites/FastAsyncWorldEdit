@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class RollbackOptimizedHistory extends DiskStorageHistory {
     private long time;
 
@@ -32,7 +34,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         super(world, uuid);
         this.time = System.currentTimeMillis();
     }
-    
+
     public RollbackOptimizedHistory(World world, UUID uuid, int index, long time, long size, CuboidRegion region, String command) {
         super(world, uuid, index);
         this.time = time;
@@ -45,7 +47,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        System.out.println("Size " + size);
+        getLogger(RollbackOptimizedHistory.class).debug("Size {}", size);
     }
 
     public long getTime() {

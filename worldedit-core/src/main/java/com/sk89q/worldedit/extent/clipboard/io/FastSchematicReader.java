@@ -32,10 +32,13 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
@@ -99,6 +102,7 @@ public class FastSchematicReader extends NBTSchematicReader {
     public FastSchematicReader(NBTInputStream inputStream) {
         checkNotNull(inputStream);
         this.inputStream = inputStream;
+        this.fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
     }
 
     private String fix(String palettePart) {
@@ -133,7 +137,12 @@ public class FastSchematicReader extends NBTSchematicReader {
         StreamDelegate root = new StreamDelegate();
         StreamDelegate schematic = root.add("Schematic");
         schematic.add("DataVersion").withInt((i, v) -> dataVersion = v);
-        schematic.add("Version").withInt((i, v) -> version = v);
+        schematic.add("Version").withInt((i, v) -> {
+            version = v;
+            if (v == 1 && dataVersion == -1) { // DataVersion might not be present, assume 1.13.2
+                dataVersion = Constants.DATA_VERSION_MC_1_13_2;
+            }
+        });
         schematic.add("Width").withInt((i, v) -> width = v);
         schematic.add("Height").withInt((i, v) -> height = v);
         schematic.add("Length").withInt((i, v) -> length = v);

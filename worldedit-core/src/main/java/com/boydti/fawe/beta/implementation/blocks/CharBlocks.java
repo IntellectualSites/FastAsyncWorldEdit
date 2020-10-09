@@ -6,8 +6,12 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class CharBlocks implements IBlocks {
+
+    public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);
 
     public static final Section FULL = new Section() {
         @Override
@@ -17,7 +21,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public static final Section EMPTY = new Section() {
         @Override
-        public synchronized final char[] get(CharBlocks blocks, int layer) {
+        public final synchronized char[] get(CharBlocks blocks, int layer) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null);
@@ -120,10 +124,9 @@ public abstract class CharBlocks implements IBlocks {
         try {
             set(layer, index, value);
         } catch (ArrayIndexOutOfBoundsException exception) {
+            logger.error("Tried setting block at coordinates (" + x + "," + y + "," + z + ")");
             assert Fawe.imp() != null;
-            Fawe.imp().debug("Tried Setting Block at x:" + x + ", y:" + y + " , z:" + z);
-            Fawe.imp().debug("Layer variable was = " + layer);
-            exception.printStackTrace();
+            logger.error("Layer variable was = {}", layer, exception);
         }
     }
 

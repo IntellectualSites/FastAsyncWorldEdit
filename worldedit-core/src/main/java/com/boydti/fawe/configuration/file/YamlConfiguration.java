@@ -30,7 +30,7 @@ public class YamlConfiguration extends FileConfiguration {
     private final Yaml yaml = new Yaml(new YamlConstructor(), yamlRepresenter, yamlOptions);
 
     /**
-     * Creates a new {@link com.boydti.fawe.configuration.file.YamlConfiguration}, loading from the given file.
+     * Creates a new {@link YamlConfiguration}, loading from the given file.
      *
      * <p>
      * Any errors loading the Configuration will be logged and then ignored.
@@ -46,12 +46,12 @@ public class YamlConfiguration extends FileConfiguration {
      * @return Resulting configuration
      * @throws IllegalArgumentException Thrown if file is null
      */
-    public static com.boydti.fawe.configuration.file.YamlConfiguration loadConfiguration(final File file) {
+    public static YamlConfiguration loadConfiguration(final File file) {
         if (file == null) {
             throw new NullPointerException("File cannot be null");
         }
 
-        final com.boydti.fawe.configuration.file.YamlConfiguration config = new com.boydti.fawe.configuration.file.YamlConfiguration();
+        final YamlConfiguration config = new YamlConfiguration();
 
         try {
             config.load(file);
@@ -64,11 +64,8 @@ public class YamlConfiguration extends FileConfiguration {
                     dest = new File(file.getAbsolutePath() + "_broken_" + i++);
                 }
                 Files.copy(file.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("&dCould not read: &7" + file);
-                System.out.println("&dRenamed to: &7" + dest.getName());
-                System.out.println("&c============ Full stacktrace ============");
-                ex.printStackTrace();
-                System.out.println("&c=========================================");
+                getLogger(YamlConfiguration.class).error("Could not read: {}\n"
+                                                             + "Renamed to: {}", file, dest.getName(), ex);
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -78,7 +75,7 @@ public class YamlConfiguration extends FileConfiguration {
     }
 
     /**
-     * Creates a new {@link com.boydti.fawe.configuration.file.YamlConfiguration}, loading from the given reader.
+     * Creates a new {@link YamlConfiguration}, loading from the given reader.
      *
      * <p>
      * Any errors loading the Configuration will be logged and then ignored.
@@ -90,12 +87,12 @@ public class YamlConfiguration extends FileConfiguration {
      * @return resulting configuration
      * @throws IllegalArgumentException Thrown if stream is null
      */
-    public static com.boydti.fawe.configuration.file.YamlConfiguration loadConfiguration(final Reader reader) {
+    public static YamlConfiguration loadConfiguration(final Reader reader) {
         if (reader == null) {
             throw new NullPointerException("Reader cannot be null");
         }
 
-        final com.boydti.fawe.configuration.file.YamlConfiguration config = new com.boydti.fawe.configuration.file.YamlConfiguration();
+        final YamlConfiguration config = new YamlConfiguration();
 
         try {
             config.load(reader);

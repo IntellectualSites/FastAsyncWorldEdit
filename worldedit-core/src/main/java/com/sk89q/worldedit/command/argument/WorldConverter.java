@@ -39,10 +39,10 @@ import java.util.stream.Stream;
 public class WorldConverter implements ArgumentConverter<World> {
 
     public static void register(CommandManager commandManager) {
-        commandManager.registerConverter(Key.of(World.class),
-                new WorldConverter()
-        );
+        commandManager.registerConverter(Key.of(World.class), WORLD_CONVERTER);
     }
+    
+    public static final WorldConverter WORLD_CONVERTER = new WorldConverter();
 
     private final TextComponent choices;
 

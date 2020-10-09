@@ -167,6 +167,7 @@ public class RegionCommands {
 
     @Command(
         name = "/removelighting",
+        aliases = "/removelight",
         desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
@@ -203,6 +204,7 @@ public class RegionCommands {
 
     @Command(
         name = "/setblocklight",
+        aliases = "/setlight",
         desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")

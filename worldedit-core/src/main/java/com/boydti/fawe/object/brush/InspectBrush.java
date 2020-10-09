@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class InspectBrush extends BrushTool {
 
     /**
@@ -62,13 +64,13 @@ public class InspectBrush extends BrushTool {
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
-            System.out.println("No tool control");
+            getLogger(InspectBrush.class).debug("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable",
                 "history.use-database (Import with /history import )"));
-            System.out.println("No db");
+            getLogger(InspectBrush.class).debug("No db");
             return false;
         }
         try {
@@ -109,10 +111,9 @@ public class InspectBrush extends BrushTool {
             }
             player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer", count));
         } catch (IOException e) {
-            System.out.println("IOE");
             throw new RuntimeException(e);
         } catch (Throwable e) {
-            System.out.println("E throw");
+            getLogger(InspectBrush.class).error("E throw", e);
         }
         return true;
     }

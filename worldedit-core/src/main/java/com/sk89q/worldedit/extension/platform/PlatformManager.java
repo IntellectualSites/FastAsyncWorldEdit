@@ -437,7 +437,7 @@ public class PlatformManager {
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
-                                                                                                     getConfiguration(), player, session));
+                            getConfiguration(), player, session));
                         event.setCancelled(true);
                         return;
                     }
@@ -450,7 +450,7 @@ public class PlatformManager {
                     if (tool instanceof TraceTool && tool.canUse(player)) {
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                                                                  getConfiguration(), player, session), false, true);
+                            getConfiguration(), player, session), false, true);
                         event.setCancelled(true);
                         return;
                     }

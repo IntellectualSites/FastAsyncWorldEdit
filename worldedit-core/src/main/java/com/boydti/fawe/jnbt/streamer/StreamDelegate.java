@@ -6,6 +6,8 @@ import com.sk89q.jnbt.NBTInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class StreamDelegate {
     private static final byte[][] ZERO_KEYS = new byte[0][];
     private static final StreamDelegate[] ZERO_VALUES = new StreamDelegate[0];
@@ -39,7 +41,7 @@ public class StreamDelegate {
 
     private StreamDelegate add(String name, StreamDelegate scope) {
         if (valueReader != null) {
-            System.out.println("Scope " + name + " | " + scope + " may not run, as the stream is only read once, and a value reader is already set");
+            getLogger(StreamDelegate.class).warn("Scope {} | {} may not run, as the stream is only read once, and a value reader is already set", name, scope);
         }
         byte[] bytes = name.getBytes(NBTConstants.CHARSET);
         int maxSize = bytes.length;
@@ -167,7 +169,7 @@ public class StreamDelegate {
 
     public StreamDelegate withValue(ValueReader valueReader) {
         if (keys.length != 0) {
-            System.out.println("Reader " + valueReader + " may not run, as the stream is only read once, and a value reader is already set");
+            getLogger(StreamDelegate.class).warn("Reader {} may not run, as the stream is only read once, and a value reader is already set", valueReader);
         }
         this.valueReader = valueReader;
         return this;
