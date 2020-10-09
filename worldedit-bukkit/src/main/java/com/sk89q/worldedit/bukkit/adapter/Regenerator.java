@@ -143,7 +143,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) //ignore ChunkStatus.EMPTY
                 return;
             int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
@@ -158,7 +158,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatus::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) //ignore ChunkStatus.EMPTY
                 return;
             Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
