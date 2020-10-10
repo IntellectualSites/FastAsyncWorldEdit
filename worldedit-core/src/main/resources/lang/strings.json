@@ -165,6 +165,8 @@
 	"fawe.tips.tip.biome.pattern": "Tip: The #biome[forest] pattern can be used in any command",
 	"fawe.tips.tip.biome.mask": "Tip: Restrict to a biome with the `$jungle` mask",
 
+    "fawe.regen.time": "Regenerating region, this might take a while!",
+
     "worldedit.expand.description.vert": "Vertically expand the selection to world limits.",
     "worldedit.expand.expanded": "Region expanded {0} blocks",
     "worldedit.expand.expanded.vert": "Region expanded {0} blocks (top-to-bottom).",
