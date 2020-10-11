@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="fawe-logo.png">
+  <img src="fawe-logo.png" width="300">
 </p>
 
 ---
