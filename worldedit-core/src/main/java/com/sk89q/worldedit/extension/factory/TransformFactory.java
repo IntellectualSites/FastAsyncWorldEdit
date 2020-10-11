@@ -2,6 +2,7 @@ package com.sk89q.worldedit.extension.factory;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.parser.transform.LinearTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.OffsetTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.PatternTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.RandomTransformParser;
@@ -31,6 +32,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
         register(new RotateTransformParser(worldEdit));
         register(new SpreadTransformParser(worldEdit));
         register(new PatternTransformParser(worldEdit));
+        register(new LinearTransformParser(worldEdit));
     }
 
     // TODO is there a better default?
