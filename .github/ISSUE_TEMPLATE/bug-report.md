@@ -19,10 +19,12 @@ assignees: ''
 <!--- Please provide this information by using a paste service such as https://haste.athion.net -->
 <!--- If you are unwilling to supply the information we need, we reserve the right to not assist you. Redact IP addresses if you need to. -->
 
+**/fawe debugpaste**:
+
 **Required Information**
-- FAWE Version Number: 
-- Spigot/Paper Version Number:  
-- Minecraft Version: [e.g. 1.16.3]
+- FAWE Version Number (`/version FastAsyncWorldEdit`):     
+- Spigot/Paper Version Number (`/version`):     
+- Minecraft Version: [e.g. 1.16.3]     
 
 **Describe the bug**
 A clear and concise description of what the bug is.
