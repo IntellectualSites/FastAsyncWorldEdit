@@ -4,6 +4,7 @@ import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.transform.OffsetTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.PatternTransformParser;
+import com.sk89q.worldedit.extension.factory.parser.transform.RandomTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.RotateTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.ScaleTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.transform.SpreadTransformParser;
@@ -21,6 +22,9 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
      */
     public TransformFactory(WorldEdit worldEdit) {
         super(worldEdit, new NullTransformParser(worldEdit));
+
+        // split and parse each sub-transform
+        register(new RandomTransformParser(worldEdit));
 
         register(new OffsetTransformParser(worldEdit));
         register(new ScaleTransformParser(worldEdit));
