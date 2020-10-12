@@ -26,7 +26,13 @@ public class RandomTransformParser extends InputParser<ResettableExtent> {
         if (split.size() == 1) {
             return Stream.empty();
         }
-        return worldEdit.getTransformFactory().getSuggestions(split.get(split.size() - 1)).stream();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < split.size() - 1; i++) {
+            builder.append(split.get(i)).append(',');
+        }
+        String previous = builder.toString();
+        return worldEdit.getTransformFactory().getSuggestions(split.get(split.size() - 1)).stream()
+                .map(s -> previous + s);
     }
 
     @Override
