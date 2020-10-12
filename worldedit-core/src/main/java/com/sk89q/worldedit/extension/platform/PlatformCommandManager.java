@@ -850,7 +850,7 @@ public final class PlatformCommandManager {
 
             event.setSuggestions(suggestions.stream()
                 .map(suggestion -> {
-                    int noSlashLength = arguments.length() - 1;
+                    int noSlashLength = arguments.length();
                     Substring original = suggestion.getReplacedArgument() == split.size()
                         ? Substring.from(arguments, noSlashLength, noSlashLength)
                         : split.get(suggestion.getReplacedArgument());

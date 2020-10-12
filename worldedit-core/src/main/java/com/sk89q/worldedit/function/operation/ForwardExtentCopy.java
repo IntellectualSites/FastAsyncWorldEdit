@@ -382,10 +382,11 @@ public class ForwardExtentCopy implements Operation {
         List<? extends Entity> entities;
         if (copyingEntities) {
             // filter players since they can't be copied
-            entities = source.getEntities(region)
-                    .stream()
-                    .filter(e -> e.getType() != EntityTypes.PLAYER)
-                    .collect(Collectors.toList());
+            entities = source.getEntities(region);
+            entities.removeIf(entity -> {
+                EntityProperties properties = entity.getFacet(EntityProperties.class);
+                return properties != null && !properties.isPasteable();
+            });
         } else {
             entities = Collections.emptyList();
         }

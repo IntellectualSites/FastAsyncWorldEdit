@@ -167,6 +167,7 @@ public class RegionCommands {
 
     @Command(
         name = "/removelighting",
+        aliases = "/removelight",
         desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
@@ -203,6 +204,7 @@ public class RegionCommands {
 
     @Command(
         name = "/setblocklight",
+        aliases = "/setlight",
         desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
@@ -614,6 +616,7 @@ public class RegionCommands {
         try {
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
+            actor.printInfo(TranslatableComponent.of("fawe.regen.time"));
             success = world.regenerate(region, editSession);
         } finally {
             session.setMask(mask);
