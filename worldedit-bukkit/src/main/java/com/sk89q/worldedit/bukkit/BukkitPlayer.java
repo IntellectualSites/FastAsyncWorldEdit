@@ -67,6 +67,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
@@ -74,19 +75,29 @@ public class BukkitPlayer extends AbstractPlayerActor {
     private final Player player;
     private final WorldEditPlugin plugin;
     private final PermissionAttachment permAttachment;
-
-    public BukkitPlayer(Player player) {
-        super(getExistingMap(WorldEditPlugin.getInstance(), player));
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     *
+     * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     */
+    public BukkitPlayer(@Nullable Player player) {
+        super(player != null ? getExistingMap(WorldEditPlugin.getInstance(), player) : new ConcurrentHashMap<>());
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
 
-    public BukkitPlayer(WorldEditPlugin plugin, Player player) {
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     *
+     * @param plugin The running instance of {@link WorldEditPlugin}
+     * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     */
+    public BukkitPlayer(@Nonnull WorldEditPlugin plugin, @Nullable Player player) {
         this.plugin = plugin;
         this.player = player;
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
-        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+        if (player != null && Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
     }
