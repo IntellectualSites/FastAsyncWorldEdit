@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.BukkitGetBlocks_1_15_2;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.adapter.Regenerator;
 import com.sk89q.worldedit.extent.Extent;
@@ -53,6 +54,7 @@ import net.minecraft.server.v1_15_R1.IChunkAccess;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.LightEngineThreaded;
 import net.minecraft.server.v1_15_R1.LinearCongruentialGenerator;
+import net.minecraft.server.v1_15_R1.MinecraftKey;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NoiseGeneratorPerlin;
@@ -181,6 +183,14 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalNMSWorld.worldProvider.getDimensionManager(), originalNMSWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen) {
             @Override
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
+            }
+
+            @Override
+            public BiomeBase a(int i, int k, int j) {
+                if (options.hasBiomeType()) {
+                    return IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+                }
+                return this.getChunkProvider().getChunkGenerator().getWorldChunkManager().getBiome(i, j, k);
             }
         }).get();
         freshNMSWorld.savingDisabled = true;
@@ -358,13 +368,32 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         //init new WorldChunkManagerOverworld
         BiomeLayoutOverworldConfiguration biomeconfig = new BiomeLayoutOverworldConfiguration(freshNMSWorld.getWorldData())
                 .a((GeneratorSettingsOverworld) originalChunkProvider.getChunkGenerator().getSettings());
-        chunkManager = new WorldChunkManagerOverworld(biomeconfig);
-
-        //replace genLayer
         AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, biomeconfig.b(), biomeconfig.c(), (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
-        genLayerField.set(chunkManager, new FastGenLayer(factory));
+        if (options.hasBiomeType()) {
+            BiomeBase biome = IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+            chunkManager = new SingleBiomeWorldChunkManagerOverworld(biome);
+        } else {
+            chunkManager = new WorldChunkManagerOverworld(biomeconfig);
+            //replace genlayer
+            genLayerField.set(chunkManager, new FastGenLayer(factory));
+        }
 
         return chunkManager;
+    }
+
+    private static class SingleBiomeWorldChunkManagerOverworld extends WorldChunkManager {
+
+        private final BiomeBase biome;
+
+        public SingleBiomeWorldChunkManagerOverworld(BiomeBase biome) {
+            super(ImmutableSet.of(biome));
+            this.biome = biome;
+        }
+
+        @Override
+        public BiomeBase getBiome(int i, int i1, int i2) {
+            return biome;
+        }
     }
 
     private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {

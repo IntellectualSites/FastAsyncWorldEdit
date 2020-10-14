@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.adapter.Regenerator;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,15 +55,14 @@ import net.minecraft.server.v1_16_R1.GeneratorSettings;
 import net.minecraft.server.v1_16_R1.GeneratorSettingsFlat;
 import net.minecraft.server.v1_16_R1.IChunkAccess;
 import net.minecraft.server.v1_16_R1.IRegistry;
-import net.minecraft.server.v1_16_R1.IRegistryCustom;
 import net.minecraft.server.v1_16_R1.LightEngineThreaded;
 import net.minecraft.server.v1_16_R1.LinearCongruentialGenerator;
+import net.minecraft.server.v1_16_R1.MinecraftKey;
 import net.minecraft.server.v1_16_R1.MinecraftServer;
 import net.minecraft.server.v1_16_R1.NBTBase;
 import net.minecraft.server.v1_16_R1.NBTTagCompound;
 import net.minecraft.server.v1_16_R1.NoiseGeneratorPerlin;
 import net.minecraft.server.v1_16_R1.ProtoChunk;
-import net.minecraft.server.v1_16_R1.RegistryReadOps;
 import net.minecraft.server.v1_16_R1.ResourceKey;
 import net.minecraft.server.v1_16_R1.World;
 import net.minecraft.server.v1_16_R1.WorldChunkManager;
@@ -200,6 +201,14 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getTypeKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.e().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
             @Override
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
+            }
+
+            @Override
+            public BiomeBase a(int i, int j, int k) {
+                if (options.hasBiomeType()) {
+                    return IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+                }
+                return this.getChunkProvider().getChunkGenerator().getWorldChunkManager().getBiome(i, j, k);
             }
         }).get();
         freshNMSWorld.savingDisabled = true;
@@ -398,14 +407,39 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         //init new WorldChunkManagerOverworld
         boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
-        boolean largebiomes = largeBiomesField.getBoolean(chunkManager);
-        chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes);
+        boolean largeBiomes = largeBiomesField.getBoolean(chunkManager);
 
-        //replace genLayer
-        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largebiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
-        genLayerField.set(chunkManager, new FastGenLayer(factory));
+        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largeBiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
+        if (options.hasBiomeType()) {
+            BiomeBase biome = IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+            chunkManager = new SingleBiomeWorldChunkManagerOverworld(biome);
+        } else {
+            chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largeBiomes);
+            //replace genLayer
+            genLayerField.set(chunkManager, new FastGenLayer(factory));
+        }
 
         return chunkManager;
+    }
+
+    private static class SingleBiomeWorldChunkManagerOverworld extends WorldChunkManager {
+
+        private final BiomeBase biome;
+
+        public SingleBiomeWorldChunkManagerOverworld(BiomeBase biome) {
+            super(Arrays.asList(biome));
+            this.biome = biome;
+        }
+
+        @Override
+        protected Codec<? extends WorldChunkManager> a() {
+            return WorldChunkManagerOverworld.e;
+        }
+
+        @Override
+        public BiomeBase getBiome(int i, int i1, int i2) {
+            return biome;
+        }
     }
 
     private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
