@@ -185,10 +185,12 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
             }
 
+            private final BiomeBase singleBiome = options.hasBiomeType() ? IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId())) : null;
+
             @Override
             public BiomeBase a(int i, int k, int j) {
                 if (options.hasBiomeType()) {
-                    return IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+                    return singleBiome;
                 }
                 return this.getChunkProvider().getChunkGenerator().getWorldChunkManager().getBiome(i, j, k);
             }
