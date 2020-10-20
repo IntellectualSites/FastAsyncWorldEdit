@@ -74,7 +74,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        return delegate.get(this).getTile(x, y, z);
+        return delegate.set(this).getTile(x, y, z);
     }
 
     @Override
@@ -530,7 +530,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
-            chunk.delegate = GET;
+            chunk.delegate = BOTH;
             chunk.chunkExisting.trim(false);
             return chunk.chunkExisting;
         }
@@ -538,7 +538,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public IChunkSet set(ChunkHolder chunk) {
             chunk.getOrCreateSet();
-            chunk.delegate = SET;
+            chunk.delegate = BOTH;
             return chunk.chunkSet;
         }
 
