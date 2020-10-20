@@ -74,7 +74,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        return delegate.set(this).getTile(x, y, z);
+        return delegate.get(this).getTile(x, y, z);
     }
 
     @Override
@@ -94,7 +94,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public BiomeType[] getBiomes() {
-        return delegate.set(this).getBiomes(); // TODO return get?
+        // Uses set as this method is only used to retrieve biomes that have been set to the extent/chunk.
+        return delegate.set(this).getBiomes();
     }
 
     @Override public char[][] getLight() {
@@ -218,8 +219,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
+        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
 
@@ -530,7 +530,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
+            chunk.delegate = GET;
             chunk.chunkExisting.trim(false);
             return chunk.chunkExisting;
         }
@@ -538,7 +538,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public IChunkSet set(ChunkHolder chunk) {
             chunk.getOrCreateSet();
-            chunk.delegate = BOTH;
+            chunk.delegate = SET;
             return chunk.chunkSet;
         }
 
