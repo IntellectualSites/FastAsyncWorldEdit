@@ -192,7 +192,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
         if (confirm == null) {
             return false;
         }
-        queueAction(confirm::signal);
+        confirm.signal();
         return true;
     }
 
