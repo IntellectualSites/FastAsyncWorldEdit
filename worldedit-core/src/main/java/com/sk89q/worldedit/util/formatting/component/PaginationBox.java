@@ -140,11 +140,7 @@ public abstract class PaginationBox extends MessageBox {
     }
 
     public static <T> PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<T> lines, Function<T, Component> adapt) {
-        return fromStrings(header, pageCommand, Collections2.transform(lines, adapt));
-    }
-
-    public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection lines) {
-        return new ListPaginationBox(header, pageCommand, lines);
+        return fromComponents(header, pageCommand, Collections2.transform(lines, adapt));
     }
 
     public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<String> lines) {
@@ -162,7 +158,7 @@ public abstract class PaginationBox extends MessageBox {
 
         ListPaginationBox(String header, String pageCommand, Collection<Component> lines) {
             super(header, pageCommand);
-            this.lines = lines;
+            this.lines = ImmutableList.copyOf(lines);
         }
 
         @Override

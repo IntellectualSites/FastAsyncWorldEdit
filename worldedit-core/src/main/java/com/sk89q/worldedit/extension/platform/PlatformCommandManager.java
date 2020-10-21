@@ -444,7 +444,6 @@ public final class PlatformCommandManager {
                     Lists.newArrayList("br", "/brush", "/br", "/tool", "tool"),
                     "Brushing commands",
                     c -> {
-                        // TODO find out what's going on here
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
                         c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
                         c.accept(ToolUtilCommandsRegistration.builder(), new ToolUtilCommands(worldEdit));
@@ -490,11 +489,6 @@ public final class PlatformCommandManager {
                 commandManager,
                 ClipboardCommandsRegistration.builder(),
                 new ClipboardCommands()
-            );
-            this.registration.register(
-                commandManager,
-                GeneralCommandsRegistration.builder(),
-                new GeneralCommands(worldEdit)
             );
             GeneralCommands.register(
                     registration,

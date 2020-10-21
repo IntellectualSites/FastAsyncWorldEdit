@@ -174,17 +174,22 @@ public class ChunkCommands {
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, "/stop"))));
     }
 
-    private static class ChunkListPaginationBox extends PaginationBox.ListPaginationBox {
+    private static class ChunkListPaginationBox extends PaginationBox {
         //private final Region region;
         private final List<BlockVector2> chunks = null;
 
         ChunkListPaginationBox(Region region) {
-            super("Selected Chunks", "/listchunks -p %page%", region.getChunks());
+            super("Selected Chunks", "/listchunks -p %page%");
         }
 
         @Override
         public Component getComponent(int number) {
-            return create(number);
+            return TextComponent.of(chunks.get(number).toString());
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return chunks.size();
         }
     }
 }

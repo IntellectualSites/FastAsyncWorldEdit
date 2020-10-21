@@ -28,6 +28,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.command.tool.BlockReplacer;
+import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.DistanceWand;
 import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
 import com.sk89q.worldedit.command.tool.FloodFillTool;
@@ -136,6 +137,7 @@ public class ToolCommands {
 
     static void setToolNone(Player player, LocalSession session, boolean isBrush)
         throws InvalidToolBindException {
+        isBrush = session.getTool(player) instanceof BrushTool;
         session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
         player.printInfo(TranslatableComponent.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }

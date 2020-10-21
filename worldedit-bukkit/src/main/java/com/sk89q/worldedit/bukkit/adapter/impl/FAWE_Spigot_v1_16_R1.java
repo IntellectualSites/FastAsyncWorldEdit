@@ -47,6 +47,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -56,6 +57,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_16_R1.BiomeBase;
 import net.minecraft.server.v1_16_R1.Block;
@@ -276,6 +278,21 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Component getRichBlockName(BlockType blockType) {
+        return parent.getRichBlockName(blockType);
+    }
+
+    @Override
+    public Component getRichItemName(ItemType itemType) {
+        return parent.getRichItemName(itemType);
+    }
+
+    @Override
+    public Component getRichItemName(BaseItemStack itemStack) {
+        return parent.getRichItemName(itemStack);
     }
 
     @Override
