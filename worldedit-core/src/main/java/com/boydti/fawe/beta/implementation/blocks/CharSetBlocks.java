@@ -57,7 +57,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (biomes == null) {
             return null;
         }
-        return biomes[(z << 4) | x];
+        return biomes[y << 2 | z & 12 | x >> 2];
     }
 
     @Override
@@ -88,9 +88,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if (biomes == null) {
-            biomes = new BiomeType[256];
+            biomes = new BiomeType[1024];
         }
-        biomes[x + (z << 4)] = biome;
+        biomes[y << 2 | z & 12 | x >> 2] = biome;
         return true;
     }
 

@@ -4,7 +4,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Location;
@@ -82,17 +81,20 @@ public class ScaleTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         boolean result = false;
-        MutableBlockVector3 pos = new MutableBlockVector3(
-            getPos(position.getBlockX(), 0, position.getBlockZ()));
+        MutableBlockVector3 pos = new MutableBlockVector3(getPos(position));
         double sx = pos.getX();
+        double sy = pos.getY();
         double sz = pos.getZ();
-        double ex = pos.getX() + dx;
-        double ez = pos.getZ() + dz;
-        for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-            for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                result |= super.setBiome(pos.toBlockVector2(), biome);
+        double ex = sx + dx;
+        double ey = Math.min(maxy, sy + dy);
+        double ez = sz + dz;
+        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
+            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
+                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+                    result |= super.setBiome(pos, biome);
+                }
             }
         }
         return result;

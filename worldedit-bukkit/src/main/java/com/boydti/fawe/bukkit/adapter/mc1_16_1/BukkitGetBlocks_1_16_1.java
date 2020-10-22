@@ -421,14 +421,14 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                     if (createCopy) {
                         copy.storeBiomes(currentBiomes);
                     }
-                    for (int z = 0, i = 0; z < 16; z++) {
-                        for (int x = 0; x < 16; x++, i++) {
-                            final BiomeType biome = biomes[i];
-                            if (biome != null) {
-                                final Biome craftBiome = BukkitAdapter.adapt(biome);
-                                BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
-                                for (int y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
-                                    currentBiomes.setBiome(x >> 2, y >> 2, z >> 2, nmsBiome);
+                    for (int y = 0, i = 0; y < 64; y++) {
+                        for (int z = 0; z < 4; z++) {
+                            for (int x = 0; x < 4; x++, i++) {
+                                final BiomeType biome = biomes[i];
+                                if (biome != null) {
+                                    final Biome craftBiome = BukkitAdapter.adapt(biome);
+                                    BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(craftBiome);
+                                    currentBiomes.setBiome(x, y, z, nmsBiome);
                                 }
                             }
                         }

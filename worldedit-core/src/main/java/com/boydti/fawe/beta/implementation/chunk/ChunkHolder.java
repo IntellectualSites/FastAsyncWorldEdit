@@ -94,7 +94,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public BiomeType[] getBiomes() {
-        return delegate.set(this).getBiomes(); // TODO return get?
+        // Uses set as this method is only used to retrieve biomes that have been set to the extent/chunk.
+        return delegate.set(this).getBiomes();
     }
 
     @Override public char[][] getLight() {
@@ -218,8 +219,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
+        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y, int z) {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
 
