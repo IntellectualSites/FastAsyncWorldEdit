@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.internal.command;
 
+import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -46,6 +47,10 @@ public class ConfirmHandler implements CommandCallListener {
             return;
         }
         Actor actor = actorOpt.get();
+        // don't check confirmation if actor doesn't need to confirm
+        if (!Settings.IMP.getLimit(actor).CONFIRM_LARGE) {
+            return;
+        }
         if (!confirmAnnotation.value().passes(actor, parameters, 1)) {
             throw new StopExecutionException(TextComponent.empty());
         }
