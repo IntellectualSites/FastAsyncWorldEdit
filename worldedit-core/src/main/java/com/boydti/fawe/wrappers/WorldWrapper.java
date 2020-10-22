@@ -29,6 +29,7 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -240,6 +241,11 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean regenerate(Region region, EditSession session) {
         return parent.regenerate(region, session);
+    }
+
+    @Override
+    public boolean regenerate(Region region, Extent extent, RegenOptions options) {
+        return parent.regenerate(region, extent, options);
     }
 
     @Override
