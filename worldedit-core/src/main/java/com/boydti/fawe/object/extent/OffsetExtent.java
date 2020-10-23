@@ -2,9 +2,7 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -13,7 +11,6 @@ public class OffsetExtent extends ResettableExtent {
     private final int dx;
     private final int dy;
     private final int dz;
-    private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public OffsetExtent(Extent parent, int dx, int dy, int dz) {
         super(parent);
@@ -23,9 +20,9 @@ public class OffsetExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent()
-            .setBiome(mutable.setComponents(position.getBlockX() + dx, position.getBlockZ() + dz),
+            .setBiome(position.getBlockX() + dx, position.getBlockY() + dy, position.getBlockZ() + dz,
                 biome);
     }
 
@@ -45,11 +42,5 @@ public class OffsetExtent extends ResettableExtent {
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
         throws WorldEditException {
         return getExtent().setBlock(x + dx, y + dy, z + dz, block);
-    }
-
-    @Override
-    public ResettableExtent setExtent(Extent extent) {
-        mutable = new MutableBlockVector2();
-        return super.setExtent(extent);
     }
 }

@@ -59,6 +59,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,7 +73,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -424,14 +424,14 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                     if (createCopy) {
                         copy.storeBiomes(currentBiomes);
                     }
-                    for (int z = 0, i = 0; z < 16; z++) {
-                        for (int x = 0; x < 16; x++, i++) {
-                            final BiomeType biome = biomes[i];
-                            if (biome != null) {
-                                final Biome craftBiome = BukkitAdapter.adapt(biome);
-                                BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(nmsWorld.r().b(IRegistry.ay), craftBiome);
-                                for (int y = 0; y < FaweCache.IMP.WORLD_HEIGHT; y++) {
-                                    currentBiomes.setBiome(x >> 2, y >> 2, z >> 2, nmsBiome);
+                    for (int y = 0, i = 0; y < 64; y++) {
+                        for (int z = 0; z < 4; z++) {
+                            for (int x = 0; x < 4; x++, i++) {
+                                final BiomeType biome = biomes[i];
+                                if (biome != null) {
+                                    final Biome craftBiome = BukkitAdapter.adapt(biome);
+                                    BiomeBase nmsBiome = CraftBlock.biomeToBiomeBase(nmsWorld.r().b(IRegistry.ay), craftBiome);
+                                    currentBiomes.setBiome(x, y, z, nmsBiome);
                                 }
                             }
                         }

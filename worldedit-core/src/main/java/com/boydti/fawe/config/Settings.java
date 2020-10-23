@@ -36,8 +36,6 @@ public class Settings extends Config {
             "fawe.<plugin>  permission. See the Permissions page for supported region plugins."
     })
     public boolean REGION_RESTRICTIONS = true;
-    @Comment("FAWE will skip chunks when there's not enough memory available")
-    public boolean PREVENT_CRASHES = false;
     @Comment({
             "FAWE will cancel non admin edits when memory consumption exceeds this %",
             " - Bypass with `/wea` or `//fast` or `fawe.bypass`",
@@ -80,9 +78,6 @@ public class Settings extends Config {
             "Specific aspects can be turned on and off further below"
         })
         public boolean PLOTSQUARED_HOOK = true;
-        @Comment({"Send anonymous FAWE statistics to https://bstats.org/.",
-            "Please keep this setting enabled. It helps us identifying which parts of FAWE are used the most to organize future updates better."})
-        public boolean BSTATS = true;
     }
 
     @Comment("Paths for various directories")

@@ -94,7 +94,11 @@ public interface OutputExtent {
      */
     @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return setBiome(position.toBlockVector3(), biome);
+        boolean result = false;
+        for (int y = 0; y < 256; y ++) {
+            result |= setBiome(position.toBlockVector3().mutY(y), biome);
+        }
+        return result;
     }
 
     @NonAbstractForCompatibility(

@@ -321,7 +321,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
+    public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
         blockSize++;
         try {
             FaweOutputStream os = getBiomeOS();
@@ -333,6 +333,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z >> 16));
             os.write((byte) (z >> 8));
             os.write((byte) (z));
+            os.write((byte) (y));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (Throwable e) {
@@ -462,9 +463,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     if (int1 != -1) {
                         int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
                         int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
+                        int y = is.read();
                         int from = is.readVarInt();
                         int to = is.readVarInt();
-                        change.setBiome(x, z, from, to);
+                        change.setBiome(x, y, z, from, to);
                         return change;
                     }
                 } catch (EOFException ignored) {

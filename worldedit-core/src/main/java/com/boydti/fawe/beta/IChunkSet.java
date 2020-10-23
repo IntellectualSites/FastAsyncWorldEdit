@@ -60,6 +60,12 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     Set<UUID> getEntityRemoves();
 
+    /**
+     * This will return only biomes SET to the EXTENT or QUEUE. This will NOT return the current biomes in the world.
+     * This is used for history purposes.
+     *
+     * @return Array of biomes set
+     */
     BiomeType[] getBiomes();
 
     default boolean hasBiomes() {

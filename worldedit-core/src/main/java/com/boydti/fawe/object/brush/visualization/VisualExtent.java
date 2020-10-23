@@ -57,6 +57,12 @@ public class VisualExtent extends AbstractDelegateExtent {
         return false;
     }
 
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        // Do nothing
+        return false;
+    }
+
     public void clear() {
         IQueueExtent queue = (IQueueExtent) getExtent();
         queue.cancel();

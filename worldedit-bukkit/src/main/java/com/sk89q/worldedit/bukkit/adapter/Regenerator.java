@@ -11,6 +11,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.RegenOptions;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -266,9 +267,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //Setting Blocks
         long start = System.currentTimeMillis();
         boolean genbiomes = options.shouldRegenBiomes();
+        boolean hasBiome = options.hasBiomeType();
+        BiomeType biome = options.getBiomeType();
         for (BlockVector3 vec : region) {
             target.setBlock(vec, source.getBlock(vec));
-            if (genbiomes) {
+            if (hasBiome) {
+                target.setBiome(vec, biome);
+            } else if (genbiomes) {
                 target.setBiome(vec, source.getBiome(vec));
             }
 //                    realExtent.setSkyLight(vec, extent.getSkyLight(vec));

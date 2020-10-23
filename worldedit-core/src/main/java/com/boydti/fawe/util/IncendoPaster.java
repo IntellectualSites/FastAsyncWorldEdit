@@ -232,6 +232,7 @@ public final class IncendoPaster implements Paster {
         RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
         b.append("Uptime: ").append(TimeUnit.MINUTES.convert(rb.getUptime(), TimeUnit.MILLISECONDS))
             .append(" minutes").append('\n');
+        b.append("JVM Flags: ").append(rb.getInputArguments()).append('\n');
         b.append("Free Memory: ").append(runtime.freeMemory() / 1024 / 1024).append(" MB").append('\n');
         b.append("Max Memory: ").append(runtime.maxMemory() / 1024 / 1024).append(" MB").append('\n');
         b.append("Total Memory: ").append(runtime.totalMemory() / 1024 / 1024).append(" MB").append('\n');
