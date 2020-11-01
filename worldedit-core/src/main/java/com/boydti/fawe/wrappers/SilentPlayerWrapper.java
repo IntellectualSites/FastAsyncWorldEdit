@@ -3,6 +3,8 @@ package com.boydti.fawe.wrappers;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.formatting.text.Component;
 
+
+//TODO: Add proper documenation for this class describing what it is. Is it just a wrapper for a player so no messages are printed anywhere? 
 /**
  * Avoids printing any messages
  */
