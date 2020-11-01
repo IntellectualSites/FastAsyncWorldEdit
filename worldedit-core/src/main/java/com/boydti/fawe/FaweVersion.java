@@ -1,6 +1,6 @@
 package com.boydti.fawe;
 
-/** An internal FAWE class not mean't for public use. **/
+/** An internal FAWE class not meant for public use. **/
 public class FaweVersion {
     public final int year;
     public final int month;
