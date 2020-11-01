@@ -10,7 +10,7 @@ import java.util.Base64;
 import static org.slf4j.LoggerFactory.getLogger;
 
 //TODO: Look into renaming this class or moving to a new package. 
-/** An internal FAWE class not mean't for public use. **/
+/** An internal FAWE class not meant for public use. **/
 public enum Jars {
 
     MM_v1_7_8(
