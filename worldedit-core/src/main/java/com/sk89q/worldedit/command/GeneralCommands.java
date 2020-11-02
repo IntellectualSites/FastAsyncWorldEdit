@@ -102,7 +102,9 @@ public class GeneralCommands {
         Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
             .collect(Collectors.toSet());
         for (org.enginehub.piston.Command command : commands) {
-            if (command.getName().equals("/fast")) {
+            /*if in FAWE, //fast will remain for now
+             (command.getName().equals("/fast")) {
+
                 // deprecate to `//perf`
                 commandManager.register(CommandUtil.deprecate(
                     command, "//fast duplicates //perf " +
@@ -111,6 +113,7 @@ public class GeneralCommands {
                 ));
                 continue;
             }
+            */
 
             commandManager.register(command);
         }

@@ -212,7 +212,7 @@
     "worldedit.timeout.set": "Timeout time set to {0}ms.",
     "worldedit.timeout.return-to-default": " (Use //timeout to go back to the default.)",
     "worldedit.fast.disabled": "Fast mode disabled.",
-    "worldedit.fast.enabled": "Fast mode enabled. Lighting in the affected chunks may be wrong and/or you may need to rejoin to see changes.",
+    "worldedit.fast.enabled": "Fast mode enabled. Changes won't be written to history (//undo is disabled). Lighting in the affected chunks may be wrong and/or you may need to rejoin to see changes.",
     "worldedit.fast.disabled.already": "Fast mode already disabled.",
     "worldedit.fast.enabled.already": "Fast mode already enabled.",
     "worldedit.perf.sideeffect.set": "Side effect \"{0}\" set to {1}",
