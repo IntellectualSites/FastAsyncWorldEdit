@@ -159,11 +159,13 @@ public class FallbackChunkGet implements IChunkGet {
         }
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
-            for (int z = 0, i = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++, i++) {
-                    BiomeType biome = biomes[i];
-                    if (biome != null) {
-                        extent.setBiome(bx + x, 0, bz + z, biome);
+            for (int y = 0, i = 0; y < 64; y++) {
+                for (int z = 0; z < 4; z++) {
+                    for (int x = 0; x < 4; x++, i++) {
+                        BiomeType biome = biomes[i];
+                        if (biome != null) {
+                            extent.setBiome(bx + (x << 2), y << 2, bz + (z << 2), biome);
+                        }
                     }
                 }
             }

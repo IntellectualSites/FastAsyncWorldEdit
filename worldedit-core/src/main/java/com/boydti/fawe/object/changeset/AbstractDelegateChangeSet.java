@@ -69,8 +69,8 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
-        parent.addBiomeChange(x, z, from, to);
+    public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
+        parent.addBiomeChange(x, y, z, from, to);
     }
 
     @Override

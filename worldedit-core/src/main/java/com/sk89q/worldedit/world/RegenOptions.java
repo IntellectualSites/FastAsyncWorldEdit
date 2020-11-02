@@ -22,6 +22,7 @@ package com.sk89q.worldedit.world;
 import com.google.auto.value.AutoValue;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.OptionalLong;
 import javax.annotation.Nullable;
@@ -38,7 +39,7 @@ public abstract class RegenOptions {
      * @return the builder
      */
     public static Builder builder() {
-        return new AutoValue_RegenOptions.Builder().seed(OptionalLong.empty()).regenBiomes(false);
+        return new AutoValue_RegenOptions.Builder().seed(OptionalLong.empty()).regenBiomes(false).biomeType(null);
     }
 
     @AutoValue.Builder
@@ -70,6 +71,13 @@ public abstract class RegenOptions {
         public abstract Builder regenBiomes(boolean regenBiomes);
 
         /**
+         * Defines the {@code BiomeType} the regenerator should use for regeneration. Defaults to {@code null}.
+         * @param biomeType the {@code BiomeType} to be used for regeneration
+         * @return this builder
+         */
+        public abstract Builder biomeType(@Nullable BiomeType biomeType);
+
+        /**
          * Build the options object.
          *
          * @return the options object
@@ -97,6 +105,12 @@ public abstract class RegenOptions {
      */
     public final boolean shouldRegenBiomes() {
         return isRegenBiomes();
+    }
+
+    @Nullable public abstract BiomeType getBiomeType();
+
+    public boolean hasBiomeType() {
+        return getBiomeType() != null;
     }
 
 }
