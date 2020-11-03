@@ -9,7 +9,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
-import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_4.nbt.LazyCompoundTag_1_16_4;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
@@ -22,38 +22,38 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R2;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R3;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.minecraft.server.v1_16_R2.BiomeBase;
-import net.minecraft.server.v1_16_R2.BiomeStorage;
-import net.minecraft.server.v1_16_R2.BlockPosition;
-import net.minecraft.server.v1_16_R2.Chunk;
-import net.minecraft.server.v1_16_R2.ChunkSection;
-import net.minecraft.server.v1_16_R2.DataBits;
-import net.minecraft.server.v1_16_R2.DataPalette;
-import net.minecraft.server.v1_16_R2.DataPaletteBlock;
-import net.minecraft.server.v1_16_R2.DataPaletteHash;
-import net.minecraft.server.v1_16_R2.DataPaletteLinear;
-import net.minecraft.server.v1_16_R2.Entity;
-import net.minecraft.server.v1_16_R2.EntityTypes;
-import net.minecraft.server.v1_16_R2.EnumSkyBlock;
-import net.minecraft.server.v1_16_R2.HeightMap;
-import net.minecraft.server.v1_16_R2.IBlockData;
-import net.minecraft.server.v1_16_R2.IRegistry;
-import net.minecraft.server.v1_16_R2.LightEngine;
-import net.minecraft.server.v1_16_R2.NBTTagCompound;
-import net.minecraft.server.v1_16_R2.NBTTagInt;
-import net.minecraft.server.v1_16_R2.NibbleArray;
-import net.minecraft.server.v1_16_R2.SectionPosition;
-import net.minecraft.server.v1_16_R2.TileEntity;
-import net.minecraft.server.v1_16_R2.WorldServer;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeStorage;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.Chunk;
+import net.minecraft.server.v1_16_R3.ChunkSection;
+import net.minecraft.server.v1_16_R3.DataBits;
+import net.minecraft.server.v1_16_R3.DataPalette;
+import net.minecraft.server.v1_16_R3.DataPaletteBlock;
+import net.minecraft.server.v1_16_R3.DataPaletteHash;
+import net.minecraft.server.v1_16_R3.DataPaletteLinear;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.EnumSkyBlock;
+import net.minecraft.server.v1_16_R3.HeightMap;
+import net.minecraft.server.v1_16_R3.IBlockData;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.LightEngine;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagInt;
+import net.minecraft.server.v1_16_R3.NibbleArray;
+import net.minecraft.server.v1_16_R3.SectionPosition;
+import net.minecraft.server.v1_16_R3.TileEntity;
+import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
     private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_16_4.class);
 
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
-    private static final Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_16_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+    private static final Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_16_4(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     public ChunkSection[] sections;
     public Chunk nmsChunk;
     public WorldServer world;
@@ -150,7 +150,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         if (tileEntity == null) {
             return null;
         }
-        return new LazyCompoundTag_1_16_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+        return new LazyCompoundTag_1_16_4(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
     @Override
@@ -313,7 +313,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         entity.die();
     }
 
-    public Chunk ensureLoaded(net.minecraft.server.v1_16_R2.World nmsWorld, int chunkX, int chunkZ) {
+    public Chunk ensureLoaded(net.minecraft.server.v1_16_R3.World nmsWorld, int chunkX, int chunkZ) {
         return BukkitAdapter_1_16_4.ensureLoaded(nmsWorld, chunkX, chunkZ);
     }
 
@@ -659,7 +659,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                FAWE_Spigot_v1_16_R2 adapter = ((FAWE_Spigot_v1_16_R2) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                FAWE_Spigot_v1_16_R3 adapter = ((FAWE_Spigot_v1_16_R3) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitAdapter_1_16_4.fieldBits.get(blocks);
@@ -749,7 +749,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_16_R2 adapter) {
+    private final char ordinal(IBlockData ibd, FAWE_Spigot_v1_16_R3 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {

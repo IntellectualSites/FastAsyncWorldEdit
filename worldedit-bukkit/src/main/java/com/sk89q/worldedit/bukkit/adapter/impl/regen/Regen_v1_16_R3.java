@@ -15,54 +15,54 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
 import net.minecraft.server.v1_16_R3.Area;
-import net.minecraft.server.v1_16_R2.AreaContextTransformed;
-import net.minecraft.server.v1_16_R2.AreaFactory;
-import net.minecraft.server.v1_16_R2.AreaTransformer8;
-import net.minecraft.server.v1_16_R2.BiomeBase;
-import net.minecraft.server.v1_16_R2.BiomeRegistry;
-import net.minecraft.server.v1_16_R2.Chunk;
-import net.minecraft.server.v1_16_R2.ChunkConverter;
-import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R2.ChunkGenerator;
-import net.minecraft.server.v1_16_R2.ChunkGeneratorAbstract;
-import net.minecraft.server.v1_16_R2.ChunkProviderFlat;
-import net.minecraft.server.v1_16_R2.ChunkProviderServer;
-import net.minecraft.server.v1_16_R2.ChunkStatus;
-import net.minecraft.server.v1_16_R2.Convertable;
-import net.minecraft.server.v1_16_R2.DefinedStructureManager;
-import net.minecraft.server.v1_16_R2.DynamicOpsNBT;
-import net.minecraft.server.v1_16_R2.GenLayer;
-import net.minecraft.server.v1_16_R2.GenLayers;
-import net.minecraft.server.v1_16_R2.GeneratorSettingBase;
-import net.minecraft.server.v1_16_R2.GeneratorSettings;
-import net.minecraft.server.v1_16_R2.GeneratorSettingsFlat;
-import net.minecraft.server.v1_16_R2.IChunkAccess;
-import net.minecraft.server.v1_16_R2.IRegistry;
-import net.minecraft.server.v1_16_R2.IRegistryCustom;
-import net.minecraft.server.v1_16_R2.LightEngineThreaded;
-import net.minecraft.server.v1_16_R2.LinearCongruentialGenerator;
-import net.minecraft.server.v1_16_R2.MinecraftKey;
-import net.minecraft.server.v1_16_R2.MinecraftServer;
-import net.minecraft.server.v1_16_R2.NBTBase;
-import net.minecraft.server.v1_16_R2.NBTTagCompound;
-import net.minecraft.server.v1_16_R2.NoiseGeneratorPerlin;
-import net.minecraft.server.v1_16_R2.ProtoChunk;
-import net.minecraft.server.v1_16_R2.RegistryGeneration;
-import net.minecraft.server.v1_16_R2.RegistryMaterials;
-import net.minecraft.server.v1_16_R2.RegistryReadOps;
-import net.minecraft.server.v1_16_R2.ResourceKey;
-import net.minecraft.server.v1_16_R2.World;
-import net.minecraft.server.v1_16_R2.WorldChunkManager;
-import net.minecraft.server.v1_16_R2.WorldChunkManagerOverworld;
-import net.minecraft.server.v1_16_R2.WorldDataServer;
-import net.minecraft.server.v1_16_R2.WorldDimension;
-import net.minecraft.server.v1_16_R2.WorldLoadListener;
-import net.minecraft.server.v1_16_R2.WorldServer;
-import net.minecraft.server.v1_16_R2.WorldSettings;
+import net.minecraft.server.v1_16_R3.AreaContextTransformed;
+import net.minecraft.server.v1_16_R3.AreaFactory;
+import net.minecraft.server.v1_16_R3.AreaTransformer8;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeRegistry;
+import net.minecraft.server.v1_16_R3.Chunk;
+import net.minecraft.server.v1_16_R3.ChunkConverter;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.ChunkGenerator;
+import net.minecraft.server.v1_16_R3.ChunkGeneratorAbstract;
+import net.minecraft.server.v1_16_R3.ChunkProviderFlat;
+import net.minecraft.server.v1_16_R3.ChunkProviderServer;
+import net.minecraft.server.v1_16_R3.ChunkStatus;
+import net.minecraft.server.v1_16_R3.Convertable;
+import net.minecraft.server.v1_16_R3.DefinedStructureManager;
+import net.minecraft.server.v1_16_R3.DynamicOpsNBT;
+import net.minecraft.server.v1_16_R3.GenLayer;
+import net.minecraft.server.v1_16_R3.GenLayers;
+import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
+import net.minecraft.server.v1_16_R3.GeneratorSettings;
+import net.minecraft.server.v1_16_R3.GeneratorSettingsFlat;
+import net.minecraft.server.v1_16_R3.IChunkAccess;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.IRegistryCustom;
+import net.minecraft.server.v1_16_R3.LightEngineThreaded;
+import net.minecraft.server.v1_16_R3.LinearCongruentialGenerator;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.NBTBase;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NoiseGeneratorPerlin;
+import net.minecraft.server.v1_16_R3.ProtoChunk;
+import net.minecraft.server.v1_16_R3.RegistryGeneration;
+import net.minecraft.server.v1_16_R3.RegistryMaterials;
+import net.minecraft.server.v1_16_R3.RegistryReadOps;
+import net.minecraft.server.v1_16_R3.ResourceKey;
+import net.minecraft.server.v1_16_R3.World;
+import net.minecraft.server.v1_16_R3.WorldChunkManager;
+import net.minecraft.server.v1_16_R3.WorldChunkManagerOverworld;
+import net.minecraft.server.v1_16_R3.WorldDataServer;
+import net.minecraft.server.v1_16_R3.WorldDimension;
+import net.minecraft.server.v1_16_R3.WorldLoadListener;
+import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.WorldSettings;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R2.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
 import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
@@ -83,7 +83,7 @@ import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_16_R2.ChunkStatusWrap> {
+public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_16_R3.ChunkStatusWrap> {
 
     private static final Field serverWorldsField;
     private static final Field worldPaperConfigField;
@@ -328,7 +328,7 @@ public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     @Override
     protected IChunkCache<IChunkGet> initSourceQueueCache() {
-        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_2(freshNMSWorld, chunkX, chunkZ) {
+        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_4(freshNMSWorld, chunkX, chunkZ) {
             @Override
             public Chunk ensureLoaded(World nmsWorld, int x, int z) {
                 return getChunkAt(x, z);

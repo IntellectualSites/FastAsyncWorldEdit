@@ -2,7 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_16_4;
 
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
+import com.boydti.fawe.bukkit.adapter.mc1_16_4.nbt.LazyCompoundTag_1_16_4;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -13,14 +13,14 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import net.minecraft.server.v1_16_R2.BiomeBase;
-import net.minecraft.server.v1_16_R2.BiomeStorage;
-import net.minecraft.server.v1_16_R2.Entity;
-import net.minecraft.server.v1_16_R2.IRegistry;
-import net.minecraft.server.v1_16_R2.NBTTagCompound;
-import net.minecraft.server.v1_16_R2.TileEntity;
-import net.minecraft.server.v1_16_R2.WorldServer;
-import org.bukkit.craftbukkit.v1_16_R2.block.CraftBlock;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeStorage;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.TileEntity;
+import net.minecraft.server.v1_16_R3.WorldServer;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class BukkitGetBlocks_1_16_4_Copy extends BukkitGetBlocks_1_16_4 {
 
     protected void storeTile(TileEntity tile) {
         tiles.put(BlockVector3.at(tile.getPosition().getX(), tile.getPosition().getY(), tile.getPosition().getZ()),
-            new LazyCompoundTag_1_16_2(Suppliers.memoize(() -> tile.save(new NBTTagCompound()))));
+            new LazyCompoundTag_1_16_4(Suppliers.memoize(() -> tile.save(new NBTTagCompound()))));
     }
 
     @Override

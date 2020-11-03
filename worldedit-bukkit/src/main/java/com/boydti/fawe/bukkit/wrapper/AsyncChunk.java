@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +50,11 @@ public class AsyncChunk implements Chunk {
     @Override
     public int getZ() {
         return z;
+    }
+
+    @Override
+    public long getChunkKey() {
+        return Chunk.getChunkKey(getX(), getZ());
     }
 
     @Override
@@ -182,5 +188,10 @@ public class AsyncChunk implements Chunk {
     public boolean contains(@NotNull BlockData block) {
         //todo
         return false;
+    }
+
+    @Override
+    public @NotNull PersistentDataContainer getPersistentDataContainer() {
+        return null;
     }
 }
