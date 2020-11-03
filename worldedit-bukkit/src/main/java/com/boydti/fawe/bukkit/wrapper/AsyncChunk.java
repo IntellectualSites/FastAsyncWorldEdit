@@ -146,7 +146,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public boolean isSlimeChunk() {
-        return false;
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).isSlimeChunk());
     }
 
     @Override
@@ -176,22 +176,21 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public long getInhabitedTime() {
-        return 0; //todo
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).getInhabitedTime());
     }
 
     @Override
     public void setInhabitedTime(long ticks) {
-        //todo
+        world.getChunkAt(x, z).setInhabitedTime(ticks);
     }
 
     @Override
     public boolean contains(@NotNull BlockData block) {
-        //todo
-        return false;
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).contains(block));
     }
 
     @Override
     public @NotNull PersistentDataContainer getPersistentDataContainer() {
-        return null;
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).getPersistentDataContainer());
     }
 }
