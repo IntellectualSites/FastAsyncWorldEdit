@@ -46,7 +46,7 @@ public class NullChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
+    public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
 
     }
 

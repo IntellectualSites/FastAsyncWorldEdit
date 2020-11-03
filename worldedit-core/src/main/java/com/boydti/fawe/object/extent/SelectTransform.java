@@ -52,7 +52,7 @@ public abstract class SelectTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent(position).setBiome(position, biome);
     }
 }

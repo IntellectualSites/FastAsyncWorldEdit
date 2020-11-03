@@ -188,13 +188,15 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
-            for (int z = 0, index = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++, index++) {
-                    BiomeType newBiome = biomes[index];
-                    if (newBiome != null) {
-                        BiomeType oldBiome = get.getBiomeType(x, 0, z);
-                        if (oldBiome != newBiome) {
-                            addBiomeChange(bx + x, bz + z, oldBiome, newBiome);
+            for (int y = 0, index = 0; y < 64; y++) {
+                for (int z = 0; z < 4; z++) {
+                    for (int x = 0; x < 4; x++, index++) {
+                        BiomeType newBiome = biomes[index];
+                        if (newBiome != null) {
+                            BiomeType oldBiome = get.getBiomeType(x, y, z);
+                            if (oldBiome != newBiome) {
+                                addBiomeChange(bx + (x << 2), y << 2,bz + (z << 2), oldBiome, newBiome);
+                            }
                         }
                     }
                 }
@@ -216,7 +218,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public abstract void addEntityCreate(CompoundTag tag);
 
-    public abstract void addBiomeChange(int x, int z, BiomeType from, BiomeType to);
+    public abstract void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to);
 
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);

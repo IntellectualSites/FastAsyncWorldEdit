@@ -63,7 +63,9 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.annotation.Command;
@@ -609,15 +611,26 @@ public class RegionCommands {
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
-    public void regenerateChunk(Actor actor, World world, LocalSession session, EditSession editSession,
-                                @Selection Region region) throws WorldEditException {
+    void regenerate(Actor actor, World world, LocalSession session, EditSession editSession,
+                    @Selection Region region,
+                    @Arg(desc = "The seed to regenerate with, otherwise uses world seed", def = "")
+                            Long seed,
+                    @Switch(name = 'b', desc = "Regenerate biomes as well")
+                            boolean regenBiomes,
+                    @Arg(desc = "Biome to apply for this regeneration (only works in overworld)", def = "")
+                            BiomeType biomeType) throws WorldEditException {
         Mask mask = session.getMask();
         boolean success;
         try {
-            session.setMask((Mask) null);
-            session.setSourceMask((Mask) null);
+            session.setMask(null);
+            session.setSourceMask(null);
             actor.printInfo(TranslatableComponent.of("fawe.regen.time"));
-            success = world.regenerate(region, editSession);
+            RegenOptions options = RegenOptions.builder()
+                    .seed(seed)
+                    .regenBiomes(regenBiomes)
+                    .biomeType(biomeType)
+                    .build();
+            success = world.regenerate(region, editSession, options);
         } finally {
             session.setMask(mask);
             session.setSourceMask(mask);

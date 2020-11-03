@@ -50,7 +50,7 @@ public class MCAChunk implements IChunk {
     public final boolean[] hasSections = new boolean[16];
 
     public boolean hasBiomes = false;
-    public final BiomeType[] biomes = new BiomeType[256];
+    public final BiomeType[] biomes = new BiomeType[1024];
 
     public final char[] blocks = new char[65536];
 
@@ -481,7 +481,7 @@ public class MCAChunk implements IChunk {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return this.biomes[(z << 4) | x];
+        return this.biomes[y << 2 | z & 12 | x >> 2];
     }
 
     @Override
@@ -505,7 +505,7 @@ public class MCAChunk implements IChunk {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[x + (z << 4)] = biome; //TODO Support 3D Biomes
+        biomes[y << 2 | z & 12 | x >> 2] = biome;
         return true;
     }
 

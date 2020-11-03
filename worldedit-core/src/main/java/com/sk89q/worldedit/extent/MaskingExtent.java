@@ -31,7 +31,6 @@ import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -91,11 +90,6 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return this.mask.test(location) && super.setBlock(location, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return this.mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override

@@ -9,13 +9,14 @@ import java.util.Base64;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public enum Jars {
+/** An internal FAWE class not meant for public use. **/
+public enum ThirdPartyManager {
 
-    MM_v1_7_8(
+    MapManager(
         "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.8-SNAPSHOT/MapManager_v1.7.8-SNAPSHOT.jar",
         "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 544000),
 
-    PL_v3_7_6(
+    PacketListenerAPI(
         "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.6-SNAPSHOT/PacketListenerAPI_v3.7.6-SNAPSHOT.jar",
         "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 143000),
 
@@ -30,7 +31,7 @@ public enum Jars {
      * @param digest The Base64-encoded SHA-256 digest
      * @param fileSize Size of this jar in bytes
      */
-    Jars(String url, String digest, int fileSize) {
+    ThirdPartyManager(String url, String digest, int fileSize) {
         this.url = url;
         this.digest = digest;
         this.fileSize = fileSize;
@@ -45,7 +46,7 @@ public enum Jars {
         try (DataInputStream dis = new DataInputStream(url.openConnection().getInputStream())) {
             dis.readFully(jarBytes);
             if (dis.read() != -1) { // assert that we've read everything
-                throw new IllegalStateException("downloaded jar is longer than expected");
+                throw new IllegalStateException("Downloaded jar is longer than expected");
             }
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] jarDigestBytes = md.digest(jarBytes);
@@ -53,12 +54,12 @@ public enum Jars {
             String jarDigest = Base64.getEncoder().encodeToString(jarDigestBytes);
 
             if (this.digest.equals(jarDigest)) {
-                getLogger(Jars.class).debug("++++ HASH CHECK ++++");
-                getLogger(Jars.class).debug(this.url);
-                getLogger(Jars.class).debug(this.digest);
+                getLogger(ThirdPartyManager.class).debug("++++ HASH CHECK ++++");
+                getLogger(ThirdPartyManager.class).debug(this.url);
+                getLogger(ThirdPartyManager.class).debug(this.digest);
                 return jarBytes;
             } else {
-                getLogger(Jars.class).debug(jarDigest + " | " + url);
+                getLogger(ThirdPartyManager.class).debug(jarDigest + " | " + url);
                 throw new IllegalStateException("The downloaded jar does not match the hash");
             }
         } catch (NoSuchAlgorithmException e) {

@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.BukkitGetBlocks_1_16_2;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.adapter.Regenerator;
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_16_R2.Area;
 import net.minecraft.server.v1_16_R2.AreaContextTransformed;
@@ -56,11 +58,14 @@ import net.minecraft.server.v1_16_R2.IRegistry;
 import net.minecraft.server.v1_16_R2.IRegistryCustom;
 import net.minecraft.server.v1_16_R2.LightEngineThreaded;
 import net.minecraft.server.v1_16_R2.LinearCongruentialGenerator;
+import net.minecraft.server.v1_16_R2.MinecraftKey;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import net.minecraft.server.v1_16_R2.NBTBase;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
 import net.minecraft.server.v1_16_R2.NoiseGeneratorPerlin;
 import net.minecraft.server.v1_16_R2.ProtoChunk;
+import net.minecraft.server.v1_16_R2.RegistryGeneration;
+import net.minecraft.server.v1_16_R2.RegistryMaterials;
 import net.minecraft.server.v1_16_R2.RegistryReadOps;
 import net.minecraft.server.v1_16_R2.ResourceKey;
 import net.minecraft.server.v1_16_R2.World;
@@ -201,6 +206,16 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
             @Override
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
+            }
+
+            private final BiomeBase singleBiome = options.hasBiomeType() ? RegistryGeneration.WORLDGEN_BIOME.get(MinecraftKey.a(options.getBiomeType().getId())) : null;
+
+            @Override
+            public BiomeBase a(int i, int j, int k) {
+                if (options.hasBiomeType()) {
+                    return singleBiome;
+                }
+                return this.getChunkProvider().getChunkGenerator().getWorldChunkManager().getBiome(i, j, k);
             }
         }).get();
         freshNMSWorld.savingDisabled = true;
@@ -395,8 +410,6 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         largeBiomesField.setAccessible(true);
         Field biomeRegistryField = WorldChunkManagerOverworld.class.getDeclaredField("k");
         biomeRegistryField.setAccessible(true);
-        Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("f");
-        genLayerField.setAccessible(true);
         Field areaLazyField = GenLayer.class.getDeclaredField("b");
         areaLazyField.setAccessible(true);
         Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", boolean.class, int.class, int.class, LongFunction.class);
@@ -405,15 +418,51 @@ public class Regen_v1_16_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         //init new WorldChunkManagerOverworld
         boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
         boolean largebiomes = largeBiomesField.getBoolean(chunkManager);
-        IRegistry<BiomeBase> biomeRegistry = (IRegistry<BiomeBase>) biomeRegistryField.get(chunkManager);
-        chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes, biomeRegistry);
+        IRegistry<BiomeBase> biomeRegistrynms = (IRegistry<BiomeBase>) biomeRegistryField.get(chunkManager);
+        IRegistry<BiomeBase> biomeRegistry;
+        if (options.hasBiomeType()) {
+            BiomeBase biome = RegistryGeneration.WORLDGEN_BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+            biomeRegistry = new RegistryMaterials<>(ResourceKey.a(new MinecraftKey("fawe_biomes")), Lifecycle.experimental());
+            ((RegistryMaterials) biomeRegistry).a(0, RegistryGeneration.WORLDGEN_BIOME.c(biome).get(), biome, Lifecycle.experimental());
+        } else {
+            biomeRegistry = biomeRegistrynms;
+        }
+        chunkManager = new FastWorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes, biomeRegistry);
 
         //replace genLayer
         AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largebiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
-        genLayerField.set(chunkManager, new FastGenLayer(factory));
+        ((FastWorldChunkManagerOverworld) chunkManager).genLayer = new FastGenLayer(factory);
 
         return chunkManager;
     }
+
+    private static class FastWorldChunkManagerOverworld extends WorldChunkManager {
+
+        private GenLayer genLayer;
+        private final IRegistry<BiomeBase> k;
+        private final boolean isSingleRegistry;
+
+        public FastWorldChunkManagerOverworld(long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, IRegistry<BiomeBase> biomeRegistry) {
+            super(biomeRegistry.g().collect(Collectors.toList()));
+            this.k = biomeRegistry;
+            this.isSingleRegistry = biomeRegistry.d().size() == 1;
+            this.genLayer = GenLayers.a(seed, legacyBiomeInitLayer, largeBiomes ? 6 : 4, 4);
+        }
+
+        @Override
+        protected Codec<? extends WorldChunkManager> a() {
+            return WorldChunkManagerOverworld.e;
+        }
+
+        @Override
+        public BiomeBase getBiome(int i, int i1, int i2) {
+            if (this.isSingleRegistry) {
+                return this.k.fromId(0);
+            }
+            return this.genLayer.a(this.k, i, i2);
+        }
+    }
+
 
     private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
 

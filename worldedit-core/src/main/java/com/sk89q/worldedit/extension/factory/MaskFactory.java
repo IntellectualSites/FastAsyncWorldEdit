@@ -38,6 +38,7 @@ import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ROCAngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.RichOffsetMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SimplexMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SurfaceMaskParser;
@@ -97,6 +98,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new FalseMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));
         //register(new RadiusMaskParser(worldEdit)); TODO: Adapt to work with FAWE's Chunk I/O
+        register(new RichOffsetMaskParser(worldEdit));
         register(new ROCAngleMaskParser(worldEdit));
         register(new SimplexMaskParser(worldEdit));
         register(new SurfaceMaskParser(worldEdit));
