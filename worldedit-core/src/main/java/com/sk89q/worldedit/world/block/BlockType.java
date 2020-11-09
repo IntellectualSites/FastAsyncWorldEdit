@@ -33,6 +33,7 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -96,6 +97,11 @@ public class BlockType implements Keyed, Pattern {
         return this.id;
     }
 
+    public Component getRichName() {
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+            .getRegistries().getBlockRegistry().getRichName(this);
+    }
+
     public String getNamespace() {
         String id = getId();
         int i = id.indexOf(':');
@@ -111,15 +117,11 @@ public class BlockType implements Keyed, Pattern {
      * Gets the name of this block, or the ID if the name cannot be found.
      *
      * @return The name, or ID
+     * @deprecated The name is now translatable, use {@link #getRichName()}.
      */
     @Deprecated
     public String getName() {
-        String name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this);
-        if (name == null) {
-            return getId();
-        } else {
-            return name;
-        }
+        return getRichName().toString();
     }
 
     /*
@@ -274,9 +276,7 @@ public class BlockType implements Keyed, Pattern {
     /**
      * Gets the legacy ID. Needed for legacy reasons.
      *
-     * <p>
      * DO NOT USE THIS.
-     * </p>
      *
      * @return legacy id or 0, if unknown
      */
@@ -286,9 +286,37 @@ public class BlockType implements Keyed, Pattern {
         return combinedId == null ? 0 : combinedId;
     }
 
+    /**
+     * Gets the legacy data. Needed for legacy reasons.
+     *
+     * DO NOT USE THIS.
+     *
+     * @return legacy data or 0, if unknown
+     */
     @Deprecated
     public int getLegacyId() {
         return computeLegacy(0);
+    }
+
+    /**
+     * Gets the legacy data. Needed for legacy reasons.
+     *
+     * <p>
+     * DO NOT USE THIS.
+     * </p>
+     *
+     * @return legacy data or 0, if unknown
+     */
+    @Deprecated
+    public int getLegacyData() {
+        return computeLegacy(1);
+    }
+
+    private int computeLegacy(int index) {
+        if (this.legacyCombinedId == null) {
+            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
+        }
+        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 
     /**
@@ -335,26 +363,5 @@ public class BlockType implements Keyed, Pattern {
 
     public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
-    }
-
-    /**
-     * Gets the legacy data. Needed for legacy reasons.
-     *
-     * <p>
-     * DO NOT USE THIS.
-     * </p>
-     *
-     * @return legacy data or 0, if unknown
-     */
-    @Deprecated
-    public int getLegacyData() {
-        return computeLegacy(1);
-    }
-
-    private int computeLegacy(int index) {
-        if (this.legacyCombinedId == null) {
-            this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
-        }
-        return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
     }
 }

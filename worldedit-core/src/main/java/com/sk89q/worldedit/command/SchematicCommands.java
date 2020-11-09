@@ -561,7 +561,7 @@ public class SchematicCommands {
 
                 return msg.create();
             });
-        PaginationBox paginationBox = PaginationBox.fromStrings("Available schematics", pageCommand, components);
+        PaginationBox paginationBox = PaginationBox.fromComponents("Available schematics", pageCommand, components);
         actor.print(paginationBox.create(page));
     }
 

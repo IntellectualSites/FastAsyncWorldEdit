@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -38,6 +39,14 @@ import javax.annotation.Nullable;
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
     private BukkitBlockMaterial[] materialMap;
+
+    @Override
+    public Component getRichName(BlockType blockType) {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getRichBlockName(blockType);
+        }
+        return super.getRichName(blockType);
+    }
 
     @Nullable
     @Override
