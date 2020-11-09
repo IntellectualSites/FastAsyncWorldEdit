@@ -496,6 +496,11 @@ public final class PlatformCommandManager {
                     commandManagerService,
                     worldEdit
             );
+            this.registration.register(
+                    commandManager,
+                    GenerationCommandsRegistration.builder(),
+                    new GenerationCommands(worldEdit)
+            );
             HistoryCommands history = new HistoryCommands(worldEdit);
             this.registration.register(
                     commandManager,
