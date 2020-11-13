@@ -787,6 +787,14 @@ public abstract class BlockVector3 {
         return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
     }
 
+    /**
+     * Returns a string representation that is supported by the parser.
+     * @return string
+     */
+    public String toParserString() {
+        return getX() + "," + getY() + "," + getZ();
+    }
+
     //Used by VS fork
     public BlockVector3 plus(BlockVector3 other) {
         return add(other);
