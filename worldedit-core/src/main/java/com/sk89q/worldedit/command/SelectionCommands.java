@@ -308,7 +308,7 @@ public class SelectionCommands {
     @Command(
         name = "toggleeditwand",
         aliases = { "/toggleeditwand" },
-        desc = "Remind the user that the wand is now a tool and can be unbound with /none."
+        desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player) {
