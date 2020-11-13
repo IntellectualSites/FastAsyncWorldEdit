@@ -153,17 +153,6 @@ public class BrushCommands {
         this.worldEdit = worldEdit;
     }
 
-    /* Covered by ToolCommands
-    @Command(
-        name = "none",
-        aliases = "unbind",
-        desc = "Unbind a bound brush from your current item"
-    )
-    void none(Player player, LocalSession session) throws WorldEditException {
-        ToolCommands.setToolNone(player, session, true);
-    }
-    */
-
     @Command(name = "blendball",
         aliases = {
             "bb",

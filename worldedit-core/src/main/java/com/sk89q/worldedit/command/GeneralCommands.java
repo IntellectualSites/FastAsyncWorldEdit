@@ -403,6 +403,7 @@ public class GeneralCommands {
         aliases = {"/toggleplace"},
         desc = "Switch between your position and pos1 for placement"
     )
+    @CommandPermissions("worldedit.toggleplace")
     public void togglePlace(Player player, LocalSession session) {
         if (session.togglePlacementPosition()) {
             player.printInfo(TranslatableComponent.of("worldedit.toggleplace.pos1"));

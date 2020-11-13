@@ -160,6 +160,7 @@ public class ToolCommands {
         aliases = "unbind",
         desc = "Unbind a bound tool from your current item"
     )
+    @CommandPermissions("worldedit.tool.none")
     public void none(Player player, LocalSession session) throws WorldEditException {
         setToolNone(player, session, false);
     }
