@@ -569,7 +569,9 @@ public class UtilityCommands {
                        @Switch(name = 'f', desc = "Also kill all friendly mobs (Applies the flags `-abgnpt`)")
                            boolean killFriendly,
                        @Switch(name = 'r', desc = "Also destroy armor stands")
-                           boolean killArmorStands) throws WorldEditException {
+                                   boolean killArmorStands,
+                       @Switch(name = 'w', desc = "Also kill water mobs")
+                                   boolean killWater) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
         if (radius == null) {
@@ -595,6 +597,7 @@ public class UtilityCommands {
         flags.or(CreatureButcher.Flags.AMBIENT, killAmbient, "worldedit.butcher.ambient");
         flags.or(CreatureButcher.Flags.TAGGED, killWithName, "worldedit.butcher.tagged");
         flags.or(CreatureButcher.Flags.ARMOR_STAND, killArmorStands, "worldedit.butcher.armorstands");
+        flags.or(CreatureButcher.Flags.WATER, killWater, "worldedit.butcher.water");
 
         int killed = killMatchingEntities(radius, actor, flags::createFunction);
 
