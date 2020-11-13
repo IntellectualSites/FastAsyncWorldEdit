@@ -1326,7 +1326,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> int makeCuboidFaces(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidFaces(region, block);
+        return makeCuboidFaces(region, (Pattern) block);
     }
 
     /**
