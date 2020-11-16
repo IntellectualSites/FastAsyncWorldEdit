@@ -432,7 +432,7 @@
     "worldedit.tool.tree.equip": "Tree tool bound to {0}.",
     "worldedit.tool.tree.obstructed": "A tree can't go there.",
     "worldedit.tool.info.equip": "Info tool bound to {0}.",
-	"worldedit.tool.inspect.equip": "Inspect tool bound to {0}.",
+    "worldedit.tool.inspect.equip": "Inspect tool bound to {0}.",
     "worldedit.tool.info.blockstate.hover": "Block state",
     "worldedit.tool.info.internalid.hover": "Internal ID",
     "worldedit.tool.info.legacy.hover": "Legacy id:data",
@@ -444,6 +444,7 @@
     "worldedit.tool.farwand.equip": "Far wand tool bound to {0}.",
     "worldedit.tool.lrbuild.equip": "Long-range building tool bound to {0}.",
     "worldedit.tool.lrbuild.set": "Left-click set to {0}; right-click set to {1}.",
+    "worldedit.tool.stack.equip": "Stack tool bound to {0}.",
 
     "worldedit.tool.superpickaxe.mode.single": "Mode is now single. Left click with a pickaxe. // to disable.",
     "worldedit.tool.superpickaxe.mode.area": "Mode is now area. Left click with a pickaxe. // to disable.",
