@@ -398,13 +398,18 @@ public class AsyncBlock implements Block {
     }
 
     public boolean applyBoneMeal(@NotNull BlockFace face) {
-        throw new UnsupportedOperationException("FAWE does not support this method");
+        throw new UnsupportedOperationException("FAWE does not support this yet");
     }
 
     public String getTranslationKey() {
         throw new UnsupportedOperationException("FAWE does not support this yet");
     }
 
+    @NotNull
+    @Override
+    public float getDestroySpeed(@NotNull ItemStack itemStack) {
+        throw new UnsupportedOperationException("FAWE does not support this yet");
+    }
 
     @NotNull
     @Override

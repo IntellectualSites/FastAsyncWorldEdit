@@ -650,6 +650,21 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public boolean isClearWeather() {
+        return parent.isClearWeather();
+    }
+
+    @Override
+    public void setClearWeatherDuration(int duration) {
+        parent.setClearWeatherDuration(duration);
+    }
+
+    @Override
+    public int getClearWeatherDuration() {
+        return parent.getClearWeatherDuration();
+    }
+
+    @Override
     public boolean createExplosion(double x, double y, double z, float power) {
         return this.createExplosion(x, y, z, power, false, true);
     }
