@@ -84,6 +84,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
@@ -186,6 +187,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         // Setup metrics
         new Metrics(this, BSTATS_PLUGIN_ID);
+
+        // Check whether the server runs on 11 or greater
+        checkJvm();
     }
 
     private void setupPreWorldData() {
