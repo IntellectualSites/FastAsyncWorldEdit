@@ -581,17 +581,15 @@ public class SchematicCommands {
                     total_bytes += Files.size(Paths.get(schem.getAbsolutePath()));
         }catch(IOException e) {   e.printStackTrace();    }
 
-        TextComponentProducer total_size = new TextComponentProducer();
-        TextComponent totalsize_elem = TextComponent.of("Total size: ",TextColor.DARK_GREEN);
-        total_size.append(totalsize_elem);
+        String header_bytes_elem = String.format("%.1fkb",total_bytes/1000.0);
 
-        TextComponent bytes_elem = TextComponent.of(String.format("%.1f kb",total_bytes/1000.0), TextColor.GRAY);
-        total_size.append(bytes_elem);
+        if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
+            header_bytes_elem += String.format("/%dkb",
+                    Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
+        }
 
-        components.add(total_size.create());
-
-
-        PaginationBox paginationBox = PaginationBox.fromComponents("Available schematics", pageCommand, components);
+        String full_header = "Schematics ["+header_bytes_elem+"]";
+        PaginationBox paginationBox = PaginationBox.fromComponents(full_header, pageCommand, components);
         actor.print(paginationBox.create(page));
     }
 
@@ -648,11 +646,11 @@ public class SchematicCommands {
                 check_filesize = true;
             }
 
-            long directorysize_bytes = 0;
+            double directorysize_kb = 0;
             String cur_filepath = file.getAbsolutePath();
             final String SCHEMATIC_NAME = file.getName();
 
-            double overwrite_old_bytes = 0;
+            double overwrite_old_kb = 0;
             String overwrite_path = cur_filepath;
 
             if(check_filesize) {
@@ -660,11 +658,11 @@ public class SchematicCommands {
 
                 for(File child: parent_dir.listFiles())
                     if(child.getName().endsWith(".schem") || child.getName().endsWith(".schematic"))
-                        directorysize_bytes += Files.size(Paths.get(child.getAbsolutePath()));
+                        directorysize_kb += Files.size(Paths.get(child.getAbsolutePath()))/1000.0;
 
 
                 if(overwrite) {
-                    overwrite_old_bytes = Files.size(Paths.get(file.getAbsolutePath()));
+                    overwrite_old_kb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
                     int iter = 1;
                     while (new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension()).exists())
                         iter++;
@@ -676,11 +674,15 @@ public class SchematicCommands {
             if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
 
                 int cur_files = new File(file.getParent()).listFiles().length;
-                long limit = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT;
+                int limit = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT;
 
                 if(cur_files >= limit) {
 
-                    actor.printError("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!");
+                    TextComponent no_slots_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                            "You have "+String.format("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!"
+                                    ,TextColor.RED));
+                    actor.printError(no_slots_err);
+
                     log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
                     return null;
                 }
@@ -711,38 +713,51 @@ public class SchematicCommands {
                         writer.write(target);
                     }
 
-                    closer.close();
+                    closer.close(); // release the new .schem file so that its size can be measured
                     double filesize_kb = Files.size(Paths.get(file.getAbsolutePath()))/1000.0;
 
-                    actor.print(SCHEMATIC_NAME+ " size: "+String.format("%.1f",filesize_kb)+"kb");
+                    TextComponent filesize_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                            SCHEMATIC_NAME+ " size: "+String.format("%.1f",filesize_kb)+"kb",TextColor.GRAY);
+                    actor.print(filesize_notif);
 
                     if(check_filesize) {
 
-                        if(overwrite) {
-                            directorysize_bytes -= overwrite_old_bytes;
-                            new File(cur_filepath).delete();
-                            file.renameTo(new File(cur_filepath));
-                        }
+                        double cur_kb = filesize_kb + directorysize_kb;
+                        int allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
 
-                        double cur_kb = filesize_kb + directorysize_bytes/1000.0;
-                        double allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
+                        if(overwrite)
+                            cur_kb -= overwrite_old_kb;
 
 
                         if ((cur_kb) > allocated_kb) {
 
                             file.delete();
-                            actor.printError("You're about to be at " + String.format("%.1f",cur_kb) + "kb of schematics. ("+
-                                    String.format("%.1f",allocated_kb)+" available) Delete some first to save this one!");
+                            TextComponent no_kb_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                                    "You're about to be at " + String.format("%.1f",cur_kb) + "kb of schematics. ("+
+                                            String.format("%dkb",allocated_kb)+" available) Delete some first to save this one!"
+                                            ,TextColor.RED);
+                            actor.printError(no_kb_err);
 
                             log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME+" - not enough space!");
                             return null;
                         }
-                        actor.print("You have "+String.format("%.1f",(allocated_kb-cur_kb))+"kb left for schematics.");
+
+                        if(overwrite) {
+                            new File(cur_filepath).delete();
+                            file.renameTo(new File(cur_filepath));
+                        }
+                        TextComponent kb_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                                "You have "+String.format("%.1f",(allocated_kb-cur_kb))+"kb left for schematics.",TextColor.GRAY);
+                        actor.print(kb_left_notif);
                     }
 
                     if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
                         int cur_files = new File(file.getParent()).listFiles().length;
-                        actor.print("You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT-cur_files) + " schematic file slots left.");
+
+                        TextComponent slots_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                                "You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT-cur_files) +
+                                        " schematic file slots left.",TextColor.GRAY);
+                        actor.print(slots_left_notif);
                     }
 
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
