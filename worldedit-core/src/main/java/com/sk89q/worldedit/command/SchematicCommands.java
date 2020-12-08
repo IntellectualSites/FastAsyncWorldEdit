@@ -366,7 +366,6 @@ public class SchematicCommands {
         AsyncCommandBuilder.wrap(task, actor)
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
                 .sendMessageAfterDelay(TranslatableComponent.of("worldedit.schematic.save.saving"))
-                .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
                 .onFailure("Failed to save schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
                 .buildAndExec(worldEdit.getExecutorService());
     }
@@ -560,15 +559,45 @@ public class SchematicCommands {
                 }
                 msg.append(msgElem);
 
+                if (type == UtilityCommands.URIType.FILE) {
+                    long filesize = 0;
+                    try {
+                        filesize = Files.size(Paths.get(dir.getAbsolutePath() + File.separator +
+                                (playerFolder ? (uuid.toString() + File.separator) : "") + path));
+                    }catch(IOException e) {   e.printStackTrace();     }
+                    TextComponent sizeElem = TextComponent.of(String.format(" (%.1f kb)",filesize/1000.0), TextColor.GRAY);
+                    msg.append(sizeElem);
+
+                }
+
                 return msg.create();
             });
+
+        long total_bytes = 0;
+        File parent_dir = new File(dir.getAbsolutePath()+(playerFolder?File.separator+uuid.toString():""));
+        try {
+            for(File schem: parent_dir.listFiles())
+                if(schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic"))
+                    total_bytes += Files.size(Paths.get(schem.getAbsolutePath()));
+        }catch(IOException e) {   e.printStackTrace();    }
+
+        TextComponentProducer total_size = new TextComponentProducer();
+        TextComponent totalsize_elem = TextComponent.of("Total size: ",TextColor.DARK_GREEN);
+        total_size.append(totalsize_elem);
+
+        TextComponent bytes_elem = TextComponent.of(String.format("%.1f kb",total_bytes/1000.0), TextColor.GRAY);
+        total_size.append(bytes_elem);
+
+        components.add(total_size.create());
+
+
         PaginationBox paginationBox = PaginationBox.fromComponents("Available schematics", pageCommand, components);
         actor.print(paginationBox.create(page));
     }
 
     private static class SchematicLoadTask implements Callable<ClipboardHolder> {
         private final Actor actor;
-        private final File file;
+        private File file;
         private final ClipboardFormat format;
 
         SchematicLoadTask(Actor actor, File file, ClipboardFormat format) {
@@ -593,7 +622,7 @@ public class SchematicCommands {
 
     private static class SchematicSaveTask implements Callable<Void> {
         private final Actor actor;
-        private final File file;
+        private File file;
         private final ClipboardFormat format;
         private final ClipboardHolder holder;
         private final boolean overwrite;
@@ -620,8 +649,28 @@ public class SchematicCommands {
             }
 
             long directorysize_bytes = 0;
-            if(check_filesize)
-                directorysize_bytes = Files.size(Paths.get(file.getParent()));
+            String cur_filepath = file.getAbsolutePath();
+            final String SCHEMATIC_NAME = file.getName();
+
+            double overwrite_old_bytes = 0;
+            String overwrite_path = cur_filepath;
+
+            if(check_filesize) {
+                File parent_dir = new File(file.getParent());
+
+                for(File child: parent_dir.listFiles())
+                    if(child.getName().endsWith(".schem") || child.getName().endsWith(".schematic"))
+                        directorysize_bytes += Files.size(Paths.get(child.getAbsolutePath()));
+
+
+                if(overwrite) {
+                    overwrite_old_bytes = Files.size(Paths.get(file.getAbsolutePath()));
+                    int iter = 1;
+                    while (new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension()).exists())
+                        iter++;
+                    file = new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension());
+                }
+            }
 
 
             if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
@@ -662,31 +711,42 @@ public class SchematicCommands {
                         writer.write(target);
                     }
 
+                    closer.close();
+                    double filesize_kb = Files.size(Paths.get(file.getAbsolutePath()))/1000.0;
+
+                    actor.print(SCHEMATIC_NAME+ " size: "+String.format("%.1f",filesize_kb)+"kb");
 
                     if(check_filesize) {
-                        long filesize_bytes = Files.size(Paths.get(file.getAbsolutePath()));
-                        long cur_space = (filesize_bytes + directorysize_bytes) / 1000000;
-                        long avail_space = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
 
-                        if ((filesize_bytes + directorysize_bytes) > avail_space * 1000000) {
+                        if(overwrite) {
+                            directorysize_bytes -= overwrite_old_bytes;
+                            new File(cur_filepath).delete();
+                            file.renameTo(new File(cur_filepath));
+                        }
+
+                        double cur_kb = filesize_kb + directorysize_bytes/1000.0;
+                        double allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
+
+
+                        if ((cur_kb) > allocated_kb) {
 
                             file.delete();
-                            actor.printError("You have " + cur_space + "mb / " + avail_space +
-                                    "mb of schematics. Delete some to save this one!");
-                            log.info(actor.getName() + " failed to save " + file.getCanonicalPath()+" - not enough space!");
+                            actor.printError("You're about to be at " + String.format("%.1f",cur_kb) + "kb of schematics. ("+
+                                    String.format("%.1f",allocated_kb)+" available) Delete some first to save this one!");
+
+                            log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME+" - not enough space!");
                             return null;
                         }
-                        actor.print("You have " + cur_space + "mb / " + avail_space +
-                                "mb of schematics.");
+                        actor.print("You have "+String.format("%.1f",(allocated_kb-cur_kb))+"kb left for schematics.");
                     }
 
                     if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
                         int cur_files = new File(file.getParent()).listFiles().length;
-                        actor.print("You now have " + cur_files + " saved schematics.");
+                        actor.print("You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT-cur_files) + " schematic file slots left.");
                     }
 
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
-                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", file.getName()));
+                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", SCHEMATIC_NAME));
                 } else {
                     actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
                 }

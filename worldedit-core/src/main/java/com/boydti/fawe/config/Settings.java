@@ -396,16 +396,16 @@ public class Settings extends Config {
         public boolean SEND_BEFORE_HISTORY = false;
 
         @Comment({
-                "Sets a maximum limit (in Mb) for the size of a player's schematics directory (per-player mode only)",
+                "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
                 "set to -1 to have no limit"
         })
-        public long PERPLAYER_FILESIZELIMIT = -1;
+        public double PERPLAYER_FILESIZELIMIT = -1;
 
         @Comment({
                 "Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)",
                 "set to -1 to have no limit"
         })
-        public long PERPLAYER_FILENUMLIMIT = -1;
+        public int PERPLAYER_FILENUMLIMIT = -1;
     }
 
     public static class PLOTSQUARED_INTEGRATION {
