@@ -33,7 +33,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class MessageBox extends TextComponentProducer {
 
-    private static final int GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH = 47;
+    //decremented by one (from 47) to account for minecraft font characters having varying widths
+
+    // method for applying border needs to be replaced in the future  - need to
+    // be able to measure length of title (and prefix) by pixel width, not by character width
+    // (to avoid wrapping in case of thick chars, or not enough spacers in case of thin chars)
+    private static final int GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH = 46;
 
     private TextComponentProducer contents;
     private TextColor borderColor;
