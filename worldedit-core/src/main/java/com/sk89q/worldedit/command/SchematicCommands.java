@@ -80,6 +80,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -611,6 +612,31 @@ public class SchematicCommands {
             Transform transform = holder.getTransform();
             Clipboard target;
 
+            boolean check_filesize = false;
+
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS &&
+                    Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
+                check_filesize = true;
+            }
+
+            long directorysize_bytes = 0;
+            if(check_filesize)
+                directorysize_bytes = Files.size(Paths.get(file.getParent()));
+
+
+            if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
+
+                int cur_files = new File(file.getParent()).listFiles().length;
+                long limit = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT;
+
+                if(cur_files >= limit) {
+
+                    actor.printError("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!");
+                    log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
+                    return null;
+                }
+            }
+
             // If we have a transform, bake it into the copy
             if (transform.isIdentity()) {
                 target = clipboard;
@@ -635,6 +661,30 @@ public class SchematicCommands {
                     } else {
                         writer.write(target);
                     }
+
+
+                    if(check_filesize) {
+                        long filesize_bytes = Files.size(Paths.get(file.getAbsolutePath()));
+                        long cur_space = (filesize_bytes + directorysize_bytes) / 1000000;
+                        long avail_space = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
+
+                        if ((filesize_bytes + directorysize_bytes) > avail_space * 1000000) {
+
+                            file.delete();
+                            actor.printError("You have " + cur_space + "mb / " + avail_space +
+                                    "mb of schematics. Delete some to save this one!");
+                            log.info(actor.getName() + " failed to save " + file.getCanonicalPath()+" - not enough space!");
+                            return null;
+                        }
+                        actor.print("You have " + cur_space + "mb / " + avail_space +
+                                "mb of schematics.");
+                    }
+
+                    if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
+                        int cur_files = new File(file.getParent()).listFiles().length;
+                        actor.print("You now have " + cur_files + " saved schematics.");
+                    }
+
                     log.info(actor.getName() + " saved " + file.getCanonicalPath());
                     actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", file.getName()));
                 } else {
