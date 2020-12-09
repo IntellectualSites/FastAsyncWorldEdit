@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import javax.annotation.Nullable;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -48,6 +49,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
+import com.sk89q.worldedit.util.formatting.component.MessageBox;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -615,11 +617,11 @@ public class SchematicCommands {
         String header_bytes_elem = String.format("%.1fkb", total_bytes / 1000.0);
 
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
-            header_bytes_elem += String.format("/%dkb",
+            header_bytes_elem += String.format(" / %dkb",
                 Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
         }
 
-        String full_header = "Schematics [" + header_bytes_elem + "]";
+        String full_header = " Schematics | " + header_bytes_elem + " |";
         PaginationBox paginationBox = PaginationBox.fromComponents(full_header, pageCommand, components);
         actor.print(paginationBox.create(page));
     }
