@@ -816,7 +816,6 @@ public class SchematicCommands {
                                 "You're about to be at " + String.format("%.1f", curKb) + "kb of schematics. ("
                                     + String.format("%dkb", allocatedKb) + " available) Delete some first to save this one!",
                                 TextColor.RED);
-                            //actor.printError(notEnoughKbErr);
                             log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
                             throw new WorldEditException(notEnoughKbErr) {
                             };
