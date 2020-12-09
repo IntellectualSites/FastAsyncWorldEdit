@@ -405,7 +405,7 @@ public class Settings extends Config {
                 "Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)",
                 "set to -1 to have no limit"
         })
-        public int PERPLAYER_FILENUMLIMIT = -1;
+        public int PER_PLAYER_FILE_NUM_LIMIT = -1;
     }
 
     public static class PLOTSQUARED_INTEGRATION {
