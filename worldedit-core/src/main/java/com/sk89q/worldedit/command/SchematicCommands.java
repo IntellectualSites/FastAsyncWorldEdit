@@ -840,7 +840,7 @@ public class SchematicCommands {
                         int cur_files = new File(file.getParent()).listFiles().length;
 
                         TextComponent slots_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            "You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT - cur_files)
+                            "You have " + (Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT - cur_files)
                                 + " schematic file slots left.", TextColor.GRAY);
                         actor.print(slots_left_notif);
                     }
