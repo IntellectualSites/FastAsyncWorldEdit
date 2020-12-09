@@ -724,7 +724,7 @@ public class SchematicCommands {
             boolean check_filesize = false;
 
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
-                && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
+                && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1) {
                 check_filesize = true;
             }
 
@@ -807,7 +807,7 @@ public class SchematicCommands {
                     if (check_filesize) {
 
                         double cur_kb = filesize_kb + directorysize_kb;
-                        int allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
+                        int allocated_kb = Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT;
 
                         if (overwrite) {
                             cur_kb -= overwrite_old_kb;
