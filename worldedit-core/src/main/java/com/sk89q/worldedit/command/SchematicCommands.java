@@ -621,7 +621,7 @@ public class SchematicCommands {
                 Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
         }
 
-        String full_header = " Schematics | " + header_bytes_elem + " |";
+        String full_header = "| Schematics: " + header_bytes_elem + " |";
         PaginationBox paginationBox = PaginationBox.fromComponents(full_header, pageCommand, components);
         actor.print(paginationBox.create(page));
     }
