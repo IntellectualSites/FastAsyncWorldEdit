@@ -836,7 +836,7 @@ public class SchematicCommands {
                         actor.print(kb_left_notif);
                     }
 
-                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
+                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
                         int cur_files = new File(file.getParent()).listFiles().length;
 
                         TextComponent slots_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
