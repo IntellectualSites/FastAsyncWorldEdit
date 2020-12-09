@@ -604,7 +604,6 @@ public class SchematicCommands {
         File parent_dir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
             for (File schem : parent_dir.listFiles()) {
-
                 if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
                     total_bytes += Files.size(Paths.get(schem.getAbsolutePath()));
                 }
