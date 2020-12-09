@@ -823,7 +823,6 @@ public class SchematicCommands {
                                     + String.format("%dkb", allocated_kb) + " available) Delete some first to save this one!",
                                 TextColor.RED);
                             actor.printError(no_kb_err);
-
                             log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
                             return null;
                         }
