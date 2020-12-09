@@ -618,7 +618,7 @@ public class SchematicCommands {
 
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1) {
             header_bytes_elem += String.format(" / %dkb",
-                Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
+                Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT );
         }
 
         String full_header = "| Schematics: " + header_bytes_elem + " |";
