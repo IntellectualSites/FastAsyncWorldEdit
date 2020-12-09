@@ -762,7 +762,6 @@ public class SchematicCommands {
                 int limit = Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT ;
 
                 if (cur_files >= limit) {
-
                     TextComponent no_slots_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
                         "You have " + String.format("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!",
                             TextColor.RED));
