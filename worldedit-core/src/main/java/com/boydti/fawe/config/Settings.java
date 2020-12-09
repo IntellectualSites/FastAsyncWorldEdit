@@ -397,7 +397,7 @@ public class Settings extends Config {
 
         @Comment({
                 "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
-                "set to -1 to have no limit"
+                "Set to -1 to disable"
         })
         public int PERPLAYER_FILESIZELIMIT = -1;
 
