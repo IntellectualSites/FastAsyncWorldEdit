@@ -816,7 +816,6 @@ public class SchematicCommands {
                         }
 
                         if ((cur_kb) > allocated_kb) {
-
                             file.delete();
                             TextComponent no_kb_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
                                 "You're about to be at " + String.format("%.1f", cur_kb) + "kb of schematics. ("
