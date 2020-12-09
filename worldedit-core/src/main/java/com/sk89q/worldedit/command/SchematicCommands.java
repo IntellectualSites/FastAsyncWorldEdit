@@ -116,6 +116,31 @@ public class SchematicCommands {
         this.worldEdit = worldEdit;
     }
 
+    //TODO filtering for directories, global, and private scheamtics needs to be reimplemented here
+    private static List<File> getFiles(File root, String filter, ClipboardFormat format) {
+        File[] files = root.listFiles();
+        if (files == null) {
+            return null;
+        }
+        //Only get the files that match the format parameter
+        if (format != null) {
+            files = Arrays.stream(files).filter(format::isFormat).toArray(File[]::new);
+        }
+        List<File> fileList = new ArrayList<>();
+        for (File f : files) {
+            if (f.isDirectory()) {
+                List<File> subFiles = getFiles(f, filter, format);
+                if (subFiles == null) {
+                    continue; // empty subdir
+                }
+                fileList.addAll(subFiles);
+            } else {
+                fileList.add(f);
+            }
+        }
+        return fileList;
+    }
+
     @Command(
         name = "loadall",
         desc = "Load multiple clipboards (paste will randomly choose one)"
@@ -123,12 +148,12 @@ public class SchematicCommands {
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
     public void loadall(Player player, LocalSession session,
-                    @Arg(desc = "Format name.", def = "schematic")
-                        String formatName,
-                    @Arg(desc = "File name.")
-                        String filename,
-                    @Switch(name = 'r', desc = "Apply random rotation")
-                        boolean randomRotate) throws FilenameException {
+                        @Arg(desc = "Format name.", def = "schematic")
+                            String formatName,
+                        @Arg(desc = "File name.")
+                            String filename,
+                        @Switch(name = 'r', desc = "Apply random rotation")
+                            boolean randomRotate) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
@@ -356,7 +381,7 @@ public class SchematicCommands {
         if (parent != null && !parent.exists()) {
             if (!parent.mkdirs()) {
                 throw new StopExecutionException(TranslatableComponent.of(
-                        "worldedit.schematic.save.failed-directory"));
+                    "worldedit.schematic.save.failed-directory"));
             }
         }
 
@@ -364,10 +389,10 @@ public class SchematicCommands {
 
         SchematicSaveTask task = new SchematicSaveTask(actor, f, format, holder, overwrite);
         AsyncCommandBuilder.wrap(task, actor)
-                .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
-                .sendMessageAfterDelay(TranslatableComponent.of("worldedit.schematic.save.saving"))
-                .onFailure("Failed to save schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
-                .buildAndExec(worldEdit.getExecutorService());
+            .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
+            .sendMessageAfterDelay(TranslatableComponent.of("worldedit.schematic.save.saving"))
+            .onFailure("Failed to save schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+            .buildAndExec(worldEdit.getExecutorService());
     }
 
     @Command(
@@ -531,22 +556,22 @@ public class SchematicCommands {
 
                 if (loaded) {
                     msg.append(TextComponent.of("[-]", TextColor.RED)
-                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Unload"))));
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + path))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Unload"))));
                 } else {
                     msg.append(TextComponent.of("[+]", TextColor.GREEN)
-                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Add to clipboard"))));
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + path))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Add to clipboard"))));
                 }
                 if (type != UtilityCommands.URIType.DIRECTORY) {
                     msg.append(TextComponent.of("[X]", TextColor.DARK_RED)
-                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("delete")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("delete")))
                     );
                 } else if (hasShow) {
                     msg.append(TextComponent.of("[O]", TextColor.DARK_AQUA)
-                            .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
-                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("visualize")))
+                        .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("visualize")))
                     );
                 }
                 TextComponent msgElem = TextComponent.of(name, color);
@@ -562,293 +587,41 @@ public class SchematicCommands {
                 if (type == UtilityCommands.URIType.FILE) {
                     long filesize = 0;
                     try {
-                        filesize = Files.size(Paths.get(dir.getAbsolutePath() + File.separator +
-                                (playerFolder ? (uuid.toString() + File.separator) : "") + path));
-                    }catch(IOException e) {   e.printStackTrace();     }
-                    TextComponent sizeElem = TextComponent.of(String.format(" (%.1f kb)",filesize/1000.0), TextColor.GRAY);
+                        filesize = Files.size(Paths.get(dir.getAbsolutePath() + File.separator
+                            + (playerFolder ? (uuid.toString() + File.separator) : "") + path));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    TextComponent sizeElem = TextComponent.of(String.format(" (%.1f kb)", filesize / 1000.0), TextColor.GRAY);
                     msg.append(sizeElem);
-
                 }
-
                 return msg.create();
             });
 
         long total_bytes = 0;
-        File parent_dir = new File(dir.getAbsolutePath()+(playerFolder?File.separator+uuid.toString():""));
+        File parent_dir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
-            for(File schem: parent_dir.listFiles())
-                if(schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic"))
+            for (File schem : parent_dir.listFiles()) {
+
+                if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
                     total_bytes += Files.size(Paths.get(schem.getAbsolutePath()));
-        }catch(IOException e) {   e.printStackTrace();    }
+                }
 
-        String header_bytes_elem = String.format("%.1fkb",total_bytes/1000.0);
-
-        if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
-            header_bytes_elem += String.format("/%dkb",
-                    Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        String full_header = "Schematics ["+header_bytes_elem+"]";
+        String header_bytes_elem = String.format("%.1fkb", total_bytes / 1000.0);
+
+        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
+            header_bytes_elem += String.format("/%dkb",
+                Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT);
+        }
+
+        String full_header = "Schematics [" + header_bytes_elem + "]";
         PaginationBox paginationBox = PaginationBox.fromComponents(full_header, pageCommand, components);
         actor.print(paginationBox.create(page));
-    }
-
-    private static class SchematicLoadTask implements Callable<ClipboardHolder> {
-        private final Actor actor;
-        private File file;
-        private final ClipboardFormat format;
-
-        SchematicLoadTask(Actor actor, File file, ClipboardFormat format) {
-            this.actor = actor;
-            this.file = file;
-            this.format = format;
-        }
-
-        @Override
-        public ClipboardHolder call() throws Exception {
-            try (Closer closer = Closer.create()) {
-                FileInputStream fis = closer.register(new FileInputStream(file));
-                BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
-                ClipboardReader reader = closer.register(format.getReader(bis));
-
-                Clipboard clipboard = reader.read();
-                log.info(actor.getName() + " loaded " + file.getCanonicalPath());
-                return new ClipboardHolder(clipboard);
-            }
-        }
-    }
-
-    private static class SchematicSaveTask implements Callable<Void> {
-        private final Actor actor;
-        private File file;
-        private final ClipboardFormat format;
-        private final ClipboardHolder holder;
-        private final boolean overwrite;
-
-        SchematicSaveTask(Actor actor, File file, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
-            this.actor = actor;
-            this.file = file;
-            this.format = format;
-            this.holder = holder;
-            this.overwrite = overwrite;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            Clipboard clipboard = holder.getClipboard();
-            Transform transform = holder.getTransform();
-            Clipboard target;
-
-            boolean check_filesize = false;
-
-            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS &&
-                    Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
-                check_filesize = true;
-            }
-
-            double directorysize_kb = 0;
-            String cur_filepath = file.getAbsolutePath();
-            final String SCHEMATIC_NAME = file.getName();
-
-            double overwrite_old_kb = 0;
-            String overwrite_path = cur_filepath;
-
-            if(check_filesize) {
-                File parent_dir = new File(file.getParent());
-
-                for(File child: parent_dir.listFiles())
-                    if(child.getName().endsWith(".schem") || child.getName().endsWith(".schematic"))
-                        directorysize_kb += Files.size(Paths.get(child.getAbsolutePath()))/1000.0;
-
-
-                if(overwrite) {
-                    overwrite_old_kb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
-                    int iter = 1;
-                    while (new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension()).exists())
-                        iter++;
-                    file = new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension());
-                }
-            }
-
-
-            if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
-
-                int cur_files = new File(file.getParent()).listFiles().length;
-                int limit = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT;
-
-                if(cur_files >= limit) {
-
-                    TextComponent no_slots_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            "You have "+String.format("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!"
-                                    ,TextColor.RED));
-                    actor.printError(no_slots_err);
-
-                    log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
-                    return null;
-                }
-            }
-
-            // If we have a transform, bake it into the copy
-            if (transform.isIdentity()) {
-                target = clipboard;
-            } else {
-                FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                target = new BlockArrayClipboard(result.getTransformedRegion());
-                target.setOrigin(clipboard.getOrigin());
-                Operations.completeLegacy(result.copyTo(target));
-            }
-
-            try (Closer closer = Closer.create()) {
-                FileOutputStream fos = closer.register(new FileOutputStream(file));
-                BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
-                ClipboardWriter writer = closer.register(format.getWriter(bos));
-                URI uri = null;
-                if (holder instanceof URIClipboardHolder) {
-                    uri = ((URIClipboardHolder) holder).getURI(clipboard);
-                }
-                if (new ActorSaveClipboardEvent(actor, clipboard, uri, file.toURI()).call()) {
-                    if (writer instanceof MinecraftStructure) {
-                        ((MinecraftStructure) writer).write(target, actor.getName());
-                    } else {
-                        writer.write(target);
-                    }
-
-                    closer.close(); // release the new .schem file so that its size can be measured
-                    double filesize_kb = Files.size(Paths.get(file.getAbsolutePath()))/1000.0;
-
-                    TextComponent filesize_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            SCHEMATIC_NAME+ " size: "+String.format("%.1f",filesize_kb)+"kb",TextColor.GRAY);
-                    actor.print(filesize_notif);
-
-                    if(check_filesize) {
-
-                        double cur_kb = filesize_kb + directorysize_kb;
-                        int allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
-
-                        if(overwrite)
-                            cur_kb -= overwrite_old_kb;
-
-
-                        if ((cur_kb) > allocated_kb) {
-
-                            file.delete();
-                            TextComponent no_kb_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                                    "You're about to be at " + String.format("%.1f",cur_kb) + "kb of schematics. ("+
-                                            String.format("%dkb",allocated_kb)+" available) Delete some first to save this one!"
-                                            ,TextColor.RED);
-                            actor.printError(no_kb_err);
-
-                            log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME+" - not enough space!");
-                            return null;
-                        }
-
-                        if(overwrite) {
-                            new File(cur_filepath).delete();
-                            file.renameTo(new File(cur_filepath));
-                        }
-                        TextComponent kb_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                                "You have "+String.format("%.1f",(allocated_kb-cur_kb))+"kb left for schematics.",TextColor.GRAY);
-                        actor.print(kb_left_notif);
-                    }
-
-                    if(Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
-                        int cur_files = new File(file.getParent()).listFiles().length;
-
-                        TextComponent slots_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                                "You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT-cur_files) +
-                                        " schematic file slots left.",TextColor.GRAY);
-                        actor.print(slots_left_notif);
-                    }
-
-                    log.info(actor.getName() + " saved " + file.getCanonicalPath());
-                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", SCHEMATIC_NAME));
-                } else {
-                    actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
-                }
-            }
-            return null;
-        }
-    }
-
-    private static class SchematicListTask implements Callable<Component> {
-        private final String prefix;
-        private final int sortType;
-        private final int page;
-        private final File rootDir;
-        private final String pageCommand;
-        private final String filter;
-        private String formatName;
-
-        SchematicListTask(String prefix, int sortType, int page, String pageCommand,
-            String filter, String formatName) {
-            this.prefix = prefix;
-            this.sortType = sortType;
-            this.page = page;
-            this.rootDir = WorldEdit.getInstance().getWorkingDirectoryFile(prefix);
-            this.pageCommand = pageCommand;
-            this.filter = filter;
-            this.formatName = formatName;
-        }
-
-        @Override
-        public Component call() throws Exception {
-            ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
-            List<File> fileList = getFiles(rootDir,filter,format);
-
-            if (fileList == null || fileList.isEmpty()) {
-                return ErrorFormat.wrap("No schematics found.");
-            }
-
-            File[] files = new File[fileList.size()];
-            fileList.toArray(files);
-            // cleanup file list
-            Arrays.sort(files, (f1, f2) -> {
-                // http://stackoverflow.com/questions/203030/best-way-to-list-files-in-java-sorted-by-date-modified
-                int res;
-                if (sortType == 0) { // use name by default
-                    int p = f1.getParent().compareTo(f2.getParent());
-                    if (p == 0) { // same parent, compare names
-                        res = f1.getName().compareTo(f2.getName());
-                    } else { // different parent, sort by that
-                        res = p;
-                    }
-                } else {
-                    res = Long.compare(f1.lastModified(), f2.lastModified()); // use date if there is a flag
-                    if (sortType == 1) {
-                        res = -res; // flip date for newest first instead of oldest first
-                    }
-                }
-                return res;
-            });
-
-            PaginationBox paginationBox = new SchematicPaginationBox(prefix, files, pageCommand);
-            return paginationBox.create(page);
-        }
-    }
-
-    //TODO filtering for directories, global, and private scheamtics needs to be reimplemented here
-    private static List<File> getFiles(File root, String filter, ClipboardFormat format) {
-        File[] files = root.listFiles();
-        if (files == null) {
-            return null;
-        }
-        //Only get the files that match the format parameter
-        if (format != null) {
-            files = Arrays.stream(files).filter(format::isFormat).toArray(File[]::new);
-        }
-        List<File> fileList = new ArrayList<>();
-        for (File f : files) {
-            if (f.isDirectory()) {
-                List<File> subFiles = getFiles(f, filter, format);
-                if (subFiles == null) {
-                    continue; // empty subdir
-                }
-                fileList.addAll(subFiles);
-            } else {
-                fileList.add(f);
-            }
-        }
-        return fileList;
     }
 
     @Command(
@@ -899,6 +672,243 @@ public class SchematicCommands {
             return true;
         }
         return false;
+    }
+
+    private static class SchematicLoadTask implements Callable<ClipboardHolder> {
+        private final Actor actor;
+        private final ClipboardFormat format;
+        private final File file;
+
+        SchematicLoadTask(Actor actor, File file, ClipboardFormat format) {
+            this.actor = actor;
+            this.file = file;
+            this.format = format;
+        }
+
+        @Override
+        public ClipboardHolder call() throws Exception {
+            try (Closer closer = Closer.create()) {
+                FileInputStream fis = closer.register(new FileInputStream(file));
+                BufferedInputStream bis = closer.register(new BufferedInputStream(fis));
+                ClipboardReader reader = closer.register(format.getReader(bis));
+
+                Clipboard clipboard = reader.read();
+                log.info(actor.getName() + " loaded " + file.getCanonicalPath());
+                return new ClipboardHolder(clipboard);
+            }
+        }
+    }
+
+    private static class SchematicSaveTask implements Callable<Void> {
+        private final Actor actor;
+        private final ClipboardFormat format;
+        private final ClipboardHolder holder;
+        private final boolean overwrite;
+        private File file;
+
+        SchematicSaveTask(Actor actor, File file, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
+            this.actor = actor;
+            this.file = file;
+            this.format = format;
+            this.holder = holder;
+            this.overwrite = overwrite;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            Clipboard clipboard = holder.getClipboard();
+            Transform transform = holder.getTransform();
+            Clipboard target;
+
+            boolean check_filesize = false;
+
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+                && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT > -1) {
+                check_filesize = true;
+            }
+
+            double directorysize_kb = 0;
+            String cur_filepath = file.getAbsolutePath();
+            final String SCHEMATIC_NAME = file.getName();
+
+            double overwrite_old_kb = 0;
+            String overwrite_path = cur_filepath;
+
+            if (check_filesize) {
+                File parent_dir = new File(file.getParent());
+
+                for (File child : parent_dir.listFiles()) {
+                    if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
+                        directorysize_kb += Files.size(Paths.get(child.getAbsolutePath())) / 1000.0;
+                    }
+                }
+
+
+                if (overwrite) {
+                    overwrite_old_kb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
+                    int iter = 1;
+                    while (new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension()).exists()) {
+                        iter++;
+                    }
+                    file = new File(overwrite_path + "." + iter + "." + format.getPrimaryFileExtension());
+                }
+            }
+
+
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
+
+                int cur_files = new File(file.getParent()).listFiles().length;
+                int limit = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT;
+
+                if (cur_files >= limit) {
+
+                    TextComponent no_slots_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                        "You have " + String.format("You have " + cur_files + "/" + limit + " saved schematics. Delete some to save this one!",
+                            TextColor.RED));
+                    actor.printError(no_slots_err);
+
+                    log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
+                    return null;
+                }
+            }
+
+            // If we have a transform, bake it into the copy
+            if (transform.isIdentity()) {
+                target = clipboard;
+            } else {
+                FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
+                target = new BlockArrayClipboard(result.getTransformedRegion());
+                target.setOrigin(clipboard.getOrigin());
+                Operations.completeLegacy(result.copyTo(target));
+            }
+
+            try (Closer closer = Closer.create()) {
+                FileOutputStream fos = closer.register(new FileOutputStream(file));
+                BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
+                ClipboardWriter writer = closer.register(format.getWriter(bos));
+                URI uri = null;
+                if (holder instanceof URIClipboardHolder) {
+                    uri = ((URIClipboardHolder) holder).getURI(clipboard);
+                }
+                if (new ActorSaveClipboardEvent(actor, clipboard, uri, file.toURI()).call()) {
+                    if (writer instanceof MinecraftStructure) {
+                        ((MinecraftStructure) writer).write(target, actor.getName());
+                    } else {
+                        writer.write(target);
+                    }
+
+                    closer.close(); // release the new .schem file so that its size can be measured
+                    double filesize_kb = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
+
+                    TextComponent filesize_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                        SCHEMATIC_NAME + " size: " + String.format("%.1f", filesize_kb) + "kb", TextColor.GRAY);
+                    actor.print(filesize_notif);
+
+                    if (check_filesize) {
+
+                        double cur_kb = filesize_kb + directorysize_kb;
+                        int allocated_kb = Settings.IMP.EXPERIMENTAL.PERPLAYER_FILESIZELIMIT;
+
+                        if (overwrite) {
+                            cur_kb -= overwrite_old_kb;
+                        }
+
+
+                        if ((cur_kb) > allocated_kb) {
+
+                            file.delete();
+                            TextComponent no_kb_err = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                                "You're about to be at " + String.format("%.1f", cur_kb) + "kb of schematics. ("
+                                    + String.format("%dkb", allocated_kb) + " available) Delete some first to save this one!",
+                                TextColor.RED);
+                            actor.printError(no_kb_err);
+
+                            log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
+                            return null;
+                        }
+
+                        if (overwrite) {
+                            new File(cur_filepath).delete();
+                            file.renameTo(new File(cur_filepath));
+                        }
+                        TextComponent kb_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                            "You have " + String.format("%.1f", (allocated_kb - cur_kb)) + "kb left for schematics.", TextColor.GRAY);
+                        actor.print(kb_left_notif);
+                    }
+
+                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT > -1) {
+                        int cur_files = new File(file.getParent()).listFiles().length;
+
+                        TextComponent slots_left_notif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
+                            "You have " + (Settings.IMP.EXPERIMENTAL.PERPLAYER_FILENUMLIMIT - cur_files)
+                                + " schematic file slots left.", TextColor.GRAY);
+                        actor.print(slots_left_notif);
+                    }
+
+                    log.info(actor.getName() + " saved " + file.getCanonicalPath());
+                    actor.print(Caption.of("fawe.worldedit.schematic.schematic.saved", SCHEMATIC_NAME));
+                } else {
+                    actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
+                }
+            }
+            return null;
+        }
+    }
+
+    private static class SchematicListTask implements Callable<Component> {
+        private final String prefix;
+        private final int sortType;
+        private final int page;
+        private final File rootDir;
+        private final String pageCommand;
+        private final String filter;
+        private final String formatName;
+
+        SchematicListTask(String prefix, int sortType, int page, String pageCommand,
+                          String filter, String formatName) {
+            this.prefix = prefix;
+            this.sortType = sortType;
+            this.page = page;
+            this.rootDir = WorldEdit.getInstance().getWorkingDirectoryFile(prefix);
+            this.pageCommand = pageCommand;
+            this.filter = filter;
+            this.formatName = formatName;
+        }
+
+        @Override
+        public Component call() throws Exception {
+            ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
+            List<File> fileList = getFiles(rootDir, filter, format);
+
+            if (fileList == null || fileList.isEmpty()) {
+                return ErrorFormat.wrap("No schematics found.");
+            }
+
+            File[] files = new File[fileList.size()];
+            fileList.toArray(files);
+            // cleanup file list
+            Arrays.sort(files, (f1, f2) -> {
+                // http://stackoverflow.com/questions/203030/best-way-to-list-files-in-java-sorted-by-date-modified
+                int res;
+                if (sortType == 0) { // use name by default
+                    int p = f1.getParent().compareTo(f2.getParent());
+                    if (p == 0) { // same parent, compare names
+                        res = f1.getName().compareTo(f2.getName());
+                    } else { // different parent, sort by that
+                        res = p;
+                    }
+                } else {
+                    res = Long.compare(f1.lastModified(), f2.lastModified()); // use date if there is a flag
+                    if (sortType == 1) {
+                        res = -res; // flip date for newest first instead of oldest first
+                    }
+                }
+                return res;
+            });
+
+            PaginationBox paginationBox = new SchematicPaginationBox(prefix, files, pageCommand);
+            return paginationBox.create(page);
+        }
     }
 
     private static class SchematicPaginationBox extends PaginationBox {
