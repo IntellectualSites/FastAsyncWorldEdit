@@ -815,7 +815,6 @@ public class SchematicCommands {
                             cur_kb -= overwrite_old_kb;
                         }
 
-
                         if ((cur_kb) > allocated_kb) {
 
                             file.delete();
