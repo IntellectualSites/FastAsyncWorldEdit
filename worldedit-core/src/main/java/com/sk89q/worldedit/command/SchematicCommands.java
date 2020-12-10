@@ -761,7 +761,7 @@ public class SchematicCommands {
 
                 if (curFilesAmount >= limit) {
                     TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                        "You have " + String.format("You have " + curFilesAmount + "/" + limit + " saved schematics. Delete some to save this one!",
+                        String.format("You have " + curFilesAmount + "/" + limit + " saved schematics. Delete some to save this one!",
                             TextColor.RED));
                     log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
                     throw new WorldEditException(noSlotsErr) {
