@@ -1,8 +1,9 @@
 daysUntilStale: 60
 daysUntilClose: 7
+only: issues
 exemptLabels:
-  - "[!] Bug"
-  - "[+] Enhancement"
+  - "Bug"
+  - "Enhancement"
   - "Approved"
   - "Priority"
   - "Under investigation"
