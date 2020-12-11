@@ -386,7 +386,7 @@ public class SchematicCommands {
 
         ClipboardHolder holder = session.getClipboard();
 
-        SchematicSaveTask task = new SchematicSaveTask(actor, f, format, holder, overwrite);
+        SchematicSaveTask task = new SchematicSaveTask(actor, f, dir, format, holder, overwrite);
         AsyncCommandBuilder.wrap(task, actor)
             .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
             .sendMessageAfterDelay(TranslatableComponent.of("worldedit.schematic.save.saving"))
@@ -601,11 +601,10 @@ public class SchematicCommands {
         long totalBytes = 0;
         File parentDir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
-            for (File schem : parentDir.listFiles()) {
+            for (File schem : getFiles(parentDir, null, null)) {
                 if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
                     totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
                 }
-
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -703,11 +702,13 @@ public class SchematicCommands {
         private final ClipboardFormat format;
         private final ClipboardHolder holder;
         private final boolean overwrite;
+        private final File rootDir;
         private File file;
 
-        SchematicSaveTask(Actor actor, File file, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
+        SchematicSaveTask(Actor actor, File file, File rootDir, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
             this.actor = actor;
             this.file = file;
+            this.rootDir = rootDir;
             this.format = format;
             this.holder = holder;
             this.overwrite = overwrite;
@@ -733,15 +734,16 @@ public class SchematicCommands {
             double oldKbOverwritten = 0;
             String overwrittenPath = curFilepath;
 
+            int numFiles = -1;
             if (checkFilesize) {
                 File parentDir = new File(file.getParent());
 
-                for (File child : parentDir.listFiles()) {
+                for (File child : getFiles(rootDir, null, null)) {
                     if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
                         directorysizeKb += Files.size(Paths.get(child.getAbsolutePath())) / 1000.0;
+                        numFiles++;
                     }
                 }
-
 
                 if (overwrite) {
                     oldKbOverwritten = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
@@ -756,12 +758,19 @@ public class SchematicCommands {
 
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
 
-                int curFilesAmount = new File(file.getParent()).listFiles().length;
+                if (numFiles == -1) {
+                    numFiles = 0;
+                    for (File child : getFiles(rootDir, null, null)) {
+                        if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
+                            numFiles++;
+                        }
+                    }
+                }
                 int limit = Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT;
 
-                if (curFilesAmount >= limit) {
+                if (numFiles >= limit) {
                     TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                        String.format("You have " + curFilesAmount + "/" + limit + " saved schematics. Delete some to save this one!",
+                        String.format("You have " + numFiles + "/" + limit + " saved schematics. Delete some to save this one!",
                             TextColor.RED));
                     log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
                     throw new WorldEditException(noSlotsErr) {
@@ -823,6 +832,8 @@ public class SchematicCommands {
                         if (overwrite) {
                             new File(curFilepath).delete();
                             file.renameTo(new File(curFilepath));
+                        } else {
+                            numFiles++;
                         }
                         TextComponent kbRemainingNotif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
                             "You have " + String.format("%.1f", (allocatedKb - curKb)) + "kb left for schematics.", TextColor.GRAY);
@@ -830,10 +841,9 @@ public class SchematicCommands {
                     }
 
                     if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT > -1) {
-                        int cur_files = new File(file.getParent()).listFiles().length;
 
                         TextComponent slotsRemainingNotif = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
-                            "You have " + (Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT - cur_files)
+                            "You have " + (Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_NUM_LIMIT - numFiles)
                                 + " schematic file slots left.", TextColor.GRAY);
                         actor.print(slotsRemainingNotif);
                     }
