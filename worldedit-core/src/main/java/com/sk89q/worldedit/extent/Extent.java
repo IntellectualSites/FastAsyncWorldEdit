@@ -502,7 +502,6 @@ public interface Extent extends InputExtent, OutputExtent {
             traverser.setNext(nullExtent);
             child.cancel();
         }
-        addProcessor(nullExtent);
         return true;
     }
 
