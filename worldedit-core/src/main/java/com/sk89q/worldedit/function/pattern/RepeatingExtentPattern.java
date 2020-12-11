@@ -21,7 +21,6 @@ package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -88,9 +87,9 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        int x = Math.abs(position.getX() + offset.getX()) % size.getBlockX() + origin.getX();
-        int y = Math.abs(position.getY() + offset.getY()) % size.getBlockY() + origin.getY();
-        int z = Math.abs(position.getZ() + offset.getZ()) % size.getBlockZ() + origin.getZ();
+        int x = Math.floorMod(position.getBlockX() + offset.getBlockX(), size.getBlockX()) + origin.getBlockX();
+        int y = Math.floorMod(position.getBlockY() + offset.getBlockY(), size.getBlockY()) + origin.getBlockY();
+        int z = Math.floorMod(position.getBlockZ() + offset.getBlockZ(), size.getBlockZ()) + origin.getBlockZ();
         return getExtent().getFullBlock(x, y, z);
     }
 
