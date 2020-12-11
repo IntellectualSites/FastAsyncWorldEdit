@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RepeatingExtentPattern extends AbstractExtentPattern {
 
     private final BlockVector3 size;
-    private final MutableBlockVector3 mutable;
     private BlockVector3 origin;
     private BlockVector3 offset;
 
@@ -47,7 +46,6 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
         setOrigin(origin);
         setOffset(offset);
         size = extent.getMaximumPoint().subtract(extent.getMinimumPoint()).add(1, 1, 1);
-        this.mutable = new MutableBlockVector3();
     }
 
     /**
@@ -93,7 +91,7 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
         int x = Math.abs(position.getX() + offset.getX()) % size.getBlockX() + origin.getX();
         int y = Math.abs(position.getY() + offset.getY()) % size.getBlockY() + origin.getY();
         int z = Math.abs(position.getZ() + offset.getZ()) % size.getBlockZ() + origin.getZ();
-        return getExtent().getFullBlock(mutable.setComponents(x, y, z));
+        return getExtent().getFullBlock(x, y, z);
     }
 
 }
