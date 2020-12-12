@@ -394,6 +394,18 @@ public class Settings extends Config {
             " - Requires combine_stages = true"
         })
         public boolean SEND_BEFORE_HISTORY = false;
+
+        @Comment({
+                "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
+                "Set to -1 to disable"
+        })
+        public int PER_PLAYER_FILE_SIZE_LIMIT = -1;
+
+        @Comment({
+                "Sets a maximum limit for the amount of schematics in a player's schematics directory (per-player mode only)",
+                "Set to -1 to disable"
+        })
+        public int PER_PLAYER_FILE_NUM_LIMIT = -1;
     }
 
     public static class PLOTSQUARED_INTEGRATION {
