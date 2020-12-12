@@ -32,11 +32,14 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.FlatRegionMaskingFilter;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -167,7 +170,6 @@ public class BiomeCommands {
         World world = player.getWorld();
         Region region;
         Mask mask = editSession.getMask();
-        Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
             final BlockVector3 pos = player.getLocation().toVector().toBlockPoint();
@@ -176,11 +178,11 @@ public class BiomeCommands {
             region = session.getSelection(world);
         }
 
-        FlatRegionFunction replace = new BiomeReplace(editSession, target);
-        if (mask2d != null) {
-            replace = new FlatRegionMaskingFilter(mask2d, replace);
+        RegionFunction replace = new BiomeReplace(editSession, target);
+        if (mask != null) {
+            replace = new RegionMaskingFilter(editSession, mask, replace);
         }
-        FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);
+        RegionVisitor visitor = new RegionVisitor(region, replace);
         Operations.completeLegacy(visitor);
 
         player.printInfo(TranslatableComponent.of(

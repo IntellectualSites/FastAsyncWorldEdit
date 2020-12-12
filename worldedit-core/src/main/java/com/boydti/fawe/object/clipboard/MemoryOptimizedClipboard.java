@@ -193,13 +193,8 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         return nbtMap.values();
     }
 
-    private int ylast;
-    private int ylasti;
-    private int zlast;
-    private int zlasti;
-
     public int getIndex(int x, int y, int z) {
-        return x + ((ylast == y) ? ylasti : (ylasti = (ylast = y) * getArea())) + ((zlast == z) ? zlasti : (zlasti = (zlast = z) * getWidth()));
+        return x + y * getArea() + z * getWidth();
     }
 
     @Override

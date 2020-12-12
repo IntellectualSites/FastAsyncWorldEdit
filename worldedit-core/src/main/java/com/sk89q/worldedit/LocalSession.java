@@ -1066,13 +1066,13 @@ public class LocalSession implements TextureHolder {
     private transient boolean loadDefaults = true;
 
     public Tool getTool(BaseItem item, Player player) {
+        loadDefaults(player, false);
         if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) {
                 return tool;
             }
         }
-        loadDefaults(player, false);
         return getTool(item.getType());
     }
 
@@ -1122,6 +1122,9 @@ public class LocalSession implements TextureHolder {
     }
 
     public BrushTool getBrushTool(BaseItem item, Player player, boolean create) throws InvalidToolBindException {
+        if (item.getType().hasBlockType()) {
+            throw new InvalidToolBindException(item.getType(), "Blocks can't be used");
+        }
         Tool tool = getTool(item, player);
         if (!(tool instanceof BrushTool)) {
             if (create) {
