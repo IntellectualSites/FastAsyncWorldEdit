@@ -49,13 +49,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
-    private BlockState blockState;
-    @Nullable private CompoundTag nbtData;
-
-    @Deprecated
-    public BaseBlock() {
-        this(BlockTypes.AIR.getDefaultState());
-    }
+    private final BlockState blockState;
+    @Nullable private final CompoundTag nbtData;
 
     /**
      * Construct a block with the given type and default data.
@@ -151,6 +146,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
             return "";
         }
         Tag idTag = nbtData.getValue().get("id");
+        if (idTag == null) {
+            idTag = nbtData.getValue().get("Id");
+        }
         if (idTag instanceof StringTag) {
             return ((StringTag) idTag).getValue();
         } else {
@@ -162,6 +160,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     @Override
     public CompoundTag getNbtData() {
         return this.nbtData;
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        throw new UnsupportedOperationException("This class is immutable.");
     }
 
     /**
