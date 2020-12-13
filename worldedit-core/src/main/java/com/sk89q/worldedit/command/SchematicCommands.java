@@ -602,12 +602,13 @@ public class SchematicCommands {
         File parentDir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
             List<File> toAddUp = getFiles(parentDir, null, null);
-            if(toAddUp != null &&  toAddUp.size() != 0)
+            if (toAddUp != null &&  toAddUp.size() != 0) {
                 for (File schem : toAddUp) {
                     if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
                         totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
                     }
                 }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -739,7 +740,7 @@ public class SchematicCommands {
             int numFiles = -1;
             if (checkFilesize) {
                 List<File> toAddUp = getFiles(rootDir, null, null);
-                if(toAddUp != null &&  toAddUp.size() != 0) {
+                if (toAddUp != null &&  toAddUp.size() != 0) {
                     for (File child : toAddUp) {
                         if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
                             directorysizeKb += Files.size(Paths.get(child.getAbsolutePath())) / 1000.0;
@@ -763,7 +764,7 @@ public class SchematicCommands {
                 if (numFiles == -1) {
                     numFiles = 0;
                     List<File> toAddUp = getFiles(rootDir, null, null);
-                    if(toAddUp != null &&  toAddUp.size() != 0) {
+                    if (toAddUp != null &&  toAddUp.size() != 0) {
                         for (File child : toAddUp) {
                             if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
                                 numFiles++;
