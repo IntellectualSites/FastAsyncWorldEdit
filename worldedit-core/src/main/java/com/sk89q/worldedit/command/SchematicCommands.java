@@ -601,11 +601,13 @@ public class SchematicCommands {
         long totalBytes = 0;
         File parentDir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
-            for (File schem : getFiles(parentDir, null, null)) {
-                if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
-                    totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
+            List<File> toAddUp = getFiles(parentDir, null, null);
+            if(toAddUp != null &&  toAddUp.size() != 0)
+                for (File schem : toAddUp) {
+                    if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
+                        totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
+                    }
                 }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
