@@ -601,9 +601,12 @@ public class SchematicCommands {
         long totalBytes = 0;
         File parentDir = new File(dir.getAbsolutePath() + (playerFolder ? File.separator + uuid.toString() : ""));
         try {
-            for (File schem : getFiles(parentDir, null, null)) {
-                if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
-                    totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
+            List<File> toAddUp = getFiles(parentDir, null, null);
+            if (toAddUp != null &&  toAddUp.size() != 0) {
+                for (File schem : toAddUp) {
+                    if (schem.getName().endsWith(".schem") || schem.getName().endsWith(".schematic")) {
+                        totalBytes += Files.size(Paths.get(schem.getAbsolutePath()));
+                    }
                 }
             }
         } catch (IOException e) {
@@ -736,15 +739,15 @@ public class SchematicCommands {
 
             int numFiles = -1;
             if (checkFilesize) {
-                File parentDir = new File(file.getParent());
-
-                for (File child : getFiles(rootDir, null, null)) {
-                    if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
-                        directorysizeKb += Files.size(Paths.get(child.getAbsolutePath())) / 1000.0;
-                        numFiles++;
+                List<File> toAddUp = getFiles(rootDir, null, null);
+                if (toAddUp != null &&  toAddUp.size() != 0) {
+                    for (File child : toAddUp) {
+                        if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
+                            directorysizeKb += Files.size(Paths.get(child.getAbsolutePath())) / 1000.0;
+                            numFiles++;
+                        }
                     }
                 }
-
                 if (overwrite) {
                     oldKbOverwritten = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
                     int iter = 1;
@@ -760,9 +763,12 @@ public class SchematicCommands {
 
                 if (numFiles == -1) {
                     numFiles = 0;
-                    for (File child : getFiles(rootDir, null, null)) {
-                        if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
-                            numFiles++;
+                    List<File> toAddUp = getFiles(rootDir, null, null);
+                    if (toAddUp != null &&  toAddUp.size() != 0) {
+                        for (File child : toAddUp) {
+                            if (child.getName().endsWith(".schem") || child.getName().endsWith(".schematic")) {
+                                numFiles++;
+                            }
                         }
                     }
                 }
