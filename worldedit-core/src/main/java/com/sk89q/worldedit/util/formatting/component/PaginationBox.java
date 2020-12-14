@@ -21,17 +21,19 @@ package com.sk89q.worldedit.util.formatting.component;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
+import java.util.stream.Collectors;
 
 public abstract class PaginationBox extends MessageBox {
 
@@ -138,53 +140,30 @@ public abstract class PaginationBox extends MessageBox {
     }
 
     public static <T> PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<T> lines, Function<T, Component> adapt) {
-        return fromStrings(header, pageCommand, Collections2.transform(lines, adapt));
+        return fromComponents(header, pageCommand, Collections2.transform(lines, adapt));
     }
 
-    public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection lines) {
+    public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<String> lines) {
+        return fromComponents(header, pageCommand, lines.stream()
+            .map(TextComponent::of)
+            .collect(Collectors.toList()));
+    }
+
+    public static PaginationBox fromComponents(String header, @Nullable String pageCommand, Collection<Component> lines) {
         return new ListPaginationBox(header, pageCommand, lines);
     }
 
-    public static PaginationBox fromStrings(String header, @Nullable String pageCommand, List<String> lines) {
-        return fromStrings(header, pageCommand, (Collection) lines);
-    }
+    private static class ListPaginationBox extends PaginationBox {
+        private final List<Component> lines;
 
-    public static class ListPaginationBox extends PaginationBox {
-        private final Collection lines;
-        private int iterIndex;
-        private Iterator iterator;
-
-        public ListPaginationBox(String header, String pageCommand, List<String> lines) {
-            this(header, pageCommand, (Collection) lines);
-        }
-
-        public ListPaginationBox(String header, String pageCommand, Collection lines) {
+        ListPaginationBox(String header, String pageCommand, Collection<Component> lines) {
             super(header, pageCommand);
-            this.lines = lines;
+            this.lines = ImmutableList.copyOf(lines);
         }
 
         @Override
         public Component getComponent(int number) {
-            Object obj;
-            if (lines instanceof List) {
-                obj = ((List) lines).get(number);
-            } else {
-                if (iterator == null || iterIndex > number) {
-                    iterator = lines.iterator();
-                    iterIndex = 0;
-                }
-                do {
-                    obj = iterator.next();
-                    iterIndex++;
-                } while (iterIndex < number);
-            }
-            if (obj instanceof Supplier) {
-                obj = ((Supplier) obj).get();
-            }
-            if (obj instanceof Component) {
-                return (Component) obj;
-            }
-            return TextComponent.of(obj + "");
+            return lines.get(number);
         }
 
         @Override

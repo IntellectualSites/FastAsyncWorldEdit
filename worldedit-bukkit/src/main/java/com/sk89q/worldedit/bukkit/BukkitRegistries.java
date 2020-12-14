@@ -22,7 +22,6 @@ package com.sk89q.worldedit.bukkit;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
-import com.sk89q.worldedit.world.registry.BundledItemRegistry;
 import com.sk89q.worldedit.world.registry.BundledRegistries;
 import com.sk89q.worldedit.world.registry.EntityRegistry;
 import com.sk89q.worldedit.world.registry.ItemCategoryRegistry;
@@ -35,8 +34,8 @@ class BukkitRegistries extends BundledRegistries {
 
     private static final BukkitRegistries INSTANCE = new BukkitRegistries();
     private final BlockRegistry blockRegistry = new BukkitBlockRegistry();
-    private final ItemRegistry itemRegistry = new BukkitItemRegistry();
     private final BiomeRegistry biomeRegistry = new BukkitBiomeRegistry();
+    private final ItemRegistry itemRegistry = new BukkitItemRegistry();
     private final EntityRegistry entityRegistry = new BukkitEntityRegistry();
     private final BlockCategoryRegistry blockCategoryRegistry = new BukkitBlockCategoryRegistry();
     private final ItemCategoryRegistry itemCategoryRegistry = new BukkitItemCategoryRegistry();
@@ -55,6 +54,11 @@ class BukkitRegistries extends BundledRegistries {
     @Override
     public BiomeRegistry getBiomeRegistry() {
         return biomeRegistry;
+    }
+
+    @Override
+    public ItemRegistry getItemRegistry() {
+        return itemRegistry;
     }
 
     @Override
@@ -81,8 +85,4 @@ class BukkitRegistries extends BundledRegistries {
         return INSTANCE;
     }
 
-    @Override
-    public ItemRegistry getItemRegistry() {
-        return itemRegistry;
-    }
 }

@@ -159,15 +159,16 @@ public class FastSchematicWriter implements ClipboardWriter {
                 if (nbt != null) {
                     Map<String, Tag> values = nbt.getValue();
 
-                    values.remove("id"); // Remove 'id' if it exists. We want 'Id'
-
                     // Positions are kept in NBT, we don't want that.
                     values.remove("x");
                     values.remove("y");
                     values.remove("z");
-                    if (!values.containsKey("Id")) {
-                        values.put("Id", new StringTag(block.getNbtId()));
-                    }
+                    values.put("Id", new StringTag(block.getNbtId()));
+
+                    // Remove 'id' if it exists. We want 'Id'.
+                    // Do this after we get "getNbtId" cos otherwise "getNbtId" doesn't work.
+                    // Dum.
+                    values.remove("id");
                     values.put("Pos", new IntArrayTag(new int[]{
                             pos.getX(),
                             pos.getY(),

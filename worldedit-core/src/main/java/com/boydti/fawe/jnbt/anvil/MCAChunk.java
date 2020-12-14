@@ -481,7 +481,7 @@ public class MCAChunk implements IChunk {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return this.biomes[y << 2 | z & 12 | x >> 2];
+        return this.biomes[(y >> 2) << 4 | (z & 3) << 2 | x & 3];
     }
 
     @Override
@@ -505,7 +505,7 @@ public class MCAChunk implements IChunk {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         setModified();
-        biomes[y << 2 | z & 12 | x >> 2] = biome;
+        biomes[(y >> 2) << 4 | (z & 3) << 2 | x & 3] = biome;
         return true;
     }
 

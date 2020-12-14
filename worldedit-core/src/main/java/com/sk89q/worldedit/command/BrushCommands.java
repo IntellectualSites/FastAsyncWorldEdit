@@ -153,15 +153,6 @@ public class BrushCommands {
         this.worldEdit = worldEdit;
     }
 
-    @Command(
-        name = "none",
-        aliases = "unbind",
-        desc = "Unbind a bound brush from your current item"
-    )
-    void none(Player player, LocalSession session) throws WorldEditException {
-        ToolCommands.setToolNone(player, session, true);
-    }
-
     @Command(name = "blendball",
         aliases = {
             "bb",
@@ -1012,7 +1003,9 @@ public class BrushCommands {
                              @Switch(name = 'f', desc = "Also kill all friendly mobs (Applies the flags `-abgnpt`)")
                                  boolean killFriendly,
                              @Switch(name = 'r', desc = "Also destroy armor stands")
-                                 boolean killArmorStands, InjectedValueAccess context) throws WorldEditException {
+                                         boolean killArmorStands,
+                             @Switch(name = 'w', desc = "Also kill water mobs")
+                                         boolean killWater, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
 
         CreatureButcher flags = new CreatureButcher(player);
@@ -1024,6 +1017,7 @@ public class BrushCommands {
         flags.or(CreatureButcher.Flags.AMBIENT, killAmbient, "worldedit.butcher.ambient");
         flags.or(CreatureButcher.Flags.TAGGED, killWithName, "worldedit.butcher.tagged");
         flags.or(CreatureButcher.Flags.ARMOR_STAND, killArmorStands, "worldedit.butcher.armorstands");
+        flags.or(CreatureButcher.Flags.WATER, killWater, "worldedit.butcher.water");
 
         set(context, new ButcherBrush(flags)).setSize(radius);
     }

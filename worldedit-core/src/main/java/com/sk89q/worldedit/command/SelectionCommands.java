@@ -212,7 +212,8 @@ public class SelectionCommands {
 
     @Command(
         name = "/chunk",
-        desc = "Set the selection to your current chunk."
+        desc = "Set the selection to your current chunk.",
+        descFooter = "This command selects 256-block-tall areas,\nwhich can be specified by the y-coordinate.\nE.g. -c x,1,z will select from y=256 to y=511."
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.chunk")
@@ -308,19 +309,21 @@ public class SelectionCommands {
     @Command(
         name = "toggleeditwand",
         aliases = { "/toggleeditwand" },
-        desc = "Remind the user that the wand is now a tool and can be unbound with /none."
+        desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player) {
-        player.printInfo(TextComponent.of("The selection wand is now a normal tool. You can disable it with ")
-                .append(TextComponent.of("/none", TextColor.AQUA).clickEvent(
-                        ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/none")))
-                .append(TextComponent.of(" and rebind it to any item with "))
-                .append(TextComponent.of("//selwand", TextColor.AQUA).clickEvent(
-                        ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "//selwand")))
-                .append(TextComponent.of(" or get a new wand with "))
-                .append(TextComponent.of("//wand", TextColor.AQUA).clickEvent(
-                        ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "//wand"))));
+        player.printInfo(
+                TranslatableComponent.of(
+                        "worldedit.wand.selwand.now.tool",
+                        TextComponent.of("/tool none", TextColor.AQUA).clickEvent(
+                                ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/tool none")),
+                        TextComponent.of("/tool selwand", TextColor.AQUA).clickEvent(
+                                ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/tool selwand")),
+                        TextComponent.of("//wand", TextColor.AQUA).clickEvent(
+                                ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "//wand"))
+                )
+        );
     }
 
     @Command(
@@ -570,6 +573,7 @@ public class SelectionCommands {
         aliases = { ";", "/desel", "/deselect" },
         desc = "Choose a region selector"
     )
+    @CommandPermissions("worldedit.analysis.sel")
     public void select(Actor actor, World world, LocalSession session,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
@@ -715,7 +719,7 @@ public class SelectionCommands {
 
             final BlockState state = c.getID();
             final BlockType blockType = state.getBlockType();
-            TextComponent blockName = TextComponent.of(blockType.getName(), TextColor.LIGHT_PURPLE);
+            Component blockName = blockType.getRichName().color(TextColor.LIGHT_PURPLE);
             TextComponent toolTip;
             if (separateStates && state != blockType.getDefaultState()) {
                 toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);

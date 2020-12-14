@@ -421,6 +421,10 @@ public interface Extent extends InputExtent, OutputExtent {
 
         for (final BlockVector3 pt : region) {
             BlockType type = getBlock(pt).getBlockType();
+            if (type == BlockTypes.__RESERVED__) {
+                counter[1]++;
+                continue;
+            }
             counter[type.getInternalId()]++;
         }
         List<Countable<BlockType>> distribution = new ArrayList<>();
@@ -446,6 +450,13 @@ public interface Extent extends InputExtent, OutputExtent {
         for (final BlockVector3 pt : region) {
             BlockState blk = this.getBlock(pt);
             BlockType type = blk.getBlockType();
+            if (type == BlockTypes.__RESERVED__) {
+                int[] stateCounter = counter[1];
+                if (stateCounter == null) {
+                    counter[1] = stateCounter = new int[BlockTypes.AIR.getMaxStateId() + 1];
+                }
+                stateCounter[BlockTypes.AIR.getDefaultState().getInternalPropertiesId()]++;
+            }
             int[] stateCounter = counter[type.getInternalId()];
             if (stateCounter == null) {
                 counter[type.getInternalId()] = stateCounter = new int[type.getMaxStateId() + 1];

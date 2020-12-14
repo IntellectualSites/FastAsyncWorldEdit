@@ -40,6 +40,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -146,5 +147,10 @@ class BukkitEntityProperties implements EntityProperties {
     @Override
     public boolean isPasteable() {
         return !(entity instanceof Player || entity instanceof ComplexEntityPart);
+    }
+
+    @Override
+    public boolean isWaterCreature() {
+        return entity instanceof WaterMob;
     }
 }

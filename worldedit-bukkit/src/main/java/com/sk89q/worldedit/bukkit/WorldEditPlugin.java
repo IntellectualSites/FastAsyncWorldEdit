@@ -34,6 +34,7 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R2;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R3;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
@@ -83,6 +84,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
@@ -185,6 +187,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         // Setup metrics
         new Metrics(this, BSTATS_PLUGIN_ID);
+
+        // Check whether the server runs on 11 or greater
+        checkJvm();
     }
 
     private void setupPreWorldData() {
@@ -299,6 +304,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             adapterLoader.addClass(FAWE_Spigot_v1_15_R2.class);
             adapterLoader.addClass(FAWE_Spigot_v1_16_R1.class);
             adapterLoader.addClass(FAWE_Spigot_v1_16_R2.class);
+            adapterLoader.addClass(FAWE_Spigot_v1_16_R3.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

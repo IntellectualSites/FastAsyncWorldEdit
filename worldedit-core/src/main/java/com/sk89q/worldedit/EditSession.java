@@ -1326,7 +1326,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> int makeCuboidFaces(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidFaces(region, block);
+        return makeCuboidFaces(region, (Pattern) block);
     }
 
     /**
@@ -2559,7 +2559,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     int zv = (int) (z.getValue() * unit.getZ() + zero2.getZ());
 
                     BlockState get;
-                    if (yv >= 0 && yv < 265) {
+                    if (yv >= 0 && yv < 256) {
                         get = getBlock(xv, yv, zv);
                     } else {
                         get = BlockTypes.AIR.getDefaultState();

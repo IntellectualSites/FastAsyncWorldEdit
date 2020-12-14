@@ -116,14 +116,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         return nbtMapIndex.get(index);
     }
 
-    private int yLast;
-    private int yLastI;
-    private int zLast;
-    private int zLastI;
-
     public int getIndex(int x, int y, int z) {
-        return x + ((yLast == y) ? yLastI : (yLastI = (yLast = y) * getArea())) + ((zLast == z) ? zLastI
-            : (zLastI = (zLast = z) * getWidth()));
+        return x + y * getArea() + z * getWidth();
     }
 
     @Override

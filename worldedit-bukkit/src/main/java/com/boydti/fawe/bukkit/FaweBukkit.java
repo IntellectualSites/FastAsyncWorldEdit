@@ -21,7 +21,7 @@ import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.Jars;
+import com.boydti.fawe.util.ThirdPartyManager;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
@@ -123,7 +123,7 @@ public class FaweBukkit implements IFawe, Listener {
             if (manager.getPlugin("PacketListenerApi") == null) {
                 File output = new File(plugin.getDataFolder().getParentFile(),
                     "PacketListenerAPI_v3.7.6-SNAPSHOT.jar");
-                byte[] jarData = Jars.PL_v3_7_6.download();
+                byte[] jarData = ThirdPartyManager.PacketListenerAPI.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }
@@ -131,7 +131,7 @@ public class FaweBukkit implements IFawe, Listener {
             if (manager.getPlugin("MapManager") == null) {
                 File output = new File(plugin.getDataFolder().getParentFile(),
                     "MapManager_v1.7.8-SNAPSHOT.jar");
-                byte[] jarData = Jars.MM_v1_7_8.download();
+                byte[] jarData = ThirdPartyManager.MapManager.download();
                 try (FileOutputStream fos = new FileOutputStream(output)) {
                     fos.write(jarData);
                 }

@@ -83,6 +83,7 @@ import com.sk89q.worldedit.command.WorldEditCommands;
 import com.sk89q.worldedit.command.WorldEditCommandsRegistration;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.argument.BooleanConverter;
+import com.sk89q.worldedit.command.argument.Chunk3dVectorConverter;
 import com.sk89q.worldedit.command.argument.CommaSeparatedValuesConverter;
 import com.sk89q.worldedit.command.argument.DirectionConverter;
 import com.sk89q.worldedit.command.argument.DirectionVectorConverter;
@@ -90,7 +91,9 @@ import com.sk89q.worldedit.command.argument.EntityRemoverConverter;
 import com.sk89q.worldedit.command.argument.EnumConverter;
 import com.sk89q.worldedit.command.argument.ExpressionConverter;
 import com.sk89q.worldedit.command.argument.FactoryConverter;
+import com.sk89q.worldedit.command.argument.HeightConverter;
 import com.sk89q.worldedit.command.argument.LocationConverter;
+import com.sk89q.worldedit.command.argument.OffsetConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.SideEffectConverter;
@@ -250,6 +253,7 @@ public final class PlatformCommandManager {
             );
         }
         VectorConverter.register(commandManager);
+        Chunk3dVectorConverter.register(commandManager);
         EnumConverter.register(commandManager);
         RegistryConverter.register(commandManager);
         ZonedDateTimeConverter.register(commandManager);
@@ -260,6 +264,8 @@ public final class PlatformCommandManager {
         LocationConverter.register(commandManager);
         ExpressionConverter.register(commandManager);
         SideEffectConverter.register(commandManager);
+        HeightConverter.register(commandManager);
+        OffsetConverter.register(worldEdit, commandManager);
 
         registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));
@@ -359,9 +365,8 @@ public final class PlatformCommandManager {
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-        CommandManager commandManager,
-        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
-        @NotNull Consumer<CommandManager> additionalConfig) {
+                                          Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
+                                          @NotNull Consumer<CommandManager> additionalConfig) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -438,7 +443,6 @@ public final class PlatformCommandManager {
                     "brush",
                     Lists.newArrayList("br", "/brush", "/br", "/tool", "tool"),
                     "Brushing commands",
-                    commandManager,
                     c -> {
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
                         c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
@@ -486,10 +490,11 @@ public final class PlatformCommandManager {
                 ClipboardCommandsRegistration.builder(),
                 new ClipboardCommands()
             );
-            this.registration.register(
-                commandManager,
-                GeneralCommandsRegistration.builder(),
-                new GeneralCommands(worldEdit)
+            GeneralCommands.register(
+                    registration,
+                    commandManager,
+                    commandManagerService,
+                    worldEdit
             );
             this.registration.register(
                     commandManager,

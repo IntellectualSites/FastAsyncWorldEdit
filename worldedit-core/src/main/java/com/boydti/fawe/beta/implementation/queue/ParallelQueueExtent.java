@@ -178,12 +178,12 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
-        return apply(region, new DistrFilter(), false).getDistribution();
+        return apply(region, new DistrFilter(), true).getDistribution();
     }
 
     @Override
     public List<Countable<BlockType>> getBlockDistribution(Region region) {
-        return apply(region, new DistrFilter(), false).getTypeDistribution();
+        return apply(region, new DistrFilter(), true).getTypeDistribution();
     }
 
     /**
