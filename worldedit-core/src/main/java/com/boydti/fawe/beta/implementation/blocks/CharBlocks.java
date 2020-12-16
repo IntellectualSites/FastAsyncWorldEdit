@@ -115,6 +115,9 @@ public abstract class CharBlocks implements IBlocks {
     public char get(int x, @Range(from = 0, to = 255) int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
+        if (layer >= sections.length || layer < 0) {
+            return 0;
+        }
         return sections[layer].get(this, layer, index);
     }
 
