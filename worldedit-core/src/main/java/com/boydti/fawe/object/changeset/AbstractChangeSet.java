@@ -137,7 +137,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
         if (!tilesTo.isEmpty()) {
             for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
-                addTileCreate(entry.getValue());
+                CompoundTag nbt = entry.getValue();
+                BlockVector3 pos = entry.getKey();
+                MainUtil.setPosition(nbt, pos.getX() + bx, pos.getY(), pos.getZ() + bz);
+                addTileCreate(nbt);
             }
         }
         Set<UUID> entRemoves = set.getEntityRemoves();
