@@ -57,6 +57,7 @@ import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
+import com.sk89q.worldedit.function.block.SnowSimulator;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
 import com.sk89q.worldedit.function.mask.BlockStateMask;
@@ -97,6 +98,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
@@ -104,6 +106,7 @@ import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -148,6 +151,7 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.function.block.SnowSimulator.snowy;
 import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
@@ -2150,9 +2154,25 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param radius the radius
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @deprecated Use {@link #thaw(BlockVector3, double, int)}.
      */
     @Deprecated
     public int thaw(BlockVector3 position, double radius)
+        throws MaxChangedBlocksException {
+        return thaw(position, radius,
+            WorldEdit.getInstance().getConfiguration().defaultVerticalHeight);
+    }
+
+    /**
+     * Thaw blocks in a cylinder.
+     *
+     * @param position the position
+     * @param radius the radius
+     * @param height the height (upwards and downwards)
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int thaw(BlockVector3 position, double radius, int height)
         throws MaxChangedBlocksException {
         int affected = 0;
         double radiusSq = radius * radius;
@@ -2164,6 +2184,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         BlockState air = BlockTypes.AIR.getDefaultState();
         BlockState water = BlockTypes.WATER.getDefaultState();
 
+        int centerY = Math.max(getWorld().getMinY(), Math.min(getWorld().getMaxY(), oy));
+        int minY = Math.max(getWorld().getMinY(), centerY - height);
+        int maxY = Math.min(getWorld().getMaxY(), centerY + height);
+
         int ceilRadius = (int) Math.ceil(radius);
         for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
             for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
@@ -2171,15 +2195,25 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     continue;
                 }
 
-                for (int y = maxY; y >= 1; --y) {
-                    BlockType id = getBlock(x, y, z).getBlockType();
+                for (int y = maxY; y > minY; --y) {
+                    BlockVector3 pt = BlockVector3.at(x, y, z);
+                    BlockVector3 below = BlockVector3.at(x, y - 1, z);
+                    BlockType id = getBlock(pt).getBlockType();
 
                     if (id == BlockTypes.ICE) {
-                        if (setBlock(x, y, z, water)) {
+                        if (setBlock(pt, water)) {
                             ++affected;
                         }
                     } else if (id == BlockTypes.SNOW) {
-                        if (setBlock(x, y, z, air)) {
+                        if (setBlock(pt, air)) {
+                            if (y > 0 ) {
+                                BlockState block = getBlock(below);
+                                if (block.getStates().containsKey(snowy)) {
+                                    if (setBlock(below, block.with(snowy, false))) {
+                                        affected++;
+                                    }
+                                }
+                            }
                             ++affected;
                         }
                     } else if (id.getMaterial().isAir()) {
@@ -2191,7 +2225,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
         }
 
-        return changes = affected;
+        return affected;
     }
 
     /**
@@ -2201,67 +2235,46 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param radius a radius
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @deprecated Use {@link #simulateSnow(BlockVector3, double, int)}.
      */
     @Deprecated
     public int simulateSnow(BlockVector3 position, double radius) throws MaxChangedBlocksException {
-        int affected = 0;
-        double radiusSq = radius * radius;
-
-        int ox = position.getBlockX();
-        int oy = position.getBlockY();
-        int oz = position.getBlockZ();
-
-        BlockState ice = BlockTypes.ICE.getDefaultState();
-        BlockState snow = BlockTypes.SNOW.getDefaultState();
-
-        int ceilRadius = (int) Math.ceil(radius);
-        for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
-            for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
-                if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
-                    continue;
-                }
-
-                for (int y = maxY; y >= 1; --y) {
-                    BlockVector3 pt = BlockVector3.at(x, y, z);
-                    BlockType id = getBlock(pt).getBlockType();
-
-                    if (id.getMaterial().isAir()) {
-                        continue;
-                    }
-
-                    // Ice!
-                    if (id == BlockTypes.WATER) {
-                        if (setBlock(pt, ice)) {
-                            ++affected;
-                        }
-                        break;
-                    }
-
-                    // Snow should not cover these blocks
-                    if (id.getMaterial().isTranslucent()) {
-                        // Add snow on leaves
-                        if (!BlockCategories.LEAVES.contains(id)) {
-                            break;
-                        }
-                    }
-
-                    // Too high?
-                    if (y == maxY) {
-                        break;
-                    }
-
-                    // add snow cover
-                    if (setBlock(pt.add(0, 1, 0), snow)) {
-                        ++affected;
-                    }
-                    break;
-                }
-            }
-        }
-
-        return changes = affected;
+        return simulateSnow(position, radius,
+            WorldEdit.getInstance().getConfiguration().defaultVerticalHeight);
     }
 
+    /**
+     * Make snow in a cylinder.
+     *
+     * @param position a position
+     * @param radius a radius
+     * @param height the height (upwards and downwards)
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int simulateSnow(BlockVector3 position, double radius, int height)
+        throws MaxChangedBlocksException {
+
+        return simulateSnow(new CylinderRegion(position, Vector2.at(radius, radius), position.getBlockY(), height), false);
+    }
+
+    /**
+     * Make snow in a region.
+     *
+     * @param region the region to simulate snow in
+     * @param stack whether it should stack existing snow
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int simulateSnow(FlatRegion region, boolean stack)
+        throws MaxChangedBlocksException {
+        checkNotNull(region);
+
+        SnowSimulator snowSimulator = new SnowSimulator(this, stack);
+        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator);
+        Operations.completeLegacy(layerVisitor);
+        return snowSimulator.getAffected();
+    }
     /**
      * Make dirt green.
      *
@@ -2270,52 +2283,67 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param onlyNormalDirt only affect normal dirt (all default properties)
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     * @deprecated Use {@link #green(BlockVector3, double, int, boolean)}.
      */
     @Deprecated
     public int green(BlockVector3 position, double radius, boolean onlyNormalDirt)
         throws MaxChangedBlocksException {
+        return green(position, radius,
+            WorldEdit.getInstance().getConfiguration().defaultVerticalHeight, onlyNormalDirt);
+    }
+
+    /**
+     * Make dirt green in a cylinder.
+     *
+     * @param position the position
+     * @param radius the radius
+     * @param height the height
+     * @param onlyNormalDirt only affect normal dirt (all default properties)
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int green(BlockVector3 position, double radius, int height, boolean onlyNormalDirt)
+        throws MaxChangedBlocksException {
+        int affected = 0;
         final double radiusSq = radius * radius;
 
         final int ox = position.getBlockX();
+        final int oy = position.getBlockY();
         final int oz = position.getBlockZ();
 
         final BlockState grass = BlockTypes.GRASS_BLOCK.getDefaultState();
 
+        final int centerY = Math.max(getWorld().getMinY(), Math.min(getWorld().getMaxY(), oy));
+        final int minY = Math.max(getWorld().getMinY(), centerY - height);
+        final int maxY = Math.min(getWorld().getMaxY(), centerY + height);
+
         final int ceilRadius = (int) Math.ceil(radius);
         for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
-            int dx = x - ox;
-            int dx2 = dx * dx;
             for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
-                int dz = z - oz;
-                int dz2 = dz * dz;
-                if (dx2 + dz2 > radiusSq) {
+                if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
                     continue;
                 }
-                loop:
-                for (int y = maxY; y >= 1; --y) {
-                    final BlockType block = getBlockType(x, y, z);
-                    switch (block.getInternalId()) {
-                        case BlockID.COARSE_DIRT:
-                            if (onlyNormalDirt) {
-                                break loop;
-                            }
-                            this.setBlock(x, y, z, grass);
-                            break loop;
-                        case BlockID.DIRT:
-                            this.setBlock(x, y, z, grass);
-                            break loop;
-                        case BlockID.WATER:
-                        case BlockID.LAVA:
-                        default:
-                            if (block.getMaterial().isMovementBlocker()) {
-                                break loop;
-                            }
+
+                for (int y = maxY; y > minY; --y) {
+                    final BlockVector3 pt = BlockVector3.at(x, y, z);
+                    final BlockState block = getBlock(pt);
+
+                    if (block.getBlockType() == BlockTypes.DIRT
+                        || (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
+                        if (setBlock(pt, grass)) {
+                            ++affected;
+                        }
+                        break;
+                    } else if (block.getBlockType() == BlockTypes.WATER || block.getBlockType() == BlockTypes.LAVA) {
+                        break;
+                    } else if (block.getBlockType().getMaterial().isMovementBlocker()) {
+                        break;
                     }
                 }
             }
         }
 
-        return changes;
+        return affected;
     }
 
     /**
