@@ -1,51 +1,42 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.plotsquared.core.queue.LocalBlockQueue;
+import com.plotsquared.core.queue.LightingMode;
+import com.plotsquared.core.queue.QueueCoordinator;
+import com.plotsquared.core.queue.subscriber.ProgressSubscriber;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-// TODO FIXME
-public class FaweLocalBlockQueue extends LocalBlockQueue {
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+
+public class FaweLocalBlockQueue extends QueueCoordinator {
 
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
     private boolean setbiome = false;
 
-    public FaweLocalBlockQueue(String worldName) {
-        super(worldName);
-        this.world = FaweAPI.getWorld(worldName);
+    public FaweLocalBlockQueue(World world) {
+        super(world);
+        this.world = world;
         instance = Fawe.get().getQueueHandler().getQueue(world);
         Fawe.get().getQueueHandler().unCache();
-    }
-
-    @Override
-    public boolean next() {
-        if (!instance.isEmpty()) {
-            instance.flush();
-        }
-        return false;
-    }
-
-    @Override
-    public void startSet(boolean parallel) {
-        Fawe.get().getQueueHandler().startSet(parallel);
-    }
-
-    @Override
-    public void endSet(boolean parallel) {
-        Fawe.get().getQueueHandler().endSet(parallel);
     }
 
     @Override
@@ -54,16 +45,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public void optimize() {
-    }
-
-    @Override
     public void setModified(long l) {
-    }
-
-    @Override
-    public long getModified() {
-        return instance.size();
     }
 
     @Override
@@ -94,18 +76,55 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public boolean setBiome() {
-        return setbiome;
+    public boolean setBiome(int x, int y, int z, @NotNull BiomeType biome) {
+        return false;
     }
 
     @Override
-    public String getWorld() {
-        return world.getId();
+    public boolean isSettingBiomes() {
+        return false;
     }
 
     @Override
-    public void flush() {
-        instance.flush();
+    public boolean setEntity(@NotNull Entity entity) {
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public List<BlockVector2> getReadChunks() {
+        return null;
+    }
+
+    @Override
+    public void addReadChunks(@NotNull Set<BlockVector2> readChunks) {
+
+    }
+
+    @Override
+    public void addReadChunk(@NotNull BlockVector2 chunk) {
+
+    }
+
+    @Override
+    public boolean isUnloadAfter() {
+        return false;
+    }
+
+    @Override
+    public void setUnloadAfter(boolean unloadAfter) {
+
+    }
+
+    @Nullable
+    @Override
+    public CuboidRegion getRegenRegion() {
+        return null;
+    }
+
+    @Override
+    public void setRegenRegion(@NotNull CuboidRegion regenRegion) {
+
     }
 
     @Override
@@ -116,12 +135,50 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     }
 
     @Override
-    public void refreshChunk(int x, int z) {
-        world.refreshChunk(x, z);
+    public void start() {
+
     }
 
     @Override
-    public void fixChunkLighting(int x, int z) {
+    public void cancel() {
+
+    }
+
+    @Override
+    public Runnable getCompleteTask() {
+        return null;
+    }
+
+    @Override
+    public void setCompleteTask(@Nullable Runnable whenDone) {
+
+    }
+
+    @Nullable
+    @Override
+    public Consumer<BlockVector2> getChunkConsumer() {
+        return null;
+    }
+
+    @Override
+    public void setChunkConsumer(@NotNull Consumer<BlockVector2> consumer) {
+
+    }
+
+    @Override
+    public void addProgressSubscriber(@NotNull ProgressSubscriber progressSubscriber) {
+
+    }
+
+    @NotNull
+    @Override
+    public LightingMode getLightingMode() {
+        return null;
+    }
+
+    @Override
+    public void setLightingMode(@Nullable LightingMode mode) {
+
     }
 
     @Override
@@ -133,5 +190,10 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
         instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
         return true;
+    }
+
+    @Override
+    public boolean isSettingTiles() {
+        return false;
     }
 }

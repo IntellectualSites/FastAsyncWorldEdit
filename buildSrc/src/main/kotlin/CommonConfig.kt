@@ -9,6 +9,7 @@ fun Project.applyCommonConfiguration() {
         mavenCentral()
         mavenLocal()
         maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
+        maven { url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/") }
         maven { url = uri("https://plotsquared.com/mvn/") }
         maven { url = uri("https://maven.enginehub.org/repo/") }
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }

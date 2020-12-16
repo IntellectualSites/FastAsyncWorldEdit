@@ -14,6 +14,7 @@ plugins {
 repositories {
     maven { url = uri("https://plotsquared.com/mvn") }
     maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
+    maven { url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/") }
     mavenCentral()
 
 }
@@ -56,8 +57,14 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
+    "compile"("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT") {
         isTransitive = false
+    }
+    api("com.google.inject:guice:4.2.3") {
+        exclude(group = "com.google.guava")
+    }
+    api("com.google.inject.extensions:guice-assistedinject:4.2.3") {
+        exclude("com.google.inject", "guice")
     }
 }
 

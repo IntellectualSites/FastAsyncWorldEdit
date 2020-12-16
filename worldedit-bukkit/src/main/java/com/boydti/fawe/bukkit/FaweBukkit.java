@@ -302,7 +302,9 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
             WEManager.IMP.managers
                 .add(new com.boydti.fawe.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
-        } else {
+        } else if (plotSquared.getClass().getSimpleName().equals("BukkitPlatform")) {
+            System.out.println("woo");
+        }else{
             WEManager.IMP.managers
                 .add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
         }
