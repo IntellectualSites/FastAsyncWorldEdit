@@ -400,7 +400,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
                                 this.reset();
-                            } else if (existingSection != getSections()[layer]) {
+                            } else if (existingSection != getSections(false)[layer]) {
                                 this.sections[layer] = existingSection;
                                 this.reset();
                             } else if (!Arrays.equals(update(layer, new char[4096]), load(layer))) {
@@ -647,7 +647,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
 
     @Override
     public synchronized char[] update(int layer, char[] data) {
-        ChunkSection section = getSections()[layer];
+        ChunkSection section = getSections(true)[layer];
         // Section is null, return empty array
         if (section == null) {
             data = new char[4096];
@@ -762,7 +762,10 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
         }
     }
 
-    public ChunkSection[] getSections() {
+    public ChunkSection[] getSections(boolean force) {
+        if (force) {
+            return sections = getChunk().getSections().clone();
+        }
         ChunkSection[] tmp = sections;
         if (tmp == null) {
             synchronized (this) {
@@ -814,7 +817,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
 
     @Override
     public boolean hasSection(int layer) {
-        return getSections()[layer] != null;
+        return getSections(false)[layer] != null;
     }
 
     @Override
@@ -830,7 +833,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks {
                 if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
                     continue;
                 }
-                ChunkSection existing = getSections()[i];
+                ChunkSection existing = getSections(false)[i];
                 try {
                     final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
 
