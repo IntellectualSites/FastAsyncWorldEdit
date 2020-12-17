@@ -5,6 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkGetCopy;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -158,6 +159,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 addEntityCreate(tag);
             }
         }
+        boolean updateSet = get instanceof IChunkGetCopy;
         for (int layer = 0; layer < 16; layer++) {
             if (!set.hasSection(layer)) {
                 continue;
@@ -168,7 +170,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
             }
             char[] blocksSet = set.load(layer);
-
+            char[] newBlocksSet = null;
+            if (updateSet) {
+                newBlocksSet = ((IChunkGetCopy) get).getNewSetArr(layer);
+            }
+;
             int by = layer << 4;
             for (int y = 0, index = 0; y < 16; y++) {
                 int yy = y + by;
@@ -176,13 +182,17 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                     int zz = z + bz;
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
-                        int combinedFrom = blocksGet[index];
-                        if (combinedFrom == 0) {
-                            combinedFrom = BlockID.AIR;
+                        int from = blocksGet[index];
+                        if (from == 0) {
+                            from = BlockID.AIR;
                         }
-                        int combinedTo = blocksSet[index];
+                        final int combinedFrom = from;
+                        final int combinedTo = blocksSet[index];
                         if (combinedTo != 0) {
                             add(xx, yy, zz, combinedFrom, combinedTo);
+                        }
+                        if (updateSet) {
+                            blocksSet[index] = newBlocksSet[index];
                         }
                     }
                 }

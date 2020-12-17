@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_16_2;
 
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IChunkGetCopy;
 import com.boydti.fawe.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
@@ -29,12 +30,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class BukkitGetBlocks_1_16_2_Copy extends BukkitGetBlocks_1_16_2 {
+public class BukkitGetBlocks_1_16_2_Copy extends BukkitGetBlocks_1_16_2 implements IChunkGetCopy {
 
     private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
     private final Set<CompoundTag> entities = new HashSet<>();
     private BiomeStorage biomeStorage;
     private final char[][] blocks = new char[16][4096];
+    private final char[][] newSetBlocks = new char[16][];
 
     protected BukkitGetBlocks_1_16_2_Copy(WorldServer world, int X, int Z) {
         super(world, X, Z);
@@ -126,5 +128,14 @@ public class BukkitGetBlocks_1_16_2_Copy extends BukkitGetBlocks_1_16_2 {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         return blocks[layer][index];
+    }
+
+    protected void storeSetBlocks(int layer, char[] blocks) {
+        newSetBlocks[layer] = blocks;
+    }
+
+    @Override
+    public char[] getNewSetArr(int layer) {
+        return newSetBlocks[layer];
     }
 }

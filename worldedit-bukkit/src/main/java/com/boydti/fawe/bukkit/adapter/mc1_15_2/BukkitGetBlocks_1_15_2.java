@@ -357,13 +357,18 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     if (!set.hasSection(layer)) {
                         continue;
                     }
-                    if (createCopy) {
-                        copy.storeSection(layer);
-                    }
 
                     bitMask |= 1 << layer;
 
                     char[] setArr = set.load(layer);
+                    // If we're creating a copy, it's because we're delaying history so we do not want to write to
+                    // the chunkSet yet.
+                    if (createCopy) {
+                        setArr = setArr.clone();
+                        copy.storeSection(layer);
+                        copy.storeSetBlocks(layer, setArr);
+                    }
+
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
