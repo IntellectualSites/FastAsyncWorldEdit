@@ -125,7 +125,7 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
             return false;
         }
-        ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
+        ibdToStateOrdinal = new char[BlockTypesCache.states.length]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_16_4 material = (BlockMaterial_1_16_4) state.getMaterial();
