@@ -1,5 +1,6 @@
 package com.boydti.fawe.util;
 
+import com.plotsquared.core.util.PseudoRandom;
 import com.sk89q.worldedit.world.block.BlockType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -34,6 +35,8 @@ public class RandomTextureUtil extends CachedTextureUtil {
         if (i < 0) {
             int i1 = -i;
             return -ThreadLocalRandom.current().nextInt(i1);
+        } else if( i == 0) {
+            return 0;
         } else {
             return ThreadLocalRandom.current().nextInt(i);
         }
